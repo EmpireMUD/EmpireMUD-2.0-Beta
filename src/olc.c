@@ -78,6 +78,7 @@ OLC_MODULE(abiledit_name);
 OLC_MODULE(abiledit_scale);
 OLC_MODULE(abiledit_shortduration);
 OLC_MODULE(abiledit_targets);
+OLC_MODULE(abiledit_tools);
 OLC_MODULE(abiledit_types);
 OLC_MODULE(abiledit_waittype);
 
@@ -372,6 +373,7 @@ OLC_MODULE(oedit_quantity);
 OLC_MODULE(oedit_quick_recipe);
 OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
+OLC_MODULE(oedit_requirestools);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
@@ -577,6 +579,7 @@ const struct olc_command_data olc_data[] = {
 	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "shortduration", abiledit_shortduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "targets", abiledit_targets, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "tools", abiledit_tools, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
@@ -882,6 +885,7 @@ const struct olc_command_data olc_data[] = {
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "requirestools", oedit_requirestools, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "shortdescription", oedit_short_description, OLC_OBJECT, OLC_CF_EDITOR },
@@ -6587,7 +6591,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 	else if (is_abbrev(arg1, "add")) {
 		num = atoi(arg2);
 		
-		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '-') || num == 0) {
+		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '+' && *arg2 != '-') || num == 0) {
 			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
 		}
 		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
@@ -6628,7 +6632,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 		}
 		else if (is_abbrev(type_arg, "value") || is_abbrev(type_arg, "amount") || is_abbrev(type_arg, "quantity")) {
 			num = atoi(val_arg);
-			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+			if ((!isdigit(*val_arg) && *val_arg != '+' && *val_arg != '-') || num == 0) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
 			}
 			else {

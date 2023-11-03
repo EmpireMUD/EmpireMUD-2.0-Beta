@@ -391,9 +391,13 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(18800)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
+  %quest% %actor% drop 18808
   %purge% %self%
+  halt
+elseif !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
 set Candy18802 %self.Candy18802%
@@ -527,6 +531,8 @@ while (%item% && (%all% || %CandyCount% == 0) && %CandyTotal% < %Needs%)
   * and repeat the loop
   set item %next_item%
 done
+* store progress
+%quest% %actor% settrigger 18808 %CandyTotal%
 * did we fail?
 if !%CandyCount%
   if %all%
@@ -579,6 +585,7 @@ if %event.running(18800)%
 end
 if %self.carried_by%
   %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 18808
 end
 %purge% %self%
 ~
@@ -734,9 +741,9 @@ else
   %morph% %target% %costume_vnum%
   %send% %actor% You dress up %prev_name% as ~%target%!
   %echoaround% %actor% ~%actor% dresses up %prev_name% as ~%target%!
+  %quest% %actor% trigger 18819
   eval costume_vnum %costume_vnum% + 1
-  if %costume_vnum% > 18817
-    %quest% %actor% trigger 18819
+  if %costume_vnum% > 18817 || %actor.quest_finished(18819)%
     nop %self.val0(0)%
     %quest% %actor% finish 18819
   else
@@ -870,10 +877,10 @@ else
   %morph% %target% %costume_vnum%
   %send% %actor% You wave @%self% at %prev_name%, who turns into ~%target%!
   %echoaround% %actor% ~%actor% waves @%self% at %prev_name%, who turns into ~%target%!
+  %quest% %actor% trigger 18821
   set charges %self.val0%
   eval charges %charges% - 1
-  if %charges% == 0
-    %quest% %actor% trigger 18821
+  if %charges% == 0 || %actor.quest_finished(18821)%
     %quest% %actor% finish 18821
   else
     nop %self.val0(%charges%)%
@@ -1029,10 +1036,10 @@ else
   %echoaround% %actor% ~%actor% finishes bogrolling the building.
   %send% %actor% Your Stealth skill ensures nobody notices your mischief.
   %load% obj 18825 room
+  %quest% %actor% trigger 18824
   set charges %self.val0%
-  if %charges% == 1
+  if %charges% == 1 || %actor.quest_finished(18824)%
     %send% %actor% @%self% runs out!
-    %quest% %actor% trigger 18824
     %quest% %actor% finish 18824
   else
     eval charges %charges% - 1
@@ -1094,10 +1101,10 @@ else
   %force% %target% mmove
   %force% %target% mmove
   %force% %target% mmove
+  %quest% %actor% trigger 18827
   eval times %self.val0% + 1
-  if %times% == 5
+  if %times% == 5 || %actor.quest_finished(18827)%
     %send% %actor% You have scared enough citizens, but you can keep pretending to be Dracula if you want to.
-    %quest% %actor% trigger 18827
     %quest% %actor% finish 18827
   else
     nop %self.val0(%times%)%
@@ -1330,7 +1337,7 @@ elseif %self.val1% > 0 && %self.var(name1)% ~= %arg%
 elseif %self.val2% > 0 && %self.var(name2)% ~= %arg%
   set vnum %self.val2%
   nop %self.val2(-1)%
-elseif %actor.obj_target(%arg%)% == %self%
+elseif %arg.car% == cage || %actor.obj_target(%arg%)% == %self%
   if %self.val0% > 0
     set vnum %self.val0%
     nop %self.val0(-1)%
@@ -1407,7 +1414,10 @@ nop %mob.unscale_and_reset%
 %send% %actor% You hold out @%self%...
 %echoaround% %actor% ~%actor% holds out @%self%...
 %echo% You shield your eyes from the bright light as ~%mob% emerges from the cage!
+%quest% %actor% trigger 18840
 if %self.val0% == -1 && %self.val1% == -1 && %self.val2% == -1
+  %quest% %actor% finish 18840
+elseif %actor.quest_finished(18840)%
   %quest% %actor% finish 18840
 end
 ~
@@ -1549,8 +1559,8 @@ nop %actor.charge_component(%component_base%, %sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
 %load% obj 18849 room
-if %sacrifices_left% == 0
-  %quest% %actor% trigger %qvnum%
+%quest% %actor% trigger %qvnum%
+if %sacrifices_left% == 0 || %actor.quest_finished(%qvnum%)%
   %quest% %actor% finish %qvnum%
 end
 ~
@@ -1644,6 +1654,7 @@ elseif %actor.eq(clothes)%
   end
 end
 if %banish% == 1
+  wait %random.5%
   %echo% ~%self% shreaks in terror and vanishes back to the realm whence &%self% came!
   %purge% %self%
 end
@@ -1895,6 +1906,7 @@ switch %clothing_count%
     set build_up %clothing1%
     if !%self.varexists(clothing1)%
       remote clothing1 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You've got one shadowy reflection in there, now just to get four more, each in a unique outfit of its own!
   break
@@ -1903,6 +1915,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing2 %clothing.shortdesc%
       remote clothing2 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need three more unique outfits for your shadowy reflection to wear.
     set build_up %self.clothing1% and the new one %self.clothing2%.
@@ -1912,6 +1925,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing3 %clothing.shortdesc%
       remote clothing3 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need two more unique outfits for your shadowy reflection to wear.
     set build_up %self.clothing1%, the second %self.clothing2%, and the latest %self.clothing3%.
@@ -1921,6 +1935,7 @@ switch %clothing_count%
     if %update% != 1
       set clothing4 %clothing.shortdesc%
       remote clothing4 %self.id%
+      %quest% %actor% trigger 18856
     end
     set left You still need one more unique outfit for your shadowy reflection to wear.
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, and the latest %self.clothing4%.
@@ -1954,13 +1969,13 @@ if %cmd% == challenge
   if !%actor.on_quest(18857)%
     %send% %actor% You hear a ghostly voice whisper, 'You should not have this any longer.'
     %echoaround% %actor% You hear a ghostly voice whispering, but can't make out the words.
-    %echo% The @%self% vanishes into a puff of smoke!
+    %echo% @%self% vanishes into a puff of smoke!
     return 1
     %purge% %self%
     halt
   end
   if !%arg%
-    %send% %actor% who did you want to challenge?
+    %send% %actor% Who did you want to challenge?
     return 1
     halt
   else
@@ -1977,16 +1992,16 @@ if %cmd% == challenge
     halt
   end
   if %target.is_npc%
-    %send% %actor% You can only challenge other players.
+    %send% %actor% You can only challenge players.
     return 1
     halt
   end
   set challenged %target%
   remote challenged %self.id%
-  %send% %target% %actor.pc_name% is challenging you to bob for apples. Whoever gets the largest apple wins!
+  %send% %target% ~%actor% is challenging you to bob for apples. Whoever gets the largest apple wins!
   %send% %target% Type 'accept %owner.pc_name%' to accept.
-  %send% %actor% You challenge %target.pc_name% to bob for apples. Whoever gets the largest apple wins!
-  %echoneither% %actor% %target% You see %actor.pc_name% challenge %target.pc_name% to an apple bobbing contest!
+  %send% %actor% You challenge ~%target% to bob for apples. Whoever gets the largest apple wins!
+  %echoneither% %actor% %target% You see ~%actor% challenge ~%target% to an apple bobbing contest!
 end
 if %cmd% == accept
   set owner %self.owner%
@@ -1996,7 +2011,7 @@ if %cmd% == accept
     return 0
     halt
   end
-  if %arg% != %owner.pc_name%
+  if %actor.char_target(%arg%)% != %owner% && !(%owner.pc_name% /= %arg%)
     return 0
     halt
   end
@@ -2006,20 +2021,20 @@ if %cmd% == accept
     halt
   end
   if !%owner.on_quest(18857)%
-    %send% %actor% You here spirits whisper, '%owner.pc_name% should no longer have this.'
-    %echo% The @%self% vanishes in a puff of smoke!
+    %send% %actor% You here spirits whisper, '&&Z~%owner% should no longer have this.'
+    %echo% @%self% vanishes in a puff of smoke!
     return 1
     halt
   end
-  if !(%actor.can_see(%owner%)%)
-    %send% %actor% You don't see %owner.pc_name% around here any longer.
+  if !%actor.can_see(%owner%)%
+    %send% %actor% You don't see them around here any longer.
     return 1
     halt
   end
   set game_on 1
   remote game_on %self.id%
   %send% %challenged% You are up first. Type 'bob bucket' to begin, and 'stand' to complete your turn.
-  %send% %owner% %challenged.pc_name% has accepted your challenge, &%challenged% is up first.
+  %send% %owner% ~%challenged% has accepted your challenge and &%challenged% is up first.
   set turn %challenged%
   remote turn %self.id%
 end
@@ -2030,12 +2045,12 @@ apple bobbing bob~
 bob~
 set otarg %actor.obj_target(%arg%)%
 if !%otarg% || %otarg.vnum% != 18857
-  %send% %actor% You can only bob in the @%self%.
+  %send% %actor% You can only bob in @%self%.
   return 1
   halt
 end
 if !%self.varexists(turn)%
-  %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from this @%self%.
+  %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from @%self%.
   return 1
   halt
 end
@@ -2050,7 +2065,7 @@ if %self.varexists(same_round)%
   halt
 end
 %send% %actor% You dip your head into the water of the bucket and start looking for an apple.
-%echoaround% %actor% %actor.pc_name% sticks ^%actor% head into the bucket and starts looking for an apple.
+%echoaround% %actor% ~%actor% sticks ^%actor% head into the bucket and starts looking for an apple.
 set start_bob %timestamp%
 remote start_bob %self.id%
 set timer_running 1
@@ -2065,7 +2080,7 @@ wait 4 s
 if %self.varexists(timer_running)%
   set turn %self.turn%
   %send% %turn% You can't hold your breath any longer and pull your head out of the water.
-  %echoaround% %turn% %turn.pc_name% suddenly pulls ^%turn% head out of the water gasping for air!
+  %echoaround% %turn% ~%turn% suddenly pulls ^%turn% head out of the water gasping for air!
   rdelete timer_running %self.id%
   %send% %turn% Try again? And maybe, make sure you stand up before you can no longer hold your breath.
 end
@@ -2078,7 +2093,7 @@ apple bobbing bucket was left behind~
 if %self.carried_by%
   set actor %self.carried_by%
   if !%actor.on_quest(18857)%
-    %send% %actor% The @%self% vanishes from your arms in a poof of smoke!
+    %send% %actor% @%self% vanishes from your arms in a poof of smoke!
     %purge% %self%
     halt
   end
@@ -2091,7 +2106,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% The @%self% vanishes in a poof of smoke!
+%echo% @%self% vanishes in a poof of smoke!
 %purge% %self%
 ~
 #18860
@@ -2100,7 +2115,7 @@ bobbing please stand up~
 bob stand~
 if %cmd% == bob
   if !(%actor.obj_target(%arg%)% == %self%)
-    %send% %actor% You can only bob for apples in the @%self%.
+    %send% %actor% You can only bob for apples in @%self%.
     return 1
     halt
   end
@@ -2128,7 +2143,7 @@ if %cmd% == stand
   rdelete timer_running %self.id%
   eval time %timestamp% - %self.start_bob%
   if %time% == 0
-    %echoaround% %actor% %actor.pc_name% stands back up immediately with no apple in ^%actor% mouth.
+    %echoaround% %actor% ~%actor% stands back up immediately with no apple in ^%actor% mouth.
     return 1
     halt
   end
@@ -2187,7 +2202,7 @@ if %cmd% == stand
     break
   done
   %send% %actor% You managed to get a %apple_size% apple from the bucket!
-  %echoaround% %actor% %actor.pc_name% straightens up with a %apple_size% apple in ^%actor% mouth!
+  %echoaround% %actor% ~%actor% straightens up with a %apple_size% apple in ^%actor% mouth!
   if %actor% == %self.challenged%
     set ch_apple %apple_val%
     remote ch_apple %self.id%
@@ -2198,12 +2213,12 @@ if %cmd% == stand
     set ch_apple %self.ch_apple%
     if %ow_apple% > %ch_apple%
       %send% %actor% You win!
-      %echoaround% %actor% %actor.pc_name% wins!
+      %echoaround% %actor% ~%actor% wins!
       %quest% %actor% finish 18857
       %purge% %self%
     elseif %ow_apple% < %ch_apple%
       %send% %actor% You've lost this time.
-      %echoaround% %actor% %self.challenged.pc_name% wins!
+      %echoaround% %actor% ~%self.challenged% wins!
     else
       %echo% It's a tie!
     end
@@ -2345,7 +2360,8 @@ else
   set portals %self.portals%
 end
 eval portals %portals% + 1
-if %portals% < 3
+%quest% %actor% trigger 18861
+if %portals% < 3 && !%actor.quest_finished(18861)%
   remote portals %self.id%
   halt
 end
@@ -2458,8 +2474,8 @@ while %BiteList%
 done
 set BiteList %self.BiteList% %id%
 remote BiteList %self.id%
-if %count% == 5
-  %quest% %actor% trigger 18866
+%quest% %actor% trigger 18866
+if %count% == 5 || %actor.quest_finished(18866)%
   %quest% %actor% finish 18866
 else
   %send% %actor% You're up to %count% of 5 citizens now.
@@ -2568,11 +2584,8 @@ if %actor.action% == playing
           done
           set places %self.places% %loc%
         end
-        if %counter% >= 5
-          %quest% %actor% trigger %questid%
-        else
-          remote places %self.id%
-        end
+        %quest% %actor% trigger %questid%
+        remote places %self.id%
         %load% mob 18871
       end
     break

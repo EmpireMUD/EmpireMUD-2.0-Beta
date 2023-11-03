@@ -186,15 +186,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
-				case PTECH_TWO_HANDED_WEAPONS: {
-					if ((obj = GET_EQ(ch, WEAR_WIELD)) && OBJ_FLAGGED(obj, OBJ_TWO_HANDED)) {
-						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
-						unequip_char_to_inventory(ch, WEAR_WIELD);
-						determine_gear_level(ch);
-						need_affect_total = TRUE;
-					}
-					break;
-				}
 			}
 		}
 	}
@@ -601,6 +592,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
+	ability_data *abil = find_ability_by_vnum(ability);
 	char buf[MAX_STRING_LENGTH];
 	int time, needs_cost;
 	
@@ -629,6 +621,17 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
+	if (abil && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to do that: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to do that.\r\n", AN(buf), buf);
+		}
+		return FALSE;
+	}
+
 	if (cooldown_type != NOTHING && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
 		snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
 		CAP(buf);
@@ -2422,6 +2425,11 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
 		}
 		
+		if (ABIL_REQUIRES_TOOL(abil)) {
+			prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
+		}
+		
 		// data, if parameterized
 		if (ABIL_DATA(abil)) {
 			// techs
@@ -2657,9 +2665,6 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 				break;
 			}
 		}
-	}
-	else if (OBJ_FLAGGED(item, OBJ_TWO_HANDED)) {
-		tech = PTECH_TWO_HANDED_WEAPONS;
 	}
 	else if (IS_MISSILE_WEAPON(item)) {
 		tech = PTECH_RANGED_COMBAT;
@@ -3011,8 +3016,10 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
 			obj_to_char(rope, ch);
 			scale_item_to_level(rope, 1);	// minimum scale
-			load_otrigger(rope);
-			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+			if (load_otrigger(rope)) {
+				act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+				get_otrigger(rope, ch, FALSE);
+			}
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
 		request_char_save_in_world(victim);

@@ -346,15 +346,17 @@ int count_owned_homes(empire_data *emp) {
 * @return int The number of tiles with that sector vnum, owned by emp.
 */
 int count_owned_sector(empire_data *emp, sector_vnum vnum) {
-	room_data *room, *next_room;
+	struct sector_index_type *idx;
+	struct map_data *map;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (ROOM_OWNER(room) == emp && GET_SECT_VNUM(SECT(room)) == vnum) {
+	idx = find_sector_index(vnum);
+	LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+		if (map->room && ROOM_OWNER(map->room) == emp) {
 			++count;
 		}
 	}
@@ -631,7 +633,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 	LL_FOREACH(tracker, task) {
 		if (last_group != task->group) {
 			if (task->group) {
-				sprintf(save_buffer + strlen(save_buffer), "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+				sprintf(save_buffer + strlen(save_buffer), "  %s:\r\n", (count > 0 ? "Or all of" : "All of"));
 			}
 			last_group = task->group;
 			sub = 0;
@@ -710,7 +712,8 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			}
 			case QR_OBJECT: {
 				obj_data *obj = NULL;
-				int iter;
+				int iter, obj_ok = 0;
+				
 				for (iter = 0; iter < reward->amount; ++iter) {
 					obj = read_object(reward->vnum, TRUE);
 					scale_item_to_level(obj, reward_level);
@@ -727,7 +730,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 						reduce_obj_binding(obj, ch);
 					}
 					
-					load_otrigger(obj);
+					obj_ok = load_otrigger(obj);
+					if (obj_ok) {
+						get_otrigger(obj, ch, FALSE);
+					}
 				}
 				
 				// mark gained
@@ -742,7 +748,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
-				if (obj) {
+				if (obj_ok && obj) {
 					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 				}
 				break;
@@ -3249,12 +3255,13 @@ void qt_start_quest(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: mark a triggered condition for 1 quest
+* Quest Tracker: increase a triggered condition for a quest by 1
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to mark.
+* @param int specific_val Optional: Sets it to this value (pass 0 to just add 1 instead).
 */
-void qt_triggered_task(char_data *ch, any_vnum vnum) {
+void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3266,7 +3273,14 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = task->needed;
+					if (specific_val > 0) {
+						// specific value
+						task->current = MIN(specific_val, task->needed);
+					}
+					else {
+						// add instead
+						task->current = MIN(task->current+1, task->needed);
+					}
 				}
 			}
 		}
@@ -3275,12 +3289,13 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: cancel a triggered condition for the quest
+* Quest Tracker: reduce a triggered condition for the quest by 1 (or all)
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to un-mark.
+* @param bool remove_all If TRUE, removes ALL triggers.
 */
-void qt_untrigger_task(char_data *ch, any_vnum vnum) {
+void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3292,7 +3307,13 @@ void qt_untrigger_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = 0;
+					// remove all OR 1
+					if (remove_all) {
+						task->current = 0;
+					}
+					else {
+						task->current = MAX(task->current-1, 0);
+					}
 				}
 			}
 		}

@@ -562,15 +562,13 @@ set done 1
 set obj %actor.inventory()%
 while %obj%
   if %obj.vnum% == 9036
-    if %obj.is_flagged(ENCHANTED)% && %obj% != %self%
-      set done 0
+    if !%obj.is_flagged(ENCHANTED)% && %obj% != %self%
+      eval done %done% + 1
     end
   end
   set obj %obj.next_in_list%
 done
-if %done%
-  %quest% %actor% trigger 9036
-end
+%quest% %actor% settrigger 9036 %done%
 return 1
 ~
 #9042

@@ -98,7 +98,7 @@ trinkets enchanted by a class of novice sorcerers as practice.
 ~
 The High Sorcerer takes the trinkets and thanks you for your help.
 ~
-14 ef 1 75 -1
+16 ef 1 75 -1
 A
 1 228
 P
@@ -109,7 +109,7 @@ T 9003
 W
 2 9036 0 5 a
 W+
-11 0 0 1 a
+11 0 0 5 a
 Disenchant 5 useless trinkets~
 Z
 1 228

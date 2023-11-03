@@ -1240,7 +1240,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		send_config_msg(ch, "huh_string");
 	}
 	
-	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD))) {
+	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD), IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING))) {
 		// sent own error message
 	}
 	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING)) {
@@ -1514,9 +1514,10 @@ ACMD(do_alias) {
 * @param int min_pos The minimum allowed POS_ const.
 * @param bool allow_animal If FALSE, players can't do this in an animal morph.
 * @param bool allow_invulnerable If FALSE, players can't do this while un-attackable.
+* @param bool override_feeding If TRUE, ignores position for feeding vampires.
 * @return bool TRUE if the character can act, FALSE (with error msg) if not
 */
-bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable) {
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable, bool override_feeding) {
 	if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN)) {
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	}
@@ -1538,7 +1539,7 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while in deathshroud!\r\n");
 	}
-	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING) {
+	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING && !override_feeding) {
 		msg_to_char(ch, "You can't do that right now!\r\n");
 	}
 	else if (GET_FED_ON_BY(ch) && min_pos >= POS_SLEEPING) {
@@ -2952,20 +2953,25 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_automessages_on_login(d->character);
 			
-			display_tip_to_char(d->character);
+			if (!PRF_FLAGGED(d->character, PRF_NO_TUTORIALS)) {
+				display_tip_to_char(d->character);
+			}
 			
 			if (GET_MAIL_PENDING(d->character)) {
-				send_to_char("\r\n\trYou have mail waiting.\t0\r\n", d->character);
+				send_to_char("\trYou have mail waiting.\t0\r\n", d->character);
+			}
+			if (has_uncollected_event_rewards(d->character)) {
+				msg_to_char(d->character, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
 			}
 			
 			// reset daily cycle now
-			check_daily_cycle_reset(d->character, TRUE);
+			check_daily_cycle_reset(d->character);
 			
 			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
-				msg_to_char(d->character, "\r\n&o%s&0", msg);
+				msg_to_char(d->character, "\r\n\to%s\t0", msg);
 			}
 			if (show_start && (msg = config_get_string("start_message")) && *msg) {
-				msg_to_char(d->character, "\r\n&Y%s&0", msg);
+				msg_to_char(d->character, "\r\n\tY%s\t0", msg);
 			}
 			
 			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {

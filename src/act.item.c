@@ -141,10 +141,13 @@ INTERACTION_FUNC(combine_obj_interact) {
 	else {
 		obj_to_room(new_obj, IN_ROOM(ch));
 	}
-	load_otrigger(new_obj);
 	
 	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
 	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
+	
+	if (load_otrigger(new_obj) && new_obj->carried_by) {
+		get_otrigger(new_obj, new_obj->carried_by, FALSE);
+	}
 	
 	free_resource_list(res);
 	return TRUE;
@@ -441,7 +444,9 @@ INTERACTION_FUNC(identifies_to_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -690,6 +695,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	if (GET_OBJ_TOOL_FLAGS(obj)) {
 		prettier_sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf);
 		msg_to_char(ch, "Tool type: %s\r\n", buf);
+	}
+	if (GET_OBJ_REQUIRES_TOOL(obj)) {
+		prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf);
+		msg_to_char(ch, "Requires tool to use when crafting: %s\r\n", buf);
 	}
 	
 	if (GET_OBJ_AFF_FLAGS(obj)) {
@@ -1021,7 +1030,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 INTERACTION_FUNC(light_obj_interact) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *new = NULL;
-	int num;
+	int num, obj_ok = 0;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		// load
@@ -1039,7 +1048,10 @@ INTERACTION_FUNC(light_obj_interact) {
 		else {
 			obj_to_room(new, IN_ROOM(ch));
 		}
-		load_otrigger(new);
+		obj_ok = load_otrigger(new);
+		if (obj_ok && new->carried_by) {
+			get_otrigger(new, new->carried_by, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -1054,11 +1066,11 @@ INTERACTION_FUNC(light_obj_interact) {
 		strcpy(buf1, "It is now $p.");
 	}
 		
-	if (new) {
+	if (obj_ok && new) {
 		act(buf1, FALSE, ch, new, NULL, TO_CHAR | TO_ROOM);
 	}
 	
-	if (inter_item && IS_AMMO(inter_item) && IS_AMMO(new)) {
+	if (obj_ok && new && inter_item && IS_AMMO(inter_item) && IS_AMMO(new)) {
 		set_obj_val(new, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(inter_item));
 	}
 	
@@ -1405,7 +1417,9 @@ INTERACTION_FUNC(seed_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -1455,7 +1469,9 @@ INTERACTION_FUNC(separate_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		load_otrigger(new_obj);
+		if (load_otrigger(new_obj) && new_obj->carried_by) {
+			get_otrigger(new_obj, new_obj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -2277,7 +2293,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		return FALSE;
 	}
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
-		if (get_otrigger(obj, ch)) {
+		if (get_otrigger(obj, ch, TRUE)) {
 			// last-minute scaling: scale to its minimum (adventures will override this on their own)
 			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
 				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
@@ -2413,7 +2429,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
-	if (can_take_obj(ch, obj) && get_otrigger(obj, ch)) {
+	if (can_take_obj(ch, obj) && get_otrigger(obj, ch, TRUE)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
 			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
@@ -4025,6 +4041,7 @@ void trade_buy(char_data *ch, char *argument) {
 		// obj
 		add_to_object_list(tpd->obj);
 		obj_to_char(tpd->obj, ch);
+		get_otrigger(tpd->obj, ch, FALSE);
 		tpd->obj = NULL;
 		
 		// cleanup
@@ -4150,6 +4167,7 @@ void trade_collect(char_data *ch, char *argument) {
 				obj_to_char(tpd->obj, ch);
 				
 				act("You collect $p from an expired auction.", FALSE, ch, tpd->obj, NULL, TO_CHAR);
+				get_otrigger(tpd->obj, ch, FALSE);
 				tpd->obj = NULL;
 				any = TRUE;
 			}
@@ -4686,6 +4704,8 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				
 				// this should not be running load triggers
 				// load_otrigger(obj);
+				
+				get_otrigger(obj, ch, FALSE);
 			}
 		}
 		
@@ -4973,8 +4993,8 @@ ACMD(do_buy) {
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n buys $p.", FALSE, ch, obj, NULL, TO_ROOM);
 			
-			if (!get_check_money(ch, obj)) {
-				load_otrigger(obj);
+			if (load_otrigger(obj)) {
+				get_check_money(ch, obj);
 			}
 			
 			free_shop_temp_list(shop_list);

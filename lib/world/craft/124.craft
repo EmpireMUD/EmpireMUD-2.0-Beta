@@ -32,7 +32,7 @@ S
 #12424
 goblin smuggler's hulk~
 12424 1
-11 61 nt 1 12424 c bu
+11 61 nt 1 12424 0 bu
 R
 6000 50 1 0
 R
@@ -49,7 +49,7 @@ S
 #12425
 goblin pirate ship~
 12425 1
-11 61 nt 1 12425 c bu
+11 61 nt 1 12425 0 bu
 R
 6000 60 1 0
 R
@@ -68,7 +68,7 @@ S
 #12426
 cliffdocks~
 -1 1
-8 300 t 1 12426 c 0
+8 300 t 1 12426 0 0
 B
 12426 c ah
 R
@@ -83,7 +83,7 @@ S
 #12427
 smugglerswharf~
 -1 1
-8 300 t 1 12427 c 0
+8 300 t 1 12427 0 0
 B
 12427 c ah
 R

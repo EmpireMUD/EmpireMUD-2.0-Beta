@@ -265,9 +265,10 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 * @param char_data *ch The person looking for a craft.
 * @param char *argument The typed-in name.
 * @param int craft_type Any CRAFT_TYPE_ to look up.
+* @param bool hide_dismantle_only If TRUE, skips crafts set dismantle-only.
 * @return craft_data* The matching craft, if any.
 */
-craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
+craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type, bool hide_dismantle_only) {
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL, *known_abbrev_no_res = NULL;
 	craft_data *unknown_multi = NULL;
@@ -282,6 +283,9 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 			continue;
 		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
+		}
+		if (hide_dismantle_only && CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
@@ -780,7 +784,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
-	if (!(craft = find_best_craft_by_name(ch, argument, craft_type))) {
+	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE))) {
 		msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
@@ -1048,7 +1052,9 @@ void cancel_gen_craft(char_data *ch) {
 			else {
 				obj_to_room(obj, IN_ROOM(ch));
 			}
-			load_otrigger(obj);
+			if (load_otrigger(obj) && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 		
 		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) {
@@ -1069,7 +1075,9 @@ void cancel_gen_craft(char_data *ch) {
 					bind_obj_to_player(obj, ch);
 				}
 			}
-			load_otrigger(obj);
+			if (load_otrigger(obj) && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 	}
 	
@@ -1105,7 +1113,7 @@ void finish_gen_craft(char_data *ch) {
 	struct resource_data *res;
 	ability_data *cft_abil;
 	obj_data *proto, *temp_obj, *obj = NULL;
-	int iter, amt = 1;
+	int iter, amt = 1, obj_ok = 0;
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
 	is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
@@ -1135,7 +1143,10 @@ void finish_gen_craft(char_data *ch) {
 		}
 		scale_item_to_level(obj, get_craft_scale_level(ch, type));
 		
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
+		}
 	}
 	else if (GET_CRAFT_QUANTITY(type) > 0) {
 		// NON-SOUP (careful, soup uses quantity for maximum contents
@@ -1165,7 +1176,10 @@ void finish_gen_craft(char_data *ch) {
 					obj_to_room(obj, IN_ROOM(ch));
 				}
 				
-				load_otrigger(obj);
+				obj_ok = load_otrigger(obj);
+				if (obj_ok && obj->carried_by) {
+					get_otrigger(obj, obj->carried_by, FALSE);
+				}
 			}
 			
 			// mark for the empire
@@ -1176,7 +1190,12 @@ void finish_gen_craft(char_data *ch) {
 	}
 
 	// send message -- soup uses quantity for amount of soup instead of multiple items
-	if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
+	if (!obj_ok) {
+		// object self-purged?
+		sprintf(buf, "You finish %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		sprintf(buf, "You finish %s $p (x%d)!", gen_craft_data[GET_CRAFT_TYPE(type)].verb, amt);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
@@ -1184,9 +1203,16 @@ void finish_gen_craft(char_data *ch) {
 		sprintf(buf, "You finish %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
-
-	sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, obj, 0, TO_ROOM);
+	
+	// to-room message
+	if (obj_ok) {
+		sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	else {
+		sprintf(buf, "$n finishes %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	}
 	
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);
@@ -1262,6 +1288,19 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
+		// check required tool
+		if (found_obj && GET_OBJ_REQUIRES_TOOL(found_obj) && !has_all_tools(ch, GET_OBJ_REQUIRES_TOOL(found_obj))) {
+			prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(found_obj), tool_flags, buf);
+			if (count_bits(GET_OBJ_REQUIRES_TOOL(found_obj)) > 1) {
+				msg_to_char(ch, "You need the following tools to use %s: %s\r\n", GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT), buf);
+			}
+			else {
+				msg_to_char(ch, "You need %s %s to use %s.\r\n", AN(buf), buf, GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT));
+			}
+			cancel_action(ch);
+			return;
+		}
+		
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		request_vehicle_save_in_world(veh);
@@ -1334,7 +1373,7 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// things that check for & set weapon
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_tool(ch, TOOL_HAMMER)) && !can_forge(ch)) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && (!(weapon = has_tool(ch, TOOL_HAMMER)) || !can_forge(ch))) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}

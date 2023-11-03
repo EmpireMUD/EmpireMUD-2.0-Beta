@@ -613,6 +613,8 @@ const char *extra_attribute_types[] = {
 	"Blood-Upkeep",
 	"Age",
 	"Night-Vision",
+	"Nearby-Range",	// 15
+	"Where-Range",
 	"\n"
 };
 
@@ -963,7 +965,7 @@ const char *player_tech_types[] = {
 	"Steal-Upgrade",
 	"Swimming",
 	"Teleport-City",
-	"Two-Handed-Weapons",	// 50
+	"Two-Handed-Mastery",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",
 	"Skinning-Upgrade",
@@ -1553,34 +1555,36 @@ const char *apply_type_names[] = {
 
 /* APPLY_x (1/4) */
 const char *apply_types[] = {
-	"NONE",
+	"NONE",	// 0
 	"STRENGTH",
 	"DEXTERITY",
 	"HEALTH-REGEN",
 	"CHARISMA",
-	"GREATNESS",
+	"GREATNESS",	// 5
 	"MOVE-REGEN",
 	"MANA-REGEN",
 	"INTELLIGENCE",
 	"WITS",
-	"AGE",
+	"AGE",	// 10
 	"MAX-MOVE",
 	"RESIST-PHYSICAL",
 	"BLOCK",
 	"HEAL-OVER-TIME",
-	"MAX-HEALTH",
+	"MAX-HEALTH",	// 15
 	"MAX-MANA",
 	"TO-HIT",
 	"DODGE",
 	"INVENTORY",
-	"MAX-BLOOD",
+	"MAX-BLOOD",	// 20
 	"BONUS-PHYSICAL",
 	"BONUS-MAGICAL",
 	"BONUS-HEALING",
 	"RESIST-MAGICAL",
-	"CRAFTING",
+	"CRAFTING",	// 25
 	"BLOOD-UPKEEP",
 	"NIGHT-VISION",
+	"NEARBY-RANGE",
+	"WHERE-RANGE",
 	"\n"
 };
 
@@ -1614,7 +1618,9 @@ const double apply_values[] = {
 	0.5,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
-	1,	// NIGTH-VISION
+	1,	// NIGHT-VISION
+	1,	// NEARBY-RANGE
+	1,	// WHERE-RANGE
 };
 
 
@@ -1648,6 +1654,8 @@ const int apply_attribute[] = {
 	NOTHING,	// crafting
 	NOTHING,	// blood-upkeep
 	NOTHING,	// night-vision
+	NOTHING,	// nearby-range
+	NOTHING,	// where-range
 };
 
 
@@ -1681,6 +1689,8 @@ const bool apply_never_scales[] = {
 	TRUE,	// CRAFTING
 	TRUE,	// BLOOD-UPKEEP
 	TRUE,	// NIGHT-VISION
+	TRUE,	// NEARBY-RANGE
+	TRUE,	// WHERE-RANGE
 };
 
 
@@ -1753,22 +1763,22 @@ const struct character_size_data size_data[] = {
 
 // CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
-	"POTTERY",
+	"POTTERY",	// 0
 	"BUILDING",
 	"SKILLED-LABOR",
 	"SKIP-CONSUMES-TO",
 	"*",	// formerly carpenter (now uses a function)
-	"*",	// formerly alchemy (identical to FIRE)
+	"*",	// 5: formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
 	"FIRE",
 	"SOUP",
 	"IN-DEVELOPMENT",
-	"UPGRADE",
+	"UPGRADE",	// 10
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
 	"VEHICLE",
 	"*",	// formerly shipyard (now uses a function)
-	"*",	// formerly bld-upgraded (now uses a function)
+	"*",	// 15: formerly bld-upgraded (now uses a function)
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
@@ -1779,27 +1789,26 @@ const char *craft_flags[] = {
 
 // CRAFT_x (2/2): how flags that show up on "craft info"
 const char *craft_flag_for_info[] = {
-	"pottery",
+	"pottery",	// 0
 	"",	// building
 	"",	// skilled labor
 	"",	// skip-consumes-to
 	"",
-	"",
+	"",	// 5
 	"",
 	"requires fire",
 	"",	// soup
 	"",	// in-dev
-	"is an upgrade",	// upgrade
+	"is an upgrade",	// 10: upgrade
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
 	"",
-	"requires upgraded building",
+	"",	// 15
 	"",	// learned
 	"must be by a river",
 	"",	// remove-production
 	"",	// take-required-obj
-	"",
 	"\n"
 };
 
@@ -2630,7 +2639,7 @@ const double obj_flag_scaling_bonus[] = {
 	0.5,	// OBJ_JUNK
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
-	1.5,	// OBJ_TWO_HANDED
+	1.8,	// OBJ_TWO_HANDED
 	1.3,	// OBJ_BIND_ON_EQUIP
 	1.4,	// OBJ_BIND_ON_PICKUP
 	1.0,	// unused
@@ -3002,12 +3011,13 @@ const char *progress_types[] = {
 
 // PRG_x: progress flags
 const char *progress_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"PURCHASABLE",
 	"NO-AUTOSTART",
 	"HIDDEN",
 	"NO-ANNOUNCE",
-	"NO-PREVIEW",
+	"NO-PREVIEW",	// 5
+	"NO-TRACKER",
 	"\n"
 };
 
@@ -4565,7 +4575,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// own vehicle
 	REQ_AMT_THRESHOLD,	// skill over
 	REQ_AMT_THRESHOLD,	// skill under
-	REQ_AMT_NONE,	// triggered
+	REQ_AMT_NUMBER,	// triggered
 	REQ_AMT_NONE,	// visit building
 	REQ_AMT_NONE,	// visit rmt
 	REQ_AMT_NONE,	// visit sect

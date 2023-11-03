@@ -119,7 +119,7 @@ ACMD(do_create) {
 	char *name;
 	obj_data *proto, *obj = NULL;
 	obj_data *obj_iter, *next_obj;
-	int cost, iter, mat, num = 1, count = 0;
+	int cost, iter, mat, num = 1, count = 0, obj_ok = 0;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_LOAD));
 	bool low_res = FALSE;
 
@@ -187,7 +187,10 @@ ACMD(do_create) {
 			}
 			
 			scale_item_to_level(obj, 1);	// minimum level
-			load_otrigger(obj);
+			obj_ok = load_otrigger(obj);
+			if (obj_ok && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 		else {
 			low_res = TRUE;
@@ -196,9 +199,13 @@ ACMD(do_create) {
 
 	if (count == 0) {
 		msg_to_char(ch, "You fail to create it.\r\n");
-		if (obj) {
+		if (obj_ok && obj) {
 			extract_obj(obj);
 		}
+	}
+	else if (!obj_ok) {
+		// probably self-purged?
+		msg_to_char(ch, "You create it.\r\n");
 	}
 	else if (count == 1) {
 		act("You create $p!", FALSE, ch, obj, 0, TO_CHAR);

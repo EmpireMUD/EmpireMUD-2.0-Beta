@@ -41,7 +41,7 @@ ACMD(do_dismount);
 
 INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
-	int num;
+	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
 		return FALSE;	// 60% chance of failure without the ability
@@ -51,7 +51,10 @@ INTERACTION_FUNC(butcher_interact) {
 		fillet = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char(fillet, ch);
-		load_otrigger(fillet);
+		obj_ok = load_otrigger(fillet);
+		if (obj_ok) {
+			get_otrigger(fillet, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -60,7 +63,12 @@ INTERACTION_FUNC(butcher_interact) {
 	}
 	
 	if (fillet) {
-		if (interaction->quantity != 1) {
+		if (!obj_ok) {
+			// obj likely self-purged
+			act("You skillfully butcher the corpse!", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n butchers a corpse.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else if (interaction->quantity != 1) {
 			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
 			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
 			

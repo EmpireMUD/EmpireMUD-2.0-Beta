@@ -1571,7 +1571,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	// warn players of lag on 'all'
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) == CON_PLAYING && desc->character) {
-			write_to_descriptor(desc->descriptor, "The game is performing a brief update... this will take a moment.\r\n");
+			write_to_descriptor(desc->descriptor, "\r\nThe game is performing a brief update... this will take a moment.\r\n");
 			desc->has_prompt = FALSE;
 		}
 	}
@@ -6788,6 +6788,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
+	prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(j), tool_flags, buf);
+	msg_to_char(ch, "Requires tool to use when crafting: \tg%s\t0\r\n", buf);
+	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
 		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);
@@ -9408,7 +9411,9 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
-		load_otrigger(obj);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
+		}
 	}
 	else if (is_abbrev(buf, "vehicle")) {
 		if (!vehicle_proto(number)) {

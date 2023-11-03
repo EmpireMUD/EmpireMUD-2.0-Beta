@@ -882,7 +882,9 @@ void finish_dismantle(char_data *ch, room_data *room) {
 				if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 					bind_obj_to_player(newobj, ch);
 				}
-				load_otrigger(newobj);
+				if (load_otrigger(newobj)) {
+					get_otrigger(newobj, ch, FALSE);
+				}
 			}
 		}
 	}
@@ -1116,6 +1118,19 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
+			// check required tool
+			if (found_obj && GET_OBJ_REQUIRES_TOOL(found_obj) && !has_all_tools(ch, GET_OBJ_REQUIRES_TOOL(found_obj))) {
+				prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(found_obj), tool_flags, buf);
+				if (count_bits(GET_OBJ_REQUIRES_TOOL(found_obj)) > 1) {
+					msg_to_char(ch, "You need the following tools to use %s: %s\r\n", GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT), buf);
+				}
+				else {
+					msg_to_char(ch, "You need %s %s to use %s.\r\n", AN(buf), buf, GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT));
+				}
+				cancel_action(ch);
+				return;
+			}
+			
 			// if maintaining, remove a "similar" item from the old built-with list -- this is what the maintaining item is replacing
 			if (act_type == ACT_MAINTENANCE && found_obj) {
 				remove_like_item_from_built_with(&GET_BUILT_WITH(room), found_obj);
@@ -2569,6 +2584,9 @@ ACMD(do_designate) {
 	}
 	else if (subcmd == SCMD_DESIGNATE && IS_MAP_BUILDING(IN_ROOM(ch)) && dir != BUILDING_ENTRANCE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You may only designate %s from here.\r\n", dirs[get_direction_for_char(ch, BUILDING_ENTRANCE(IN_ROOM(ch)))]);
+	}
+	else if (subcmd == SCMD_REDESIGNATE && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "You can't redesignate because an adventure is currently linked here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish the building before you can designate rooms.\r\n");

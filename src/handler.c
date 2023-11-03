@@ -225,8 +225,8 @@ EVENTFUNC(room_affect_expire_event) {
 	if ((af->type > 0)) {
 		// this avoids sending messages multiple times for 1 affect type
 		if (!af->next || (af->next->type != af->type) || (af->next->expire_time > af->expire_time)) {
-			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
-				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 			}
 		}
 	}
@@ -448,8 +448,8 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
 			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
-				if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
-					act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				shown = TRUE;
 			}
@@ -756,6 +756,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_NIGHT_VISION: {
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_NIGHT_VISION), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
+		case APPLY_NEARBY_RANGE: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
+		case APPLY_WHERE_RANGE: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_WHERE_RANGE), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
 		default:
@@ -8791,7 +8799,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			break;
 		}
 		case REQ_TRIGGERED: {
-			strcpy(output, "Scripted condition");
+			snprintf(output, sizeof(output), "Scripted condition %dx", req->needed);
 			break;
 		}
 		case REQ_VISIT_BUILDING: {
@@ -10132,7 +10140,6 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	}
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
-	load_otrigger(obj);
 	
 	if (stolen) {
 		record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
@@ -10140,6 +10147,11 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
 		add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
+	}
+	
+	// do this after the "stolen" section, in case it'll purge the item
+	if (load_otrigger(obj)) {
+		get_otrigger(obj, ch, FALSE);
 	}
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;

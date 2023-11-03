@@ -75,7 +75,6 @@ Beaver dam construction~
 ~
 * sector vnums to allow
 set valid_sects 5 19 53 85 87
-*
 set room %self.room%
 if !%instance.location%
   %purge% %self%
@@ -401,9 +400,16 @@ if !%self.leader% || %actor% != %self.leader%
   end
   return 1
   halt
+elseif %cmd.mudcommand% == harness && %actor.cooldown(18473)%
+  %send% %actor% You can't harness another spirit steed yet.
+  return 1
+  halt
 end
 * made it?
 nop %self.add_mob_flag(MOUNTABLE)%
+if %cmd.mudcommand% == harness
+  nop %actor.set_cooldown(18473,86400)%
+end
 return 0
 * check and remove mountable if mount failed
 wait 1
@@ -922,6 +928,12 @@ end
 nop %mob.remove_mob_flag(SILENT)%
 detach 18492 %self.id%
 ~
+#18493
+Colossal Cave unstable portal: Xyzzy command~
+2 c 0
+xyzzy~
+%send% %actor% Nothing happens.
+~
 #18494
 Doctor Who?~
 0 d 0
@@ -1015,14 +1027,27 @@ return 1
 Unstable Portal: Precipice: Grafted scion kill~
 0 z 100
 ~
+set room %self.room%
 * mark player killed
-if %actor.is_pc% && %self.room.template% == 18473
+if %actor.is_pc% && %room.template% == 18473
   set killed_%actor.id% 1
-  remote killed_%actor.id% %self.room.id%
+  remote killed_%actor.id% %room.id%
 end
+* replace corpses with bloodstains
+wait 1
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.type% == CORPSE
+    nop %obj.empty%
+    %load% obj 18482
+    %purge% %obj%
+  end
+  set obj %next_obj%
+done
 * check for more players
 set valid_pos Standing Fighting Sitting Resting Sleeping
-set ch %self.room.people%
+set ch %room.people%
 set found 0
 while %ch% && !%found%
   if %ch.is_pc% && %valid_pos% ~= %ch.position%
@@ -1032,6 +1057,19 @@ while %ch% && !%found%
 done
 if !%found%
   wait 5 sec
+  * convert corpses to bloodstains again, in case
+  set room %self.room%
+  set obj %room.contents%
+  while %obj%
+    set next_obj %obj.next_in_list%
+    if %obj.type% == CORPSE
+      nop %obj.empty%
+      %load% obj 18482
+      %purge% %obj%
+    end
+    set obj %next_obj%
+  done
+  * and leave
   %echo% ~%self% skitters out of sight.
   %purge% %self%
 end

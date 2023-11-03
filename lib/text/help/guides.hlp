@@ -200,13 +200,14 @@ EmpireMUD offers tutorial quests to help you learn the game. Most of these
 quests reward you with some bonus experience.
 
 If you aren't interested in tutorials, you can turn them off by typing
-'toggle tutorials'.
+'toggle tutorials off'. This also disables the automatic tip you receive on
+login.
 
 You can also find tutorial zones at the following locations:
  - The Soulstream (general) at any Tower of Souls.
  - The Museum of Early Man (Trade skill) on the newbie island.
 
-See also: NEARBY, QUEST, TOGGLE
+See also: NEARBY, QUEST, TIPS, TOGGLE
 #
 "VAMPIRE GUIDE"
 

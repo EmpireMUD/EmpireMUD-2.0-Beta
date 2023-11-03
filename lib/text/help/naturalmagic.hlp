@@ -753,8 +753,11 @@ Usage:  resurrect <dead person>
 Cost:  75 mana
 
 This ability can return a recently-deceased player to life. The player will
-return with 10% of his or her health, mana, and moves. You can target the dead
-player or the player's most recent corpse.
+return with 10% of his or her health, mana, and moves. Vampires who were very
+low on blood will gain up to 10% of their blood back.
+
+You can target the dead player or the player's most recent corpse -- though the
+corpse may not work if the player was adventure-summoned and already respawned.
 
 See also: ACCEPT, MOONRISE, RESPAWN
 #

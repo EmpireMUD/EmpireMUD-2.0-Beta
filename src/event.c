@@ -203,6 +203,54 @@ char *get_event_name_by_proto(any_vnum vnum) {
 
 
 /**
+* Determines if a player has any event rewards the haven't collected.
+*
+* @param char_data *ch The player.
+* @return bool TRUE if the player can collect rewards.
+*/
+bool has_uncollected_event_rewards(char_data *ch) {
+	struct player_event_data *ped, *next_ped;
+	struct event_reward *reward;
+	bool any;
+	
+	any = FALSE;
+	
+	// check player's event data
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (any) {
+			break;	// shortcut
+		}
+		if (!ped->event || EVT_FLAGGED(ped->event, EVTF_IN_DEVELOPMENT)) {
+			continue;	// no work if no event or in-dev
+		}
+		if (ped->status == EVTS_COLLECTED) {
+			continue;	// no work for fully-collected events
+		}
+		
+		// players can claim thresholds at any time, before the event ends
+		LL_FOREACH(EVT_THRESHOLD_REWARDS(ped->event), reward) {
+			if (ped->points >= reward->min && ped->collected_points < reward->min) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		// rank rewards: look for events in the 'complete' state (not 'collected')
+		if (ped->status == EVTS_COMPLETE) {
+			LL_FOREACH(EVT_RANK_REWARDS(ped->event), reward) {
+				if (ped->rank >= reward->min && ped->rank <= reward->max) {
+					any = TRUE;
+					break;
+				}
+			}
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Wraps quest_reward_string for use with event rewards.
 *
 * @param struct event_reward *reward The reward to show.
@@ -578,11 +626,15 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	if (points > 0) {
 		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		if (real_gain > 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	else if (points < 0) {
-		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		if (real_gain < 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);

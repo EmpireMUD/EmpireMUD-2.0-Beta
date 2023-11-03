@@ -327,7 +327,7 @@ void entry_memory_mtrigger(char_data *ch);
 int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method);
 int drop_otrigger(obj_data *obj, char_data *actor, int mode);
 int timer_otrigger(obj_data *obj);
-int get_otrigger(obj_data *obj, char_data *actor);
+int get_otrigger(obj_data *obj, char_data *actor, bool preventable);
 int drop_wtrigger(obj_data *obj, char_data *actor, int mode);
 int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
 int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
@@ -350,7 +350,7 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
 void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
-void load_otrigger(obj_data *obj);
+int load_otrigger(obj_data *obj);
 void load_wtrigger(room_data *room);
 
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);

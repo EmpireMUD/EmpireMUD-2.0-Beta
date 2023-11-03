@@ -1234,7 +1234,7 @@ void death_restore(char_data *ch) {
 	set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 4));
 	set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 4));
 	set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 4));
-	set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 4) : GET_MAX_BLOOD(ch));
+	set_blood(ch, GET_MAX_BLOOD(ch));
 	
 	// conditions: drunk goes away, but you become hungry/thirsty (by half)
 	if (GET_COND(ch, FULL) >= 0) {
@@ -1272,7 +1272,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	char_data *ch_iter, *player, *killleader;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
-	int iter, trig_val;
+	int iter, trig_val, obj_ok = 0;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -1304,7 +1304,12 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
 		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
 		set_health(ch, GET_MAX_HEALTH(ch) / 4);
-		set_blood(ch, IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch));
+		if (!IS_VAMPIRE(ch)) {
+			set_blood(ch, GET_MAX_BLOOD(ch));
+		}
+		else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 5) {
+			set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+		}
 		set_move(ch, MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5));
 		set_mana(ch, MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5));
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
@@ -1448,11 +1453,11 @@ obj_data *die(char_data *ch, char_data *killer) {
 			recursive_loot_set(corpse, GET_IDNUM(killleader), GET_LOYALTY(killleader));
 		}
 		
-		load_otrigger(corpse);
+		obj_ok = load_otrigger(corpse);
 	}
 	
 	extract_char(ch);	
-	return corpse;
+	return obj_ok ? corpse : NULL;
 }
 
 
@@ -1497,6 +1502,7 @@ INTERACTION_FUNC(loot_interact) {
 		
 		obj_to_char(obj, inter_mob);
 		load_otrigger(obj);
+		// does not fire a GET trigger
 	}
 	
 	return TRUE;
@@ -1719,7 +1725,12 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 10));
 			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 10));
 			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 10));
-			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 10) : GET_MAX_BLOOD(ch));
+			if (!IS_VAMPIRE(ch)) {
+				set_blood(ch, GET_MAX_BLOOD(ch));
+			}
+			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 10) {
+				set_blood(ch, GET_MAX_BLOOD(ch) / 10);
+			}
 
 			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
 			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
@@ -1739,7 +1750,12 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
 			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
 			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
-			set_blood(ch, IS_VAMPIRE(ch) ? MAX(1, GET_MAX_BLOOD(ch) / 2) : GET_MAX_BLOOD(ch));
+			if (!IS_VAMPIRE(ch)) {
+				set_blood(ch, GET_MAX_BLOOD(ch));
+			}
+			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 5) {
+				set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+			}
 			
 			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
 			if (GET_COND(ch, FULL) >= 0) {
@@ -3507,6 +3523,14 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
 				}
 			}
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_TWO_HANDED_MASTERY) && weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED)) {
+				// it could be considered a bug that this checks solo under the _assumption_ that the ptech comes from a synergy ability
+				// and the only solution that comes to mind would be to have each tech annotate where the player got it from in the player data
+				dam *= 1.5;
+				if (can_gain_exp_from(ch, victim)) {
+					gain_player_tech_exp(ch, PTECH_TWO_HANDED_MASTERY, 2);
+				}
+			}
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
@@ -3875,11 +3899,6 @@ void perform_violence_melee(char_data *ch, obj_data *weapon) {
 	// sanity
 	if (weapon && !IS_WEAPON(weapon)) {
 		weapon = NULL;
-	}
-	
-	if (weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED) && (!has_player_tech(ch, PTECH_TWO_HANDED_WEAPONS) || !check_solo_role(ch))) {
-		msg_to_char(ch, "You must be alone to use two-handed weapons in the solo role.\r\n");
-		return;
 	}
 	
 	// random chance of this INSTEAD of 'hit' when blood-starved

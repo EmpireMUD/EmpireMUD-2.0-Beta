@@ -541,6 +541,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	argument = any_one_arg(argument, vict_arg);
 	argument = any_one_arg(argument, cmd_arg);
 	argument = any_one_arg(argument, vnum_arg);
+	skip_spaces(&argument);
 	
 	if (!*vict_arg || !*cmd_arg || !*vnum_arg) {
 		script_log_by_type(go_type, go, "dg_quest: too few args");
@@ -642,10 +643,22 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		}
 	}
 	else if (is_abbrev(cmd_arg, "trigger")) {
-		qt_triggered_task(vict, QUEST_VNUM(quest));
+		// passing 0 here leads to adding 1 instead of setting to a specific value
+		qt_triggered_task(vict, QUEST_VNUM(quest), 0);
 	}
 	else if (is_abbrev(cmd_arg, "untrigger")) {
-		qt_untrigger_task(vict, QUEST_VNUM(quest));
+		qt_untrigger_task(vict, QUEST_VNUM(quest), FALSE);
+	}
+	else if (is_abbrev(cmd_arg, "resettrigger")) {
+		qt_untrigger_task(vict, QUEST_VNUM(quest), TRUE);
+	}
+	else if (is_abbrev(cmd_arg, "settrigger")) {
+		if (isdigit(*argument)) {
+			qt_triggered_task(vict, QUEST_VNUM(quest), atoi(argument));
+		}
+		else {
+			script_log_by_type(go_type, go, "dg_quest: invalid settrigger argument '%s'", argument);
+		}
 	}
 	else {
 		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);

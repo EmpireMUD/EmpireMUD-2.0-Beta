@@ -258,7 +258,9 @@ void process_copying_book(char_data *ch) {
 			
 			msg_to_char(ch, "You finish a fresh copy of %s!\r\n", book->title);
 			act("$n finishes copying out $p.", TRUE, ch, obj, NULL, TO_ROOM);
-			load_otrigger(obj);
+			if (load_otrigger(obj)) {
+				get_otrigger(obj, ch, FALSE);
+			}
 		}
 	}
 	else if (GET_ACTION_TIMER(ch) == 6 && !PRF_FLAGGED(ch, PRF_NOSPAM)) {

@@ -460,7 +460,10 @@ void boot_db(void) {
 	check_nowhere_einv_all();
 	check_languages_all_empires();
 	verify_empire_goals();
+	
+	log("Updating progress goals.");
 	need_progress_refresh = TRUE;
+	check_progress_refresh();
 	
 	log("Checking for ruined cities...");
 	check_ruined_cities();

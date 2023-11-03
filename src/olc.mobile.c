@@ -306,6 +306,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	descriptor_data *desc;
 	struct global_data *glb, *next_glb;
 	ability_data *abil, *next_abil;
+	obj_data *obj, *next_obj;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
@@ -447,6 +448,15 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// update objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_MINIPET(obj) && GET_MINIPET_VNUM(obj) == vnum) {
+			set_obj_val(obj, VAL_MINIPET_VNUM, 0);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost its minipet", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_KILL_MOB, vnum);
@@ -571,6 +581,12 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		if (GET_OLC_MOBILE(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			if (IS_MINIPET(GET_OLC_OBJECT(desc)) && GET_MINIPET_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_MINIPET_VNUM, 0);
+				msg_to_char(desc->character, "The minipet used by the item you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
@@ -805,6 +821,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	struct interaction_item *inter;
 	struct global_data *glb, *next_glb;
 	ability_data *abil, *next_abil;
+	obj_data *obj, *next_obj;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
@@ -908,6 +925,14 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
+		}
+	}
+	
+	// objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_MINIPET(obj) && GET_MINIPET_VNUM(obj) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	

@@ -47,21 +47,20 @@ Seeds of Magic~
    The world is covered in forests from pole to pole, but most forests are of
 little note. Legends tell of an enchanted forest which can be grown from a
 single enchanted seed. Find the crystal seed, enchant it, and plant it to start
-an enchanted forest for your empire. Be sure to claim the forest right away,
+a starwood forest for your empire. Be sure to claim the forest right away,
 because a mysterious cult of necrovandals is known to destroy unclaimed magical
 forests. Completing this goal earns your empire more territory per greatness.
 ~
-6 4 0 5 d
+7 4 0 5 c
 K 5 5
 W
 34 604 0 6 -
 S
 #4011
-Enchanted Forest~
-   A single tree does not a forest make. Carefully tend and grow your enchanted
-forest by keeping it surrounded by claimed Plains tiles, and allowing it to
-grow rather than chopping it down. You'll need to grow your forest to produce
-enough magewood to complete this goal.
+Starwood Forest~
+   A single tree does not a forest make. Carefully tend your starwood forest by
+performing the Chant of Nature on it daily. You'll need to grow your forest to
+produce enough magewood to complete this goal.
 ~
 4 4 0 15 0
 K 7 5
@@ -71,9 +70,10 @@ W
 S
 #4012
 Witchwood~
-   Through careful management of your land, you can produce yet more of the
-prized magewood from your enchanted forests. Grow your forest larger and
-carefully chop down and saw enough of it to produce 750 stellar magewood.
+   Through careful management of your starwood forest, you can produce yet more
+of the prized magewood from your enchanted forests. Perform the Chant of Nature
+daily and carefully chop down and saw enough of it to produce 750 stellar
+magewood.
 ~
 7 4 0 25 0
 K 7 5
@@ -84,7 +84,7 @@ S
 #4013
 The Magic Grows~
    Only the most powerful empires achieve the level of greatness it takes to
-manage a large enchanted forest and produce 2000 stellar magewood. Accomplish
+manage a large starwood forest and produce 2000 stellar magewood. Accomplish
 this and bards will tell the tale of your empire for ages to come.
 ~
 5 4 0 50 0
@@ -94,11 +94,11 @@ W
 34 604 0 2000 -
 S
 #4014
-Rowling in the Forest~
-   Continue to grow your enchanted forest beyond all reason as you succumb to
-its magnetic magenta mysteries. Carefully chop trees from the center of your
-forest as it grows at the edges, until you have produced an incredible 5000
-stellar magewood.
+World Wand-er~
+   Continue to grow your starwood forest beyond all reason as you succumb to
+its magnetic magenta mysteries. Carefully perform the Chant of Nature daily and
+tend the forest as it grows, until you have produced an incredible 5000 stellar
+magewood.
 ~
 7 4 0 50 0
 K 7 50
@@ -109,7 +109,7 @@ S
 #4015
 Magic to Make the Sanest Man Go Mad~
    Few empires ever stand in the shadow of the prestige required to produce
-10,000 stellar magewood. Grow, claim, and tend your enchanted forest to become
+10,000 stellar magewood. Grow, chant, and tend your starwood forest to become
 the greatest producer of magewood the world has ever seen and achieve renown to
 last a thousand years.
 ~
@@ -218,17 +218,16 @@ forest right away, because a mysterious cult of necrovandals is known to
 destroy unclaimed magical forests. You will need to chop down some of the
 weirdwood and saw it into magewood to complete this goal.
 ~
-6 4 0 5 0
+7 4 0 5 c
 K 5 5
 W
 34 619 0 6 -
 S
 #4031
 Grove of Wonders~
-   A single tree does not a forest make. Carefully tend and grow your weirdwood
-forest by keeping it surrounded by clear, claimed desert tiles, and by allowing
-it to grow rather than chopping it down. You'll need to grow your forest to get
-enough magewood to complete this goal.
+   A single tree does not a forest make. Perform the Chant of Nature daily and
+grow your weirdwood trees to produce more magical lumber. You'll need to tend
+your forest often to get enough magewood to complete this goal.
 ~
 5 4 0 15 0
 K 7 5
@@ -239,8 +238,8 @@ S
 #4032
 Weirdwood Warden~
    Through careful management of your land, you can produce yet more of the
-prized magewood from your enchanted deserts. Grow your weirdwood forest larger
-and carefully chop down and saw enough of it to produce 750 empyreal magewood.
+prized magewood from your enchanted deserts. Perform the Chant of Nature and
+carefully chop down and saw enough of it to produce 750 empyreal magewood.
 ~
 6 4 0 25 0
 K 7 5
@@ -263,9 +262,8 @@ S
 #4034
 The Spice is Rife~
    Continue to grow your weirdwood forest beyond all reason as you succumb to
-its violet allure. Carefully chop trees from the center of your forest as it
-grows at the edges, until you have produced an incredible 5000 empyreal
-magewood.
+its violet allure. Perform the Chant of Nature often and tend your forest daily
+until you have produced an incredible 5000 empyreal magewood.
 ~
 8 4 0 50 0
 K 7 50
@@ -276,7 +274,7 @@ S
 #4035
 I Dream of Weirdwood in the Desert Sand~
    Few empires ever stand in the shadow of the prestige required to produce
-10,000 empyreal magewood. Grow, claim, and tend your weirdwood forest to become
+10,000 empyreal magewood. Grow, chant, and tend your weirdwood forest to become
 the greatest producer of magewood the world has ever seen and achieve renown
 to last a thousand years.
 ~
@@ -287,5 +285,94 @@ W
 25 618 0 1 a
 W
 34 619 0 10000 a
+S
+#4036
+The Power to Move Forests~
+   Your empire's members learn the ancient and arcane art of crafting crystal
+seeds -- the same seeds used to grow enchanted forests. But this is not without
+cost. Crafting the nascent crystal seed will require a powerful magic gem, a
+fair amount of mana, and magewood aplenty. The crafter will also need to
+possess the ability to Enchant Tools. Once crafted, the nascent crystal seed
+must be awakened in a magical forest, draining that forest of its magic but
+allowing the seed to be enchanted and planted elsewhere.
+~
+2 4 50 0 b
+K 2 621
+P 4037
+S
+#4037
+Famous Forests~
+   Your empire has drawn the attention of the world as it now controls forests
+of both starwood and weirdwood -- two rare and powerful trees sought by mages
+the world over! Guard these precious resources carefully, for even a single
+unclaimed tile will not escape the attention of the necrovandals who seek to
+destroy them.
+~
+3 4 0 30 dg
+K 7 5
+W
+25 601 0 1 a
+W
+25 611 0 1 a
+W
+25 601 0 1 b
+W
+25 612 0 1 b
+W
+25 601 0 1 c
+W
+25 613 0 1 c
+W
+25 601 0 1 d
+W
+25 614 0 1 d
+W
+25 602 0 1 e
+W
+25 611 0 1 e
+W
+25 602 0 1 f
+W
+25 612 0 1 f
+W
+25 602 0 1 g
+W
+25 613 0 1 g
+W
+25 602 0 1 h
+W
+25 614 0 1 h
+W
+25 603 0 1 i
+W
+25 611 0 1 i
+W
+25 603 0 1 j
+W
+25 612 0 1 j
+W
+25 603 0 1 k
+W
+25 613 0 1 k
+W
+25 603 0 1 l
+W
+25 614 0 1 l
+W
+25 604 0 1 m
+W
+25 611 0 1 m
+W
+25 604 0 1 n
+W
+25 612 0 1 n
+W
+25 604 0 1 o
+W
+25 613 0 1 o
+W
+25 604 0 1 p
+W
+25 614 0 1 p
 S
 $

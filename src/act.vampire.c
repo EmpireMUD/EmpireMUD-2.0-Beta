@@ -34,6 +34,7 @@
 // external functions
 ACMD(do_say);
 ACMD(do_stand);
+ACMD(do_wake);
 
 // locals
 ACMD(do_bite);
@@ -507,10 +508,20 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// get ready
 	if (GET_POS(ch) < POS_FIGHTING) {
-		do_stand(ch, "", 0, 0);
+		if (GET_POS(ch) == POS_SLEEPING) {
+			do_wake(ch, "", 0, 0);
+		}
+		if (GET_POS(ch) == POS_RESTING || GET_POS(ch) == POS_SITTING) {
+			do_stand(ch, "", 0, 0);
+		}
 		if (GET_POS(ch) < POS_FIGHTING) {
 			return FALSE;	// failed to stand
 		}
+	}
+	
+	// cancel timed action
+	if (GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
 	}
 	
 	// message only if not already fighting
@@ -936,7 +947,7 @@ ACMD(do_bite) {
 			send_config_msg(ch, "must_be_vampire");
 		}
 	}
-	else if (!char_can_act(ch, POS_FIGHTING, TRUE, FALSE)) {
+	else if (!char_can_act(ch, POS_FIGHTING, TRUE, FALSE, TRUE)) {
 		// do_bite allows positions as low as sleeping so you can cancel biting, but they can't do anything past here
 		// sends own message
 	}

@@ -120,6 +120,7 @@
 #define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)
 #define ABIL_SCALE(abil)  ((abil)->scale)
 #define ABIL_SHORT_DURATION(abil)  ((abil)->short_duration)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
@@ -926,6 +927,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->min_scale_level : 0)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->quest_lookups : NULL)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_quest : NOTHING)
+#define GET_OBJ_REQUIRES_TOOL(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_tool : NOTHING)
 #define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->shop_lookups : NULL)
 #define GET_OBJ_STORAGE(obj)  ((obj)->proto_data ? (obj)->proto_data->storage : NULL)
 #define GET_OBJ_TOOL_FLAGS(obj)  ((obj)->proto_data ? (obj)->proto_data->tool_flags : NOBITS)
@@ -2188,6 +2190,7 @@ bool valid_rank_name(char_data *ch, char *newname);
 void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
+bool has_uncollected_event_rewards(char_data *ch);
 struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
@@ -2261,7 +2264,7 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
-void check_daily_cycle_reset(char_data *ch, bool extra_space);
+void check_daily_cycle_reset(char_data *ch);
 void check_pointless_fight(char_data *mob);
 void check_ruined_cities();
 void gain_condition(char_data *ch, int condition, int value);
@@ -2448,8 +2451,8 @@ void qt_lose_vehicle(char_data *ch, vehicle_data *veh);
 void qt_quest_completed(char_data *ch, any_vnum vnum);
 void qt_remove_obj(char_data *ch, obj_data *obj);
 void qt_start_quest(char_data *ch, any_vnum vnum);
-void qt_triggered_task(char_data *ch, any_vnum vnum);
-void qt_untrigger_task(char_data *ch, any_vnum vnum);
+void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val);
+void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 

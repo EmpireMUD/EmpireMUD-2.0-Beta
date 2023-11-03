@@ -188,6 +188,17 @@ of time based on your Dexterity (max 3 seconds).
 Gains experience when you take a potentially fatal blow, whether you die or
 survive.
 #
+"MASTER TRACKER"
+
+Master Tracker (Survival ability)
+
+Usage:  where [name]
+Range:  75 tiles
+
+Increases the base range of your "where" command to 75 tiles.
+
+See also: WHERE
+#
 MOUNT DISMOUNT RIDING RIDE "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
 
 Ride (Survival ability)
@@ -414,29 +425,6 @@ Gains experience when you find tracks.
 Example:
   > track dog
   You sense a trail south from here!
-
-See also: NO TRACE, UNSEEN PASSING
-#
-WHERE "MASTER TRACKER"
-
-Master Tracker (Survival ability)
-
-Usage:  where [animal | player]
-Range:  20 / 75 tiles
-
-Tells you the location of a near-by animal or player. Anybody can use this
-to find things that are close by, but master trackers can use it over a much
-larger area.
-
-If used with no argument, "where" instead tells you the location of all nearby
-players.
-
-Master Tracker gains experience when you find someone or something using 'where'
-even if it is within the normal range.
-
-Example:
-  > where
-  > where dragon
 
 See also: NO TRACE, UNSEEN PASSING
 #

@@ -1775,7 +1775,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		strcat(buf, "\r\n");
 	}
 	
-	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+	if (mode == OBJ_DESC_LOOK_AT || (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
 			strcat(buf, "...it has a quest for you!\r\n");
 		}
@@ -3380,13 +3380,12 @@ ACMD(do_mudstats) {
 
 
 ACMD(do_nearby) {
-	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
-	int iter, dist, size;
+	int iter, dist, size, max_dist;
 	bool found = FALSE;
 	room_data *loc;
 	any_vnum vnum;
@@ -3412,6 +3411,11 @@ ACMD(do_nearby) {
 		return;
 	}
 	
+	// detect distance
+	max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
+	max_dist += GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
+	max_dist = MAX(0, max_dist);
+	
 	// argument-parsing
 	skip_spaces(&argument);
 	while (*argument == '-') {
@@ -3435,7 +3439,7 @@ ACMD(do_nearby) {
 	}
 	
 	// displaying:
-	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
+	size = snprintf(buf, sizeof(buf), "You find nearby (within %d tile%s):\r\n", max_dist, PLURAL(max_dist));
 	#define NEARBY_DIR  get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE))
 			// was: (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 

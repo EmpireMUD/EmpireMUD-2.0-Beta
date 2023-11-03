@@ -1053,6 +1053,7 @@ while %cycles_left% >= 0
           %echo% ~%person% looks pacified.
           if %person.vnum% >= 12654 && %person.vnum% <= 12657
             set give_token 1
+            %quest% %person% trigger 12650
           end
         end
         set person %next_person%
@@ -1080,7 +1081,6 @@ while %cycles_left% >= 0
           end
           if %done%
             %send% %person% You have tranquilized all four of the druid leaders.
-            %quest% %person% trigger 12650
           end
         end
         set person %person.next_in_room%

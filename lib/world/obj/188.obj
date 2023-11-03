@@ -754,10 +754,9 @@ A pillaging pillowcase is standing up on its own!~
    If you are seeing this, it is broken. Please report to an immortal via the
 bug command.
 ~
-3 p a 0 9
+3 p a 0 10
 0 0 0
 7 0
-Q 18808
 T 18809
 T 18808
 T 18810
@@ -872,11 +871,11 @@ T 18856
 S
 #18857
 bucket apple-bobbing bobbing~
-apple bobbing bucket~
+the apple bobbing bucket~
 The apple-bobbing bucket is set up here, waiting for players.~
 This wooden bucket is on the larger side and filled with water and apples.
 Type:  challenge <player>
-Then type:   bob bucket
+Then type:  bob bucket
 ~
 3 z a 0 8
 0 0 0

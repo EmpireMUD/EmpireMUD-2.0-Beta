@@ -327,6 +327,8 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_CRAFTING  25	// bonus craft levels
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
 #define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
+#define APPLY_NEARBY_RANGE  28	// larger "nearby"
+#define APPLY_WHERE_RANGE  29	// larger "where"
 
 
 // AUTOMSG_x: automessage types
@@ -968,7 +970,9 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
 #define ATT_AGE_MODIFIER  13	// +/- age
 #define ATT_NIGHT_VISION  14	// bonus light radius at night
-#define NUM_EXTRA_ATTRIBUTES  15
+#define ATT_NEARBY_RANGE  15	// larger "nearby"
+#define ATT_WHERE_RANGE  16		// larger "where"
+#define NUM_EXTRA_ATTRIBUTES  17
 
 
 // AFF_x: Affect bits
@@ -2502,7 +2506,7 @@ typedef enum {
 #define PTECH_STEAL_UPGRADE  47	// can steal from vaults
 #define PTECH_SWIMMING  48	// player can enter water tiles
 #define PTECH_TELEPORT_CITY  49	// teleports can target cities
-#define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
+#define PTECH_TWO_HANDED_MASTERY  50	// bonus damage from 2H weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
 #define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
@@ -2588,6 +2592,7 @@ typedef enum {
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
 #define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
+#define PRG_NO_TRACKER  BIT(6)	// g. hide the tracker from the player
 
 
 // PRG_PERK_x: progress perks
@@ -3615,6 +3620,7 @@ struct ability_data {
 	double scale;	// effectiveness scale (1.0 = 100%)
 	bitvector_t immunities;	// AFF_ flags that block this ability
 	bitvector_t gain_hooks;	// AGH_ flags
+	bitvector_t requires_tool;	// TOOL_ flags required to use it
 	
 	// command-related data
 	char *command;	// if ability has a command
@@ -5733,6 +5739,7 @@ struct obj_proto_data {
 	int max_scale_level;	// maximum level this obj may be scaled to
 	
 	any_vnum requires_quest;	// can only have obj whilst on quest
+	bitvector_t requires_tool;	// tool required when crafting/building
 	
 	// lists
 	struct extra_descr_data *ex_description;	// extra descriptions

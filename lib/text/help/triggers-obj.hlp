@@ -64,8 +64,19 @@ Return value:  return 0 to cancel getting the object
 
 Activated any time a character attempts to pick up the object.
 
+This trigger also fires when a character retrieves an object from storage,
+collects it from the trading post, collects event rewards, produces the item
+directly to their inventory from a chore, and other similar cases. However, in
+these cases, returning 0 does NOT prevent the character from having the item.
+
+If this trigger would purge the object, consider using "wait 1" before the
+purge to avoid conflicts.
+
 Variables:
   &c%actor%&0 - The character trying to get the object.
+  &c%preventable%&0 - 1 means the "get" can be blocked, 0 means it cannot. If
+     the "get" is not preventable, you can still attempt to remove it from the
+     player's inventory in the script.
 #d
 "GIVE TRIGGER" "OTRIG GIVE" TRIGEDIT-OBJ-GIVE
 

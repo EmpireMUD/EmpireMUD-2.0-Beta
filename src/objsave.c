@@ -343,6 +343,18 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				BAD_TAG_WARNING(line)
 				break;
 			}
+			case 'R': {
+				if (!strn_cmp(line, "Requires-tool: ", 15)) {
+					if (sscanf(line + 15, "%s", s_in)) {
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->requires_tool = asciiflag_conv(s_in);
+						}
+					}
+				}
+				BAD_TAG_WARNING(line)
+				break;
+			}
 			case 'S': {
 				if (!strn_cmp(line, "Short-desc:", 11)) {
 					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
@@ -594,6 +606,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	if (!proto && GET_OBJ_TOOL_FLAGS(obj) != NOBITS) {
 		fprintf(fl, "Tool: %s\n", bitv_to_alpha(GET_OBJ_TOOL_FLAGS(obj)));
+	}
+	if (!proto && GET_OBJ_REQUIRES_TOOL(obj) != NOBITS) {
+		fprintf(fl, "Requires-tool: %s\n", bitv_to_alpha(GET_OBJ_REQUIRES_TOOL(obj)));
 	}
 
 	if (obj->last_empire_id != NOTHING) {

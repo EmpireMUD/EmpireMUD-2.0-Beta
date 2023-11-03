@@ -131,9 +131,8 @@ void check_attribute_gear(char_data *ch) {
 * a message).
 *
 * @param char_data *ch The player.
-* @param bool extra_space If TRUE, adds a line break before the message.
 */
-void check_daily_cycle_reset(char_data *ch, bool extra_space) {
+void check_daily_cycle_reset(char_data *ch) {
 	int gain;
 	
 	if (!IS_NPC(ch) && GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
@@ -146,10 +145,10 @@ void check_daily_cycle_reset(char_data *ch, bool extra_space) {
 		GET_DAILY_QUESTS(ch) = 0;
 		GET_EVENT_DAILY_QUESTS(ch) = 0;
 	
-		msg_to_char(ch, "%s\tjYour daily quests and bonus experience have reset!\t0\r\n", extra_space ? "\r\n" : "");
+		msg_to_char(ch, "\tjYour daily quests and bonus experience have reset!\t0\r\n");
 		
 		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
-			msg_to_char(ch, "Your daily quests expire.\r\n");
+			msg_to_char(ch, "\tjYour daily quests expire.\t0\r\n");
 		}
 	
 		// update to this cycle so it only happens once a day
@@ -342,7 +341,9 @@ INTERACTION_FUNC(consumes_or_decays_interact) {
 		}
 		
 		if (!fail) {
-			load_otrigger(new_obj);
+			if (load_otrigger(new_obj) && new_obj->carried_by) {
+				get_otrigger(new_obj, new_obj->carried_by, FALSE);
+			}
 		}
 	}
 	
@@ -574,7 +575,7 @@ void real_update_player(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	check_daily_cycle_reset(ch, FALSE);
+	check_daily_cycle_reset(ch);
 
 	/* Update conditions */
 	if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			

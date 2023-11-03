@@ -324,7 +324,9 @@ INTERACTION_FUNC(devastate_crop) {
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		load_otrigger(newobj);
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
 	}
 	
 	return TRUE;
@@ -354,7 +356,9 @@ INTERACTION_FUNC(devastate_trees) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		load_otrigger(newobj);
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -393,6 +397,21 @@ double get_enchant_scale_for_char(char_data *ch, int max_scale) {
 */
 void perform_ritual(char_data *ch) {	
 	int rit = GET_ACTION_VNUM(ch, 0);
+	char buf[MAX_STRING_LENGTH];
+	ability_data *abil;
+	
+	// check tool still present
+	if (ritual_data[rit].ability != NO_ABIL && (abil = find_ability_by_vnum(ritual_data[rit].ability)) && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to finish the %s: %s\r\n", buf, ritual_scmd[ritual_data[rit].subcmd]);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to finish the %s.\r\n", AN(buf), buf, ritual_scmd[ritual_data[rit].subcmd]);
+		}
+		cancel_action(ch);
+		return;
+	}
 	
 	GET_ACTION_TIMER(ch) += 1;
 	send_ritual_messages(ch, rit, GET_ACTION_TIMER(ch));
@@ -809,7 +828,9 @@ ACMD(do_disenchant) {
 				obj_to_char(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
-				load_otrigger(reward);
+				if (load_otrigger(reward)) {
+					get_otrigger(reward, ch, FALSE);
+				}
 			}
 		}
 	}
@@ -1154,6 +1175,7 @@ ACMD(do_ritual) {
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int iter, rit = NOTHING;
 	bool found, result = FALSE;
+	ability_data *abil;
 	
 	half_chop(argument, arg, arg2);
 	
@@ -1210,13 +1232,25 @@ ACMD(do_ritual) {
 		return;
 	}
 	
-	// triggers?
-	if (ritual_data[rit].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, ritual_data[rit].ability)) {
+	if (GET_MANA(ch) < ritual_data[rit].cost) {
+		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
 		return;
 	}
 	
-	if (GET_MANA(ch) < ritual_data[rit].cost) {
-		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
+	// check tool
+	if (ritual_data[rit].ability != NO_ABIL && (abil = find_ability_by_vnum(ritual_data[rit].ability)) && ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, buf);
+		if (count_bits(ABIL_REQUIRES_TOOL(abil)) > 1) {
+			msg_to_char(ch, "You need tools to perform the %s: %s\r\n", ritual_scmd[subcmd], buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to perform the %s.\r\n", AN(buf), buf, ritual_scmd[subcmd]);
+		}
+		return;
+	}
+	
+	// triggers?
+	if (ritual_data[rit].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, ritual_data[rit].ability)) {
 		return;
 	}
 	

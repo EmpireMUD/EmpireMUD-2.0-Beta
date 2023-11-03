@@ -851,6 +851,7 @@ Fields:
   &c-ptech&0 - see HELP PTECH
   &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
   &c-targets&0 - see HELP ABILEDIT TARGETS
+  &c-tools&0 - required tools, see HELP TOOL TYPES
   &c-type&0 - see HELP ABILEDIT TYPE
   &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
   &c-vmin&0, &c-vmax&0 - VNUM range limits
@@ -1052,7 +1053,7 @@ Available techs are:
  &cSteal-Upgrade&0 * - Can steal from vaults too.
  &cSwimming&0 * - Can move on water tiles with no boat.
  &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
- &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
+ &cTwo-Handed-Mastery&0 * - Bonus damage from two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
  &cSkinning-Upgrade&0 - Skinning always succeeds.
@@ -4172,7 +4173,7 @@ Scaling based on item types:
  pack - the "capacity" value
 
 The following attributes never scale: greatness, age, crafting, blood-upkeep,
-night-vision
+night-vision, nearby-range, where-range
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -5306,33 +5307,35 @@ other sources (the default is "natural"). The superior and *-drop apply types
 will only appear on the item if it has matching flags.
 
 Most applies are self-explanatory:
- STRENGTH - characters can't use an item that would reduce them below 1
- DEXTERITY - chance to hit/dodge
- HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1
- GREATNESS - empire meta-trait (unscaled)
- MOVE-REGEN - rate of move regen (per 5 second tick)
- MANA-REGEN - rate of mana regen (per 5 second tick)
- INTELLIGENCE - characters can't use an item that would reduce them below 1
- WITS - combat speed and damage
- AGE - this actually raises/lowers the player's age, which has no effect
- MAX-MOVE - move pool
- RESIST-PHYSICAL - physical damage reduction
- BLOCK - block only matters if the player has a shield
- HEAL-OVER-TIME - healing even during battle
- MAX-HEALTH - health pool
- MAX-MANA - mana pool
- TO-HIT - chance to hit (%)
- DODGE - chance to dodge (%)
- INVENTORY - this adds to inventory capacity
- MAX-BLOOD - blood pool size
- BONUS-PHYSICAL - added to strength-based damage and weapon dps
- BONUS-MAGICAL - added to magical damage and weapon dps
- BONUS-HEALING - added to damage healed (by abilities this player uses)
- RESIST-MAGICAL - magical damage reduction
- CRAFTING - bonus to craft level (unscaled)
- BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
- NIGHT-VISION - adds to light radius at night (unscaled)
+ &cSTRENGTH&0 - characters can't use an item that would reduce them below 1
+ &cDEXTERITY&0 - chance to hit/dodge
+ &cHEALTH-REGEN&0 - rate of health regen (per 5 second tick)
+ &cCHARISMA&0 - characters can't use an item that would reduce them below 1
+ &cGREATNESS&0 - empire meta-trait (unscaled)
+ &cMOVE-REGEN&0 - rate of move regen (per 5 second tick)
+ &cMANA-REGEN&0 - rate of mana regen (per 5 second tick)
+ &cINTELLIGENCE&0 - characters can't use an item that would reduce them below 1
+ &cWITS&0 - combat speed and damage
+ &cAGE&0 - this actually raises/lowers the player's age, which has no effect
+ &cMAX-MOVE&0 - move pool
+ &cRESIST-PHYSICAL&0 - physical damage reduction
+ &cBLOCK&0 - block only matters if the player has a shield
+ &cHEAL-OVER-TIME&0 - healing even during battle
+ &cMAX-HEALTH&0 - health pool
+ &cMAX-MANA&0 - mana pool
+ &cTO-HIT&0 - chance to hit (%)
+ &cDODGE&0 - chance to dodge (%)
+ &cINVENTORY&0 - this adds to inventory capacity
+ &cMAX-BLOOD&0 - blood pool size
+ &cBONUS-PHYSICAL&0 - added to strength-based damage and weapon dps
+ &cBONUS-MAGICAL&0 - added to magical damage and weapon dps
+ &cBONUS-HEALING&0 - added to damage healed (by abilities this player uses)
+ &cRESIST-MAGICAL&0 - magical damage reduction
+ &cCRAFTING&0 - bonus to craft level (unscaled)
+ &cBLOOD-UPKEEP&0 - adds to how much blood vampires must spend per hour (unscaled)
+ &cNIGHT-VISION&0 - adds to light radius at night (unscaled)
+ &cNEARBY-RANGE&0 - increases the range of the player's nearby command
+ &cWHERE-RANGE&0 - increases the range of the player's where command
 
 See also: OLC OBJECTS
 #d
@@ -5660,6 +5663,7 @@ Fields:
   &c-lightislit&0 - find lights that default to lit, excluding the LIGHT flag
   &c-lightisunlit&0 - find lights that default to unlit
   &c-material&0 - see OEDIT MATERIAL
+  &c-requirestools&0 - see HELP OEDIT TOOLS
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
@@ -5881,6 +5885,23 @@ Requires objects will be lost when the quest ends.
 
 See also: OLC OBJECTS
 #d
+"OEDIT REQUIRESTOOLS" "OEDIT REQUIRES TOOLS"
+
+Usage:  .requirestools [add | remove] <flags>
+
+If an object requires a tool when you build or maintain a building WITH it, use
+this field. This is separate from any tools set on the building's craft itself.
+
+This does not apply to non-building/non-vehicle crafts, which are instant. For
+those, set the tool on the craft itself.
+
+Examples:
+ - nails require a hammer when crafting
+
+See &yHELP TOOLS&0 for a full list.
+
+See also: OLC OBJECTS, CEDIT TOOL, OEDIT TOOLS
+#d
 "OEDIT STORAGE"
 
 Usage:  .storage add <building | vehicle> <vnum> [flags]
@@ -6029,18 +6050,21 @@ real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT TOOLS" "OEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
+"OEDIT TOOLS" "OEDIT TOOL FLAGS" "ABILEDIT TOOLS" "ABILEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
 
 Usage:  .tools [add | remove] <flags>
 
+Abilities: Player must be using this type of tool to use the ability.
 Objects: Tool flags allow an object to be used for various tasks, like sawing.
+         Objects also support a "requires tools" flag for tools needed to build
+         something that uses the object (e.g. nails require hammer).
 Crafts: You can require 1 or more tools to create the craft. These tools MUST
         be present, and you can't substitute with a building (e.g. tailor for
         sewing kit).
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC CRAFTS, OLC OBJECTS
+See also: OLC ABILITIES, OLC CRAFTS, OLC OBJECTS, OEDIT REQUIRES TOOLS
 #d
 "OEDIT TYPE"
 
@@ -6882,6 +6906,7 @@ The following progress goal flags are available:
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
  &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
+ &cNO-TRACKER&0 - Mortals can't see the detailed tracker while in-progress.
 
 See also: OLC PROGRESS
 #d
@@ -8308,12 +8333,21 @@ players can 'fill' from it like a fountain.
 
 Note: Unlike other items, if there is a 'timer' on a drink container, it will
 only cause the liquid inside to go bad and be poured out, rather than purging
-the whole container.
+the whole container -- unless it has a 1-USE flag, in which case it the drink
+container is also destroyed. Consuming the last liquid in a 1-USE drink
+container will also cause it to be destroyed.
 
 Object values:
  0 - max capacity (scalable)
  1 - current amount
  2 - generic liquid vnum
+
+Custom messages:
+ decays-on-char - shown when contents expire
+ decays-in-room - shown when contents expire
+
+Interactions:
+ DECAYS-TO - only when a 1-USE drink container's timer expires
 #d
 "FOOD ITEM" "FOOD OBJECT"
 

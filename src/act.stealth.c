@@ -192,7 +192,9 @@ INTERACTION_FUNC(pickpocket_interact) {
 		scale_item_to_level(obj, get_approximate_level(inter_mob));
 		obj_to_char(obj, ch);
 		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
-		load_otrigger(obj);
+		if (load_otrigger(obj)) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -589,6 +591,9 @@ ACMD(do_backstab) {
 	}
 	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
 		send_to_char("You must use a stabbing weapon to backstab.\r\n", ch);
+	}
+	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {
+		msg_to_char(ch, "You can't do that while disarmed!\r\n");
 	}
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
 		send_to_char("Backstab whom?\r\n", ch);
@@ -1049,6 +1054,9 @@ ACMD(do_jab) {
 	}
 	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
 		send_to_char("You must use a stabbing weapon to jab.\r\n", ch);
+	}
+	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {
+		msg_to_char(ch, "You can't do that while disarmed!\r\n");
 	}
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
 		send_to_char("Jab whom?\r\n", ch);

@@ -1118,7 +1118,14 @@ int timer_otrigger(obj_data *obj) {
 }
 
 
-int get_otrigger(obj_data *obj, char_data *actor) {
+/**
+* Trigger fires when actor tries to get obj, or receives it in some way.
+*
+* @param obj_data *obj The object trying to be "got".
+* @param char_data *actor The person trying to receive the object.
+* @param bool preventable If TRUE, the script can block the "get". If FALSE, the character has already received the object and it can only be prevented by moving it in the script.
+*/
+int get_otrigger(obj_data *obj, char_data *actor, bool preventable) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
@@ -1129,6 +1136,8 @@ int get_otrigger(obj_data *obj, char_data *actor) {
 		if (TRIGGER_CHECK(t, OTRIG_GET) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			snprintf(buf, sizeof(buf), "%d", preventable ? 1 : 0);
+			add_var(&GET_TRIG_VARS(t), "preventable", buf, 0);
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
 			obj = sdd.o;
@@ -1482,11 +1491,15 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim) {
 	return 1;
 }
 
-void load_otrigger(obj_data *obj) {
-	trig_data *trig, *next_trig;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_LOAD))
-		return;
+// returns 0 if the obj was purged; 1 otherwise
+int load_otrigger(obj_data *obj) {
+	trig_data *trig, *next_trig;
+	int return_val = 1;	// default to ok
+
+	if (!SCRIPT_CHECK(obj, OTRIG_LOAD)) {
+		return return_val;
+	}
 	
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), trig, next_trig) {
 		if (TRIGGER_CHECK(trig, OTRIG_LOAD) && (number(1, 100) <= GET_TRIG_NARG(trig))) {
@@ -1494,9 +1507,18 @@ void load_otrigger(obj_data *obj) {
 			sdd.o = obj;
 			script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
 			obj = sdd.o;
+			if (!obj) {
+				// purged!
+				return_val = 0;
+			}
+			
+			// always break out after 1 trigger runs
+			// TODO: allow-multiple?
 			break;
 		}
 	}
+	
+	return return_val;
 }
 
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {

@@ -601,21 +601,29 @@ void perform_alternate(char_data *old, char_data *new) {
 		look_at_room(new);
 	}
 	
-	msg_to_char(new, "\r\n");	// leading \r\n between the look and the tip
-	display_tip_to_char(new);
+	// leading \r\n between the look and the tip/info section
+	msg_to_char(new, "\r\n");
 	
+	display_automessages_on_login(new);
+	
+	if (!PRF_FLAGGED(new, PRF_NO_TUTORIALS)) {
+		display_tip_to_char(new);
+	}
 	if (GET_MAIL_PENDING(new)) {
-		send_to_char("&rYou have mail waiting.&0\r\n", new);
+		send_to_char("\trYou have mail waiting.\t0\r\n", new);
+	}
+	if (has_uncollected_event_rewards(new)) {
+		msg_to_char(new, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
 	}
 	
 	// reset daily cycle now
-	check_daily_cycle_reset(new, TRUE);
+	check_daily_cycle_reset(new);
 	
 	if (!IS_APPROVED(new) && (msg = config_get_string("unapproved_greeting")) && *msg) {
-		msg_to_char(new, "\r\n&o%s&0", msg);
+		msg_to_char(new, "\r\n\to%s\t0", msg);
 	}
 	if (show_start && (msg = config_get_string("start_message")) && *msg) {
-		msg_to_char(new, "\r\n&Y%s&0", msg);
+		msg_to_char(new, "\r\n\tY%s\t0", msg);
 	}
 	
 	if (!IS_IMMORTAL(new)) {
@@ -715,7 +723,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
 		return FALSE;
 	}
-	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return FALSE;
 	}
 	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
@@ -847,7 +855,7 @@ static void print_group(char_data *ch) {
 
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
-	int iter, amt;
+	int iter, amt, obj_ok = 0;
 	obj_data *obj = NULL;
 	
 	add_cooldown(inter_mob, COOLDOWN_SHEAR, config_get_int("shear_growth_time") * SECS_PER_REAL_HOUR);
@@ -861,7 +869,10 @@ INTERACTION_FUNC(shear_interact) {
 	for (iter = 0; iter < amt; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -870,7 +881,12 @@ INTERACTION_FUNC(shear_interact) {
 	}
 	
 	// only show loot to the skinner
-	if (amt == 1) {
+	if (!obj_ok || !obj) {
+		act("You skillfully shear $N.", FALSE, ch, NULL, inter_mob, TO_CHAR);
+		act("$n skillfully shears you.", FALSE, ch, NULL, inter_mob, TO_VICT);
+		act("$n skillfully shears $N.", FALSE, ch, NULL, inter_mob, TO_NOTVICT);
+	}
+	else if (amt == 1) {
 		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
 		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
 		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
@@ -891,7 +907,7 @@ INTERACTION_FUNC(shear_interact) {
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
-	int num;
+	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_SKINNING_UPGRADE) && number(1, 100) > 60) {
 		return FALSE;	// 60% failure unskilled
@@ -901,7 +917,10 @@ INTERACTION_FUNC(skin_interact) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char(obj, ch);
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -910,7 +929,11 @@ INTERACTION_FUNC(skin_interact) {
 	}
 	
 	// only show loot to the skinner
-	if (interaction->quantity > 1) {
+	if (!obj_ok) {
+		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR);
+		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM);
+	}
+	else if (interaction->quantity > 1) {
 		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
 		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
@@ -2121,7 +2144,7 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
 		return;
 	}
-	if (abil && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+	if (abil && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return;
 	}
 	if (!abil && GET_POS(ch) < POS_STANDING) {

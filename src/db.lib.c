@@ -394,7 +394,7 @@ void display_automessages(void) {
 */
 void display_automessages_on_login(char_data *ch) {
 	struct automessage *msg, *next_msg;
-	bool any = FALSE;
+	// bool any = FALSE;
 	
 	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (msg->timing != AUTOMSG_ON_LOGIN) {
@@ -402,13 +402,14 @@ void display_automessages_on_login(char_data *ch) {
 		}
 		
 		show_automessage_to_char(ch, msg);
-		any = TRUE;
+		// any = TRUE;
 	}
 		
-	// trailing crlf
+	/* trailing crlf -- currently NOT sending this
 	if (any) {
 		msg_to_char(ch, "\r\n");
 	}
+	*/
 }
 
 
@@ -5377,7 +5378,7 @@ void parse_object(FILE *obj_f, int nr) {
 	static char line[256];
 	int t[10], retval;
 	char *tmpptr;
-	char f1[256], f2[256], f3[256];
+	char f1[256], f2[256], f3[256], f4[256];
 	struct obj_storage_type *store;
 	struct obj_apply *apply;
 	obj_data *obj, *find;
@@ -5419,14 +5420,17 @@ void parse_object(FILE *obj_f, int nr) {
 		exit(1);
 	}
 	// type extra-flags wear-flags tool-flags version
-	if ((retval = sscanf(line, " %d %s %s %s %d", &t[0], f1, f2, f3, &t[1])) != 5) {
-		strcpy(f3, "0");	// backwards-compatible version has no tool flags
-		if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
-			// older version of the file: missing version into
-			t[1] = 1;
-			if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
-				log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
-				exit(1);
+	if ((retval = sscanf(line, " %d %s %s %s %s %d", &t[0], f1, f2, f3, f4, &t[1])) != 6) {
+		strcpy(f4, "0");	// backwards-compatible version has no requires-tool flags
+		if ((retval = sscanf(line, " %d %s %s %s %d", &t[0], f1, f2, f3, &t[1])) != 5) {
+			strcpy(f3, "0");	// backwards-compatible version has no tool flags
+			if ((retval = sscanf(line, " %d %s %s %d", &t[0], f1, f2, &t[1])) != 4) {
+				// older version of the file: missing version into
+				t[1] = 1;
+				if ((retval = sscanf(line, " %d %s %s", t, f1, f2)) != 3) {
+					log("SYSERR: Format error in first numeric line (expecting 3 args, got %d), %s", retval, buf2);
+					exit(1);
+				}
 			}
 		}
 	}
@@ -5434,6 +5438,7 @@ void parse_object(FILE *obj_f, int nr) {
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
 	obj->proto_data->tool_flags = asciiflag_conv(f3);
+	obj->proto_data->requires_tool = asciiflag_conv(f4);
 	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
@@ -5613,7 +5618,7 @@ void parse_object(FILE *obj_f, int nr) {
 * @param obj_data *obj The object to save.
 */
 void write_obj_to_file(FILE *fl, obj_data *obj) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], temp4[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_apply *apply;
 	
@@ -5635,7 +5640,8 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	strcpy(temp, bitv_to_alpha(GET_OBJ_EXTRA(obj)));
 	strcpy(temp2, bitv_to_alpha(GET_OBJ_WEAR(obj)));
 	strcpy(temp3, bitv_to_alpha(GET_OBJ_TOOL_FLAGS(obj)));
-	fprintf(fl, "%d %s %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, temp3, OBJ_VERSION(obj));
+	strcpy(temp4, bitv_to_alpha(GET_OBJ_REQUIRES_TOOL(obj)));
+	fprintf(fl, "%d %s %s %s %s %d\n", GET_OBJ_TYPE(obj), temp, temp2, temp3, temp4, OBJ_VERSION(obj));
 
 	fprintf(fl, "%d %d %d\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
 	

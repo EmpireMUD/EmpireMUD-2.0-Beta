@@ -310,7 +310,7 @@ the ladle down by his cauldron and approaches with interest.
    'Oh yes,' he says, examining the bugs. 'Yes, these will do nicely. Here is
 your reward. Don't lose it all in one place.'
 ~
-15 e 0 0 -1
+16 e 0 0 -1
 A
 1 18217
 D 18243
@@ -324,8 +324,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 -
-Catch 2 bugs~
+11 0 0 2 -
+Catch bugs~
 Z
 1 18208
 S
@@ -398,7 +398,7 @@ little thing? Good little Morty. Uncle Nosty has a treat for you...'
    Your reward is on the desk and you decide this is a good time to take it and
 leave.
 ~
-18 e 0 0 -1
+19 e 0 0 -1
 A
 1 18217
 D 18243
@@ -412,8 +412,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 a
-Feed Rodentmort three corpses~
+11 0 0 3 a
+Feed Rodentmort corpses~
 Z
 1 18211
 S
@@ -753,7 +753,7 @@ the old mirror. 'Quite spectacular, indeed. Oh, and you've nabbed a necrofiend?
 And what's this, is there a woman in here? She looks like some kind of dark
 wizard. You have outdone yourself this time. Truly, truly.'
 ~
-22 e 0 0 -1
+23 e 0 0 -1
 A
 1 18217
 D 18252
@@ -767,8 +767,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 a
-Capture 3 fiends in the mirror~
+11 0 0 3 a
+Capture fiends in the mirror~
 Z
 1 18210
 S
@@ -1129,7 +1129,7 @@ return the siphoned frost power to the guild.
 ~
 You hand over the siphon and the frosty power it contains.
 ~
-14 e 0 0 -1
+15 e 0 0 -1
 A
 1 18210
 A
@@ -1145,7 +1145,7 @@ R
 1 -1 50
 T 18261
 W+
-11 0 0 1 -
+11 0 0 2 -
 Use the siphon on the Cryomancer and Rime Mage~
 Z
 1 18210

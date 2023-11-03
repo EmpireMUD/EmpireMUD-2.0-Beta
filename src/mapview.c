@@ -2547,10 +2547,13 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		max_distance = 20;
 	}
 	
+	max_distance += GET_EXTRA_ATT(ch, ATT_WHERE_RANGE);
+	max_distance = MAX(0, max_distance);
+	
 	command_lag(ch, WAIT_OTHER);
 
 	if (!*arg) {
-		send_to_char("Players near you\r\n--------------------\r\n", ch);
+		msg_to_char(ch, "Players near you (%d tile%s)\r\n------------------------------\r\n", max_distance, PLURAL(max_distance));
 		DL_FOREACH2(player_character_list, i, next_plr) {
 			if (IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
@@ -2621,13 +2624,13 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		if (found) {
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(found))) {
 				// same map location:
-				msg_to_char(ch, "%-20s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), (IN_ROOM(ch) == IN_ROOM(found)) ? " (here)" : "");
+				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), (IN_ROOM(ch) == IN_ROOM(found)) ? " (here)" : "");
 			}
 			else {
 				// not the same map location -- show distance/coords:
 				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(found), FALSE);
 				// distance is already set for us as 'closest'
-				msg_to_char(ch, "%-25s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), TRUE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (*dir_str ? dir_str : "away"));
+				msg_to_char(ch, "%s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (*dir_str ? dir_str : "away"));
 			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}

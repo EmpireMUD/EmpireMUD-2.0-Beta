@@ -443,8 +443,8 @@ char *next_page(char *str, descriptor_data *desc) {
 		else if (*str == 'm' && spec_code)
 			spec_code = FALSE;
 		
-		// skip & colorcodes
-		else if (*str == COLOUR_CHAR) {
+		// skip & and \t colorcodes
+		else if (*str == COLOUR_CHAR || *str == '\t') {
 			++str;
 			if (*str == COLOUR_CHAR) {	// cause it to print a & in case of &&
 				--str;
