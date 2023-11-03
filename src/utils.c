@@ -2609,6 +2609,12 @@ void change_sex(char_data *ch, int sex) {
 		add_companion_mod(cd, CMOD_SEX, sex, NULL);
 		queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 	}
+
+	// reset player pronouns
+	if (!IS_NPC(ch) && GET_PRONOUNS(ch)) {
+		free(GET_PRONOUNS(ch));
+		GET_PRONOUNS(ch) = NULL;
+	}
 	
 	// update msdp
 	update_MSDP_gender(ch, UPDATE_SOON);
@@ -7104,6 +7110,96 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 }
 
+// Warning: PRONOUN_FORMAT is padded with a NUL byte
+#define PRONOUN_SIZE 16
+#define PRONOUN_FORMAT "%15s"
+struct pronoun_data {
+	char hssh[PRONOUN_SIZE];
+	char hmhr[PRONOUN_SIZE];
+	char hshr[PRONOUN_SIZE];
+};
+
+/**
+* Creates pronouns based on a string
+*
+* @param ch The character
+* @param pronouns A string representing the pronouns
+* @return pronouns Pronouns allocated in the heap
+**/
+struct pronoun_data *create_pronouns(const char *pronouns) {
+	struct pronoun_data *data;
+	CREATE(data, struct pronoun_data, 1);
+	if (!data) {
+		return NULL;
+	}
+	char canary;
+	int rc = sscanf(pronouns,
+		PRONOUN_FORMAT " " PRONOUN_FORMAT " " PRONOUN_FORMAT "%c",
+		data->hssh, data->hmhr, data->hshr, &canary);
+	if (rc != 3) {
+		free(data);
+		return NULL;
+	}
+	return data;
+}
+
+/**
+* Serialize pronouns for a character as a string
+*
+* @param pronouns The pronouns
+* @return string A string suitable to pass to set_pronouns, allocated in the heap
+**/
+char *serialize_pronouns(struct pronoun_data* data) {
+	// Have room for three pronouns, two slashes and a NUL byte
+	size_t buffer_size = (PRONOUN_SIZE * 3) + 3;
+	char *buffer;
+	CREATE(buffer, char, buffer_size);
+	if (!buffer) {
+		return NULL;
+	}
+	snprintf(buffer, buffer_size, "%s %s %s", data->hssh, data->hmhr, data->hshr);
+	return buffer;
+}
+
+// Default pronouns
+struct pronoun_data it_pronouns = { .hssh = "it", .hmhr = "it", .hshr = "its" };
+struct pronoun_data male_pronouns = { .hssh = "he", .hmhr = "him", .hshr = "his" };
+struct pronoun_data female_pronouns = { .hssh = "she", .hmhr = "her", .hshr = "her" };
+struct pronoun_data they_pronouns = { .hssh = "they", .hmhr = "them", .hshr = "their" };
+
+/**
+* This calculates a pronoun for a character, factoring in player ronoun data.
+*
+* @param ch The character
+* @param pronoun PRONOUN_HSHR, PRONOUN_HSSH, or PRONOUN_HMHR
+* @param real Whether to show real un-morphed pronouns
+* @return pronoun The pronoun
+**/
+const char *calc_pronoun(char_data *ch, int pronoun, bool real) {
+	struct pronoun_data *pronouns = NULL;
+	int sex = real ? GET_REAL_SEX(ch) : GET_SEX(ch);
+	if (MOB_FLAGGED((ch), MOB_PLURAL)) {
+		pronouns = &they_pronouns;
+	} else if(!real && CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) {
+		pronouns = &it_pronouns;
+	} else if (!IS_NPC(ch) && GET_PRONOUNS(ch)) {
+		pronouns = GET_PRONOUNS(ch);
+	} else if(sex == SEX_MALE) {
+		pronouns = &male_pronouns;
+	} else if(sex == SEX_FEMALE) {
+		pronouns = &female_pronouns;
+	} else {
+		pronouns = &it_pronouns;
+	}
+	switch(pronoun) {
+		case PRONOUN_HSSH: return pronouns->hssh;
+		case PRONOUN_HMHR: return pronouns->hmhr;
+		case PRONOUN_HSHR: return pronouns->hshr;
+		default:
+			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: calc_pronoun: Unknown pronoun %i", pronoun);
+			return "PRONOUN_WHAT";
+	}
+}
 
  //////////////////////////////////////////////////////////////////////////////
 //// CONVERTER UTILS /////////////////////////////////////////////////////////

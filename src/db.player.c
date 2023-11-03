@@ -881,6 +881,9 @@ void free_char(char_data *ch) {
 		if (GET_TITLE(ch)) {
 			free(GET_TITLE(ch));
 		}
+		if (GET_PRONOUNS(ch)) {
+			free(GET_PRONOUNS(ch));
+		}
 		if (GET_PROMPT(ch)) {
 			free(GET_PROMPT(ch));
 		}
@@ -1969,6 +1972,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Preferences: ", 13)) {
 					PRF_FLAGS(ch) = asciiflag_conv(line + 13);
 				}
+				else if (!strn_cmp(line, "Pronouns: ", 10)) {
+					if (GET_PRONOUNS(ch)) {
+						free(GET_PRONOUNS(ch));
+					}
+					char *pronouns = str_dup(line + 10);
+					GET_PRONOUNS(ch) = create_pronouns(pronouns);
+					free(pronouns);
+				}
 				else if (!strn_cmp(line, "Promo ID: ", 10)) {
 					GET_PROMO_ID(ch) = atoi(line + 10);
 				}
@@ -2789,6 +2800,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (PRF_FLAGS(ch)) {
 		fprintf(fl, "Preferences: %s\n", bitv_to_alpha(PRF_FLAGS(ch)));
+	}
+	if (GET_PRONOUNS(ch)) {
+		char *serialized = serialize_pronouns(GET_PRONOUNS(ch));
+		fprintf(fl, "Pronouns: %s\n", serialized);
+		free(serialized);
 	}
 	if (GET_PROMO_ID(ch)) {
 		fprintf(fl, "Promo ID: %d\n", GET_PROMO_ID(ch));
@@ -4607,6 +4623,7 @@ void init_player(char_data *ch) {
 	ch->player.short_descr = NULL;
 	ch->player.long_descr = NULL;
 	ch->player.look_descr = NULL;
+	GET_PRONOUNS(ch) = NULL;
 	GET_PROMPT(ch) = NULL;
 	GET_FIGHT_PROMPT(ch) = NULL;
 	POOFIN(ch) = NULL;

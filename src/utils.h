@@ -1244,6 +1244,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_PERSONAL_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->personal_lastname))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
+#define GET_PRONOUNS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pronouns))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
 #define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
 #define GET_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->quests))
@@ -1580,13 +1581,21 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
  //////////////////////////////////////////////////////////////////////////////
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
-#define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
-#define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
-#define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+struct pronoun_data;
+struct pronoun_data *create_pronouns(const char *pronouns);
+char *serialize_pronouns(struct pronoun_data* data);
 
-#define REAL_HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
-#define REAL_HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
-#define REAL_HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+#define PRONOUN_HSSH 0
+#define PRONOUN_HMHR 1
+#define PRONOUN_HSHR 2
+const char *calc_pronoun(char_data *ch, int pronoun, bool real);
+
+#define HSSH(ch)  calc_pronoun(ch, PRONOUN_HSSH, false)
+#define HMHR(ch)  calc_pronoun(ch, PRONOUN_HMHR, false)
+#define HSHR(ch)  calc_pronoun(ch, PRONOUN_HSHR, false)
+#define REAL_HSSH(ch)  calc_pronoun(ch, PRONOUN_HSSH, true)
+#define REAL_HMHR(ch)  calc_pronoun(ch, PRONOUN_HMHR, true)
+#define REAL_HSHR(ch)  calc_pronoun(ch, PRONOUN_HSHR, true)
 
 #define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
 #define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")

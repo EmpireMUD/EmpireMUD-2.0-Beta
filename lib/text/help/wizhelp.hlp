@@ -1005,6 +1005,7 @@ loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
 password       PC      STRING       Change password
 sex            BOTH    MISC         Person's sex
+pronouns       PC      STRING       Change pronouns
 skill          PC      MISC         Changes a skill level
 title          PC      STRING       Player's title
 vampire        PC      BINARY       Makes/unmakes vampires

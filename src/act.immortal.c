@@ -1978,6 +1978,7 @@ struct set_struct {
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
 		{ "noidleout",	LVL_START_IMM,	PC,		BINARY },
 		{ "sex", 		LVL_START_IMM, 	BOTH, 	MISC },
+		{ "pronouns", 		LVL_START_IMM, 	PC, 	MISC },
 		{ "age",		LVL_START_IMM,	BOTH,	NUMBER },
 		{ "lastname",	LVL_START_IMM,	PC,		MISC },
 		{ "muted",		LVL_START_IMM,	PC, 	BINARY },
@@ -2307,6 +2308,18 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		change_sex(vict, i);
 		sprintf(output, "%s's sex is now %s.", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
+	}
+	else if SET_CASE("pronouns") {
+		struct pronoun_data *data = create_pronouns(val_arg);
+		if (!data) {
+			send_to_char("Unknown pronouns\r\n", ch);
+			return (0);
+		}
+		if (GET_PRONOUNS(vict)) {
+			free(GET_PRONOUNS(vict));
+		}
+		GET_PRONOUNS(vict) = data;
+		sprintf(output, "%s's pronouns are now %s.", GET_NAME(vict), val_arg);
 	}
 	else if SET_CASE("age") {
 		if (value < 2 || value > 95) {	/* Arbitrary limits. */
