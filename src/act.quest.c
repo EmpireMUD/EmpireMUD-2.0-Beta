@@ -620,6 +620,7 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	HASH_ITER(hh, str_hash, str_iter, next_str) {
 		sprintf(buf + strlen(buf), "%s%s", (*buf ? "; " : ""), str_iter->str);
 	}
+	free_string_hash(&str_hash);
 	
 	// show string?
 	if (*buf) {
