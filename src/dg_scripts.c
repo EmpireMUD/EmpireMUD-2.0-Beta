@@ -2810,7 +2810,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%s", temperature_to_string(atoi(field)));
 				}
 				else {
-					snprintf(str, slen, "");
+					strcpy(str, "");
 				}
 			}
 			// no else
