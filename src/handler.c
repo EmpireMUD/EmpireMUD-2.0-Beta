@@ -766,6 +766,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_WHERE_RANGE), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
+		case APPLY_WARMTH: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_WARMTH), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
+		case APPLY_COOLING: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_COOLING), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		default:
 			log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
 			break;

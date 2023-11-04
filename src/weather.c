@@ -29,6 +29,7 @@
 *   Unsorted Code
 *   Time Handling
 *   Moon System
+*   Temperature System
 */
 
 // external vars
@@ -845,5 +846,171 @@ void show_visible_moons(char_data *ch) {
 		// ok: show it
 		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
+
+/**
+* Computes a player's current temperature including any warmth/cooling gear
+* and effects.
+*
+* Warmth is penalized by half of the player's cooling attribute, and vice
+* versa, meaning if a player has 100 warmth and 20 cooling, they are really
+* at 90 warmth.
+*
+* @param char_data *ch The player (NPCs always return 0).
+* @return int The adjusted temperature that the character is feeling (usually -100 to 100; 0 is pleasant).
+*/
+int get_relative_temperature(char_data *ch) {
+	int temp, warm, cool;
+	
+	if (IS_NPC(ch)) {
+		return 0;	// NPCs do not have this property
+	}
+	
+	temp = GET_TEMPERATURE(ch);
+	warm = GET_WARMTH(ch);
+	warm = MAX(0, warm);		// do not apply negative warmth
+	cool = GET_COOLING(ch);
+	cool = MAX(0, cool);		// do not apply negative cooling
+	
+	// penalize half of the other trait
+	if (temp < 0) {
+		temp += GET_WARMTH(ch) - (GET_COOLING(ch) / 2);
+	}
+	else if (temp > 0) {
+		temp -= GET_COOLING(ch) + (GET_WARMTH(ch) / 2);
+	}
+	
+	return temp;
+}
+
+
+/**
+* Determine the temperature of a room. Positive numbers are hot and negative
+* numbers are cold. These do not use real-life units; temperature is counter-
+* balanced by a player's WARMTH or COOLING trait.
+*
+* @param room_data *room Get the temperature for this room.
+* @return int The temperature (zero is neutral).
+*/
+int get_room_temperature(room_data *room) {
+	return 0;
+}
+
+
+/**
+* Initializes a player's temperature, generally when they get a free restore on
+* login. If they would be comfortable, sets them to room temperature. Otherwise
+* it will set them to neutral temperature.
+*
+* @param char_data *ch The player.
+*/
+void reset_player_temperature(char_data *ch) {
+	int room_temp, warm, cool, limit;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	
+	// basic values
+	room_temp = get_room_temperature(IN_ROOM(ch));
+	limit = config_get_int("temperature_limit");
+	warm = MAX(0, GET_WARMTH(ch));
+	cool = MAX(0, GET_COOLING(ch));
+	
+	if (room_temp > 0 && (room_temp - cool + (warm / 2)) >= limit) {
+		// going to be too warm -- start at 0
+		GET_TEMPERATURE(ch) = 0;
+	}
+	else if (room_temp < 0 && (room_temp + warm - (cool / 2)) <= limit) {
+		// going to be too cold -- start at 0
+		GET_TEMPERATURE(ch) = 0;
+	}
+	else {
+		// player should be comfortable -- start at room temp
+		GET_TEMPERATURE(ch) = room_temp;
+	}
+}
+
+
+/**
+* Gives a user-readable word for a given temperature.
+*
+* @param int temperature A temperature (normally -100 to 100).
+* @return const char* An adjective for it such as "chilly" or "sweltering".
+*/
+const char *temperature_to_string(int temperature) {
+	int iter;
+	
+	struct temperature_name_t {
+		int min_temp;
+		const char *text;
+	} temperature_name[] = {
+		// { over temp, show text }
+		{ INT_MIN, "freezing" },
+		{ -94, "frigid" },
+		{ -79, "icy" },
+		{ -64, "frosty" },
+		{ -49, "cold" },
+		{ -34, "chilly" },
+		{ -19, "cool" },
+		{ -9, "pleasant" },
+		{ 10, "balmy" },
+		{ 20, "warm" },
+		{ 35, "hot" },
+		{ 50, "scorching" },
+		{ 65, "sweltering" },
+		{ 80, "blistering" },
+		{ 95, "searing" },
+
+		{ INT_MAX, "\n" }	// must be last
+	};
+	
+	for (iter = 0; *temperature_name[iter].text != '\n'; ++iter) {
+		if (temperature_name[iter].min_temp <= temperature && temperature_name[iter+1].min_temp > temperature) {
+			return temperature_name[iter].text;
+		}
+	}
+	
+	// should not get here but
+	return "searing";
+}
+
+
+/**
+* Shifts the player's temperature slightly toward room temperature. Ideally
+* this should run during the 5-second "real updates".
+*
+* @param char_data *ch The player experiencing temperature and life.
+*/
+void update_player_temperature(char_data *ch) {
+	int ambient;
+	double change;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	
+	ambient = get_room_temperature(IN_ROOM(ch));
+	
+	if (ambient != GET_TEMPERATURE(ch)) {
+		change = (double)ambient / ((double) SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE);
+		change = ABSOLUTE(change);	// change is positive
+		change = MAX(1.0, change);	// minimum of 1
+		
+		// apply
+		if (GET_TEMPERATURE(ch) < ambient) {
+			GET_TEMPERATURE(ch) += change;
+		}
+		else {
+			GET_TEMPERATURE(ch) -= change;
+		}
+		
+		// probably not worth triggering a character save for a temperature change alone
+		// ... but they almost certainly save when this runs, anyway, due to other events
 	}
 }

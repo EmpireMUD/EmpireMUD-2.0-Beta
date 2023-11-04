@@ -358,6 +358,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
 #define GET_MANA_DEFICIT(ch)  GET_DEFICIT((ch), MANA)
 #define GET_BONUS_INVENTORY(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_INVENTORY)
+#define GET_COOLING(ch)  GET_EXTRA_ATT(ch, ATT_COOLING)
 #define GET_RESIST_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_PHYSICAL)
 #define GET_RESIST_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_MAGICAL)
 #define GET_BLOCK(ch)  GET_EXTRA_ATT(ch, ATT_BLOCK)
@@ -370,6 +371,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_HEAL_OVER_TIME(ch)  GET_EXTRA_ATT(ch, ATT_HEAL_OVER_TIME)
 #define GET_CRAFTING_BONUS(ch)  GET_EXTRA_ATT(ch, ATT_CRAFTING_BONUS)
 #define GET_AGE_MODIFIER(ch)  GET_EXTRA_ATT(ch, ATT_AGE_MODIFIER)
+#define GET_WARMTH(ch)  GET_EXTRA_ATT(ch, ATT_WARMTH)
 
 // ch->char_specials: char_special_data
 #define FIGHTING(ch)  ((ch)->char_specials.fighting.victim)
@@ -1258,6 +1260,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
 #define GET_SPEAKING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->speaking))
 #define GET_TECHS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->techs))
+#define GET_TEMPERATURE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temperature))
 #define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
 #define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->tomb_room))
@@ -1426,7 +1429,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
 #define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || can_interact_room((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
-#define GET_SEASON(room)  y_coord_to_season[Y_COORD(room)]
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
@@ -1483,6 +1485,26 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_WATER_BUILDING(room)  (ROOM_BLD_FLAGGED((room), BLD_SAIL))
 #define WATER_SECT(room)		(ROOM_SECT_FLAGGED((room), SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED((room), BLD_NEED_BOAT) || RMT_FLAGGED((room), RMT_NEED_BOAT) || (IS_WATER_BUILDING(room) && !IS_COMPLETE(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)))
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
+
+
+/**
+* Determine season by room location. This was a short macro but needed coord-
+* safety.
+*
+* @param room_data *room The room to get the current season for.
+* @return int A TILESET_ const (default: TILESET_SPRING).
+*/
+static inline int GET_SEASON(room_data *room) {
+	extern byte y_coord_to_season[MAP_HEIGHT];
+	int coord;
+	
+	if (room && (coord = Y_COORD(room)) >= 0 && coord < MAP_HEIGHT) {
+		return y_coord_to_season[coord];
+	}
+	else {
+		return TILESET_SPRING;	// default
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2539,6 +2561,13 @@ moon_phase_t get_moon_phase(double cycle_days);
 moon_pos_t get_moon_position(moon_phase_t phase, int hour);
 bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
+
+// weather.c temperature
+int get_relative_temperature(char_data *ch);
+int get_room_temperature(room_data *room);
+void reset_player_temperature(char_data *ch);
+const char *temperature_to_string(int temperature);
+void update_player_temperature(char_data *ch);
 
 // weather.c time
 double get_hours_of_sun(room_data *room);

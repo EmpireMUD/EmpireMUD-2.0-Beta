@@ -6338,7 +6338,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 
 	if (!IS_NPC(k)) {
-		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
+		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d, Temperature: %d (%s), Warmth: %d, Cooling: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK), get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
 		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
@@ -7160,6 +7160,9 @@ void do_stat_room(char_data *ch) {
 	else {
 		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
 	}
+	
+	// temperature info
+	msg_to_char(ch, "Temperature: %d\r\n", get_room_temperature(IN_ROOM(ch)));
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));

@@ -14,12 +14,11 @@
 #include "sysdep.h"
 
 #include "structs.h"
+#include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
 #include "db.h"
-#include "utils.h"
 #include "handler.h"
-#include "utils.h"
 #include "olc.h"
 #include "skills.h"
 #include "vnums.h"
@@ -413,6 +412,7 @@ ACMD(do_tan);
 ACMD(do_tavern);
 ACMD(do_tedit);
 ACMD(do_tell);
+ACMD(do_temperature);
 ACMD(do_territory);
 ACMD(do_throw);
 ACMD(do_tie);
@@ -1024,6 +1024,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_TELL_HISTORY ),
+	SIMPLE_CMD( "temperature", POS_DEAD, do_temperature, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),

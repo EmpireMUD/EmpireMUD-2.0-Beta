@@ -19,7 +19,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "utils.h"
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
@@ -687,7 +686,7 @@ void display_attributes(char_data *ch, char_data *to) {
 void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, count, pts, cols, val;
+	int i, j, count, pts, cols, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -745,16 +744,23 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// row 2 col 1: conditions
 	*lbuf = '\0';
 	if (IS_HUNGRY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&yhungry&0");
+		sprintf(lbuf + strlen(lbuf), "%s&yhungry&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_THIRSTY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&cthirsty&0");
+		sprintf(lbuf + strlen(lbuf), "%s&cthirsty&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_DRUNK(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&mdrunk&0");
+		sprintf(lbuf + strlen(lbuf), "%s&mdrunk&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_BLOOD_STARVED(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&rstarving&0");
+		sprintf(lbuf + strlen(lbuf), "%s&rstarving&0", (strlen(lbuf) > 0 ? ", " : ""));
+	}
+	temperature = get_relative_temperature(ch);
+	if (temperature <= -1 * config_get_int("temperature_limit")) {
+		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
+	}
+	if (temperature >= config_get_int("temperature_limit")) {
+		sprintf(lbuf + strlen(lbuf), "%s&o%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
 	}
 	if (*lbuf == '\0') {
 		strcpy(lbuf, "&gnone&0");
@@ -3779,6 +3785,7 @@ ACMD(do_survey) {
 		ordered_sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, climate_flags_order, FALSE, buf);
 		msg_to_char(ch, "Climate: %s\r\n", buf);
 	}
+	msg_to_char(ch, "Temperature: %s\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
 	
 	base_height = ROOM_HEIGHT(HOME_ROOM(IN_ROOM(ch)));
 	mod_height = get_room_blocking_height(IN_ROOM(ch), NULL);
@@ -3827,6 +3834,25 @@ ACMD(do_survey) {
 	//	- room name
 	//	- building info (name)
 	
+}
+
+
+ACMD(do_temperature) {
+	int ch_temp, temp_limit;
+	
+	msg_to_char(ch, "It's %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+	
+	ch_temp = get_relative_temperature(ch);
+	temp_limit = config_get_int("temperature_limit");
+	
+	if (ch_temp < temp_limit && ch_temp > -1 * temp_limit) {
+		msg_to_char(ch, "You're comfortable right now.\r\n");
+	}
+	else {
+		msg_to_char(ch, "You are %s%s\r\n", temperature_to_string(ch_temp), (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
+	}
+	
+	// TODO should this show current warmth/cooling
 }
 
 
@@ -4005,6 +4031,9 @@ ACMD(do_weather) {
 	if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
 	}
+	
+	// temperature
+	msg_to_char(ch, "It's %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
 }
 
 

@@ -2134,7 +2134,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'T': {
-				if (!strn_cmp(line, "Temporary Account: ", 19)) {
+				if (!strn_cmp(line, "Temperature: ", 13)) {
+					GET_TEMPERATURE(ch) = atoi(line + 13);
+				}
+				else if (!strn_cmp(line, "Temporary Account: ", 19)) {
 					GET_TEMPORARY_ACCOUNT_ID(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Title: ", 7)) {
@@ -2842,6 +2845,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'T'
+	if (GET_TEMPERATURE(ch)) {
+		fprintf(fl, "Temperature: %d\n", GET_TEMPERATURE(ch));
+	}
 	if (GET_TITLE(ch)) {
 		fprintf(fl, "Title: %s\n", GET_TITLE(ch));
 	}
@@ -4412,6 +4418,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);
 		clean_player_kills(ch);
+		reset_player_temperature(ch);
 		affect_total(ch);	// again, in case things changed
 	}
 	else {
@@ -4931,6 +4938,9 @@ void start_new_character(char_data *ch) {
 	set_move(ch, GET_MAX_MOVE(ch));
 	set_mana(ch, GET_MAX_MANA(ch));
 	set_blood(ch, GET_MAX_BLOOD(ch));
+	
+	// starting temperature
+	reset_player_temperature(ch);
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);

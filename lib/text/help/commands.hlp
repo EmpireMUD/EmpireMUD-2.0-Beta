@@ -1884,7 +1884,7 @@ Here are the prompt codes and what they do:
   %i  Health text         %u  Move text          %n  Mana text
   
   %b  Current blood       %t  Time               %I  Inventory size
-  %B  Maximum blood       %a  Current action
+  %B  Maximum blood       %T  Temperature        %a  Current action
   %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
@@ -2566,7 +2566,15 @@ Example:
  > tellhistory
  Khufu tells you, 'hi!'
 
-See also: SAYHISTORY, TELL
+See also: HISTORY, TELL
+#
+TEMPERATURE
+
+Usage:  temperature
+
+This command tells you how warm or cold it is right now.
+
+See also: SURVEY, TIME, WEATHER
 #
 THROW
 
@@ -2609,7 +2617,7 @@ Handy time-conversion chart:
  - 1 day in-game = 30 minutes
  - 1 year in-game = 7.5 days
 
-See also: TIME ZONE, YEARLY RESET
+See also: SURVEY, TEMPERATURE, TIME ZONE, WEATHER, YEARLY RESET
 #
 TITLE
 
@@ -2825,6 +2833,8 @@ Usage:  weather
 If you're uncertain whether the sun is shining or the rain is pouring down. 
 You'll have to be outside in order to tell however. It will also tell you if
 the sun or moon are up.
+
+See also: SURVEY, TEMPERATURE, TIME
 #
 WHO
 

@@ -222,6 +222,7 @@ When using field - The variable returns:
 &csubzone&0 - The subzone id of the room template, if any (-1 if none).
 &csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
    light, setting (only 'dark' makes the room dark).
+&ctemperature&0 - The room's temperature as a number (usually -100 to 100).
 &ctemplate&0 - The room template vnum, if any.
 &ctime(field)&0 - Time at this room. Fields: hour, day, month, year, day_of_year.
 &ctitle&0 - The room's title (shown on 'look').

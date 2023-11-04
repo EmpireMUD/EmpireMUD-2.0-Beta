@@ -615,6 +615,8 @@ const char *extra_attribute_types[] = {
 	"Night-Vision",
 	"Nearby-Range",	// 15
 	"Where-Range",
+	"Warmth",
+	"Cooling",
 	"\n"
 };
 
@@ -1585,6 +1587,8 @@ const char *apply_types[] = {
 	"NIGHT-VISION",
 	"NEARBY-RANGE",
 	"WHERE-RANGE",
+	"WARMTH",	// 30
+	"COOLING",
 	"\n"
 };
 
@@ -1621,6 +1625,8 @@ const double apply_values[] = {
 	1,	// NIGHT-VISION
 	1,	// NEARBY-RANGE
 	1,	// WHERE-RANGE
+	1,	// WARMTH
+	1,	// COOLING
 };
 
 
@@ -1656,6 +1662,8 @@ const int apply_attribute[] = {
 	NOTHING,	// night-vision
 	NOTHING,	// nearby-range
 	NOTHING,	// where-range
+	NOTHING,	// warmth
+	NOTHING,	// cooling
 };
 
 
@@ -1691,6 +1699,8 @@ const bool apply_never_scales[] = {
 	TRUE,	// NIGHT-VISION
 	TRUE,	// NEARBY-RANGE
 	TRUE,	// WHERE-RANGE
+	TRUE,	// WARMTH
+	TRUE,	// COOLING
 };
 
 

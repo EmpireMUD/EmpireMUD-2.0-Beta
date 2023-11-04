@@ -3040,6 +3040,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 		if (*str == '%') {
 			switch (*(++str)) {
 				case 'c': {	// player conditions (words)
+					int temperature = get_relative_temperature(ch);
+					int t_limit = config_get_int("temperature_limit");
 					*i = '\0';
 					if (PRF_FLAGGED(ch, PRF_AFK)) {
 						strcat(i, "\trA");
@@ -3077,6 +3079,12 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALK(ch)) {
 						strcat(i, "\t0W");
 					}
+					if (temperature <= -1 * t_limit) {
+						strcat(i, "\tcC");
+					}
+					if (temperature >= t_limit) {
+						strcat(i, "\toH");
+					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
 							strcat(i, "\tMR");
@@ -3095,6 +3103,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 'C': {	// player conditions (words)
+					int temperature = get_relative_temperature(ch);
+					int t_limit = config_get_int("temperature_limit");
 					*i = '\0';
 					if (PRF_FLAGGED(ch, PRF_AFK)) {
 						sprintf(i + strlen(i), "%safk", (*i ? " " : ""));
@@ -3128,6 +3138,12 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (HAS_WATERWALK(ch)) {
 						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
+					}
+					if (temperature <= -1 * t_limit) {
+						sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+					}
+					if (temperature >= t_limit) {
+						sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
@@ -3304,8 +3320,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case 't':	/* Sun timer */
-				case 'T': {
+				case 't': {	/* Sun timer */
 					tinfo = get_local_time(IN_ROOM(ch));
 					sun = get_sun_status(IN_ROOM(ch));
 					
@@ -3335,6 +3350,23 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					tmp = i;
 					break;
+				}
+				case 'T': {	// temperature
+					int temperature = get_room_temperature(IN_ROOM(ch));
+					int limit = config_get_int("temperature_limit");
+					char *temp_color;
+					
+					if (temperature <= -1 * limit) {
+						temp_color = "\tc";
+					}
+					else if (temperature >= limit) {
+						temp_color = "\to";
+					}
+					else {
+						temp_color = "\t0";
+					}
+					
+					sprintf(i, "%s%s\t0", temp_color, temperature_to_string(temperature));
 				}
 				case 'a': {	// action
 					if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_GEN_CRAFT) {

@@ -2805,6 +2805,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 			}
+			else if (!str_cmp(var, "temperature")) {
+				if (field && (*field == '-' || *field == '+' || isdigit(*field))) {
+					snprintf(str, slen, "%s", temperature_to_string(atoi(field)));
+				}
+				else {
+					snprintf(str, slen, "");
+				}
+			}
+			// no else
 		}
 
 		if (c) {
@@ -4497,7 +4506,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// char.t*
-					if (!str_cmp(field, "thirst")) {
+					if (!str_cmp(field, "temperature")) {
+						snprintf(str, slen, "%d", get_relative_temperature(c));
+					}
+					else if (!str_cmp(field, "thirst")) {
 						if (subfield && *subfield) {
 							gain_condition(c, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
 						}
@@ -5726,7 +5738,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// room.t*
-					if (!str_cmp(field, "template")) {
+					if (!str_cmp(field, "temperature")) {
+						snprintf(str, slen, "%d", get_room_temperature(r));
+					}
+					else if (!str_cmp(field, "template")) {
 						if (r && GET_ROOM_TEMPLATE(r)) {
 							snprintf(str, slen, "%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(r))); 
 						}

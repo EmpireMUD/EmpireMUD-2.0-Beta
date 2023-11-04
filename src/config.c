@@ -1979,6 +1979,8 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
 	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel file logs");
+	init_config(CONFIG_PLAYERS, "temperature_limit", CONFTYPE_INT, "highest safe/comfortable temperature value");
+	init_config(CONFIG_PLAYERS, "temperature_penalties", CONFTYPE_BOOL, "whether or not players must manage warmth and cooling");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");

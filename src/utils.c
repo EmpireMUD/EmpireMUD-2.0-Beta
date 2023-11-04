@@ -2787,6 +2787,12 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_WHERE_RANGE: {
 			return GET_EXTRA_ATT(ch, ATT_WHERE_RANGE);
 		}
+		case APPLY_WARMTH: {
+			return GET_EXTRA_ATT(ch, ATT_WARMTH);
+		}
+		case APPLY_COOLING: {
+			return GET_EXTRA_ATT(ch, ATT_COOLING);
+		}
 	}
 	return 0;	// if we got this far
 }

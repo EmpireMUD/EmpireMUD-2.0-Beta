@@ -329,6 +329,8 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
 #define APPLY_NEARBY_RANGE  28	// larger "nearby"
 #define APPLY_WHERE_RANGE  29	// larger "where"
+#define APPLY_WARMTH  30	// protects against cold weather
+#define APPLY_COOLING  31	// protects against warm weather
 
 
 // AUTOMSG_x: automessage types
@@ -972,7 +974,9 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_NIGHT_VISION  14	// bonus light radius at night
 #define ATT_NEARBY_RANGE  15	// larger "nearby"
 #define ATT_WHERE_RANGE  16		// larger "where"
-#define NUM_EXTRA_ATTRIBUTES  17
+#define ATT_WARMTH  17	// from gear that keeps you warm in the cold
+#define ATT_COOLING  18	// from gear that keeps you cool in the heat
+#define NUM_EXTRA_ATTRIBUTES  19
 
 
 // AFF_x: Affect bits
@@ -4559,6 +4563,7 @@ struct player_special_data {
 	ubyte apparent_age;	// for vampires	
 	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
+	int temperature;	// how warm/cold the player currently is
 	
 	// various lists
 	struct coin_data *coins;	// linked list of coin data
