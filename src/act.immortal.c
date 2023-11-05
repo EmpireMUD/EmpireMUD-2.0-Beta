@@ -1403,9 +1403,10 @@ ADMIN_UTIL(util_strlen) {
 
 
 ADMIN_UTIL(util_temperature) {
-	int climate_val, season_val, sun_val, bit;
+	int climate_val, season_count, season_val, sun_count, sun_val, bit;
 	double season_mod, sun_mod, temperature;
 	bitvector_t climates;
+	char season_part[256], sun_part[256];
 	
 	msg_to_char(ch, "Temperature information for this room:\r\n");
 	
@@ -1413,7 +1414,8 @@ ADMIN_UTIL(util_temperature) {
 	climate_val = 0;
 	season_val = season_temperature[GET_SEASON(IN_ROOM(ch))];
 	sun_val = sun_temperature[get_sun_status(IN_ROOM(ch))];
-	season_mod = sun_mod = 1.0;
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
 	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
 	
 	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[GET_SEASON(IN_ROOM(ch))]);
@@ -1422,14 +1424,48 @@ ADMIN_UTIL(util_temperature) {
 	// determine climates
 	for (bit = 0; climates; ++bit, climates >>= 1) {
 		if (IS_SET(climates, BIT(0))) {
-			msg_to_char(ch, "%s: %+d, %.1f%% sun, %.1f%% seasonal\r\n", climate_flags[bit], climate_temperature[bit].base_add, 100.0 * climate_temperature[bit].sun_weight, 100.0 * climate_temperature[bit].season_weight);
 			climate_val += climate_temperature[bit].base_add;
-			season_mod *= climate_temperature[bit].season_weight;
-			sun_mod *= climate_temperature[bit].sun_weight;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+				snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
+			}
+			else {
+				strcpy(season_part, "no mod for");
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+				snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
+			}
+			else {
+				strcpy(sun_part, "no mod for");
+			}
+			
+			msg_to_char(ch, "%s: %+d, %s sun, %s seasonal\r\n", climate_flags[bit], climate_temperature[bit].base_add, sun_part, season_part);
 		}
 	}
 	
-	temperature = climate_val + (season_val * season_mod) + (sun_val * sun_mod);
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
 	msg_to_char(ch, "Final temperature: %d (%s), %.1f%% sun, %.1f%% seasonal\r\n", (int) temperature, temperature_to_string((int) temperature), 100.0 * sun_mod, 100.0 * season_mod);
 }
 
