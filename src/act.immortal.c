@@ -1416,7 +1416,7 @@ ADMIN_UTIL(util_temperature) {
 	season_mod = sun_mod = 1.0;
 	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
 	
-	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, seasons[GET_SEASON(IN_ROOM(ch))]);
+	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[GET_SEASON(IN_ROOM(ch))]);
 	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[get_sun_status(IN_ROOM(ch))]);
 	
 	// determine climates
@@ -7197,7 +7197,7 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	// temperature info
-	msg_to_char(ch, "Temperature: %d (%s), Season: %s\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), seasons[GET_SEASON(IN_ROOM(ch))]);
+	msg_to_char(ch, "Temperature: %d (%s), Season: %s\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));

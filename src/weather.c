@@ -1013,7 +1013,7 @@ int get_relative_temperature(char_data *ch) {
 * @return int The temperature (zero is neutral).
 */
 int get_room_temperature(room_data *room) {
-	int climate_val, season_val, sun_val, bit;
+	int climate_val, season_count, season_val, sun_count, sun_val, bit;
 	double season_mod, sun_mod, temperature;
 	bitvector_t climates;
 	
@@ -1021,19 +1021,45 @@ int get_room_temperature(room_data *room) {
 	climate_val = 0;
 	season_val = season_temperature[GET_SEASON(room)];
 	sun_val = sun_temperature[get_sun_status(room)];
-	season_mod = sun_mod = 1.0;
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
 	climates = GET_SECT_CLIMATE(SECT(room));	// TODO: vary for buildings
 	
 	// determine climates
 	for (bit = 0; climates; ++bit, climates >>= 1) {
 		if (IS_SET(climates, BIT(0))) {
 			climate_val += climate_temperature[bit].base_add;
-			season_mod *= climate_temperature[bit].season_weight;
-			sun_mod *= climate_temperature[bit].sun_weight;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+			}
 		}
 	}
 	
-	temperature = climate_val + (season_val * season_mod) + (sun_val * sun_mod);
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
 	return round(temperature);
 }
 

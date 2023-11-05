@@ -307,7 +307,7 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 	
 	// other stuff that's room-based
-	MSDPSetString(desc, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
+	MSDPSetString(desc, eMSDP_WORLD_SEASON, icon_types[GET_SEASON(IN_ROOM(ch))]);
 	
 	MSDPUpdate(desc);
 }

@@ -6199,9 +6199,13 @@ struct vehicle_room_list {
 // for climate-based temperature
 struct climate_temperature_t {
 	int base_add;	// core temperature from this climate
-	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%)
-	double season_weight;	// how much season affects this (default: 1.0 / 100%)
+	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double season_weight;	// how much season affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
 };
+
+
+// for climate temperatures
+#define NO_TEMP_MOD  -1.0
 
 
 // TILESET_x, used in sector_data
