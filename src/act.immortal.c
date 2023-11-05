@@ -1403,23 +1403,41 @@ ADMIN_UTIL(util_strlen) {
 
 
 ADMIN_UTIL(util_temperature) {
-	int climate_val, season_count, season_val, sun_count, sun_val, bit;
+	int climate_val, season_count, season_val, sun_count, sun_val, bit, find;
+	int use_sun = get_sun_status(IN_ROOM(ch)), use_season = GET_SEASON(IN_ROOM(ch));
 	double season_mod, sun_mod, temperature;
 	bitvector_t climates;
-	char season_part[256], sun_part[256];
+	char season_part[256], sun_part[256], arg[MAX_INPUT_LENGTH];
+	
+	argument = one_argument(argument, arg);
+	while (*arg) {
+		if ((find = search_block(arg, sun_types, FALSE)) != NOTHING) {
+			use_sun = find;
+		}
+		else if ((find = search_block(arg, icon_types, FALSE)) != NOTHING && find != TILESET_ANY) {
+			use_season = find;
+		}
+		else {
+			msg_to_char(ch, "Invalid argument: %s\r\n", arg);
+			return;
+		}
+		
+		// repeat
+		argument = one_argument(argument, arg);
+	}
 	
 	msg_to_char(ch, "Temperature information for this room:\r\n");
 	
 	// init
 	climate_val = 0;
-	season_val = season_temperature[GET_SEASON(IN_ROOM(ch))];
-	sun_val = sun_temperature[get_sun_status(IN_ROOM(ch))];
+	season_val = season_temperature[use_season];
+	sun_val = sun_temperature[use_sun];
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
 	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
 	
-	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[GET_SEASON(IN_ROOM(ch))]);
-	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[get_sun_status(IN_ROOM(ch))]);
+	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[use_season]);
+	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[use_sun]);
 	
 	// determine climates
 	for (bit = 0; climates; ++bit, climates >>= 1) {
