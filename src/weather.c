@@ -869,7 +869,7 @@ void check_temperature_penalties(char_data *ch) {
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
 		return;	// no temperature
 	}
-	if (!config_get_bool("temperature_penalties")) {
+	if (IS_GOD(ch) || IS_IMMORTAL(ch) || !config_get_bool("temperature_penalties")) {
 		// no penalties-- remove them, though, in case it was just shut off
 		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
 		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
