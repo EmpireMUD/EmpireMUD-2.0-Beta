@@ -3974,19 +3974,69 @@ ACMD(do_tip) {
 
 
 ACMD(do_weather) {
-	const char *sky_look[] = {
-		"cloudless",
-		"cloudy",
-		"rainy",
-		"lit by flashes of lightning"
-	};
+	char *sky_text, *change_text;
 	
 	// weather, if available
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
 	}
 	else if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
+		// these may be overridden below
+		if (weather_info.change >= 0) {
+			change_text = "and you feel a warm wind from the south";
+		}
+		else {
+			change_text = "but your foot tells you bad weather is due";
+		}
+		
+		// main weather messages
+		switch (weather_info.sky) {
+			case SKY_CLOUDLESS: {
+				sky_text = "cloudless";
+				break;
+			}
+			case SKY_CLOUDY: {
+				sky_text = "cloudy";
+				break;
+			}
+			case SKY_RAINING: {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+					sky_text = "snowy";
+					if (weather_info.change >= 0) {
+						change_text = "but better weather is due any day now";
+					}
+					else {
+						change_text = "and the chill in your bones tells you it's getting worse";
+					}
+				}
+				else {
+					sky_text = "rainy";
+				}
+				break;
+			}
+			case SKY_LIGHTNING: {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+					sky_text = "white with snow";
+					if (weather_info.change >= 0) {
+						change_text = "but it seems to be clearing up";
+					}
+					else {
+						change_text = "and it's getting worse";
+					}
+				}
+				else {
+					sky_text = "lit by flashes of lightning";
+				}
+				break;
+			}
+			default: {
+				sky_text = "clear";
+				// change-text already set
+				break;
+			}
+		}
+		
+		msg_to_char(ch, "The sky is %s %s.\r\n", sky_text, change_text);
 	}
 	
 	// show season unless in a no-location room

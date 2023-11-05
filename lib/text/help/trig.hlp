@@ -667,6 +667,7 @@ Special Variables When using field - The variable returns:
    instead to get local time.
 &ctimestamp&0 - Current unix timestamp.
 &cweather&0 - One of: sunny, cloudy, raining, lightning
+   Note that in cold weather, raining and lightning represent snow instead.
 
 Names and pronouns:
 &c~%var%&0 - name, someone, you

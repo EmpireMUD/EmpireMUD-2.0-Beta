@@ -2572,7 +2572,11 @@ TEMPERATURE
 
 Usage:  temperature
 
-This command tells you how warm or cold it is right now.
+This command tells you how warm or cold it is around you right now as well as
+how warm or cold you are.
+
+When you move to a location that's warmer or colder, your temperature rises or
+falls over the course of an in-game hour.
 
 See also: SURVEY, TIME, WEATHER
 #

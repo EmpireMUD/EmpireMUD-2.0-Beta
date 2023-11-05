@@ -3887,6 +3887,8 @@ const char *sun_types[] = {
 
 
 // SKY_x -- mainly used by scripting
+// TODO replace these with a new weather system because raining/lightning are
+// displayed to the player as "snowing" in cold rooms as of b5.162
 const char *weather_types[] = {
 	"sunny",
 	"cloudy",
