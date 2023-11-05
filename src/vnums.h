@@ -218,6 +218,8 @@
 #define ATYPE_HUNTED  3103
 #define ATYPE_WORKING  3104
 #define ATYPE_ARROW_DISTRACTION  3105
+#define ATYPE_COLD_PENALTY  3106	// "freezing"
+#define ATYPE_HOT_PENALTY  3107	// "sweltering"
 
 
 // GENERIC_COOLDOWN entires used by the code

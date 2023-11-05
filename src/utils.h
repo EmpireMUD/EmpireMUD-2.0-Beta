@@ -2563,6 +2563,7 @@ bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c temperature
+void check_temperature_penalties(char_data *ch);
 int get_relative_temperature(char_data *ch);
 int get_room_temperature(room_data *room);
 void reset_player_temperature(char_data *ch);

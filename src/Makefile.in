@@ -386,7 +386,7 @@ vehicles.o: vehicles.c conf.h sysdep.h structs.h protocol.h uthash.h \
   constants.h vnums.h
 	$(CC) -c $(CFLAGS) vehicles.c
 weather.o: weather.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  handler.h interpreter.h db.h skills.h constants.h
+  handler.h interpreter.h db.h skills.h constants.h vnums.h
 	$(CC) -c $(CFLAGS) weather.c
 workforce.o: workforce.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h handler.h db.h skills.h vnums.h constants.h

@@ -23,6 +23,7 @@
 #include "db.h"
 #include "skills.h"
 #include "constants.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -852,6 +853,120 @@ void show_visible_moons(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
+
+/**
+*
+*/
+void check_temperature_penalties(char_data *ch) {
+	int iter, limit, room_temp, temperature;
+	struct affected_type *af;
+	obj_data *obj;
+	bool any, room_safe;
+	
+	// some items provide warmth when lit
+	#define IS_WARM_OBJ(obj)  (GET_LIGHT_IS_LIT(obj) && LIGHT_FLAGGED((obj), LIGHT_FLAG_LIGHT_FIRE | LIGHT_FLAG_COOKING_FIRE))
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	if (!config_get_bool("temperature_penalties")) {
+		// no penalties-- remove them, though, in case it was just shut off
+		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
+		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		return;
+	}
+	
+	// base temperature and numbers
+	limit = config_get_int("temperature_limit");
+	temperature = get_relative_temperature(ch);
+	room_temp = get_room_temperature(IN_ROOM(ch));
+	room_safe = (room_temp < limit && room_temp > (-1 * limit));
+	
+	// little fires everywhere (only if cold)
+	if (temperature < 0) {
+		// look for a warm obj
+		any = FALSE;
+		
+		// room
+		if (!any) {
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+				if (IS_WARM_OBJ(obj)) {
+					any = TRUE;
+					break;	// only need one
+				}
+			}
+		}
+		
+		// equipped
+		for (iter = 0; iter < NUM_WEARS && !any; ++iter) {
+			if ((obj = GET_EQ(ch, iter)) && IS_WARM_OBJ(obj)) {
+				any = TRUE;
+			}
+		}
+		
+		// inventory
+		if (!any) {
+			DL_FOREACH2(ch->carrying, obj, next_content) {
+				if (IS_WARM_OBJ(obj)) {
+					any = TRUE;
+					break;	// only need one
+				}
+			}
+		}
+		
+		if (any) {
+			temperature += config_get_int("temperature_from_fire");
+		}
+	}
+	else if (temperature > 0) {
+		// look for temperature relief from water (any water tile + not sitting on a vehicle)
+		if ((ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_SHALLOW_WATER) || WATER_SECT(IN_ROOM(ch))) && !GET_SITTING_ON(ch)) {
+			temperature -= config_get_int("temperature_from_water");
+		}
+	}
+	
+	// do we need penalties
+	if (ABSOLUTE(temperature) >= limit && !room_safe) {
+		if (temperature > 0) {
+			// start hot penalty
+			affect_from_char(ch, ATYPE_COLD_PENALTY, FALSE);
+			
+			// message only if it's new
+			if (!affected_by_spell(ch, ATYPE_HOT_PENALTY)) {
+				act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+			}
+			
+			// stats penalties
+			af = create_flag_aff(ATYPE_HOT_PENALTY, UNLIMITED, AFF_SLOW, ch);
+			affect_join(ch, af, NOBITS);
+			
+			// pain
+			apply_dot_effect(ch, ATYPE_HOT_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+		}
+		else {
+			// start cold penalty
+			affect_from_char(ch, ATYPE_HOT_PENALTY, FALSE);
+			
+			// message only if it's new
+			if (!affected_by_spell(ch, ATYPE_COLD_PENALTY)) {
+				act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+			}
+			
+			// stats penalties
+			af = create_flag_aff(ATYPE_COLD_PENALTY, UNLIMITED, AFF_SLOW, ch);
+			affect_join(ch, af, NOBITS);
+			
+			// pain
+			apply_dot_effect(ch, ATYPE_COLD_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+		}
+	}
+	else if (ABSOLUTE(temperature) < limit) {
+		// remove all penalties if the player has cooled down or warmed up
+		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
+		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+	}
+}
+
 
 /**
 * Computes a player's current temperature including any warmth/cooling gear

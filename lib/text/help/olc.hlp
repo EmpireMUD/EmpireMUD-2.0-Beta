@@ -5728,7 +5728,10 @@ the available options:
  &cCOOKING-FIRE&0 - Can be used to cook.
  &cDESTROY-WHEN-DOUSED&0 - If the player douses this light, it is destroyed.
 
-See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
+See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT, TEMPERATURE
 #d
 "OEDIT LIGHTISLIT" "OEDIT LIGHT IS LIT" "OEDIT IS LIT"
 
@@ -8397,6 +8400,9 @@ Light items also use these custom messages:
    carried.
  decays-in-room - When the light burns out (or its timer expires) in a room.
 
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
 Example lights:
 - torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
 - campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
@@ -8404,7 +8410,7 @@ Example lights:
 - lantern: 24 hours of light, CAN-DOUSE
 
 See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
-   OEDIT LIGHT FLAGS
+   OEDIT LIGHT FLAGS, TEMPERATURE
 #d
 "LIGHTER ITEM" "LIGHTER OBJECT"
 

@@ -2576,7 +2576,9 @@ This command tells you how warm or cold it is around you right now as well as
 how warm or cold you are.
 
 When you move to a location that's warmer or colder, your temperature rises or
-falls over the course of an in-game hour.
+falls over the course of an in-game hour. Having a lit torch or camp fire will
+help keep you warm in the winter, and being in the water will help keep you
+cool in the summer.
 
 See also: SURVEY, TIME, WEATHER
 #

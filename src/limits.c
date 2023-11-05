@@ -691,6 +691,7 @@ void real_update_player(char_data *ch) {
 	
 	// temperature check
 	update_player_temperature(ch);
+	check_temperature_penalties(ch);
 
 	/* Blood check */
 	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
