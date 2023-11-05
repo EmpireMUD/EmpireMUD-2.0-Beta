@@ -3248,7 +3248,7 @@ const int bld_relationship_vnum_types[] = {
 };
 
 
-// CLIM_x (1/3): climate flags
+// CLIM_x (1/4): climate flags
 const char *climate_flags[] = {
 	"*",	// 0
 	"*",
@@ -3276,7 +3276,36 @@ const char *climate_flags[] = {
 };
 
 
-// CLIM_x (2/3): order to display climate flags
+// CLIM_x (2/4): modifiers for temperature
+const struct climate_temperature_t climate_temperature[] = {
+	// { base-add, sun-weight (1.0), season-weight (1.0) }
+	{ 0, 1.0, 1.0 },	// 0
+	{ 0, 1.0, 1.0 },	// unused climates
+	{ 0, 1.0, 1.0 },
+	{ 0, 1.0, 1.0 },
+	
+	{ 15, 1.0, 1.0 },	// CLIM_HOT
+	{ -15, 1.0, 1.0 },	// 5: CLIM_COLD
+	{ -15, 0.5, 0.5 },	// CLIM_HIGH
+	{ 15, 0.5, 0.5 },	// CLIM_LOW
+	{ 0, 1.0, 1.0 },	// CLIM_MAGICAL
+	{ 0, 0.5, 2.0 },	// CLIM_TEMPERATE
+	{ 20, 2.0, 0.25 },	// 10: CLIM_ARID
+	{ 10, 0.25, 0.5 },	// CLIM_TROPICAL
+	{ -5, 1.0, 1.0 },	// CLIM_MOUNTAIN
+	{ 0, 1.0, 1.0 },	// CLIM_RIVER
+	{ 0, 1.0, 1.0 },	// CLIM_FRESH_WATER
+	{ 0, 1.0, 1.0 },	// 15: CLIM_SALT_WATER
+	{ 0, 0.75, 1.0 },	// CLIM_FOREST
+	{ 0, 1.0, 1.0 },	// CLIM_GRASSLAND
+	{ 0, 0.5, 0.75 },	// CLIM_COASTAL
+	{ 0, 0.5, 0.5 },	// CLIM_OCEAN
+	{ 0, 0.75, 1.0 },	// 20: CLIM_LAKE
+	{ 0, 0.75, 1.0 },	// CLIM_WATERSIDE
+};
+
+
+// CLIM_x (3/4): order to display climate flags
 const bitvector_t climate_flags_order[] = {
 	CLIM_HOT, CLIM_COLD,	// temperatures first
 	CLIM_HIGH, CLIM_LOW,	// relative elevation
@@ -3297,7 +3326,7 @@ const bitvector_t climate_flags_order[] = {
 };
 
 
-// CLIM_x (3/3): whether or not vehicles can ruin slowly over time when they have an invalid climate
+// CLIM_x (4/4): whether or not vehicles can ruin slowly over time when they have an invalid climate
 const bool climate_ruins_vehicle_slowly[][2] = {
 	// { when gaining climate, when losing climate }
 	{ FALSE, FALSE },	// *
@@ -3854,7 +3883,7 @@ const char *spawn_flags_short[] = {
 };
 
 
-// TILESET_x
+// TILESET_x (1/3): season display text
 const char *seasons[] = {
 	"Season data not found.",	// TILESET_ANY (should never hit this case)
 	"It is spring and everything is flowering.",
@@ -3865,7 +3894,7 @@ const char *seasons[] = {
 };
 
 
-// TILESET_x
+// TILESET_x (2/3): icon type / season name
 const char *icon_types[] = {
 	"Any",
 	"Spring",
@@ -3876,13 +3905,32 @@ const char *icon_types[] = {
 };
 
 
-// SUN_x: sun states (anything other than 'dark' is light)
+// TILESET_x (3/3): seasonal temperature base
+const int season_temperature[] = {
+	0,	// TILESET_ANY
+	-5,	// spring
+	10,	// summer
+	0,	// autumn
+	-10,	// winter
+};
+
+
+// SUN_x (1/2): sun states (anything other than 'dark' is light)
 const char *sun_types[] = {
 	"dark",
 	"rising",
 	"light",
 	"setting",
 	"\n"
+};
+
+
+// SUN_x (2/2): temperature modifiers for sun
+const int sun_temperature[] = {
+	-10,	// SUN_DARK
+	0,	// SUN_RISE
+	10,	// SUN_LIGHT
+	0,	// SUN_SET
 };
 
 

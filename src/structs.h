@@ -6196,6 +6196,14 @@ struct vehicle_room_list {
  //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON STRUCTS //////////////////////////////////////////////
 
+// for climate-based temperature
+struct climate_temperature_t {
+	int base_add;	// core temperature from this climate
+	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%)
+	double season_weight;	// how much season affects this (default: 1.0 / 100%)
+};
+
+
 // TILESET_x, used in sector_data
 struct tileset_data {
 	char *icon;  // ^^^^
@@ -6203,6 +6211,8 @@ struct tileset_data {
 };
 
 
+// global weather data
+// TODO - I dream of making this regional or per-island -pc
 struct weather_data {
 	int pressure;	// How is the pressure ( Mb )
 	int change;	// How fast and what way does it change

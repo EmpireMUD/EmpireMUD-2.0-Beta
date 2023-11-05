@@ -1013,7 +1013,28 @@ int get_relative_temperature(char_data *ch) {
 * @return int The temperature (zero is neutral).
 */
 int get_room_temperature(room_data *room) {
-	return 0;
+	int climate_val, season_val, sun_val, bit;
+	double season_mod, sun_mod, temperature;
+	bitvector_t climates;
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[GET_SEASON(room)];
+	sun_val = sun_temperature[get_sun_status(room)];
+	season_mod = sun_mod = 1.0;
+	climates = GET_SECT_CLIMATE(SECT(room));	// TODO: vary for buildings
+	
+	// determine climates
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			climate_val += climate_temperature[bit].base_add;
+			season_mod *= climate_temperature[bit].season_weight;
+			sun_mod *= climate_temperature[bit].sun_weight;
+		}
+	}
+	
+	temperature = climate_val + (season_val * season_mod) + (sun_val * sun_mod);
+	return round(temperature);
 }
 
 

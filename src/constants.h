@@ -213,6 +213,7 @@ extern const char *bld_flags[];
 extern const char *bld_relationship_types[];
 extern const int bld_relationship_vnum_types[];
 extern const char *climate_flags[];
+extern const struct climate_temperature_t climate_temperature[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
@@ -235,7 +236,9 @@ extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *seasons[];
 extern const char *icon_types[];
+extern const int season_temperature[];
 extern const char *sun_types[];
+extern const int sun_temperature[];
 extern const char *weather_types[];
 
 // for the second dimension of: climate_ruins_vehicle_slowly[climate][when]
