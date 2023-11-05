@@ -326,6 +326,7 @@ ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
+ADMIN_UTIL(util_temperature);
 ADMIN_UTIL(util_tool);
 ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
@@ -351,6 +352,7 @@ struct {
 	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
+	{ "temperature", LVL_START_IMM, util_temperature },
 	{ "tool", LVL_IMPL, util_tool },
 	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
@@ -1397,6 +1399,38 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_temperature) {
+	int climate_val, season_val, sun_val, bit;
+	double season_mod, sun_mod, temperature;
+	bitvector_t climates;
+	
+	msg_to_char(ch, "Temperature information for this room:\r\n");
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[GET_SEASON(IN_ROOM(ch))];
+	sun_val = sun_temperature[get_sun_status(IN_ROOM(ch))];
+	season_mod = sun_mod = 1.0;
+	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
+	
+	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, seasons[GET_SEASON(IN_ROOM(ch))]);
+	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[get_sun_status(IN_ROOM(ch))]);
+	
+	// determine climates
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			msg_to_char(ch, "%s: %+d, %.1f%% sun, %.1f%% seasonal\r\n", climate_flags[bit], climate_temperature[bit].base_add, 100.0 * climate_temperature[bit].sun_weight, 100.0 * climate_temperature[bit].season_weight);
+			climate_val += climate_temperature[bit].base_add;
+			season_mod *= climate_temperature[bit].season_weight;
+			sun_mod *= climate_temperature[bit].sun_weight;
+		}
+	}
+	
+	temperature = climate_val + (season_val * season_mod) + (sun_val * sun_mod);
+	msg_to_char(ch, "Final temperature: %d (%s), %.1f%% sun, %.1f%% seasonal\r\n", (int) temperature, temperature_to_string((int) temperature), 100.0 * sun_mod, 100.0 * season_mod);
 }
 
 
