@@ -3276,7 +3276,7 @@ const char *climate_flags[] = {
 };
 
 
-// CLIM_x (2/4): modifiers for temperature
+// CLIM_x (2/4): modifiers for temperature (see also: season_temperature, sun_temperature)
 const struct climate_temperature_t climate_temperature[] = {
 	// { base-add, sun-weight (1.0), season-weight (1.0) }
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// 0
@@ -3286,18 +3286,18 @@ const struct climate_temperature_t climate_temperature[] = {
 	
 	{ 15, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_HOT
 	{ -15, NO_TEMP_MOD, NO_TEMP_MOD },	// 5: CLIM_COLD
-	{ -15, 0.5, 0.5 },	// CLIM_HIGH
-	{ 15, 0.5, 0.5 },	// CLIM_LOW
+	{ -7, 0.5, 0.5 },	// CLIM_HIGH
+	{ 7, 0.5, 0.5 },	// CLIM_LOW
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_MAGICAL
-	{ 0, 0.5, 2.0 },	// CLIM_TEMPERATE
-	{ 20, 2.0, 0.25 },	// 10: CLIM_ARID
-	{ 10, 0.25, 0.5 },	// CLIM_TROPICAL
-	{ -5, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_MOUNTAIN
+	{ -8, 0.4, 3.0 },	// CLIM_TEMPERATE
+	{ 13, 1.75, 3.25 },	// 10: CLIM_ARID
+	{ 15, 0.25, 0.5 },	// CLIM_TROPICAL
+	{ -5, 1.25, NO_TEMP_MOD },	// CLIM_MOUNTAIN
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_RIVER
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_FRESH_WATER
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// 15: CLIM_SALT_WATER
-	{ 0, 0.75, 1.0 },	// CLIM_FOREST
-	{ 0, 0.5, 1.0 },	// CLIM_GRASSLAND
+	{ 0, 0.25, 1.5 },	// CLIM_FOREST
+	{ 0, 0.75, 1.0 },	// CLIM_GRASSLAND
 	{ 0, 0.5, 0.75 },	// CLIM_COASTAL
 	{ 0, 0.5, 0.5 },	// CLIM_OCEAN
 	{ 0, 0.75, NO_TEMP_MOD },	// 20: CLIM_LAKE
@@ -3905,11 +3905,11 @@ const char *icon_types[] = {
 };
 
 
-// TILESET_x (3/3): seasonal temperature base
+// TILESET_x (3/3): seasonal temperature base (see also: climate_temperature, sun_temperature)
 const int season_temperature[] = {
 	0,	// TILESET_ANY
 	-5,	// spring
-	10,	// summer
+	8,	// summer
 	0,	// autumn
 	-10,	// winter
 };
@@ -3925,11 +3925,11 @@ const char *sun_types[] = {
 };
 
 
-// SUN_x (2/2): temperature modifiers for sun
+// SUN_x (2/2): temperature modifiers for sun (see also: climate_temperature, season_temperature)
 const int sun_temperature[] = {
 	-10,	// SUN_DARK
 	0,	// SUN_RISE
-	10,	// SUN_LIGHT
+	8,	// SUN_LIGHT
 	0,	// SUN_SET
 };
 
