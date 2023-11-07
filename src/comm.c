@@ -3040,8 +3040,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 		if (*str == '%') {
 			switch (*(++str)) {
 				case 'c': {	// player conditions (words)
-					int temperature = get_relative_temperature(ch);
-					int t_limit = config_get_int("temperature_limit");
 					*i = '\0';
 					if (PRF_FLAGGED(ch, PRF_AFK)) {
 						strcat(i, "\trA");
@@ -3079,11 +3077,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALK(ch)) {
 						strcat(i, "\t0W");
 					}
-					if (temperature <= -1 * t_limit) {
-						strcat(i, "\tcC");
-					}
-					if (temperature >= t_limit) {
-						strcat(i, "\toH");
+					if (config_get_bool("temperature_penalties")) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_limit");
+						if (temperature <= -1 * t_limit) {
+							strcat(i, "\tcC");
+						}
+						if (temperature >= t_limit) {
+							strcat(i, "\toH");
+						}
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
@@ -3103,8 +3105,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 'C': {	// player conditions (words)
-					int temperature = get_relative_temperature(ch);
-					int t_limit = config_get_int("temperature_limit");
 					*i = '\0';
 					if (PRF_FLAGGED(ch, PRF_AFK)) {
 						sprintf(i + strlen(i), "%safk", (*i ? " " : ""));
@@ -3139,11 +3139,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALK(ch)) {
 						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
 					}
-					if (temperature <= -1 * t_limit) {
-						sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
-					}
-					if (temperature >= t_limit) {
-						sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+					if (config_get_bool("temperature_penalties")) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_limit");
+						if (temperature <= -1 * t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
+						if (temperature >= t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
