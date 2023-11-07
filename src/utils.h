@@ -1923,7 +1923,7 @@ char *shared_by(obj_data *obj, char_data *ch);
 char *show_color_codes(char *string);
 char *str_dup(const char *source);
 char *str_replace(const char *search, const char *replace, const char *subject);
-char *str_str(char *cs, char *ct);
+char *str_str(const char *cs, const char *ct);
 char *strip_color(char *input);
 char *stripcr(char *dest, const char *src);
 void strip_crlf(char *buffer);

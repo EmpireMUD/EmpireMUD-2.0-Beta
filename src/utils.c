@@ -5425,12 +5425,12 @@ int strn_cmp(const char *arg1, const char *arg2, int n) {
 /*
 * Version of str_str from dg_scripts -- better than the base CircleMUD version.
 *
-* @param char *cs The string to search.
-* @param char *ct The string to search for...
+* @param const char *cs The string to search.
+* @param const char *ct The string to search for...
 * @return char* A pointer to the substring within cs, or NULL if not found.
 */
-char *str_str(char *cs, char *ct) {
-	char *s, *t;
+char *str_str(const char *cs, const char *ct) {
+	const char *s, *t;
 
 	if (!cs || !ct || !*ct)
 		return NULL;
@@ -5449,7 +5449,7 @@ char *str_str(char *cs, char *ct) {
 		}
 
 		if (!*t)
-			return s;
+			return (char*)s;
 	}
 
 	return NULL;
