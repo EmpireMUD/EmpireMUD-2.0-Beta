@@ -1609,6 +1609,7 @@ typedef struct vehicle_data vehicle_data;
 #define LIQF_WATER  BIT(0)	// counts as water for certain commands
 #define LIQF_COOLING  BIT(1)	// cools down the player
 #define LIQF_WARMING  BIT(2)	// warms up the player
+// BIT(31) limit: this is stored as an int (in the generic values)
 
 
  //////////////////////////////////////////////////////////////////////////////
