@@ -855,7 +855,10 @@ void show_visible_moons(char_data *ch) {
 //// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
 
 /**
+* Checks whether a player should have penalties from high or low temperature,
+* adds them if needed, or removes them if not.
 *
+* @param char_data *ch The player.
 */
 void check_temperature_penalties(char_data *ch) {
 	int iter, limit, room_temp, temperature;
