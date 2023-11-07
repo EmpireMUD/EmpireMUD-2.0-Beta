@@ -2580,6 +2580,10 @@ falls over the course of an in-game hour. Having a lit torch or camp fire will
 help keep you warm in the winter, and being in the water will help keep you
 cool in the summer.
 
+Cold temperatures (in order): chilly, cold, frosty, icy, frigid, freezing
+Comfortable temperatures: cool, pleasant, balmy
+Hot temperatures: warm, hot, scorching, sweltering, blistering, searing
+
 See also: SURVEY, TIME, WEATHER
 #
 THROW

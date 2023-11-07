@@ -1132,20 +1132,20 @@ const char *temperature_to_string(int temperature) {
 	} temperature_name[] = {
 		// { over temp, show text }
 		{ INT_MIN, "freezing" },
-		{ -94, "frigid" },
-		{ -79, "icy" },
-		{ -64, "frosty" },
-		{ -49, "cold" },
-		{ -34, "chilly" },
+		{ -49, "frigid" },
+		{ -39, "icy" },
+		{ -34, "frosty" },
+		{ -29, "cold" },
+		{ -24, "chilly" },
 		{ -19, "cool" },
 		{ -9, "pleasant" },
 		{ 10, "balmy" },
 		{ 20, "warm" },
-		{ 35, "hot" },
-		{ 50, "scorching" },
-		{ 65, "sweltering" },
-		{ 80, "blistering" },
-		{ 95, "searing" },
+		{ 25, "hot" },
+		{ 30, "scorching" },
+		{ 35, "sweltering" },
+		{ 40, "blistering" },
+		{ 50, "searing" },
 
 		{ INT_MAX, "\n" }	// must be last
 	};
