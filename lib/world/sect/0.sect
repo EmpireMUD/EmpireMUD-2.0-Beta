@@ -846,7 +846,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'.' 18 kov 6 iw jp
+'.' 18 kovw 6 iw jp
 C
 dig, drink, fill, gather, pick~
 D0
@@ -1304,7 +1304,7 @@ S
 #30
 Tundra~
 The Arctic Tundra~
-',' 16 fs 50 cev 0
+',' 16 fsx 50 cev 0
 D0
 ,,,,~
 &W~
@@ -2817,7 +2817,7 @@ S
 #70
 Irrigated Field~
 An Irrigated Field~
-'.' 10 jklrv 2 il bp
+'.' 10 jklrvw 2 il bp
 C
 dig, gather, pick~
 D0
@@ -2870,7 +2870,7 @@ S
 #71
 Irrigated Forest~
 An Irrigated Forest~
-'.' 14 jkqv 3 adil np
+'.' 14 jkqvw 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -2927,7 +2927,7 @@ S
 #72
 Irrigated Jungle~
 An Irrigated Jungle~
-'^' 14 klqv 3 adi g
+'^' 14 klqvw 3 adi g
 C
 chop, dig, gather, pick~
 D0
@@ -2988,7 +2988,7 @@ S
 #73
 Irrigated Stumps~
 An Irrigated Field of Stumps~
-'.' 10 jkrv 2 adil bp
+'.' 10 jkrvw 2 adil bp
 C
 burn stumps, dig, gather, pick~
 D0
@@ -3037,7 +3037,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'.' 13 jkrv 3 adi p
+'.' 13 jkrvw 3 adi p
 C
 chop, dig, pick~
 D0
@@ -3092,7 +3092,7 @@ S
 #75
 Irrigated Jungle Stumps~
 An Irrigated Field of Stumps~
-'.' 10 klrv 3 adil p
+'.' 10 klrvw 3 adil p
 C
 chop, dig, pick~
 D0
@@ -3139,7 +3139,7 @@ S
 #76
 Irrigated Jungle Copse~
 An Irrigated Jungle Copse~
-'w' 13 klv 6 adi p
+'w' 13 klvw 6 adi p
 C
 chop, dig, pick~
 D0
@@ -3200,7 +3200,7 @@ S
 #77
 Planted Irrigated Field~
 A Planted Irrigated Field~
-',' 10 jkl 3 ij kp
+',' 10 jklw 3 ij kp
 C
 dig~
 D0
@@ -3237,7 +3237,7 @@ S
 #78
 Irrigated Crop~
 An Irrigated Crop~
-'.' 10 jkl 3 dijk kp
+'.' 10 jklw 3 dijk kp
 D0
 ????~
 &G~
@@ -3258,7 +3258,7 @@ S
 #79
 Shady Irrigated Forest~
 A Shady Irrigated Forest~
-'^' 14 jkqv 3 adil np
+'^' 14 jkqvw 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -3321,7 +3321,7 @@ S
 #80
 Lush Oasis~
 A Lush Oasis~
-'.' 18 koqv 6 adiw jp
+'.' 18 koqvw 6 adiw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -3370,7 +3370,7 @@ S
 #81
 Shady Oasis~
 A Shady Oasis~
-'.' 18 koqv 6 diw jp
+'.' 18 koqvw 6 diw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -3412,7 +3412,7 @@ S
 #82
 Dry Oasis~
 A Dry Oasis~
-'.' 21 k 6 l ep
+'.' 21 kw 6 l ep
 C
 dig, gather, pick~
 D1
@@ -3467,7 +3467,7 @@ S
 #83
 Planted Oasis~
 A Planted Oasis~
-'.' 18 kov 6 ijw kp
+'.' 18 kovw 6 ijw kp
 C
 dig, drink, fill~
 D0
@@ -3498,7 +3498,7 @@ S
 #84
 Oasis Crop~
 An Oasis Crop~
-'.' 18 kov 6 dijkw kp
+'.' 18 kovw 6 dijkw kp
 D0
 ????~
 &y~
@@ -3513,7 +3513,7 @@ S
 #85
 Irrigation Canal~
 An Irrigation Canal~
-'~' 17 ko 8 gi af
+'~' 17 kow 8 gi af
 D0
 @w&?~~@e~
 &C~
@@ -3583,7 +3583,7 @@ S
 #88
 Irrigated Oasis~
 An Oasis on the Irrigated Field~
-'.' 18 jklov 6 iw jp
+'.' 18 jklovw 6 iw jp
 C
 dig, drink, fill, gather, pick~
 D0
@@ -3627,7 +3627,7 @@ S
 #89
 Shady Irrigated Oasis~
 A Shady Oasis on the Irrigated Field~
-'.' 18 jkloqv 6 diw jp
+'.' 18 jkloqvw 6 diw jp
 C
 dig, drink, fill, gather, pick~
 D0
