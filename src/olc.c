@@ -225,6 +225,7 @@ OLC_MODULE(fedit_startingreputation);
 
 // generic modules
 OLC_MODULE(genedit_flags);
+OLC_MODULE(genedit_liquidflags);
 OLC_MODULE(genedit_name);
 OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
@@ -756,6 +757,7 @@ const struct olc_command_data olc_data[] = {
 	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "liquid", genedit_liquid, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "liquidflags", genedit_liquidflags, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: currency
 	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },

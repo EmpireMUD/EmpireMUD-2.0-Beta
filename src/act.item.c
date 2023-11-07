@@ -6840,7 +6840,7 @@ ACMD(do_pour) {
 			}
 			
 			// shortcut through do_douse_room if it's water and burning
-			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER) {
+			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && liquid_flagged(GET_DRINK_CONTAINER_TYPE(from_obj), LIQF_WATER)) {
 				do_douse_room(ch, IN_ROOM(ch), from_obj);
 				return;
 			}
@@ -6849,7 +6849,7 @@ ACMD(do_pour) {
 			act("You empty $p.", FALSE, ch, from_obj, 0, TO_CHAR);
 
 			/* If it's a trench, fill her up */
-			if (GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
+			if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(from_obj), LIQF_WATER) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
 				add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_FILL_TIME, -25 * GET_DRINK_CONTAINER_CONTENTS(from_obj));
 				if (find_stored_event(SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL)) {
 					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);

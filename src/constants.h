@@ -153,6 +153,7 @@ extern const char *generic_types[];
 extern const bool generic_types_uses_in_dev[];
 extern const char *generic_flags[];
 extern const char *language_types[];
+extern const char *liquid_flags[];
 
 // mob constants
 extern const char *action_bits[];

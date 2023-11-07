@@ -711,13 +711,18 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 // GENERIC_x: value definitions and getters
 
 // GENERIC_LIQUID
+#define GVAL_LIQUID_DRUNK  0
+#define GVAL_LIQUID_FULL  1
+#define GVAL_LIQUID_THIRST  2
+#define GVAL_LIQUID_FLAGS  3
 #define GSTR_LIQUID_NAME  0
 #define GSTR_LIQUID_COLOR  1
 #define GET_LIQUID_NAME(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_NAME) : "")
 #define GET_LIQUID_COLOR(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_COLOR) : "")
-#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), DRUNK) : 0)
-#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), FULL) : 0)
-#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), THIRST) : 0)
+#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_DRUNK) : 0)
+#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_FULL) : 0)
+#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_THIRST) : 0)
+#define GET_LIQUID_FLAGS(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_FLAGS) : 0)
 
 // GENERIC_ACTION
 #define GSTR_ACTION_BUILD_TO_CHAR  0
@@ -2255,6 +2260,7 @@ void combat_meter_heal_taken(char_data *ch, int amt);
 
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag);
 
 // instance.c
 int adjusted_instance_limit(adv_data *adv);

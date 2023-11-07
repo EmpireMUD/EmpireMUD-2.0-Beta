@@ -2308,7 +2308,7 @@ ACMD(do_douse) {
 	if (!use_room) {
 		// this loop finds a water container and sets obj
 		DL_FOREACH2(ch->carrying, iter, next_content) {
-			if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
+			if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(iter), LIQF_WATER) && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
 				obj = iter;
 				break;
 			}

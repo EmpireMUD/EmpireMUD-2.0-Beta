@@ -204,6 +204,25 @@ int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
 
 
 /**
+* Checks liquid flags based on the liquid's vnum.
+*
+* @param any_vnum generic_liquid_vnum Which liquid (generic) vnum to check.
+* @param bitvector_t flag Which flag(s) to look for.
+* @return bool TRUE if ALL those flags are set on the liquid, FALSE if not.
+*/
+bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag) {
+	generic_data *gen = real_generic(generic_liquid_vnum);
+	
+	if (gen && flag && (GET_LIQUID_FLAGS(gen) & flag) == flag) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
+/**
 * Determines if a generic has a given relationship with another generic.
 *
 * @param struct generic_relation *list The list to check.
@@ -1770,6 +1789,9 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_LIQUID: {
 			size += snprintf(buf + size, sizeof(buf) - size, "Liquid: \ty%s\t0, Color: \ty%s\t0\r\n", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
 			size += snprintf(buf + size, sizeof(buf) - size, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]\r\n", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
+			
+			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Liquid flags: \tg%s\t0\r\n", part);
 			break;
 		}
 		case GENERIC_ACTION: {
@@ -1854,6 +1876,9 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%shunger\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
 			sprintf(buf + strlen(buf), "<%sthirst\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
 			sprintf(buf + strlen(buf), "<%sdrunk\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
+			
+			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sliquidflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
 			break;
 		}
 		case GENERIC_ACTION: {
@@ -1941,6 +1966,18 @@ OLC_MODULE(genedit_flags) {
 	if (had_in_dev && !GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(genedit_liquidflags) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_LIQUID) {
+		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
+	}
+	else {
+		GEN_VALUE(gen, GVAL_LIQUID_FLAGS) = olc_process_flag(ch, argument, "liquid", "liquidflags", liquid_flags, GET_LIQUID_FLAGS(gen));
 	}
 }
 
@@ -2721,7 +2758,7 @@ OLC_MODULE(genedit_drunk) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, DRUNK) = olc_process_number(ch, argument, "drunk", "drunk", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_DRUNK(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_DRUNK) = olc_process_number(ch, argument, "drunk", "drunk", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_DRUNK(gen));
 	}
 }
 
@@ -2733,7 +2770,7 @@ OLC_MODULE(genedit_hunger) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, FULL) = olc_process_number(ch, argument, "hunger", "hunger", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_FULL(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_FULL) = olc_process_number(ch, argument, "hunger", "hunger", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_FULL(gen));
 	}
 }
 
@@ -2757,6 +2794,6 @@ OLC_MODULE(genedit_thirst) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, THIRST) = olc_process_number(ch, argument, "thirst", "thirst", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_THIRST(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_THIRST) = olc_process_number(ch, argument, "thirst", "thirst", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_THIRST(gen));
 	}
 }

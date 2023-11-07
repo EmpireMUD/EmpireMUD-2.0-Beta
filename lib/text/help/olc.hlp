@@ -3703,12 +3703,13 @@ See also: OLC GENERICS, GENEDIT PLURAL
 
 The 'liquid' generic type is used in drink containers and resource lists.
 
-You must set 5 properties on liquids:
+You must set 6 properties on liquids:
   <&yliquid&0> the name as it appears in descriptions (a bottle of 'water')
   <&ycolor&0> the color of the liquid when the player looks in the bottle
   <&yhunger&0> number of hours to satiate hunger per unit of liquid
   <&ythirst&0> number of hours to satiate thirst per unit
   <&ydrunk&0> number of hours to cause drunknness per unit
+  <&yliquidflags&0> optional flags for liquids (see LIQUID FLAGS)
 
 Stock liquids can be found in the 0-99 vnum block, but new liquids should
 usually be added within an adventure zone's vnums.
@@ -3758,6 +3759,17 @@ EmpireMUD comes with language [150] English and all characters start with this
 language. Add the IN-DEV flag to disable it.
 
 See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
+#d
+"GENEDIT LIQUIDFLAGS" "GENEDIT LIQUID FLAGS" "LIQUID FLAGS"
+
+Usage:  .liquidflags [add | remove] <flags>
+
+The following flags are available for liquids:
+ &cWATER&0 - Counts as water for certain game commands (douse).
+ &cCOOLING&0 - Drinking this liquid makes the player cooler.
+ &cWARMING&0 - Drinking this liquid makes the player warmer.
+
+See also: OLC GENERICS, GENERIC LIQUIDS
 #d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 

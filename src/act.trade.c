@@ -465,7 +465,7 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 	obj_data *obj, *found = NULL;
 	
 	DL_FOREACH2(list, obj, next_content) {
-		if (IS_DRINK_CONTAINER(obj) && CAN_SEE_OBJ(ch, obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(obj) >= (GET_DRINK_CONTAINER_CAPACITY(obj)/2)) {
+		if (IS_DRINK_CONTAINER(obj) && CAN_SEE_OBJ(ch, obj) && liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WATER) && GET_DRINK_CONTAINER_CONTENTS(obj) >= (GET_DRINK_CONTAINER_CAPACITY(obj)/2)) {
 			found = obj;
 			break;
 		}

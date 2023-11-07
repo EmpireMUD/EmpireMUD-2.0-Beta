@@ -1605,6 +1605,12 @@ typedef struct vehicle_data vehicle_data;
 #define LANG_SPEAK  2	// full comprehension and speaking
 
 
+// LIQF_x: flags for liquids
+#define LIQF_WATER  BIT(0)	// counts as water for certain commands
+#define LIQF_COOLING  BIT(1)	// cools down the player
+#define LIQF_WARMING  BIT(2)	// warms up the player
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MOBILE DEFINES //////////////////////////////////////////////////////////
 
