@@ -2866,6 +2866,8 @@ typedef enum {
 #define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
 #define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
 #define CLIM_WATERSIDE  BIT(21)	// t. adjacent to fresh water
+#define CLIM_MILD  BIT(22)	// u. reduces temperature effects of other terrains
+#define CLIM_HARSH  BIT(23)	// v. increases temperature effects of other terrains
 
 
 // DPLTN_x: depletion types
@@ -6201,6 +6203,8 @@ struct climate_temperature_t {
 	int base_add;	// core temperature from this climate
 	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
 	double season_weight;	// how much season affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double cold_modifier;	// multiplies cold temperatures by this
+	double heat_modifier;	// multiplies hot temperatures by this
 };
 
 

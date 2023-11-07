@@ -3272,42 +3272,47 @@ const char *climate_flags[] = {
 	"ocean",
 	"lake",	// 20
 	"waterside",
+	"mild",
+	"harsh",
 	"\n"
 };
 
 
 // CLIM_x (2/4): modifiers for temperature (see also: season_temperature, sun_temperature)
 const struct climate_temperature_t climate_temperature[] = {
-	// { base-add, sun-weight (1.0), season-weight (1.0) }
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// 0
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// unused climates
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },
+	// { base-add, sun-weight (1.0 or NO_TEMP_MOD), season-weight (1.0 or NO_TEMP_MOD), cold-mod (1.0), heat-mod (1.0) }
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 0
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// unused climates
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },
 	
-	{ 15, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_HOT
-	{ -15, NO_TEMP_MOD, NO_TEMP_MOD },	// 5: CLIM_COLD
-	{ -7, 0.5, 0.5 },	// CLIM_HIGH
-	{ 7, 0.5, 0.5 },	// CLIM_LOW
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_MAGICAL
-	{ -8, 0.4, 3.0 },	// CLIM_TEMPERATE
-	{ 13, 1.75, 3.25 },	// 10: CLIM_ARID
-	{ 15, 0.25, 0.5 },	// CLIM_TROPICAL
-	{ -5, 1.25, NO_TEMP_MOD },	// CLIM_MOUNTAIN
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_RIVER
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// CLIM_FRESH_WATER
-	{ 0, NO_TEMP_MOD, NO_TEMP_MOD },	// 15: CLIM_SALT_WATER
-	{ 0, 0.25, 1.5 },	// CLIM_FOREST
-	{ 0, 0.75, 1.0 },	// CLIM_GRASSLAND
-	{ 0, 0.5, 0.75 },	// CLIM_COASTAL
-	{ 0, 0.5, 0.5 },	// CLIM_OCEAN
-	{ 0, 0.75, NO_TEMP_MOD },	// 20: CLIM_LAKE
-	{ 0, 0.75, NO_TEMP_MOD },	// CLIM_WATERSIDE
+	{ 15, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_HOT
+	{ -15, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 5: CLIM_COLD
+	{ -7, 0.5, 0.5, 1.0, 1.0 },	// CLIM_HIGH
+	{ 7, 0.5, 0.5, 1.0, 1.0 },	// CLIM_LOW
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_MAGICAL
+	{ -8, 0.4, 3.0, 1.0, 1.0 },	// CLIM_TEMPERATE
+	{ 13, 1.75, 3.25, 1.0, 1.0 },	// 10: CLIM_ARID
+	{ 15, 0.25, 0.5, 1.0, 1.0 },	// CLIM_TROPICAL
+	{ -5, 1.25, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_MOUNTAIN
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_RIVER
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_FRESH_WATER
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 15: CLIM_SALT_WATER
+	{ 0, 0.25, 1.5, 1.0, 1.0 },	// CLIM_FOREST
+	{ 0, 0.75, 1.0, 1.0, 1.0 },	// CLIM_GRASSLAND
+	{ 0, 0.5, 0.75, 1.0, 1.0 },	// CLIM_COASTAL
+	{ 0, 0.5, 0.5, 1.0, 1.0 },	// CLIM_OCEAN
+	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// 20: CLIM_LAKE
+	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_WATERSIDE
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 0.5, 0.5 },	// CLIM_MILD
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.5, 1.5 },	// CLIM_HARSH
 };
 
 
 // CLIM_x (3/4): order to display climate flags
 const bitvector_t climate_flags_order[] = {
 	CLIM_HOT, CLIM_COLD,	// temperatures first
+	CLIM_MILD, CLIM_HARSH,	// modifiers
 	CLIM_HIGH, CLIM_LOW,	// relative elevation
 	CLIM_MAGICAL,			// special attribute
 	
@@ -3350,7 +3355,9 @@ const bool climate_ruins_vehicle_slowly[][2] = {
 	{ TRUE, TRUE },	// coastal
 	{ FALSE, TRUE },	// ocean
 	{ FALSE, TRUE },	// lake
-	{ TRUE, TRUE }	// waterside
+	{ TRUE, TRUE },	// waterside
+	{ TRUE, TRUE },	// mild
+	{ TRUE, TRUE },	// harsh
 };
 
 

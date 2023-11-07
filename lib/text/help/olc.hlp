@@ -3107,7 +3107,9 @@ which case they must only match at least 1 climate.
 
 Climates:
  &chot&0 - Hotter than normal for this type (modifier).
- &ccold&0 - Coler than normal for this type (modifier).
+ &ccold&0 - Colder than normal for this type (modifier).
+ &cmild&0 - Milder temperatures than normal for this type (modifier).
+ &charsh&0 - Harsher temperatures than normal for this type (modifier).
  &chigh&0 - Higher than normal for this type (modifier), e.g. mountain peak.
  &clow&0 - Lower than normal for this type (modifier).
  &cmagical&0 - Magical in some way (enchanted forest).

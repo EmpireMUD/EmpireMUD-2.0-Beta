@@ -1014,7 +1014,7 @@ int get_relative_temperature(char_data *ch) {
 */
 int get_room_temperature(room_data *room) {
 	int climate_val, season_count, season_val, sun_count, sun_val, bit;
-	double season_mod, sun_mod, temperature;
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
 	bitvector_t climates;
 	
 	// init
@@ -1023,6 +1023,7 @@ int get_room_temperature(room_data *room) {
 	sun_val = sun_temperature[get_sun_status(room)];
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
 	climates = GET_SECT_CLIMATE(SECT(room));	// TODO: vary for buildings
 	
 	// determine climates
@@ -1037,6 +1038,12 @@ int get_room_temperature(room_data *room) {
 			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
 				sun_mod += climate_temperature[bit].sun_weight;
 				++sun_count;
+			}
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
 			}
 		}
 	}
@@ -1058,6 +1065,14 @@ int get_room_temperature(room_data *room) {
 	}
 	else {
 		temperature += sun_val;
+	}
+	
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
 	}
 	
 	return round(temperature);
