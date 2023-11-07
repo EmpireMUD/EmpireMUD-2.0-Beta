@@ -1469,7 +1469,7 @@ ADMIN_UTIL(util_temperature) {
 			else {
 				*cold_mod_part = '\0';
 			}
-			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD && climate_temperature[bit].heat_modifier != 1.0) {
 				heat_mod *= climate_temperature[bit].heat_modifier;
 				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
 			}
