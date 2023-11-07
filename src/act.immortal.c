@@ -1405,9 +1405,9 @@ ADMIN_UTIL(util_strlen) {
 ADMIN_UTIL(util_temperature) {
 	int climate_val, season_count, season_val, sun_count, sun_val, bit, find;
 	int use_sun = get_sun_status(IN_ROOM(ch)), use_season = GET_SEASON(IN_ROOM(ch));
-	double season_mod, sun_mod, temperature;
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
 	bitvector_t climates;
-	char season_part[256], sun_part[256], arg[MAX_INPUT_LENGTH];
+	char cold_mod_part[256], heat_mod_part[256], season_part[256], sun_part[256], arg[MAX_INPUT_LENGTH];
 	
 	argument = one_argument(argument, arg);
 	while (*arg) {
@@ -1434,6 +1434,7 @@ ADMIN_UTIL(util_temperature) {
 	sun_val = sun_temperature[use_sun];
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
 	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
 	
 	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[use_season]);
@@ -1461,7 +1462,22 @@ ADMIN_UTIL(util_temperature) {
 				strcpy(sun_part, "no mod for");
 			}
 			
-			msg_to_char(ch, "%s: %+d, %s sun, %s seasonal\r\n", climate_flags[bit], climate_temperature[bit].base_add, sun_part, season_part);
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD && climate_temperature[bit].cold_modifier != 1.0) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+				snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
+			}
+			else {
+				*cold_mod_part = '\0';
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
+				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
+			}
+			else {
+				*heat_mod_part = '\0';
+			}
+			
+			msg_to_char(ch, "%s: %+d, %s sun, %s seasonal%s%s\r\n", climate_flags[bit], climate_temperature[bit].base_add, sun_part, season_part, cold_mod_part, heat_mod_part);
 		}
 	}
 	
@@ -1484,7 +1500,15 @@ ADMIN_UTIL(util_temperature) {
 		temperature += sun_val;
 	}
 	
-	msg_to_char(ch, "Final temperature: %d (%s), %.1f%% sun, %.1f%% seasonal\r\n", (int) temperature, temperature_to_string((int) temperature), 100.0 * sun_mod, 100.0 * season_mod);
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
+	}
+	
+	msg_to_char(ch, "Final temperature: %.1f (%s), %.1f%% sun, %.1f%% seasonal\r\n", temperature, temperature_to_string((int) (temperature + 0.5)), 100.0 * sun_mod, 100.0 * season_mod);
 }
 
 
