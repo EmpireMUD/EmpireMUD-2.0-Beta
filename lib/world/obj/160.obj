@@ -300,4 +300,194 @@ A
 C
 125 200
 S
+#16020
+opening shadowy~
+a shadowy opening~
+A shadowy opening is visible in the wall. (adventure)~
+   An easily overlooked opening in the wall here leads down into a void. The
+smell of blood floats on the stale air, and the sounds of hissing laughter can
+be heard if you listen closely, or have vampiric ears.
+~
+8 0 0 0 3
+-1 0 0
+1 0
+T 16021
+S
+#16021
+blood solidified disc~
+some solidified blood~
+A disc of solidified blood lays here.~
+   This disc of magically solidified blood has runes scratched into the edge.
+They look almost like they'd fit a magical keyhole. Perhaps you could use this
+to meet with the vampire elder behind the invasion?
+~
+3 p a 0 4
+0 0 0
+10 0
+T 16020
+S
+#16022
+arch exit~
+the arch back out~
+The arch back out of here stands before you.~
+   Before you is an arch in the stone leading back out of this vampire nest.
+It seems that the barier which was present on the other side is only one
+directional.
+~
+8 0 0 0 2
+-1 0 0
+1 0
+S
+#16023
+vial bone blood~
+a vial~
+A vial made of bone sits here.~
+   This small vial seems to be made of a hollowed out leg bone. Blood stains
+the inside of the bone. Seems this would be good for a quick pick me up for a
+hungry vampire.
+~
+5 k a 0 11
+10 10 6
+14 0
+C
+1 1
+T 16027
+T 16020
+S
+#16024
+oranges blood sack~
+a sack of blood oranges~
+A sack of blood red oranges is sitting here.~
+   This sack of blood oranges can be planted or eaten. But who knows what the
+vampires might have done to them?
+~
+6 bg a 0 9
+24 16024 0
+7 168
+A
+20 20 0
+C
+1 1
+I 15 16025 100.00 4 x  # SEPARATE: blood orange
+O+ 1 6134
+R
+4 5114 0
+S
+#16025
+orange blood~
+a blood orange~
+A blood orange is lying here.~
+It's a bright red orange.
+~
+6 g a 0 8
+6 0 0
+7 48
+A
+20 5 0
+C
+1 1
+I 14 16024 100.00 4 x  # COMBINE: sack of blood oranges
+O+ 1 6124
+S
+#16026
+amulet half flame~
+half of a flame amulet~
+Half of an elder vampire's amulet is in the dust here.~
+   This seems to be half of an amulet, used for summoning the elder vampire
+from within his chamber. The connection point clearly won't allow two of the
+same halves to connect, but seem to be able to join with three other amulet
+halves. Symbols for fire, water, earth, and wind are etched along the center
+line.
+~
+3 k a 0 3
+0 0 0
+10 96
+C
+1 1
+T 16055
+S
+#16027
+amulet half water~
+half of a water amulet~
+Half of an elder vampire's amulet is in the dust here.~
+   This seems to be half of an amulet, used for summoning the elder vampire
+from within his chamber. The connection point clearly won't allow two of the
+same halves to connect, but seem to be able to join with three other amulet
+halves. Symbols for fire, water, earth, and wind are etched along the center
+line.
+~
+3 k a 0 5
+0 0 0
+10 96
+C
+1 1
+T 16055
+S
+#16028
+amulet half earth~
+half of an earth amulet~
+Half of an elder vampire's amulet is in the dust here.~
+   This seems to be half of an amulet, used for summoning the elder vampire
+from within his chamber. The connection point clearly won't allow two of the
+same halves to connect, but seem to be able to join with three other amulet
+halves. Symbols for fire, water, earth, and wind are etched along the center
+line.
+~
+3 k a 0 5
+0 0 0
+10 96
+C
+1 1
+T 16055
+S
+#16029
+amulet half wind~
+half of a wind amulet~
+Half of an elder vampire's amulet is in the dust here.~
+   This seems to be half of an amulet, used for summoning the elder vampire
+from within his chamber. The connection point clearly won't allow two of the
+same halves to connect, but seem to be able to join with three other amulet
+halves. Symbols for fire, water, earth, and wind are etched along the center
+line.
+~
+3 k a 0 4
+0 0 0
+10 96
+C
+1 1
+T 16055
+S
+#16030
+sarcophagus royal~
+the royal sarcophagus~
+The royal sarcophagus holds center stage in the crypt.~
+~
+4 0 0 0 3
+5 1 0
+1 0
+C
+1 1
+T 16062
+S
+#16031
+note dropped~
+a dropped note~
+A note has been carelessly dropped here.~
+   If you see this, please let the immortals know immediately. Feel free to use
+the bug command to do so. Thank you for your help.
+~
+3 0 0 0 4
+0 0 0
+0 0
+T 16060
+S
+#16099
+scythe~
+death's scythe~
+A new object is sitting here.~
+~
+0 0 a 0 2
+0 0 0
+0 0
+S
 $

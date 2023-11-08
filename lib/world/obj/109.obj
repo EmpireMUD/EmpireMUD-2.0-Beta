@@ -564,9 +564,11 @@ The dragonsteel warhammer schematic is lying here.~
    This schematic makes a dragonsteel warhammer, a powerful 1-handed melee
 weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 0 5
+7 0 a 0 0 6
 10910 0 0
 0 0
+C
+1 1
 S
 #10932
 schematic dragonsteel claymore~
@@ -575,9 +577,11 @@ The dragonsteel claymore schematic is lying here.~
    This schematic makes a dragonsteel claymore, a powerful 2-handed melee
 weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 0 6
+7 0 a 0 0 7
 10911 0 0
 0 0
+C
+1 1
 S
 #10933
 schematic dragonbone mace~
@@ -586,9 +590,11 @@ The dragonbone mace schematic is lying here.~
    This schematic makes a dragonbone mace, a strong tank weapon. You require
 Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 0 7
+7 0 a 0 0 8
 10912 0 0
 0 0
+C
+1 1
 S
 #10934
 schematic wand draconic~
@@ -597,9 +603,11 @@ The draconic wand schematic is lying here.~
    This schematic makes a flaming draconic wand, a powerful healer's weapon.
 You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 0 0 8
+7 0 a 0 0 9
 10913 0 0
 0 0
+C
+1 1
 S
 #10935
 schematic dragonbone staff~
@@ -608,9 +616,11 @@ The dragonbone staff schematic is lying here.~
    This schematic makes a flaming dragonbone staff, a powerful caster weapon.
 You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 0 0 9
+7 0 a 0 0 10
 10914 0 0
 0 0
+C
+1 1
 S
 #10936
 design wristblade dragonbone~
@@ -620,9 +630,11 @@ The dragonbone wristblade design is lying here.~
 melee warriors. You require Mythic Forge (Trade/Battle) to forge this off-hand
 weapon.
 ~
-7 0 a 0 0 10
+7 0 a 0 0 11
 10915 0 0
 0 0
+C
+1 1
 S
 #10937
 design dragonbone tower shield~
@@ -631,9 +643,11 @@ The dragonbone tower shield design is lying here.~
    This design is for a dragonbone tower shield, a strong shield for tanks.
 You require Mythic Forge (Trade/Battle) to forge this shield.
 ~
-7 0 a 0 0 11
+7 0 a 0 0 12
 10916 0 0
 0 0
+C
+1 1
 S
 #10938
 design red dragon charm~
@@ -642,9 +656,11 @@ The red dragon charm design is lying here.~
    This design is for a flaming red dragon charm, a powerful healer off-hand
 item. You need Lore Crafts (Trade/High Sorcery) to craft this off-hand trinket.
 ~
-7 0 a 0 0 12
+7 0 a 0 0 13
 10917 0 0
 0 0
+C
+1 1
 S
 #10939
 design tome dragonkind~
@@ -653,9 +669,11 @@ The dragonkind tome design is lying here.~
    This design creates the tome of dragonkind, a powerful caster off-hand item.
 You need Lore Crafts (Trade/High Sorcery) to craft this off-hand tome.
 ~
-7 0 a 0 0 13
+7 0 a 0 0 14
 10918 0 0
 0 0
+C
+1 1
 S
 #10940
 pattern dragon girdle crimson~
@@ -665,9 +683,11 @@ The crimson dragon girdle pattern is lying here.~
 waistband for melee warriors. You need Fabled Hides (Trade/Natural Magic) to
 sew this belt.
 ~
-7 0 a 0 0 14
+7 0 a 0 0 15
 10919 0 0
 0 0
+C
+1 1
 S
 #10941
 pattern burning dragonsteel waistband~
@@ -676,9 +696,11 @@ The burning dragonsteel waistband pattern is lying here.~
    This pattern creates a burning dragonsteel waistband, a heavy armored
 tanking belt. You need Fabled Hides (Trade/Natural Magic) to sew this belt.
 ~
-7 0 a 0 0 15
+7 0 a 0 0 16
 10920 0 0
 0 0
+C
+1 1
 S
 #10942
 pattern draconic flaming cincture~
@@ -687,9 +709,11 @@ The flaming draconic cincture pattern is lying here.~
    This pattern creates a flaming draconic cincture, a powerful mage armor belt
 for healers. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 0 0 17
+7 0 a 0 0 18
 10921 0 0
 0 0
+C
+1 1
 S
 #10943
 pattern burning dragoncloth sash~
@@ -698,9 +722,11 @@ The burning dragoncloth sash pattern is lying here.~
    This pattern creates a burning dragoncloth sash, a powerful mage armor belt
 for casters. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 0 0 17
+7 0 a 0 0 18
 10922 0 0
 0 0
+C
+1 1
 S
 #10944
 stone red dragon shining~
@@ -761,9 +787,11 @@ The magnificent dragon bracelet schematic is lying here.~
 wrist item that brings Greatness to your empire! You require Fabled Hides
 (Trade/Natural Magic) to sew this item.
 ~
-7 0 a 0 0 7
+7 0 a 0 0 8
 10946 0 0
 0 0
+C
+1 1
 S
 #10950
 skin dragon molted moulted mountainous pile~
@@ -1019,9 +1047,11 @@ The giant's causeway schematic is on the ground.~
    This schematic teaches you to build a special bridge: the giant's causeway.
 This schematic requires the Architect ability.
 ~
-7 0 a 0 0 2
+7 0 a 0 0 3
 10972 0 0
 0 0
+C
+1 1
 S
 #10973
 club giant wooden~
@@ -1048,9 +1078,11 @@ The giant hovel schematic is on the ground.~
    This schematic will teach you to build a new single-room large home, the
 giant hovel. This schematic requires the Architect ability.
 ~
-7 0 a 0 0 1
+7 0 a 0 0 2
 10974 0 0
 0 0
+C
+1 1
 S
 #10975
 schematic giant stone head~
@@ -1059,9 +1091,11 @@ The giant stone head schematic is on the ground.~
    This schematic will teach you to build a unique monument, the giant stone
 head. It requires the Architect ability.
 ~
-7 0 a 0 0 1
+7 0 a 0 0 2
 10975 0 0
 0 0
+C
+1 1
 S
 #10980
 tombstone stone~
@@ -1166,9 +1200,11 @@ A fractured sorcerer's stone is lying here.~
 mostly intact. You could use this to build a tower of sorcery:
 Build (requires Architect): fracturedtower
 ~
-3 e a 0 0 1
+3 e a 0 0 2
 0 0 0
 1 0
+C
+1 1
 S
 #10991
 spore strange~

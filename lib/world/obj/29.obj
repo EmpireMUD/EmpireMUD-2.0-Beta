@@ -5,7 +5,7 @@ An imperial traveling pack is lying on the ground.~
    This shining pack is surprisingly light, with dozens of compartments,
 straps, and mesh pouches.
 ~
-24 emo ar 0 2
+24 emo ar 0 0 2
 1 0 0
 11 0
 C
@@ -17,9 +17,11 @@ the imperial traveling pack pattern~
 The imperial traveling pack pattern is on the ground.~
 This pattern will teach you to sew: imperial traveling pack.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2900 0 0
 0 0
+C
+100 100
 S
 #2902
 pack imperial prismatic~
@@ -28,7 +30,7 @@ A prismatic imperial pack is lying here.~
    This pack is small, but it is coated in scales of imperium that glisten
 every color in the sunlight.
 ~
-24 emo ar 0 3
+24 emo ar 0 0 3
 1 0 0
 11 0
 A
@@ -50,9 +52,11 @@ the prismatic imperial pack pattern~
 The prismatic imperial pack pattern is on the ground.~
 This pattern will teach you to sew: prismatic imperial pack.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2902 0 0
 0 0
+C
+100 100
 S
 #2904
 shoes pair imperial winged~
@@ -60,7 +64,7 @@ winged imperial shoes~
 A pair of winged imperial shoes is lying here.~
 These shoes are made from leather and imperium, with tiny wings on the sides.
 ~
-2 mo ag 0 1
+2 mo ag 0 0 1
 0 0 0
 2 0
 A
@@ -76,9 +80,11 @@ the winged imperial shoes pattern~
 The winged imperial shoes pattern is on the ground.~
 This pattern will teach you to sew: winged imperial shoes.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2904 0 0
 0 0
+C
+100 100
 S
 #2906
 egg griffin imperial~
@@ -87,7 +93,7 @@ An imperial griffin egg is lying here.~
    This strange egg looks like it's actually just been magicked together from
 gold and gems. Nevertheless, you can use it to summon a non-combat pet.
 ~
-19 o a 0 5
+19 o a 0 0 5
 2906 0 0
 10 0
 C
@@ -99,9 +105,11 @@ the imperial griffin egg design~
 The imperial griffin egg design is on the ground.~
 This design will teach you to forge: imperial griffin egg.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2906 0 0
 0 0
+C
+100 100
 S
 #2908
 schematic imperial carriage~
@@ -109,9 +117,11 @@ the imperial carriage schematic~
 The imperial carriage schematic is on the ground.~
 This schematic will teach you to craft: imperial carriage.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2908 0 0
 0 0
+C
+100 100
 S
 #2910
 pack heroic adventuring~
@@ -119,7 +129,7 @@ a heroic adventuring pack~
 A heroic adventuring pack is sitting here.~
 This pack is so massive that it has its own monopod for support.
 ~
-24 emo ar 0 3
+24 emo ar 0 0 3
 1 0 0
 11 0
 C
@@ -131,9 +141,11 @@ the heroic adventuring pack pattern~
 The heroic adventuring pack pattern is on the ground.~
 This pattern will teach you to sew: heroic adventuring pack.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2910 0 0
 0 0
+C
+200 200
 S
 #2912
 boots seven strides heroic~
@@ -143,7 +155,7 @@ The heroic boots of seven strides are stopped here.~
 their bearer greatly improved movement. In fact, each stride is like taking
 seven.
 ~
-2 mo ag 0 3
+2 mo ag 0 0 3
 0 0 0
 2 0
 A
@@ -159,9 +171,11 @@ the heroic boots of seven strides pattern~
 The heroic boots of seven strides pattern is on the ground.~
 This pattern will teach you to sew: heroic boots of seven strides.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2912 0 0
 0 0
+C
+200 200
 S
 #2914
 stone heroic changeling~
@@ -170,7 +184,7 @@ A heroic changeling stone is lying here.~
    This odd stone is made mostly from magic, and glows with arcane symbols. It
 looks like you could use it to summon a minipet.
 ~
-19 o a 0 7
+19 o a 0 0 7
 2914 0 0
 10 0
 C
@@ -182,9 +196,11 @@ the heroic changeling stone design~
 The heroic changeling stone design is on the ground.~
 This design will teach you to forge: heroic changeling stone.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2914 0 0
 0 0
+C
+200 200
 S
 #2916
 schematic heroic caravan~
@@ -192,9 +208,11 @@ the heroic caravan schematic~
 The heroic caravan schematic is on the ground.~
 This schematic will teach you to craft: heroic caravan.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2916 0 0
 0 0
+C
+200 200
 S
 #2917
 schematic heroic galleon~
@@ -202,9 +220,11 @@ the heroic galleon schematic~
 The heroic galleon schematic is on the ground.~
 This schematic will teach you to manufacture: heroic galleon.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2917 0 0
 0 0
+C
+200 200
 S
 #2918
 potion imperial healing imperial-healing~
@@ -214,7 +234,7 @@ An imperial healing potion is on the ground.~
 white potion within. Hint: create an alias for 'quaff imperial-healing' to make
 sure you target the right potion.
 ~
-25 m a 0 7
+25 m a 0 0 7
 1250 30 -1
 8 0
 C
@@ -231,9 +251,11 @@ the imperial healing potion formula~
 The imperial healing potion formula is on the ground.~
 This formula will teach you to brew: imperial healing potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2918 0 0
 0 0
+C
+100 100
 S
 #2920
 potion stamina imperial imperial-stamina~
@@ -243,7 +265,7 @@ An imperial stamina potion is on the ground.~
 yellow potion within. Hint: create an alias for 'quaff imperial-stamina' to
 make sure you target the right potion.
 ~
-25 m a 0 7
+25 m a 0 0 7
 1252 30 -1
 8 0
 C
@@ -260,9 +282,11 @@ the imperial stamina potion formula~
 The imperial stamina potion formula is on the ground.~
 This formula will teach you to brew: imperial stamina potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2920 0 0
 0 0
+C
+100 100
 S
 #2922
 potion mana imperial imperial-mana~
@@ -272,7 +296,7 @@ An imperial mana potion is on the ground.~
 swirling blue potion within. Hint: create an alias for 'quaff imperial-mana' to
 make sure you target the right potion.
 ~
-25 m a 0 7
+25 m a 0 0 7
 1254 30 -1
 8 0
 C
@@ -289,9 +313,11 @@ the imperial mana potion formula~
 The imperial mana potion formula is on the ground.~
 This formula will teach you to brew: imperial mana potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2922 0 0
 0 0
+C
+100 100
 S
 #2924
 potion imperial wayfarers wayfarer's imperial-wayfarers imperial-wayfarer's~
@@ -301,7 +327,7 @@ An imperial wayfarer's potion is on the ground.~
 swirling potion within. Hint: create an alias for 'quaff imperial-wayfarers' to
 make sure you target the right potion.
 ~
-25 m a 0 14
+25 m a 0 0 14
 -1 0 3030
 8 0
 A
@@ -321,9 +347,11 @@ the imperial wayfarer's potion formula~
 The imperial wayfarer's potion formula is on the ground.~
 This formula will teach you to brew: imperial wayfarer's potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2924 0 0
 0 0
+C
+100 100
 S
 #2926
 potion imperial hex-purging imperial-hex-purging hexpurging imperial-hexpurging~
@@ -333,7 +361,7 @@ An imperial hex-purging potion is on the ground.~
 potion within. Hint: create an alias for 'quaff imperial-hex-purging' to make
 sure you target the right potion.
 ~
-25 m a 0 16
+25 m a 0 0 16
 -1 0 3030
 8 0
 C
@@ -350,20 +378,22 @@ the imperial hex-purging potion formula~
 The imperial hex-purging potion formula is on the ground.~
 This formula will teach you to brew: imperial hex-purging potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2926 0 0
 0 0
+C
+100 100
 S
 #2928
 potion imperial waterwalking imperial-waterwalking-potion~
 an imperial waterwalking potion~
 An imperial waterwalking potion is lying here.~
    This quaint little flask swirls with the colors of the ocean. A little of
-this and you'll be able to walk on water (so long as you aren't mounted). 
+this and you'll be able to walk on water (so long as you aren't mounted).
 Hint: create an alias for 'quaff imperial-waterwalking-potion' to make sure you
 target the right one.
 ~
-25 m a 0 17
+25 m a 0 0 17
 -1 0 3030
 8 0
 B
@@ -381,8 +411,10 @@ the imperial waterwalking potion formula~
 The imperial waterwalking potion formula is on the ground.~
 This formula will teach you to brew: imperial waterwalking potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2928 0 0
 0 0
+C
+100 100
 S
 $

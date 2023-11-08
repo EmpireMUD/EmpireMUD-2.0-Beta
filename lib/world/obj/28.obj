@@ -6,7 +6,7 @@ A suit of imperial fox chain mail is hanging on a rack.~
 resemble a fox. It is both strong and lithe, and bestows these properties on
 the wearer.
 ~
-27 emo aq 0 5
+27 emo aq 0 0 5
 2 0 0
 2 0
 A
@@ -28,9 +28,11 @@ the imperial fox chain mail pattern~
 The imperial fox chain mail pattern is on the ground.~
 This pattern will teach you to forge: imperial fox chain mail.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2800 0 0
 0 0
+C
+100 100
 S
 #2802
 helmet fox imperial~
@@ -39,7 +41,7 @@ An imperial fox helmet lies empty on the ground.~
    This clever helmet is made from imperium but shaped like a fox, with fur
 both inside and out.
 ~
-27 mo ae 0 5
+27 mo ae 0 0 5
 2 0 0
 2 0
 A
@@ -63,9 +65,11 @@ the imperial fox helmet pattern~
 The imperial fox helmet pattern is on the ground.~
 This pattern will teach you to forge: imperial fox helmet.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2802 0 0
 0 0
+C
+100 100
 S
 #2804
 armguards guards imperial fox pair~
@@ -74,7 +78,7 @@ A pair of imperial fox armguards is lying here.~
    These armguards are made from imperium but lined with fox fur, offering both
 protection and comfort in battle.
 ~
-27 emo ai 0 4
+27 emo ai 0 0 4
 2 0 0
 2 0
 A
@@ -92,9 +96,11 @@ the imperial fox armguards pattern~
 The imperial fox armguards pattern is on the ground.~
 This pattern will teach you to forge: imperial fox armguards.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2804 0 0
 0 0
+C
+100 100
 S
 #2806
 shield fox imperial~
@@ -104,7 +110,7 @@ An imperial fox shield is propped up on the ground.~
 Its edges are razor sharp so though it is difficult to wield, it's even more
 difficult to fight against.
 ~
-23 emo ao 0 6
+23 emo ao 0 0 6
 0 0 0
 2 0
 A
@@ -122,9 +128,11 @@ the imperial fox shield design~
 The imperial fox shield design is on the ground.~
 This design will teach you to forge: imperial fox shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2806 0 0
 0 0
+C
+100 100
 S
 #2808
 armor heroic suit cerberus~
@@ -134,7 +142,7 @@ A suit of heroic cerberus armor is lying on the ground.~
 and eventide metals that makes it up. The chestpiece has been hammered to look
 like it has three howling mouths, like the mythical Cerberus itself.
 ~
-27 emo aq 0 6
+27 emo aq 0 0 6
 2 0 0
 2 0
 A
@@ -156,9 +164,11 @@ the heroic cerberus armor pattern~
 The heroic cerberus armor pattern is on the ground.~
 This pattern will teach you to forge: heroic cerberus armor.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2808 0 0
 0 0
+C
+200 200
 S
 #2810
 helm cerberus heroic~
@@ -168,7 +178,7 @@ A heroic cerberus helm is lying on the ground.~
 like the head of a hellhound -- and so are the two other fearsome heads
 attached to the sides.
 ~
-27 mo ae 0 6
+27 mo ae 0 0 6
 2 0 0
 2 0
 A
@@ -192,9 +202,11 @@ the heroic cerberus helm pattern~
 The heroic cerberus helm pattern is on the ground.~
 This pattern will teach you to forge: heroic cerberus helm.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2810 0 0
 0 0
+C
+200 200
 S
 #2812
 vambraces heroic cerberus~
@@ -203,7 +215,7 @@ A pair of heroic cerberus vambraces is lying here.~
    These vambraces depict a trio of howling hounds: one crafted from argentine,
 one from eventide, and the center hound which is a swirl of the two.
 ~
-27 emo ai 0 5
+27 emo ai 0 0 5
 2 0 0
 2 0
 A
@@ -221,9 +233,11 @@ the heroic cerberus vambraces pattern~
 The heroic cerberus vambraces pattern is on the ground.~
 This pattern will teach you to forge: heroic cerberus vambraces.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2812 0 0
 0 0
+C
+200 200
 S
 #2814
 shield cerberus heroic~
@@ -233,7 +247,7 @@ A heroic cerberus shield is lying on the ground.~
 left-to-right. Each circle is hammered into the shape of a hellhound's snarling
 mouth, and every part of the shield has been sharpened.
 ~
-23 emo ao 0 7
+23 emo ao 0 0 7
 0 0 0
 2 0
 A
@@ -251,9 +265,11 @@ the heroic cerberus shield design~
 The heroic cerberus shield design is on the ground.~
 This design will teach you to forge: heroic cerberus shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2814 0 0
 0 0
+C
+200 200
 S
 #2816
 potion imperial duelist's duelists imperial-duelists imperial-duelist's~
@@ -263,7 +279,7 @@ An imperial duelist's potion is on the ground.~
 swirling potion within. Hint: create an alias for 'quaff imperial-duelists' to
 make sure you target the right potion.
 ~
-25 m a 0 13
+25 m a 0 0 13
 -1 0 3030
 8 0
 A
@@ -276,10 +292,10 @@ A
 17 2 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #2817
 formula imperial duelist's potion~
@@ -287,8 +303,10 @@ the imperial duelist's potion formula~
 The imperial duelist's potion formula is on the ground.~
 This formula will teach you to brew: imperial duelist's potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2816 0 0
 0 0
+C
+100 100
 S
 $
