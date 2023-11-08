@@ -7590,6 +7590,8 @@ Available sector flags:
     than making sure the tile isn't adjacent to ANY of them.
  SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
     than making sure the tile isn't near ANY of them.
+ INHERIT-BASE-CLIMATE - Uses the climate flags of the base sector in addition
+    to the ones set on this sector. For example, a road or building sector.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d

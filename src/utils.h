@@ -1958,6 +1958,7 @@ bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t wi
 room_data *find_other_starting_location(room_data *current_room);
 bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
+bitvector_t get_climate(room_data *room);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);

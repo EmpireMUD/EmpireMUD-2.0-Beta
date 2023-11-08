@@ -1368,15 +1368,8 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow
 		return TRUE;	// junk in, junk out
 	}
 	
-	// determine which climate to use
-	if (IS_MAP_BUILDING(room) || IS_ROAD(room)) {
-		// open map buildings use base sect
-		climate = GET_SECT_CLIMATE(BASE_SECT(room));
-	}
-	else {
-		// all other tiles use regular sect
-		climate = GET_SECT_CLIMATE(SECT(room));
-	}
+	// climate is complex
+	climate = get_climate(room);
 	
 	// compare
 	if (VEH_REQUIRES_CLIMATE(veh) && !(VEH_REQUIRES_CLIMATE(veh) & climate)) {

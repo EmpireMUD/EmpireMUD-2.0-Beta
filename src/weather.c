@@ -1027,7 +1027,7 @@ int get_room_temperature(room_data *room) {
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
 	cold_mod = heat_mod = 1.0;
-	climates = GET_SECT_CLIMATE(SECT(room));	// TODO: vary for buildings
+	climates = get_climate(room);
 	
 	// determine climates
 	for (bit = 0; climates; ++bit, climates >>= 1) {

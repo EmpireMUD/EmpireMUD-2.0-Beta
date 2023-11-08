@@ -3781,8 +3781,8 @@ ACMD(do_survey) {
 		}
 	}
 	
-	if (IS_OUTDOOR_TILE(IN_ROOM(ch)) && GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))) {
-		ordered_sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, climate_flags_order, FALSE, buf);
+	if (get_climate(IN_ROOM(ch)) != NOBITS) {
+		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
 		msg_to_char(ch, "Climate: %s\r\n", buf);
 	}
 	msg_to_char(ch, "Temperature: %s\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));

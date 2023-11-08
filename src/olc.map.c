@@ -342,7 +342,7 @@ OLC_MODULE(mapedit_terrain) {
 			}
 		}
 		else if (cp) {
-			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))))) {
+			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(IN_ROOM(ch))))) {
 				msg_to_char(ch, "No crop sector types are set up.\r\n");
 				return;
 			}

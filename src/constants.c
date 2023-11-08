@@ -3851,6 +3851,7 @@ const char *sector_flags[] = {
 	"KEEPS-HEIGHT",
 	"SEPARATE-NOT-ADJACENTS",	// 25
 	"SEPARATE-NOT-NEARS",
+	"INHERIT-BASE-CLIMATE",
 	"\n"
 };
 

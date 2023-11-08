@@ -2697,6 +2697,7 @@ typedef enum {
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
 #define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
 #define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
+#define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
 
 
  //////////////////////////////////////////////////////////////////////////////

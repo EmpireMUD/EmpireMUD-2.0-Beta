@@ -324,19 +324,22 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 */
 bool morph_affinity_ok(room_data *location, morph_data *morph) {
 	bool ok = TRUE;
+	bitvector_t climate;
 	
 	// shortcut
 	if (!morph) {
 		return TRUE;
 	}
 	
-	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TEMPERATE)) {
+	climate = get_climate(location);
+	
+	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && !IS_SET(climate, CLIM_TEMPERATE)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_ARID)) {
+	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && !IS_SET(climate, CLIM_ARID)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TROPICAL)) {
+	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && !IS_SET(climate, CLIM_TROPICAL)) {
 		ok = FALSE;
 	}
 	

@@ -1435,7 +1435,7 @@ ADMIN_UTIL(util_temperature) {
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
 	cold_mod = heat_mod = 1.0;
-	climates = GET_SECT_CLIMATE(SECT(IN_ROOM(ch)));	// TODO: vary for buildings
+	climates = get_climate(IN_ROOM(ch));
 	
 	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[use_season]);
 	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[use_sun]);

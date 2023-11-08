@@ -1004,6 +1004,7 @@ void uncrop_tile(room_data *room) {
 	
 	// 4. attempt to find one
 	if (!to_sect) {
+		// should this be get_climate(room) rather than GET_SECT_CLIMATE(SECT(room)) ?
 		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags, GET_SECT_CLIMATE(SECT(room)));
 	}
 	

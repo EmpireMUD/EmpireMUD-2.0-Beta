@@ -5781,6 +5781,38 @@ int distance_to_nearest_player(room_data *room) {
 
 
 /**
+* Determines the full climate type of a given room. This should be used instead
+* of GET_SECT_CLIMATE() in most cases because it checks additional fields.
+*
+* @param room_data *room The room to check climate for.
+* @return bitvector_t The full set of CLIM_ flags for the room.
+*/
+bitvector_t get_climate(room_data *room) {
+	bitvector_t flags = GET_SECT_CLIMATE(SECT(room));
+	room_data *home = HOME_ROOM(room);
+	
+	// base sect?
+	if (ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+		flags |= GET_SECT_CLIMATE(BASE_SECT(room));
+		
+		// home room -- only if checking base sect
+		if (home != room) {
+			flags |= GET_SECT_CLIMATE(SECT(home));
+			
+			// and base of the home room?
+			if (ROOM_SECT_FLAGGED(home, SECTF_INHERIT_BASE_CLIMATE)) {
+				flags |= GET_SECT_CLIMATE(BASE_SECT(home));
+			}
+		}
+	}
+	
+	// TODO room/building setting for checking environment
+	
+	return flags;
+}
+
+
+/**
 * This finds the ultimate map point for a given room, resolving any number of
 * layers of boats and home rooms.
 *
