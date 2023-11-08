@@ -503,7 +503,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mry opx
+'-' 26 0 1 mryB opx
 D1
 ----~
 &0~
@@ -530,7 +530,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dopuy 0
+'?' 27 0 1 dopuyB 0
 D1
 [..]~
 &0~
@@ -547,7 +547,7 @@ S
 #11
 Inside~
 Inside~
-'?' 0 0 1 dq 0
+'?' 0 0 1 dqB 0
 D1
 (..)~
 &0~
@@ -1326,7 +1326,7 @@ S
 #31
 Adventure~
 An Adventure~
-'?' 0 j 2 b 0
+'?' 0 0 2 bB 0
 D0
 ....~
 &0~
