@@ -879,6 +879,23 @@ void check_temperature_penalties(char_data *ch) {
 		return;
 	}
 	
+	// check for always-comfortable:
+	if (GET_BUILDING(IN_ROOM(ch)) && GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(IN_ROOM(ch))) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
+		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		return;
+	}
+	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(IN_ROOM(ch))) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
+		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		return;
+	}
+	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(IN_ROOM(ch))) == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance && GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(IN_ROOM(ch))->instance)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
+		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		return;
+	}
+	
 	// base temperature and numbers
 	limit = config_get_int("temperature_limit");
 	temperature = get_relative_temperature(ch);
@@ -1017,6 +1034,7 @@ int get_relative_temperature(char_data *ch) {
 */
 int get_room_temperature(room_data *room) {
 	int climate_val, season_count, season_val, sun_count, sun_val, bit;
+	int ttype = TEMPERATURE_USE_LOCAL;
 	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
 	bitvector_t climates;
 	
@@ -1029,7 +1047,40 @@ int get_room_temperature(room_data *room) {
 	cold_mod = heat_mod = 1.0;
 	climates = get_climate(room);
 	
-	// determine climates
+	// check for a temperature type (building or room template)
+	if (GET_BUILDING(room)) {
+		ttype = GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(room));
+	}
+	else if (GET_ROOM_TEMPLATE(room)) {
+		ttype = GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(room));
+	}
+	
+	// check adventure, too, IF we're on use-local
+	if (ttype == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+		ttype = GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(room)->instance));
+	}
+	
+	// shortcut types?
+	switch (ttype) {
+		case TEMPERATURE_FREEZING: {
+			return -3 * config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_COLD: {
+			return -1 * config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_NEUTRAL: {
+			return 0;
+		}
+		case TEMPERATURE_HOT: {
+			return config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_SWELTERING: {
+			return 3 * config_get_int("temperature_limit");
+		}
+		// no default: fall through
+	}
+	
+	// determine climate modifiers
 	for (bit = 0; climates; ++bit, climates >>= 1) {
 		if (IS_SET(climates, BIT(0))) {
 			climate_val += climate_temperature[bit].base_add;
@@ -1076,6 +1127,48 @@ int get_room_temperature(room_data *room) {
 	}
 	if (temperature > 0) {
 		temperature *= heat_mod;
+	}
+	
+	// ttype modifiers
+	switch (ttype) {
+		case TEMPERATURE_MILDER: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 20);
+			}
+			else if (temperature < 0) {
+				temperature = MIN(0, temperature + 20);
+			}
+			break;
+		}
+		case TEMPERATURE_HARSHER: {
+			if (temperature > 0) {
+				temperature += 20;
+			}
+			else if (temperature < 0) {
+				temperature -= 20;
+			}
+			break;
+		}
+		case TEMPERATURE_COOLER: {
+			temperature -= 15;
+			break;
+		}
+		case TEMPERATURE_COOLER_WHEN_HOT: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 15);
+			}
+			break;
+		}
+		case TEMPERATURE_WARMER: {
+			temperature += 15;
+			break;
+		}
+		case TEMPERATURE_WARMER_WHEN_COLD: {
+			if (temperature < 0) {
+				temperature = MIN(0, temperature + 15);
+			}
+			break;
+		}
 	}
 	
 	return round(temperature);
