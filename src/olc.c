@@ -96,6 +96,7 @@ OLC_MODULE(advedit_name);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
+OLC_MODULE(advedit_temperature);
 OLC_MODULE(advedit_startvnum);
 OLC_MODULE(advedit_uncascade);
 
@@ -153,6 +154,7 @@ OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
 OLC_MODULE(bedit_spawns);
+OLC_MODULE(bedit_temperature);
 OLC_MODULE(bedit_title);
 
 // class modules
@@ -432,6 +434,7 @@ OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
 OLC_MODULE(rmedit_subzone);
+OLC_MODULE(rmedit_temperature);
 
 // sector modules
 OLC_MODULE(sectedit_buildflags);
@@ -598,6 +601,7 @@ const struct olc_command_data olc_data[] = {
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "temperature", advedit_temperature, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
 	
 	// adventures: special
@@ -659,6 +663,7 @@ const struct olc_command_data olc_data[] = {
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "script", bedit_script, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "temperature", bedit_temperature, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "title", bedit_title, OLC_BUILDING, OLC_CF_EDITOR },
 	
 	// class commands
@@ -948,6 +953,7 @@ const struct olc_command_data olc_data[] = {
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "subzone", rmedit_subzone, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "temperature", rmedit_temperature, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	
 	// sector commands	
 	{ "buildflags", sectedit_buildflags, OLC_SECTOR, OLC_CF_EDITOR },

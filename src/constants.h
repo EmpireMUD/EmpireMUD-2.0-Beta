@@ -240,6 +240,7 @@ extern const char *icon_types[];
 extern const int season_temperature[];
 extern const char *sun_types[];
 extern const int sun_temperature[];
+extern const char *temperature_types[];
 extern const char *weather_types[];
 
 // for the second dimension of: climate_ruins_vehicle_slowly[climate][when]

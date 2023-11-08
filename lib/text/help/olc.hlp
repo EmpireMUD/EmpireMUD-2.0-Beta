@@ -1769,6 +1769,33 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
+"ADVEDIT TEMPERATURE" "BEDIT TEMPERATURE" "REDIT TEMPERATURE"
+
+Usage:  .temperature <type>
+
+This field determines how warm or cold the area will be. Most of these are
+relative to the temperature of the tile the adventure/building/room is on.
+
+A room template will override the adventure's setting unless the room is set
+to "use local".
+
+Available temperature types:
+ &cuse local&0 - Inherits its temperature from the tile it's on.
+ &calways comfortable&0 - Player receives no temperature penalties.
+ &cmilder&0 - Temperature is milder (less hot/cold) than local area.
+ &charsher&0 - Temperature is harsher (more hot/cold).
+ &cfreezing&0 - Always extremely cold (high penalties).
+ &ccold&0 - Always cold (low penalties).
+ &ccooler&0 - Cooler than the local area.
+ &ccooler when hot&0 - Cooler than the local area when temperature is over 0.
+ &cneutral&0 - Temperature is between hot and cold.
+ &cwarmer&0 - Warmer than the local area.
+ &cwarmer when cold&0 - Warmer than the local area when temperature is below 0.
+ &chot&0 - Always hot (low penalties).
+ &csweltering&0 - Always extremely hot (high penalties).
+
+See also: OLC ADVENTURES, OLC BUILDINGS, OLC ROOM TEMPLATES, TEMPERATURE
+#d
 "AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:

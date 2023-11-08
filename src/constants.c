@@ -3951,6 +3951,25 @@ const int sun_temperature[] = {
 };
 
 
+// TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
+const char *temperature_types[] = {
+	"use local",	// 0
+	"always comfortable",
+	"milder",
+	"harsher",
+	"freezing",
+	"cold",	// 5
+	"cooler",
+	"cooler when hot",
+	"neutral",
+	"warmer",
+	"warmer when cold",	// 10
+	"hot",
+	"sweltering",
+	"\n"
+};
+
+
 // SKY_x -- mainly used by scripting
 // TODO replace these with a new weather system because raining/lightning are
 // displayed to the player as "snowing" in cold rooms as of b5.162

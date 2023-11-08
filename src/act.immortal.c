@@ -6138,6 +6138,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
 	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
 	
@@ -6239,6 +6241,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
 	msg_to_char(ch, "Base affects: &g%s&0\r\n", buf);
+	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
@@ -7548,6 +7552,8 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
+	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;

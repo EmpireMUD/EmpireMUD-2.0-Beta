@@ -254,6 +254,32 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				break;
 			}
 			
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_ADV_TEMPERATURE_TYPE(adv) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -295,6 +321,11 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
+	
+	// Z: misc data
+	if (GET_ADV_TEMPERATURE_TYPE(adv)) {
+		fprintf(fl, "Z1 %d\n", GET_ADV_TEMPERATURE_TYPE(adv));
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -815,6 +846,31 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				LL_APPEND(GET_BLD_RELATIONS(bld), relat);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_BLD_TEMPERATURE_TYPE(bld) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -910,6 +966,11 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// U: relations (formerly upgrades_to)
 	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
 		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
+	}
+	
+	// Z: misc data
+	if (GET_BLD_TEMPERATURE_TYPE(bld)) {
+		fprintf(fl, "Z1 %d\n", GET_BLD_TEMPERATURE_TYPE(bld));
 	}
 	
 	// end
@@ -6085,6 +6146,31 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				parse_trig_proto(line, &GET_RMT_SCRIPTS(rmt), buf2);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_RMT_TEMPERATURE_TYPE(rmt) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6150,6 +6236,11 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_RMT_SCRIPTS(rmt));
+	
+	// Z: misc data
+	if (GET_RMT_TEMPERATURE_TYPE(rmt)) {
+		fprintf(fl, "Z1 %d\n", GET_RMT_TEMPERATURE_TYPE(rmt));
+	}
 	
 	// end
 	fprintf(fl, "S\n");

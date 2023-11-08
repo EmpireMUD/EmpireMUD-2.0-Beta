@@ -3004,6 +3004,22 @@ typedef enum {
 #define SAVE_INFO_PACK_SAVED  BIT(0)	// indicates an obj/veh pack is already saved
 
 
+// TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
+#define TEMPERATURE_USE_LOCAL  0	// inherit from local tile
+#define TEMPERATURE_ALWAYS_COMFORTABLE  1	// no penalties from temperature
+#define TEMPERATURE_MILDER  2	// milder than local tile
+#define TEMPERATURE_HARSHER  3	// harsher than local tile
+#define TEMPERATURE_FREEZING  4	// always freezing
+#define TEMPERATURE_COLD  5	// always cold
+#define TEMPERATURE_COOLER  6	// cooler than local tile
+#define TEMPERATURE_COOLER_WHEN_HOT  7	// cooler than local tile when > 0
+#define TEMPERATURE_NEUTRAL  8	// temperature is always 0 (neutral)
+#define TEMPERATURE_WARMER  9	// warmer than local tile
+#define TEMPERATURE_WARMER_WHEN_COLD  10	// warmer than local tile when < 0
+#define TEMPERATURE_HOT  11	// always hot
+#define TEMPERATURE_SWELTERING  12	// always sweltering
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAXIMA AND LIMITS ///////////////////////////////////////////////////////
 
@@ -3717,6 +3733,7 @@ struct adventure_data {
 	int reset_time;	// how often to reset things (minutes)
 	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_link_rule *linking;
@@ -3819,6 +3836,7 @@ struct room_template {
 	bitvector_t base_affects;	// ROOM_AFF_
 	bitvector_t functions;	// FNC_
 	rmt_vnum subzone;	// for subdividing where/shout/etc
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -3979,6 +3997,7 @@ struct bld_data {
 	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	int height;	// 0+ addition to terrain height (map buildings only)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x

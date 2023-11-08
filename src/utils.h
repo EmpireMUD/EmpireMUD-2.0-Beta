@@ -159,6 +159,7 @@
 #define GET_ADV_LINKING(adv)  ((adv)->linking)
 #define GET_ADV_PLAYER_LIMIT(adv)  ((adv)->player_limit)
 #define GET_ADV_SCRIPTS(adv)  ((adv)->proto_script)
+#define GET_ADV_TEMPERATURE_TYPE(adv)  ((adv)->temperature_type)
 
 // utils
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
@@ -258,6 +259,7 @@
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
+#define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
 #define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
 
 
@@ -1529,6 +1531,7 @@ static inline int GET_SEASON(room_data *room) {
 #define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 #define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
+#define GET_RMT_TEMPERATURE_TYPE(rmt)  ((rmt)->temperature_type)
 
 
  //////////////////////////////////////////////////////////////////////////////
