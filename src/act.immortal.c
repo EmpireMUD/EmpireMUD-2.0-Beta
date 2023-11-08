@@ -7275,7 +7275,11 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	// temperature info
-	msg_to_char(ch, "Temperature: %d (%s), Season: %s\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	msg_to_char(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	if (get_climate(IN_ROOM(ch)) != NOBITS) {
+		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
+		msg_to_char(ch, "Climate: \tc%s\t0\r\n", buf);
+	}
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));

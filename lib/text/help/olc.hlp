@@ -2117,6 +2117,20 @@ Usually an augment should be locked down to just one wear flag.
 
 See also: OEDIT WEAR, OLC AUGMENTS
 #d
+"BASE SECTOR" "BASE SECTORS" "BASE TERRAIN"
+
+A map tile's "base sector" is the sector underneath its current one. It is used
+for roads, buildings, and other temporary map changes. You can view it with
+"stat room".
+
+Most map tiles have the same base and current sectors.
+
+In some cases, tiles inherit properties from the base sector. For example,
+roads have the same climate as their base sector due to their
+INHERIT-BASE-CLIMATE flag.
+
+See also: SECTOR, STAT
+#d
 "BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
@@ -7705,6 +7719,17 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SECTOR SECTORS "SECTOR TYPE" "CURRENT SECTOR"
+
+A "sector" is a terrain type, such as "Plains" or "Calamander Jungle". These
+are configured in the sector editor (SECTEDIT), appear on "show sector", and
+can be manually added to the map with MAPEDIT TERRAIN.
+
+Each map room also has a BASE SECTOR and a NATURAL SECTOR. You can view all
+three sector types on a room using "stat room".
+
+See also: BASE SECTOR, MAPEDIT TERRAIN, NATURAL SECTOR, SECTEDIT, SHOW SECTORS
 #d
 SHOPEDIT "OLC SHOPS" "SHOP OLC"
 
