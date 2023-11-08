@@ -872,25 +872,8 @@ void check_temperature_penalties(char_data *ch) {
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
 		return;	// no temperature
 	}
-	if (IS_GOD(ch) || IS_IMMORTAL(ch) || !config_get_bool("temperature_penalties")) {
+	if (IS_GOD(ch) || IS_IMMORTAL(ch) || !config_get_bool("temperature_penalties") || get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
 		// no penalties-- remove them, though, in case it was just shut off
-		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
-		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
-		return;
-	}
-	
-	// check for always-comfortable:
-	if (GET_BUILDING(IN_ROOM(ch)) && GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(IN_ROOM(ch))) == TEMPERATURE_ALWAYS_COMFORTABLE) {
-		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
-		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
-		return;
-	}
-	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(IN_ROOM(ch))) == TEMPERATURE_ALWAYS_COMFORTABLE) {
-		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
-		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
-		return;
-	}
-	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(IN_ROOM(ch))) == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance && GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(IN_ROOM(ch))->instance)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
 		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
 		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
 		return;
@@ -1005,6 +988,9 @@ int get_relative_temperature(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return 0;	// NPCs do not have this property
 	}
+	if (get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		return 0;	// always comfortable here
+	}
 	
 	temp = GET_TEMPERATURE(ch);
 	warm = GET_WARMTH(ch);
@@ -1046,19 +1032,7 @@ int get_room_temperature(room_data *room) {
 	season_mod = sun_mod = 0.0;
 	cold_mod = heat_mod = 1.0;
 	climates = get_climate(room);
-	
-	// check for a temperature type (building or room template)
-	if (GET_BUILDING(room)) {
-		ttype = GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(room));
-	}
-	else if (GET_ROOM_TEMPLATE(room)) {
-		ttype = GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(room));
-	}
-	
-	// check adventure, too, IF we're on use-local
-	if (ttype == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		ttype = GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(room)->instance));
-	}
+	ttype = get_temperature_type(room);
 	
 	// shortcut types?
 	switch (ttype) {
@@ -1077,7 +1051,7 @@ int get_room_temperature(room_data *room) {
 		case TEMPERATURE_SWELTERING: {
 			return 3 * config_get_int("temperature_limit");
 		}
-		// no default: fall through
+		// no default: keep working
 	}
 	
 	// determine climate modifiers
@@ -1176,6 +1150,37 @@ int get_room_temperature(room_data *room) {
 
 
 /**
+* Determines what TEMPERATURE_ type const to use for a given room, based on
+* whether or not it's in a building or adventure.
+*
+* @param room_data *room The room to check.
+* @return int Any TEMPERATURE_ type const.
+*/
+int get_temperature_type(room_data *room) {
+	int ttype = TEMPERATURE_USE_LOCAL;
+	
+	if (!room) {
+		return ttype;	// missing arg?
+	}
+	
+	// check for a temperature type (building or room template)
+	if (GET_BUILDING(room)) {
+		ttype = GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(room));
+	}
+	else if (GET_ROOM_TEMPLATE(room)) {
+		ttype = GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(room));
+	}
+	
+	// check adventure, too, IF we're on use-local
+	if (ttype == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+		ttype = GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(room)->instance));
+	}
+	
+	return ttype;
+}
+
+
+/**
 * Initializes a player's temperature, generally when they get a free restore on
 * login. If they would be comfortable, sets them to room temperature. Otherwise
 * it will set them to neutral temperature.
@@ -1270,7 +1275,7 @@ void update_player_temperature(char_data *ch) {
 	
 	ambient = get_room_temperature(IN_ROOM(ch));
 	
-	if (ambient != GET_TEMPERATURE(ch)) {
+	if (GET_TEMPERATURE(ch) != ambient) {
 		change = (double)ambient / ((double) SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE);
 		change = ABSOLUTE(change);	// change is positive
 		change = MAX(1.0, change);	// minimum of 1

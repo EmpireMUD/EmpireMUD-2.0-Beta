@@ -2576,6 +2576,7 @@ void show_visible_moons(char_data *ch);
 void check_temperature_penalties(char_data *ch);
 int get_relative_temperature(char_data *ch);
 int get_room_temperature(room_data *room);
+int get_temperature_type(room_data *room);
 void reset_player_temperature(char_data *ch);
 const char *temperature_to_string(int temperature);
 void update_player_temperature(char_data *ch);
