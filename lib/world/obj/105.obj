@@ -923,9 +923,11 @@ The whipping winds of the North pattern is lying here.~
    This looks complicated to do... This pattern teaches you to sew the whipping
 winds of the North.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10571 0 0
 0 0
+C
+1 1
 S
 #10573
 sword pykrete frozen~
@@ -952,9 +954,11 @@ The frozen pykrete sword is lying here.~
    Forging is easy. Forging ice without shattering it is a lot harder. This
 pattern teaches you to forge a frozen pykrete sword.
 ~
-7 0 a 0 0 2
+7 0 a 0 0 3
 10573 0 0
 0 0
+C
+1 1
 S
 #10575
 star winter icy~
@@ -983,9 +987,11 @@ The icy star of winter pattern is lying here.~
    Cutting ice is basically like cutting gems. The tricky bit is trapping a
 star inside it. This pattern teaches you to craft the icy star of winter.
 ~
-7 0 a 0 0 2
+7 0 a 0 0 3
 10575 0 0
 0 0
+C
+1 1
 S
 #10577
 staff glacial maelstrom~
@@ -1016,9 +1022,11 @@ The glacial staff of the Maelstrom pattern is lying here.~
 anathema to high sorcerers, so normal staffmaking skill isn't required to craft
 it. This pattern teaches you to craft a glacial staff of the Maelstrom.
 ~
-7 0 a 0 0 2
+7 0 a 0 0 3
 10577 0 0
 0 0
+C
+1 1
 S
 #10579
 echoes cold future~

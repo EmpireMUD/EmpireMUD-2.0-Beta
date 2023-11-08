@@ -6,7 +6,7 @@ The imperial raiment of the bear is hanging here.~
 inspection shows it is actually woven from fine threads of nocturnium. As you
 run your fingers along the fur, it emits a low roar.
 ~
-27 emo aq 0 4
+27 emo aq 0 0 4
 0 0 0
 2 0
 A
@@ -32,9 +32,11 @@ the imperial raiment of the bear pattern~
 The imperial raiment of the bear pattern is on the ground.~
 This pattern will teach you to sew: imperial raiment of the bear.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2500 0 0
 0 0
+C
+100 100
 S
 #2502
 cowl bear imperial~
@@ -44,7 +46,7 @@ An imperial bear cowl is lying on the ground.~
 looks as if it was sewn from fine nocturnium fibers. Despite how heavy it feels
 in your hands, it's lighter than air when you put it on your head.
 ~
-27 mo ae 0 6
+27 mo ae 0 0 6
 0 0 0
 2 0
 A
@@ -70,9 +72,11 @@ the imperial bear cowl pattern~
 The imperial bear cowl pattern is on the ground.~
 This pattern will teach you to sew: imperial bear cowl.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2502 0 0
 0 0
+C
+100 100
 S
 #2504
 armband bearclaw claw imperial~
@@ -83,7 +87,7 @@ strands of nocturnium. The claws exude a raw magical energy that roars through
 them from somewhere beyond the pale physical world. Now you truly have the
 right to bear armband.
 ~
-27 mo ai 0 7
+27 mo ai 0 0 7
 0 0 0
 2 0
 A
@@ -105,9 +109,11 @@ the imperial bearclaw armband design~
 The imperial bearclaw armband design is on the ground.~
 This design will teach you to sew: imperial bearclaw armband.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2504 0 0
 0 0
+C
+100 100
 S
 #2506
 totem bear imperial~
@@ -117,7 +123,7 @@ An imperial bear totem is lying here.~
 shape of a bear. Though it's small, it is heavier than it looks, weighed down
 by the force of the mana that roars just beneath its surface.
 ~
-3 mo ao 0 7
+3 mo ao 0 0 7
 0 0 0
 2 0
 A
@@ -133,9 +139,11 @@ the imperial totem of the bear design~
 The imperial totem of the bear design is on the ground.~
 This design will teach you to craft: imperial totem of the bear.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2506 0 0
 0 0
+C
+100 100
 S
 #2508
 armor suit heroic unicorn~
@@ -146,7 +154,7 @@ sun-bleached to look like the hide of a pure white unicorn. The manacloth has
 been hardened like armor, but has the light weight and free movement of your
 favorite robe.
 ~
-27 emo aq 0 5
+27 emo aq 0 0 5
 0 0 0
 2 0
 A
@@ -172,9 +180,11 @@ the heroic unicorn armor pattern~
 The heroic unicorn armor pattern is on the ground.~
 This pattern will teach you to sew: heroic unicorn armor.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2508 0 0
 0 0
+C
+200 200
 S
 #2510
 circlet unicorn heroic~
@@ -184,7 +194,7 @@ A heroic unicorn circlet is lying on the ground.~
 eventide wire. A unicorn's horn forged from eventide protrudes from the front
 of the circlet, though it is impossibly light for a horn of such size.
 ~
-27 mo ae 0 7
+27 mo ae 0 0 7
 0 0 0
 2 0
 A
@@ -210,9 +220,11 @@ the heroic unicorn circlet pattern~
 The heroic unicorn circlet pattern is on the ground.~
 This pattern will teach you to sew: heroic unicorn circlet.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2510 0 0
 0 0
+C
+200 200
 S
 #2512
 strands unicorn's blessing heroic~
@@ -222,7 +234,7 @@ Heroic strands of unicorn's blessing are tangled on the ground.~
 the mana that flows from them is nearly overwhelming. They look like they're
 meant to be tied around your arms.
 ~
-27 mo ai 0 8
+27 mo ai 0 0 8
 0 0 0
 2 0
 A
@@ -244,9 +256,11 @@ the heroic strands of unicorn's blessing pattern~
 The heroic strands of unicorn's blessing pattern is on the ground.~
 This pattern will teach you to sew: heroic strands of unicorn's blessing.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2512 0 0
 0 0
+C
+200 200
 S
 #2514
 wand heroic unicorn healing~
@@ -256,7 +270,7 @@ A heroic unicorn wand is lying here.~
 It has the shape of a unicorn horn, though it is far too light to be the real
 thing.
 ~
-3 mo ao 0 8
+3 mo ao 0 0 8
 0 0 0
 2 0
 A
@@ -272,9 +286,11 @@ the heroic unicorn wand of healing design~
 The heroic unicorn wand of healing design is on the ground.~
 This design will teach you to craft: heroic unicorn wand of healing.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2514 0 0
 0 0
+C
+200 200
 S
 #2516
 potion imperial medicament imperial-medicament~
@@ -284,7 +300,7 @@ An imperial potion of medicament is on the ground.~
 swirling potion within. Hint: create an alias for 'quaff imperial-medicament'
 to make sure you target the right potion.
 ~
-25 m a 0 9
+25 m a 0 0 9
 -1 0 3030
 8 0
 A
@@ -295,10 +311,10 @@ A
 23 3 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #2517
 formula imperial medicament potion~
@@ -306,8 +322,10 @@ the imperial medicament potion formula~
 The imperial medicament potion formula is on the ground.~
 This formula will teach you to brew: imperial medicament potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2516 0 0
 0 0
+C
+100 100
 S
 $

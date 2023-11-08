@@ -7,7 +7,7 @@ To use it:
 - 'make snowball' 3 times
 - 'make snowman'
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 11 0
 Q 16606
@@ -21,7 +21,7 @@ A tin syringe is fully compressed here.~
 destroyed.
 Type 'use syringe <target>' to draw the victim's blood.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 2 0
 T 16601
@@ -34,7 +34,7 @@ A simple but sturdy stand is here waiting for a tree.~
 are carved into the sides indicating this is probably for a Christmas tree
 specifically.
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 6 0
 Q 16607
@@ -45,7 +45,7 @@ vial of blood~
 A vial of blood is here.~
 Just a small glass vial with dark red blood in it.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 8 72
 S
@@ -57,7 +57,7 @@ A sealed letter to Father Christmas flutters in the wind.~
 the least would know. And you don't want to get on to the naughty list. Better
 just post the letter instead.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 0 0
 T 16604
@@ -68,7 +68,7 @@ a snowball~
 A single lonely snowball waits to be part of a snowman.~
 Just looks like a bunch of snow, rolled together, and compressed.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 10 0
 Q 16606
@@ -80,7 +80,7 @@ A Christmas tree lies here sadly.~
    This tree is sadly lying on its side. Hopefully someone will stand it up
 right soon. After you make a Christmas tree stand, of course.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 Q 16607
@@ -94,7 +94,7 @@ A bland Christmas tree stands here.~
 came across and stuck it up in the city center for the holiday. If you need to
 remove it, you could always light it on fire.
 ~
-3 v 0 0 8
+3 v 0 0 0 8
 0 0 0
 0 8064
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -109,7 +109,7 @@ empire tradition. Once you have your chosen tree, craft a Christmas tree stand
 and plant it in your city center.
 Type 'quest Stand a Christmas Tree' for more information.
 ~
-3 ep a 0 9
+3 ep a 0 0 9
 0 0 0
 11 0
 Q 16607
@@ -121,7 +121,7 @@ a beautiful snow angel~
 A beautiful snow angel is imprinted on the ground.~
 A quickly melting imprint in the snow forms the shape of an angel.
 ~
-3 0 0 0 4
+3 0 0 0 0 4
 0 0 0
 10 48
 S
@@ -134,7 +134,7 @@ the edges a constant stream of flurries spread. You could probably make a snow
 angel in all the additional snow being created.
 Type: make snow angel
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 11 0
 Q 16610
@@ -147,7 +147,7 @@ A gift with generic wrapping and tag sits on the ground.~
    This gift is wrapped in simple paper, tied with a simple bow. The tag
 indicates it's for 'Citizen'.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 0 0
 Q 16611
@@ -160,7 +160,7 @@ A red stocking cap has been discarded here.~
    This stocking cap is made from red felt, and lined in white fur, with a
 matching white tassel at the end.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 0 0
 Q 16612
@@ -176,7 +176,7 @@ home with a sack of gifts over his shoulder. Is this the grinchy demon Father
 Christmas asked you to stop?
 Type 'use sack <normal | hard | group | boss>' to find him.
 ~
-3 ek a 0 4
+3 ek a 0 0 4
 0 0 0
 0 0
 Q 16613
@@ -188,7 +188,7 @@ a sense of rage~
 A sense of rage can be felt in the room.~
 How can you see a feeling?
 ~
-3 k 0 0 2
+3 k 0 0 0 2
 0 0 0
 10 4
 S
@@ -198,7 +198,7 @@ a puddle~
 There's a puddle on the ground.~
 It's a little puddle.
 ~
-5 g 0 0 2
+5 g 0 0 0 2
 6 6 0
 0 3
 C
@@ -214,7 +214,7 @@ A giant red ribbon is floating in the breeze.~
    This ribbon is used when making a giant straw goat. Find a nice outdoor spot
 in your empire and 'craft giant straw goat'.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 Q 16660
@@ -227,7 +227,7 @@ Some reindeer outfits lay here empty.~
 given the hairs on the inside.
 Usage: dress <horse | camel>
 ~
-3 k a 0 6
+3 k a 0 0 6
 0 0 0
 11 0
 Q 16618
@@ -243,7 +243,7 @@ Within the set you have: strands of garland, a candy cane hanging, a faerie
 lantern, and reindeer hoofprint maker.
 Type 'hang ornaments' in 4 rooms.
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 0 0
 Q 16620
@@ -257,7 +257,7 @@ The instructions detail how to make the set of four ornaments.
 1. 'craft winter ornaments'
 2. 'hang ornaments' in 4 rooms to prepare for the winter holiday
 ~
-3 kp a 0 3
+3 kp a 0 0 3
 0 0 0
 0 0
 Q 16620
@@ -270,7 +270,7 @@ Silver, gold, and green strands of garland are artfully draped about the room.~
 back of the empire's storage barns.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 8
+3 v 0 0 0 8
 0 0 0
 11 576
 T 16627
@@ -283,7 +283,7 @@ An artful hanging made up of candy canes dangles down in the middle of the area.
 an abstract winter scene.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 10
+3 v 0 0 0 10
 0 0 0
 7 576
 T 16627
@@ -297,7 +297,7 @@ comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-29 v 0 0 11
+29 v 0 0 0 11
 -1 1 0
 2 576
 T 16627
@@ -310,7 +310,7 @@ A set of reindeer hoofprints are clearly visible in the ground.~
 hoofprints in the ground.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 9
+3 v 0 0 0 9
 0 0 0
 10 576
 T 16627
@@ -323,7 +323,7 @@ Some elf outfits lay here empty.~
 rather than a biped. And at the back end there's a hole for possibly a tail.
 Usage: dress terrier
 ~
-3 k a 0 5
+3 k a 0 0 5
 0 0 0
 11 0
 Q 16617
@@ -337,7 +337,7 @@ A safely frozen pixy is in mid flutter.~
 frost coating it's entire body.
 Type: 'place pixy' to top the tree.
 ~
-3 k a 0 9
+3 k a 0 0 9
 0 0 0
 10 12
 Q 16626
@@ -352,7 +352,7 @@ A wand carved to look like an icicle lays here.~
 ability it has.
 Type: 'freeze pixy'
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 Q 16626
@@ -368,7 +368,7 @@ various gems pressed into the packed snow. It should be enough to freeze the
 abominable snowman and save your snow buddy from being violently melted.
 type: 'throw snowball <target>'
 ~
-3 k a 0 5
+3 k a 0 0 5
 0 0 0
 10 0
 Q 16628
@@ -385,7 +385,7 @@ buddy from the abominable snowman.
 type: 'enchant snowball freezing'
 (Requires 6 seashells)
 ~
-3 k a 0 5
+3 k a 0 0 5
 0 0 0
 10 0
 Q 16628
@@ -399,7 +399,7 @@ A sculpture of ice perfectly captures the rage of the abominable snowman.~
 abominable snowman. After a chilling bit of magic though, it's nothing more
 than a beautiful winter ornament.
 ~
-3 v 0 0 2
+3 v 0 0 0 2
 0 0 0
 10 2304
 S
@@ -411,7 +411,7 @@ A pet adoption certificate is lying here.~
 you choose will be added to your companion command.
 Type 'adopt' to see your options.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 C
@@ -428,7 +428,7 @@ Additional notes:
 - If you 'clear' a player's pet, you can give them obj 16640 which grants
   a new pet.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 0 0
 C
@@ -442,7 +442,7 @@ A straw goat crackles and spits as it burns.~
    Someone put a lot of time into making the straw goat, only to have it burned
 down by a common vandal. What is this city coming to?
 ~
-29 0 0 0 4
+29 0 0 0 0 4
 -1 1 9
 0 576
 M
@@ -458,7 +458,7 @@ A giant straw goat looms over you.~
 celebrate the Yule season. Its long, curved horns are dusted with snow at the
 top, well out of reach.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 576
 C
@@ -477,7 +477,7 @@ Some elfish flying sleigh wax has been left here.~
 only be used on the regular red sleigh from the Winter Wonderland event.
 Usage: enchant sleigh
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 10 0
 R
@@ -492,9 +492,11 @@ The design for a goose farm is lying here.~
 geese.
 Usage: build goosefarm
 ~
-3 0 a 0 2
+3 0 a 0 0 3
 0 0 0
 0 0
+C
+1 1
 S
 #16652
 tin flying reindeer polish~
@@ -506,7 +508,7 @@ works directly on your mount list, so you already need to know a reindeer mount
 to use it.
 Usage: use polish
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 2 0
 T 16652
@@ -519,7 +521,7 @@ A hideous sweater has been tossed aside on the ground.~
 resembles a fir tree. Yellow yarn is used all over for ornaments and
 highlights, but the entire thing looks like it was knitted by a troll.
 ~
-2 p ad 0 3
+2 p ad 0 0 3
 0 0 0
 0 0
 A
@@ -537,7 +539,7 @@ been enchanted to light up like candles outlining the shape of a fir tree. The
 effect is majestic, but the sweater itself appears to have been knitted by a
 cave troll.
 ~
-2 p ad 0 3
+2 p ad 0 0 3
 0 0 0
 0 0
 A
@@ -563,7 +565,7 @@ silver elfish omni-tool: +50 total crafting and +1 greatness (becomes superior)
 
 (The item must be in your inventory.)
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 0 0
 T 16655
@@ -576,7 +578,7 @@ A sprig of mistletoe is hanging here.~
 You can 'drop' the mistletoe and see what happens! Enjoy it while it lasts,
 because the mistletoe will go bad eventually.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 8064
 T 16656
@@ -590,7 +592,7 @@ December holiday of Hanukkah. The sides of the dreidel have letters on them:
 nun (nothing), hei (half), gimel (all), and shin (put in).
 Type 'spin dreidel' to use it.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 R
@@ -606,9 +608,11 @@ A frozen ice stone lies here, freezing the ground around it.~
 be used to build a magnificent ice palace!
 Build (requires Architect): icepalace
 ~
-3 e a 0 1
+3 e a 0 0 2
 0 0 0
 1 0
+C
+1 1
 S
 #16659
 stocking knitted red~
@@ -619,7 +623,7 @@ hang from a fireplace on Christmas Eve. This one feels like it contains a
 gift... Type 'open stocking' to receive it. But be sure to open it before the
 event ends.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 11 0
 T 16659
@@ -630,7 +634,7 @@ some chocolate coins~
 Some chocolate coins are lying on the ground.~
 These coins are made from chocolate and coated in thin foil.
 ~
-6 p a 0 2
+6 p a 0 0 2
 6 0 0
 7 1024
 A
@@ -657,7 +661,7 @@ Some snowball cookies are disguised on the ground.~
    These cookies are small and dense, and coated in powdered sugar so they look
 like snowballs.
 ~
-6 mp a 0 2
+6 mp a 0 0 2
 6 0 0
 7 1024
 A
@@ -678,7 +682,7 @@ Some thumbprint cookies are lying on the ground.~
    The cookies are coated in chopped nuts and have jelly in a little impression
 in the top.
 ~
-6 mp a 0 3
+6 mp a 0 0 3
 6 0 0
 7 1024
 A
@@ -700,7 +704,7 @@ A rocking horse saddle is lying here.~
 and green glow means it's been enchanted with the Christmas spirit, and it
 seems to reshape itself to fit any mount.
 ~
-2 emp as 0 3
+2 emp as 0 0 3
 0 0 0
 0 0
 A
@@ -717,7 +721,7 @@ A mini-grinchy pet whistle is lying here.~
    This whistle will teach you the tiny grinchy demon minipet. Type 'use
 whistle'.
 ~
-19 p a 0 7
+19 p a 0 0 7
 16664 0 0
 2 0
 S
@@ -728,7 +732,7 @@ A reindeer dog minipet whistle is lying here.~
 This whistle will teach you the reindeer dog minipet.
 Type 'use whistle'.
 ~
-19 p a 0 8
+19 p a 0 0 8
 16665 0 0
 2 0
 S
@@ -740,7 +744,7 @@ An elfish omni-tool is lying here.~
 Flecks of brightly colored paint decorate each part of the tool, no doubt the
 result of centuries of toymaking.
 ~
-3 mp ao cefm 11
+3 mp ao cefm 0 11
 0 0 0
 2 0
 A
@@ -758,7 +762,7 @@ the lantern~
 A little lantern is floating in the air.~
 This little lantern is floating in the air.
 ~
-29 k 0 0 4
+29 k 0 0 0 4
 -1 1 0
 0 4
 C
@@ -771,7 +775,7 @@ a gingerbread man~
 A gingerbread man lies dead on the ground.~
 It appears to be a dead gingerbread man.
 ~
-6 0 a 0 1
+6 0 a 0 0 1
 24 0 0
 0 24
 C
@@ -792,7 +796,7 @@ a little snowman~
 A little snowman is standing here.~
 It's a handsome little snowman with a button nose and a tophat.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 10 8
 C
@@ -810,7 +814,7 @@ A hearty Christmas spirit lingers in the air.~
 and it takes a hearty person to survive the cold and dark. The Christmas spirit
 fills you with that hearty feeling, and your fear of midwinter vanishes.
 ~
-2 mp ak 0 2
+2 mp ak 0 0 2
 0 0 0
 10 0
 A
@@ -836,7 +840,7 @@ A generous Christmas spirit hangs in the air.~
 who 'have not'. What you have is a good dagger (or sword, or axe), and you're
 filled with the urge to give it to someone else blade-first.
 ~
-2 mp ak 0 3
+2 mp ak 0 0 3
 0 0 0
 10 0
 A
@@ -864,7 +868,7 @@ A serene Christmas spirit hangs in the air.~
 snow. It's a time for coming together and for healing, and for facing the
 coming year together.
 ~
-2 mp ak 0 4
+2 mp ak 0 0 4
 0 0 0
 10 0
 A
@@ -892,7 +896,7 @@ A warm Christmas spirit fills the air.~
 between life and death. You're filled with this spirit of warmth, and perhaps
 through your knowledge of the old magicks, you can spread this fire to others.
 ~
-2 mp ak 0 6
+2 mp ak 0 0 6
 0 0 0
 10 0
 A
@@ -920,7 +924,7 @@ An anxious Christmas spirit fills the air.~
 and for adults who dread the large groups of friends and family. But for some,
 that anxiety is a source of power.
 ~
-2 mp ak 0 7
+2 mp ak 0 0 7
 0 0 0
 10 0
 A
@@ -950,7 +954,7 @@ Christmasses with who are gone. But those are memories of the people we love,
 who live in our hearts forever, and a little nostalgia is good for passing the
 long winter nights.
 ~
-2 mp ak 0 8
+2 mp ak 0 0 8
 0 0 0
 10 0
 A
@@ -978,7 +982,7 @@ A festive tambourine is here.~
 song. Hold this tambourine and play it for 10 different citizens to complete
 the 'Cheer for the City' quest.
 ~
-22 0 ao 0 6
+22 0 ao 0 0 6
 0 0 0
 0 0
 C
@@ -1036,7 +1040,7 @@ Some sleigh bells are here.~
 it. Hold the sleigh bells and play them at 4 different dedicate-able buildings
 (like shrines and statues) to complete the 'Charity Concert' quest.
 ~
-22 0 ao 0 8
+22 0 ao 0 0 8
 0 0 0
 0 0
 C
@@ -1095,7 +1099,7 @@ hang from a fireplace on Christmas Eve. This one feels like it contains a
 gift... Type 'open stocking' to receive it. But be sure to open it before the
 event ends.
 ~
-3 p a 0 5
+3 p a 0 0 5
 0 0 0
 11 0
 T 16678
@@ -1106,7 +1110,7 @@ a tiny krampus whistle~
 A tiny krampus whistle is lying here.~
 This whistle will teach you the tiny krampus minipet. Type 'use whistle'.
 ~
-19 p a 0 8
+19 p a 0 0 8
 16679 0 0
 2 0
 S
@@ -1121,7 +1125,7 @@ the nice list. Instead, there's just a strange sigil on the parchment.
 the demon who's named on this parchment. Defeat it to finish the quest.
 Type 'use list <normal | hard | group | boss>' in the ice cave.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 C
@@ -1139,7 +1143,7 @@ object new~
 snow cube~
 A new object is sitting here.~
 ~
-0 0 a 0 1
+0 0 a 0 0 1
 0 0 0
 0 0
 S
@@ -1150,7 +1154,7 @@ A burning straw goat whistle is lying here.~
    This whistle will teach you the burning straw goat minipet. Type 'use
 whistle'.
 ~
-19 p a 0 10
+19 p a 0 0 10
 16685 0 0
 2 0
 S
@@ -1161,7 +1165,7 @@ The Winter Wonderland boss tester is here.~
 This item will summon a grinchy demon or krampus demon for testing.
 Usage: test <grinch | krampus> <normal | hard | group | boss>
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 T 16686
@@ -1175,7 +1179,7 @@ holds it. Nothing seems to be able to pass through the outer layer except for
 the cookies and chocolates found inside your stockings. Put cookies into the
 polar vortex until it's satisfied!
 ~
-3 p a 0 8
+3 p a 0 0 8
 0 0 0
 10 0
 C
@@ -1194,7 +1198,7 @@ light from beyond the North. An inscription on the side of the jar gives the
 magic words to recapture the Nordlys:
 Usage: recapture nordlys
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 0
 C
@@ -1216,7 +1220,7 @@ the forest, or you risk losing it. Unlike other enchanted forests, this one
 won't spread beyond the first tile.
 Usage: open jar
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 0
 C
@@ -1231,7 +1235,7 @@ A glowing nordlys tree has fallen here.~
 fallen. It shimmers with an ethereal magic that seems to warm you even in the
 cold.
 ~
-3 e a 0 13
+3 e a 0 0 13
 0 0 0
 0 0
 C
@@ -1250,7 +1254,7 @@ Some glowing magewood is stacked here.~
 light you can see rivulets of green and magenta light streaming down the length
 of the boards. Magewood is used in some highly skilled crafts.
 ~
-3 e a 0 11
+3 e a 0 0 11
 0 0 0
 0 0
 C
@@ -1280,7 +1284,7 @@ if you're not an immortal, then how did you get this?
 If you are an immortal, the command is below:
 type: modify <player name> <positive or negative number>
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 10 0
 T 16699

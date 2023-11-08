@@ -587,9 +587,11 @@ the spiked wooden breastplate pattern~
 The pattern for a spiked wooden breastplate is lying here.~
 This is the pattern for a spiked wooden breastplate.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10240 0 0
 0 0
+C
+1 1
 S
 #10242
 sword cactus~
@@ -614,9 +616,11 @@ the cactus sword pattern~
 The pattern for a cactus sword is lying here.~
 This is the recipe for the cactus sword.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10242 0 0
 0 0
+C
+1 1
 S
 #10244
 elixir aloe soothing~
@@ -641,9 +645,11 @@ an aloe recipe~
 An aloe recipe has been left here.~
 This is the recipe for the soothing aloe elixir.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10244 0 0
 0 0
+C
+1 1
 S
 #10250
 portal raging red~
@@ -991,9 +997,11 @@ The pattern for a dracosaur bone spear is lying here.~
 This pattern allows you to craft the dracosaur bone spear, a strong tanking
 weapon from the Primeval age.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10270 0 0
 0 0
+C
+1 1
 S
 #10272
 staff bone jeweled jewelled~
@@ -1082,9 +1090,11 @@ rare resources from the Primeval era. Type 'learn designs' to learn:
   dracosaur tooth boots  (Caster, Sew, Magical Vestments)
   dracosaur scale boots  (PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 0 5
+7 0 a 0 0 6
 10274 0 0
 0 0
+C
+1 1
 T 10275
 S
 #10276
@@ -1164,9 +1174,11 @@ The pattern for the primordial boots is lying here.~
 This pattern allows you to forge the primordial boots, some of the best tanking
 boots in all of history.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 10278 0 0
 0 0
+C
+1 1
 S
 #10280
 wristguard dracosaur stunning~
@@ -1244,9 +1256,11 @@ The schematic for the Tome of the Primordium is lying here.~
    This pattern allows you to craft the tome of the primordium, a powerful
 magical relic from a bygone era.
 ~
-7 0 a 0 0 4
+7 0 a 0 0 5
 10282 0 0
 0 0
+C
+1 1
 S
 #10284
 crown bone primeval~
@@ -1273,9 +1287,11 @@ The design for the bone crown of the primeval is lying here.~
    This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
 ~
-7 0 a 0 0 5
+7 0 a 0 0 6
 10284 0 0
 0 0
+C
+1 1
 S
 #10286
 whistle bone strange terrosaur~

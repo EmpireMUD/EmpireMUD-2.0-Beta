@@ -1,7 +1,7 @@
 #0
 Water~
 1 0
-0 0 3 0
+0 0 3 1
 T0
 water~
 T1
@@ -145,7 +145,7 @@ S
 #16
 Coconut Water~
 1 0
-0 1 2 0
+0 1 2 1
 T0
 coconut water~
 T1
