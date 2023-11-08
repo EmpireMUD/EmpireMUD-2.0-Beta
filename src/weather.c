@@ -1042,8 +1042,14 @@ int get_room_temperature(room_data *room) {
 		case TEMPERATURE_COLD: {
 			return -1 * config_get_int("temperature_limit");
 		}
+		case TEMPERATURE_COOL: {
+			return -1 * config_get_int("temperature_limit") + 1;
+		}
 		case TEMPERATURE_NEUTRAL: {
 			return 0;
+		}
+		case TEMPERATURE_WARM: {
+			return config_get_int("temperature_limit") - 1;
 		}
 		case TEMPERATURE_HOT: {
 			return config_get_int("temperature_limit");

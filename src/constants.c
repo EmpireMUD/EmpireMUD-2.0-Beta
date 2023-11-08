@@ -3959,11 +3959,13 @@ const char *temperature_types[] = {
 	"harsher",
 	"freezing",
 	"cold",	// 5
+	"cool",
 	"cooler",
 	"cooler when hot",
 	"neutral",
+	"warm",	// 10
 	"warmer",
-	"warmer when cold",	// 10
+	"warmer when cold",
 	"hot",
 	"sweltering",
 	"\n"

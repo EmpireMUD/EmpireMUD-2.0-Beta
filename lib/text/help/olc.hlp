@@ -1786,9 +1786,11 @@ Available temperature types:
  &charsher&0 - Temperature is harsher (more hot/cold).
  &cfreezing&0 - Always extremely cold (high penalties).
  &ccold&0 - Always cold (low penalties).
+ &ccool&0 - Always cool (no penalties).
  &ccooler&0 - Cooler than the local area.
  &ccooler when hot&0 - Cooler than the local area when temperature is over 0.
  &cneutral&0 - Temperature is between hot and cold.
+ &cwarm&0 - Always warm (no penalties).
  &cwarmer&0 - Warmer than the local area.
  &cwarmer when cold&0 - Warmer than the local area when temperature is below 0.
  &chot&0 - Always hot (low penalties).

@@ -3011,13 +3011,15 @@ typedef enum {
 #define TEMPERATURE_HARSHER  3	// harsher than local tile
 #define TEMPERATURE_FREEZING  4	// always freezing
 #define TEMPERATURE_COLD  5	// always cold
-#define TEMPERATURE_COOLER  6	// cooler than local tile
-#define TEMPERATURE_COOLER_WHEN_HOT  7	// cooler than local tile when > 0
-#define TEMPERATURE_NEUTRAL  8	// temperature is always 0 (neutral)
-#define TEMPERATURE_WARMER  9	// warmer than local tile
-#define TEMPERATURE_WARMER_WHEN_COLD  10	// warmer than local tile when < 0
-#define TEMPERATURE_HOT  11	// always hot
-#define TEMPERATURE_SWELTERING  12	// always sweltering
+#define TEMPERATURE_COOL  6	// always cool (no penalty)
+#define TEMPERATURE_COOLER  7	// cooler than local tile
+#define TEMPERATURE_COOLER_WHEN_HOT  8	// cooler than local tile when > 0
+#define TEMPERATURE_NEUTRAL  9	// temperature is always 0 (neutral)
+#define TEMPERATURE_WARM  10	// always warm (no penalty)
+#define TEMPERATURE_WARMER  11	// warmer than local tile
+#define TEMPERATURE_WARMER_WHEN_COLD  12	// warmer than local tile when < 0
+#define TEMPERATURE_HOT  13	// always hot
+#define TEMPERATURE_SWELTERING  14	// always sweltering
 
 
  //////////////////////////////////////////////////////////////////////////////
