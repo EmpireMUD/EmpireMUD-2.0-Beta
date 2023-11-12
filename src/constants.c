@@ -515,7 +515,7 @@ const char *account_flags[] = {
 };
 
 
-// BONUS_x
+// BONUS_x (1/2): bonus traits
 const char *bonus_bits[] = {
 	"STRENGTH",		// 0
 	"DEXTERITY",
@@ -538,13 +538,13 @@ const char *bonus_bits[] = {
 	"NO-THIRST",
 	"NO-HUNGER",
 	"VIEW-HEIGHT",	// 20
-	"HEAT-RESIST",
+	"WARM-RESIST",
 	"COLD-RESIST",
 	"\n"
 };
 
 
-// BONUS_x
+// BONUS_x (2/2): bonus traits as shown to players
 const char *bonus_bit_descriptions[] = {
 	"Big boned (+1 Strength)",	// 0
 	"Double-jointed (+1 Dexterity)",
@@ -567,8 +567,8 @@ const char *bonus_bit_descriptions[] = {
 	"Salt blooded (never thirsty)",
 	"Tenacious waif (never hungry)",
 	"Surveyor (+1 view height)",	// 20
-	"Fire born (tolerates hot climates)",
-	"Frost born (tolerates cold climates)",
+	"Fireborn (tolerates warm climates)",
+	"Frostborn (tolerates cold climates)",
 	"\n"
 };
 

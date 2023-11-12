@@ -1000,10 +1000,18 @@ int get_relative_temperature(char_data *ch) {
 	
 	// penalize half of the other trait
 	if (temp < 0) {
-		temp += GET_WARMTH(ch) - (GET_COOLING(ch) / 2);
+		temp += warm - (cool / 2);
 	}
 	else if (temp > 0) {
-		temp -= GET_COOLING(ch) + (GET_WARMTH(ch) / 2);
+		temp -= cool + (warm / 2);
+	}
+	
+	// character bonus
+	if (HAS_BONUS_TRAIT(ch, BONUS_WARM_RESIST) && temp > 0) {
+		temp = MAX(0, temp - 10);
+	}
+	else if (HAS_BONUS_TRAIT(ch, BONUS_COLD_RESIST) && temp < 0) {
+		temp = MIN(0, temp + 10);
 	}
 	
 	return temp;
@@ -1272,7 +1280,7 @@ const char *temperature_to_string(int temperature) {
 * @param char_data *ch The player experiencing temperature and life.
 */
 void update_player_temperature(char_data *ch) {
-	int ambient, relative, limit;
+	int ambient, was_temp, relative, limit;
 	double change;
 	bool gain = FALSE, loss = FALSE;
 	
@@ -1283,6 +1291,7 @@ void update_player_temperature(char_data *ch) {
 	ambient = get_room_temperature(IN_ROOM(ch));
 	
 	if (GET_TEMPERATURE(ch) != ambient) {
+		was_temp = get_relative_temperature(ch);
 		change = (double)ambient / ((double) SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE);
 		change = ABSOLUTE(change);	// change is positive
 		change = MAX(1.0, change);	// minimum of 1
@@ -1299,8 +1308,9 @@ void update_player_temperature(char_data *ch) {
 		
 		// messaging?
 		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
-			if (gain && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
-				relative = get_relative_temperature(ch);
+			relative = get_relative_temperature(ch);
+			
+			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
 				limit = config_get_int("temperature_limit");
 				if (relative >= limit - (limit / 10)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
@@ -1314,8 +1324,7 @@ void update_player_temperature(char_data *ch) {
 			
 				GET_LAST_WARM_TIME(ch) = time(0);
 			}
-			else if (loss && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
-				relative = get_relative_temperature(ch);
+			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
 				limit = -1 * config_get_int("temperature_limit");
 				if (relative <= (limit + (limit / -10))) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
