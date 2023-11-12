@@ -2647,16 +2647,34 @@ static const char *GetMSSP_DB_Size() {
 	// we're not 100% sure what counts toward DB Size, but here is a rough guess
 	size += HASH_CNT(idnum_hh, player_table_by_idnum);
 	size += HASH_COUNT(empire_table);
-	size += HASH_COUNT(mobile_table);
-	size += HASH_COUNT(object_table);
+	
+	size += HASH_COUNT(ability_table);
 	size += HASH_COUNT(adventure_table);
-	size += HASH_COUNT(world_table);
+	size += HASH_COUNT(archetype_table);
+	size += HASH_COUNT(augment_table);
 	size += HASH_COUNT(building_table);
+	size += HASH_COUNT(class_table);
+	size += HASH_COUNT(craft_table);
+	size += HASH_COUNT(crop_table);
+	size += HASH_COUNT(event_table);
+	size += HASH_COUNT(faction_table);
+	size += HASH_COUNT(generic_table);
+	size += HASH_COUNT(globals_table);
+	size += HASH_COUNT(mobile_table);
+	size += HASH_COUNT(morph_table);
+	size += HASH_COUNT(object_table);
+	size += HASH_COUNT(progress_table);
+	size += HASH_COUNT(quest_table);
 	size += HASH_COUNT(room_template_table);
 	size += HASH_COUNT(sector_table);
-	size += HASH_COUNT(crop_table);
+	size += HASH_COUNT(shop_table);
+	size += HASH_COUNT(skill_table);
+	size += HASH_COUNT(social_table);
 	size += HASH_COUNT(trigger_table);
-	size += HASH_COUNT(craft_table);
+	size += HASH_COUNT(vehicle_table);
+	size += HASH_COUNT(island_table);
+	
+	// size += HASH_COUNT(world_table);
 	
 	snprintf(buf, sizeof(buf), "%d", size);
 	return buf;
