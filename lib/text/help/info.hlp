@@ -346,8 +346,6 @@ Basic traits:
  Unusual stamina (faster move regeneration)
  Channeler (faster mana regeneration)
  Quick learner (extra daily bonus exp)
- Fireborn (tolerates warm climates)
- Frostborn (tolerates cold climates)
 
 Advanced traits (require 12 hours of playtime):
  Twilight sight (larger light radius)
@@ -358,6 +356,8 @@ Advanced traits (require 12 hours of playtime):
  Salt blooded (never thirsty)
  Tenacious waif (never hungry)
  Surveyor (+1 view height)
+ Fireborn (tolerates warm climates)
+ Frostborn (tolerates cold climates)
 #
 BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 
