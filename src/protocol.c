@@ -2953,8 +2953,8 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 		{ "EQUIPMENT SYSTEM", "Level and Skill" },
 		{ "MULTIPLAYING", "No" },
 		{ "PLAYERKILLING", "Restricted" },
-		{ "QUEST SYSTEM", "0" },
-		{ "ROLEPLAYING", "" },
+		{ "QUEST SYSTEM", "Integrated" },
+		{ "ROLEPLAYING", "Encouraged" },
 		{ "TRAINING SYSTEM", "Skill" },
 		{ "WORLD ORIGINALITY", "All Original" },
 		
