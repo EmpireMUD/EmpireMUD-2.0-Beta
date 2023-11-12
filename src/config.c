@@ -216,6 +216,8 @@ const int base_hit_chance = 50;
 // how much hit/dodge 1 point of Dexterity gives
 const double hit_per_dex = 5.0;
 
+// rounds up when scaling mobs/gear if this is > 1; ignored if 0 or 1
+const int round_level_scaling_to_nearest = 5;
 
 // Books must contain one of these terms (prevents abuse like naming the book "a gold bar")
 const char *book_name_list[] = {

@@ -2151,6 +2151,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 		level = MIN(room_max, level);
 	}
 	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
+	
 	// insanity!
 	if (level <= 0) {
 		return;

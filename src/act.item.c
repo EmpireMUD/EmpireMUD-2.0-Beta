@@ -2902,6 +2902,11 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// hard lower limit -- the stats are the same at 0 or 1, but 0 shows as "unscalable" because unscalable items have 0 scale level
 	level = MAX(1, level);
 	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
+	
 	// if it's not scalable, we can still set its scale level if the prototype is not scalable
 	// (if the prototype IS scalable, but this instance isn't, we can't rescale it this way)
 	if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
