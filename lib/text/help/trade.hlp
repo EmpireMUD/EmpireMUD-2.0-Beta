@@ -998,6 +998,8 @@ For most recipes, the level of the resulting item will be the lowest of:
 For example, the arming sword from Iron Blades cannot be higher than level 75,
 since this ability is from the 50-75 level range.
 
+Levels for all items are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
+
 Recipes which come from crafting patterns follow slightly different rules - see
 HELP CRAFTING PATTERNS for more information. Most importantly, they aren't
 limited by the level range of the ability.

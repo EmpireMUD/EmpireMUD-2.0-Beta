@@ -1018,6 +1018,9 @@ Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
+Levels for mobs and items are rounded up to the next 5 (e.g. 73 to 75, 109 to
+110).
+
 Note: Until level 100, you must be in the same level range as an item
    (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
    can't use gear that's more than 25 levels above you (50 for BoP items). Your
@@ -1453,6 +1456,8 @@ EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
 to the level of the player or group that is fighting them. Each mob has a
 minimum and maximum scale level, and will scale to any level in that range,
 based on the composite skill of the player.
+
+Levels for mobs are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
 
 Some mobs have additional adjustments that make them harder or require more
 effort to beat them. You can use the 'consider' command to determine if you
