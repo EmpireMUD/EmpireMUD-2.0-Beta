@@ -747,6 +747,13 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 					*part = '\0';
 				}
 				msg_to_char(ch, "Contains %d units of %s%s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), part);
+				
+				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_COOLING)) {
+					msg_to_char(ch, "It will cool you down if you're warm.\r\n");
+				}
+				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WARMING)) {
+					msg_to_char(ch, "It will warm you up if you're cold.\r\n");
+				}
 			}
 			else {
 				msg_to_char(ch, "It is empty.\r\n");
@@ -5215,7 +5222,7 @@ ACMD(do_drink) {
 	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ, number, iter;
+	int type = drink_OBJ, number, iter, warmed;
 	room_data *to_room;
 	char *argptr = arg;
 	size_t size;
@@ -5388,7 +5395,7 @@ ACMD(do_drink) {
 		amount = MAX((int)thirst_amt, (int)hunger_amt);
 	
 		// if it causes drunkenness, minimum of 1
-		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0) {
+		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) > 0) {
 			amount = MAX(1, amount);
 		}
 	}
@@ -5406,19 +5413,28 @@ ACMD(do_drink) {
 	}
 	
 	// -1 to remove condition, amount = number of gulps
-	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
-	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	// drunk goes positive instead of negative
-	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
-
+	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	
+	// check warming
+	warmed = warm_player_from_liquid(ch, amount, liquid);
+	if (warmed > 0) {
+		msg_to_char(ch, "It warms you up%s\r\n", (get_relative_temperature(ch) >= config_get_int("temperature_limit") ? " -- you're getting too hot!" : "."));
+	}
+	else if (warmed < 0) {
+		msg_to_char(ch, "It cools you down%s\r\n", (get_relative_temperature(ch) <= (-1 * config_get_int("temperature_limit")) ? " -- you're getting too cold!" : "."));
+	}
+	
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) != 0) {
+	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) != 0) {
+	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) != 0) {
+	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 

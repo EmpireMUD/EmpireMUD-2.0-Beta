@@ -2582,6 +2582,7 @@ int get_temperature_type(room_data *room);
 void reset_player_temperature(char_data *ch);
 const char *temperature_to_string(int temperature);
 void update_player_temperature(char_data *ch);
+int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid);
 
 // weather.c time
 double get_hours_of_sun(room_data *room);

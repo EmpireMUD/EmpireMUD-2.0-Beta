@@ -1332,3 +1332,47 @@ void update_player_temperature(char_data *ch) {
 		// ... but they almost certainly save when this runs, anyway, due to other events
 	}
 }
+
+
+/**
+* Warms (or cools) a player from drinking a liquid.
+*
+* @param char_data *ch The player who drank the liquid.
+* @param int hours_drank How much they drank (in game hours).
+* @param any_vnum liquid Which generic liquid vnum they drank.
+* @return int 1 if it warmed the player up at all; -1 if it cooled them down; 0 if neither or both.
+*/
+int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
+	generic_data *gen = real_generic(liquid);
+	int val = 0, amount;
+	
+	if (!ch || !gen || hours_drank < 1 || GEN_TYPE(gen) != GENERIC_LIQUID) {
+		return 0;	// no work
+	}
+	
+	// how much heating/cooling is possible
+	amount = round(hours_drank / 4.0);
+	amount = MAX(1, amount);
+	
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_COOLING) && GET_TEMPERATURE(ch) > 0) {
+		// cool
+		GET_TEMPERATURE(ch) -= amount;
+		
+		// don't cool past 0 from drinking
+		GET_TEMPERATURE(ch) = MAX(0, GET_TEMPERATURE(ch));
+		
+		val -= 1;
+	}
+	
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WARMING) && GET_TEMPERATURE(ch) < 0) {
+		// warm
+		GET_TEMPERATURE(ch) += amount;
+		
+		// don't warm past 0 from drinking
+		GET_TEMPERATURE(ch) = MIN(0, GET_TEMPERATURE(ch));
+		
+		val += 1;
+	}
+	
+	return val;
+}
