@@ -1272,7 +1272,7 @@ const char *temperature_to_string(int temperature) {
 * @param char_data *ch The player experiencing temperature and life.
 */
 void update_player_temperature(char_data *ch) {
-	int ambient;
+	int ambient, relative, limit;
 	double change;
 	
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
@@ -1292,6 +1292,40 @@ void update_player_temperature(char_data *ch) {
 		}
 		else {
 			GET_TEMPERATURE(ch) -= change;
+		}
+		
+		// messaging?
+		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			if (change > 0 && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
+				relative = get_relative_temperature(ch);
+				limit = config_get_int("temperature_limit");
+				if (relative >= limit - (limit / 10)) {
+					msg_to_char(ch, "You're getting too hot!\r\n");
+				}
+				else if (relative > 0) {
+					msg_to_char(ch, "You're getting warm.\r\n");
+				}
+				else {
+					msg_to_char(ch, "You're warming up.\r\n");
+				}
+			
+				GET_LAST_WARM_TIME(ch) = time(0);
+			}
+			else if (change < 0 && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
+				relative = get_relative_temperature(ch);
+				limit = -1 * config_get_int("temperature_limit");
+				if (relative <= limit) {
+					msg_to_char(ch, "You're getting too cold!\r\n");
+				}
+				else if (relative < 0) {
+					msg_to_char(ch, "You're getting cold.\r\n");
+				}
+				else {
+					msg_to_char(ch, "You're cooling down.\r\n");
+				}
+			
+				GET_LAST_COLD_TIME(ch) = time(0);
+			}
 		}
 		
 		// probably not worth triggering a character save for a temperature change alone
