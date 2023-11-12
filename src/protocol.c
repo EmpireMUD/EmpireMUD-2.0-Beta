@@ -2706,8 +2706,16 @@ static const char *GetMSSP_Extra_Descs() {
 }
 
 static const char *GetMSSP_Helpfiles() {
-	static char buf[256];	
-	snprintf(buf, sizeof(buf), "%d", top_of_helpt + 1);
+	static char buf[256];
+	int iter, count = 0;
+	
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (!help_table[iter].duplicate) {
+			++count;
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "%d", count);
 	return buf;
 }
 
