@@ -1305,7 +1305,7 @@ void update_player_temperature(char_data *ch) {
 				if (relative >= limit - (limit / 10)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
 				}
-				else if (relative > 0) {
+				else if (relative >= (limit / 2)) {
 					msg_to_char(ch, "You're getting warm.\r\n");
 				}
 				else {
@@ -1317,10 +1317,10 @@ void update_player_temperature(char_data *ch) {
 			else if (loss && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
 				relative = get_relative_temperature(ch);
 				limit = -1 * config_get_int("temperature_limit");
-				if (relative <= limit) {
+				if (relative <= (limit + (limit / -10))) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
 				}
-				else if (relative < 0) {
+				else if (relative <= (limit / 2)) {
 					msg_to_char(ch, "You're getting cold.\r\n");
 				}
 				else {
