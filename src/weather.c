@@ -1274,6 +1274,7 @@ const char *temperature_to_string(int temperature) {
 void update_player_temperature(char_data *ch) {
 	int ambient, relative, limit;
 	double change;
+	bool gain = FALSE, loss = FALSE;
 	
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
 		return;	// no temperature
@@ -1289,14 +1290,16 @@ void update_player_temperature(char_data *ch) {
 		// apply
 		if (GET_TEMPERATURE(ch) < ambient) {
 			GET_TEMPERATURE(ch) += change;
+			gain = TRUE;
 		}
 		else {
 			GET_TEMPERATURE(ch) -= change;
+			loss = TRUE;
 		}
 		
 		// messaging?
 		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
-			if (change > 0 && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
+			if (gain && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
 				relative = get_relative_temperature(ch);
 				limit = config_get_int("temperature_limit");
 				if (relative >= limit - (limit / 10)) {
@@ -1311,7 +1314,7 @@ void update_player_temperature(char_data *ch) {
 			
 				GET_LAST_WARM_TIME(ch) = time(0);
 			}
-			else if (change < 0 && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
+			else if (loss && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
 				relative = get_relative_temperature(ch);
 				limit = -1 * config_get_int("temperature_limit");
 				if (relative <= limit) {
