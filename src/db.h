@@ -528,6 +528,14 @@ faction_data *find_faction_by_vnum(any_vnum vnum);
 void free_faction(faction_data *fct);
 void remove_faction_from_table(faction_data *fct);
 
+// fight messages
+extern struct message_list *fight_messages;
+
+struct message_list *create_fight_message_list(int a_type);
+struct message_list *find_fight_message(int a_type, bool create_if_missing);
+void free_message_list(struct message_list *list);
+void free_message_type(struct message_type *type);
+
 // generics
 extern generic_data *generic_table;
 extern generic_data *sorted_generics;

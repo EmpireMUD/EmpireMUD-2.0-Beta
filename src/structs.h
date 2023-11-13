@@ -3045,7 +3045,6 @@ typedef enum {
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
-#define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
@@ -5702,6 +5701,8 @@ struct message_list {
 	int a_type;	// Attack type
 	int number_of_attacks;	// How many attack messages to chose from
 	struct message_type *msg;	// List of messages
+	
+	UT_hash_handle hh;	// fight_messages hash (by a_type)
 };
 
 
