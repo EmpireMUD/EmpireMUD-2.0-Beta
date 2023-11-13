@@ -2121,18 +2121,18 @@ void load_fight_messages(void) {
 		
 		LL_PREPEND(fight_messages[i].msg, messages);
 
-		messages->die_msg.attacker_msg = fread_action(fl, i);
-		messages->die_msg.victim_msg = fread_action(fl, i);
-		messages->die_msg.room_msg = fread_action(fl, i);
-		messages->miss_msg.attacker_msg = fread_action(fl, i);
-		messages->miss_msg.victim_msg = fread_action(fl, i);
-		messages->miss_msg.room_msg = fread_action(fl, i);
-		messages->hit_msg.attacker_msg = fread_action(fl, i);
-		messages->hit_msg.victim_msg = fread_action(fl, i);
-		messages->hit_msg.room_msg = fread_action(fl, i);
-		messages->god_msg.attacker_msg = fread_action(fl, i);
-		messages->god_msg.victim_msg = fread_action(fl, i);
-		messages->god_msg.room_msg = fread_action(fl, i);
+		messages->msg[MSG_DIE].attacker_msg = fread_action(fl, i);
+		messages->msg[MSG_DIE].victim_msg = fread_action(fl, i);
+		messages->msg[MSG_DIE].room_msg = fread_action(fl, i);
+		messages->msg[MSG_MISS].attacker_msg = fread_action(fl, i);
+		messages->msg[MSG_MISS].victim_msg = fread_action(fl, i);
+		messages->msg[MSG_MISS].room_msg = fread_action(fl, i);
+		messages->msg[MSG_HIT].attacker_msg = fread_action(fl, i);
+		messages->msg[MSG_HIT].victim_msg = fread_action(fl, i);
+		messages->msg[MSG_HIT].room_msg = fread_action(fl, i);
+		messages->msg[MSG_GOD].attacker_msg = fread_action(fl, i);
+		messages->msg[MSG_GOD].victim_msg = fread_action(fl, i);
+		messages->msg[MSG_GOD].room_msg = fread_action(fl, i);
 		fgets(chk, 128, fl);
 		while (!feof(fl) && (*chk == '\n' || *chk == '*'))
 			fgets(chk, 128, fl);

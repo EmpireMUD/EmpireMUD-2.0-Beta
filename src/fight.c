@@ -2335,39 +2335,39 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 			if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 					if (ch != vict) {
-						act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+						act(msg->msg[MSG_GOD].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
 					}
-					act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
+					act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 				}
-				act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
+				act(msg->msg[MSG_GOD].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
 			}
 			else if (dam != 0) {
 				if (GET_POS(vict) == POS_DEAD) {
 					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 						if (ch != vict) {
 							send_to_char("&y", ch);
-							act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+							act(msg->msg[MSG_DIE].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 							send_to_char("&0", ch);
 						}
 						
-						act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
+						act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 					}
 					send_to_char("&r", vict);
-					act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
+					act(msg->msg[MSG_DIE].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
 				}
 				else {
 					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 						if (ch != vict) {
 							send_to_char("&y", ch);
-							act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+							act(msg->msg[MSG_HIT].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 							send_to_char("&0", ch);
 						}
 						
-						act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
+						act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 					}
 					send_to_char("&r", vict);
-					act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
+					act(msg->msg[MSG_HIT].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
 				}
 			}
@@ -2375,14 +2375,14 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 					if (ch != vict) {
 						send_to_char("&y", ch);
-						act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+						act(msg->msg[MSG_MISS].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
 						send_to_char("&0", ch);
 					}
 					
-					act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
+					act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 				}
 				send_to_char("&r", vict);
-				act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
+				act(msg->msg[MSG_MISS].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 				send_to_char("&0", vict);
 			}
 			return (1);
@@ -3104,11 +3104,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		skill_message(dam, ch, victim, attacktype);
 	else {
 		if (dam == 0 || ch == victim || (GET_POS(victim) == POS_DEAD && WOULD_EXECUTE(ch, victim))) {
-			if (!skill_message(dam, ch, victim, attacktype))
+			if (!skill_message(dam, ch, victim, attacktype)) {
 				dam_message(dam, ch, victim, attacktype);
+			}
 		}
-		else
+		else {
 			dam_message(dam, ch, victim, attacktype);
+		}
 	}
 
 	/* Use send_to_char -- act() doesn't send message if you are DEAD. */

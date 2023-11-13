@@ -5682,12 +5682,17 @@ struct msg_type {
 };
 
 
+// MSG_x: each fight message has these 4 types
+#define MSG_DIE  0	// messages when death
+#define MSG_MISS  1	// messages when miss
+#define MSG_HIT  2	// messages when hit
+#define MSG_GOD  3	// messages when hit on god
+#define NUM_MSG_TYPES  4	// total
+
+
 // part of fight messages
 struct message_type {
-	struct msg_type die_msg;	// messages when death
-	struct msg_type miss_msg;	// messages when miss
-	struct msg_type hit_msg;	// messages when hit
-	struct msg_type god_msg;	// messages when hit on god
+	struct msg_type msg[NUM_MSG_TYPES];	// the 4 message types
 	struct message_type *next;	// to next messages of this kind
 };
 
