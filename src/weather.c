@@ -1318,7 +1318,7 @@ void update_player_temperature(char_data *ch) {
 				else if (relative >= (limit / 2)) {
 					msg_to_char(ch, "You're getting warm.\r\n");
 				}
-				else {
+				else if (relative < (limit / -2)) {
 					msg_to_char(ch, "You're warming up.\r\n");
 				}
 			
@@ -1332,7 +1332,7 @@ void update_player_temperature(char_data *ch) {
 				else if (relative <= (limit / 2)) {
 					msg_to_char(ch, "You're getting cold.\r\n");
 				}
-				else {
+				else  if (relative > (limit / -2)) {
 					msg_to_char(ch, "You're cooling down.\r\n");
 				}
 			
