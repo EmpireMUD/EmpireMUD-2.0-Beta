@@ -888,10 +888,10 @@ RELOAD
 Usage:  reload < '*' | all | file >
 
 Reload is used to reload text files such as the MOTD from disk into memory. 
-Reload * reloads all the text files below. This command is grantable.
+Reload * reloads all the text files below. This command is grantable. Available
+files to reload are:
 
-Valid files are:
-
+Text files:
   credits    (/mud_dir/lib/text/credits)
   intros     (/mud_dir/lib/text/intros/*)
   handbook   (/mud_dir/lib/text/handbook)
@@ -903,8 +903,11 @@ Valid files are:
   info       (/mud_dir/lib/text/info)
   policy     (/mud_dir/lib/text/policies)
   wizlist    (/mud_dir/lib/text/wizlist)
-  xhelp      (/mud_dir/lib/text/help/*)
-  data       (/mud_dir/lib/misc/game_data)
+  
+Other:
+  xhelp          (/mud_dir/lib/text/help/*)
+  data           (/mud_dir/lib/misc/game_data)
+  fightmessages  (/mud_dir/lib/misc/messages)
 
 See also: GRANT
 #d

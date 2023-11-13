@@ -10122,6 +10122,9 @@ ACMD(do_reload) {
 		top_of_helpt = 0;
 		index_boot_help();
 	}
+	else if (!str_cmp(arg, "fmessages") || !str_cmp(arg, "fightmessages")) {
+		load_fight_messages();
+	}
 	else if (!str_cmp(arg, "data")) {
 		load_data_table();
 	}

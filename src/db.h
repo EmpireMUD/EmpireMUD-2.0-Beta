@@ -535,6 +535,7 @@ struct message_list *create_fight_message_list(int a_type);
 struct message_list *find_fight_message(int a_type, bool create_if_missing);
 void free_message_list(struct message_list *list);
 void free_message_type(struct message_type *type);
+void load_fight_messages();
 
 // generics
 extern generic_data *generic_table;
