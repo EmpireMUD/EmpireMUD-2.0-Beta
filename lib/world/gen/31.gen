@@ -51,11 +51,11 @@ T5
 T6
 You shiver as you slowly freeze.~
 T7
-$n shivers as $e slowly freezes.~
+$N shivers as $E slowly freezes.~
 T8
 Oh no... you froze to death!~
 T9
-$n is frozen solid in place as $e dies of the cold!~
+$N is frozen solid in place as $E dies of the cold!~
 S
 #3107
 sweltering~
@@ -70,10 +70,10 @@ T5
 T6
 You sweat profusely as you suffer in the heat.~
 T7
-$n sweats profusely as $e suffers in the heat.~
+$N sweats profusely as $E suffers in the heat.~
 T8
 The world goes dark as you pass out from the heat... and die!~
 T9
-$n falls over from the heat, dead!~
+$N falls over from the heat, dead!~
 S
 $

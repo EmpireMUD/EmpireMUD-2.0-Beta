@@ -3642,7 +3642,8 @@ Optional properties used for damage-over-time effects (DoTs):
   <&ydeathtochar&0> Damage shown to the character when dying from DoT damage.
   <&ydeathtoroom&0> Damage shown to the room when character dies from DoT damage.
   Note: If no dot-to or death-to messages are set, this will use the standard
-        DoT messaging. But if any are set, omitted messages won't show at all.
+      DoT messaging. But if any are set, omitted messages won't show at all.
+      DoT and death messages should use uppercase placeholder pronouns like $N.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3761,7 +3762,7 @@ This message is optional. If any of the dottoroom, deathtochar, or deathtoroom
 message are set but dottochar is not, no message will be displayed. However, if
 all of these messages are omitted, standard DoT messages will appear.
 
-Can use $n, $e, $s, and $m tokens.
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
 
 Example:
 "You shiver as you slowly freeze."
@@ -3779,9 +3780,9 @@ This message is optional. If any of the dottochar, deathtochar, or deathtoroom
 message are set but dottoroom is not, no message will be displayed. However, if
 all of these messages are omitted, standard DoT messages will appear.
 
-Can use $n, $e, $s, and $m tokens.
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
 
-Example: $n shivers as $e slowly freezes.
+Example: $N shivers as $E slowly freezes.
 "Paris shivers as he slowly freezes."
 
 See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
@@ -3797,7 +3798,7 @@ This message is optional. If any of the dottochar, dottoroom, or deathtoroom
 message are set but deathtochar is not, no message will be displayed. However,
 if all of these messages are omitted, standard DoT messages will appear.
 
-Can use $n, $e, $s, and $m tokens.
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
 
 Example:
 "Oh no... you froze to death!"
@@ -3815,9 +3816,9 @@ This message is optional. If any of the dottochar, dottoroom, or deathtochar
 message are set but deathtoroom is not, no message will be displayed. However,
 if all of these messages are omitted, standard DoT messages will appear.
 
-Can use $n, $e, $s, and $m tokens.
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
 
-Example: $n is frozen solid in place as $e dies of the cold!
+Example: $N is frozen solid in place as $E dies of the cold!
 "Paris is frozen solid in place as he dies of the cold!"
 
 See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
