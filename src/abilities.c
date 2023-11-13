@@ -1846,7 +1846,7 @@ DO_ABIL(do_damage_ability) {
 	}
 	
 	// msg_to_char(ch, "Damage: %d\r\n", dmg);
-	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
+	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
 	data->success = TRUE;
 	
 	if (result < 0) {	// dedz

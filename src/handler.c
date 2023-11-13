@@ -193,7 +193,7 @@ EVENTFUNC(dot_update_event) {
 		}
 		
 		// bam! (damage func shows the messaging)
-		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type, custom_fmessage);
 		
 		if (custom_fmessage) {
 			free_message_list(custom_fmessage);

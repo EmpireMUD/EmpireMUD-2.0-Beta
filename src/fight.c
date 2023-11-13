@@ -1860,7 +1860,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	// guard towers ALWAYS see the offender
 	add_offense(emp, OFFENSE_GUARD_TOWER, ch, to_room, OFF_SEEN);
 	
-	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
+	if (damage(ch, ch, dam, type, DAM_PHYSICAL, NULL) != 0) {
 		// slow effect (1 mud hour)
 		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, SECS_PER_MUD_HOUR, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
@@ -2310,17 +2310,22 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 * @param int dam How much damage was done.
 * @param char_data *ch The character dealing the damage.
 * @param char_data *victim The person receiving the damage.
-* @param int w_type The attack type (ATTACK_x)
+* @param int w_type The attack type (ATTACK_x)struct message_list *custom_fight_messages
+* @param struct message_list *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
 * @return int 1: sent message, 0: no message found
 */
-int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
+int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struct message_list *custom_fight_messages) {
 	int j, nr;
 	struct message_list *msg_set;
 	struct message_type *msg;
 	
 	obj_data *weap = GET_EQ(ch, WEAR_WIELD);	// if any
 	
-	if (!(msg_set = find_fight_message(attacktype, FALSE))) {
+	// determine which messages to use
+	if (custom_fight_messages) {
+		msg_set = custom_fight_messages;
+	}
+	else if (!(msg_set = find_fight_message(attacktype, FALSE))) {
 		return 0;	// no skill message for this attacktype
 	}
 	
@@ -2992,12 +2997,18 @@ bool check_combat_position(char_data *ch, double speed) {
 }
 
 
-/*
- *	< 0	Victim died.
- *	= 0	No damage.
- *	> 0	How much damage done.
- */
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
+/**
+* Main function for one character damaging another (or themselves).
+*
+* @param char_data *ch The person dealing the damage.
+* @param char_data *victim The person to receive the damage.
+* @param int dam How much damage.
+* @param int attacktype An ATYPE_ const.
+* @param byte damtype A DAM_ const.
+* @param struct message_list *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
+* @return int Return < 0 if the victim died, 0 for no damage, or > 0 for the amount of damage done.
+*/
+int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, struct message_list *custom_fight_messages) {
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -3102,11 +3113,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	 * death blow, send a skill_message if one exists; if not, default to a
 	 * dam_message. Otherwise, always send a dam_message.
 	 */
-	if (!IS_WEAPON_TYPE(attacktype))
-		skill_message(dam, ch, victim, attacktype);
+	if (!IS_WEAPON_TYPE(attacktype)) {
+		skill_message(dam, ch, victim, attacktype, custom_fight_messages);
+	}
 	else {
 		if (dam == 0 || ch == victim || (GET_POS(victim) == POS_DEAD && WOULD_EXECUTE(ch, victim))) {
-			if (!skill_message(dam, ch, victim, attacktype)) {
+			if (!skill_message(dam, ch, victim, attacktype, custom_fight_messages)) {
 				dam_message(dam, ch, victim, attacktype);
 			}
 		}
@@ -3466,7 +3478,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// miss
 		combat_meter_miss(ch);
 		combat_meter_dodge(victim);
-		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
+		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type, NULL);
 		if (can_gain_exp_from(victim, ch)) {
 			run_ability_gain_hooks(victim, ch, AGH_DODGE);
 		}
@@ -3566,7 +3578,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		dam = MAX(0, dam);
 
 		// anything after this must NOT rely on victim being alive
-		result = damage(ch, victim, (int) dam, w_type, attack_hit_info[w_type].damage_type);
+		result = damage(ch, victim, (int) dam, w_type, attack_hit_info[w_type].damage_type, NULL);
 		
 		// exp gain
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
@@ -4008,7 +4020,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		block_missile_attack(ch, vict, GET_MISSILE_WEAPON_TYPE(weapon));
 	}
 	else if (!success) {
-		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL);
+		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL, NULL);
 		if (can_gain_exp_from(vict, ch)) {
 			run_ability_gain_hooks(vict, ch, AGH_DODGE);
 		}
@@ -4025,7 +4037,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// damage last! it's sometimes fatal for vict
-		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type);
+		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type, NULL);
 		
 		if (ret > 0 && !EXTRACTED(vict) && !IS_DEAD(vict) && IN_ROOM(vict) == IN_ROOM(ch)) {
 			// affects?

@@ -623,7 +623,7 @@ ACMD(do_backstab) {
 		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
 		if (!success) {
-			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL);
+			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL);
 		}
 		else {
 			dam = GET_STRENGTH(ch) + (!IS_NPC(ch) ? GET_WEAPON_DAMAGE_BONUS(GET_EQ(ch, WEAR_WIELD)) : MOB_DAMAGE(ch));
@@ -635,7 +635,7 @@ ACMD(do_backstab) {
 				dam *= 2;
 			}
 
-			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
+			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL) > 0) {
 				if (has_player_tech(ch, PTECH_POISON)) {
 					if (!number(0, 1) && apply_poison(ch, vict) < 0) {
 						// dedz

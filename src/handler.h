@@ -520,7 +520,7 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep);
 // fight.c
 void appear(char_data *ch);
 bool can_fight(char_data *ch, char_data *victim);
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
+int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, struct message_list *custom_fight_messages);
 obj_data *die(char_data *ch, char_data *killer);
 void engage_combat(char_data *ch, char_data *vict, bool melee);
 void heal(char_data *ch, char_data *vict, int amount);

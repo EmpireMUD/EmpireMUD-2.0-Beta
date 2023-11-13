@@ -152,7 +152,7 @@ ACMD(do_bash) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (!success) {
-		damage(ch, vict, 0, ATTACK_BASH, DAM_PHYSICAL);
+		damage(ch, vict, 0, ATTACK_BASH, DAM_PHYSICAL, NULL);
 	}
 	else {
 		/*
@@ -169,7 +169,7 @@ ACMD(do_bash) {
 			dam *= 2;
 		}
 
-		if (damage(ch, vict, dam, ATTACK_BASH, DAM_PHYSICAL) > 0) {	/* -1 = dead, 0 = miss */
+		if (damage(ch, vict, dam, ATTACK_BASH, DAM_PHYSICAL, NULL) > 0) {	/* -1 = dead, 0 = miss */
 			if (!AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN)) {
 				af = create_flag_aff(ATYPE_BASH, 5, AFF_STUNNED, ch);
 				affect_join(vict, af, 0);
@@ -518,10 +518,10 @@ ACMD(do_kick) {
 	
 		dam = GET_STRENGTH(ch) * (IS_CLASS_ABILITY(ch, ABIL_KICK) ? 4 : 2);
 		dam += GET_BONUS_PHYSICAL(ch);
-		damage(ch, vict, dam, ATTACK_KICK, DAM_PHYSICAL);
+		damage(ch, vict, dam, ATTACK_KICK, DAM_PHYSICAL, NULL);
 	}
 	else {
-		damage(ch, vict, 0, ATTACK_KICK, DAM_PHYSICAL);
+		damage(ch, vict, 0, ATTACK_KICK, DAM_PHYSICAL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {

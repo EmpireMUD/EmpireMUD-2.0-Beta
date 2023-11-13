@@ -1037,10 +1037,10 @@ ACMD(do_bite) {
 			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
 			
 			if (success) {
-				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL, NULL);
 			}
 			else {
-				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL, NULL);
 			}
 			
 			// reduce DODGE
