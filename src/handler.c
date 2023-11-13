@@ -152,6 +152,8 @@ EVENTFUNC(dot_update_event) {
 	struct over_time_effect_type *dot;
 	char_data *ch, *caster;
 	int type, result;
+	struct message_list *custom_fmessage = NULL;
+	generic_data *gen;
 	
 	// grab data and free it
 	ch = data->ch;
@@ -171,8 +173,31 @@ EVENTFUNC(dot_update_event) {
 		));
 		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
 		
+		// custom messages?
+		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
+			custom_fmessage = create_fight_message(NOTHING);
+			add_fight_message(custom_fmessage, create_fight_message_entry(TRUE,
+				NULL,	// death to-attacker
+				GET_AFFECT_DEATH_TO_CHAR(gen),
+				GET_AFFECT_DEATH_TO_ROOM(gen),
+				NULL,	// miss to-attacker
+				NULL,	// miss to_vict
+				NULL,	// miss to-room
+				NULL,	// hit to-attacker
+				GET_AFFECT_DOT_TO_CHAR(gen),
+				GET_AFFECT_DOT_TO_ROOM(gen),
+				NULL,	// god to-attacker
+				NULL,	// god to_vict
+				NULL	// god to-room
+			));
+		}
+		
 		// bam! (damage func shows the messaging)
 		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		
+		if (custom_fmessage) {
+			free_message_list(custom_fmessage);
+		}
 		
 		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
 			// done here (death and extraction should both remove the DOT themselves)

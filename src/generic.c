@@ -1814,6 +1814,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off to room: %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Look at char: %s\r\n", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Look at room: %s\r\n", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "DoT to char: %s\r\n", GET_AFFECT_DOT_TO_CHAR(gen) ? GET_AFFECT_DOT_TO_CHAR(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "DoT to room: %s\r\n", GET_AFFECT_DOT_TO_ROOM(gen) ? GET_AFFECT_DOT_TO_ROOM(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Death to char: %s\r\n", GET_AFFECT_DEATH_TO_CHAR(gen) ? GET_AFFECT_DEATH_TO_CHAR(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Death to room: %s\r\n", GET_AFFECT_DEATH_TO_ROOM(gen) ? GET_AFFECT_DEATH_TO_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -1903,6 +1907,10 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%slookatchar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%slookatroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdottochar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DOT_TO_CHAR), ""), GET_AFFECT_DOT_TO_CHAR(gen) ? GET_AFFECT_DOT_TO_CHAR(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdottoroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DOT_TO_ROOM), ""), GET_AFFECT_DOT_TO_ROOM(gen) ? GET_AFFECT_DOT_TO_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdeathtochar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DEATH_TO_CHAR), ""), GET_AFFECT_DEATH_TO_CHAR(gen) ? GET_AFFECT_DEATH_TO_CHAR(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdeathtoroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DEATH_TO_ROOM), ""), GET_AFFECT_DEATH_TO_ROOM(gen) ? GET_AFFECT_DEATH_TO_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -2254,6 +2262,119 @@ OLC_MODULE(genedit_apply2room) {
 		olc_process_string(ch, argument, "apply2room", &GEN_STRING(gen, pos));
 	}
 }
+
+
+OLC_MODULE(genedit_deathtochar) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_DEATH_TO_CHAR;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "Death-to-char message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "deathtochar", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_deathtoroom) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_DEATH_TO_ROOM;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "Death-to-room message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "deathtoroom", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_dottochar) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_DOT_TO_CHAR;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "DoT-to-char message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "dottochar", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_dottoroom) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_DOT_TO_ROOM;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(argument, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "DoT-to-room message removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "dottoroom", &GEN_STRING(gen, pos));
+	}
+}
+
 
 OLC_MODULE(genedit_lookatchar) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);

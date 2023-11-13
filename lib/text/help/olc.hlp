@@ -3626,7 +3626,7 @@ See also: OLC GENERICS, DOLLAR SIGN CODES
 Generic 'affects' are used by spells, abilities, and scripts to show names on
 the affect list, and to show messages when these effects wear off.
 
-Affects have 4 properties:
+Affects have several properties:
   <&yapply2char&0> An optional message shown to the character when the affect
     is applied.
   <&yapply2room&0> An optional message shown to the room when the affect is
@@ -3635,6 +3635,14 @@ Affects have 4 properties:
   <&ywearoff2room&0> An optional message shown to the rest of the room.
   <&ylookatchar&0> An optional message shown after description on 'look name'.
   <&ylookatroom&0> An optional message shown after the character on 'look'.
+
+Optional properties used for damage-over-time effects (DoTs):
+  <&ydottochar&0> Damage shown to the character when taking DoT damage.
+  <&ydottoroom&0> Damage shown to the room when character takes DoT damage.
+  <&ydeathtochar&0> Damage shown to the character when dying from DoT damage.
+  <&ydeathtoroom&0> Damage shown to the room when character dies from DoT damage.
+  Note: If no dot-to or death-to messages are set, this will use the standard
+        DoT messaging. But if any are set, omitted messages won't show at all.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3741,6 +3749,80 @@ You must set 2 properties on currency:
   <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
 
 See also: OLC GENERICS, GENEDIT PLURAL
+#d
+"GENEDIT DOTTOCHAR" "GENEDIT DOT-TO-CHAR" "GENEDIT DOT TO CHAR"
+
+Usage:  .dottochar <message | none>
+
+This message is shown to the character each time they take damage from a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottoroom, deathtochar, or deathtoroom
+message are set but dottochar is not, no message will be displayed. However, if
+all of these messages are omitted, standard DoT messages will appear.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example:
+"You shiver slowly as you freeze."
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+"GENEDIT DOTTOROOM" "GENEDIT DOT-TO-ROOM" "GENEDIT DOT TO ROOM"
+
+Usage:  .dottoroom <message | none>
+
+This message is shown to the room each time the character takes damage from a
+DoT (damage-over-time) affect.
+
+This message is optional. If any of the dottochar, deathtochar, or deathtoroom
+message are set but dottoroom is not, no message will be displayed. However, if
+all of these messages are omitted, standard DoT messages will appear.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example: $n shivers as $e slowly freezes.
+"Paris shivers as he slowly freezes."
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+
+
+"GENEDIT DEATHTOCHAR" "GENEDIT DEATH-TO-CHAR" "GENEDIT DEATH TO CHAR"
+
+Usage:  .deathtochar <message | none>
+
+This message is shown to the character if they are killed by a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottochar, dottoroom, or deathtoroom
+message are set but deathtochar is not, no message will be displayed. However,
+if all of these messages are omitted, standard DoT messages will appear.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example:
+"Oh no... you froze to death!"
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+"GENEDIT DEATHTOROOM" "GENEDIT DEATH-TO-ROOM" "GENEDIT DEATH TO ROOM"
+
+Usage:  .deathtoroom <message | none>
+
+This message is shown to the room if a character is killed by a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottochar, dottoroom, or deathtochar
+message are set but deathtoroom is not, no message will be displayed. However,
+if all of these messages are omitted, standard DoT messages will appear.
+
+Can use $n, $e, $s, and $m tokens.
+
+Example: $n is frozen solid in place as $e dies of the cold!
+"Paris is frozen solid in place as he dies of the cold!"
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
 #d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 

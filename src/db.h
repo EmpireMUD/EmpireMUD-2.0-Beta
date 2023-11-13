@@ -531,7 +531,9 @@ void remove_faction_from_table(faction_data *fct);
 // fight messages
 extern struct message_list *fight_messages;
 
-struct message_list *create_fight_message_list(int a_type);
+void add_fight_message(struct message_list *add_to, struct message_type *messages);
+struct message_list *create_fight_message(int a_type);
+struct message_type *create_fight_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
 struct message_list *find_fight_message(int a_type, bool create_if_missing);
 void free_message_list(struct message_list *list);
 void free_message_type(struct message_type *type);

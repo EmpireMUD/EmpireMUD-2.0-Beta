@@ -1593,7 +1593,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // how many strings a generic stores (can be safely raised with no updates)
-#define NUM_GENERIC_STRINGS  6
+#define NUM_GENERIC_STRINGS  10
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
