@@ -4,7 +4,7 @@ a boy~
 A little boy is playing here.
 ~
 5 10 dqvI 0 2
-1 0 0 15
+1 0 0 15 -1
 D
    The boy looks no older than five. He's playing with a little wooden toy on
 the ground.
@@ -16,7 +16,7 @@ a girl~
 A little girl is playing here.
 ~
 5 10 dqvI 0 2
-2 0 0 15
+2 0 0 15 -1
 D
    The little girl is wearing a plain dress, though it doesn't stop her from
 dancing around like a princess at a ball.
@@ -28,7 +28,7 @@ S
 #n, citizen of #e, is standing here.
 ~
 20 50 dqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 This loyal citizen appears to be minding his own business.
 ~
@@ -39,7 +39,7 @@ S
 #n, citizen of #e, is standing here.
 ~
 20 50 dqvI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 This citizen doesn't seem to be in a hurry.
 ~
@@ -50,7 +50,7 @@ guard #n~
 Guard #n is standing here.
 ~
 50 75 bdoqtuvDFI c 3
-0 0 0 1
+0 0 0 1 -1
 D
 The guard looks ready to protect the realm.
 ~
@@ -61,7 +61,7 @@ S
 #n the bodyguard is standing here.
 ~
 0 125 bdpqvGI cm 3
-0 0 0 1
+0 0 0 1 -1
 D
 This loyal bodyguard would die before abandoning their duties.
 ~
@@ -73,7 +73,7 @@ farmer #n~
 Farmer #n is working the fields.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 
 This citizen is dilligently working the crops. (workforce farming)
@@ -85,7 +85,7 @@ feller #n~
 Feller #n is chopping trees.
 ~
 20 50 bdqvI 0 3
-1 0 0 2
+1 0 0 2 -1
 D
 This citizen is chopping trees. (workforce chopping)
 ~
@@ -96,7 +96,7 @@ miner #n~
 Miner #n is looking for ore.
 ~
 20 50 bdqvI 0 3
-1 0 0 3
+1 0 0 3 -1
 D
 This citizen is mining for ore. (workforce mining)
 ~
@@ -107,7 +107,7 @@ builder #n~
 Builder #n is hard at work.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is working on the building. (workforce building)
 ~
@@ -118,7 +118,7 @@ S
 #n Miller is pouring some flour into a sack.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The miller owns and operates this mill, which processes grain into flour.
 ~
@@ -129,7 +129,7 @@ S
 #n Potter is cleaning up the shop.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The potter owns and operates this shop.
 ~
@@ -140,7 +140,7 @@ S
 #n Smith is sharpening a sword.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The blacksmith owns and maintains the forge.
 ~
@@ -152,7 +152,7 @@ Stablemaster #n~
 Stablemaster #n is tending the animals.
 ~
 20 50 bdqvI 0 3
-1 0 0 7
+1 0 0 7 -1
 D
 The stablemaster is in charge of the animals here.
 ~
@@ -163,7 +163,7 @@ S
 #n the baker is mixing dough.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The baker owns and runs this little shop.
 ~
@@ -175,7 +175,7 @@ S
 #n the glassblower is tending the oven.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 This artisan tends the fire and blows glass for the kingdom.
 ~
@@ -186,7 +186,7 @@ Imperial Engineer #n~
 Imperial Engineer #n is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The engineer surveys the construction yard and the supplies.
 ~
@@ -197,7 +197,7 @@ S
 #n Wright is sweeping up sawdust.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This artisan runs the carpenter shop.
 ~
@@ -208,7 +208,7 @@ S
 #n the Beekeeper is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The beekeeper is tending to the hives.
 ~
@@ -219,7 +219,7 @@ S
 #n Taylor is mending a gown.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The old tailor is carefully stitching a dress that was brought in for repair.
 ~
@@ -230,7 +230,7 @@ Old #n~
 Old #n the #a barkeep is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The barkeep leans against the bar, prepared to hear another pointless story
 from a drunken patron.
@@ -242,7 +242,7 @@ S
 Master #n is sitting here, watching you.
 ~
 100 125 bdqvAI 0 3
-1 0 0 4
+1 0 0 4 -1
 D
    Judging from his attire, he appears to be a member of the Thieves' Guild.
 But you would never make such an accusation out loud -- you like your
@@ -257,7 +257,7 @@ a greyhound~
 A greyhound is running around.
 ~
 5 15 djoq c 2
-0 0 14 9
+0 0 14 9 -1
 D
    This lanky dog has so much energy to spend that it runs around you three
 times before you can even get a good look at it.
@@ -293,7 +293,7 @@ a terrier~
 A small terrier is sitting here.
 ~
 5 15 djoq c 2
-0 0 14 9
+0 0 14 9 -1
 D
    This furry little dog sits patiently, watching everyone that passes in case
 they drop some food.
@@ -329,7 +329,7 @@ S
 #n is busy digging.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is digging for resources. (workforce digging)
 ~
@@ -340,7 +340,7 @@ S
 #n is gathering sticks.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is gathering plant material.
 ~
@@ -351,7 +351,7 @@ feller #n~
 Feller #n is preparing to light some fires.
 ~
 20 50 bdqvI 0 3
-1 0 0 12
+1 0 0 12 -1
 D
 This citizen is removing stumps. (workforce burn-stumps)
 ~
@@ -362,7 +362,7 @@ S
 #n is scraping off trees.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is scraping trees to make pillars. (workforce scraping)
 ~
@@ -373,7 +373,7 @@ High Sorcerer #n~
 High Sorcerer #n is standing here.
 ~
 100 125 bdqvxAI ci 3
-0 2 0 16
+0 2 0 16 -1
 D
    The High Sorcerer looks out from the tower, surveying the city they have
 sworn to protect.
@@ -390,7 +390,7 @@ S
 #n, the repairman, is hard at work.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is fixing up the empire's buildings. (workforce maintenance)
 ~
@@ -401,7 +401,7 @@ a thug~
 A shady thug is standing here.
 ~
 60 75 dovDFI 0 3
-1 0 0 4
+1 0 0 4 -1
 D
 This thug appears to be up to no good.
 ~
@@ -413,7 +413,7 @@ S
 #n the Alchemist is standing at the counter.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The alchemist is managing stores of herbs as well as bubbling potions.
 ~
@@ -424,7 +424,7 @@ the mine foreman~
 The mine foreman is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The foreman is just supervising the mine. He doesn't do any physical labor.
 ~
@@ -435,7 +435,7 @@ a stablehand~
 A stablehand is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The stablehand is doing odd chores.
 ~
@@ -446,7 +446,7 @@ the miller's daughter~
 The miller's daughter is standing here.
 ~
 10 15 bdqvI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 The miller's daughter is young, single, and pretty.
 ~
@@ -457,7 +457,7 @@ an unusual butler~
 An unusual butler is standing here.
 ~
 20 50 dqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The butler moves effortless, almost floating along the floor with an inhuman
 air about him.
@@ -469,7 +469,7 @@ a bathing citizen~
 A bathing citizen is lounging here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 
 The citizen is relaxing, and not paying any attention to you.
@@ -481,7 +481,7 @@ a city sorcerer~
 A city sorcerer is standing here.
 ~
 50 75 dquvxI 0 3
-1 0 0 16
+1 0 0 16 -1
 D
    The sorcerer is dressed in the city's finery and carrying a small stack of
 books.
@@ -498,7 +498,7 @@ a foreign diplomat~
 A foreign diplomat is standing here.
 ~
 20 50 dqvI 0 3
-2 0 0 15
+2 0 0 15 -1
 D
 The diplomat is dressed in strange clothing.
 ~
@@ -509,7 +509,7 @@ a visiting dignitary~
 A visiting dignitary is standing here.
 ~
 20 50 dqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The dignitary is dressed in fancy clothing like none you've ever seen!
 ~
@@ -520,7 +520,7 @@ a wandering trader~
 A wandering trader is standing here.
 ~
 20 50 dqvI 0 3
-1 0 26 15
+1 0 26 15 -1
 D
 The trader lumbers along, heavy with the weight of the goods in his pack.
 ~
@@ -531,7 +531,7 @@ a young apprentice~
 A young apprentice is standing here.
 ~
 10 15 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The apprentice's hand is bandaged and he has developed a slight limp.
 ~
@@ -542,7 +542,7 @@ a drunk patron~
 A drunk patron is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The patron appears to be having trouble staying on his chair.
 ~
@@ -553,7 +553,7 @@ a druid~
 A druid is chanting here.
 ~
 20 50 dqvxI c 3
-1 0 0 16
+1 0 0 16 -1
 D
 The druid is wearing a long, brown cloak with the hood over his head.
 ~
@@ -565,7 +565,7 @@ the priest~
 The priest is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The priest is dressed all in white, and welcomes you with open arms.
 ~
@@ -577,7 +577,7 @@ a court knight~
 A court knight is standing here.
 ~
 50 75 dquvzI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
    The court knight is wearing his best-looking armor, though not necessarily
 his best.
@@ -593,7 +593,7 @@ a highwayman~
 A highwayman is lurking in the shadows.
 ~
 50 75 cdqvI c 3
-1 0 0 4
+1 0 0 4 -1
 D
 The highwayman is looking right at your coinpurse!
 ~
@@ -611,7 +611,7 @@ a lost boy~
 A lost boy is hiding here.
 ~
 5 10 dqvI 0 2
-1 0 0 15
+1 0 0 15 -1
 D
    There's no indication where this lost boy came from. You don't even speak
 his language.
@@ -623,7 +623,7 @@ a traveling knight~
 A traveling knight is standing here.
 ~
 20 50 dquvzI c 3
-2 0 0 1
+2 0 0 1 -1
 D
 The knight is lightly armored and looks travel-weary.
 ~
@@ -639,7 +639,7 @@ a lost sailor~
 A lost sailor is sitting on a raft.
 ~
 20 50 dlqvI c 3
-1 0 3 4
+1 0 3 4 -1
 D
 The sailor is adrift on a small raft.
 ~
@@ -651,7 +651,7 @@ a rogue wizard~
 A rogue wizard is standing here.
 ~
 50 75 cdqvxI 0 3
-1 0 0 16
+1 0 0 16 -1
 D
    The wizard isn't dressed in the colors of any school of magic you're
 familiar with. He also doesn't look very friendly!
@@ -668,7 +668,7 @@ a city guard~
 A city guard is standing here.
 ~
 75 100 dqtuvAI c 3
-0 0 0 1
+0 0 0 1 -1
 D
 This dutiful guard stands watch over the city.
 ~
@@ -685,7 +685,7 @@ an outguard~
 An outguard from #e is standing here.
 ~
 75 100 dqtuvI c 3
-0 0 0 1
+0 0 0 1 -1
 D
 The outguard is guarding the empire's frontier.
 ~
@@ -700,7 +700,7 @@ a #a scout~
 A #a scout is standing here.
 ~
 50 75 dqtvI c 3
-0 0 0 1
+0 0 0 1 -1
 D
 The scout is keeping an eye on the frontier.
 ~
@@ -715,7 +715,7 @@ an imperial guard~
 An imperial guard is standing here.
 ~
 75 100 bdpqtuvyBI 0 3
-0 0 0 1
+0 0 0 1 -1
 D
 The imperial guard is protecting the empire's most important assets.
 ~
@@ -732,7 +732,7 @@ a sailor~
 A sailor is standing here.
 ~
 20 50 dqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
 The sailor seems busy keeping the ship in ship shape.
 ~
@@ -743,7 +743,7 @@ S
 #n is sawing trees into lumber.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is sawing trees into lumber. (workforce sawing)
 ~
@@ -754,7 +754,7 @@ S
 #n is smelting ore into ingots.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is smelting ore into ingots. (workforce smelting)
 ~
@@ -765,7 +765,7 @@ S
 #n is weaving cloth.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is weaving cloth from thread. (workforce weaving)
 ~
@@ -776,7 +776,7 @@ S
 #n is cutting stone from the quarry.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is cutting stone blocks. (workforce quarrying)
 ~
@@ -787,7 +787,7 @@ S
 #n is forging nails for building.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is tediously forging nails. (workforce nailmaking)
 ~
@@ -798,7 +798,7 @@ S
 #n is making bricks from clay.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is making bricks. (workforce brickmaking)
 ~
@@ -809,7 +809,7 @@ gardener #n~
 Gardener #n is tending the herbs.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is picking herbs. (workforce herb-gardening)
 ~
@@ -820,7 +820,7 @@ Postmaster #n~
 Postmaster #n is tending the cages.
 ~
 20 50 bdqvI 0 3
-0 0 0 15
+0 0 0 15 -1
 D
 The postmaster is taking care of the mail pigeons.
 ~
@@ -831,7 +831,7 @@ a bootlegger~
 A bootlegger is standing here.
 ~
 20 50 dqvI c 3
-1 0 0 15
+1 0 0 15 -1
 D
 The bootlegger is trying to smuggle a cask of illegal ale through the swamp.
 ~
@@ -843,7 +843,7 @@ S
 #n is here with a bucket trying to put out the fire!
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is trying to put out the fire. (workforce fire-brigade)
 ~
@@ -854,7 +854,7 @@ trapper #n~
 #n is tending the skins.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is checking traps and collecting skins. (workforce trapping)
 ~
@@ -865,7 +865,7 @@ tanner #n~
 #n is tanning leather.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is tanning skins into leather. (workforce tanning)
 ~
@@ -876,7 +876,7 @@ stablehand #n~
 #n is sharpening some shears.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is shearing wool. (workforce shearing)
 ~
@@ -887,7 +887,7 @@ maker coinmaker #n~
 #n is working the coin mill.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is minting coins at the mill. (workforce minting)
 ~
@@ -898,7 +898,7 @@ dockworker #n~
 #n is moving crates around the docks.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen is working the docks.
 ~
@@ -909,7 +909,7 @@ apprentice exarch #n~
 Apprentice exarch #n is working on a nexus crystal.
 ~
 20 50 bdqvI 0 3
-1 0 0 16
+1 0 0 16 -1
 D
 This citizen is crafting nexus crystals. (workforce nexus-crystals)
 ~
@@ -920,7 +920,7 @@ S
 #n is working as the miller's apprentice.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is milling flour from grain. (workforce milling)
 ~
@@ -931,7 +931,7 @@ S
 #n, the repairman, is hard at work.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is fixing up a vehicle. (workforce repair-vehicles)
 ~
@@ -942,7 +942,7 @@ Overseer #n~
 Overseer #n is standing here.
 ~
 20 50 bdqvI 0 3
-1 0 0 1
+1 0 0 1 -1
 D
 This citizen has just overseen the dispatch of a ship.
 ~
@@ -953,7 +953,7 @@ S
 #n Oiler is tending the presses.
 ~
 20 50 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    The oilmaker takes pride in his work. Oils are needed both for food and for
 carpentry.
@@ -965,7 +965,7 @@ S
 #n is working as the oilmaker's apprentice.
 ~
 20 50 bdqvI 0 3
-1 0 0 6
+1 0 0 6 -1
 D
 This citizen is pressing oil. (workforce oilmaking)
 ~
@@ -976,7 +976,7 @@ supervisor #n~
 Supervisor #n is surveying the area.
 ~
 20 50 bdqvI 0 3
-0 0 0 15
+0 0 0 15 -1
 D
 This citizen is dismantling the empty mine. (workforce dismantle-mines)
 ~
@@ -987,7 +987,7 @@ Grand Forgemaster #n~
 Grand Forgemaster #n is overseeing the magma crucible.
 ~
 20 50 bdqvI 0 3
-0 0 0 15
+0 0 0 15 -1
 D
 The Grand Forgemaster is tending the volcanic forge.
 ~
@@ -998,7 +998,7 @@ fisherman #n~
 #n is working the nets.
 ~
 20 50 bdqvI 0 3
-1 0 0 7
+1 0 0 7 -1
 D
 This citizen is catching fish to feed the empire. (workforce fishing)
 ~
@@ -1009,7 +1009,7 @@ organizer #n~
 #n is organizing the depository and sending items off for proper storage.
 ~
 10 15 bdqvI 0 3
-1 0 0 15
+1 0 0 15 -1
 D
    This tireless depository worker is ensuring everything ends up in the right
 place.
@@ -1022,7 +1022,7 @@ beekeeper #n~
 #n is tending the hives.
 ~
 20 50 bdqvI 0 3
-1 0 0 23
+1 0 0 23 -1
 D
 This citizen is taking care of the beehives. (workforce beekeeping)
 ~
@@ -1033,7 +1033,7 @@ glassmaker #n~
 #n is working as the glassblower's apprentice.
 ~
 20 50 bdqvI 0 3
-1 0 0 12
+1 0 0 12 -1
 D
 This citizen is making glass ingots for the glassblower. (workforce glassmaking)
 ~
@@ -1044,7 +1044,7 @@ S
 #n is working as an apprentice.
 ~
 20 50 bdqvI 0 3
-0 0 0 6
+0 0 0 6 -1
 D
 This citizen appears to be making something. (workforce crafting)
 ~
@@ -1055,7 +1055,7 @@ S
 #n is assisting with some work.
 ~
 20 50 bdqvI 0 3
-0 0 0 1
+0 0 0 1 -1
 D
    This citizen appears to be producing resources for the empire. (workforce
 production)
@@ -1067,7 +1067,7 @@ prospector #n~
 #n is camped here, prospecting for minerals.
 ~
 20 50 bdqvI 0 3
-1 0 0 8
+1 0 0 8 -1
 D
    This citizen has camped out and is methodically searching for minerals.
 (workforce prospecting)
