@@ -165,12 +165,7 @@ EVENTFUNC(dot_update_event) {
 	// damage them if any time remains (if not, this dot is actually already over)
 	if (dot->time_remaining > 0) {
 		// determine type:
-		// TODO could this be an array or function
-		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
-			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
-			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
-			ATTACK_PHYSICAL_DOT
-		));
+		type = damage_type_to_dot_attack[dot->damage_type];
 		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
 		
 		// custom messages?

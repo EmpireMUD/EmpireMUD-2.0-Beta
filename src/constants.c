@@ -3997,14 +3997,24 @@ const char *shop_flags[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// SKILL CONSTANTS /////////////////////////////////////////////////////////
 
-// DAM_x damage types
+// DAM_x (1/2): damage types
 const char *damage_types[] = {
-	"physical",
+	"physical",	// 0
 	"magical",
 	"fire",
 	"poison",
 	"direct",
 	"\n"
+};
+
+
+// DAM_x (2/2): damage type to DoT attack type
+const int damage_type_to_dot_attack[] = {
+	ATTACK_PHYSICAL_DOT,	// 0
+	ATTACK_MAGICAL_DOT,
+	ATTACK_FIRE_DOT,
+	ATTACK_POISON_DOT,
+	ATTACK_PHYSICAL_DOT,	// DAM_DIRECT uses physical dot
 };
 
 

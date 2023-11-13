@@ -252,6 +252,7 @@ extern const char *shop_flags[];
 
 // skill constants
 extern const char *damage_types[];
+extern const int damage_type_to_dot_attack[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
 extern const char *weapon_types[];
