@@ -3764,7 +3764,7 @@ all of these messages are omitted, standard DoT messages will appear.
 Can use $n, $e, $s, and $m tokens.
 
 Example:
-"You shiver slowly as you freeze."
+"You shiver as you slowly freeze."
 
 See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
 #d
@@ -3786,8 +3786,6 @@ Example: $n shivers as $e slowly freezes.
 
 See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
 #d
-
-
 "GENEDIT DEATHTOCHAR" "GENEDIT DEATH-TO-CHAR" "GENEDIT DEATH TO CHAR"
 
 Usage:  .deathtochar <message | none>
