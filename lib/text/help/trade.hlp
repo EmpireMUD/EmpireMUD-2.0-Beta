@@ -460,6 +460,7 @@ FORGE
 Forge (Trade ability)
 
 Building:  (FF)  Forge  (Build ability)
+Temperature:  warmer than outside
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
@@ -837,6 +838,7 @@ POTTER POTTERY
 Pottery (Trade ability)
 
 Building:  (PP) potter
+Temperature:  warmer than outside
 Command:  craft [number] <item>
 
 A good potter can mold clay into many different useful items. You will need
