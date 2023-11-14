@@ -6319,7 +6319,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct obj_binding *bind;
 	obj_data *proto, *new;
 	trig_data *trig;
+	struct eq_set_obj *eq_set, *new_set;
+	struct obj_apply *apply_iter, *old_apply, *new_apply;
 	int iter;
+	bool found;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -6328,7 +6331,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 	new = read_object(GET_OBJ_VNUM(obj), FALSE);
 	
-	// preserve some flags
+	// preserve some flags (see later for enchanted)
 	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_PRESERVE_FLAGS;
 	
 	// remove preservable flags that are absent in the original
@@ -6353,6 +6356,14 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
+	
+	// copy eq sets
+	LL_FOREACH(GET_OBJ_EQ_SETS(obj), eq_set) {
+		CREATE(new_set, struct eq_set_obj, 1);
+		*new_set = *eq_set;
+		new_set->next = NULL;
+		LL_APPEND(GET_OBJ_EQ_SETS(new), new_set);
+	}
 	
 	// custom strings?
 	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
@@ -6421,6 +6432,33 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 	if (scale_level > 0) {
 		scale_item_to_level(new, scale_level);
+	}
+	
+	// copy enchantment ONLY if level is the same
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
+		SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+		
+		LL_FOREACH(GET_OBJ_APPLIES(obj), apply_iter) {
+			if (apply_iter->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				// ensure it's not on the proto
+				found = FALSE;
+				LL_FOREACH(GET_OBJ_APPLIES(proto), old_apply) {
+					if (old_apply->apply_type == apply_iter->apply_type && old_apply->location == apply_iter->location) {
+						found = TRUE;
+						break;
+					}
+				}
+				if (found) {
+					continue;	// no need to copy
+				}
+				
+				// copy enchantment
+				CREATE(new_apply, struct obj_apply, 1);
+				*new_apply = *old_apply;
+				new_apply->next = NULL;
+				LL_APPEND(GET_OBJ_APPLIES(new), new_apply);
+			}
+		}
 	}
 	
 	return new;
