@@ -1050,7 +1050,6 @@ M
 $n plays the tectonic tuba.~
 R
 4 5193 0
-T 18056
 S
 #18070
 replacer loot molten fiend~
@@ -1063,7 +1062,6 @@ This item is replaced when loaded.
 1 0
 C
 200 300
-T 18070
 S
 #18075
 skirt firecloth brilliant worn~
@@ -1512,6 +1510,5 @@ While standing on the ledge, type 'list' to see the things you can make and
 10 0
 C
 200 250
-T 18011
 S
 $

@@ -404,7 +404,6 @@ line.
 10 96
 C
 1 1
-T 16055
 S
 #16027
 amulet half water~
@@ -421,7 +420,6 @@ line.
 10 96
 C
 1 1
-T 16055
 S
 #16028
 amulet half earth~
@@ -438,7 +436,6 @@ line.
 10 96
 C
 1 1
-T 16055
 S
 #16029
 amulet half wind~
@@ -455,7 +452,6 @@ line.
 10 96
 C
 1 1
-T 16055
 S
 #16030
 sarcophagus royal~
@@ -467,7 +463,6 @@ The royal sarcophagus holds center stage in the crypt.~
 1 0
 C
 1 1
-T 16062
 S
 #16031
 note dropped~
@@ -479,7 +474,6 @@ the bug command to do so. Thank you for your help.
 3 0 0 0 4
 0 0 0
 0 0
-T 16060
 S
 #16099
 scythe~
