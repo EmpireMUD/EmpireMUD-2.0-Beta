@@ -6454,7 +6454,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 				
 				// copy enchantment
 				CREATE(new_apply, struct obj_apply, 1);
-				*new_apply = *old_apply;
+				*new_apply = *apply_iter;
 				new_apply->next = NULL;
 				LL_APPEND(GET_OBJ_APPLIES(new), new_apply);
 			}
