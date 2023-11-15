@@ -2876,6 +2876,7 @@ typedef enum {
 #define CLIM_WATERSIDE  BIT(21)	// t. adjacent to fresh water
 #define CLIM_MILD  BIT(22)	// u. reduces temperature effects of other terrains
 #define CLIM_HARSH  BIT(23)	// v. increases temperature effects of other terrains
+#define CLIM_FROZEN_WATER  BIT(24)	// w. this would be a water sect but it's frozen
 
 
 // DPLTN_x: depletion types

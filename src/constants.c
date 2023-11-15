@@ -62,7 +62,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5";
+const char *version = "EmpireMUD 2.0 beta 5.162";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -3283,6 +3283,7 @@ const char *climate_flags[] = {
 	"waterside",
 	"mild",
 	"harsh",
+	"frozen water",
 	"\n"
 };
 
@@ -3315,6 +3316,7 @@ const struct climate_temperature_t climate_temperature[] = {
 	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_WATERSIDE
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 0.5, 0.5 },	// CLIM_MILD
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.5, 1.5 },	// CLIM_HARSH
+	{ -12, NO_TEMP_MOD, NO_TEMP_MOD, 1.25, 1.0 },	// CLIM_FROZEN_WATER
 };
 
 
@@ -3327,7 +3329,7 @@ const bitvector_t climate_flags_order[] = {
 	
 	CLIM_TEMPERATE, CLIM_ARID, CLIM_TROPICAL,	// latitude adjustments
 	
-	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER,	// water prefixes
+	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER, CLIM_FROZEN_WATER,	// water prefixes
 	CLIM_RIVER, CLIM_OCEAN, CLIM_LAKE,	// water types
 	
 	CLIM_WATERSIDE,	// before land types
@@ -3367,6 +3369,7 @@ const bool climate_ruins_vehicle_slowly[][2] = {
 	{ TRUE, TRUE },	// waterside
 	{ TRUE, TRUE },	// mild
 	{ TRUE, TRUE },	// harsh
+	{ FALSE, TRUE },	// frozen water
 };
 
 
