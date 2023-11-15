@@ -35,6 +35,7 @@ M 0 10559 100.00 1
 M 0 10568 100.00 1
 T 10563
 T 10556
+Z1 4
 S
 #10551
 The Wall of the Glacier~
@@ -60,6 +61,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10554 100.00 1
 T 10563
+Z1 4
 S
 #10552
 The Base of the Glacier~
@@ -90,6 +92,7 @@ snow ice~
 All you can see from here is endless snow and ice.
 ~
 T 10563
+Z1 4
 S
 #10553
 A Rising Path up the Glacier~
@@ -122,6 +125,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10554
 A Rising Path up the Glacier~
@@ -155,6 +159,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10555
 An Outcropping at the Top~
@@ -188,6 +193,7 @@ All you can see from here is endless snow and ice.
 ~
 M 0 10551 100.00 1
 T 10563
+Z1 4
 S
 #10556
 A Path Through Deep Snow~
@@ -223,6 +229,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10557
 A Rising Path up the Glacier~
@@ -255,6 +262,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10558
 A Rising Path up the Glacier~
@@ -287,6 +295,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10559
 A Small Cave at the Top~
@@ -320,6 +329,7 @@ All you can see from here is endless snow and ice.
 ~
 M 0 10552 100.00 1
 T 10563
+Z1 4
 S
 #10560
 A Tunnel Through the Snow~
@@ -352,6 +362,7 @@ All you can see from here is endless snow and ice.
 ~
 M 1 10594 100.00 6
 T 10563
+Z1 4
 S
 #10561
 Atop a Frozen Altar~
@@ -387,5 +398,6 @@ All you can see from here is endless snow and ice.
 M 0 10550 100.00 1
 T 10563
 T 10599
+Z1 4
 S
 $

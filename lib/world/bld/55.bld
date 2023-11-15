@@ -176,6 +176,7 @@ M
 T 5511
 U
 1 5164
+Z1 2
 S
 #5512
 Aftercastle~
@@ -275,6 +276,7 @@ F
 FG
 M
 255 20.00 c
+Z1 11
 S
 #5518
 Inside Wagon~
@@ -304,6 +306,7 @@ sleep while it's rattling over the open plains.
 ~
 F
 d
+Z1 12
 S
 #5520
 Wagon Cooking Area~
@@ -321,6 +324,7 @@ it has only pillows for chairs.
 ~
 F
 G
+Z1 11
 S
 #5521
 Carriage~
@@ -337,6 +341,7 @@ E
 windows out~
 The windows are too dirty to see much.
 ~
+Z1 12
 S
 #5522
 On Deck~

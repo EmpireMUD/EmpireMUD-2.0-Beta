@@ -4364,6 +4364,7 @@ The house has no windows.
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11976
 A Cozy Little House~
@@ -4449,6 +4450,7 @@ M 0 11976 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11977
 A Cozy Little House~
@@ -4542,6 +4544,7 @@ M 0 11955 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11978
 A Cozy Little House~
@@ -4617,6 +4620,7 @@ M 0 11951 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11979
 The Altar Below~
@@ -4695,6 +4699,7 @@ T 11946
 T 11976
 T 11979
 T 11980
+Z1 10
 S
 #11980
 The Sepulcher of Orka~
@@ -4762,6 +4767,7 @@ M 0 11980 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11981
 A Dark Rock-Cut Chamber~
@@ -4837,6 +4843,7 @@ T 11945
 T 11946
 T 11976
 T 11936
+Z1 10
 S
 #11982
 The Central Plaza of the Eastern Rooftop Walkway~
@@ -4918,6 +4925,7 @@ M 0 11971 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11983
 The Eastern Rooftop Walkway~
@@ -5009,6 +5017,7 @@ M 0 11983 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11984
 The Eastern Rooftop Walkway~
@@ -5102,6 +5111,7 @@ M 0 11952 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11985
 The Eastern Rooftop Walkway, Above the Stairs~
@@ -5186,6 +5196,7 @@ M 0 11985 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11986
 The Eastern Rooftop Walkway~
@@ -5285,6 +5296,7 @@ M 0 11953 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11987
 The Western Rooftop Walkway~
@@ -5360,6 +5372,7 @@ M 0 11987 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11988
 Wooden Steps Down the Cliffside~
@@ -5432,6 +5445,7 @@ You can't see the gate from here; it's around the corner.
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11989
 The Great Gate of Gobbrabakh of Orka~
@@ -5513,6 +5527,7 @@ T 11945
 T 11946
 T 11976
 T 11936
+Z1 10
 S
 #11990
 The Stone Cauldrons~
@@ -5594,6 +5609,7 @@ M 0 11949 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11991
 A Great Standing Stone Overlooking the Sea~
@@ -5681,6 +5697,7 @@ M 0 11948 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11992
 On the Cliffside~
@@ -5737,6 +5754,7 @@ T 11945
 T 11946
 T 11976
 T 11970
+Z1 10
 S
 #11993
 An Endless River~
@@ -5779,6 +5797,7 @@ M 1 11979 100.00 1
 T 11945
 T 11946
 T 11994
+Z1 6
 S
 #11994
 In the Presence of the God~
@@ -5826,5 +5845,6 @@ T 11946
 T 11994
 T 11995
 T 11996
+Z1 1
 S
 $

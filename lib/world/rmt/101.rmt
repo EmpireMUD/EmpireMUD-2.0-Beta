@@ -66,6 +66,7 @@ Large, woody roots form a natural walkway above the wet desert floor.
 ~
 T 10163
 T 10157
+Z1 10
 S
 #10141
 A Torchlit Path~
@@ -95,6 +96,7 @@ After all, this is the Magiterranean.
 M 0 10145 100.00 2
 T 10163
 T 10157
+Z1 10
 S
 #10142
 A Torchlit Stone Circle~
@@ -126,6 +128,7 @@ T 10161
 T 10162
 T 10163
 T 10157
+Z1 10
 S
 #10143
 The Head Druid's Tent~
@@ -157,6 +160,7 @@ shelves scrolls parchment~
 in the same shaky hand.
 ~
 T 10181
+Z1 10
 S
 #10144
 A Desert Path~
@@ -185,6 +189,7 @@ After all, this is the Magiterranean.
 ~
 T 10163
 T 10157
+Z1 10
 S
 #10145
 A Rocky Hilltop~
@@ -211,6 +216,7 @@ After all, this is the Magiterranean.
 M 1 10171 100.00 1
 T 10163
 T 10157
+Z1 10
 S
 #10146
 The Cactus Garden Dimension~

@@ -46,6 +46,7 @@ D3
 ~
 0 10230
 M 1 10225 100.00 3
+Z1 10
 S
 #10227
 The Cactus Garden~
@@ -77,6 +78,7 @@ I 7 10228 10.00 50 p  # PICK: stack of cactus pads
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10243 10.00 1
+Z1 10
 S
 #10228
 A Pineapple Field~
@@ -109,6 +111,7 @@ I 7 10226 10.00 50 p  # PICK: pineapple
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10232 10.00 1
+Z1 10
 S
 #10229
 An Agave Field~
@@ -141,6 +144,7 @@ I 7 10227 10.00 50 p  # PICK: agave heart
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10241 10.00 1
+Z1 10
 S
 #10230
 An Aloe Garden~
@@ -173,6 +177,7 @@ I 7 10230 10.00 50 p  # PICK: thick aloe leaves
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10245 10.00 1
+Z1 10
 S
 #10250
 Base Camp~
@@ -204,6 +209,7 @@ M 0 10251 100.00 1
 T 10274
 T 10255
 T 10267
+Z1 10
 S
 #10251
 Backtracking Toward Camp~
@@ -218,6 +224,7 @@ D2
 0 10250
 T 10274
 T 10268
+Z1 10
 S
 #10252
 The Primeval Forest~
@@ -245,6 +252,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10253
 The Primeval Forest~
@@ -272,6 +280,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10254
 The Primeval Forest~
@@ -299,6 +308,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10255
 The Primeval Forest~
@@ -326,6 +336,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10256
 The Primeval Forest~
@@ -353,6 +364,7 @@ M 1 10257 100.00 1
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10257
 The Primeval Forest~
@@ -380,6 +392,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10258
 A Clearing in the Primeval Forest~
@@ -409,6 +422,7 @@ I 5 1300 2.50 1 X  # DIG: glowing green seashell
 M 1 10264 100.00 1
 T 10274
 T 10255
+Z1 10
 S
 #10259
 Outside of Base Camp~
@@ -432,5 +446,6 @@ drowns out any hint that people are living out here.
 ~
 T 10274
 T 10267
+Z1 10
 S
 $
