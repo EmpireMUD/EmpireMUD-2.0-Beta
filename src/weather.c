@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: weather.c                                       EmpireMUD 2.0b5 *
-*  Usage: functions handling time and the weather                         *
+*  Usage: functions handling time, the weather, and temperature           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
