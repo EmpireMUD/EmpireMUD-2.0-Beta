@@ -1403,7 +1403,7 @@ ADMIN_UTIL(util_strlen) {
 
 
 ADMIN_UTIL(util_temperature) {
-	int climate_val, season_count, season_val, sun_count, sun_val, bit, find;
+	int calc_temp, climate_val, season_count, season_val, sun_count, sun_val, bit, find;
 	int use_sun = get_sun_status(IN_ROOM(ch)), use_season = GET_SEASON(IN_ROOM(ch));
 	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
 	bitvector_t climates;
@@ -1509,6 +1509,10 @@ ADMIN_UTIL(util_temperature) {
 	}
 	
 	msg_to_char(ch, "Final temperature: %.1f (%s), %.1f%% sun, %.1f%% seasonal\r\n", temperature, temperature_to_string((int) (temperature + 0.5)), 100.0 * sun_mod, 100.0 * season_mod);
+	
+	// and now using internal funcs
+	calc_temp = calculate_temperature(TEMPERATURE_USE_LOCAL, get_climate(IN_ROOM(ch)), use_season, use_sun);
+	msg_to_char(ch, "Computed temperature for verification: %d %s.\r\n", calc_temp, temperature_to_string(calc_temp));
 }
 
 

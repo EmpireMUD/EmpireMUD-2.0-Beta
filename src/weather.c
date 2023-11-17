@@ -930,6 +930,149 @@ void show_visible_moons(char_data *ch) {
 //// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
 
 /**
+* Calculates temperature for a hypothetical room based on various data. This
+* can be used for real rooms or for hypotheticals.
+*
+* @param int temp_type Any TEMPERATURE_ type const; pass TEMPERATURE_USE_LOCAL as a default.
+* @param bitvector_t climates Any CLIM_ flags that apply here.
+* @param int season Any TILESET_ season const.
+* @param int sun Any SUN_ const.
+* @return int The rounded temperature value.
+*/
+int calculate_temperature(int temp_type, bitvector_t climates, int season, int sun) {
+	int climate_val, season_count, season_val, sun_count, sun_val, bit;
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[season];
+	sun_val = sun_temperature[sun];
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
+	
+	// shortcut types?
+	switch (temp_type) {
+		case TEMPERATURE_FREEZING: {
+			return -3 * config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_COLD: {
+			return -1 * config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_COOL: {
+			return -1 * config_get_int("temperature_limit") + 1;
+		}
+		case TEMPERATURE_NEUTRAL: {
+			return 0;
+		}
+		case TEMPERATURE_WARM: {
+			return config_get_int("temperature_limit") - 1;
+		}
+		case TEMPERATURE_HOT: {
+			return config_get_int("temperature_limit");
+		}
+		case TEMPERATURE_SWELTERING: {
+			return 3 * config_get_int("temperature_limit");
+		}
+		// no default: keep working
+	}
+	
+	// determine climate modifiers
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			climate_val += climate_temperature[bit].base_add;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+			}
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
+			}
+		}
+	}
+	
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
+	}
+	
+	// ttype modifiers
+	switch (temp_type) {
+		case TEMPERATURE_MILDER: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 20);
+			}
+			else if (temperature < 0) {
+				temperature = MIN(0, temperature + 20);
+			}
+			break;
+		}
+		case TEMPERATURE_HARSHER: {
+			if (temperature > 0) {
+				temperature += 20;
+			}
+			else if (temperature < 0) {
+				temperature -= 20;
+			}
+			break;
+		}
+		case TEMPERATURE_COOLER: {
+			temperature -= 15;
+			break;
+		}
+		case TEMPERATURE_COOLER_WHEN_HOT: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 15);
+			}
+			break;
+		}
+		case TEMPERATURE_WARMER: {
+			temperature += 15;
+			break;
+		}
+		case TEMPERATURE_WARMER_WHEN_COLD: {
+			if (temperature < 0) {
+				temperature = MIN(0, temperature + 15);
+			}
+			break;
+		}
+	}
+	
+	return round(temperature);
+}
+
+
+/**
 * Checks whether a player should have penalties from high or low temperature,
 * adds them if needed, or removes them if not.
 *
@@ -1102,139 +1245,7 @@ int get_relative_temperature(char_data *ch) {
 * @return int The temperature (zero is neutral).
 */
 int get_room_temperature(room_data *room) {
-	int climate_val, season_count, season_val, sun_count, sun_val, bit;
-	int ttype = TEMPERATURE_USE_LOCAL;
-	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
-	bitvector_t climates;
-	
-	// init
-	climate_val = 0;
-	season_val = season_temperature[GET_SEASON(room)];
-	sun_val = sun_temperature[get_sun_status(room)];
-	season_count = sun_count = 0;
-	season_mod = sun_mod = 0.0;
-	cold_mod = heat_mod = 1.0;
-	climates = get_climate(room);
-	ttype = get_temperature_type(room);
-	
-	// shortcut types?
-	switch (ttype) {
-		case TEMPERATURE_FREEZING: {
-			return -3 * config_get_int("temperature_limit");
-		}
-		case TEMPERATURE_COLD: {
-			return -1 * config_get_int("temperature_limit");
-		}
-		case TEMPERATURE_COOL: {
-			return -1 * config_get_int("temperature_limit") + 1;
-		}
-		case TEMPERATURE_NEUTRAL: {
-			return 0;
-		}
-		case TEMPERATURE_WARM: {
-			return config_get_int("temperature_limit") - 1;
-		}
-		case TEMPERATURE_HOT: {
-			return config_get_int("temperature_limit");
-		}
-		case TEMPERATURE_SWELTERING: {
-			return 3 * config_get_int("temperature_limit");
-		}
-		// no default: keep working
-	}
-	
-	// determine climate modifiers
-	for (bit = 0; climates; ++bit, climates >>= 1) {
-		if (IS_SET(climates, BIT(0))) {
-			climate_val += climate_temperature[bit].base_add;
-			
-			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
-				season_mod += climate_temperature[bit].season_weight;
-				++season_count;
-			}
-			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
-				sun_mod += climate_temperature[bit].sun_weight;
-				++sun_count;
-			}
-			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD) {
-				cold_mod *= climate_temperature[bit].cold_modifier;
-			}
-			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
-				heat_mod *= climate_temperature[bit].heat_modifier;
-			}
-		}
-	}
-	
-	// final math
-	temperature = climate_val;
-	
-	if (season_count > 0) {
-		season_mod /= season_count;
-		temperature += season_val * season_mod;
-	}
-	else {
-		temperature += sun_val;
-	}
-	
-	if (sun_count > 0) {
-		sun_mod /= sun_count;
-		temperature += sun_val * sun_mod;
-	}
-	else {
-		temperature += sun_val;
-	}
-	
-	// overall modifiers
-	if (temperature < 0) {
-		temperature *= cold_mod;
-	}
-	if (temperature > 0) {
-		temperature *= heat_mod;
-	}
-	
-	// ttype modifiers
-	switch (ttype) {
-		case TEMPERATURE_MILDER: {
-			if (temperature > 0) {
-				temperature = MAX(0, temperature - 20);
-			}
-			else if (temperature < 0) {
-				temperature = MIN(0, temperature + 20);
-			}
-			break;
-		}
-		case TEMPERATURE_HARSHER: {
-			if (temperature > 0) {
-				temperature += 20;
-			}
-			else if (temperature < 0) {
-				temperature -= 20;
-			}
-			break;
-		}
-		case TEMPERATURE_COOLER: {
-			temperature -= 15;
-			break;
-		}
-		case TEMPERATURE_COOLER_WHEN_HOT: {
-			if (temperature > 0) {
-				temperature = MAX(0, temperature - 15);
-			}
-			break;
-		}
-		case TEMPERATURE_WARMER: {
-			temperature += 15;
-			break;
-		}
-		case TEMPERATURE_WARMER_WHEN_COLD: {
-			if (temperature < 0) {
-				temperature = MIN(0, temperature + 15);
-			}
-			break;
-		}
-	}
-	
-	return round(temperature);
+	return calculate_temperature(get_temperature_type(room), get_climate(room), GET_SEASON(room), get_sun_status(room));
 }
 
 
