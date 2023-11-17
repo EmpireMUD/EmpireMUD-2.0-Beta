@@ -5421,10 +5421,10 @@ ACMD(do_drink) {
 	// check warming
 	warmed = warm_player_from_liquid(ch, amount, liquid);
 	if (warmed > 0) {
-		msg_to_char(ch, "It warms you up%s\r\n", (get_relative_temperature(ch) >= config_get_int("temperature_limit") ? " -- you're getting too hot!" : "."));
+		msg_to_char(ch, "It warms you up%s\r\n", (get_relative_temperature(ch) >= config_get_int("temperature_discomfort") ? " -- you're getting too hot!" : "."));
 	}
 	else if (warmed < 0) {
-		msg_to_char(ch, "It cools you down%s\r\n", (get_relative_temperature(ch) <= (-1 * config_get_int("temperature_limit")) ? " -- you're getting too cold!" : "."));
+		msg_to_char(ch, "It cools you down%s\r\n", (get_relative_temperature(ch) <= (-1 * config_get_int("temperature_discomfort")) ? " -- you're getting too cold!" : "."));
 	}
 	
 	// messages based on what changed

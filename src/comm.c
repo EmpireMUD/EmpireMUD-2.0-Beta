@@ -3079,7 +3079,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 						int temperature = get_relative_temperature(ch);
-						int t_limit = config_get_int("temperature_limit");
+						int t_limit = config_get_int("temperature_discomfort");
 						if (temperature <= -1 * t_limit) {
 							strcat(i, "\tcC");
 						}
@@ -3141,7 +3141,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 						int temperature = get_relative_temperature(ch);
-						int t_limit = config_get_int("temperature_limit");
+						int t_limit = config_get_int("temperature_discomfort");
 						if (temperature <= -1 * t_limit) {
 							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
 						}
@@ -3357,7 +3357,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 'T': {	// temperature
 					int temperature = get_room_temperature(IN_ROOM(ch));
-					int limit = config_get_int("temperature_limit");
+					int limit = config_get_int("temperature_discomfort");
 					char *temp_color;
 					
 					if (temperature <= -1 * limit) {

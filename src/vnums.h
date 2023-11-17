@@ -220,6 +220,8 @@
 #define ATYPE_ARROW_DISTRACTION  3105
 #define ATYPE_COLD_PENALTY  3106	// "freezing"
 #define ATYPE_HOT_PENALTY  3107	// "sweltering"
+#define ATYPE_COOL_PENALTY  3108	// "chilly"
+#define ATYPE_WARM_PENALTY  3109	// "warm"
 
 
 // GENERIC_COOLDOWN entires used by the code

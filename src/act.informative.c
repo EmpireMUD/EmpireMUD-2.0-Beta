@@ -756,10 +756,10 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		sprintf(lbuf + strlen(lbuf), "%s&rstarving&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	temperature = get_relative_temperature(ch);
-	if (temperature <= -1 * config_get_int("temperature_limit")) {
+	if (temperature <= -1 * config_get_int("temperature_discomfort")) {
 		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
 	}
-	if (temperature >= config_get_int("temperature_limit")) {
+	if (temperature >= config_get_int("temperature_discomfort")) {
 		sprintf(lbuf + strlen(lbuf), "%s&o%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
 	}
 	if (*lbuf == '\0') {
@@ -3854,7 +3854,7 @@ ACMD(do_temperature) {
 	msg_to_char(ch, "It's %s %s%s.\r\n", temperature_to_string(room_temp), IS_OUTDOORS(ch) ? "out" : "in here", imm_part);
 	
 	ch_temp = get_relative_temperature(ch);
-	temp_limit = config_get_int("temperature_limit");
+	temp_limit = config_get_int("temperature_discomfort");
 	
 	// imm part for character
 	*imm_part = '\0';
@@ -3877,7 +3877,7 @@ ACMD(do_temperature) {
 			if (room_temp < 0) {
 				snprintf(change_part, sizeof(change_part), " and warming up");
 			}
-			else if (GET_TEMPERATURE(ch) < config_get_int("temperature_limit")) {
+			else if (GET_TEMPERATURE(ch) < config_get_int("temperature_discomfort")) {
 				snprintf(change_part, sizeof(change_part), " and getting warmer");
 			}
 			else {
@@ -4049,7 +4049,7 @@ ACMD(do_weather) {
 				break;
 			}
 			case SKY_RAINING: {
-				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 					sky_text = "snowy";
 					if (weather_info.change >= 0) {
 						change_text = "but better weather is due any day now";
@@ -4064,7 +4064,7 @@ ACMD(do_weather) {
 				break;
 			}
 			case SKY_LIGHTNING: {
-				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 					sky_text = "white with snow";
 					if (weather_info.change >= 0) {
 						change_text = "but it seems to be clearing up";

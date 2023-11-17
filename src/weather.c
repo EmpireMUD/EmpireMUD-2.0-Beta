@@ -301,7 +301,7 @@ void weather_change(void) {
 						msg_to_char(ch, "The sky starts to get cloudy.\r\n");
 					}
 					else {	// was raining
-						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 							msg_to_char(ch, "The snow stops.\r\n");
 						}
 						else {
@@ -312,7 +312,7 @@ void weather_change(void) {
 				}
 				case SKY_RAINING: {
 					if (was_state != SKY_LIGHTNING) {
-						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 							msg_to_char(ch, "It starts to snow.\r\n");
 						}
 						else {
@@ -320,7 +320,7 @@ void weather_change(void) {
 						}
 					}
 					else {	// was lightning
-						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 							msg_to_char(ch, "The blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\r\n");
 						}
 						else {
@@ -334,7 +334,7 @@ void weather_change(void) {
 					break;
 				}
 				case SKY_LIGHTNING: {
-					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
 						msg_to_char(ch, "The gentle snowfall becomes a serious blizzard.\r\n");
 					}
 					else {
@@ -954,25 +954,25 @@ int calculate_temperature(int temp_type, bitvector_t climates, int season, int s
 	// shortcut types?
 	switch (temp_type) {
 		case TEMPERATURE_FREEZING: {
-			return -3 * config_get_int("temperature_limit");
+			return -1 * config_get_int("temperature_extreme");
 		}
 		case TEMPERATURE_COLD: {
-			return -1 * config_get_int("temperature_limit");
+			return -1 * config_get_int("temperature_discomfort");
 		}
 		case TEMPERATURE_COOL: {
-			return -1 * config_get_int("temperature_limit") + 1;
+			return -1 * config_get_int("temperature_discomfort") + 1;
 		}
 		case TEMPERATURE_NEUTRAL: {
 			return 0;
 		}
 		case TEMPERATURE_WARM: {
-			return config_get_int("temperature_limit") - 1;
+			return config_get_int("temperature_discomfort") - 1;
 		}
 		case TEMPERATURE_HOT: {
-			return config_get_int("temperature_limit");
+			return config_get_int("temperature_discomfort");
 		}
 		case TEMPERATURE_SWELTERING: {
-			return 3 * config_get_int("temperature_limit");
+			return config_get_int("temperature_extreme");
 		}
 		// no default: keep working
 	}
@@ -1073,13 +1073,34 @@ int calculate_temperature(int temp_type, bitvector_t climates, int season, int s
 
 
 /**
+* Cancels all affects caused by temperature.
+*
+* @param char_data *ch The player.
+* @param int keep_type If not NOTHING, will keep an affect of this type ONLY.
+* @param bool send_messages If TRUE, sends wear-off messages for the affects.
+*/
+void cancel_temperature_penalties(char_data *ch, int keep_type, bool send_messages) {
+	int iter;
+	
+	// terminate this list with a NOTHING
+	any_vnum type_list[] = { ATYPE_COOL_PENALTY, ATYPE_COLD_PENALTY, ATYPE_WARM_PENALTY, ATYPE_HOT_PENALTY, NOTHING };
+	
+	for (iter = 0; type_list[iter] != NOTHING; ++iter) {
+		if (type_list[iter] != keep_type) {
+			affect_from_char(ch, type_list[iter], send_messages);
+		}
+	}
+}
+
+
+/**
 * Checks whether a player should have penalties from high or low temperature,
 * adds them if needed, or removes them if not.
 *
 * @param char_data *ch The player.
 */
 void check_temperature_penalties(char_data *ch) {
-	int iter, limit, room_temp, temperature;
+	int iter, limit, extreme, room_temp, temperature;
 	struct affected_type *af;
 	obj_data *obj;
 	bool any, room_safe;
@@ -1092,16 +1113,19 @@ void check_temperature_penalties(char_data *ch) {
 	}
 	if (IS_GOD(ch) || IS_IMMORTAL(ch) || !config_get_bool("temperature_penalties") || get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
 		// no penalties-- remove them, though, in case it was just shut off
-		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
-		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		cancel_temperature_penalties(ch, NOTHING, TRUE);
 		return;
 	}
 	
 	// base temperature and numbers
-	limit = config_get_int("temperature_limit");
+	limit = config_get_int("temperature_discomfort");
+	extreme = config_get_int("temperature_extreme");
 	temperature = get_relative_temperature(ch);
 	room_temp = get_room_temperature(IN_ROOM(ch));
 	room_safe = (room_temp < limit && room_temp > (-1 * limit));
+	if (extreme < limit) {
+		extreme = limit;	// in case it's not set correctly
+	}
 	
 	// little fires everywhere (only if cold)
 	if (temperature < 0) {
@@ -1149,42 +1173,65 @@ void check_temperature_penalties(char_data *ch) {
 	// do we need penalties
 	if (ABSOLUTE(temperature) >= limit && !room_safe) {
 		if (temperature > 0) {
-			// start hot penalty
-			affect_from_char(ch, ATYPE_COLD_PENALTY, FALSE);
-			
-			// message only if it's new
-			if (!affected_by_spell(ch, ATYPE_HOT_PENALTY)) {
-				act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+			// start HOT penalty
+			if (temperature >= extreme) {
+				// extreme hot
+				cancel_temperature_penalties(ch, ATYPE_WARM_PENALTY, FALSE);
+				
+				// message only if it's new
+				if (!affected_by_spell(ch, ATYPE_HOT_PENALTY)) {
+					act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				// pain
+				apply_dot_effect(ch, ATYPE_HOT_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+			}
+			else {
+				// mild hot
+				cancel_temperature_penalties(ch, ATYPE_HOT_PENALTY, FALSE);
+				
+				// message only if it's new
+				if (!affected_by_spell(ch, ATYPE_WARM_PENALTY)) {
+					act("You start to feel like you're getting too warm.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
 			}
 			
-			// stats penalties
+			// stats penalties (either way)
 			af = create_flag_aff(ATYPE_HOT_PENALTY, UNLIMITED, AFF_SLOW, ch);
 			affect_join(ch, af, NOBITS);
-			
-			// pain
-			apply_dot_effect(ch, ATYPE_HOT_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
 		}
 		else {
-			// start cold penalty
-			affect_from_char(ch, ATYPE_HOT_PENALTY, FALSE);
-			
-			// message only if it's new
-			if (!affected_by_spell(ch, ATYPE_COLD_PENALTY)) {
-				act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+			// start COLD penalty
+			if (temperature <= -1 * extreme) {
+				// extreme cold
+				cancel_temperature_penalties(ch, ATYPE_COOL_PENALTY, FALSE);
+				
+				// message only if it's new
+				if (!affected_by_spell(ch, ATYPE_COLD_PENALTY)) {
+					act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				// pain
+				apply_dot_effect(ch, ATYPE_COLD_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+			}
+			else {
+				// mild cold
+				cancel_temperature_penalties(ch, ATYPE_COLD_PENALTY, FALSE);
+				
+				// message only if it's new
+				if (!affected_by_spell(ch, ATYPE_COOL_PENALTY)) {
+					act("You're starting to feel a little too cold.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
 			}
 			
-			// stats penalties
+			// stats penalties (either way)
 			af = create_flag_aff(ATYPE_COLD_PENALTY, UNLIMITED, AFF_SLOW, ch);
 			affect_join(ch, af, NOBITS);
-			
-			// pain
-			apply_dot_effect(ch, ATYPE_COLD_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
 		}
 	}
 	else if (ABSOLUTE(temperature) < limit) {
 		// remove all penalties if the player has cooled down or warmed up
-		affect_from_char(ch, ATYPE_COLD_PENALTY, TRUE);
-		affect_from_char(ch, ATYPE_HOT_PENALTY, TRUE);
+		cancel_temperature_penalties(ch, NOTHING, TRUE);
 	}
 }
 
@@ -1296,7 +1343,7 @@ void reset_player_temperature(char_data *ch) {
 	
 	// basic values
 	room_temp = get_room_temperature(IN_ROOM(ch));
-	limit = config_get_int("temperature_limit");
+	limit = config_get_int("temperature_discomfort");
 	warm = MAX(0, GET_WARMTH(ch));
 	cool = MAX(0, GET_COOLING(ch));
 	
@@ -1397,7 +1444,7 @@ void update_player_temperature(char_data *ch) {
 			relative = get_relative_temperature(ch);
 			
 			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
-				limit = config_get_int("temperature_limit");
+				limit = config_get_int("temperature_discomfort");
 				if (relative >= limit - (limit / 10)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
 				}
@@ -1411,7 +1458,7 @@ void update_player_temperature(char_data *ch) {
 				GET_LAST_WARM_TIME(ch) = time(0);
 			}
 			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
-				limit = -1 * config_get_int("temperature_limit");
+				limit = -1 * config_get_int("temperature_discomfort");
 				if (relative <= (limit + (limit / -10))) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
 				}
