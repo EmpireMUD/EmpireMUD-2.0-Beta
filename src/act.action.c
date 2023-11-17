@@ -3557,7 +3557,7 @@ ACMD(do_plant) {
 	else if (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"))) {
 		msg_to_char(ch, "You must plant that closer to fresh water.\r\n");
 	}
-	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
+	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, get_climate(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
 			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
 			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
