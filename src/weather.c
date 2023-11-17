@@ -1385,7 +1385,7 @@ void update_player_temperature(char_data *ch) {
 		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 			relative = get_relative_temperature(ch);
 			
-			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 30) {
+			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
 				limit = config_get_int("temperature_limit");
 				if (relative >= limit - (limit / 10)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
@@ -1399,7 +1399,7 @@ void update_player_temperature(char_data *ch) {
 			
 				GET_LAST_WARM_TIME(ch) = time(0);
 			}
-			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 30) {
+			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
 				limit = -1 * config_get_int("temperature_limit");
 				if (relative <= (limit + (limit / -10))) {
 					msg_to_char(ch, "You're getting too cold!\r\n");

@@ -3839,7 +3839,7 @@ ACMD(do_survey) {
 
 ACMD(do_temperature) {
 	int ch_temp, room_temp, temp_limit;
-	char imm_part[256];
+	char imm_part[256], change_part[256];
 	
 	room_temp = get_room_temperature(IN_ROOM(ch));
 	
@@ -3857,18 +3857,40 @@ ACMD(do_temperature) {
 	temp_limit = config_get_int("temperature_limit");
 	
 	// imm part for character
+	*imm_part = '\0';
 	if (IS_IMMORTAL(ch)) {
 		snprintf(imm_part, sizeof(imm_part), " (%d)", ch_temp);
 	}
-	else {
-		*imm_part = '\0';
+	
+	// change part?
+	*change_part = '\0';
+	if (GET_TEMPERATURE(ch) != room_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		if (GET_TEMPERATURE(ch) > room_temp) {
+			if (room_temp > 0) {
+				snprintf(change_part, sizeof(change_part), " and cooling down");
+			}
+			else {
+				snprintf(change_part, sizeof(change_part), " and getting colder");
+			}
+		}
+		else {
+			if (room_temp < 0) {
+				snprintf(change_part, sizeof(change_part), " and warming up");
+			}
+			else if (GET_TEMPERATURE(ch) < config_get_int("temperature_limit")) {
+				snprintf(change_part, sizeof(change_part), " and getting warmer");
+			}
+			else {
+				snprintf(change_part, sizeof(change_part), " and getting hotter");
+			}
+		}
 	}
 	
 	if (ch_temp < temp_limit && ch_temp > -1 * temp_limit) {
-		msg_to_char(ch, "You're comfortable right now%s.\r\n", imm_part);
+		msg_to_char(ch, "You're comfortable right now%s%s.\r\n", imm_part, change_part);
 	}
 	else {
-		msg_to_char(ch, "You are %s%s%s\r\n", temperature_to_string(ch_temp), imm_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
+		msg_to_char(ch, "You are %s%s%s%s\r\n", temperature_to_string(ch_temp), imm_part, change_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
 	}
 	
 	// TODO should this show current warmth/cooling
