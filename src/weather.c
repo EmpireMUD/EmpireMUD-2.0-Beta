@@ -1422,7 +1422,23 @@ void update_player_temperature(char_data *ch) {
 	}
 	
 	ambient = get_room_temperature(IN_ROOM(ch));
+	limit = config_get_int("temperature_discomfort");
 	
+	// check if room itself changed
+	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
+			// higher temp
+			msg_to_char(ch, "It's %s %s.\r\n", (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
+		}
+		else {	// lower temp
+			msg_to_char(ch, "It's %s %s.\r\n", (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here");
+		}
+		
+		// update temp for later
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = ambient;
+	}
+	
+	// check player's own temperature
 	if (GET_TEMPERATURE(ch) != ambient) {
 		was_temp = get_relative_temperature(ch);
 		change = (double)ambient / ((double) SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE);
@@ -1440,11 +1456,10 @@ void update_player_temperature(char_data *ch) {
 		}
 		
 		// messaging?
-		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		if (!IS_IMMORTAL(ch) && !IS_GOD(ch) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 			relative = get_relative_temperature(ch);
 			
 			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
-				limit = config_get_int("temperature_discomfort");
 				if (relative >= limit - (limit / 10)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
 				}
@@ -1452,13 +1467,13 @@ void update_player_temperature(char_data *ch) {
 					msg_to_char(ch, "You're getting warm.\r\n");
 				}
 				else if (relative <= (-1 * limit)) {
-					msg_to_char(ch, "You're warming up.\r\n");
+					msg_to_char(ch, "You're warming up%s.\r\n", (relative <= -1 * limit) ? " but still quite cold" : "");
 				}
 			
 				GET_LAST_WARM_TIME(ch) = time(0);
 			}
 			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
-				limit = -1 * config_get_int("temperature_discomfort");
+				limit *= -1;	// negative limit
 				if (relative <= (limit + (limit / -10))) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
 				}
@@ -1466,7 +1481,7 @@ void update_player_temperature(char_data *ch) {
 					msg_to_char(ch, "You're getting cold.\r\n");
 				}
 				else  if (relative >= (-1 * limit)) {
-					msg_to_char(ch, "You're cooling down.\r\n");
+					msg_to_char(ch, "You're cooling down%s.\r\n", (relative >= -1 * limit) ? " but still rather warm" : "");
 				}
 			
 				GET_LAST_COLD_TIME(ch) = time(0);

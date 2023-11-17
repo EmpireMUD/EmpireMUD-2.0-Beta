@@ -1234,6 +1234,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LAST_HOME_SET_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_home_set_time))
 #define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_known_level))
 #define GET_LAST_LOOK_SUN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_look_sun))
+#define GET_LAST_MESSAGED_TEMPERATURE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_messaged_temperature))
 #define GET_LAST_OFFENSE_SEEN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_offense_seen))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))

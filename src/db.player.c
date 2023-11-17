@@ -4372,6 +4372,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_passive_buffs(ch);
 	convert_and_schedule_player_affects(ch);
 	schedule_all_obj_timers(ch);
+	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

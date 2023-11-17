@@ -3892,8 +3892,6 @@ ACMD(do_temperature) {
 	else {
 		msg_to_char(ch, "You are %s%s%s%s\r\n", temperature_to_string(ch_temp), imm_part, change_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
 	}
-	
-	// TODO should this show current warmth/cooling
 }
 
 

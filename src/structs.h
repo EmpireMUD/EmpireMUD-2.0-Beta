@@ -4698,6 +4698,7 @@ struct player_special_data {
 	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	int last_cold_time;	// last time a player was told they're getting colder
 	int last_warm_time;	// last time a player was told they're getting warmer
+	int last_messaged_temperature;	// last temperature a player was warned about
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet

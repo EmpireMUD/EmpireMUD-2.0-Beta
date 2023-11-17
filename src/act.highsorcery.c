@@ -1742,6 +1742,10 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		greet_mtrigger(ch, NO_DIR, "ability");
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR, "ability");
+		
+		// reset this to avoid messages
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+		
 		msdp_update_room(ch);	// once we're sure we're staying
 	
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);

@@ -875,6 +875,9 @@ void perform_transport(char_data *ch, room_data *to_room) {
 			perform_transport(k->follower, to_room);
 		}
 	}
+	
+	// reset this to avoid messages
+	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
 }
 
 
@@ -1478,6 +1481,9 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		greet_memory_mtrigger(ch);
 	}
 	
+	// reset this to avoid messages
+	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -1577,6 +1583,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	command_lag(ch, WAIT_MOVEMENT);
 	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
+	
+	// reset this to avoid messages
+	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	
 	msdp_update_room(ch);
 	
 	// cancel some actions on movement
@@ -2165,6 +2175,10 @@ ACMD(do_circle) {
 	}
 	entry_memory_mtrigger(ch);
 	greet_memory_mtrigger(ch);
+	
+	// reset this to avoid messages
+	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	
 	msdp_update_room(ch);	// once we're sure we're staying
 	
 	gain_ability_exp_from_moves(ch, was_in, MOVE_CIRCLE);
