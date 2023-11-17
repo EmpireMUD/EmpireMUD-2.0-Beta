@@ -4797,6 +4797,14 @@ Skycleave: Shared get trigger (diary replacement, struggle)~
 1 g 100
 ~
 if %self.vnum% == 11890
+  * struggle
+  if %self.carried_by%
+    if %self.carried_by_affect(11822)%
+      * likely called during load trigger
+      return 1
+      halt
+    end
+  end
   * the struggle-- just purge
   %send% %actor% # You can't get that.
   return 0
