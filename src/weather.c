@@ -179,7 +179,10 @@ void reset_weather(void) {
 
 
 void weather_change(void) {
-	int diff, change;
+	int diff, change, was_state;
+	descriptor_data *desc;
+	char_data *ch;
+	
 	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))
 		diff = (weather_info.pressure > 985 ? -2 : 2);
 	else
@@ -243,32 +246,104 @@ void weather_change(void) {
 			weather_info.sky = SKY_CLOUDLESS;
 			break;
 	}
-
+	
+	// save for later
+	was_state = weather_info.sky;
+	
+	// SKY_x: update sky based on change
 	switch (change) {
-		case 1:
-			send_to_outdoor(TRUE, "The sky starts to get cloudy.\r\n");
+		case 1: {
 			weather_info.sky = SKY_CLOUDY;
 			break;
-		case 2:
-			send_to_outdoor(TRUE, "It starts to rain.\r\n");
+		}
+		case 2: {
 			weather_info.sky = SKY_RAINING;
 			break;
-		case 3:
-			send_to_outdoor(TRUE, "The clouds disappear.\r\n");
+		}
+		case 3: {
 			weather_info.sky = SKY_CLOUDLESS;
 			break;
-		case 4:
-			send_to_outdoor(TRUE, "Lightning starts to show in the sky.\r\n");
+		}
+		case 4: {
 			weather_info.sky = SKY_LIGHTNING;
 			break;
-		case 5:
-			send_to_outdoor(TRUE, "The rain stops.\r\n");
+		}
+		case 5: {
 			weather_info.sky = SKY_CLOUDY;
 			break;
-		case 6:
-			send_to_outdoor(TRUE, "The lightning stops.\r\n");
+		}
+		case 6: {
 			weather_info.sky = SKY_RAINING;
 			break;
+		}
+	}
+	
+	// messaging to outdoor players
+	if (change > 0) {
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || (ch = desc->character) == NULL) {
+				continue;	// not playing
+			}
+			if (!AWAKE(ch)) {
+				continue;	// sleeping
+			}
+			if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+				continue;	// no weather here
+			}
+			if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
+				continue;	// can't see weather from here
+			}
+			
+			// SKY_x: ok, we can see weather
+			switch (weather_info.sky) {
+				case SKY_CLOUDY: {
+					if (was_state != SKY_RAINING) {
+						msg_to_char(ch, "The sky starts to get cloudy.\r\n");
+					}
+					else {	// was raining
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+							msg_to_char(ch, "The snow stops.\r\n");
+						}
+						else {
+							msg_to_char(ch, "The rain stops.\r\n");
+						}
+					}
+					break;
+				}
+				case SKY_RAINING: {
+					if (was_state != SKY_LIGHTNING) {
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+							msg_to_char(ch, "It starts to snow.\r\n");
+						}
+						else {
+							msg_to_char(ch, "It starts to rain.\r\n");
+						}
+					}
+					else {	// was lightning
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+							msg_to_char(ch, "The blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\r\n");
+						}
+						else {
+							msg_to_char(ch, "The intense lightning storm gives way to a soothing rain.\r\n");
+						}
+					}
+					break;
+				}
+				case SKY_CLOUDLESS: {
+					msg_to_char(ch, "The clouds disappear.\r\n");
+					break;
+				}
+				case SKY_LIGHTNING: {
+					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_limit")) {
+						msg_to_char(ch, "The gentle snowfall becomes a serious blizzard.\r\n");
+					}
+					else {
+						msg_to_char(ch, "Lightning starts to show in the sky.\r\n");
+					}
+					break;
+				}
+			}
+		}
 	}
 }
 
