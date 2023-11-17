@@ -191,7 +191,7 @@ CLOTHING CLOTHES
 These are items you can sew and wear, but which have no affect on your stats.
 
 Leather clothing:
- head: traveling hat, leather hood, fur hat
+ head: traveling hat (cooling), leather hood, fur hat (warm)
  body: leather jacket, spotted robe
  about body: cape, cloak, shawl
  hands: leather gloves
@@ -201,7 +201,8 @@ Leather clothing:
 
 Cloth clothing:
  head: hood, barbette, brimmed cap, bonnet, wimple, coif
- body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic
+ body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic,
+       breezy clothes (cooling), layered clothes (warm)
  about body: mantle
  hands: gloves
  waist: girdle
