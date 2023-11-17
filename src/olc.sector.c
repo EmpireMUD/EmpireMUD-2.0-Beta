@@ -921,6 +921,25 @@ OLC_MODULE(sectedit_buildflags) {
 }
 
 
+OLC_MODULE(sectedit_checktemperature) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	char buf[256];
+	int iter, low, high;
+	
+	int season_list[] = { TILESET_SPRING, TILESET_SUMMER, TILESET_AUTUMN, TILESET_WINTER, -1 };
+	
+	
+	msg_to_char(ch, "Temperature analysis for this sector:\r\n");
+	
+	for (iter = 0; season_list[iter] != -1; ++iter) {
+		low = calculate_temperature(TEMPERATURE_USE_LOCAL, GET_SECT_CLIMATE(st), season_list[iter], SUN_DARK);
+		high = calculate_temperature(TEMPERATURE_USE_LOCAL, GET_SECT_CLIMATE(st), season_list[iter], SUN_LIGHT);
+		snprintf(buf, sizeof(buf), "  %s: %d to %d", seasons[season_list[iter]], low, high);
+		msg_to_char(ch, "%s\r\n", CAP(buf));
+	}
+}
+
+
 OLC_MODULE(sectedit_climate) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	GET_SECT_CLIMATE(st) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_SECT_CLIMATE(st));

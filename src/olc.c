@@ -442,6 +442,7 @@ OLC_MODULE(rmedit_temperature);
 
 // sector modules
 OLC_MODULE(sectedit_buildflags);
+OLC_MODULE(sectedit_checktemperature);
 OLC_MODULE(sectedit_climate);
 OLC_MODULE(sectedit_commands);
 OLC_MODULE(sectedit_evolution);
@@ -965,6 +966,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// sector commands	
 	{ "buildflags", sectedit_buildflags, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "checktemperature", sectedit_checktemperature, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "climate", sectedit_climate, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "commands", sectedit_commands, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "evolution", sectedit_evolution, OLC_SECTOR, OLC_CF_EDITOR },

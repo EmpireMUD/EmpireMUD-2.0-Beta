@@ -3148,6 +3148,9 @@ If a crop has multiple climate flags, the sector must match ALL of them for the
 crop to be planted there, unless the crop has the ANY-LISTED-CLIMATE flag, in
 which case they must only match at least 1 climate.
 
+For sectors, you can test climate temperatures with ".checktemp" while editing
+a sector.
+
 Climates:
  &chot&0 - Hotter than normal for this type (modifier).
  &ccold&0 - Colder than normal for this type (modifier).
@@ -3168,7 +3171,7 @@ Climates:
  &cwaterside&0 - Adjacent (or near) fresh water.
  &cfrozen water&0 - Would be water but is currently frozen.
 
-See also: OLC CROPS, OLC SECTORS
+See also: OLC CROPS, OLC SECTORS, SECTEDIT CHECK TEMPERATURE
 #d
 "CROPEDIT FLAGS" "CROP FLAGS"
 
@@ -7604,6 +7607,15 @@ be added in one line, so you can't type multiple words. Try abbreviating them
 to one word, such as: "plains full desert" (the full stands for 'full forest').
 
 See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
+#d
+"SECTEDIT CHECKTEMPERATURE" "SECTEDIT CHECK TEMPERATURE"
+
+Usage:  .checktemperature
+
+Use this command while editing a sector to see what temperatures its climate
+flags will give it during various parts of the year.
+
+See also: SECTEDIT CLIMATE
 #d
 "SECTEDIT COMMANDS"
 
