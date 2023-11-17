@@ -3903,13 +3903,13 @@ const char *spawn_flags_short[] = {
 };
 
 
-// TILESET_x (1/3): season display text
+// TILESET_x (1/3): season names
 const char *seasons[] = {
-	"Season data not found.",	// TILESET_ANY (should never hit this case)
-	"It is spring and everything is flowering.",
-	"It's summer time and you're quite warm.",
-	"It is autumn and leaves are falling from the trees.",
-	"It's winter and you're a little bit cold.",
+	"UNKNOWN",	// TILESET_ANY (should never hit this case)
+	"spring",
+	"summertime",
+	"autumn",
+	"winter",
 	"\n"
 };
 

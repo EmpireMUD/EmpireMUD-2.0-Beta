@@ -3954,8 +3954,15 @@ ACMD(do_time) {
 	}
 	
 	// check season
-	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+	if (IS_OUTDOORS(ch) && !NO_LOCATION(IN_ROOM(ch))) {
+		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
+		
+		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			msg_to_char(ch, " and %s out here.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
+		}
+		else {
+			send_to_char(".\r\n", ch);
+		}
 	}
 	
 	// check solstices
@@ -4060,7 +4067,14 @@ ACMD(do_weather) {
 	
 	// show season unless in a no-location room
 	if (!NO_LOCATION(IN_ROOM(ch))) {
-		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
+		
+		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			msg_to_char(ch, " and %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out here" : "in here");
+		}
+		else {
+			send_to_char(".\r\n", ch);
+		}
 	}
 	
 	// show sun/daytime
