@@ -3906,10 +3906,10 @@ const char *spawn_flags_short[] = {
 // TILESET_x (1/3): season names
 const char *seasons[] = {
 	"UNKNOWN",	// TILESET_ANY (should never hit this case)
-	"spring",
+	"springtime",
 	"summertime",
 	"autumn",
-	"winter",
+	"wintertime",
 	"\n"
 };
 
