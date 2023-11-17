@@ -3958,7 +3958,7 @@ ACMD(do_time) {
 		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
 		
 		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
-			msg_to_char(ch, " and %s out here.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
+			msg_to_char(ch, " and %s out.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
 		}
 		else {
 			send_to_char(".\r\n", ch);
@@ -4001,6 +4001,7 @@ ACMD(do_tip) {
 
 ACMD(do_weather) {
 	char *sky_text, *change_text;
+	bool showed_temp = FALSE;
 	
 	// weather, if available
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
@@ -4070,7 +4071,8 @@ ACMD(do_weather) {
 		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
 		
 		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
-			msg_to_char(ch, " and %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out here" : "in here");
+			msg_to_char(ch, " and %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+			showed_temp = TRUE;
 		}
 		else {
 			send_to_char(".\r\n", ch);
@@ -4116,7 +4118,10 @@ ACMD(do_weather) {
 	}
 	
 	// temperature
-	msg_to_char(ch, "It's %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+	if (!showed_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		msg_to_char(ch, "It's %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+		showed_temp = TRUE;
+	}
 }
 
 
