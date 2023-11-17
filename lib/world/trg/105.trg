@@ -871,7 +871,7 @@ end
 Permafrost weather~
 2 c 0
 weather look~
-if %cmd% /= look
+if look /= %cmd%
   if out == %arg%
     %force% %actor% look snow
     return 1

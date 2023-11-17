@@ -3186,7 +3186,7 @@ if break /= %cmd% || smash /= %cmd%
   if !%arg%
     %send% %actor% Break what?
     halt
-  elseif %arg% /= chains || %arg% /= shackles || %arg% /= gems
+  elseif chains /= %arg% || shackles /= %arg% || gems /= %arg%
     * ok
   else
     %send% %actor% You can't break that.
@@ -8812,7 +8812,7 @@ if !%actor.affect(11822)%
   end
   %purge% %self%
   halt
-elseif !(%cmd% /= struggle)
+elseif !(struggle /= %cmd%)
   return 0
   halt
 end

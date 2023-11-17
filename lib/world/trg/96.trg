@@ -280,7 +280,7 @@ if !%actor.affect(9602)%
   rdelete scf_free_room %actor.id%
   %purge% %self%
   halt
-elseif !(%cmd% /= struggle)
+elseif !(struggle /= %cmd%)
   return 0
   halt
 end
