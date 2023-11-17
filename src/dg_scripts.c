@@ -4507,7 +4507,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// char.t*
 					if (!str_cmp(field, "temperature")) {
-						snprintf(str, slen, "%d", get_relative_temperature(c));
+						if (subfield && *subfield) {
+							if (!str_cmp(subfield, "base")) {
+								snprintf(str, slen, "%d", IS_NPC(c) ? 0 : GET_TEMPERATURE(c));
+							}
+							else if (isdigit(*subfield) || *subfield == '+' || *subfield == '-') {
+								int new_temp = atoi(subfield);
+								new_temp = MAX(-100, MIN(100, new_temp));
+								if (IS_NPC(c)) {
+									GET_TEMPERATURE(c) = new_temp;
+								}
+								// and report new relative temp
+								snprintf(str, slen, "%d", get_relative_temperature(c));
+							}
+							else {
+								snprintf(str, slen, "%d", get_relative_temperature(c));
+							}
+						}
+						else {
+							snprintf(str, slen, "%d", get_relative_temperature(c));
+						}
 					}
 					else if (!str_cmp(field, "thirst")) {
 						if (subfield && *subfield) {
