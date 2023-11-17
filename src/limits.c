@@ -582,7 +582,11 @@ void real_update_player(char_data *ch) {
 		gain_condition(ch, FULL, -1);
 	}
 	else {
-		if (!number(0, 1)) {
+		if (AFF_FLAGGED(ch, AFF_HUNGRIER)) {
+			gain_condition(ch, FULL, number(1, 2));
+		}
+		else if (!number(0, 1)) {
+			// random chance of hunger
 			gain_condition(ch, FULL, 1);
 		}
 	}
@@ -594,7 +598,10 @@ void real_update_player(char_data *ch) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
-		if (!number(0, 1)) {
+		if (AFF_FLAGGED(ch, AFF_THIRSTIER)) {
+			gain_condition(ch, THIRST, number(1, 2));
+		}
+		else if (!number(0, 1)) {
 			gain_condition(ch, THIRST, 1);
 		}
 	}
@@ -2272,7 +2279,7 @@ int health_gain(char_data *ch, bool info_only) {
 		}
 		
 		// put this last
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}
@@ -2326,7 +2333,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		// this goes last
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}
@@ -2372,7 +2379,7 @@ int move_gain(char_data *ch, bool info_only) {
 			gain = MAX(gain, min);
 		}
 
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}

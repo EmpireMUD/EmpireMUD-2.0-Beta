@@ -391,7 +391,7 @@ void update_actions(void) {
 		}
 		
 		// things that slow you down
-		if ((AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) && !IS_SET(act_flags, ACTF_IGNORE_COND)) {
+		if ((AFF_FLAGGED(ch, AFF_SLOW | AFF_SLOWER_ACTIONS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) && !IS_SET(act_flags, ACTF_IGNORE_COND)) {
 			speed /= 2.0;
 			speed = MAX(1.0, speed);	// don't stall them completely
 		}

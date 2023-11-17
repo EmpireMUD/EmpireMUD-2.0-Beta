@@ -1020,6 +1020,10 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
 #define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
 #define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
+#define AFF_POOR_REGENS  BIT(39)	// N. dramatically lower regens
+#define AFF_SLOWER_ACTIONS  BIT(40)	// O. timed actions are slower
+#define AFF_HUNGRIER  BIT(41)	// P. character becomes hungry faster
+#define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
 
 
 // Injury flags -- IS_INJURED

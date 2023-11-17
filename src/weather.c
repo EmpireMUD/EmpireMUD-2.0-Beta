@@ -1100,7 +1100,7 @@ void cancel_temperature_penalties(char_data *ch, int keep_type, bool send_messag
 * @param char_data *ch The player.
 */
 void check_temperature_penalties(char_data *ch) {
-	int iter, limit, extreme, room_temp, temperature;
+	int atype, iter, limit, extreme, room_temp, temperature;
 	struct affected_type *af;
 	obj_data *obj;
 	bool any, room_safe;
@@ -1176,56 +1176,71 @@ void check_temperature_penalties(char_data *ch) {
 			// start HOT penalty
 			if (temperature >= extreme) {
 				// extreme hot
-				cancel_temperature_penalties(ch, ATYPE_WARM_PENALTY, FALSE);
+				atype = ATYPE_HOT_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, ATYPE_HOT_PENALTY)) {
+				if (!affected_by_spell(ch, atype)) {
 					act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				// pain
-				apply_dot_effect(ch, ATYPE_HOT_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				apply_dot_effect(ch, atype, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				af = create_flag_aff(atype, UNLIMITED, AFF_DISTRACTED, ch);
+				affect_join(ch, af, NOBITS);
 			}
 			else {
 				// mild hot
-				cancel_temperature_penalties(ch, ATYPE_HOT_PENALTY, FALSE);
+				atype = ATYPE_WARM_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, ATYPE_WARM_PENALTY)) {
+				if (!affected_by_spell(ch, atype)) {
 					act("You start to feel like you're getting too warm.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
+				
+				// discomfort
+				af = create_flag_aff(atype, UNLIMITED, AFF_SLOWER_ACTIONS, ch);
+				affect_join(ch, af, NOBITS);
 			}
 			
-			// stats penalties (either way)
-			af = create_flag_aff(ATYPE_HOT_PENALTY, UNLIMITED, AFF_SLOW, ch);
+			// stats penalties (warm/hot)
+			af = create_flag_aff(atype, UNLIMITED, AFF_POOR_REGENS | AFF_THIRSTIER, ch);
 			affect_join(ch, af, NOBITS);
 		}
 		else {
 			// start COLD penalty
 			if (temperature <= -1 * extreme) {
 				// extreme cold
-				cancel_temperature_penalties(ch, ATYPE_COOL_PENALTY, FALSE);
+				atype = ATYPE_COLD_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, ATYPE_COLD_PENALTY)) {
+				if (!affected_by_spell(ch, atype)) {
 					act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				// pain
-				apply_dot_effect(ch, ATYPE_COLD_PENALTY, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				apply_dot_effect(ch, atype, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				af = create_flag_aff(atype, UNLIMITED, AFF_DISTRACTED, ch);
+				affect_join(ch, af, NOBITS);
 			}
 			else {
 				// mild cold
-				cancel_temperature_penalties(ch, ATYPE_COLD_PENALTY, FALSE);
+				atype = ATYPE_COOL_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, ATYPE_COOL_PENALTY)) {
+				if (!affected_by_spell(ch, atype)) {
 					act("You're starting to feel a little too cold.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
+				
+				af = create_flag_aff(atype, UNLIMITED, AFF_SLOWER_ACTIONS, ch);
+				affect_join(ch, af, NOBITS);
 			}
 			
-			// stats penalties (either way)
-			af = create_flag_aff(ATYPE_COLD_PENALTY, UNLIMITED, AFF_SLOW, ch);
+			// stats penalties (cool/cold)
+			af = create_flag_aff(atype, UNLIMITED, AFF_SLOW | AFF_HUNGRIER, ch);
 			affect_join(ch, af, NOBITS);
 		}
 	}

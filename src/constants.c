@@ -1322,6 +1322,10 @@ const char *affected_bits[] = {
 	"!WHERE",
 	"WATERWALK",
 	"LIGHT",
+	"POOR-REGENS",
+	"SLOWER-ACTIONS",	// 40
+	"HUNGRIER",
+	"THIRSTIER",
 	"\n"
 };
 
@@ -1366,6 +1370,10 @@ const char *affected_bits_consider[] = {
 	"",	// !where
 	"",	// waterwalk
 	"",	// light
+	"",	// poor-regens
+	"",	// 40 - slower-actions
+	"",	// hungrier
+	"",	// thirstier
 	"\n"
 };
 
@@ -1410,6 +1418,10 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,
 	FALSE,
+	TRUE,
+	TRUE,	// 40 - slower-actions
+	TRUE,
+	TRUE,
 };
 
 

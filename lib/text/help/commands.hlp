@@ -2568,7 +2568,7 @@ Example:
 
 See also: HISTORY, TELL
 #
-TEMPERATURE
+TEMPERATURE COLD HOT FREEZING SWELTERING BALMY SCORCHING CHILLY
 
 Usage:  temperature
 
@@ -2580,9 +2580,15 @@ falls over the course of an in-game hour. Having a lit torch or camp fire will
 help keep you warm in the winter, and being in the water will help keep you
 cool in the summer.
 
-Cold temperatures (in order): chilly, cold, frosty, icy, frigid, freezing
-Comfortable temperatures: cool, pleasant, balmy
-Hot temperatures: warm, hot, scorching, sweltering, blistering, searing
+Cold temperatures (in order): &Cchilly, cold, frosty, icy, frigid, freezing&0
+Comfortable temperatures: &Jcool, pleasant, balmy&0
+Hot temperatures: &Owarm, hot, scorching, sweltering, blistering, searing&0
+
+Cold penalties: slow effect, get hungry faster, actions are slow
+Freezing penalties: distracted from timed actions, damage over time
+
+Hot penalties: poor regeneration rate, get thirsty faster, actions are slow
+Sweltering penalties: distracted from timed actions, damage over time
 
 See also: SURVEY, TIME, WEATHER
 #
