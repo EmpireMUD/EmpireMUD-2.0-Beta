@@ -1307,7 +1307,17 @@ int get_relative_temperature(char_data *ch) {
 * @return int The temperature (zero is neutral).
 */
 int get_room_temperature(room_data *room) {
-	return calculate_temperature(get_temperature_type(room), get_climate(room), GET_SEASON(room), get_sun_status(room));
+	int temp_type;
+	room_data *home;
+	
+	temp_type = get_temperature_type(room);
+	
+	// check temperature of parent building if using local and not the home-room (e.g. a bedroom in a warm house)
+	if (temp_type == TEMPERATURE_USE_LOCAL && !IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
+		temp_type = get_temperature_type(home);
+	}
+	
+	return calculate_temperature(temp_type, get_climate(room), GET_SEASON(room), get_sun_status(room));
 }
 
 
