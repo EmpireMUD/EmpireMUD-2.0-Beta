@@ -1216,7 +1216,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
 	
 	// check fight messages (may exit early)
-	if (!IS_NPC(to) && IS_SET(act_flags, TO_BUFF)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_BUFF)) {
 		show = FALSE;
 		if (!show && vict_obj && to == vict_obj) {
 			any = TRUE;
