@@ -220,6 +220,10 @@ struct alias_data {
 #define SCMD_KEEP  0
 #define SCMD_UNKEEP  1
 
+// do_fightmessages
+#define SCMD_FIGHT  0
+#define SCMD_STATUS  1
+
 // do_morph
 #define SCMD_MORPH  0
 #define SCMD_FASTMORPH  1

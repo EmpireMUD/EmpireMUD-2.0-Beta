@@ -1005,6 +1005,21 @@ const char *player_tech_types[] = {
 };
 
 
+// SM_x: status messages
+const char *status_message_types[] = {
+	"animal movement",	// 0
+	"hunger",
+	"thirst",
+	"low blood",
+	"sun",
+	"temperature",	// 5
+	"extreme temperature",
+	"vehicle movement",
+	"weather",
+	"\n"
+};
+
+
 // SYS_x syslog types
 const char *syslog_types[] = {
 	"config",

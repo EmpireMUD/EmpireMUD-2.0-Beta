@@ -284,6 +284,9 @@ void weather_change(void) {
 			if (STATE(desc) != CON_PLAYING || (ch = desc->character) == NULL) {
 				continue;	// not playing
 			}
+			if (!SHOW_STATUS_MESSAGES(ch, SM_WEATHER)) {
+				continue;	// does not want weather messages
+			}
 			if (!AWAKE(ch)) {
 				continue;	// sleeping
 			}
@@ -549,7 +552,7 @@ int get_sun_status(room_data *room) {
 		// determine exact time
 		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
 		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
-		hour = main_time_info.hours - (24.0 * percent - PERCENT_THROUGH_CURRENT_HOUR);
+		hour = main_time_info.hours - (24.0 * percent - (1.0 - PERCENT_THROUGH_CURRENT_HOUR));
 		if (hour < 0.0) {
 			hour += 24.0;
 		}
@@ -666,37 +669,40 @@ void send_hourly_sun_messages(void) {
 		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
 			GET_LAST_LOOK_SUN(desc->character) = sun;
 			
-			switch (sun) {
-				case SUN_RISE: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
-						// show map if needed
-						look_at_room(desc->character);
-						msg_to_char(desc->character, "\r\n");
+			if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
+				switch (sun) {
+					case SUN_RISE: {
+						if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+							// show map if needed
+							look_at_room(desc->character);
+							msg_to_char(desc->character, "\r\n");
+						}
+						msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+						break;
 					}
-					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
-					break;
-				}
-				case SUN_LIGHT: {
-					msg_to_char(desc->character, "The day has begun.\r\n");
-					break;
-				}
-				case SUN_SET: {
-					msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
-					break;
-				}
-				case SUN_DARK: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
-						look_at_room(desc->character);
-						msg_to_char(desc->character, "\r\n");
+					case SUN_LIGHT: {
+						msg_to_char(desc->character, "The day has begun.\r\n");
+						break;
 					}
-					msg_to_char(desc->character, "The night has begun.\r\n");
-					break;
+					case SUN_SET: {
+						msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+						break;
+					}
+					case SUN_DARK: {
+						if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+							look_at_room(desc->character);
+							msg_to_char(desc->character, "\r\n");
+						}
+						msg_to_char(desc->character, "The night has begun.\r\n");
+						break;
+					}
 				}
 			}
 		}	// end sun-change
 		
 		// check and show zenith
 		if (tinfo.hours == 12 && is_zenith_day(IN_ROOM(desc->character))) {
+			// I think this should ignore the SM_SUN setting and show anyway -pc
 			msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
 		}
 	}
@@ -1180,7 +1186,7 @@ void check_temperature_penalties(char_data *ch) {
 				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, atype)) {
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
 					act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1195,7 +1201,7 @@ void check_temperature_penalties(char_data *ch) {
 				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, atype)) {
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
 					act("You start to feel like you're getting too warm.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1216,7 +1222,7 @@ void check_temperature_penalties(char_data *ch) {
 				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, atype)) {
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
 					act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1231,7 +1237,7 @@ void check_temperature_penalties(char_data *ch) {
 				cancel_temperature_penalties(ch, atype, FALSE);
 				
 				// message only if it's new
-				if (!affected_by_spell(ch, atype)) {
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
 					act("You're starting to feel a little too cold.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1450,7 +1456,7 @@ void update_player_temperature(char_data *ch) {
 	limit = config_get_int("temperature_discomfort");
 	
 	// check if room itself changed
-	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
 			// higher temp
 			msg_to_char(ch, "It's %s %s.\r\n", (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
@@ -1481,17 +1487,17 @@ void update_player_temperature(char_data *ch) {
 		}
 		
 		// messaging?
-		if (!IS_IMMORTAL(ch) && !IS_GOD(ch) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 			relative = get_relative_temperature(ch);
 			
 			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
-				if (relative >= limit - (limit / 10)) {
+				if (relative >= limit - (limit / 10) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
 				}
-				else if (relative >= (limit / 2)) {
+				else if (relative >= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting warm.\r\n");
 				}
-				else if (relative <= (-1 * limit)) {
+				else if (relative <= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're warming up%s.\r\n", (relative <= -1 * limit) ? " but still quite cold" : "");
 				}
 			
@@ -1499,13 +1505,13 @@ void update_player_temperature(char_data *ch) {
 			}
 			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
 				limit *= -1;	// negative limit
-				if (relative <= (limit + (limit / -10))) {
+				if (relative <= (limit + (limit / -10)) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
 				}
-				else if (relative <= (limit / 2)) {
+				else if (relative <= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting cold.\r\n");
 				}
-				else  if (relative >= (-1 * limit)) {
+				else  if (relative >= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're cooling down%s.\r\n", (relative >= -1 * limit) ? " but still rather warm" : "");
 				}
 			

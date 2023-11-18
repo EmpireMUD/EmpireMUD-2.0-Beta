@@ -424,7 +424,7 @@ bool point_update_player(char_data *ch) {
 		}
 	}
 	
-	if (IS_BLOOD_STARVED(ch)) {
+	if (IS_BLOOD_STARVED(ch) && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 		msg_to_char(ch, "You are starving!\r\n");
 	}
 	
@@ -2187,14 +2187,14 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 	switch (condition) {
 		case FULL: {
-			if (IS_HUNGRY(ch) && value > 0) {
+			if (SHOW_STATUS_MESSAGES(ch, SM_HUNGER) && IS_HUNGRY(ch) && value > 0) {
 				msg_to_char(ch, "You are hungry.\r\n");
 				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			return;
 		}
 		case THIRST: {
-			if (IS_THIRSTY(ch) && value > 0) {
+			if (SHOW_STATUS_MESSAGES(ch, SM_THIRST) && IS_THIRSTY(ch) && value > 0) {
 				msg_to_char(ch, "You are thirsty.\r\n");
 				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}

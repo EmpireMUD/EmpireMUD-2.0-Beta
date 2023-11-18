@@ -2645,6 +2645,12 @@ PLAYER_UPDATE_FUNC(b5_153_player_repair) {
 }
 
 
+// b5.162: Players now have status message preferences.
+PLAYER_UPDATE_FUNC(b5_162_status_messages) {
+	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2708,6 +2714,7 @@ const struct {
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
+	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

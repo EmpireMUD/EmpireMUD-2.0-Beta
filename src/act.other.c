@@ -1441,6 +1441,16 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 
 
 /**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_smessages(char_data *ch, char_data *alt) {
+	GET_STATUS_MESSAGES(ch) = GET_STATUS_MESSAGES(alt);
+	msg_to_char(ch, "Imported status message settings.\r\n");
+}
+
+
+/**
 * Sub-processor for "alt import".
 *
 * @param char_data *ch The player.
@@ -1488,6 +1498,9 @@ void do_alt_import(char_data *ch, char *argument) {
 	else if (is_abbrev(arg2, "slash-channels")) {
 		alt_import_slash_channels(ch, alt);
 	}
+	else if (is_abbrev(arg2, "smessages") || is_abbrev(arg2, "statusmessages")) {
+		alt_import_smessages(ch, alt);
+	}
 	else if (is_abbrev(arg2, "ignores")) {
 		alt_import_ignores(ch, alt);
 	}
@@ -1502,6 +1515,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_recolors(ch, alt);
 		alt_import_ignores(ch, alt);
 		alt_import_slash_channels(ch, alt);
+		alt_import_smessages(ch, alt);
 	}
 	else {
 		msg_to_char(ch, "Unknown field '%s'.\r\n%s", arg2, valid_fields);
@@ -2346,16 +2360,37 @@ ACMD(do_douse) {
 }
 
 
+// this now also controls status messages using SCMD_FIGHT or SCMD_STATUS
+// search hints: do_fmessages, do_smessages, do_statusmessages
 ACMD(do_fightmessages) {
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	int iter, type = NOTHING, count;
 	bool on;
 	
+	// SCMD_FIGHT, SCMD_STATUS
+	const char *message_type[] = { "fight", "status" };
+	const char **type_strings = NULL;
+	bitvector_t *flagset = NULL;
+	
+	// verify type
+	if (subcmd == SCMD_FIGHT) {
+		flagset = &GET_FIGHT_MESSAGES(ch);
+		type_strings = combat_message_types;
+	}
+	else if (subcmd == SCMD_STATUS) {
+		flagset = &GET_STATUS_MESSAGES(ch);
+		type_strings = status_message_types;
+	}
+	else {
+		msg_to_char(ch, "Command not implemented.\r\n");
+		return;
+	}
+	
 	// detect possible type
 	skip_spaces(&argument);
 	if (*argument) {
-		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
-			if (is_multiword_abbrev(argument, combat_message_types[iter])) {
+		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
+			if (is_multiword_abbrev(argument, type_strings[iter])) {
 				type = iter;
 				break;
 			}
@@ -2363,19 +2398,20 @@ ACMD(do_fightmessages) {
 	}
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs do not have fight message toggles.\r\n");
+		msg_to_char(ch, "NPCs do not have %s message toggles.\r\n", message_type[subcmd]);
 	}
 	else if (!*argument) {
-		msg_to_char(ch, "Fight message toggles:\r\n");
+		snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
+		send_to_char(CAP(buf), ch);
 		
 		count = 0;
-		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
-			on = SHOW_FIGHT_MESSAGES(ch, BIT(iter));
+		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
+			on = (IS_SET(*flagset, BIT(iter)) ? TRUE : FALSE);
 			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+				msg_to_char(ch, "%s: %s\r\n", type_strings[iter], on ? "on" : "off");
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", type_strings[iter], (!(++count % 2) ? "\r\n" : ""));
 			}
 		}
 		
@@ -2385,31 +2421,31 @@ ACMD(do_fightmessages) {
 	}
 	else if (!str_cmp(argument, "all on")) {
 		// turn ON all bits that have names
-		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
-			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
+			SET_BIT(*flagset, BIT(iter));
 		}
-		msg_to_char(ch, "You toggle all fight messages \tgon\t0.\r\n");
+		msg_to_char(ch, "You toggle all %s messages \tgon\t0.\r\n", message_type[subcmd]);
 	}
 	else if (!str_cmp(argument, "all off")) {
 		// turn ON all bits that have names
-		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
-			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
+			REMOVE_BIT(*flagset, BIT(iter));
 		}
-		msg_to_char(ch, "You toggle all fight messages \troff\t0.\r\n");
+		msg_to_char(ch, "You toggle all %s messages \troff\t0.\r\n", message_type[subcmd]);
 	}
 	else if (type == NOTHING) {
-		msg_to_char(ch, "Unknown fight message type '%s'.\r\n", argument);
+		msg_to_char(ch, "Unknown %s message type '%s'.\r\n", message_type[subcmd], argument);
 	}
 	else {
-		on = !SHOW_FIGHT_MESSAGES(ch, BIT(type));
+		on = (IS_SET(*flagset, BIT(type)) ? FALSE : TRUE);
 		if (on) {
-			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+			SET_BIT(*flagset, BIT(type));
 		}
 		else {
-			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+			REMOVE_BIT(*flagset, BIT(type));
 		}
 		
-		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\troff");
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", type_strings[type], on ? "\tgon" : "\troff");
 	}
 }
 

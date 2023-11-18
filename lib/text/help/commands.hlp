@@ -174,7 +174,7 @@ have. For example, if you have an alias named "foo" and you import aliases, it
 won't overwrite the "foo" you already have with one from an alt.
 
 You can import: aliases, prompt, fprompt, preferences, fightmessages, recolors,
-slash-channels, and ignores.
+slash-channels, statusmessages, and ignores.
 
 "Preferences" will import some toggles, as well as mapsize.
 
@@ -998,7 +998,7 @@ This command lets you toggle which fight messages you do or don't see. This can
 make combat less spammy and easier to understand. You can use multi-word
 abbreviations for these toggles, like "miss ag me" for "misses against me".
 
-See also: TOGGLE
+See also: SMESSAGES, TOGGLE
 #
 FILL
 
@@ -2297,8 +2297,12 @@ Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
  * toggle political - Indicates who owns each map tile.
+ * fightmessages - Reduce combat spam.
+ * statusmessages - Turn off some status messages.
+ * /leave and /join - Control which slash-channels you're on.
 
-See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
+See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, SMESSAGES, MAPSCAN, CHART,
+   SLASH CHANNELS
 #
 SCROLLING
 
@@ -2453,6 +2457,18 @@ one you're currently speaking. If a language is unlocked by your empire,
 usually from progress goals, it will be indicated here.
 
 See also: SAY, SHOUT
+#
+STATUSMESSAGES "STATUS MESSAGES" SMESSAGES
+
+Usage:  statusmessages [type]
+        smessages all <on | off>
+
+This command lets you toggle which status messages you do or don't see. This may
+reduce spam for messages you see regularly. Type "smessages" by itself to see
+what options are available. You can use multi-word abbreviations for these
+toggles, like "extr temp" for "extreme temperature".
+
+See also: FMESSAGES, TOGGLE
 #
 STEALTHABLE
 
@@ -2702,7 +2718,7 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, STATUS MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

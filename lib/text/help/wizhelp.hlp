@@ -1143,6 +1143,7 @@ currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
+fmessages  Immort   Shows a player's fight message toggles.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
@@ -1173,6 +1174,7 @@ storage    Immort   Shows items that can be stored in a given building/room type
 subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
+smessages  Immort   Shows a player's status message toggles.
 terrain    Immort   Same as 'sectors' (for historical reasons).
 tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
@@ -1255,6 +1257,14 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW FMESSAGES" "SHOW FIGHTMESSAGES" "SHOW FIGHT MESSAGES"
+
+Usage:  show fmessages <player>
+
+This command shows which fight messages a player has toggled on or off.
+
+See also: FMESSAGES
 #e
 "SHOW HOME"
 
@@ -1455,6 +1465,14 @@ shows the player's alternate set of abilities.
 The numbers displayed are: [level, experience, unspent points]
 If there is an asterisk after the unspent ability points, it indicates that the
 player has skill resets available for that skill.
+#e
+"SHOW SMESSAGES" "SHOW STATUSMESSAGES" "SHOW STATUS MESSAGES"
+
+Usage:  show smessages <player>
+
+This command shows which status messages a player has toggled on or off.
+
+See also: SMESSAGES
 #e
 "SHOW SPAWNS"
 

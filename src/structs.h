@@ -2285,6 +2285,7 @@ typedef enum {
 #define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
 #define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
 
+// flags set at character creation
 #define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
 
 
@@ -2555,6 +2556,21 @@ typedef enum {
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
+
+
+// SM_x: status messages
+#define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
+#define SM_HUNGER  BIT(1)	// hunger messages
+#define SM_THIRST  BIT(2)	// thirst messages
+#define SM_LOW_BLOOD  BIT(3)	// vampire starvation messages
+#define SM_SUN  BIT(4)	// sunrise/sunset
+#define SM_TEMPERATURE  BIT(5)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(6)	// warning messages for dangerous temperature
+#define SM_VEHICLE_MOVEMENT  BIT(7)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(8)	// weather change messages
+
+// flags set at character creation
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SUN | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -4560,6 +4576,7 @@ struct player_special_data {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_
 	bitvector_t fight_messages;	// FM_ flags
+	bitvector_t status_messages;	// SM_ flags
 	bitvector_t informative_flags;	// INFORMATIVE_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters

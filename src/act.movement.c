@@ -1704,6 +1704,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	char msg[256], temp[256];
 	char_data *targ;
 	int move_type;
+	bitvector_t is_animal_move = NOBITS;
 	
 	// no work if they can't be seen moving
 	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
@@ -1714,6 +1715,11 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	if (cur_room != to_room) {
 		char_from_room(ch);
 		char_to_room(ch, to_room);
+	}
+	
+	// check if it can be ignored by SM_ANIMAL_MOVEMENT
+	if ((MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) && IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		is_animal_move = TO_ANIMAL_MOVE;
 	}
 	
 	// prepare empty room message
@@ -1755,6 +1761,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
 			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
 			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1771,6 +1778,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
 			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1796,10 +1804,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			if (strstr(msg, "%s") != NULL) {
 				// needs direction
 				snprintf(temp, sizeof(temp), msg, from_dir[get_direction_for_char(targ, dir)]);
-				act(temp, TRUE, ch, NULL, targ, TO_VICT);
+				act(temp, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 			else {
-				act(msg, TRUE, ch, NULL, targ, TO_VICT);
+				act(msg, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 		}
 	}
@@ -1830,6 +1838,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	char msg[256], temp[256];
 	char_data *targ;
 	int move_type;
+	bitvector_t is_animal_move = NOBITS;
 	
 	// no work if they can't be seen moving
 	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
@@ -1840,6 +1849,11 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	if (cur_room != from_room) {
 		char_from_room(ch);
 		char_to_room(ch, from_room);
+	}
+	
+	// check if it can be ignored by SM_ANIMAL_MOVEMENT
+	if ((MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) && IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		is_animal_move = TO_ANIMAL_MOVE;
 	}
 	
 	// prepare empty room message
@@ -1879,6 +1893,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
 			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
 			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1895,6 +1910,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
 			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1920,10 +1936,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 			if (strstr(msg, "%s") != NULL) {
 				// needs direction
 				snprintf(temp, sizeof(temp), msg, dirs[get_direction_for_char(targ, dir)]);
-				act(temp, TRUE, ch, NULL, targ, TO_VICT);
+				act(temp, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 			else {
-				act(msg, TRUE, ch, NULL, targ, TO_VICT);
+				act(msg, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 		}
 	}

@@ -68,6 +68,7 @@ extern const char *class_role_color[];
 extern const struct toggle_data_type toggle_data[];
 extern const char *connected_types[];
 extern const char *player_tech_types[];
+extern const char *status_message_types[];
 extern const char *syslog_types[];
 
 // direction and room constants

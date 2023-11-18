@@ -3156,6 +3156,46 @@ SHOW(show_factions) {
 }
 
 
+SHOW(show_fmessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show fmessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Fight message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_FIGHT_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_home) {
 	char name[MAX_INPUT_LENGTH];
 	bool file = FALSE;
@@ -3864,6 +3904,46 @@ SHOW(show_resource) {
 		msg_to_char(ch, "Highest active empire: %s (%lld stored)\r\n", EMPIRE_NAME(highest_emp), highest_amt);
 	}
 	msg_to_char(ch, "%d total empire%s: %lld stored, %lld mean, %d empires have any\r\n", total_emps, PLURAL(total_emps), total, (total / MAX(1, total_emps)), emps_storing);
+}
+
+
+SHOW(show_smessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show smessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Status message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *status_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_STATUS_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", status_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
 }
 
 
@@ -10663,6 +10743,8 @@ ACMD(do_show) {
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 		{ "subzone", LVL_START_IMM, show_subzone },
 		{ "tomb", LVL_START_IMM, show_tomb },
+		{ "fmessages", LVL_START_IMM, show_fmessages },
+		{ "smessages", LVL_START_IMM, show_smessages },
 
 		// last
 		{ "\n", 0, NULL }

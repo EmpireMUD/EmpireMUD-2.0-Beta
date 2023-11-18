@@ -2127,6 +2127,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Speaking: ", 10)) {
 					GET_SPEAKING(ch) = atoi(line + 10);
 				}
+				else if (!strn_cmp(line, "Status Messages: ", 17)) {
+					GET_STATUS_MESSAGES(ch) = asciiflag_conv(line + 17);
+				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
@@ -2840,6 +2843,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_SPEAKING(ch) != NOTHING) {
 		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
 	}
+	fprintf(fl, "Status Messages: %s\n", bitv_to_alpha(GET_STATUS_MESSAGES(ch)));
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
 	}
@@ -4656,6 +4660,7 @@ void init_player(char_data *ch) {
 	
 	ch->char_specials.affected_by = 0;
 	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
+	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
 
 	for (i = 0; i < NUM_CONDS; i++) {
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);

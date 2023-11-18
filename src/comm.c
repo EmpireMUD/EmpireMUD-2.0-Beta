@@ -1009,7 +1009,7 @@ void heartbeat(unsigned long heart_pulse) {
 
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
 	char_data *to, *list = NULL;
-	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
+	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE, is_animal_move = FALSE;
 
 	if (!str || !*str) {
 		return;
@@ -1024,6 +1024,10 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 	
 	if (IS_SET(act_flags, TO_SPAMMY)) {
 		is_spammy = TRUE;
+	}
+	
+	if (IS_SET(act_flags, TO_ANIMAL_MOVE)) {
+		is_animal_move = TRUE;
 	}
 
 	if (IS_SET(act_flags, TO_NODARK)) {

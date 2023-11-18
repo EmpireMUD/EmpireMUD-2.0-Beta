@@ -6,7 +6,7 @@
 *
 * Game-specific tips
 The website has a graphical world map at http://empiremud.net/map-viewer/
-You can see a list of what's changed recently at http://empiremud.net/patch-notes/
+You can see a list of what's changed recently at https://empiremud.net/empiremud-patch-notes.html
 *
 * General tips
 You can always ask for help on the /newbie channel.
@@ -150,4 +150,5 @@ Type 'swim' to move into water, or 'toggle autoswim' to remove the need to do th
 Use 'mapscan' to locate islands across the sea.
 Use 'run' to set a path and move quickly. You can 'toggle travel-look' to stop seeing rooms while running.
 Try the 'directions' command to figure out how to get to a set of coordinates.
+If the weather or temperature messages are overwhelming, try the 'statusmessages' command.
 $~

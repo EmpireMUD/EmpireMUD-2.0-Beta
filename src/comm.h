@@ -71,6 +71,7 @@ void update_reboot();
 #define TO_COMBAT_HIT  BIT(15)	// is a hit (fightmessages) -- REQUIRES vict_obj is a char
 #define TO_COMBAT_MISS  BIT(16)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
 #define TO_QUEUE  BIT(17)	// message goes into the stackable queue
+#define TO_ANIMAL_MOVE  BIT(18)	// allows SM_ANIMAL_MOVEMENT to ignore the message
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);
