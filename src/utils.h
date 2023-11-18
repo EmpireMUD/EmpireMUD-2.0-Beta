@@ -2638,7 +2638,7 @@ void sort_einv_for_empire(empire_data *emp);
 
 
 // supplementary math
-#define ABSOLUTE(x)  ((x < 0) ? ((x) * -1) : (x))
+#define ABSOLUTE(x)  (((x) < 0) ? ((x) * -1) : (x))
 
 
 // time: converts 0-23 to 1-12am, 1-12pm
