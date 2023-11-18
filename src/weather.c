@@ -669,33 +669,39 @@ void send_hourly_sun_messages(void) {
 		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
 			GET_LAST_LOOK_SUN(desc->character) = sun;
 			
-			if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
-				switch (sun) {
-					case SUN_RISE: {
-						if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
-							// show map if needed
-							look_at_room(desc->character);
-							msg_to_char(desc->character, "\r\n");
-						}
+			switch (sun) {
+				case SUN_RISE: {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN_AUTO_LOOK) && !HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+						// show map if needed
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
 						msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
-						break;
 					}
-					case SUN_LIGHT: {
+					break;
+				}
+				case SUN_LIGHT: {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
 						msg_to_char(desc->character, "The day has begun.\r\n");
-						break;
 					}
-					case SUN_SET: {
+					break;
+				}
+				case SUN_SET: {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
 						msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
-						break;
 					}
-					case SUN_DARK: {
-						if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
-							look_at_room(desc->character);
-							msg_to_char(desc->character, "\r\n");
-						}
+					break;
+				}
+				case SUN_DARK: {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN_AUTO_LOOK) && !HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
 						msg_to_char(desc->character, "The night has begun.\r\n");
-						break;
 					}
+					break;
 				}
 			}
 		}	// end sun-change

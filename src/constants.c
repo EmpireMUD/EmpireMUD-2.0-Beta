@@ -1012,7 +1012,8 @@ const char *status_message_types[] = {
 	"thirst",
 	"low blood",
 	"sun",
-	"temperature",	// 5
+	"sun auto look",	// 5
+	"temperature",
 	"extreme temperature",
 	"vehicle movement",
 	"weather",

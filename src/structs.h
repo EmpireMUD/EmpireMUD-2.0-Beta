@@ -2563,14 +2563,15 @@ typedef enum {
 #define SM_HUNGER  BIT(1)	// hunger messages
 #define SM_THIRST  BIT(2)	// thirst messages
 #define SM_LOW_BLOOD  BIT(3)	// vampire starvation messages
-#define SM_SUN  BIT(4)	// sunrise/sunset
-#define SM_TEMPERATURE  BIT(5)	// basic temperature change messages
-#define SM_EXTREME_TEMPERATURE  BIT(6)	// warning messages for dangerous temperature
-#define SM_VEHICLE_MOVEMENT  BIT(7)	// messages shown to interior when vehicle moves
-#define SM_WEATHER  BIT(8)	// weather change messages
+#define SM_SUN  BIT(4)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(5)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(6)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(7)	// warning messages for dangerous temperature
+#define SM_VEHICLE_MOVEMENT  BIT(8)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(9)	// weather change messages
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SUN | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

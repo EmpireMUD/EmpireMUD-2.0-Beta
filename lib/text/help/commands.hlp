@@ -991,7 +991,7 @@ Reputation levels and values:
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
-Usage:  fightmessages [type]
+Usage:  fightmessages [type] [on | off]
         fmessages all <on | off>
 
 This command lets you toggle which fight messages you do or don't see. This can
@@ -2460,7 +2460,7 @@ See also: SAY, SHOUT
 #
 STATUSMESSAGES "STATUS MESSAGES" SMESSAGES
 
-Usage:  statusmessages [type]
+Usage:  statusmessages [type] [on | off]
         smessages all <on | off>
 
 This command lets you toggle which status messages you do or don't see. This may
