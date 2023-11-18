@@ -2648,6 +2648,7 @@ PLAYER_UPDATE_FUNC(b5_153_player_repair) {
 // b5.162: Players now have status message preferences.
 PLAYER_UPDATE_FUNC(b5_162_status_messages) {
 	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
+	GET_FIGHT_MESSAGES(ch) |= FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT;
 }
 
 

@@ -136,9 +136,18 @@ char *ability_data_display(struct ability_data_list *adl) {
 */
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
 	bool invis;
+	bitvector_t act_flags = NOBITS;
 	
 	if (!ch || !abil) {
 		return;	// no work
+	}
+	
+	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
+		act_flags |= TO_COMBAT_MISS;
+	}
+	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
@@ -146,48 +155,48 @@ void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
 	if (ch == vict || !vict) {	// message: targeting self
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_ROOM);
+			act(buf, invis, ch, NULL, vict, TO_ROOM | act_flags);
 		}
 	}
 	else {	// message: ch != vict
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 	
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_VICT);
+			act(buf, invis, ch, NULL, vict, TO_VICT | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
+			act(buf, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		}
 	}
 }
@@ -996,9 +1005,18 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 */
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
 	bool invis;
+	bitvector_t act_flags = NOBITS;
 	
 	if (!ch || !abil) {
 		return;	// no work
+	}
+	
+	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
+		act_flags |= TO_COMBAT_HIT;
+	}
+	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
@@ -1006,28 +1024,28 @@ void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
 	if (ch == vict || !vict) {	// message: targeting self
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM | act_flags);
 		}
 	}
 	else {	// message: ch != vict
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		}
 	
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		}
 	}
 }
@@ -1445,6 +1463,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	char buf[MAX_STRING_LENGTH];
 	bool violent, invis;
 	int iter;
+	bitvector_t act_flags = NOBITS;
 	
 	if (!ch || !abil) {
 		return;
@@ -1452,6 +1471,14 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT));
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	
+	if (violent && cvict) {
+		act_flags |= TO_COMBAT_HIT;
+	}
+	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
 	
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
 		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
@@ -1529,29 +1556,29 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | TO_COMBAT_MISS);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+			act(buf, FALSE, ch, NULL, cvict, TO_CHAR | TO_COMBAT_MISS);
 		}
 		
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT | TO_COMBAT_MISS);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_VICT);
+			act(buf, FALSE, ch, NULL, cvict, TO_VICT | TO_COMBAT_MISS);
 		}
 		
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT | TO_COMBAT_MISS);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT);
+			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT | TO_COMBAT_MISS);
 		}
 		
 		data->stop = TRUE;	// prevent routines from firing
@@ -1573,53 +1600,53 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		if (ch == cvict) {	// message: targeting self
 			// to-char
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
 			}
 		
 			// to room
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_ROOM);
+				act(buf, invis, ch, NULL, cvict, TO_ROOM | act_flags);
 			}
 		}
 		else {	// message: ch != cvict
 			// to-char
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
+				act(buf, FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
 			}
 		
 			// to cvict
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_VICT);
+				act(buf, invis, ch, NULL, cvict, TO_VICT | act_flags);
 			}
 		
 			// to room
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
+				act(buf, invis, ch, NULL, cvict, TO_NOTVICT | act_flags);
 			}
 		}
 	}
@@ -1755,7 +1782,7 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | (ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_COMBAT_MISS : NOBITS));
 		return;
 	}
 	
@@ -1875,7 +1902,7 @@ DO_ABIL(do_dot_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | (ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_COMBAT_MISS : NOBITS));
 		return;
 	}
 	

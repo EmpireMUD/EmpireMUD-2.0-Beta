@@ -638,6 +638,9 @@ const char *combat_message_types[] = {
 	"other hits",
 	"other misses",
 	"autodiagnose",
+	"my buffs in combat",	// 15
+	"ally buffs in combat",
+	"other buffs in combat",
 	"\n"
 };
 
