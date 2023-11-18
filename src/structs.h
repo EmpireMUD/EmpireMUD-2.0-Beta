@@ -4699,9 +4699,9 @@ struct player_special_data {
 	int beckoned_by;	// idnum of player who beckoned (for follow)
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
-	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
-	int last_cold_time;	// last time a player was told they're getting colder
-	int last_warm_time;	// last time a player was told they're getting warmer
+	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
+	time_t last_cold_time;	// last time a player was told they're getting colder
+	time_t last_warm_time;	// last time a player was told they're getting warmer
 	int last_messaged_temperature;	// last temperature a player was warned about
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
