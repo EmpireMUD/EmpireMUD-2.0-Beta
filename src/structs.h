@@ -2285,7 +2285,7 @@ typedef enum {
 #define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
 #define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
 #define FM_MY_BUFFS_IN_COMBAT  BIT(15)	// buffs on me while fighting
-#define FM_ALLY_BUFFS_IN_COMBAT  BIT(15)	// buffs on allies while fighting
+#define FM_ALLY_BUFFS_IN_COMBAT  BIT(16)	// buffs on allies while fighting
 #define FM_OTHER_BUFFS_IN_COMBAT  BIT(17)	// buffs on others while fighting
 
 // flags set at character creation
