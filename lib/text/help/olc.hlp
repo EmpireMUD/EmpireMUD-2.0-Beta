@@ -1844,6 +1844,7 @@ The following affect flags are available:
  &cSLOWER-ACTIONS&0 - Timed actions (e.g. chopping) are slower.
  &cHUNGRIER&0 - Player becomes hungry faster.
  &cTHIRSTIER&0 - Player becomes thirsty faster.
+ &cIMMUNE-TEMPERATURE&0 - Player does not suffer effects of heat or cold.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
