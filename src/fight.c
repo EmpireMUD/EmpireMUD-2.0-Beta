@@ -2174,7 +2174,7 @@ void block_missile_attack(char_data *ch, char_data *victim, int type) {
 */
 void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	bitvector_t fmsg_type;
-	char *buf;
+	char message[1024], *ptr;
 	int iter, msgnum;
 
 	static struct dam_weapon_type {
@@ -2281,24 +2281,30 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 
 	/* damage message to onlookers */
 	if (!AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
-		buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-		act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
+		ptr = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
+		act(ptr, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
 	}
 
 	/* damage message to damager */
 	if (ch->desc && ch != victim && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
-		send_to_char("&y", ch);
-		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-		act(buf, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
-		send_to_char("&0", ch);
+		if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
+			snprintf(message, sizeof(message), "\ty%s (%d)\t0", replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun), dam);
+		}
+		else { // no damage numbers
+			snprintf(message, sizeof(message), "\ty%s\t0", replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun));
+		}
+		act(message, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
 	}
 
 	/* damage message to damagee */
 	if (victim->desc) {
-		send_to_char("&r", victim);
-		buf = replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-		act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
-		send_to_char("&0", victim);
+		if (SHOW_FIGHT_MESSAGES(victim, FM_DAMAGE_NUMBERS)) {
+			snprintf(message, sizeof(message), "\tr%s (%+d)\t0", replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun), -1 * dam);
+		}
+		else { // no damage numbers
+			snprintf(message, sizeof(message), "\tr%s\t0", replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun));
+		}
+		act(message, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
 	}
 }
 
@@ -2318,6 +2324,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	int j, nr;
 	struct message_list *msg_set;
 	struct message_type *msg;
+	char message[1024];
 	
 	obj_data *weap = GET_EQ(ch, WEAR_WIELD);	// if any
 	
@@ -2343,55 +2350,100 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 			if (ch != vict) {
-				act(msg->msg[MSG_GOD].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_GOD].attacker_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
 			}
 			act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 		}
-		act(msg->msg[MSG_GOD].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
+		
+		// victim message
+		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+			snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+		}
+		else {	// no damage numbers
+			// normally this would be red, but it's basically a miss against a god
+			snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
+		}
+		act(message, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
 	}
 	else if (dam != 0) {
 		if (GET_POS(vict) == POS_DEAD) {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 				if (ch != vict) {
-					send_to_char("&y", ch);
-					act(msg->msg[MSG_DIE].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-					send_to_char("&0", ch);
+					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
+						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
+					}
+					else {	// no damage numbers
+						snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_DIE].attacker_msg);
+					}
+					act(message, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 				}
 				
 				act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 			}
-			send_to_char("&r", vict);
-			act(msg->msg[MSG_DIE].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
-			send_to_char("&0", vict);
+			
+			// victim death message
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+			}
+			else {	// no damage numbers
+				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 		}
 		else {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 				if (ch != vict) {
-					send_to_char("&y", ch);
-					act(msg->msg[MSG_HIT].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-					send_to_char("&0", ch);
+					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
+						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
+					}
+					else {	// no damage numbers
+						snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_HIT].attacker_msg);
+					}
+					act(message, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 				}
 				
 				act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 			}
-			send_to_char("&r", vict);
-			act(msg->msg[MSG_HIT].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
-			send_to_char("&0", vict);
+			
+			// victim hit message
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+			}
+			else {	// no damage numbers
+				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 		}
 	}
 	else if (ch != vict) {	/* Dam == 0 */
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 			if (ch != vict) {
-				send_to_char("&y", ch);
-				act(msg->msg[MSG_MISS].attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
-				send_to_char("&0", ch);
+				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_MISS].attacker_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
 			}
 			
 			act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 		}
-		send_to_char("&r", vict);
-		act(msg->msg[MSG_MISS].victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
-		send_to_char("&0", vict);
+		
+		// victim miss message
+		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+			snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+		}
+		else {	// no damage numbers
+			snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
+		}
+		act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 	}
 	
 	// if we got here

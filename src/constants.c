@@ -641,6 +641,7 @@ const char *combat_message_types[] = {
 	"my buffs in combat",	// 15
 	"ally buffs in combat",
 	"other buffs in combat",
+	"damage numbers",
 	"\n"
 };
 
