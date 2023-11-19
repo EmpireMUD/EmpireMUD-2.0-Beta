@@ -222,6 +222,7 @@
 #define ATYPE_HOT_PENALTY  3107	// "sweltering"
 #define ATYPE_COOL_PENALTY  3108	// "chilly"
 #define ATYPE_WARM_PENALTY  3109	// "warm"
+#define ATYPE_BRIEF_RESPITE  3110	// after death
 
 
 // GENERIC_COOLDOWN entires used by the code

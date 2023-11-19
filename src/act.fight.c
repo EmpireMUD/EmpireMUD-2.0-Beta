@@ -458,6 +458,8 @@ ACMD(do_meters) {
 
 
 ACMD(do_respawn) {
+	struct affected_type *af;
+	
 	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
 		msg_to_char(ch, "You aren't even dead yet!\r\n");
 	}
@@ -487,6 +489,12 @@ ACMD(do_respawn) {
 		greet_mtrigger(ch, NO_DIR, "respawn");
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR, "respawn");
+		
+		// temporary safety effect after a respawn
+		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);
+		affect_join(ch, af, NOBITS);
+		RESET_LAST_MESSAGED_TEMPERATURE(ch);
+		
 		msdp_update_room(ch);
 	}
 }
