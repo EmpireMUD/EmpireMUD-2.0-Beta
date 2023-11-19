@@ -3145,11 +3145,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			/* These messages will be handled in perform_execute */
 			break;
 		default:			/* >= POSITION SLEEPING */
-			if (dam > (GET_MAX_HEALTH(victim) / 10))
-				send_to_char("&rThat really did HURT!&0\r\n", victim);
+			if (dam > (GET_MAX_HEALTH(victim) / 10)) {
+				act("&rThat really did HURT!&0", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_HIT);
+			}
 
-			if (GET_HEALTH(victim) <= (GET_MAX_HEALTH(victim) / 20))
-				msg_to_char(victim, "&rYou wish that your wounds would stop BLEEDING so much!&0\r\n");
+			if (GET_HEALTH(victim) <= (GET_MAX_HEALTH(victim) / 20)) {
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_HIT);
+			}
 
 			break;
 	}

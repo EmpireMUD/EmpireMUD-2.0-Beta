@@ -1247,7 +1247,11 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		show = any = FALSE;
 		// hits
 		if (IS_SET(act_flags, TO_COMBAT_HIT)) {
-			if (!show && to == ch) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HITS);
 			}
@@ -1277,7 +1281,11 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		// misses
 		if (IS_SET(act_flags, TO_COMBAT_MISS)) {
-			if (!show && to == ch) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_MISSES);
 			}

@@ -788,12 +788,15 @@ void send_char_pos(char_data *ch, int dam) {
 			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
 			send_to_char("You are dead!  Sorry...\r\n", ch);
 			break;
-		default:                        /* >= POSITION SLEEPING */
-			if (dam > (GET_MAX_HEALTH(ch) / 4))
-				act("That really did HURT!", FALSE, ch, 0, 0, TO_CHAR);
-			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4))
-				msg_to_char(ch, "&rYou wish that your wounds would stop BLEEDING so much!&0\r\n");
+		default: {                        /* >= POSITION SLEEPING */
+			if (dam > (GET_MAX_HEALTH(ch) / 4)) {
+				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+			}
+			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4)) {
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+			}
 			break;
+		}
 	}
 }
 
