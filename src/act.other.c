@@ -2364,8 +2364,9 @@ ACMD(do_douse) {
 // search hints: do_fmessages, do_smessages, do_statusmessages
 ACMD(do_fightmessages) {
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING, count;
-	bool on;
+	bool on = FALSE, off = FALSE, mode;
 	
 	// SCMD_FIGHT, SCMD_STATUS
 	const char *message_type[] = { "fight", "status" };
@@ -2386,8 +2387,22 @@ ACMD(do_fightmessages) {
 		return;
 	}
 	
-	// detect possible type
+	// argument processing
 	skip_spaces(&argument);
+	chop_last_arg(argument, arg1, arg2);
+	
+	// detect optional on/off
+	if (!str_cmp(arg2, "on")) {
+		on = TRUE;
+		argument = arg1;	// use only arg1
+	}
+	else if (!str_cmp(arg2, "off")) {
+		off = TRUE;
+		argument = arg1;	// use only arg1
+	}
+	// otherwise did not provide on/off arg
+	
+	// detect possible type from remaining arg
 	if (*argument) {
 		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
 			if (is_multiword_abbrev(argument, type_strings[iter])) {
@@ -2419,33 +2434,35 @@ ACMD(do_fightmessages) {
 			send_to_char("\r\n", ch);
 		}
 	}
-	else if (!str_cmp(argument, "all on")) {
-		// turn ON all bits that have names
-		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
-			SET_BIT(*flagset, BIT(iter));
+	else if (!str_cmp(argument, "all")) {
+		if (!on && !off) {
+			msg_to_char(ch, "Did you want to turn them all on or off?\r\n");
+			return;
 		}
-		msg_to_char(ch, "You toggle all %s messages \tgon\t0.\r\n", message_type[subcmd]);
-	}
-	else if (!str_cmp(argument, "all off")) {
-		// turn ON all bits that have names
+		// turn ON/OFF all bits that have names
 		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
-			REMOVE_BIT(*flagset, BIT(iter));
+			if (on) {
+				SET_BIT(*flagset, BIT(iter));
+			}
+			else {
+				REMOVE_BIT(*flagset, BIT(iter));
+			}
 		}
-		msg_to_char(ch, "You toggle all %s messages \troff\t0.\r\n", message_type[subcmd]);
+		msg_to_char(ch, "You toggle all %s messages %s\t0.\r\n", message_type[subcmd], on ? "\tgon" : "\troff");
 	}
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown %s message type '%s'.\r\n", message_type[subcmd], argument);
 	}
 	else {
-		on = (IS_SET(*flagset, BIT(type)) ? FALSE : TRUE);
-		if (on) {
+		mode = (on ? TRUE : (off ? FALSE : (IS_SET(*flagset, BIT(type)) ? FALSE : TRUE)));
+		if (mode) {
 			SET_BIT(*flagset, BIT(type));
 		}
 		else {
 			REMOVE_BIT(*flagset, BIT(type));
 		}
 		
-		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", type_strings[type], on ? "\tgon" : "\troff");
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", type_strings[type], mode ? "\tgon" : "\troff");
 	}
 }
 

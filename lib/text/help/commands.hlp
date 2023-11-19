@@ -420,7 +420,7 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  smessage channel joins
+Usage:  smessage channel joins [on | off]
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
@@ -1575,7 +1575,7 @@ There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 
-Usage:  smessages mortlog
+Usage:  smessages mortlog [on | off]
 
 This toggles mortlogs on and off. Mortlogs give you periodic updates, such as
 when a player creates, logs in, or leaves (depending on the game's settings).
@@ -2768,7 +2768,7 @@ See also: TOMB BUILDING, STARTING LOCATION
 #
 TRAVEL-LOOK TRAVEL-AUTO-LOOK "TRAVEL LOOK" "TRAVEL AUTO LOOK"
 
-Usage:  smessage travel auto look
+Usage:  smessage travel auto look [on | off]
 
 This setting causes you to automatically 'look' after each time you move when
 running or when driving, piloting, or sailing a vehicle. With this message off,
