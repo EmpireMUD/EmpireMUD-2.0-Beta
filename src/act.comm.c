@@ -704,7 +704,7 @@ int top_slash_channel_id = 0;
 
 /**
 * Sends channel join/leave messages. This function is blocked by the
-* !CHANNEL-JOINS preference (toggle channel-joins).
+* "channel joins" smessage toggle.
 *
 * @param struct slash_channel *chan The slash channel to announce to.
 * @param char_data *person The person being announced (for ignores).
@@ -725,7 +725,7 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 			if (!d->character || STATE(d) != CON_PLAYING) {
 				continue;
 			}
-			if (PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS) || is_ignoring(d->character, person)) {
+			if (!SHOW_STATUS_MESSAGES(d->character, SM_CHANNEL_JOINS) || is_ignoring(d->character, person)) {
 				continue;
 			}
 			if (!(slash = find_on_slash_channel(d->character, chan->id))) {
@@ -1415,7 +1415,7 @@ ACMD(do_slash_channel) {
 					announce_to_slash_channel(chan, ch, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
-				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS) || PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+				if (GET_INVIS_LEV(ch) > LVL_MORTAL || !SHOW_STATUS_MESSAGES(ch, SM_CHANNEL_JOINS) || PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}

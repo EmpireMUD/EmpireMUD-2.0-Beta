@@ -2437,7 +2437,7 @@ typedef enum {
 #define PRF_NOTELL  BIT(3)	// Can't receive tells
 #define PRF_POLITICAL  BIT(4)	// Changes map to political colors
 #define PRF_RP  BIT(5)	// RP-only
-#define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
+	#define PRF_UNUSED_1  BIT(6)	// was MORTLOG before b5.162
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
 #define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
@@ -2446,7 +2446,7 @@ typedef enum {
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
 #define PRF_NO_IDLE_OUT  BIT(13)	// Player won't idle out
 #define PRF_ROOMFLAGS  BIT(14)	// Sees vnums and flags on look
-#define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
+	#define PRF_UNUSED_2  BIT(15)	// was !CHANNEL-JOINS before b5.162
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
 #define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
@@ -2466,7 +2466,7 @@ typedef enum {
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 #define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
-#define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
+	#define PRF_UNUSED_3  BIT(35)	// was TRAVEL-LOOK before b5.162
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
@@ -2565,20 +2565,23 @@ typedef enum {
 
 // SM_x: status messages
 #define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
-#define SM_COOLDOWNS  BIT(1)	// message when a cooldown expires
-#define SM_HUNGER  BIT(2)	// hunger messages
-#define SM_THIRST  BIT(3)	// thirst messages
-#define SM_LOW_BLOOD  BIT(4)	// vampire starvation messages
-#define SM_SKILL_GAINS  BIT(5) // message when player gains skill points
-#define SM_SUN  BIT(6)	// sunrise/sunset messages
-#define SM_SUN_AUTO_LOOK  BIT(7)	// player looks when sun goes up or down
-#define SM_TEMPERATURE  BIT(8)	// basic temperature change messages
-#define SM_EXTREME_TEMPERATURE  BIT(9)	// warning messages for dangerous temperature
-#define SM_VEHICLE_MOVEMENT  BIT(10)	// messages shown to interior when vehicle moves
-#define SM_WEATHER  BIT(11)	// weather change messages
+#define SM_CHANNEL_JOINS  BIT(1)	// players joining/leaving slash-channels
+#define SM_COOLDOWNS  BIT(2)	// message when a cooldown expires
+#define SM_HUNGER  BIT(3)	// hunger messages
+#define SM_THIRST  BIT(4)	// thirst messages
+#define SM_LOW_BLOOD  BIT(5)	// vampire starvation messages
+#define SM_MORTLOG  BIT(6)	// player creation logs, etc
+#define SM_SKILL_GAINS  BIT(7) // message when player gains skill points
+#define SM_SUN  BIT(8)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(9)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(10)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(11)	// warning messages for dangerous temperature
+#define SM_TRAVEL_AUTO_LOOK  BIT(12)	// auto-look when running
+#define SM_VEHICLE_MOVEMENT  BIT(13)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(14)	// weather change messages
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

@@ -4812,7 +4812,6 @@ void start_new_character(char_data *ch) {
 	set_title(ch, NULL);
 
 	/* Default Flags */
-	SET_BIT(PRF_FLAGS(ch), PRF_MORTLOG);
 	if (GET_ACCOUNT(ch) && config_get_bool("siteok_everyone")) {
 		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_SITEOK);
 	}

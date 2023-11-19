@@ -1833,7 +1833,7 @@ void mortlog(const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
+		if (STATE(i) == CON_PLAYING && i->character && SHOW_STATUS_MESSAGES(i->character, SM_MORTLOG)) {
 			stack_msg_to_desc(i, "&c[ %s ]&0\r\n", output);
 		}
 	}

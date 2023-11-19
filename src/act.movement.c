@@ -1554,7 +1554,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 
 	// auto-look
 	if (ch->desc != NULL) {
-		if (IS_SET(flags, MOVE_RUN) && !PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
+		if (IS_SET(flags, MOVE_RUN) && !SHOW_STATUS_MESSAGES(ch, SM_TRAVEL_AUTO_LOOK)) {
 			msg_to_char(ch, "You run %s to %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
 		}
 		else {	// normal look

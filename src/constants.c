@@ -754,7 +754,7 @@ const char *preference_bits[] = {
 	"!TELL",
 	"POLIT",
 	"RP",
-	"MORTLOG",
+		"*",	// formerly MORTLOG
 	"!REP",
 	"LIGHT",
 	"INCOGNITO",
@@ -763,7 +763,7 @@ const char *preference_bits[] = {
 	"!HASSLE",
 	"!IDLE-OUT",
 	"ROOMFLAGS",
-	"!CHANNEL-JOINS",
+	"	*",	// formerly !CHANNEL-JOINS
 	"AUTOKILL",
 	"SCRL",
 	"NO-ROOM-DESCS",
@@ -783,7 +783,7 @@ const char *preference_bits[] = {
 	"!TUTORIALS",
 	"!PAINT",
 	"EXTRA-SPACING",
-	"TRAVEL-LOOK",
+		"*",	// formerly TRAVEL-LOOK
 	"AUTOCLIMB",
 	"AUTOSWIM",
 	"ITEM-QUALITY",
@@ -845,10 +845,6 @@ const struct toggle_data_type toggle_data[] = {
 	{ "compact", TOG_ONOFF, PRF_COMPACT, 0, NULL },
 	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, tog_pvp },
 	
-	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
-	{ "travel-look", TOG_ONOFF, PRF_TRAVEL_LOOK, 0, NULL },
-	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
-	
 	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
 	{ "extra-spacing",	TOG_ONOFF, PRF_EXTRA_SPACING, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
@@ -865,7 +861,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "item-details", TOG_ONOFF, PRF_ITEM_DETAILS, 0, NULL },
 	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
 	
-	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
+	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	
@@ -1012,16 +1008,19 @@ const char *player_tech_types[] = {
 // SM_x: status messages
 const char *status_message_types[] = {
 	"animal movement",	// 0
+	"channel joins",
 	"cooldowns",
 	"hunger",
 	"thirst",
-	"low blood",
-	"skill gains",	// 5
+	"low blood",	// 5
+	"mortlog",
+	"skill gains",
 	"sun",
 	"sun auto look",
-	"temperature",
+	"temperature",	// 10
 	"extreme temperature",
-	"vehicle movement",	// 10
+	"travel auto look",
+	"vehicle movement",
 	"weather",
 	"\n"
 };

@@ -420,12 +420,12 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  toggle channel-joins [on/off]
+Usage:  smessage channel joins
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
 
-See also: SLASH-CHANNELS, TOGGLE
+See also: SLASH-CHANNELS, STATUS MESSAGES
 #
 CHART CHARTS
 
@@ -1575,11 +1575,13 @@ There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 
-Usage:  toggle mortlog [on/off]
+Usage:  smessages mortlog
 
-This will give you periodic updates, such as when a player creates, logs in, or
-leaves (depending on the game's settings). It's useful in keeping up on current
-events. Mortlog is colored cyan.
+This toggles mortlogs on and off. Mortlogs give you periodic updates, such as
+when a player creates, logs in, or leaves (depending on the game's settings).
+It's useful in keeping up on current events. Mortlog is colored cyan.
+
+See also: STATUS MESSAGES
 #
 MOTD
 
@@ -2686,7 +2688,6 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   autoswim - can enter water without typing 'swim'
   bother - allows "bothersome" things like bite and purify
-  channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
@@ -2695,7 +2696,6 @@ Toggles:
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
-  mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
@@ -2709,7 +2709,6 @@ Toggles:
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
-  travel-look - automatically 'looks' after each run or when your vehicle moves
   tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
@@ -2767,13 +2766,15 @@ Basic tombs:
 
 See also: TOMB BUILDING, STARTING LOCATION
 #
-TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+TRAVEL-LOOK TRAVEL-AUTO-LOOK "TRAVEL LOOK" "TRAVEL AUTO LOOK"
 
-Usage:  toggle travel-look [on/off]
+Usage:  smessage travel auto look
 
-This toggle causes you to automatically 'look' after each time you move when
-running or when driving, piloting, or sailing a vehicle. With this toggle off,
+This setting causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this message off,
 you only see a short message indicating you moved.
+
+See alos: STATUS MESSAGES
 #
 TUNNEL "TUNNEL COMMAND"
 
