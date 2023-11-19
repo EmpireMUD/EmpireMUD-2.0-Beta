@@ -96,7 +96,7 @@ void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 
 // local file scope variables
-static int char_extractions_pending = 0;
+int char_extractions_pending = 0;
 static int veh_extractions_pending = 0;
 
 

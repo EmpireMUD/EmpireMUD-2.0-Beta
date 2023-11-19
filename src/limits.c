@@ -40,6 +40,7 @@
 */
 
 // external vars
+extern int char_extractions_pending;
 
 // external funcs
 ACMD(do_dismount);
@@ -492,6 +493,12 @@ void real_update_player(char_data *ch) {
 	bool found, msg;
 	
 	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	if (EXTRACTED(ch) && char_extractions_pending == 0) {
+		log("SYSERR: Player %s is EXTRACED while no extractions are pending.\r\n", GET_NAME(ch));
+		++char_extractions_pending;
 		return;
 	}
 	
