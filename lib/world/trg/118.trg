@@ -4834,7 +4834,7 @@ elseif %move% == 4
     dg_affect #11845 %self% HARD-STUNNED on 20
   end
   %send% %targ% &&m~%self% throws the shadow dagger at you, but it passes through you and strikes your shadow!&&0
-  %echoaround% %targ% &&m~%self% throws the shadow dagger at ~%actor%, but it passes through *%actor% and strikes ^%actor% shadow!&&0
+  %echoaround% %targ% &&m~%self% throws the shadow dagger at ~%targ%, but it passes through *%targ% and strikes ^%targ% shadow!&&0
   if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
     %send% %targ% &&m**** The dagger has you stuck fast... You can't move! ****&&0 (struggle)
     %echoaround% %targ% &&m~%targ% suddenly freezes!&&0
