@@ -1485,10 +1485,12 @@ void update_player_temperature(char_data *ch) {
 		// apply
 		if (GET_TEMPERATURE(ch) < ambient) {
 			GET_TEMPERATURE(ch) += change;
+			GET_TEMPERATURE(ch) = MIN(ambient, GET_TEMPERATURE(ch));
 			gain = TRUE;
 		}
 		else {
 			GET_TEMPERATURE(ch) -= change;
+			GET_TEMPERATURE(ch) = MAX(ambient, GET_TEMPERATURE(ch));
 			loss = TRUE;
 		}
 		
