@@ -1453,6 +1453,7 @@ void update_player_temperature(char_data *ch) {
 	int ambient, was_temp, relative, limit;
 	double change;
 	bool gain = FALSE, loss = FALSE;
+	bool showed_warm_room = FALSE, showed_cold_room = FALSE;
 	
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
 		return;	// no temperature
@@ -1466,9 +1467,11 @@ void update_player_temperature(char_data *ch) {
 		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
 			// higher temp
 			msg_to_char(ch, "It's %s %s.\r\n", (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
+			showed_warm_room = TRUE;
 		}
 		else {	// lower temp
 			msg_to_char(ch, "It's %s %s.\r\n", (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here");
+			showed_cold_room = TRUE;
 		}
 		
 		// update temp for later
@@ -1502,10 +1505,10 @@ void update_player_temperature(char_data *ch) {
 				if (relative >= limit - (limit / 10) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting too hot!\r\n");
 				}
-				else if (relative >= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+				else if (!showed_warm_room && relative >= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting warm.\r\n");
 				}
-				else if (relative <= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+				else if (!showed_warm_room && relative <= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're warming up%s.\r\n", (relative <= -1 * limit) ? " but still quite cold" : "");
 				}
 			
@@ -1516,10 +1519,10 @@ void update_player_temperature(char_data *ch) {
 				if (relative <= (limit + (limit / -10)) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting too cold!\r\n");
 				}
-				else if (relative <= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+				else if (!showed_cold_room && relative <= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're getting cold.\r\n");
 				}
-				else  if (relative >= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+				else  if (!showed_cold_room && relative >= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
 					msg_to_char(ch, "You're cooling down%s.\r\n", (relative >= -1 * limit) ? " but still rather warm" : "");
 				}
 			
