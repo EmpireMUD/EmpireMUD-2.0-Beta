@@ -569,6 +569,7 @@ Island flags:
  !CUSTOMIZE - Cannot be renamed by players
  CONTINENT - Is a whole continent (affects adventure spawns)
  !CHART - Cannot be charted by players
+ !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
 
 See also: CHART, GRANT
 #d

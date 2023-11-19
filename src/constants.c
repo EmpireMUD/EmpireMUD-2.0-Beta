@@ -1014,14 +1014,15 @@ const char *status_message_types[] = {
 	"thirst",
 	"low blood",	// 5
 	"mortlog",
+	"prompt",
 	"skill gains",
 	"sun",
-	"sun auto look",
-	"temperature",	// 10
+	"sun auto look",	// 10
+	"temperature",
 	"extreme temperature",
 	"travel auto look",
 	"vehicle movement",
-	"weather",
+	"weather",	// 15
 	"\n"
 };
 
@@ -3649,6 +3650,7 @@ const char *island_bits[] = {
 	"CONTINENT",
 	"*",	// has-custom-desc (internal use only)
 	"!CHART",	// 5
+	"!TEMPERATURE-PENALTIES",
 	"\n"
 };
 

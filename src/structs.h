@@ -2571,17 +2571,18 @@ typedef enum {
 #define SM_THIRST  BIT(4)	// thirst messages
 #define SM_LOW_BLOOD  BIT(5)	// vampire starvation messages
 #define SM_MORTLOG  BIT(6)	// player creation logs, etc
-#define SM_SKILL_GAINS  BIT(7) // message when player gains skill points
-#define SM_SUN  BIT(8)	// sunrise/sunset messages
-#define SM_SUN_AUTO_LOOK  BIT(9)	// player looks when sun goes up or down
-#define SM_TEMPERATURE  BIT(10)	// basic temperature change messages
-#define SM_EXTREME_TEMPERATURE  BIT(11)	// warning messages for dangerous temperature
-#define SM_TRAVEL_AUTO_LOOK  BIT(12)	// auto-look when running
-#define SM_VEHICLE_MOVEMENT  BIT(13)	// messages shown to interior when vehicle moves
-#define SM_WEATHER  BIT(14)	// weather change messages
+#define SM_PROMPT  BIT(7)	// show or hide prompt
+#define SM_SKILL_GAINS  BIT(8) // message when player gains skill points
+#define SM_SUN  BIT(9)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(10)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(11)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(12)	// warning messages for dangerous temperature
+#define SM_TRAVEL_AUTO_LOOK  BIT(13)	// auto-look when running
+#define SM_VEHICLE_MOVEMENT  BIT(14)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(15)	// weather change messages
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2963,13 +2964,14 @@ typedef enum {
 #define EX_CLOSED  BIT(1)	// The door is closed
 
 
-// Island flags -- ISLE_x
+// ISLE_x: Island flags
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
+#define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them

@@ -1123,7 +1123,7 @@ void check_temperature_penalties(char_data *ch) {
 	if (IS_NPC(ch) || !IN_ROOM(ch)) {
 		return;	// no temperature
 	}
-	if (IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_IMMUNE_TEMPERATURE) || !config_get_bool("temperature_penalties") || get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+	if (IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_IMMUNE_TEMPERATURE) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_TEMPERATURE_PENALTIES) || !config_get_bool("temperature_penalties") || get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
 		// no penalties-- remove them, though, in case it was just shut off
 		cancel_temperature_penalties(ch, NOTHING, TRUE);
 		return;

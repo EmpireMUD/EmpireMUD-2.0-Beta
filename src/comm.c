@@ -3021,6 +3021,10 @@ char *prompt_str(char_data *ch) {
 	if (FIGHTING(ch)) {
 		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
 	}
+	else if (!SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_PROMPT)) {
+		// no prompt at all please
+		return "";
+	}
 	else {
 		str = GET_PROMPT(REAL_CHAR(ch));
 	}
