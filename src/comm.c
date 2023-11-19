@@ -3414,6 +3414,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					
 					sprintf(i, "%s%s\t0", temp_color, temperature_to_string(temperature));
 					tmp = i;
+					break;
 				}
 				case 'a': {	// action
 					if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_GEN_CRAFT) {
