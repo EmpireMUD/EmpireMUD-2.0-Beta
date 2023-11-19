@@ -609,7 +609,17 @@ Examples:
   You SLAUGHTER the pig with your chop!
   You **LIQUIDATE** the ice sculpture with your fire!
 
-See also: CASTER DPS, DOT, HIT, MELEE DPS, METERS
+See also: CASTER DPS, DAMAGE NUMBERS, DOT, HIT, MELEE DPS, METERS
+#
+"DAMAGE NUMBERS"
+
+You can see the amount of damage you deal, as well as the amount dealt to you,
+by turning on "fmessages damage numbers". Damage you deal is shown as a
+positive number, and damage dealt to you is shown as a negative number.
+
+To see cumulative damage over the course of a fight, use "meters".
+
+See also: METERS
 #
 DARK NIGHT DIM "DIMLY-LIT" "DIMLY LIT"
 
