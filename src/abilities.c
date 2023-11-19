@@ -1782,7 +1782,7 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | (ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_COMBAT_MISS : NOBITS));
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
 		return;
 	}
 	
@@ -1902,7 +1902,7 @@ DO_ABIL(do_dot_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | (ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_COMBAT_MISS : NOBITS));
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
 		return;
 	}
 	

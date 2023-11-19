@@ -388,15 +388,16 @@ ACMD(do_confer) {
 		
 		// messaging
 		if (ch == vict) {
-			msg_to_char(ch, "You confer your own strength into %s!\r\n", confer_list[type].name);
+			snprintf(buf, sizeof(buf), "You confer your own strength into %s!", confer_list[type].name);
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
 			// no message to room!
 		}
 		else {
 			sprintf(buf, "You confer your strength into $N's %s!", confer_list[type].name);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_BUFF);
 			sprintf(buf, "$n confers $s strength into your %s!", confer_list[type].name);
-			act(buf, FALSE, ch, NULL, vict, TO_VICT);
-			act("$n confers $s strength into $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_BUFF);
+			act("$n confers $s strength into $N!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_BUFF);
 		}
 		
 		// determine how much to give: based on what a point of strength is worth
@@ -476,8 +477,8 @@ ACMD(do_counterspell) {
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
-		msg_to_char(ch, "You ready a counterspell.\r\n");
-		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("You ready a counterspell.", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
 		
 		af = create_flag_aff(ATYPE_COUNTERSPELL, 30 * SECS_PER_REAL_MIN, 0, ch);
 		affect_join(ch, af, 0);
@@ -1144,15 +1145,15 @@ ACMD(do_skybrand) {
 	
 	// counterspell??
 	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
-		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT);
+		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_MISS);
+		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_MISS);
+		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_MISS);
 	}
 	else {
 		// succeed
-		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
+		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
+		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
+		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);

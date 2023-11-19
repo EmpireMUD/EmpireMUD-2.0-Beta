@@ -1234,6 +1234,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
 		}
+		if (!show && !vict_obj && to != ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
+		}
 		// are we supposed to show it?
 		if (!show) {
 			return;
@@ -1255,15 +1259,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_HITS);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TANK);
 			}
@@ -1285,15 +1289,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_MISSES);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TANK);
 			}

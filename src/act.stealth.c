@@ -929,8 +929,8 @@ ACMD(do_howl) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30, WAIT_COMBAT_ABILITY);
 		
-		msg_to_char(ch, "You let out a fearsome howl!\r\n");
-		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("You let out a fearsome howl!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM | TO_COMBAT_HIT);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1088,14 +1088,14 @@ ACMD(do_jab) {
 
 		if (IS_NPC(ch)) {
 			// NPC has no weapon
-			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
+			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
+			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
 		}
 		else {
-			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR);
-			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT);
-			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT);
+			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR | TO_COMBAT_HIT);
+			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT | TO_COMBAT_HIT);
+			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT | TO_COMBAT_HIT);
 		}
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
@@ -1286,13 +1286,13 @@ ACMD(do_prick) {
 			appear(ch);
 		}
 
-		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT);
+		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
+		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
+		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
 
 		// possibly fatal
 		if (apply_poison(ch, vict) == 0) {
-			msg_to_char(ch, "It seems to have no effect.\r\n");
+			act("It seems to have no effect.", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_MISS);
 		}
 		
 		// apply_poison could have killed vict -- check location, etc
@@ -1456,8 +1456,8 @@ ACMD(do_shadowcage) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30, WAIT_COMBAT_ABILITY);
 		
-		msg_to_char(ch, "You shoot webs of pure shadow, forming a tight cage!\r\n");
-		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("You shoot webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM | TO_COMBAT_HIT);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1471,7 +1471,7 @@ ACMD(do_shadowcage) {
 				af = create_mod_aff(ATYPE_SHADOWCAGE, 15, APPLY_DODGE, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
-				msg_to_char(victim, "You can't seem to dodge as well in the shadowcage!\r\n");
+				act("You can't seem to dodge as well in the shadowcage!", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_HIT);
 				engage_combat(ch, victim, TRUE);
 			}
 		}
@@ -1769,8 +1769,8 @@ ACMD(do_whisperstride) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
 		
-		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
-		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("You cloak yourself with dark whispers, muffling your movement...", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
 		
 		af = create_flag_aff(ATYPE_WHISPERSTRIDE, 30, AFF_SNEAK, ch);
 		affect_join(ch, af, 0);
