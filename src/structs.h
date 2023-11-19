@@ -2563,18 +2563,20 @@ typedef enum {
 
 // SM_x: status messages
 #define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
-#define SM_HUNGER  BIT(1)	// hunger messages
-#define SM_THIRST  BIT(2)	// thirst messages
-#define SM_LOW_BLOOD  BIT(3)	// vampire starvation messages
-#define SM_SUN  BIT(4)	// sunrise/sunset messages
-#define SM_SUN_AUTO_LOOK  BIT(5)	// player looks when sun goes up or down
-#define SM_TEMPERATURE  BIT(6)	// basic temperature change messages
-#define SM_EXTREME_TEMPERATURE  BIT(7)	// warning messages for dangerous temperature
-#define SM_VEHICLE_MOVEMENT  BIT(8)	// messages shown to interior when vehicle moves
-#define SM_WEATHER  BIT(9)	// weather change messages
+#define SM_COOLDOWNS  BIT(1)	// message when a cooldown expires
+#define SM_HUNGER  BIT(2)	// hunger messages
+#define SM_THIRST  BIT(3)	// thirst messages
+#define SM_LOW_BLOOD  BIT(4)	// vampire starvation messages
+#define SM_SKILL_GAINS  BIT(5) // message when player gains skill points
+#define SM_SUN  BIT(6)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(7)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(8)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(9)	// warning messages for dangerous temperature
+#define SM_VEHICLE_MOVEMENT  BIT(10)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(11)	// weather change messages
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

@@ -1007,26 +1007,33 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 		}
 		
 		// messaging
-		if (pos) {
-			msg_to_char(ch, "\tyYou improve your %s skill to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
-			
-			points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
-			if (points > 0) {
-				msg_to_char(ch, "\tyYou have %d ability point%s to spend. Type 'skill %s' to see %s.\t0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
+		if (pos) {	// positive gain
+			// notify if desired
+			if (SHOW_STATUS_MESSAGES(ch, SM_SKILL_GAINS)) {
+				msg_to_char(ch, "\tyYou improve your %s skill to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
+				
+				points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
+				if (points > 0) {
+					msg_to_char(ch, "\tyYou have %d ability point%s to spend. Type 'skill %s' to see %s.\t0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
+				}
 			}
-			
+				
 			// did we hit a cap? free reset!
 			if (IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill))) {
 				skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
-				msg_to_char(ch, "\tyYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.\t0\r\n", SKILL_NAME(skill), SKILL_NAME(skill));
+				if (SHOW_STATUS_MESSAGES(ch, SM_SKILL_GAINS)) {
+					msg_to_char(ch, "\tyYou have earned a free skill reset in %s. Type 'skill reset %s' to use it.\t0\r\n", SKILL_NAME(skill), SKILL_NAME(skill));
+				}
 			}
 			
 			if (!IS_IMMORTAL(ch) && skdata->level == SKILL_MAX_LEVEL(skill)) {
 				log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached %s %d!", PERS(ch, ch, TRUE), SKILL_NAME(skill), SKILL_MAX_LEVEL(skill));
 			}
 		}
-		else {
-			msg_to_char(ch, "\tyYour %s skill drops to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
+		else {	// negative gain
+			if (SHOW_STATUS_MESSAGES(ch, SM_SKILL_GAINS)) {
+				msg_to_char(ch, "\tyYour %s skill drops to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
+			}
 		}
 		
 		// update class and progression

@@ -1011,14 +1011,16 @@ const char *player_tech_types[] = {
 // SM_x: status messages
 const char *status_message_types[] = {
 	"animal movement",	// 0
+	"cooldowns",
 	"hunger",
 	"thirst",
 	"low blood",
+	"skill gains",	// 5
 	"sun",
-	"sun auto look",	// 5
+	"sun auto look",
 	"temperature",
 	"extreme temperature",
-	"vehicle movement",
+	"vehicle movement",	// 10
 	"weather",
 	"\n"
 };

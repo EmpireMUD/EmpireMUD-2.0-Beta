@@ -3072,7 +3072,7 @@ EVENTFUNC(cooldown_expire_event) {
 	free(data);
 	
 	// messaging is a maybe
-	if (!IS_NPC(ch) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+	if (SHOW_STATUS_MESSAGES(ch, SM_COOLDOWNS) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
 		msg_to_char(ch, "\t%c%s\t0\r\n", (GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0'), GET_COOLDOWN_WEAR_OFF(gen));
 	}
 	
