@@ -514,7 +514,7 @@ on claimed land, or disappear over time on unclaimed land.
 The 'coins' command also shows special currencies (e.g. from adventures). You
 can search for specific ones by typing the name, such as 'coins permafrost'.
 
-See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
+See also: DEPOSIT, EXCHANGE, MINT, SPLIT, TREASURE, WITHDRAW
 #
 COMPONENT COMPONENTS RESOURCE RESOURCES
 
@@ -570,6 +570,11 @@ This command lists abilities and actions that you currently have cooling down.
 That is, things you can't use yet because the timer hasn't expired. Some
 abilities can only be used every so often, usually for reasons relating to
 game balance.
+
+If you don't want to see alerts when your cooldowns expire, you can turn them
+off with the "smessages" command.
+
+See also: STATUS MESSAGES
 #
 DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
 
@@ -943,7 +948,12 @@ are hungry, thirsty, or blood-starved.
 Regeneration drops to very low levels when a character is hungry, thirsty, or
 starving. Sleeping may be the only way to regenerate in this case.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, REGENS, SATED THIRST, SLEEP, TIME
+You can turn off the hunger, thirst, and low blood warnings with the
+"smessages" command. These conditions can also be put into your prompt or found
+through MSDP.
+
+See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
+   STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
 INFRA INFRAVISION
 
@@ -1631,6 +1641,21 @@ Characters will normally recover from this through normal regeneration.
 Note: Some scripting NPCs can stun characters even while they have stun
 immunity. This is part of the combat script.
 #
+SUN SUNRISE SUNSET DAY
+
+The sun generally rises and sets each day, with the exact time determined by
+the time of year and the latitude where you're standing on the map.
+
+If you have not already typed "look" or moved around as the sun rises or sets,
+you will automatically look at the map (you can disable this with the command
+"smessages sun auto look"). The "smessages" command can also be used to turn
+off sunrise and sunset messages.
+
+You can check the current time of day with the "time" command, which will also
+tell you whether it's daytime or nighttime.
+
+See also: PROMPT, STATUS MESSAGES, TIME
+#
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
 When a player damages a mob, that mob becomes tagged by the player and his or
@@ -1700,6 +1725,17 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+TREASURE TREASURES
+
+An empire's treasure is the part of their wealth that's made of valuable items
+and precious metals, excluding coins. Storing an item that gives wealth (as
+shown on "identify") will increase the treasure shown on your "estats".
+
+Many types of treasure can be minted to produce coins. This does not change the
+value; you get 10x the wealth rating in coins, and coins are worth 0.1 wealth.
+
+See also: COINS, ESTATS, IDENTIFY, MINT, WEALTH
 #
 TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
 

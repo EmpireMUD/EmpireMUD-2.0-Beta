@@ -865,7 +865,7 @@ This command gets quick info on your empire (or another). It is a short version
 of the longer info shown with the "empire" command, and it defaults to your
 empire if you give no argument.
 
-See also: EMPIRE
+See also: EMPIRE, COINS, TREASURE
 #
 EVENT EVENTS
 
@@ -2180,6 +2180,9 @@ gatehouses and tunnels) and sail requires continuous water (including buildings
 you can sail through, like bridges). If automatic pathfinding takes too long or
 creates too complex a path, it will fail.
 
+Anybody inside the vehicle will receive a message each time the vehicle moves.
+This can be disabled with the "smessages" command.
+
 Examples:
  > drive east
  > sail 3e 4n 7nw
@@ -2189,7 +2192,7 @@ Examples:
 Many vehicles cannot move through portals.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
-STOP, TOGGLE, RUN
+STATUS MESSAGES, STOP, TOGGLE, RUN
 #
 SAVE
 
@@ -2600,13 +2603,17 @@ Cold temperatures (in order): &Cchilly, cold, frosty, icy, frigid, freezing&0
 Comfortable temperatures: &Jcool, pleasant, balmy&0
 Hot temperatures: &Owarm, hot, scorching, sweltering, blistering, searing&0
 
+Some EmpireMUDs have penalties for being too cold or too hot:
+
 Cold penalties: slow effect, get hungry faster, actions are slow
 Freezing penalties: distracted from timed actions, damage over time
 
 Hot penalties: poor regeneration rate, get thirsty faster, actions are slow
 Sweltering penalties: distracted from timed actions, damage over time
 
-See also: SURVEY, TIME, WEATHER
+You can turn off alerts about changes in temperature with "smessages".
+
+See also: SURVEY, STATUS MESSAGES, TIME, WEATHER
 #
 THROW
 
@@ -2866,7 +2873,10 @@ If you're uncertain whether the sun is shining or the rain is pouring down.
 You'll have to be outside in order to tell however. It will also tell you if
 the sun or moon are up.
 
-See also: SURVEY, TEMPERATURE, TIME
+You also receive alerts as the weather changes when you're outdoors or near a
+window. These messages can be disabled with the "smessages" command.
+
+See also: STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
 #
 WHO
 
