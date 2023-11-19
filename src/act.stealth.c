@@ -245,12 +245,8 @@ void perform_escape(char_data *ch) {
 		greet_mtrigger(ch, NO_DIR, "ability");
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR, "ability");
-		
-		// reset this to avoid messages
-		if (!IS_NPC(ch)) {
-			GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-		}
-		
+				
+		RESET_LAST_MESSAGED_TEMPERATURE(ch);
 		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -1025,9 +1021,7 @@ ACMD(do_infiltrate) {
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "move");
 	
-			// reset this to avoid messages
-			GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-			
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
@@ -1573,9 +1567,7 @@ ACMD(do_shadowstep) {
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "ability");
 			
-			// reset this to avoid messages
-			GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-			
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 

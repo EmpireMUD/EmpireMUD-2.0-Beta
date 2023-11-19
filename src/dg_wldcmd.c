@@ -665,6 +665,7 @@ WCMD(do_wteleport) {
 			char_to_room(ch, target);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 	}
@@ -690,6 +691,7 @@ WCMD(do_wteleport) {
 						GET_LAST_DIR(ch) = NO_DIR;
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
+						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
 				}
@@ -704,6 +706,7 @@ WCMD(do_wteleport) {
 				char_to_room(ch, target);
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
+				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}

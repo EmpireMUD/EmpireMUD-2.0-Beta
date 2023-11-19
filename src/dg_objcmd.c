@@ -1037,6 +1037,7 @@ OCMD(do_oteleport) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);
 		}
 	}
@@ -1062,6 +1063,7 @@ OCMD(do_oteleport) {
 						GET_LAST_DIR(ch) = NO_DIR;
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
+						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);
 					}
 				}
@@ -1076,6 +1078,7 @@ OCMD(do_oteleport) {
 				GET_LAST_DIR(ch) = NO_DIR;
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
+				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);
 			}
 		}

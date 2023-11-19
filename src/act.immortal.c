@@ -141,11 +141,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	char_from_room(ch);
 	char_to_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
-	
-	// reset this to avoid messages
-	if (!IS_NPC(ch)) {
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-	}
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 
 	if (!IS_NPC(ch) && POOFIN(ch)) {
 		if (!strstr(POOFIN(ch), "$n"))
@@ -11208,12 +11204,8 @@ ACMD(do_trans) {
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+				RESET_LAST_MESSAGED_TEMPERATURE(victim);
 				msdp_update_room(victim);	// once we're sure we're staying
-				
-				// reset this to avoid messages
-				if (!IS_NPC(victim)) {
-					GET_LAST_MESSAGED_TEMPERATURE(victim) = get_room_temperature(IN_ROOM(victim));
-				}
 			}
 		}
 		
@@ -11241,13 +11233,9 @@ ACMD(do_trans) {
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+			RESET_LAST_MESSAGED_TEMPERATURE(victim);
 			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
-			
-			// reset this to avoid messages
-			if (!IS_NPC(victim)) {
-				GET_LAST_MESSAGED_TEMPERATURE(victim) = get_room_temperature(IN_ROOM(victim));
-			}
 		}
 	}
 	else if ((veh = get_vehicle_vis(ch, buf, NULL))) {

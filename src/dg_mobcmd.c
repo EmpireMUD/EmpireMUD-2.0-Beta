@@ -1341,6 +1341,7 @@ ACMD(do_mteleport) {
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
+				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);
 			}
 		}
@@ -1367,6 +1368,7 @@ ACMD(do_mteleport) {
 						GET_LAST_DIR(vict) = NO_DIR;
 						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR, "script");
 						qt_visit_room(vict, IN_ROOM(vict));
+						RESET_LAST_MESSAGED_TEMPERATURE(vict);
 						msdp_update_room(vict);
 					}
 				}
@@ -1381,6 +1383,7 @@ ACMD(do_mteleport) {
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
 				qt_visit_room(vict, IN_ROOM(vict));
+				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);
 			}
 		}

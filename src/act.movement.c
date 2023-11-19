@@ -867,6 +867,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	greet_mtrigger(ch, NO_DIR, "transport");
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR, "transport");
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 
 	for (k = ch->followers; k; k = k->next) {
@@ -874,11 +875,6 @@ void perform_transport(char_data *ch, room_data *to_room) {
 			act("You follow $N.\r\n", FALSE, k->follower, 0, ch, TO_CHAR);
 			perform_transport(k->follower, to_room);
 		}
-	}
-	
-	// reset this to avoid messages
-	if (!IS_NPC(ch)) {
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
 	}
 }
 
@@ -1483,11 +1479,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		greet_memory_mtrigger(ch);
 	}
 	
-	// reset this to avoid messages
-	if (!IS_NPC(ch)) {
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-	}
-	
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -1588,11 +1580,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	
-	// reset this to avoid messages
-	if (!IS_NPC(ch)) {
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-	}
-	
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);
 	
 	// cancel some actions on movement
@@ -2198,11 +2186,7 @@ ACMD(do_circle) {
 	entry_memory_mtrigger(ch);
 	greet_memory_mtrigger(ch);
 	
-	// reset this to avoid messages
-	if (!IS_NPC(ch)) {
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
-	}
-	
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 	
 	gain_ability_exp_from_moves(ch, was_in, MOVE_CIRCLE);
