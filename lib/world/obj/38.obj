@@ -15,7 +15,7 @@ R
 S
 #3801
 gruel village~
-village gruel~
+the village gruel~
 Some gruel has been left behind.~
    This serving of what could, at best, be described as "rudimentary porridge"
 has already gone cold.
@@ -30,7 +30,7 @@ R
 S
 #3803
 rice village~
-village rice~
+the village rice~
 Some village rice has been left behind.~
    The rice has been cleaned and cooked, but it's rather bland. Still, you
 could sustain an enormous workforce on enough of this.
@@ -45,7 +45,7 @@ R
 S
 #3805
 vegetables pickled village~
-pickled village vegetables~
+the pickled village vegetables~
 Some pickled village vegetables are lying here.~
    The vegetables have been pickled to make them edible and give them a little
 flavor. Not very much flavor, mind you, but a little.
@@ -60,7 +60,7 @@ R
 S
 #3807
 cakes oat village~
-village oat cakes~
+the village oat cakes~
 Some village oak cakes are lying here.~
    These oat cakes are made out of little more than milled oats. A little salt
 would have been nice, or perhaps some dried fruit, but there mustn't have been
@@ -138,7 +138,7 @@ R
 S
 #3816
 fruit preserves village~
-some village fruit preserves~
+the village fruit preserves~
 Some village fruit preserves have been left here.~
 The fruit has been cooked and preserved for use outside the growing season.
 ~
