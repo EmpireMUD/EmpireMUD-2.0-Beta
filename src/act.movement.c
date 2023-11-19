@@ -877,7 +877,9 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	}
 	
 	// reset this to avoid messages
-	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	if (!IS_NPC(ch)) {
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	}
 }
 
 
@@ -1482,7 +1484,9 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	}
 	
 	// reset this to avoid messages
-	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	if (!IS_NPC(ch)) {
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	}
 	
 	msdp_update_room(ch);	// once we're sure we're staying
 }
@@ -1585,7 +1589,9 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	
 	// reset this to avoid messages
-	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	if (!IS_NPC(ch)) {
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	}
 	
 	msdp_update_room(ch);
 	
@@ -2193,7 +2199,9 @@ ACMD(do_circle) {
 	greet_memory_mtrigger(ch);
 	
 	// reset this to avoid messages
-	GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	if (!IS_NPC(ch)) {
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+	}
 	
 	msdp_update_room(ch);	// once we're sure we're staying
 	

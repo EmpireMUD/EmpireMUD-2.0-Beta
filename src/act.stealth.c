@@ -247,7 +247,9 @@ void perform_escape(char_data *ch) {
 		greet_vtrigger(ch, NO_DIR, "ability");
 		
 		// reset this to avoid messages
-		GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+		if (!IS_NPC(ch)) {
+			GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch));
+		}
 		
 		msdp_update_room(ch);
 		
