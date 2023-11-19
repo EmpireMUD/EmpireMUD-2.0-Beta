@@ -809,8 +809,14 @@ void heartbeat(unsigned long heart_pulse) {
 	
 	HEARTBEAT_LOG("start")
 	
+	// time goes first because it changes the hour
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		weather_and_time();
+		HEARTBEAT_LOG("0")
+	}
+	
 	dg_event_process();
-	HEARTBEAT_LOG("0")
+	HEARTBEAT_LOG("0.1")
 	
 	free_freeable_dots();
 	HEARTBEAT_LOG("0.5")
@@ -864,11 +870,8 @@ void heartbeat(unsigned long heart_pulse) {
 		real_update();
 		HEARTBEAT_LOG("11")
 	}
-
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		weather_and_time();
-		HEARTBEAT_LOG("12")
-	}
+	
+	// 12 was moved up (weather_and_time)
 	
 	if (HEARTBEAT(WORKFORCE_CYCLE)) {
 		chore_update();
