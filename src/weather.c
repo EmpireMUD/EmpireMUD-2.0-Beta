@@ -552,7 +552,7 @@ int get_sun_status(room_data *room) {
 		// determine exact time
 		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
 		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
-		hour = main_time_info.hours - (24.0 * percent - (1.0 - PERCENT_THROUGH_CURRENT_HOUR));
+		hour = main_time_info.hours - (24.0 * percent - PERCENT_THROUGH_CURRENT_HOUR);
 		if (hour < 0.0) {
 			hour += 24.0;
 		}
