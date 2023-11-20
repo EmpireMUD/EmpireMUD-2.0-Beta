@@ -631,7 +631,7 @@ WCMD(do_wteleport) {
 	char_data *ch, *next_ch;
 	vehicle_data *veh;
 	room_data *target;
-	obj_data *obj;
+	obj_data *obj, *cont;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	int iter;
@@ -640,20 +640,21 @@ WCMD(do_wteleport) {
 	argument = one_word(argument, arg2);
 
 	if (!*arg1 || !*arg2) {
-		wld_log(room, "wteleport called with too few args");
+		wld_log(room, "wteleport: called with too few args");
 		return;
 	}
 
+	// try to find a target for later -- this can fail
 	target = get_room(room, arg2);
 
-	if (!target) {
-		wld_log(room, "wteleport target is an invalid room");
-		return;
-	}
 
 	if (!str_cmp(arg1, "all")) {
-		if (target == room) {
-			wld_log(room, "wteleport all target is itself");
+		if (!target) {
+			wld_log(room, "wteleport all: target is an invalid room");
+			return;
+		}
+		else if (target == room) {
+			wld_log(room, "wteleport all: target is itself");
 			return;
 		}
 		
@@ -672,7 +673,11 @@ WCMD(do_wteleport) {
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
 		if (!(inst = ROOM_INSTANCE(room))) {
-			wld_log(room, "wteleport: 'adventure' mode called outside any adventure");
+			wld_log(room, "wteleport adventure: called outside any adventure");
+			return;
+		}
+		if (!target) {
+			wld_log(room, "wteleport adventure: target is an invalid room");
 			return;
 		}
 		
@@ -698,8 +703,12 @@ WCMD(do_wteleport) {
 			}
 		}
 	}
-	else {
+	else {	// single-target teleprot
 		if ((ch = get_char_by_room(room, arg1))) {
+			if (!target) {
+				wld_log(room, "wteleport character: target is an invalid room");
+				return;
+			}
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(ch) = NO_DIR;
 				char_from_room(ch);
@@ -711,15 +720,55 @@ WCMD(do_wteleport) {
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_room(room, arg1, NULL))) {
+			if (!target) {
+				wld_log(room, "wteleport vehicle: target is an invalid room");
+				return;
+			}
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
 			entry_vtrigger(veh, "script");
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_by_room(room, arg1))) {
-			obj_to_room(obj, target);
+			// teleport object
+			if (target) {
+				// move obj to room
+				obj_to_room(obj, target);
+			}
+			else if ((ch = get_char_by_room(room, arg2))) {
+				// move obj to character
+				obj_to_char(obj, ch);
+			}
+			else if ((*arg2 == UID_CHAR && (veh = get_vehicle(arg2))) || (veh = get_vehicle_room(room, arg2, NULL))) {
+				// move obj to vehicle
+				if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+					wld_log(room, "wteleport object: attempting to put an object in a vehicle that's not a container");
+					return;
+				}
+				else {
+					obj_to_vehicle(obj, veh);
+				}
+			}
+			else if ((*arg2 == UID_CHAR && (cont = get_obj(arg2))) || (cont = get_obj_by_room(room, arg2))) {
+				if (cont == obj || get_top_object(obj) == cont || get_top_object(cont) == obj) {
+					wld_log(room, "mteleport object: attempting to put an object inside itself");
+					return;
+				}
+				else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CORPSE) {
+					wld_log(room, "mteleport object: attempting to put an object in something that's not a container");
+					return;
+				}
+				else {
+					// move obj into obj
+					obj_to_obj(obj, cont);
+				}
+			}
+			else {
+				wld_log(room, "wteleport object: no valid target location found");
+			}
 		}
-		else
+		else {
 			wld_log(room, "wteleport: no target found");
+		}
 	}
 }
 

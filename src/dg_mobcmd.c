@@ -1302,7 +1302,7 @@ ACMD(do_mteleport) {
 	char_data *vict, *next_ch;
 	struct instance_data *inst;
 	vehicle_data *veh;
-	obj_data *obj;
+	obj_data *obj, *cont;
 	int iter;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1321,16 +1321,16 @@ ACMD(do_mteleport) {
 		return;
 	}
 
+	// try to find a target for later -- this can fail
 	target = find_target_room(ch, arg2);
 
-	if (!target) {
-		mob_log(ch, "mteleport target is an invalid room");
-		return;
-	}
-
 	if (!str_cmp(arg1, "all")) {
+		if (!target) {
+			mob_log(ch, "mteleport all: target is an invalid room");
+			return;
+		}
 		if (target == IN_ROOM(ch)) {
-			mob_log(ch, "mteleport all target is itself");
+			mob_log(ch, "mteleport all: target is itself");
 			return;
 		}
 		
@@ -1349,7 +1349,11 @@ ACMD(do_mteleport) {
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
 		if (!(inst = real_instance(MOB_INSTANCE_ID(ch)))) {
-			mob_log(ch, "mteleport: 'adventure' mode called on non-adventure mob");
+			mob_log(ch, "mteleport adventure: called on non-adventure mob");
+			return;
+		}
+		if (!target) {
+			mob_log(ch, "mteleport: target is an invalid room");
 			return;
 		}
 		
@@ -1375,8 +1379,13 @@ ACMD(do_mteleport) {
 			}
 		}
 	}
-	else {
+	else {	// single-target teleport
 		if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) || (vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_WORLD))) {
+			// teleport character
+			if (!target) {
+				mob_log(ch, "mteleport character: target is an invalid room");
+				return;
+			}
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
@@ -1388,12 +1397,53 @@ ACMD(do_mteleport) {
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
+			// teleport vehicle
+			if (!target) {
+				mob_log(ch, "mteleport vehicle: target is an invalid room");
+				return;
+			}
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
 			entry_vtrigger(veh, "script");
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1, NULL))) {
-			obj_to_room(obj, target);
+			// teleport object
+			if (target) {
+				// move obj to room
+				obj_to_room(obj, target);
+			}
+			else if ((*arg2 == UID_CHAR && (vict = get_char(arg2))) || (vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD))) {
+				// move obj to character
+				obj_to_char(obj, vict);
+			}
+			else if ((*arg2 == UID_CHAR && (veh = get_vehicle(arg2))) || (veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
+				// move obj to vehicle
+				if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+					mob_log(ch, "mteleport object: attempting to put an object in a vehicle that's not a container");
+					return;
+				}
+				else {
+					obj_to_vehicle(obj, veh);
+				}
+			}
+			else if ((*arg2 == UID_CHAR && (cont = get_obj(arg2))) || (cont = get_obj_vis(ch, arg2, NULL))) {
+				if (cont == obj || get_top_object(obj) == cont || get_top_object(cont) == obj) {
+					mob_log(ch, "mteleport object: attempting to put an object inside itself");
+					return;
+				}
+				else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CORPSE) {
+					mob_log(ch, "mteleport object: attempting to put an object in something that's not a container");
+					return;
+				}
+				else {
+					// move obj into obj
+					obj_to_obj(obj, cont);
+				}
+			}
+			else {
+				mob_log(ch, "mteleport object: no valid target location found");
+			}
+		
 		}
 		else {
 			mob_log(ch, "mteleport: victim (%s) does not exist", arg1);

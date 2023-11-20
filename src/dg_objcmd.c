@@ -1008,30 +1008,33 @@ OCMD(do_oteleport) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	vehicle_data *veh;
-	obj_data *tobj;
+	obj_data *tobj, *cont;
 	int iter;
-
+	
 	two_arguments(argument, arg1, arg2);
-
+	
 	if (!*arg1 || !*arg2) {
-		obj_log(obj, "oteleport called with too few args");
-		return;
-	}
-
-	target = get_room(orm, arg2);
-
-	if (!target) {
-		obj_log(obj, "oteleport target is an invalid room");
+		obj_log(obj, "oteleport: called with too few args");
 		return;
 	}
 	
+	// try to find a target for later -- this can fail
+	target = get_room(orm, arg2);
+	
 	if (!str_cmp(arg1, "all")) {
-		if (target == orm)
-			obj_log(obj, "oteleport target is itself");
+		if (!target) {
+			obj_log(obj, "oteleport all: target is an invalid room");
+			return;
+		}
+		if (target == orm) {
+			obj_log(obj, "oteleport all: target is itself");
+			// not a fatal error
+		}
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), ch, next_ch, next_in_room) {
-			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
+			if (!valid_dg_target(ch, DG_ALLOW_GODS)) {
 				continue;
+			}
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
@@ -1044,7 +1047,11 @@ OCMD(do_oteleport) {
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
 		if (!orm || !(inst = find_instance_by_room(orm, FALSE, TRUE))) {
-			obj_log(obj, "oteleport: 'adventure' mode called outside any adventure");
+			obj_log(obj, "oteleport adventure: called outside any adventure");
+			return;
+		}
+		else if (!target) {
+			obj_log(obj, "oteleport adventure: target is an invalid room");
 			return;
 		}
 		
@@ -1070,8 +1077,12 @@ OCMD(do_oteleport) {
 			}
 		}
 	}
-	else {
+	else {	// single-target teleport
 		if ((ch = get_char_by_obj(obj, arg1))) {
+			if (!target) {
+				obj_log(obj, "oteleport character: target is an invalid room");
+				return;
+			}
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				char_from_room(ch);
 				char_to_room(ch, target);
@@ -1083,12 +1094,51 @@ OCMD(do_oteleport) {
 			}
 		}
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
+			if (!target) {
+				obj_log(obj, "oteleport vehicle: target is an invalid room");
+				return;
+			}
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
 			entry_vtrigger(veh, "script");
 		}
 		else if ((tobj = get_obj_by_obj(obj, arg1))) {
-			obj_to_room(tobj, target);
+			if (target) {
+				// move obj to room
+				obj_to_room(tobj, target);
+			}
+			else if ((ch = get_char_by_obj(obj, arg2))) {
+				// move obj to character
+				obj_to_char(tobj, ch);
+			}
+			else if ((veh = get_vehicle_near_obj(obj, arg2))) {
+				// move obj to vehicle
+				if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+					obj_log(obj, "oteleport object: attempting to put an object in a vehicle that's not a container");
+					return;
+				}
+				else {
+					obj_to_vehicle(tobj, veh);
+				}
+			}
+			else if ((cont = get_obj_by_obj(obj, arg2))) {
+				// move obj into obj
+				if (cont == tobj || get_top_object(tobj) == cont || get_top_object(cont) == tobj) {
+					obj_log(obj, "oteleport object: attempting to put an object inside itself");
+					return;
+				}
+				else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CORPSE) {
+					obj_log(obj, "oteleport object: attempting to put an object in something that's not a container");
+					return;
+				}
+				else {
+					// move obj into obj
+					obj_to_obj(tobj, cont);
+				}
+			}
+			else {
+				obj_log(obj, "oteleport object: no valid target location found");
+			}
 		}
 		else {
 			obj_log(obj, "oteleport: no target found");

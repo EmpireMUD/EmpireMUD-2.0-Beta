@@ -898,6 +898,7 @@ See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
 
 %teleport% <victim | vehicle | object> <location>
+%teleport% <object> <person | vehicle | object | location>
 %teleport% all <location>
 %teleport% adventure <location>
 
@@ -908,6 +909,9 @@ command. Teleport can also move vehicles or objects.
 
 If you target 'adventure', all players in the entire adventure zone instance,
 plus their NPC followers, will be teleported to the target.
+
+Objects can be moved into other objects, into a person's inventory, or into
+a vehicle's inventory with this command.
 
 You can use i### to target a room in the current adventure instance by its
 room template vnum instead of live room number (if used in an instanced zone).
