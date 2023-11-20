@@ -1194,6 +1194,8 @@ EmpireMUD supports the following MSDP variables:
  BONUS_EXP - Daily bonus experience remaining
  INVENTORY - Current inventory size
  INVENTORY_MAX - Maximum inventory size
+ TEMPERATURE - Numeric value of player's temperature
+ TEMPERATURE_LABEL - Player's temperature as a string
 
  Current attributes: STR, DEX, CHA, GRT, INT, WIT
  Natural attributes: STR_PERM, DEX_PERM, CHA_PERM, GRT_PERM, INT_PERM, WIT_PERM
@@ -1238,6 +1240,8 @@ EmpireMUD supports the following MSDP variables:
  WORLD_MONTH - Current month (January, etc)
  WORLD_YEAR - Current year number
  WORLD_SEASON - Current season
+ AMBIENT_TEMPERATURE - Numeric value of room temperature
+ AMBIENT_TEMPERATURE_LABEL - Room temperature as a string
 
  The following GUI variables are provided, for a generic GUI:
   BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5

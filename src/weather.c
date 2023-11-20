@@ -1546,6 +1546,9 @@ void update_player_temperature(char_data *ch) {
 		
 		// probably not worth triggering a character save for a temperature change alone
 		// ... but they almost certainly save when this runs, anyway, due to other events
+		
+		// update MSDP under the assumption there was a change
+		update_MSDP_temperature(ch, FALSE, UPDATE_SOON);
 	}
 }
 

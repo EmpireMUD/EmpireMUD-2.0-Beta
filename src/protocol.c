@@ -157,6 +157,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_BONUS_EXP, "BONUS_EXP", NUMBER_READ_ONLY },
 	{ eMSDP_INVENTORY, "INVENTORY", NUMBER_READ_ONLY },
 	{ eMSDP_INVENTORY_MAX, "INVENTORY_MAX", NUMBER_READ_ONLY },
+	{ eMSDP_TEMPERATURE, "TEMPERATURE", NUMBER_READ_ONLY },
+	{ eMSDP_TEMPERATURE_LABEL, "TEMPERATURE_LABEL", STRING_READ_ONLY },
 	
 	{ eMSDP_STR, "STR", NUMBER_READ_ONLY },
 	{ eMSDP_DEX, "DEX", NUMBER_READ_ONLY },
@@ -214,6 +216,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_WORLD_MONTH, "WORLD_MONTH", STRING_READ_ONLY },
 	{ eMSDP_WORLD_YEAR, "WORLD_YEAR", NUMBER_READ_ONLY },
 	{ eMSDP_WORLD_SEASON, "WORLD_SEASON", STRING_READ_ONLY },
+	{ eMSDP_AMBIENT_TEMPERATURE, "AMBIENT_TEMPERATURE", NUMBER_READ_ONLY },
+	{ eMSDP_AMBIENT_TEMPERATURE_LABEL, "AMBIENT_TEMPERATURE_LABEL", STRING_READ_ONLY },
 	
 	/* Configurable variables */
 	{ eMSDP_CLIENT_ID, "CLIENT_ID", STRING_WRITE_ONCE(1,40) },
@@ -3154,6 +3158,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	update_MSDP_inventory(ch, NO_UPDATE);
 	update_MSDP_level(ch, NO_UPDATE);
 	update_MSDP_money(ch, NO_UPDATE);
+	update_MSDP_temperature(ch, FALSE, NO_UPDATE);
 	
 	// lists
 	update_MSDP_affects(ch, NO_UPDATE);
@@ -3519,6 +3524,37 @@ void update_MSDP_skills(char_data *ch, int send_update) {
 		}
 		MSDPSetTable(ch->desc, eMSDP_SKILLS, buf);
 	
+		check_send_msdp_update(ch, send_update);
+	}
+}
+
+
+/**
+* Updates temperature for MSDP.
+*
+* @param char_data *ch A player.
+* @param bool room_only If TRUE, skips the player's temperature.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+void update_MSDP_temperature(char_data *ch, bool room_only, int send_update) {
+	char buf[256];
+	int temp, ambient;
+	
+	if (ch->desc) {
+		if (!room_only) {
+			// mine
+			temp = get_relative_temperature(ch);
+			MSDPSetNumber(ch->desc, eMSDP_TEMPERATURE, temp);
+			strcpy(buf, temperature_to_string(temp));
+			MSDPSetString(ch->desc, eMSDP_TEMPERATURE_LABEL, buf);
+		}
+		
+		// room (always)
+		ambient = get_room_temperature(IN_ROOM(ch));
+		MSDPSetNumber(ch->desc, eMSDP_AMBIENT_TEMPERATURE, ambient);
+		strcpy(buf, temperature_to_string(ambient));
+		MSDPSetString(ch->desc, eMSDP_AMBIENT_TEMPERATURE_LABEL, buf);
+		
 		check_send_msdp_update(ch, send_update);
 	}
 }

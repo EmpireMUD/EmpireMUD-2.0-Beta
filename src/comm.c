@@ -309,6 +309,9 @@ void msdp_update_room(char_data *ch) {
 	// other stuff that's room-based
 	MSDPSetString(desc, eMSDP_WORLD_SEASON, icon_types[GET_SEASON(IN_ROOM(ch))]);
 	
+	// temperature likely changed too
+	update_MSDP_temperature(ch, TRUE, NO_UPDATE);
+	
 	MSDPUpdate(desc);
 }
 
