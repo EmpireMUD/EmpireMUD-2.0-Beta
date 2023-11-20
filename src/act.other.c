@@ -630,6 +630,11 @@ void perform_alternate(char_data *old, char_data *new) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
 	GET_LAST_TELL(new) = last_tell;
+	
+	// send fresh MSDP
+	if (new->desc) {
+		send_initial_MSDP(new->desc);
+	}
 }
 
 
