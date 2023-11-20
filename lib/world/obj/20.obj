@@ -311,9 +311,11 @@ a fur shawl~
 A fur shawl is lying here.~
 The fur shawl is warm and comfortable.
 ~
-2 0 ak 0 0 2
+2 0 ak 0 0 3
 0 0 0
 7 0
+A
+30 1 0
 C
 1 1
 R
@@ -639,13 +641,22 @@ Some light, breezy clothing is hanging here.~
    The clothing is made from such light material that the breeze blows right
 through it, keeping you cool on warm summer days.
 ~
-2 0 ad 0 0 3
+2 0 ad 0 0 6
 0 0 0
 11 0
 A
-31 12 0
+31 6 0
 C
 1 1
+M
+8
+You don $p.~
+M
+9
+$n dons $p.~
+M
+12
+$n stands here, dressed for sunny weather.~
 R
 4 5617 0
 S
@@ -656,13 +667,22 @@ Some warm, layered clothing is folded here.~
    The set of clothing is tall and heavy, made from multiple layers to keep you
 warm on those cold winter mornings.
 ~
-2 0 ad 0 0 4
+2 0 ad 0 0 7
 0 0 0
 11 0
 A
-30 12 0
+30 6 0
 C
 1 1
+M
+8
+You bundle up in $p.~
+M
+9
+$n bundles up in $p.~
+M
+12
+$n is bundled up and warm.~
 R
 4 5617 0
 S

@@ -1115,4 +1115,110 @@ A
 C
 150 150
 S
+#2371
+hides warm~
+some warm hides~
+Some warm hides are piled here.~
+   Though at first glance it just seems to be a heap of animal skins, you
+notice these have been stitched together to form warm, layered clothing.
+~
+2 0 ad 0 0 8
+0 0 0
+7 0
+A
+30 6 0
+C
+1 1
+M
+8
+You pile the warm hides onto your body for warmth.~
+M
+9
+$n piles $p onto $s body for warmth.~
+M
+12
+$n stands here beneath a thick layer of crudely-stitched hides.~
+R
+4 5617 0
+S
+#2372
+outfit leather warm~
+warm leather outfit~
+A warm leather outfit is crumpled on the ground.~
+   The leather is thick, having been made from two layers to trap heat. The
+inner layer is fur to help on those cold winter nights.
+~
+2 0 ad 0 0 10
+0 0 0
+7 0
+A
+30 12 0
+C
+100 100
+M
+8
+You squeeze into the warm leather and instantly feel warmer.~
+M
+9
+$n squeezes into a warm leather outfit.~
+M
+12
+$n stands here in warm leathers.~
+R
+4 5617 0
+S
+#2373
+robe snakeskin elegant~
+an elegant snakeskin robe~
+An elegant snakeskin robe shimmers in the light.~
+   The robe is almost ethereally thin, like the shed skin of a snake. It's cool
+to the touch, even in warm weather, and surprisngly strong. The scales don't
+rip even if you pull at them.
+~
+2 0 ad 0 0 7
+0 0 0
+11 0
+A
+31 12 0
+C
+100 100
+M
+8
+The snakeskin robe slithers over you as you touch it.~
+M
+9
+$n touches $p and it slithers over $s body.~
+M
+12
+$n stands before you in an elegant snakeskin robe.~
+R
+4 5617 0
+S
+#2374
+robe white fur luxurious~
+a luxurious white fur robe~
+A luxurious white fur robe hangs in the air.~
+   The robe is made from the finest white fur, perhaps from an ermine or hare.
+It's surprisingly light, despite how plush it is. And it's warm to the touch
+even in cold weather.
+~
+2 0 ad 0 0 8
+0 0 0
+11 0
+A
+30 12 0
+C
+100 100
+M
+8
+You slide into the white fur robe and feel instantly warmer.~
+M
+9
+$n slides into $p and looks instantly more comfortable.~
+M
+12
+$n stands before you in a luxurious white fur robe.~
+R
+4 5617 0
+S
 $

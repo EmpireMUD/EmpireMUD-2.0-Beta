@@ -5,9 +5,11 @@ An imperial traveling pack is lying on the ground.~
    This shining pack is surprisingly light, with dozens of compartments,
 straps, and mesh pouches.
 ~
-24 emo ar 0 0 2
+24 emo ar 0 0 3
 1 0 0
 11 0
+A
+28 10 0
 C
 100 200
 S
@@ -129,9 +131,11 @@ a heroic adventuring pack~
 A heroic adventuring pack is sitting here.~
 This pack is so massive that it has its own monopod for support.
 ~
-24 emo ar 0 0 3
+24 emo ar 0 0 4
 1 0 0
 11 0
+A
+28 25 0
 C
 200 300
 S
