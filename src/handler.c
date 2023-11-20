@@ -1082,7 +1082,7 @@ void affect_total(char_data *ch) {
 	
 	// delayed re-send of msdp affects
 	if (ch->desc) {
-		queue_delayed_update(ch, CDU_MSDP_AFFECTS);
+		queue_delayed_update(ch, CDU_MSDP_AFFECTS | CDU_MSDP_ATTRIBUTES);
 	}
 }
 
@@ -6894,6 +6894,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 		
 		// TODO this seems like a huge error: why is it adding to is-carrying when equipping a container
+		// or is it because contents still need to count against it?
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) += obj_carry_size(obj);
 			update_MSDP_inventory(ch, UPDATE_SOON);
