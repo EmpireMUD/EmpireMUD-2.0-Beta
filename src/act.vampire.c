@@ -98,7 +98,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 		any = FALSE;
 		LL_FOREACH(ch->affected, aff) {
 			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
-				if (!messaged) {
+				if (!messaged && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 					msg_to_char(ch, "You're too low on blood...\r\n");
 					messaged = TRUE;
 				}
@@ -129,7 +129,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 		
 		LL_FOREACH(obj->applies, app) {
 			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
-				if (!messaged) {
+				if (!messaged && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 					msg_to_char(ch, "You're too low on blood...\r\n");
 					messaged = TRUE;
 				}
