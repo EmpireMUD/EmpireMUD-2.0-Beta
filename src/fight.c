@@ -365,10 +365,10 @@ double get_combat_speed(char_data *ch, int pos) {
 	}
 	
 	// affect changes
-	if (AFF_FLAGGED(ch, AFF_HASTE)) {
+	if (IS_HASTENED(ch)) {
 		base *= 0.9;
 	}
-	if (AFF_FLAGGED(ch, AFF_SLOW)) {
+	if (IS_SLOWED(ch)) {
 		base *= 1.2;
 	}
 	

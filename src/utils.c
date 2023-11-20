@@ -3101,7 +3101,7 @@ void command_lag(char_data *ch, int wait_type) {
 			break;
 		}
 		case WAIT_MOVEMENT: {	// normal movement (special handling)
-			if (AFF_FLAGGED(ch, AFF_SLOW)) {
+			if (IS_SLOWED(ch)) {
 				wait = 1 RL_SEC;
 			}
 			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
