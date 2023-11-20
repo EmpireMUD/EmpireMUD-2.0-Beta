@@ -3870,15 +3870,15 @@ ACMD(do_temperature) {
 				snprintf(change_part, sizeof(change_part), " and cooling down");
 			}
 			else {
-				snprintf(change_part, sizeof(change_part), " and getting colder");
+				snprintf(change_part, sizeof(change_part), " %s getting colder", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
 			}
 		}
 		else {
 			if (room_temp < 0) {
 				snprintf(change_part, sizeof(change_part), " and warming up");
 			}
-			else if (GET_TEMPERATURE(ch) < config_get_int("temperature_discomfort")) {
-				snprintf(change_part, sizeof(change_part), " and getting warmer");
+			else if (GET_TEMPERATURE(ch) < temp_limit) {
+				snprintf(change_part, sizeof(change_part), " %s getting warmer", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
 			}
 			else {
 				snprintf(change_part, sizeof(change_part), " and getting hotter");
