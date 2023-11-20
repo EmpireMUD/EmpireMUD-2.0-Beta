@@ -1564,6 +1564,7 @@ void update_player_temperature(char_data *ch) {
 int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 	generic_data *gen = real_generic(liquid);
 	int val = 0, amount;
+	bool any = FALSE;
 	
 	if (!ch || !gen || hours_drank < 1 || GEN_TYPE(gen) != GENERIC_LIQUID) {
 		return 0;	// no work
@@ -1581,6 +1582,7 @@ int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 		GET_TEMPERATURE(ch) = MAX(0, GET_TEMPERATURE(ch));
 		
 		val -= 1;
+		any = TRUE;
 	}
 	
 	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WARMING) && GET_TEMPERATURE(ch) < 0) {
@@ -1591,6 +1593,11 @@ int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 		GET_TEMPERATURE(ch) = MIN(0, GET_TEMPERATURE(ch));
 		
 		val += 1;
+		any = TRUE;
+	}
+	
+	if (any) {
+		update_MSDP_temperature(ch, FALSE, UPDATE_SOON);
 	}
 	
 	return val;

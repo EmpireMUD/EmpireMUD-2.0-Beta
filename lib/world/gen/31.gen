@@ -81,7 +81,7 @@ chilly~
 4 0
 0 0 0 0
 T0
-You start to feel warm again.~
+You finally start to feel warm again.~
 T4
 $e is shivering uncontrollably!~
 T5
@@ -100,7 +100,7 @@ warm~
 4 0
 0 0 0 0
 T0
-You start to cool down.~
+You finally feel some relief from that hot weather.~
 T4
 $e is sweating and turning red.~
 T5
