@@ -1509,7 +1509,7 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 	}
 	
 	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+		msg_to_char(ch, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
 		GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
 		GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
 	}
@@ -3073,7 +3073,7 @@ EVENTFUNC(cooldown_expire_event) {
 	
 	// messaging is a maybe
 	if (SHOW_STATUS_MESSAGES(ch, SM_COOLDOWNS) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
-		msg_to_char(ch, "\t%c%s\t0\r\n", (GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0'), GET_COOLDOWN_WEAR_OFF(gen));
+		msg_to_char(ch, "\t%c%s\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_COOLDOWN_WEAR_OFF(gen));
 	}
 	
 	remove_cooldown(ch, cool);

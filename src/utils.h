@@ -1297,7 +1297,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // helpers
 #define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
-#define CUSTOM_COLOR_CHAR(ch, which)  (IS_NPC(ch) ? '0' : (GET_CUSTOM_COLOR((ch), (which)) ? GET_CUSTOM_COLOR((ch), (which)) : '0'))
+#define CUSTOM_COLOR_CHAR(ch, which)  ((!IS_NPC(ch) && GET_CUSTOM_COLOR((ch), (which))) ? GET_CUSTOM_COLOR((ch), (which)) : '0')
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define INFORMATIVE_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_INFORMATIVE_FLAGS(ch), (flag)))
