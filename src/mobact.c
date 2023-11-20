@@ -1926,6 +1926,9 @@ bool check_reset_mob(char_data *ch, bool force) {
 	if (!IS_NPC(ch)) {
 		return FALSE;	// oops
 	}
+	if (AFF_FLAGGED(ch, AFF_POOR_REGENS)) {
+		return FALSE;	// delay due to poor-regen affect
+	}
 	
 	// things to check first (if not forced)
 	if (!force) {

@@ -1840,7 +1840,7 @@ The following affect flags are available:
  &cWATERWALK&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
    flag, this allows it to move on both water and land.
  &cLIGHT&0 - Character provides light to the room.
- &cPOOR-REGENS&0 - Character regenerates very slowly.
+ &cPOOR-REGENS&0 - Players regenerate very slowly. Mobs won't regenerate.
  &cSLOWER-ACTIONS&0 - Timed actions (e.g. chopping) are slower.
  &cHUNGRIER&0 - Player becomes hungry faster.
  &cTHIRSTIER&0 - Player becomes thirsty faster.
