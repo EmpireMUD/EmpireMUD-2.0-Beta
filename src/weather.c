@@ -1480,11 +1480,11 @@ void update_player_temperature(char_data *ch) {
 	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
 			// higher temp
-			msg_to_char(ch, "\t%cIt's %s %s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
+			msg_to_char(ch, "\t%cIt's %s %s%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here", (ambient <= (-1 * limit) ? ", but still quite cold" : ""));
 			showed_warm_room = TRUE;
 		}
 		else {	// lower temp
-			msg_to_char(ch, "\t%cIt's %s %s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here");
+			msg_to_char(ch, "\t%cIt's %s %s%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here", (ambient >= limit ? ", but still too hot" : ""));
 			showed_cold_room = TRUE;
 		}
 		
