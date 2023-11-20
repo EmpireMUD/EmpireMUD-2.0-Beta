@@ -3839,7 +3839,7 @@ ACMD(do_survey) {
 
 ACMD(do_temperature) {
 	int ch_temp, room_temp, temp_limit;
-	char imm_part[256], change_part[256];
+	char imm_part[256], change_part[256], dire_part[256];
 	
 	room_temp = get_room_temperature(IN_ROOM(ch));
 	
@@ -3864,6 +3864,7 @@ ACMD(do_temperature) {
 	
 	// change part?
 	*change_part = '\0';
+	*dire_part = '\0';
 	if (GET_TEMPERATURE(ch) != room_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 		if (GET_TEMPERATURE(ch) > room_temp) {
 			if (room_temp > 0) {
@@ -3871,6 +3872,11 @@ ACMD(do_temperature) {
 			}
 			else {
 				snprintf(change_part, sizeof(change_part), " %s getting colder", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
+			}
+		
+			// dire part? (warning that it won't get better
+			if (room_temp >= temp_limit) {
+				snprintf(dire_part, sizeof(dire_part), ", but it's still too %s", (room_temp >= config_get_int("temperature_extreme") ? "hot" : "warm"));
 			}
 		}
 		else {
@@ -3883,14 +3889,19 @@ ACMD(do_temperature) {
 			else {
 				snprintf(change_part, sizeof(change_part), " and getting hotter");
 			}
+		
+			// dire part? (warning that it won't get better
+			if (room_temp <= -1 * temp_limit) {
+				snprintf(dire_part, sizeof(dire_part), ", but it's still %stoo cold", (room_temp <= -1 * config_get_int("temperature_extreme") ? "way " : ""));
+			}
 		}
 	}
 	
 	if (ch_temp < temp_limit && ch_temp > -1 * temp_limit) {
-		msg_to_char(ch, "You're comfortable right now%s%s.\r\n", imm_part, change_part);
+		msg_to_char(ch, "You're comfortable right now%s%s%s.\r\n", imm_part, change_part, dire_part);
 	}
 	else {
-		msg_to_char(ch, "You are %s%s%s%s\r\n", temperature_to_string(ch_temp), imm_part, change_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
+		msg_to_char(ch, "You are %s%s%s%s%s\r\n", temperature_to_string(ch_temp), imm_part, change_part, dire_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
 	}
 }
 
