@@ -1846,7 +1846,7 @@ ACMD(do_recolor) {
 		msg_to_char(ch, "Your custom colors are set to:\r\n");
 		for (iter = 0; *custom_color_types[iter] != '\n' && iter < NUM_CUSTOM_COLORS; ++iter) {
 			if (GET_CUSTOM_COLOR(ch, iter)) {
-				msg_to_char(ch, " %s: \t&%c\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter));
+				msg_to_char(ch, " %s: \t%c\t&%c\t0\r\n", custom_color_types[iter], GET_CUSTOM_COLOR(ch, iter), GET_CUSTOM_COLOR(ch, iter));
 			}
 			else {
 				msg_to_char(ch, " %s: not set\r\n", custom_color_types[iter]);

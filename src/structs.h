@@ -2250,7 +2250,7 @@ typedef enum {
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 
 
-// custom color types
+// CUSTOM_COLOR_x: custom color types
 #define CUSTOM_COLOR_EMOTE  0
 #define CUSTOM_COLOR_ESAY  1
 #define CUSTOM_COLOR_GSAY  2
@@ -2259,7 +2259,10 @@ typedef enum {
 #define CUSTOM_COLOR_SLASH  5
 #define CUSTOM_COLOR_TELL  6
 #define CUSTOM_COLOR_STATUS  7
-#define NUM_CUSTOM_COLORS  8	// total
+#define CUSTOM_COLOR_SUN  8
+#define CUSTOM_COLOR_TEMPERATURE  9
+#define CUSTOM_COLOR_WEATHER  10
+#define NUM_CUSTOM_COLORS  11	// total
 
 
 // COND_x: Player conditions

@@ -27,7 +27,8 @@
 
 /**
 * Contents:
-*   Unsorted Code
+*   Seasons Engine
+*   Weather Handling
 *   Time Handling
 *   Moon System
 *   Temperature System
@@ -39,14 +40,10 @@ extern unsigned long main_game_pulse;
 // local prototypes
 void another_hour();
 void send_hourly_sun_messages();
-void weather_change();
 
 
-void weather_and_time(void) {
-	another_hour();
-	weather_change();
-}
-
+ //////////////////////////////////////////////////////////////////////////////
+//// SEASONS ENGINE //////////////////////////////////////////////////////////
 
 /**
 * This is called at startup and once per game day to update the seasons for the
@@ -149,6 +146,9 @@ void determine_seasons(void) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// WEATHER HANDLING ////////////////////////////////////////////////////////
+
 /**
 * Reset weather data on startup (or request).
 */
@@ -178,6 +178,10 @@ void reset_weather(void) {
 }
 
 
+/**
+* Hourly update of weather conditions. This is global but I dream of some day
+* coming up with a good way to do local weather systems that move around. -pc
+*/
 void weather_change(void) {
 	int diff, change, was_state;
 	descriptor_data *desc;
@@ -301,14 +305,14 @@ void weather_change(void) {
 			switch (weather_info.sky) {
 				case SKY_CLOUDY: {
 					if (was_state != SKY_RAINING) {
-						msg_to_char(ch, "The sky starts to get cloudy.\r\n");
+						msg_to_char(ch, "\t%cThe sky starts to get cloudy.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 					}
 					else {	// was raining
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "The snow stops.\r\n");
+							msg_to_char(ch, "\t%cThe snow stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 						else {
-							msg_to_char(ch, "The rain stops.\r\n");
+							msg_to_char(ch, "\t%cThe rain stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 					}
 					break;
@@ -316,32 +320,32 @@ void weather_change(void) {
 				case SKY_RAINING: {
 					if (was_state != SKY_LIGHTNING) {
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "It starts to snow.\r\n");
+							msg_to_char(ch, "\t%cIt starts to snow.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 						else {
-							msg_to_char(ch, "It starts to rain.\r\n");
+							msg_to_char(ch, "\t%cIt starts to rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 					}
 					else {	// was lightning
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "The blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\r\n");
+							msg_to_char(ch, "\t%cThe blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 						else {
-							msg_to_char(ch, "The intense lightning storm gives way to a soothing rain.\r\n");
+							msg_to_char(ch, "\t%cThe intense lightning storm gives way to a soothing rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 						}
 					}
 					break;
 				}
 				case SKY_CLOUDLESS: {
-					msg_to_char(ch, "The clouds disappear.\r\n");
+					msg_to_char(ch, "\t%cThe clouds disappear.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 					break;
 				}
 				case SKY_LIGHTNING: {
 					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-						msg_to_char(ch, "The gentle snowfall becomes a serious blizzard.\r\n");
+						msg_to_char(ch, "\t%cThe gentle snowfall becomes a serious blizzard.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 					}
 					else {
-						msg_to_char(ch, "Lightning starts to show in the sky.\r\n");
+						msg_to_char(ch, "\t%cLightning starts to show in the sky.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
 					}
 					break;
 				}
@@ -351,8 +355,13 @@ void weather_change(void) {
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// WEATHER HANDLING ////////////////////////////////////////////////////////
+/**
+* Called once per game hour.
+*/
+void weather_and_time(void) {
+	another_hour();
+	weather_change();
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -677,19 +686,19 @@ void send_hourly_sun_messages(void) {
 						msg_to_char(desc->character, "\r\n");
 					}
 					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
-						msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+						msg_to_char(desc->character, "\t%cThe sun rises over the horizon.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 					}
 					break;
 				}
 				case SUN_LIGHT: {
 					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
-						msg_to_char(desc->character, "The day has begun.\r\n");
+						msg_to_char(desc->character, "\t%cThe day has begun.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 					}
 					break;
 				}
 				case SUN_SET: {
 					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
-						msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+						msg_to_char(desc->character, "\t%cThe sun slowly disappears beneath the horizon.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 					}
 					break;
 				}
@@ -699,7 +708,7 @@ void send_hourly_sun_messages(void) {
 						msg_to_char(desc->character, "\r\n");
 					}
 					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
-						msg_to_char(desc->character, "The night has begun.\r\n");
+						msg_to_char(desc->character, "\t%cThe night has begun.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 					}
 					break;
 				}
@@ -709,7 +718,7 @@ void send_hourly_sun_messages(void) {
 		// check and show zenith
 		if (tinfo.hours == 12 && is_zenith_day(IN_ROOM(desc->character))) {
 			// I think this should ignore the SM_SUN setting and show anyway -pc
-			msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
+			msg_to_char(desc->character, "\t%cYou watch as the sun passes directly overhead -- today is the zenith passage!\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 		}
 	}
 }
@@ -1116,6 +1125,7 @@ void check_temperature_penalties(char_data *ch) {
 	struct affected_type *af;
 	obj_data *obj;
 	bool any, room_safe;
+	char buf[MAX_STRING_LENGTH];
 	
 	// some items provide warmth when lit
 	#define IS_WARM_OBJ(obj)  (GET_LIGHT_IS_LIT(obj) && LIGHT_FLAGGED((obj), LIGHT_FLAG_LIGHT_FIRE | LIGHT_FLAG_COOKING_FIRE))
@@ -1193,7 +1203,8 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					act("You start to feel faint in the sweltering temperature -- you're too hot!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+					snprintf(buf, sizeof(buf), "\t%cYou start to feel faint in the sweltering temperature -- you're too hot!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				// pain
@@ -1208,7 +1219,8 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					act("You start to feel like you're getting too warm.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+					snprintf(buf, sizeof(buf), "\t%cYou start to feel like you're getting too warm.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				// discomfort
@@ -1229,7 +1241,8 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					act("The bitter cold is starting to get to you -- you're freezing!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+					snprintf(buf, sizeof(buf), "\t%cThe bitter cold is starting to get to you -- you're freezing!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				// pain
@@ -1244,7 +1257,8 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					act("You're starting to feel a little too cold.", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+					snprintf(buf, sizeof(buf), "\t%cYou're starting to feel a little too cold.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
 				af = create_flag_aff(atype, UNLIMITED, AFF_SLOWER_ACTIONS, ch);
@@ -1466,11 +1480,11 @@ void update_player_temperature(char_data *ch) {
 	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
 			// higher temp
-			msg_to_char(ch, "It's %s %s.\r\n", (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
+			msg_to_char(ch, "\t%cIt's %s %s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here");
 			showed_warm_room = TRUE;
 		}
 		else {	// lower temp
-			msg_to_char(ch, "It's %s %s.\r\n", (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here");
+			msg_to_char(ch, "\t%cIt's %s %s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here");
 			showed_cold_room = TRUE;
 		}
 		
@@ -1503,13 +1517,13 @@ void update_player_temperature(char_data *ch) {
 			
 			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
 				if (relative >= limit - (limit / 10) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
-					msg_to_char(ch, "You're getting too hot!\r\n");
+					msg_to_char(ch, "\t%cYou're getting too hot!\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 				}
 				else if (!showed_warm_room && relative >= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
-					msg_to_char(ch, "You're getting warm.\r\n");
+					msg_to_char(ch, "\t%cYou're getting warm.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 				}
 				else if (!showed_warm_room && relative <= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
-					msg_to_char(ch, "You're warming up%s.\r\n", (relative <= -1 * limit) ? " but still quite cold" : "");
+					msg_to_char(ch, "\t%cYou're warming up%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (relative <= -1 * limit) ? " but still quite cold" : "");
 				}
 			
 				GET_LAST_WARM_TIME(ch) = time(0);
@@ -1517,13 +1531,13 @@ void update_player_temperature(char_data *ch) {
 			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
 				limit *= -1;	// negative limit
 				if (relative <= (limit + (limit / -10)) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
-					msg_to_char(ch, "You're getting too cold!\r\n");
+					msg_to_char(ch, "\t%cYou're getting too cold!\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 				}
 				else if (!showed_cold_room && relative <= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
-					msg_to_char(ch, "You're getting cold.\r\n");
+					msg_to_char(ch, "\t%cYou're getting cold.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 				}
 				else  if (!showed_cold_room && relative >= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
-					msg_to_char(ch, "You're cooling down%s.\r\n", (relative >= -1 * limit) ? " but still rather warm" : "");
+					msg_to_char(ch, "\t%cYou're cooling down%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (relative >= -1 * limit) ? " but still rather warm" : "");
 				}
 			
 				GET_LAST_COLD_TIME(ch) = time(0);

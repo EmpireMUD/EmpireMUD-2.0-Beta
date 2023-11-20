@@ -584,14 +584,17 @@ const char *condition_types[] = {
 
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
-	"emote",
+	"emote",	// 0
 	"esay",
 	"gsay",
 	"oocsay",
 	"say",
-	"slash-channels",
+	"slash-channels",	// 5
 	"tell",
 	"status",
+	"sun",
+	"temperature",
+	"weather",	// 10
 	"\n"
 };
 
