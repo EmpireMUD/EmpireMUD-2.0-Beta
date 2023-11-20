@@ -355,6 +355,9 @@ Armor:
   viper helm
   shark skin vambraces
 
+Clothing:
+  warm leather outfit
+
 Misc:
   leather boots
   large backpack
@@ -742,6 +745,8 @@ You can make:
   armbands of power
   earth-hewn sandals
   magewhisper pouch
+  snakeskin robe (cooling)
+  white fur robe (warm)
 
 Sew -> Magic Attire -> Magical Vestments
 
@@ -934,6 +939,9 @@ Worn:
   rawhide breastplate
   rawhide skullcap
   rawhide bracers
+
+Clothing:
+  warm hide clothing
 
 Misc:
   rawhide boots
