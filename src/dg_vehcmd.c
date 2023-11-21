@@ -819,7 +819,7 @@ VCMD(do_vteleport) {
 	}
 
 	// try to find a target for later -- this can fail
-	target = get_room(orm, arg2);
+	target = (*arg2 == UID_CHAR ? find_room(atoi(arg2 + 1)) : get_room(orm, arg2));
 	
 	if (!str_cmp(arg1, "all")) {
 		if (!target) {

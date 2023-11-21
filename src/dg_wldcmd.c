@@ -645,8 +645,7 @@ WCMD(do_wteleport) {
 	}
 
 	// try to find a target for later -- this can fail
-	target = get_room(room, arg2);
-
+	target = (*arg2 == UID_CHAR ? find_room(atoi(arg2 + 1)) : get_room(room, arg2));
 
 	if (!str_cmp(arg1, "all")) {
 		if (!target) {

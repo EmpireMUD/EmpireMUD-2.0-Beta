@@ -1322,7 +1322,7 @@ ACMD(do_mteleport) {
 	}
 
 	// try to find a target for later -- this can fail
-	target = find_target_room(ch, arg2);
+	target = (*arg2 == UID_CHAR ? find_room(atoi(arg2 + 1)) : find_target_room(ch, arg2));
 
 	if (!str_cmp(arg1, "all")) {
 		if (!target) {
