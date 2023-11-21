@@ -1070,7 +1070,7 @@ if %loc% && %self.room% != %loc%
   %echo% &&C...it can't have gone far!&&0
   mgoto %loc%
   nop %self.add_mob_flag(SENTINEL)%
-  dg_affect #12351 %self% BONUS-PHYSICAL 1 -1
+  dg_affect #12351 %self% BONUS-PHYSICAL 1 60
   wait 1
   %regionecho% %loc% -12 The ground shakes as something enormous moves beneath it!
   %echo% &&C~%self% bursts forth from the pit... and it looks angry!&&0
@@ -1104,10 +1104,9 @@ Hoarfrost Serragon: Resume wandering if nobody fights.~
 0 b 10
 ~
 * cancel sentinel and resume movement if nobody is around and fighting me
-if !%self.affect(12351) || %room.players_present% == 0
+if !%self.affect(12351)% && !%self.fighting% && %room.players_present% == 0
   nop %self.remove_mob_flag(SENTINEL)%
   dg_affect #12350 %self% !ATTACK on -1
-  dg_affect #12351 %self% off
   detach 12358 %self.id%
 end
 ~
@@ -1283,7 +1282,7 @@ elseif %move% == 3
     if %cycle% < %times% && !%done%
       wait 1
       %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
-      %echoaround% %targ% &&Z~%self% rears back to snap at ~%targ% again...&&0
+      %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
       scfight clear dodge
       scfight setup dodge %targ%
     else if %done% && %targ.id% == %targ_id% && %diff% == 1
