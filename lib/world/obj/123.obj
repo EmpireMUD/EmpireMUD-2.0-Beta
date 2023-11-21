@@ -924,8 +924,13 @@ S
 seed hoarfrost-covered covered frost~
 a hoarfrost-covered seed~
 A hoarfrost-covered seed is lying here.~
-tba
-plants frost stalk
+   This odd seed is as large as your palm and stark white with a blanket of
+ice-cold hoarfrost over its entire shell.
+   You can plant the seed to grow a frost stalk, or it can be brewed into a
+hoarfrost potion of cooling by a skilled alchemist.
+   The origin of the hoarfrost-covered seeds is buried in mystery. Some believe
+they were stashed underground long ago, when snow covered the entire world.
+Others claim the seeds are actually part of a serragon, not a plant at all.
 ~
 3 b a 0 0 1
 0 12351 0
@@ -938,7 +943,11 @@ S
 stalk frost~
 a frost stalk~
 A frost stalk exudes cool mist as it lies on the ground.~
-tba
+   The stalk looks like a tree made of ice, with cold vapor dripping from its
+bark. But to the touch, it isn't as cold as it first appears. It's rigid enough
+to stand without breaking, and it doesn't appear to melt in the heat.
+   Frost stalks are sometimes seen growing in the desert, though few have
+learned the secret to getting them to grow.
 ~
 3 e a 0 0 6
 0 0 0
@@ -953,7 +962,11 @@ S
 berries white~
 some white berries~
 Some white berries are scattered on the ground.~
-tba
+   The small berries have no color on the outside, as if trying to blend into
+a snowbank. But inside, they're bright blue, like an iceberg that's flipped
+over in the sea.
+   Berries like these are exceptionally rare and though they contain seeds,
+there is no known way to grow them.
 ~
 6 g a 0 0 7
 4 0 0

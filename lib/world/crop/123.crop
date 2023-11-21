@@ -4,24 +4,27 @@ An Shimmering Frost Stalk~
 8 jkl cg
 0 100 0 100
 D0
-&c.&?||&c.~
-&C~
+.&C||&?.~
+&c~
 D0
-&c.&?//&c.~
-&C~
+.&C//&?.~
+&c~
 D0
-&c.&?\\&c.~
-&C~
+.&C\\&?.~
+&c~
 D0
-&c.&?\/&c.~
-&C~
+.&C\/&?.~
+&c~
 I 6 12353 100.00 1  # FORAGE: white berries
 I 8 12351 100.00 1  # HARVEST: hoarfrost-covered seed
 I 8 12352 75.00 1 c  # HARVEST: frost stalk
 I 8 12352 25.00 2 c  # HARVEST: frost stalk
 X
-stalk stalks frost hoarfrost ice icy crop~
-tba
+stalk stalks frost hoarfrost ice icy leaves patch crop~
+   A tall, frosty stalk rises from a blue patch of leaves on the ground. Around
+it, everything is carpeted in hoarfrost. Though the stalk looks delicate, it
+seems sturdy enough to hold its own weight. And despite its frigid appearance,
+it's rather solid. Perhaps it could be used for building.
 ~
 S
 $

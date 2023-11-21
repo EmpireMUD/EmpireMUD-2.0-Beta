@@ -133,7 +133,15 @@ An enormous serragon coils around the frozen landscape, baring its teeth.
 100 200 dxyAJK cEGL 6
 0 0 51 25 -1
 D
-tba
+   The serragon is so big it could be mistaken for a mountain of ice! Its long,
+slender, limbless body twists and coils around the area, making it difficult to
+escape. Each time you turn around, you're facing another of its coils.
+   The serrated scales down the creature's snake-like body leave long grooves
+in the ice as the serragon moves. Underneath, the scales look furry, with icy
+tufts visible whenever the creature turns. Cold vapor oozes from the creature's
+pores, freezing the ground on contact.
+   The serragon clacks its jaw at you as you try to back away. It's seen you
+now, and there's nowhere to run!
 ~
 F 12350
 I 0 3012 20.00 2 b  # BUTCHER: fillet of raw meat
@@ -243,8 +251,10 @@ A shaggy frost worm is coiled up before you.
 100 100 dej L 4
 0 0 5 9 -1
 D
-tba
-waterwalk mount
+   This odd creature is nearly the size of a horse, with the appearance of a
+fuzzy snake or worm. Its fur is pale blue, nearly white, though that could
+as easily be the reflection of the sky. It seems that it might be possible to
+ride the frost worm.
 ~
 S
 #12356
@@ -255,10 +265,12 @@ Hoarfrost covers the area.
 1 1 bdo dn 3
 0 0 11 9 -1
 D
-tba
+   The area is covered in a delicate carpet of crystalline ice though, you
+notice, this is no ordinary hoarfrost. It seems to be enchanted, moving at
+times, especially when you try to touch it.
 ~
 M
 0
-tba echo~
+The hoarfrost gleams on the ground.~
 S
 $

@@ -16,7 +16,12 @@ W
 S
 #12350
 Legend of the Hoarfrost Serragon~
-tba
+   Scouts report an enormous serragon in the area, and it sounds like a vicious
+one. There are rumors that the desert around its lair has frozen over and your
+sources believe this is the deadly hoarfrost serragon. Slaying such a beast
+would surely bring glory to the empire. Defeat the serragon -- several, if you
+have to -- and bring back an in-tact skull. Build a shrine to the creature so
+that the whole world can see the empire's might!
 ~
 3 4 0 5 c
 K 7 5
