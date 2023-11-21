@@ -74,4 +74,36 @@ them -- and whatever dug the whole -- is long gone.
 R
 12313 1 0 0
 S
+#12350
+Frozen Pit~
+A Frozen Pit in the Desert~
+&C.&b__&C.~
+1000 0 d 0
+0 0 0 -1
+E
+pit frozen desert~
+   All around you, the desert is glazed with frosty blue ice. And in the very
+center of it all, an enormous pit has opened up. You step carefully to the
+edge, gripping a frozen shrub as best you can, and look down. Your vision blurs
+and your head spins as you take a full step back from the realization that you
+cannot see the bottom. This pit goes down forever!
+~
+T 12354
+S
+#12354
+Hoarfrost Serragon Shrine~
+A Shrine to the Hoarfrost Serragon~
+&?\&C[]&?/~
+64 22 0 0
+0 0 0 -1
+D
+tba
+sunken into the ground
+~
+H 0 -1
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+12354 1 5 0
+Z1 8
+S
 $

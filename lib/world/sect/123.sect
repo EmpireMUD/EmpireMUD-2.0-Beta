@@ -1,0 +1,536 @@
+#12350
+Frozen Desert~
+A Desert Covered in Ice and Hoarfrost~
+'.' 8 fkx 4 au p
+D0
+....~
+&C~
+D0
+....~
+&C~
+D0
+....~
+&C~
+D0
+....~
+&C~
+D0
+....~
+&C~
+D0
+..&W.&?.~
+&C~
+D0
+.&W.&?..~
+&C~
+E
+9 0 75.00 20
+E
+12 0 1.00 20
+E
+13 0 5.00 20
+E
+14 0 1.00 20
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+desert ice hoarfrost frost frozen ground plants cactus cacti around~
+tba
+~
+S
+#12351
+Frozen Grove~
+A Shady Desert Grove Glazed with Ice and Hoarfrost~
+'.' 2 fkx 12 au p
+D0
+..&W^^~
+&C~
+D0
+.&W^^&?.~
+&C~
+D0
+&W^^&?..~
+&C~
+E
+9 0 75.00 26
+E
+12 0 1.00 20
+E
+13 0 5.00 20
+E
+14 0 1.00 20
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+desert ice hoarfrost frost frozen ground grove shady trees woods around~
+tba
+~
+S
+#12352
+Frozen Oasis~
+A Frozen Oasis in the Icy Desert~
+'.' 31 fkxy 10 au p
+D0
+.&C~~&?.~
+&C~
+E
+9 0 75.00 21
+E
+12 0 1.00 21
+E
+13 0 5.00 21
+E
+14 0 1.00 21
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen ground oasis plants water vegetation desert around~
+tba
+~
+S
+#12353
+Frozen Beach~
+An Icy Beach~
+'.' 8 fkx 4 au p
+D0
+....~
+&W~
+D0
+.&C.&?..~
+&W~
+D0
+..&C.&?.~
+&W~
+E
+9 0 75.00 51
+E
+12 0 1.00 51
+E
+13 0 5.00 51
+E
+14 0 1.00 51
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen icy beach sandy shore water ocean sea desert around~
+tba
+~
+S
+#12354
+Frozen Shallows~
+In the Shallow Sea, Among Icebergs~
+'~' 2 fkptx 20 ahu 0
+D0
+~~~&W#~
+&A~
+D0
+~~&W#&?~~
+&A~
+D0
+~&W#&?~~~
+&A~
+D0
+&W#&?~~~~
+&A~
+D0
+~&W##&?~~
+&A~
+D0
+&W##&?~~~
+&A~
+D0
+~~&W##~
+&A~
+E
+9 0 75.00 57
+E
+12 0 1.00 57
+E
+13 0 5.00 57
+E
+14 0 1.00 57
+I 21 1300 20.00 1 f  # FISH: glowing green seashell
+I 21 256 0.25 1 f  # FISH: hestian trinket
+I 21 262 0.25 1 f  # FISH: trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: sea junk
+I 21 12362 100.00 1 f  # FISH: arctic char
+X
+ice hoarfrost frost frozen icebergs sea shallow coast ocean water around~
+tba
+~
+S
+#12355
+Frozen Field~
+An Irrigation Field Covered in Hoarfrost~
+'.' 2 fkrx 4 au p
+D0
+....~
+&W~
+D0
+.&C.&?..~
+&W~
+D0
+..&C.&?.~
+&W~
+E
+9 0 75.00 70
+E
+12 0 1.00 70
+E
+13 0 5.00 70
+E
+14 0 1.00 70
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen field irrigation irrigation desert canal around~
+tba
+~
+S
+#12356
+Frozen Forest~
+An Irrigated Forest Frozen with Hoarfrost Everywhere~
+'.' 31 fkx 6 au p
+D0
+...&c^~
+&W~
+D0
+..&c^&?.~
+&W~
+D0
+.&c^&?..~
+&W~
+D0
+&c^&?...~
+&W~
+E
+9 0 75.00 71
+E
+12 0 1.00 73
+E
+13 0 5.00 73
+E
+14 0 1.00 73
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen forest trees irrigated irrigation canal around~
+tba
+~
+S
+#12357
+Frozen Jungle~
+An Irrigated Jungle Covered in Ice and Hoarfrost~
+'.' 31 fkx 6 au 0
+D0
+..&c^^~
+&W~
+D0
+.&c^^&?.~
+&W~
+D0
+&c^^&?..~
+&W~
+D0
+&c^&?..&c^~
+&W~
+D0
+&c^&?.&c^&?.~
+&W~
+D0
+.&c^&?.&c^~
+&W~
+E
+9 0 75.00 72
+E
+12 0 1.00 75
+E
+13 0 5.00 75
+E
+14 0 1.00 75
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen jungle forest trees irrigated irrigation canal around~
+tba
+~
+S
+#12358
+Frozen Oasis~
+A Frozen Oasis in the Icy Desert~
+'.' 31 fkx 10 u p
+D0
+.&c..&?.~
+&C~
+E
+9 0 75.00 82
+E
+12 0 1.00 82
+E
+13 0 5.00 82
+E
+14 0 1.00 82
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen ground oasis dry desert plants around~
+tba
+~
+_
+This is the frozen DRY oasis.
+~
+S
+#12359
+Frozen Irrigation Canal~
+A Frozen Irrigation Canal~
+'~' 2 fkxy 25 au 0
+D0
+@w&?~~@e~
+&W~
+E
+9 0 75.00 85
+E
+12 0 1.00 85
+E
+13 0 5.00 85
+E
+14 0 1.00 85
+X
+ice hoarfrost frost frozen canal irrigation water desert around~
+tba
+~
+S
+#12360
+Frozen Canal~
+A Frozen Canal in the Desert~
+'~' 2 fkxy 25 au 0
+D0
+@w&?~~@e~
+&W~
+E
+9 0 75.00 87
+E
+12 0 1.00 87
+E
+13 0 5.00 87
+E
+14 0 1.00 87
+X
+ice hoarfrost frost frozen canal verdant water irrigation irrigated around~
+tba
+~
+_
+This is actually the frozen VERDANT canal
+~
+S
+#12361
+Frozen Canal~
+A Frozen Canal~
+'~' 2 fxy 25 au 0
+D0
+@w&?~~@e~
+&W~
+E
+9 0 75.00 19
+E
+12 0 1.00 19
+E
+13 0 5.00 19
+E
+14 0 1.00 19
+X
+ice hoarfrost frost frozen canal water trench around~
+tba
+~
+_
+This is the regular temperate canal
+~
+S
+#12362
+Frozen Oasis~
+A Frozen Oasis in the Icy Desert~
+'.' 31 fkxy 10 au p
+D0
+.&c~~&?.~
+&W~
+E
+9 0 75.00 88
+E
+12 0 1.00 88
+E
+13 0 5.00 88
+E
+14 0 1.00 88
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen oasis irrigated field irrigation desert around water~
+tba
+~
+S
+#12363
+Frozen River~
+On a Frozen River~
+'~' 2 fxy 25 ux 0
+D0
+~~~~~
+&W~
+E
+9 0 75.00 5
+E
+12 0 1.00 5
+E
+13 0 5.00 5
+E
+14 0 1.00 5
+X
+ice hoarfrost frost frozen river water around~
+tba
+~
+S
+#12364
+Frozen Estuary~
+A Frozen Estuary~
+'~' 2 fxy 25 ux 0
+D0
+~~~~~
+&W~
+E
+9 0 75.00 53
+E
+12 0 1.00 53
+E
+13 0 5.00 53
+E
+14 0 1.00 53
+X
+ice hoarfrost frost frozen estuary river water ocean sea around~
+tba
+~
+S
+#12365
+Frozen Forest~
+A Dead Forest Blanketed in Ice and Hoarfrost~
+'.' 31 fjqx 10 au p
+D0
+...&cY~
+&W~
+D0
+..&cY&?.~
+&W~
+D0
+.&cY&?..~
+&W~
+D0
+&cY&?...~
+&W~
+D0
+.&cYY&?.~
+&W~
+D0
+&cYY&?..~
+&W~
+D0
+..&cYY~
+&W~
+D0
+&cY&?.&cY&?.~
+&W~
+D0
+.&cY&?.&cY~
+&W~
+D0
+.&cYYY~
+&W~
+D0
+&cYYY&?.~
+&W~
+D0
+&cYY&?.&cY~
+&W~
+D0
+&cY&?.&cYY~
+&W~
+D0
+.&cYYY~
+&W~
+E
+9 0 75.00 1
+E
+12 0 1.00 36
+E
+13 0 5.00 36
+E
+14 0 1.00 36
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+desert ice hoarfrost frost frozen ground grove shady trees woods around~
+tba
+~
+S
+#12366
+Frozen Plains~
+On a Cold and Frozen Plain~
+'.' 16 fjrx 4 u p
+D0
+....~
+&W~
+E
+9 0 75.00 0
+E
+12 0 1.00 0
+E
+13 0 5.00 0
+E
+14 0 1.00 0
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen plains field grass ground around~
+tba
+~
+S
+#12367
+Frozen Hills~
+In the Hoarfrost-Covered Foothills~
+'.' 16 fgjrx 8 u p
+D0
+....~
+&W~
+E
+9 0 75.00 58
+E
+12 0 1.00 58
+E
+13 0 5.00 58
+E
+14 0 1.00 58
+I 7 1206 8.33 125 p  # PICK: iridescent blue iris
+I 7 12368 100.00 125 p  # PICK: frost flower
+X
+ice hoarfrost frost frozen foothills hills lake mountain around~
+tba
+~
+S
+#12368
+Frozen Lake~
+A Frozen Lake~
+'~' 2 fxy 25 ux 0
+D0
+~~~~~
+&W~
+E
+9 0 75.00 32
+E
+12 0 1.00 32
+E
+13 0 5.00 32
+E
+14 0 1.00 32
+X
+ice hoarfrost frost frozen lake frozen ice down around~
+tba
+~
+S
+$

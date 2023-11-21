@@ -906,4 +906,299 @@ C
 100 375
 T 12315
 S
+#12350
+hoarfrost frost~
+the hoarfrost~
+Hoarfrost has formed on the walls of the pit.~
+A fine layer of feathery frost has covered the walls of the pit.
+~
+3 0 0 0 0 2
+0 0 0
+12 72
+M
+18
+The walls gleam as the frost begins to melt.~
+T 12351
+S
+#12351
+seed hoarfrost-covered covered frost~
+a hoarfrost-covered seed~
+A hoarfrost-covered seed is lying here.~
+tba
+plants frost stalk
+~
+3 b a 0 0 1
+0 12351 0
+12 0
+C
+100 100
+O+ 1 6600
+S
+#12352
+stalk frost~
+a frost stalk~
+A frost stalk exudes cool mist as it lies on the ground.~
+tba
+~
+3 e a 0 0 6
+0 0 0
+0 0
+C
+1 1
+O+ 1 6015
+R
+4 5118 0
+S
+#12353
+berries white~
+some white berries~
+Some white berries are scattered on the ground.~
+tba
+~
+6 g a 0 0 7
+4 0 0
+7 48
+C
+1 1
+O+ 1 6120
+S
+#12354
+skein icy serragon blood~
+an icy skein of serragon blood~
+An icy skein of serragon blood is lying here.~
+tba
+it's blood frozen almost to yarn, used to build 12354
+~
+3 e a 0 0 1
+0 0 0
+12 0
+C
+100 100
+S
+#12355
+whistle mount shaggy frost worm~
+a shaggy frost worm mount whistle~
+A shaggy frost worm mount whistle has been left behind.~
+tba
+You can 'use' this whistle to summon a shaggy frost worm, a mount that glides equally well on land and sea.
+~
+3 p a 0 0 9
+12355 0 0
+12 0
+C
+1 1
+T 9910
+S
+#12356
+whistle enchanted hoarfrost minipet frost~
+an enchanted hoarfrost minipet whistle~
+An enchanted hoarfrost minipet whistle is lying here.~
+tba minipet
+You can 'use' the whistle to gain enchanted hoarfrost as a minipet.
+~
+19 p a 0 0 11
+12356 0 0
+12 0
+C
+1 1
+S
+#12357
+scale serragon frosty~
+a frosty serragon scale~
+A frosty serragon scale is lying here.~
+tba low wealth item, giant scale
+~
+15 e a 0 0 6
+8 0 0
+7 0
+C
+100 100
+R
+4 5611 a
+S
+#12358
+spleen icy serragon~
+an icy serragon spleen~
+The icy spleen of an enormous serragon is lying here.~
+tba mid-wealth icy spleen
+~
+15 e a 0 0 7
+16 0 0
+7 0
+C
+100 100
+R
+4 5611 a
+S
+#12359
+skull translucent serragon~
+a translucent serragon skull~
+A translucent serragon skull has been left here.~
+tba serragon skull high-wealth
+.
+~
+15 e a 0 0 7
+24 0 0
+14 0
+C
+100 100
+R
+4 5611 a
+S
+#12360
+columella icy serragon~
+the icy columella of a serragon~
+The icy columella of a serragon is steaming on the ground.~
+tba
+Used for 'craft hoarfrost serragon scepter', held empire item.
+~
+3 e a 0 0 2
+0 0 0
+14 0
+C
+100 100
+R
+4 5193 0
+S
+#12361
+scepter hoarfrost serragon frost~
+a hoarfrost serragon scepter~
+A hoarfrost serragon scepter lies on the ground.~
+tba
+empire item
+~
+3 emo ao 0 0 1
+0 0 0
+14 0
+A
+19 1 0
+A
+11 2 0
+A
+6 2 0
+A
+5 1 0
+A
+5 1 3
+C
+100 225
+S
+#12362
+char arctic fish~
+an arctic char~
+The remains of an arctic char are rotting here.~
+tba
+~
+6 k a 0 0 5
+24 0 0
+7 168
+C
+1 1
+O+ 1 6203
+R
+4 5119 0
+S
+#12363
+potion cooling hoarfrost frost~
+a hoarfrost potion of cooling~
+A hoarfrost potion of cooling has been left behind.~
+tba
+plant;  brew 'hoarfrost potion of cooling'
+~
+25 0 a 0 0 9
+-1 0 3030
+8 0
+A
+31 10 0
+C
+200 200
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#12364
+lung serragon enormous~
+the enormous lung of a serragon~
+An enormous serragon lung is lying here.~
+tba
+Used for 'sew hoarfrost satchel'
+~
+3 e a 0 0 4
+0 0 0
+7 0
+C
+100 100
+R
+4 5193 0
+S
+#12365
+satchel hoarfrost~
+a hoarfrost satchel~
+A hoarfrost satchel has been left behind.~
+tba
+empire pack
+~
+3 emo ar 0 0 2
+0 0 0
+7 0
+A
+19 2 0
+A
+11 1 0
+A
+6 1 0
+A
+5 1 3
+C
+100 225
+S
+#12366
+bladder drained serragon tremendous~
+the drained bladder of a tremendous serragon~
+The drained bladder of a serragon is lying on the ground.~
+tba
+Used for 'sew serragon satchel'
+~
+3 e a 0 0 5
+0 0 0
+7 0
+C
+100 100
+R
+4 5193 0
+S
+#12367
+knapsack sack serragon~
+a serragon knapsack~
+A serragon knapsack has been left behind.~
+tba
+large pack
+~
+3 emo ar 0 0 3
+0 0 0
+7 0
+A
+19 1 0
+A
+5 1 3
+C
+100 225
+S
+#12368
+flower frost~
+a frost flower~
+A frost flower is melting on the ground.~
+tba
+~
+3 k a 0 0 3
+0 0 0
+7 2
+M
+17
+$p melts away to nothing.~
+M
+18
+$p melts away to nothing.~
+S
 $

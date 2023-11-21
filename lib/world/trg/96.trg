@@ -363,4 +363,115 @@ else
   rdelete needs_scfinterrupt %actor.id%
 end
 ~
+#9620
+Storytime using script1-5~
+0 bw 100
+~
+* uses mob custom strings script1-script5 to tell short stories
+* usage: .custom add script# <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), and skip
+* also: vforce <mob vnum in room> <command>
+* also: set <line_gap|story_gap> <time> sec
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set
+set line_gap 9 sec
+set story_gap 180 sec
+* random wait to offset competing scripts slightly
+wait %random.30%
+* find story number
+if %self.varexists(story)%
+  eval story %self.story% + 1
+  if %story% > 5
+    set story 1
+  end
+else
+  set story 1
+end
+* determine valid story number
+set tries 0
+set ok 0
+while %tries% < 5 && !%ok%
+  if %self.custom(script%story%,0)%
+    set ok 1
+  else
+    eval story %story% + 1
+    if %story% > 5
+      set story 1
+    end
+  end
+  eval tries %tries% + 1
+done
+if !%ok%
+  wait %story_gap%
+  halt
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg%
+    set mode %msg.car%
+    set msg %msg.cdr%
+    if %mode% == say
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
+    elseif %mode% == echo
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
+    elseif %mode% == emote
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
+    else
+      %echo% %self.name%: Invalid script message type '%mode%'.
+    end
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+remote story %self.id%
+* cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
+~
 $

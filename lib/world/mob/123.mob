@@ -125,4 +125,140 @@ It looks like the fur dragon has had kittens, and boy are they sharp!
 T 12318
 T 12321
 S
+#12350
+serragon hoarfrost frost enormous~
+the hoarfrost serragon~
+An enormous serragon coils around the frozen landscape, baring its teeth.
+~
+100 200 dxyAJK cEGL 6
+0 0 51 25 -1
+D
+tba
+~
+F 12350
+I 0 3012 20.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 30.00 8 b  # BUTCHER: fillet of raw meat
+I 0 3012 10.00 16 b  # BUTCHER: fillet of raw meat
+I 0 12362 40.00 1 f  # BUTCHER: arctic char
+I 0 12362 30.00 2 f  # BUTCHER: arctic char
+I 0 12362 20.00 3 f  # BUTCHER: arctic char
+I 0 12362 10.00 4 f  # BUTCHER: arctic char
+I 0 12354 10.00 1 g  # BUTCHER: icy skein of serragon blood
+I 0 12360 10.00 1 g  # BUTCHER: icy columella of a serragon
+I 0 12364 10.00 1 g  # BUTCHER: enormous lung of a serragon
+I 0 12366 10.00 1 g  # BUTCHER: drained bladder of a tremendous serragon
+I 0 12357 60.00 1 w  # BUTCHER: frosty serragon scale
+I 0 12358 30.00 1 w  # BUTCHER: icy serragon spleen
+I 0 12359 10.00 1 w  # BUTCHER: translucent serragon skull
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 30.00 8 k  # SKIN: large skin
+I 1 1351 10.00 16 k  # SKIN: large skin
+I 4 12355 10.00 1 m  # LOOT: shaggy frost worm mount whistle
+I 4 12356 10.00 1 m  # LOOT: enchanted hoarfrost minipet whistle
+I 4 12351 10.00 1 s  # LOOT: hoarfrost-covered seed
+M
+4
+$n chitters at you.~
+M
+5
+$n chitters in the dark.~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+0
+There's a thud behind you as $n beats $s tail against the ground.~
+M
+0
+Hoarfrost seems to grow on everything in sight -- including your armor!~
+M
+0
+There's a cold silence as hoarfrost forms around you.~
+M
+0
+A painful scraping sound pierces your ears as $n slides along the frozen landscape.~
+M
+4
+Wisps of steam rise off of the frost.~
+M
+0
+$n creeps toward you.~
+M
+7
+emote A biting frost drains the heat from your face as $n inches toward you.~
+M
+7
+emote $n sniffs loudly as $e twitches $s nose, itself the size of a horse, at you.~
+M
+7
+emote Icy fog forms in the air around $n as it smells you from head to toe.~
+M
+7
+emote $n rears its head back and makes a cold chittering noise with its dagger-like teeth.~
+M
+7
+emote $n twists into an enormous coil, its scales screeching as their sharp edges cut against the ice.~
+M
+7
+emote $n claps its tremendous jaws as if to taunt you -- or perhaps deter you.~
+T 12350
+T 12352
+T 12353
+T 12355
+T 9620
+T 12356
+T 12357
+T 9600
+T 9601
+T 9604
+T 12359
+S
+#12351
+spreader hoarfrost frost~
+the hoarfrost spreader~
+A hoarfrost spreader is here.
+~
+100 200 dhxyAJK cklnEGL 0
+0 0 51 25 -1
+D
+This invisible mob helps spread hoarfrost.
+~
+T 12350
+T 12353
+T 12355
+S
+#12355
+worm frost shaggy~
+a shaggy frost worm~
+A shaggy frost worm is coiled up before you.
+~
+100 100 dej L 4
+0 0 5 9 -1
+D
+tba
+waterwalk mount
+~
+S
+#12356
+hoarfrost frost enchanted~
+the enchanted hoarfrost~
+Hoarfrost covers the area.
+~
+1 1 bdo dn 3
+0 0 11 9 -1
+D
+tba
+~
+M
+0
+tba echo~
+S
 $

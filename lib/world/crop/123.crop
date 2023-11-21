@@ -1,0 +1,27 @@
+#12351
+frost stalk~
+An Shimmering Frost Stalk~
+8 jkl cg
+0 100 0 100
+D0
+&c.&?||&c.~
+&C~
+D0
+&c.&?//&c.~
+&C~
+D0
+&c.&?\\&c.~
+&C~
+D0
+&c.&?\/&c.~
+&C~
+I 6 12353 100.00 1  # FORAGE: white berries
+I 8 12351 100.00 1  # HARVEST: hoarfrost-covered seed
+I 8 12352 75.00 1 c  # HARVEST: frost stalk
+I 8 12352 25.00 2 c  # HARVEST: frost stalk
+X
+stalk stalks frost hoarfrost ice icy crop~
+tba
+~
+S
+$
