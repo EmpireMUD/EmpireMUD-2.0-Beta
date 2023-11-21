@@ -1183,8 +1183,8 @@ if %move% == 1
           set hit 1
           %echo% &&CThe avalanche knocks ~%ch% over and partially buries *%ch%!&&0
           %send% %ch% That really hurt!
-          dg_affect #12359 %person% SLOW on 10
-          dg_affect #12359 %person% COOLING 20 10
+          dg_affect #12359 %ch% SLOW on 10
+          dg_affect #12359 %ch% COOLING 20 10
           %damage% %ch% %ouch% physical
         elseif %ch.is_pc%
           %send% %ch% &&CYou find high ground just in time as the avalanche roars past you!&&0
@@ -1193,7 +1193,7 @@ if %move% == 1
           end
         end
         if %cycle% < %diff%
-          %send% %ch% &&C**** The shockwave is still going... there's another avalanche! ****&&0 (dodge)
+          %send% %ch% &&C**** The shockwave is still going... here comes another avalanche! ****&&0 (dodge)
         end
       end
       set ch %next_ch%
@@ -1281,7 +1281,10 @@ elseif %move% == 3
     end
     eval cycle %cycle% + 1
     if %cycle% < %times% && !%done%
+      wait 1
       %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+      %echoaround% %targ% &&Z~%self% rears back to snap at ~%targ% again...&&0
+      scfight clear dodge
       scfight setup dodge %targ%
     else if %done% && %targ.id% == %targ_id% && %diff% == 1
       dg_affect #12358 %targ% TO-HIT 25 20
