@@ -202,11 +202,11 @@ if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
-  return 0
+  return 1
 else
   * no need for this script anymore
   detach 12306 %self.id%
-  return 1
+  return 0
 end
 ~
 #12307
