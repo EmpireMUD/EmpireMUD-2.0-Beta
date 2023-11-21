@@ -3362,8 +3362,8 @@ const struct climate_temperature_t climate_temperature[] = {
 
 // CLIM_x (3/4): order to display climate flags
 const bitvector_t climate_flags_order[] = {
-	CLIM_HOT, CLIM_COLD,	// temperatures first
 	CLIM_MILD, CLIM_HARSH,	// modifiers
+	CLIM_HOT, CLIM_COLD,	// temperatures first
 	CLIM_HIGH, CLIM_LOW,	// relative elevation
 	CLIM_MAGICAL,			// special attribute
 	
