@@ -1329,4 +1329,26 @@ elseif %move% == 4
 end
 nop %self.remove_mob_flag(NO-ATTACK)%
 ~
+#12360
+Hoarfrost Serragon: Moving adventure command~
+0 c 0
+adventure~
+if !(summon /= %arg.car%)
+  %teleport% %actor% %instance.location%
+  %force% %actor% adventure
+  %teleport% %actor% %self.room%
+  return 1
+else
+  return 0
+end
+~
+#12361
+Hoarfrost Serragon: Leash for ice creatures~
+0 i 100
+~
+set room %self.room%
+if %room.sector_vnum% < 12350 || %room.sector_vnum% > 12399
+  return 0
+end
+~
 $

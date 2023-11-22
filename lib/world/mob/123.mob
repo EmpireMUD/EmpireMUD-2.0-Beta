@@ -231,6 +231,7 @@ T 9600
 T 9601
 T 9604
 T 12359
+T 12360
 S
 #12351
 spreader hoarfrost frost~
@@ -245,6 +246,88 @@ This invisible mob helps spread hoarfrost.
 T 12350
 T 12353
 T 12355
+S
+#12352
+serragon frost juvenile~
+a juvenile serragon~
+A juvenile frost serragon coils and raises its head above you.
+~
+100 200 acdoxyJK cEGL 5
+0 0 51 25 -1
+D
+tba
+~
+F 12350
+I 0 3012 20.00 1 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 30.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 10.00 6 b  # BUTCHER: fillet of raw meat
+I 0 12362 40.00 1 f  # BUTCHER: arctic char
+I 0 12362 60.00 2 f  # BUTCHER: arctic char
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 30.00 5 k  # SKIN: large skin
+I 1 1351 10.00 6 k  # SKIN: large skin
+M
+4
+$n chitters at you.~
+M
+5
+$n chitters in the dark.~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+0
+Hoarfrost seems to grow on everything in sight -- including your armor!~
+M
+0
+There's a cold silence as hoarfrost forms around you.~
+M
+0
+A painful scraping sound pierces your ears as $n slides along the frozen landscape.~
+M
+4
+Wisps of steam rise off of the frost.~
+M
+0
+$n creeps toward you.~
+T 12355
+T 9600
+T 9601
+T 9604
+T 12361
+S
+#12353
+rabbit ice~
+some rabbit ice~
+Some ice has formed on the ground in the shape of a rabbit.
+~
+30 50 djo 0 1
+0 0 15 20 -1
+D
+You can't tell if it's a frozen rabbit or just a clump of ice!
+~
+T 12361
+S
+#12354
+phoenix chillflame flame~
+a chillflame phoenix~
+A chillflame phoenix billows above you!
+~
+100 200 dehjo mG 3
+0 0 2 20 -1
+D
+   This mighty phoenix is an icy shade of white as blue flames billow from its
+wings and tail. It pays you little mind as it circles overhead, perhaps in
+search of its next meal. It looks like it might be possible to ride it!
+~
 S
 #12355
 worm frost shaggy~
