@@ -248,14 +248,21 @@ T 12353
 T 12355
 S
 #12352
-serragon frost juvenile~
-a juvenile serragon~
-A juvenile frost serragon coils and raises its head above you.
+hatchling frostscale~
+a frostscale hatchling~
+A frostscale hatchling coils and raises its head above you.
 ~
 100 200 acdoxyJK cEGL 5
 0 0 51 25 -1
 D
-tba
+   Though it's larger than a horse, the hatchling is miniscule in comparison to
+the full-grown serragon that left the long grooves in the frost. The palm-sized
+scales that run the length of the hatchling's body are serrated on the edges,
+though they lay flatter than the scales on the adults. Around the margins of
+each scale, beneath a delicate layer of cold vapor, you can see feathery
+hoarfrost that barely protrudes.
+   When the hatchling sees you, it starts clacking its toothy jaws and,
+ominously, you hear more clacking in the distance in response.
 ~
 F 12350
 I 0 3012 20.00 1 b  # BUTCHER: fillet of raw meat
