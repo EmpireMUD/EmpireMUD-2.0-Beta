@@ -1071,6 +1071,9 @@ if %loc% && %self.room% != %loc%
   mgoto %loc%
   nop %self.add_mob_flag(SENTINEL)%
   dg_affect #12351 %self% BONUS-PHYSICAL 1 60
+  * no_sentinel is used by the storytime script to remove sentinel
+  set no_sentinel 0
+  remote no_sentinel %self.id%
   wait 1
   %regionecho% %loc% -12 The ground shakes as something enormous moves beneath it!
   %echo% &&C~%self% bursts forth from the pit... and it looks angry!&&0
@@ -1107,6 +1110,10 @@ Hoarfrost Serragon: Resume wandering if nobody fights.~
 if !%self.affect(12351)% && !%self.fighting% && %room.players_present% == 0
   nop %self.remove_mob_flag(SENTINEL)%
   dg_affect #12350 %self% !ATTACK on -1
+  * reset no-sentinel for storytime
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  * and detach me
   detach 12358 %self.id%
 end
 ~

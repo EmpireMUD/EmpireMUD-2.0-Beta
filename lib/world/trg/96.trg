@@ -469,10 +469,10 @@ while !%done%
 done
 remote story %self.id%
 * cancel sentinel/silent
-if %self.varexists(no_sentinel)%
+if %self.var(no_sentinel,0)%
   nop %self.remove_mob_flag(SENTINEL)%
 end
-if %self.varexists(no_silent)%
+if %self.var(no_silent,0)%
   nop %self.remove_mob_flag(SILENT)%
 end
 * wait between stories
