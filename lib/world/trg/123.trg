@@ -1162,7 +1162,7 @@ if %move% == 1
     nop %self.remove_mob_flag(NO-ATTACK)%
     halt
   end
-  %echo% &&C**** &&Z~%self% slams into the ground! An avalanche is headed toward you! ****&&0 (dodge)  if %diff% > 1
+  %echo% &&C**** &&Z~%self% slams into the ground! An avalanche is headed toward you! ****&&0 (dodge)
   if %diff% > 1
     set ouch 100
   else
