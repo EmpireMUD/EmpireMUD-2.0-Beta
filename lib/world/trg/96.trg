@@ -377,6 +377,10 @@ set line_gap 9 sec
 set story_gap 180 sec
 * random wait to offset competing scripts slightly
 wait %random.30%
+* ensure not fighting
+if %self.disabled% || %self.fighting%
+  halt
+end
 * find story number
 if %self.varexists(story)%
   eval story %self.story% + 1
@@ -420,7 +424,7 @@ set pos 0
 set done 0
 while !%done%
   set msg %self.custom(script%story%,%pos%)%
-  if %msg%
+  if %msg% && !%self.fighting% && !%self.disabled%
     set mode %msg.car%
     set msg %msg.cdr%
     if %mode% == say
