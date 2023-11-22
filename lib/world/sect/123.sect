@@ -33,6 +33,12 @@ E
 14 0 1.00 20
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 desert ice hoarfrost frost frozen ground plants cactus cacti around~
 tba
@@ -61,6 +67,12 @@ E
 14 0 1.00 20
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 desert ice hoarfrost frost frozen ground grove shady trees woods around~
 tba
@@ -83,6 +95,12 @@ E
 14 0 1.00 21
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen ground oasis plants water vegetation desert around~
 tba
@@ -111,6 +129,12 @@ E
 14 0 1.00 51
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen icy beach sandy shore water ocean sea desert around~
 tba
@@ -182,6 +206,12 @@ E
 14 0 1.00 70
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen field irrigation irrigation desert canal around~
 tba
@@ -213,6 +243,12 @@ E
 14 0 1.00 73
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen forest trees irrigated irrigation canal around~
 tba
@@ -250,6 +286,12 @@ E
 14 0 1.00 75
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen jungle forest trees irrigated irrigation canal around~
 tba
@@ -272,6 +314,12 @@ E
 14 0 1.00 82
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen ground oasis dry desert plants around~
 tba
@@ -295,6 +343,12 @@ E
 13 0 5.00 85
 E
 14 0 1.00 85
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen canal irrigation water desert around~
 tba
@@ -315,6 +369,12 @@ E
 13 0 5.00 87
 E
 14 0 1.00 87
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen canal verdant water irrigation irrigated around~
 tba
@@ -338,6 +398,12 @@ E
 13 0 5.00 19
 E
 14 0 1.00 19
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen canal water trench around~
 tba
@@ -363,6 +429,12 @@ E
 14 0 1.00 88
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen oasis irrigated field irrigation desert around water~
 tba
@@ -383,6 +455,12 @@ E
 13 0 5.00 5
 E
 14 0 1.00 5
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen river water around~
 tba
@@ -403,6 +481,12 @@ E
 13 0 5.00 53
 E
 14 0 1.00 53
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen estuary river water ocean sea around~
 tba
@@ -464,6 +548,12 @@ E
 14 0 1.00 36
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 desert ice hoarfrost frost frozen ground grove shady trees woods around~
 tba
@@ -486,6 +576,12 @@ E
 14 0 1.00 0
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen plains field grass ground around~
 tba
@@ -508,6 +604,12 @@ E
 14 0 1.00 58
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen foothills hills lake mountain around~
 tba
@@ -528,6 +630,12 @@ E
 13 0 5.00 32
 E
 14 0 1.00 32
+M
+12352 5.00 d
+M
+12353 5.00 0
+M
+12354 0.05 0
 X
 ice hoarfrost frost frozen lake frozen ice down around~
 tba
