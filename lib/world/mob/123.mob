@@ -232,6 +232,8 @@ T 9601
 T 9604
 T 12359
 T 12360
+T 12362
+T 12364
 S
 #12351
 spreader hoarfrost frost~
@@ -310,6 +312,7 @@ T 9600
 T 9601
 T 9604
 T 12361
+T 12362
 S
 #12353
 rabbit ice~
@@ -322,6 +325,7 @@ D
 You can't tell if it's a frozen rabbit or just a clump of ice!
 ~
 T 12361
+T 12362
 S
 #12354
 phoenix chillflame flame~
@@ -341,7 +345,7 @@ worm frost shaggy~
 a shaggy frost worm~
 A shaggy frost worm is coiled up before you.
 ~
-100 100 dej L 4
+100 100 dehj L 4
 0 0 5 9 -1
 D
    This odd creature is nearly the size of a horse, with the appearance of a

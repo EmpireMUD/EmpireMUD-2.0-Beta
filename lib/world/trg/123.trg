@@ -1358,4 +1358,47 @@ if %room.sector_vnum% < 12350 || %room.sector_vnum% > 12399
   return 0
 end
 ~
+#12362
+Hoarfrost Serragon: Pickpocket rejection strings~
+0 p 100
+~
+if %ability% != 142
+  * not pickpocket
+  return 1
+  halt
+else
+  return 0
+  * after messaging...
+end
+switch %self.vnum%
+  case 12350
+    case 12352
+      * hoarfrost serragon, juvenile serragon
+      if !%self.aff_flagged(!ATTACK)%
+        %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
+        %aggro% %actor%
+      else
+        %send% %actor% You can't imagine which part of it might be the "pocket".
+      end
+    break
+    case 12353
+      * rabbit ice
+      %send% %actor% It doesn't seem to have any pockets.
+    break
+    default
+      %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
+    break
+  done
+~
+#12364
+Hoarfrost Serragon: Fighting characters cannot flee~
+0 c 0
+flee~
+if %actor.fighting%
+  %send% %actor% PANIC! You couldn't escape! The serragon's enormous body is coiled around the entire area!
+  return 1
+else
+  return 0
+end
+~
 $
