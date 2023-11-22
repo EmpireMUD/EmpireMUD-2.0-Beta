@@ -982,7 +982,7 @@ An icy skein of serragon blood is lying here.~
    Even frozen, the odd cyan blood of the hoarfrost serragon is as pliable as
 yarn. It doesn't feel like a liquid, even in your warm hands, so you wrap it
 into a skein and tuck it away for later.
-   The frozen blood could be used to build a 'hoarfrost serragon shrine' where
+   The frozen blood could be used to build a hoarfrost serragon shrine where
 your citizens can sit in contemplation of the time you saved them from the
 fearsome beast.
    In ages past, the hoarfrost serragons were unknown outside the arctic
@@ -998,8 +998,16 @@ S
 whistle mount shaggy frost worm~
 a shaggy frost worm mount whistle~
 A shaggy frost worm mount whistle has been left behind.~
-tba
-You can 'use' this whistle to summon a shaggy frost worm, a mount that glides equally well on land and sea.
+   The whistle looks like it was carved from ice, though it doesn't melt at
+your warm touch. Across the top of the whistle, a delicate hoarfrost has
+formed, which almost looks like fur.
+   You can 'use' this whistle to summon a shaggy frost worm, a mount that
+glides equally well on land and sea. You require All-Terrain Riding to use this
+mount.
+   No consensus exists on whether the frost worms are related to the hoarfrost
+serragon, with some believing them to be the serragon's larvae and others
+concluding the worms to be a separate creature that lives beneath the
+serragon's scales.
 ~
 3 p a 0 0 9
 12355 0 0
@@ -1012,8 +1020,15 @@ S
 whistle enchanted hoarfrost minipet frost~
 an enchanted hoarfrost minipet whistle~
 An enchanted hoarfrost minipet whistle is lying here.~
-tba minipet
-You can 'use' the whistle to gain enchanted hoarfrost as a minipet.
+   The whistle itself is nearly insubstantial, being made from feathery
+hoarfrost that crumples and starts to melt as you touch it. But, miraculously,
+it never seems to fully melt.
+   You can 'use' the whistle to gain enchanted hoarfrost as a minipet.
+   The breath of the hoarfrost serragon, which steams out its pores as ice-cold
+vapor, grows feathery ice on every surface. With just a little touch of magic,
+this frost comes to life. No practical purpose exists for it, but it has long
+entertained any stalwart adventurer who ventures close enough to a serragon to
+collect some.
 ~
 19 p a 0 0 11
 12356 0 0
@@ -1025,7 +1040,13 @@ S
 scale serragon frosty~
 a frosty serragon scale~
 A frosty serragon scale is lying here.~
-tba low wealth item, giant scale
+   This scale must have come from a full-grown serragon! It's larger than a
+heater shield and colder than the darkest part of midwinter. The edges of the
+scale are lined with razor teeth with a fuzzy blanket of hoarfrost lining the
+underside.
+   The scales of the hoarfrost serragon are as hard as pykrete in life, but
+they become incredible fragile when the creature dies. An intact scale is
+worth a cool sum on the right market.
 ~
 15 e a 0 0 6
 8 0 0
@@ -1039,7 +1060,11 @@ S
 spleen icy serragon~
 an icy serragon spleen~
 The icy spleen of an enormous serragon is lying here.~
-tba mid-wealth icy spleen
+   The blue-black spleen drips with frigid vapor that forms hoarfrost on nearly
+anything it touches. It is otherwise an unattractive lump of cold flesh.
+   All parts of the hoarfrost serragon become as delicate as ice upon the
+creature's death such that undamaged organs sometimes can fetch high prices
+and some mages keep them as frozen assets.
 ~
 15 e a 0 0 7
 16 0 0
@@ -1053,8 +1078,15 @@ S
 skull translucent serragon~
 a translucent serragon skull~
 A translucent serragon skull has been left here.~
-tba serragon skull high-wealth
-.
+   The enormous skull almost looks as if it's made from ice, though it has the
+texture of bone. The lower jaw is missing, but most of the dagger-like teeth
+in the upper jaw remain intact. In shape, the skull resembles like a giant
+snake or lizard more than a dragon or mammoth skull.
+   It's frighteningly difficult to kill a serragon without damage to its rare
+and precious skull. Not only is the face one of its only vulnerable areas,
+which causes most specimens to have shatter marks from axes and hammers, but
+the creature's death throes often bring its head high into the air, followed by
+a cataclysmic fall.
 ~
 15 e a 0 0 7
 24 0 0
@@ -1068,8 +1100,13 @@ S
 columella icy serragon~
 the icy columella of a serragon~
 The icy columella of a serragon is steaming on the ground.~
-tba
-Used for 'craft hoarfrost serragon scepter', held empire item.
+   This odd bone almost looks like a pillar of ice, though it has the texture
+of bone and it doesn't seem to melt -- though it does have a cool vapor around
+it.
+   An exquisite woodworker could craft a hoarfrost serragon scepter from this
+odd bone.
+   The columella, like the stapes in mammals, helps transmit sound to the
+eardrum.
 ~
 3 e a 0 0 2
 0 0 0
@@ -1083,8 +1120,13 @@ S
 scepter hoarfrost serragon frost~
 a hoarfrost serragon scepter~
 A hoarfrost serragon scepter lies on the ground.~
-tba
-empire item
+   This exquisite scepter looks as much like ice or gemstone as it does bone,
+though it's made from the ear column of a massive serragon. In dim light, it
+glows an eerie, delicate blue.
+   Serragons are named, in part, for what they have in common with dragons: a
+tremendous size, a fearsome maw, and a scaly body. But differences exist as
+well. The serragons have no wings, nor any legs, and they grow many times
+longer than even the largest dragons.
 ~
 3 emo ao 0 0 1
 0 0 0
@@ -1106,7 +1148,10 @@ S
 char arctic fish~
 an arctic char~
 The remains of an arctic char are rotting here.~
-tba
+   With a speckled gray back, white sides, and a red belly, this fish resembles
+a salmon or trout.
+   Called iqaluk or tariungmiutaq in the Inukitut language, arctic char are
+prized by anglers in the frozen north.
 ~
 6 k a 0 0 5
 24 0 0
@@ -1121,8 +1166,11 @@ S
 potion cooling hoarfrost frost~
 a hoarfrost potion of cooling~
 A hoarfrost potion of cooling has been left behind.~
-tba
-plant;  brew 'hoarfrost potion of cooling'
+   The little flask is filled to the cork with an ice blue potion that's cold
+to the touch.
+   Hoarfrost forms on cool, still nights when plants, rocks, and even snow
+itself can get so cold that free moisture in the air forms delicate, feathery
+ice crystals across the surface.
 ~
 25 0 a 0 0 9
 -1 0 3030
@@ -1139,9 +1187,13 @@ S
 #12364
 lung serragon enormous~
 the enormous lung of a serragon~
-An enormous serragon lung is lying here.~
-tba
-Used for 'sew hoarfrost satchel'
+An enormous serragon lung is coiled here.~
+   This disturbingly-blue colored lung is coiled up like a deflated tube. If
+unfurled, it might be as long as a farmer's acre.
+   A tradesman skilled in tailoring dangerous leathers could sew this lung into
+a hoarfrost satchel.
+   All types of serragon grow so large that their bones and organs have long
+been used as natural resources by any group clever enough to kill one.
 ~
 3 e a 0 0 4
 0 0 0
