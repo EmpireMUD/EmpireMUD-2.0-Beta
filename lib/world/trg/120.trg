@@ -556,14 +556,14 @@ if !%self.fighting% && %self.varexists(phase)%
         %send% %person% ~%self% turns his gaze inward upon you!
         %send% %person% &&rA torrent of lightning flows through you, blasting you out of the eye of the storm!
         %damage% %person% 99999 direct
-        %teleport% %person% %self%
+        %teleport% %person% %self.room%
       elseif %person.vnum% == 12031
         %purge% %person% $n fades away.
       else
         * What are you doing in here?
         * Maybe a familiar?
         %echo% ~%person% is expelled from the storm chamber.
-        %teleport% %person% %self%
+        %teleport% %person% %self.room%
       end
       set person %next_person%
     done
