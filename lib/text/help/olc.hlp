@@ -3507,9 +3507,10 @@ See also: FACTION, OLC FACTIONS, STRING EDITOR
 Usage:  .flags [add | remove] <flags>
 
 The following faction flags are available:
- IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
- REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
- HIDE-IN-LIST - Does not appear in the 'factions' command for players.
+ &cIN-DEVELOPMENT&0 - The faction can't be seen by players, and won't gain rep.
+ &cREP-FROM-KILLS&0 - Players can gain/lose rep by killing faction mobs.
+ &cHIDE-IN-LIST&0 - Does not appear in the 'factions' command for players.
+ &cHIDE-ON-MOB&0 - Does not appear below the mob description.
 
 See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
 #d

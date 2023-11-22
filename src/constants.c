@@ -2182,6 +2182,7 @@ const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
 	"REP-FROM-KILLS",
 	"HIDE-IN-LIST",
+	"HIDE-ON-MOB",
 	"\n"
 };
 
