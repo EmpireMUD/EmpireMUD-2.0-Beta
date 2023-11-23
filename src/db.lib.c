@@ -6359,7 +6359,8 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	sector_data *sect, *find;
 	double dbl_in;
 	int int_in[4];
-		
+	bitvector_t bit_in;
+	
 	// for error messages
 	sprintf(buf2, "sector vnum %d", vnum);
 	
@@ -6413,14 +6414,14 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			
 			// evolution
 			case 'E': {
-				if (!get_line(fl, line) || sscanf(line, "%d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) != 4) {
+				if (!get_line(fl, line) || sscanf(line, "%d %lld %lf %d", &int_in[0], &bit_in, &dbl_in, &int_in[2]) != 4) {
 					log("SYSERR: Bad data in E line of %s", buf2);
 					exit(1);
 				}
 				
 				CREATE(evo, struct evolution_data, 1);
 				evo->type = int_in[0];
-				evo->value = int_in[1];
+				evo->value = bit_in;
 				evo->percent = dbl_in;
 				evo->becomes = int_in[2];
 				LL_APPEND(GET_SECT_EVOS(sect), evo);
@@ -6510,7 +6511,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	// E: evolution
 	for (evo = GET_SECT_EVOS(st); evo; evo = evo->next) {
 		fprintf(fl, "E\n");
-		fprintf(fl, "%d %d %.2f %d\n", evo->type, evo->value, evo->percent, evo->becomes);
+		fprintf(fl, "%d %lld %.2f %d\n", evo->type, evo->value, evo->percent, evo->becomes);
 	}
 	
 	// I: interactions

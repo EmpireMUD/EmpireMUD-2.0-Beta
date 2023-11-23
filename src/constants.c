@@ -3494,6 +3494,10 @@ const char *evo_types[] = {
 	"OWNED",
 	"UNOWNED",
 	"BURN-STUMPS",
+	"ADJACENT-SECTOR-FLAG",
+	"NOT-ADJACENT-SECTOR-FLAG",	// 25
+	"NEAR-SECTOR-FLAG",
+	"NOT-NEAR-SECTOR-FLAG",
 	"\n"
 };
 
@@ -3524,6 +3528,10 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// owned
 	EVO_VAL_NONE,	// unowned
 	EVO_VAL_NONE,	// burn-stumps
+	EVO_VAL_SECTOR_FLAG,	// "ADJACENT-SECTOR-FLAG"
+	EVO_VAL_SECTOR_FLAG,	// "NOT-ADJACENT-SECTOR-FLAG"
+	EVO_VAL_SECTOR_FLAG,	// "NEAR-SECTOR-FLAG"
+	EVO_VAL_SECTOR_FLAG		// "NOT-NEAR-SECTOR-FLAG"
 };
 
 
@@ -3553,6 +3561,10 @@ const bool evo_is_over_time[] = {
 	TRUE,	// owned
 	TRUE,	// unowned
 	FALSE,	// burn-stumps
+	TRUE,	// "ADJACENT-SECTOR-FLAG"
+	TRUE,	// "NOT-ADJACENT-SECTOR-FLAG"
+	TRUE,	// "NEAR-SECTOR-FLAG"
+	TRUE,	// "NOT-NEAR-SECTOR-FLAG"
 };
 
 
@@ -3897,6 +3909,7 @@ const char *sector_flags[] = {
 	"SEPARATE-NOT-ADJACENTS",	// 25
 	"SEPARATE-NOT-NEARS",
 	"INHERIT-BASE-CLIMATE",
+	"IRRIGATES-AREA",
 	"\n"
 };
 

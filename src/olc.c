@@ -4369,7 +4369,7 @@ OLC_MODULE(olc_wordcount) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_evolution_display(struct evolution_data *list, char *save_buffer) {
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
 	
@@ -4378,11 +4378,16 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 	for (evo = list; evo; evo = evo->next) {
 		switch (evo_val_types[evo->type]) {
 			case EVO_VAL_SECTOR: {
-				sprintf(lbuf, " [%s (%d)]", GET_SECT_NAME(sector_proto(evo->value)), evo->value);
+				sprintf(lbuf, " [%s (%lld)]", GET_SECT_NAME(sector_proto(evo->value)), evo->value);
 				break;
 			}
 			case EVO_VAL_NUMBER: {
-				sprintf(lbuf, " [%d]", evo->value);
+				sprintf(lbuf, " [%lld]", evo->value);
+				break;
+			}
+			case EVO_VAL_SECTOR_FLAG: {
+				sprintbit(evo->value, sector_flags, part, TRUE);
+				sprintf(lbuf, " [%s]", trim(part));
 				break;
 			}
 			default: {

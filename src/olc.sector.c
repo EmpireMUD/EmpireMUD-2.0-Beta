@@ -971,9 +971,10 @@ OLC_MODULE(sectedit_commands) {
 OLC_MODULE(sectedit_evolution) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	struct evolution_data *evo, *change;
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], part[1024], *sectarg, *tmp;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int num, iter, evo_type, value;
+	int num, iter, evo_type;
+	sbitvector_t value;
 	sector_data *to_sect, *vsect;
 	double prc;
 	bool found;
@@ -1052,7 +1053,28 @@ OLC_MODULE(sectedit_evolution) {
 					}
 					
 					value = atoi(buf);
-					sprintf(valstr, " [%d]", value);
+					sprintf(valstr, " [%lld]", value);
+					break;
+				}
+				case EVO_VAL_SECTOR_FLAG: {
+					tmp = any_one_word(tmp, buf);	// buf = sector flag(s)
+					sectarg = any_one_arg(tmp, arg3);
+					
+					if (!*buf) {
+						msg_to_char(ch, "Missing sector flags.\r\n");
+						return;
+					}
+					
+					// try to pull flags
+					value = olc_process_flag(ch, buf, "sector", NULL, sector_flags, NOBITS);
+					
+					if (value == NOBITS) {
+						msg_to_char(ch, "No valid sector flags given.\r\n");
+						return;
+					}
+					
+					sprintbit(value, sector_flags, part, TRUE);
+					sprintf(valstr, " [%s]", trim(part));
 					break;
 				}
 				case EVO_VAL_NONE:
@@ -1092,7 +1114,8 @@ OLC_MODULE(sectedit_evolution) {
 	}
 	else if (is_abbrev(arg1, "change")) {
 		half_chop(arg2, num_arg, arg1);
-		half_chop(arg1, type_arg, val_arg);
+		half_chop(arg1, type_arg, arg3);	// arg3 is temporary
+		any_one_word(arg3, val_arg);	// remove quotes from val_arg if present
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
 			msg_to_char(ch, "Usage: evolution change <number> <type | value | percent | sector> <new value>\r\n");
@@ -1145,7 +1168,25 @@ OLC_MODULE(sectedit_evolution) {
 					}
 					
 					value = atoi(val_arg);
-					sprintf(valstr, "%d", value);
+					sprintf(valstr, "%lld", value);
+					break;
+				}
+				case EVO_VAL_SECTOR_FLAG: {
+					if (!*val_arg) {
+						msg_to_char(ch, "Missing sector flags.\r\n");
+						return;
+					}
+					
+					// try to pull flags
+					value = olc_process_flag(ch, val_arg, "sector", NULL, sector_flags, NOBITS);
+					
+					if (value == NOBITS) {
+						msg_to_char(ch, "No valid sector flags given.\r\n");
+						return;
+					}
+					
+					sprintbit(value, sector_flags, valstr, TRUE);
+					trim(valstr);
 					break;
 				}
 				case EVO_VAL_NONE:

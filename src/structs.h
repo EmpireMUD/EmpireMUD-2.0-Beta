@@ -239,6 +239,7 @@ typedef unsigned short int ush_int;
 // 'unsigned long long' will give you at least 64 bits if you have GCC (or C99+)
 // -- THIS IS REQUIRED because some bit sets already use it
 typedef unsigned long long	bitvector_t;
+typedef signed long long sbitvector_t;	// signed version needed for some uses
 
 
 // vnums
@@ -2734,6 +2735,8 @@ typedef enum {
 #define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
 #define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
 #define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
+#define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
+// note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2955,12 +2958,17 @@ typedef enum {
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
 #define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
-#define NUM_EVOS  24	// total
+#define EVO_ADJACENT_SECTOR_FLAG  24	// evolves adjacent to a sector flag
+#define EVO_NOT_ADJACENT_SECTOR_FLAG  25	// evolves when NOT adjacent to a sector flag
+#define EVO_NEAR_SECTOR_FLAG  26	// evolves within 2 tiles of a sector flag
+#define EVO_NOT_NEAR_SECTOR_FLAG  27	// evolves when NOT within 2 tiles of a sector flag
+#define NUM_EVOS  28	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
 #define EVO_VAL_SECTOR  1
 #define EVO_VAL_NUMBER  2
+#define EVO_VAL_SECTOR_FLAG  3
 
 
 // Exit info (doors)
@@ -6054,7 +6062,7 @@ struct sector_data {
 	
 	int movement_loss;	// move point cost
 	bitvector_t climate;	// CLIM_ flags
-	bitvector_t flags;	// SECTF_ flags
+	bitvector_t flags;	// SECTF_ flags: warning: evolutions use these as flags in a SIGNED sbitvector_t
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
 	
 	struct spawn_info *spawns;	// mob spawn data
@@ -6071,7 +6079,7 @@ struct sector_data {
 // for sector_data, to describe how a tile changes over time
 struct evolution_data {
 	int type;	// EVO_
-	int value;	// used by some types, e.g. # of adjacent forests
+	sbitvector_t value;	// used by some types, e.g. # of adjacent forests; sector flags; etc
 	double percent;	// chance of happening per zone update
 	sector_vnum becomes;	// sector to transform to
 	

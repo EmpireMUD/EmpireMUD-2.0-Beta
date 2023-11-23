@@ -7689,6 +7689,11 @@ Available types ([value] isn't used unless specified):
  &cOWNED&0 - Evolves if the tile is claimed.
  &cUNOWNED&0 - Evolves if the tile is not claimed.
  &cBURN-STUMPS&0 - Sector this tile becomes when burnt by workforce.
+ &cADJACENT-SECTOR-FLAG&0 - Evolves when adjacent to a sector with this flag.
+    Note: For multiple sector flags, use quotes like "CROP IRRIGATES-AREA".
+ &cNOT-ADJACENT-SECTOR-FLAG&0 - ... NOT adjacent to a sector with this flag.
+ &cNEAR-SECTOR-FLAG&0 - Evolves within 2 tiles of a sector with this flag.
+ &cNOT-NEAR-SECTOR-FLAG&0 - ... NOT within 2 tiles of a sector with this flag.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -7702,39 +7707,40 @@ See also: OLC SECTORS
 Usage:  .flags [add | remove] <flags>
 
 Available sector flags:
- LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
- IS-ADVENTURE - used only for adventure rooms
- NON-ISLAND - won't be detected as part of an island by the island detection
+ &cLOCK-ICON&0 - a random icon is chosen when the terrain changes to this, and kept
+ &cIS-ADVENTURE&0 - used only for adventure rooms
+ &cNON-ISLAND&0 - won't be detected as part of an island by the island detection
     system.
- CHORE - This sector may have a chore (required, or the chore will never trigger)
- !CLAIM - Cannot be claimed.
- START-LOCATION - A starting location for players; prevents combat here
- FRESH-WATER - Requires a boat, counts as a river
- OCEAN - Requires a boat, counts as ocean
- DRINK - Provides drinkable water; can also be used from adjacent rooms
- HAS-CROP-DATA - Has an associated crop (like a seeded field or a crop tile)
- CROP - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
- LAY-ROAD - The lay command here can be used to create a road
- IS-ROAD - This tile is a road
- CAN-MINE - The tile is mine-able; this allows the Prospect ability
- SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
- MAP-BUILDING - This sector represents a building on the map; shown using building data
- INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
- OBSCURE-VISION - Players can't be seen here; also blocks guard towers
- IS-TRENCH - Sector counts as a trench and fills with water
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
- ROUGH - This is rough, raised terrain, like a mountain
- SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
- NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
+ &cCHORE&0 - This sector may have a chore (required, or the chore will never trigger)
+ &c!CLAIM&0 - Cannot be claimed.
+ &cSTART-LOCATION&0 - A starting location for players; prevents combat here
+ &cFRESH-WATER&0 - Requires a boat, counts as a river
+ &cOCEAN&0 - Requires a boat, counts as ocean
+ &cDRINK&0 - Provides drinkable water; can also be used from adjacent rooms
+ &cHAS-CROP-DATA&0 - Has an associated crop (like a seeded field or a crop tile)
+ &cCROP&0 - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
+ &cLAY-ROAD&0 - The lay command here can be used to create a road
+ &cIS-ROAD&0 - This tile is a road
+ &cCAN-MINE&0 - The tile is mine-able; this allows the Prospect ability
+ &cSHOW-ON-POLITICAL-MAPOUT&0 - Still appears on the political version of the graphical map
+ &cMAP-BUILDING&0 - This sector represents a building on the map; shown using building data
+ &cINSIDE-ROOM&0 - This sector represents an interior (designated) ROOM building
+ &cLARGE-CITY-RADIUS&0 - This tile counts as in-city even in the outskirts
+ &cOBSCURE-VISION&0 - Players can't be seen here; also blocks guard towers
+ &cIS-TRENCH&0 - Sector counts as a trench and fills with water
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cROUGH&0 - This is rough, raised terrain, like a mountain
+ &cSHALLOW-WATER&0 - The tile has water but requires no boat (like a swamp)
+ &cNEEDS-HEIGHT&0 - Uses the 'height' property in some way and will set itself from
     nearby tiles if missing.
- KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
- SEPARATE-NOT-ADJACENTS - Runs each NOT-ADJACENT evolution separately rather
+ &cKEEPS-HEIGHT&0 - Uses the 'height' property but won't change it (for roads etc).
+ &cSEPARATE-NOT-ADJACENTS&0 - Runs each NOT-ADJACENT evolution separately rather
     than making sure the tile isn't adjacent to ANY of them.
- SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
+ &cSEPARATE-NOT-NEARS&0 - Runs each NOT-NEAR-SECTOR evolution separately rather
     than making sure the tile isn't near ANY of them.
- INHERIT-BASE-CLIMATE - Uses the climate flags of the base sector in addition
+ &cINHERIT-BASE-CLIMATE&0 - Uses the climate flags of the base sector in addition
     to the ones set on this sector. For example, a road or building sector.
+ &cIRRIGATES-AREA&0 - This flag is used to trigger irrigation evolutions.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
