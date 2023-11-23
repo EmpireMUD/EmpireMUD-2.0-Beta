@@ -1207,8 +1207,12 @@ S
 satchel hoarfrost~
 a hoarfrost satchel~
 A hoarfrost satchel has been left behind.~
-tba
-empire pack
+   The satchel is expertly stitched from some sort of pliable, blue leather.
+It's exceptionally waterproof and surprisingly light, though it's also so cold
+to the touch that delicate frost forms constantly on the back.
+   Perhaps the largest among its kind, the hoarfrost serragon is reputed to
+swallow entire villages. Those who doubt this is possible have probably never
+actually seen one.
 ~
 3 emo ar 0 0 2
 0 0 0
@@ -1228,8 +1232,13 @@ S
 bladder drained serragon tremendous~
 the drained bladder of a tremendous serragon~
 The drained bladder of a serragon is lying on the ground.~
-tba
-Used for 'sew serragon satchel'
+   This old, leathery blue sack was the bladder of a humongous creature. From
+the smell, it could certainly have been cleaned better. But even in this
+condition, it's still useful.
+   A tradesman skilled in tailoring dangerous leathers could sew this bladder
+into a serragon knapsack.
+   Whether due to its harsh habitat or its extreme age, all parts of the
+hoarfrost serragon are tough, durable, and always valuable.
 ~
 3 e a 0 0 5
 0 0 0
@@ -1243,8 +1252,11 @@ S
 knapsack sack serragon~
 a serragon knapsack~
 A serragon knapsack has been left behind.~
-tba
-large pack
+   The rugged knapsack is made from a most unusual leather. Though it's water-
+proof and light for its size, its most attractive feature is its deep blue
+color. The stitching on the knapsack is so fine you can't even see the threads.
+   The serrated scales and powerful jaws help the serragon cut through even
+hard bedrock to form the deep, near-vertical shafts in which they live.
 ~
 3 emo ar 0 0 3
 0 0 0
@@ -1260,7 +1272,11 @@ S
 flower frost~
 a frost flower~
 A frost flower is melting on the ground.~
-tba
+   As it melts, you realize the it wasn't a flower at all -- just
+incandescently beautiful frost.
+   Such frost flowers form when the long stems of plants freeze while the
+ground is still warm. As the water in the stems freezes, it expands out narrow
+slits, forming delicate petals of ice.
 ~
 3 k a 0 0 3
 0 0 0
