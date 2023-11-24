@@ -192,7 +192,9 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 12362 100.00 1 f  # FISH: arctic char
 X
 ice hoarfrost frost frozen icebergs sea shallow coast ocean water around~
-tba
+   The frigid water is full of chunks of ice -- small, large, and every size in
+between. They seem to be calving off of the coast, where the sandy beach is
+blanketed in snow and hoarfrost.
 ~
 S
 #12355
@@ -226,7 +228,9 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen field irrigation irrigation desert canal around~
-tba
+   The irrigation that crisscrosses the field has frozen over and the plants
+have all died. The ground is covered all over in a thick layer of snow topped
+with delicate hoarfrost that crunches as you walk.
 ~
 S
 #12356
@@ -262,8 +266,12 @@ M
 M
 12354 0.05 0
 X
-ice hoarfrost frost frozen forest trees irrigated irrigation canal around~
-tba
+ice hoarfrost frost frozen forest trees irrigated irrigation canal ground around~
+   The ice-paved ground beneath the forest is littered with branches that have
+been not merely broken, but shattered, by the weight of the ice. Every trunk
+looks like it burst as the sap within froze. The irrigation ditches that once
+watered these trees are frozen, too. And on every surface in the eerie cold,
+you find the same feathery blanket of hoarfrost.
 ~
 S
 #12357
@@ -306,7 +314,10 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen jungle forest trees irrigated irrigation canal around~
-tba
+   Dead jungle trees of every kind reach up from the frozen fields as if they
+were trying to escape the frozen onslaught. Branches that would have been
+long enough to mast a ship lie shattered on the ground, their broken remains
+covered in delicate hoarfrost.
 ~
 S
 #12358
@@ -334,7 +345,10 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen ground oasis dry desert plants around~
-tba
+   You nearly slip as you plant a foot in the snow and find ice underneath.
+From the shape of the landscape, this is an oasis! Or, at least, it was. You
+can find no flowing water. Everything here, from the plants to the hills, is
+covered in ice and snow.
 ~
 _
 This is the frozen DRY oasis.
@@ -363,7 +377,11 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen canal irrigation water desert around~
-tba
+   You catch yourself as you start to slip. The ice here is flat where it
+covers the wide irrigation canal and it's all too easy to lose your footing.
+Along the sides of the canal, the irrigated fields, too, are paved with ice
+and blanketed in snow. But at least there, the terrain is rough enough to get
+some traction.
 ~
 S
 #12360
@@ -389,7 +407,11 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen canal verdant water irrigation irrigated around~
-tba
+   You catch yourself as you start to slip. The ice here is flat where it
+covers the wide irrigation canal and it's all too easy to lose your footing.
+Along the sides of the canal, the irrigated fields, too, are paved with ice
+and blanketed in snow. But at least there, the terrain is rough enough to get
+some traction.
 ~
 _
 This is actually the frozen VERDANT canal
@@ -418,7 +440,11 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen canal water trench around~
-tba
+   You catch yourself as you start to slip. The ice here is flat where it
+covers the wide irrigation canal and it's all too easy to lose your footing.
+Along the sides of the canal, the land, too, are paved with ice
+and blanketed in snow. But at least there, the terrain is rough enough to get
+some traction.
 ~
 _
 This is the regular temperate canal
@@ -449,7 +475,10 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen oasis irrigated field irrigation desert around water~
-tba
+   You nearly slip as you plant a foot in the snow and find ice underneath.
+From the shape of the landscape, this is an oasis! Or, at least, it was. You
+can find no flowing water. Everything here, from the plants to the hills, is
+covered in ice and snow.
 ~
 S
 #12363
@@ -475,7 +504,11 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen river water around~
-tba
+   You hardly notice as you step from the crunchy snow onto what was once a
+river. But the glimpse of a frozen fish beneath the ice reveals, indeed, this
+waterway had a mighty flow until it was suddenly and mercilessly frozen in
+place. Indeed, it turned to ice so fast you can still see the current frozen
+in time.
 ~
 S
 #12364
@@ -501,7 +534,11 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen estuary river water ocean sea around~
-tba
+   Where the river meets the sea, it pours only ice. This estuary was once
+-- and perhaps recently -- a major flow into the ocean. Now, though, it is
+frozen in time along with the plants that once lined the bank. On the ice,
+a delicate layer of hoarfrost gives a soft crunch as you walk, echoing off
+the frozen banks.
 ~
 S
 #12365
@@ -568,7 +605,10 @@ M
 12354 0.05 0
 X
 desert ice hoarfrost frost frozen ground grove shady trees woods around~
-tba
+   The's a cold serenity in this dead forest, where every trunk is covered in
+feathery hoarfrost like pillars of snow. Beneath the trees lie the shattered
+remains of branches that fell when the frost became too heavy. Many of them
+bear the remains of frozen leaves, still green in their icy tombs.
 ~
 S
 #12366
@@ -596,7 +636,10 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen plains field grass ground around~
-tba
+   The plains stretch out around you, white with an unexpected winter. But as
+you kneel to examine the ground, you find it isn't snow at all. The rolling
+plains are covered in a thick sheet of ice which is topped with delicate,
+feathery hoarfrost.
 ~
 S
 #12367
@@ -624,7 +667,9 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen foothills hills lake mountain around~
-tba
+   The hills are nearly untraversable as every single step is a battle for
+traction. What looks to be snow from a distance has turned out to be an
+impossibly fragile layer of hoarfrost atop a thick sheet of ice.
 ~
 S
 #12368
@@ -650,7 +695,10 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen lake frozen ice down around~
-tba
+   The gentle ripples of the lake are preserved in ice that must have frozen
+impossibly fast. The surface of the lake has begun to grow hoarfrost -- that
+delicate, feathery carpet of ice crystals that has covered the entire
+landscape.
 ~
 S
 $
