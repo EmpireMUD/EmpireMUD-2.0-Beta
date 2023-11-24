@@ -773,7 +773,7 @@ S
 #19
 Canal~
 A Canal~
-'~' 17 o 8 gi af
+'~' 17 o 8 giC af
 D0
 @w&?~~@e~
 &c~
@@ -814,15 +814,11 @@ E
 E
 5 0 100.00 22
 E
-7 19 4.00 70
-E
-7 87 4.00 70
-E
-7 85 4.00 70
-E
 8 0 100.00 14
 E
 9 0 50.00 25
+E
+26 268435456 4.00 70
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -855,17 +851,13 @@ D0
 E
 4 0 2.00 80
 E
-7 19 4.00 88
-E
-7 87 4.00 88
-E
-7 85 4.00 88
-E
 8 0 100.00 83
 E
 9 0 75.00 80
 E
 17 20 2.00 25
+E
+26 268435456 4.00 88
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -953,17 +945,13 @@ E
 E
 4 0 2.50 24
 E
-7 19 4.00 73
-E
-7 87 4.00 73
-E
-7 85 4.00 73
-E
 9 0 50.00 24
 E
 16 0 100.00 20
 E
 23 0 100.00 20
+E
+26 268435456 4.00 73
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1017,13 +1005,9 @@ E
 E
 4 0 0.40 26
 E
-7 19 4.00 74
-E
-7 87 4.00 74
-E
-7 85 4.00 74
-E
 9 0 50.00 26
+E
+26 268435456 4.00 74
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1073,13 +1057,9 @@ E
 E
 4 0 0.40 26
 E
-7 19 4.00 74
-E
-7 87 4.00 74
-E
-7 85 4.00 74
-E
 9 0 50.00 26
+E
+26 268435456 4.00 74
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1122,11 +1102,7 @@ E
 E
 2 57 10.00 51
 E
-7 19 4.00 71
-E
-7 87 4.00 71
-E
-7 85 4.00 71
+26 268435456 4.00 71
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -2159,15 +2135,11 @@ D4
 E
 5 0 100.00 22
 E
-7 19 4.00 70
-E
-7 87 4.00 70
-E
-7 85 4.00 70
-E
 8 0 100.00 14
 E
 10 57 5.00 20
+E
+26 268435456 4.00 70
 I 5 107 75.00 1 x  # DIG: bag of sand
 I 5 101 25.00 1 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
@@ -2840,11 +2812,7 @@ E
 E
 9 0 50.00 71
 E
-11 19 4.00 20
-E
-11 87 4.00 20
-E
-11 85 4.00 20
+27 268435456 4.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -2894,11 +2862,7 @@ E
 E
 9 0 50.00 79
 E
-11 19 4.00 26
-E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2953,11 +2917,7 @@ E
 E
 0 0 100.00 72
 E
-11 19 4.00 26
-E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3002,15 +2962,11 @@ E
 E
 9 0 50.00 74
 E
-11 19 4.00 23
-E
-11 87 4.00 23
-E
-11 85 4.00 23
-E
 16 0 100.00 70
 E
 23 0 100.00 70
+E
+27 268435456 4.00 23
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -3061,11 +3017,7 @@ E
 E
 9 0 50.00 71
 E
-11 19 4.00 24
-E
-11 87 4.00 24
-E
-11 85 4.00 24
+27 268435456 4.00 24
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3106,15 +3058,11 @@ E
 E
 9 0 50.00 76
 E
-11 19 4.00 23
-E
-11 87 4.00 23
-E
-11 85 4.00 23
-E
 16 0 100.00 70
 E
 23 0 100.00 70
+E
+27 268435456 4.00 23
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3169,11 +3117,7 @@ E
 E
 9 0 50.00 72
 E
-11 19 4.00 24
-E
-11 87 4.00 24
-E
-11 85 4.00 24
+27 268435456 4.00 24
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3211,15 +3155,11 @@ E
 E
 9 0 20.00 78
 E
-11 85 4.00 20
-E
-11 87 4.00 20
-E
-11 19 4.00 20
-E
 16 0 100.00 70
 E
 19 0 100.00 70
+E
+27 268435456 4.00 20
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
@@ -3242,15 +3182,11 @@ D0
 ????~
 &G~
 E
-11 87 4.00 20
-E
-11 85 4.00 20
-E
-11 19 4.00 20
-E
 16 0 100.00 70
 E
 19 0 100.00 70
+E
+27 268435456 4.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3290,9 +3226,7 @@ E
 E
 0 0 100.00 79
 E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3335,15 +3269,11 @@ E
 E
 4 0 2.00 81
 E
-7 19 4.00 89
-E
-7 87 4.00 89
-E
-7 85 4.00 89
-E
 9 0 75.00 81
 E
 17 20 2.00 25
+E
+26 268435456 4.00 89
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3379,13 +3309,9 @@ D0
 E
 0 0 100.00 80
 E
-7 19 4.00 89
-E
-7 87 4.00 89
-E
-7 85 4.00 89
-E
 17 20 2.00 25
+E
+26 268435456 4.00 89
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3430,17 +3356,13 @@ D4
 E
 5 0 100.00 86
 E
-7 19 4.00 88
-E
-7 87 4.00 88
-E
-7 85 4.00 88
-E
 8 0 100.00 91
 E
 9 0 50.00 21
 E
 22 0 0.50 21
+E
+26 268435456 4.00 88
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3513,7 +3435,7 @@ S
 #85
 Irrigation Canal~
 An Irrigation Canal~
-'~' 17 kow 8 gi af
+'~' 17 kow 8 giC af
 D0
 @w&?~~@e~
 &C~
@@ -3563,7 +3485,7 @@ S
 #87
 Verdant Canal~
 A Verdant Canal~
-'~' 17 ko 8 gi af
+'~' 17 ko 8 giC af
 D0
 @w&?~~@e~
 &C~
@@ -3596,15 +3518,11 @@ E
 E
 9 0 75.00 89
 E
-11 19 4.00 80
-E
-11 87 4.00 80
-E
-11 85 4.00 80
-E
 17 20 2.00 25
 E
 17 70 2.00 74
+E
+27 268435456 4.00 80
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3638,15 +3556,11 @@ E
 E
 0 0 100.00 89
 E
-11 19 4.00 81
-E
-11 87 4.00 81
-E
-11 85 4.00 81
-E
 17 20 2.00 25
 E
 17 70 2.00 74
+E
+27 268435456 4.00 81
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock

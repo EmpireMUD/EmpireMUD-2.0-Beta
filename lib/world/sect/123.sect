@@ -146,7 +146,7 @@ M
 12354 0.05 0
 X
 ice hoarfrost frost frozen icy beach sandy shore water ocean sea desert around~
-   The ice-cold sand stretches for miles ahead, bordered by the near-freezing 
+   The ice-cold sand stretches for miles ahead, bordered by the near-freezing
 waters of the nearby sea. The beach is dotted with mounts of snow and beached
 icebergs, while the sparse tufts of grass and shrubs that stick out are covered
 in delicate, feathery hoarfrost.
@@ -343,7 +343,7 @@ S
 #12359
 Frozen Irrigation Canal~
 A Frozen Irrigation Canal~
-'~' 2 fkxy 25 au 0
+'~' 2 fkxy 25 auC 0
 D0
 @w&?~~@e~
 &W~
@@ -369,7 +369,7 @@ S
 #12360
 Frozen Canal~
 A Frozen Canal in the Desert~
-'~' 2 fkxy 25 au 0
+'~' 2 fkxy 25 auC 0
 D0
 @w&?~~@e~
 &W~
@@ -398,7 +398,7 @@ S
 #12361
 Frozen Canal~
 A Frozen Canal~
-'~' 2 fxy 25 au 0
+'~' 2 fxy 25 auC 0
 D0
 @w&?~~@e~
 &W~
