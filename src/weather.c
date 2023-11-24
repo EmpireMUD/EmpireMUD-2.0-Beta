@@ -1368,6 +1368,15 @@ int get_temperature_type(room_data *room) {
 	else if (GET_ROOM_TEMPLATE(room)) {
 		ttype = GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(room));
 	}
+	else {
+		// try sector(s)
+		ttype = GET_SECT_TEMPERATURE_TYPE(SECT(room));
+		
+		// attempt base if cascade is required here
+		if (ttype == TEMPERATURE_USE_LOCAL && ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+			ttype = GET_SECT_TEMPERATURE_TYPE(BASE_SECT(room));
+		}
+	}
 	
 	// check adventure, too, IF we're on use-local
 	if (ttype == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {

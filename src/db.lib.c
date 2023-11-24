@@ -6452,6 +6452,31 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_SECT_TEMPERATURE_TYPE(sect) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
 			
 			case '_': {	// notes
 				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
@@ -6525,6 +6550,11 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));
+	
+	// Z: misc data
+	if (GET_SECT_TEMPERATURE_TYPE(st)) {
+		fprintf(fl, "Z1 %d\n", GET_SECT_TEMPERATURE_TYPE(st));
+	}
 	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
 		strcpy(temp, GET_SECT_NOTES(st));

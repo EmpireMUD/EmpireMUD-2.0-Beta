@@ -6064,6 +6064,7 @@ struct sector_data {
 	bitvector_t climate;	// CLIM_ flags
 	bitvector_t flags;	// SECTF_ flags: warning: evolutions use these as flags in a SIGNED sbitvector_t
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
+	int temperature_type;	// TEMPERATURE_ const modifies the sector
 	
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time

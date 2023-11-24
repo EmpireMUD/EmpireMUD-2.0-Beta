@@ -1568,6 +1568,7 @@ static inline int GET_SEASON(room_data *room) {
 #define GET_SECT_NOTES(sect)  ((sect)->notes)
 #define GET_SECT_ROADSIDE_ICON(sect)  ((sect)->roadside_icon)
 #define GET_SECT_SPAWNS(sect)  ((sect)->spawns)
+#define GET_SECT_TEMPERATURE_TYPE(sect)  ((sect)->temperature_type)
 #define GET_SECT_TITLE(sect)  ((sect)->title)
 #define GET_SECT_VNUM(sect)  ((sect)->vnum)
 

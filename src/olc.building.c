@@ -1332,7 +1332,7 @@ void olc_show_building(char_data *ch) {
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
-		
+	
 	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
 	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));

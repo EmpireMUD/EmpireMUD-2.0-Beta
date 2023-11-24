@@ -7696,7 +7696,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
 	
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Climate: &c%s&0\r\n", buf);
+	msg_to_char(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0\r\n", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);

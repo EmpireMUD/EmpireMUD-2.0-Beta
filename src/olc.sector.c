@@ -870,6 +870,7 @@ void olc_show_sector(char_data *ch) {
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
 	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
 	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
@@ -1326,6 +1327,12 @@ OLC_MODULE(sectedit_roadsideicon) {
 OLC_MODULE(sectedit_spawns) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	olc_process_spawns(ch, argument, &GET_SECT_SPAWNS(st));
+}
+
+
+OLC_MODULE(sectedit_temperature) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	GET_SECT_TEMPERATURE_TYPE(st) = olc_process_type(ch, argument, "temperature", "temperature", temperature_types, GET_SECT_TEMPERATURE_TYPE(st));
 }
 
 

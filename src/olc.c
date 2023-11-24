@@ -456,6 +456,7 @@ OLC_MODULE(sectedit_name);
 OLC_MODULE(sectedit_notes);
 OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
+OLC_MODULE(sectedit_temperature);
 OLC_MODULE(sectedit_title);
 
 // shops
@@ -980,6 +981,7 @@ const struct olc_command_data olc_data[] = {
 	{ "notes", sectedit_notes, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "temperature", sectedit_temperature, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
 	
 	// shop commands
