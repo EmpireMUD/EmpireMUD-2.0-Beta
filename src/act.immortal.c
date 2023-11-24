@@ -1512,7 +1512,7 @@ ADMIN_UTIL(util_temperature) {
 	msg_to_char(ch, "Final temperature: %.1f (%s), %.1f%% sun, %.1f%% seasonal\r\n", temperature, temperature_to_string((int) (temperature + 0.5)), 100.0 * sun_mod, 100.0 * season_mod);
 	
 	// and now using internal funcs
-	calc_temp = calculate_temperature(TEMPERATURE_USE_LOCAL, get_climate(IN_ROOM(ch)), use_season, use_sun);
+	calc_temp = calculate_temperature(TEMPERATURE_USE_CLIMATE, get_climate(IN_ROOM(ch)), use_season, use_sun);
 	msg_to_char(ch, "Computed temperature for verification: %d %s.\r\n", calc_temp, temperature_to_string(calc_temp));
 }
 

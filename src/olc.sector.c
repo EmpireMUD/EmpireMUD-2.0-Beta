@@ -933,8 +933,8 @@ OLC_MODULE(sectedit_checktemperature) {
 	msg_to_char(ch, "Temperature analysis for this sector:\r\n");
 	
 	for (iter = 0; season_list[iter] != -1; ++iter) {
-		low = calculate_temperature(TEMPERATURE_USE_LOCAL, GET_SECT_CLIMATE(st), season_list[iter], SUN_DARK);
-		high = calculate_temperature(TEMPERATURE_USE_LOCAL, GET_SECT_CLIMATE(st), season_list[iter], SUN_LIGHT);
+		low = calculate_temperature(GET_SECT_TEMPERATURE_TYPE(st), GET_SECT_CLIMATE(st), season_list[iter], SUN_DARK);
+		high = calculate_temperature(GET_SECT_TEMPERATURE_TYPE(st), GET_SECT_CLIMATE(st), season_list[iter], SUN_LIGHT);
 		snprintf(buf, sizeof(buf), "%s: %d to %d", seasons[season_list[iter]], low, high);
 		msg_to_char(ch, "  %s\r\n", CAP(buf));
 	}

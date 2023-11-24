@@ -1769,18 +1769,19 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
-"ADVEDIT TEMPERATURE" "BEDIT TEMPERATURE" "REDIT TEMPERATURE"
+"ADVEDIT TEMPERATURE" "BEDIT TEMPERATURE" "REDIT TEMPERATURE" "SECTEDIT TEMPERATURE"
 
 Usage:  .temperature <type>
 
 This field determines how warm or cold the area will be. Most of these are
-relative to the temperature of the tile the adventure/building/room is on.
+relative to the temperature of the tile the adventure/building/room or sector
+is on.
 
 A room template will override the adventure's setting unless the room is set
-to "use local".
+to "use climate", which will then defer to the adventure setting.
 
 Available temperature types:
- &cuse local&0 - Inherits its temperature from the tile it's on.
+ &cuse climate&0 - Inherits its temperature from the climate of the tile it's on.
  &calways comfortable&0 - Player receives no temperature penalties.
  &cmilder&0 - Temperature is milder (less hot/cold) than local area.
  &charsher&0 - Temperature is harsher (more hot/cold).

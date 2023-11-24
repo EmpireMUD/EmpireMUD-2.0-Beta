@@ -5806,7 +5806,7 @@ bitvector_t get_climate(room_data *room) {
 		}
 	}
 	
-	// should this check for TEMPERATURE_USE_LOCAL too? I think "maybe not" -pc
+	// should this check for TEMPERATURE_USE_CLIMATE too? I think "maybe not" -pc
 	
 	return flags;
 }

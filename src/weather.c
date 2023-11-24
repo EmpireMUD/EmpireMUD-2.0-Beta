@@ -954,7 +954,7 @@ void show_visible_moons(char_data *ch) {
 * Calculates temperature for a hypothetical room based on various data. This
 * can be used for real rooms or for hypotheticals.
 *
-* @param int temp_type Any TEMPERATURE_ type const; pass TEMPERATURE_USE_LOCAL as a default.
+* @param int temp_type Any TEMPERATURE_ type const; pass TEMPERATURE_USE_CLIMATE as a default.
 * @param bitvector_t climates Any CLIM_ flags that apply here.
 * @param int season Any TILESET_ season const.
 * @param int sun Any SUN_ const.
@@ -1339,7 +1339,7 @@ int get_room_temperature(room_data *room) {
 	temp_type = get_temperature_type(room);
 	
 	// check temperature of parent building if using local and not the home-room (e.g. a bedroom in a warm house)
-	if (temp_type == TEMPERATURE_USE_LOCAL && !IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
+	if (temp_type == TEMPERATURE_USE_CLIMATE && !IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
 		temp_type = get_temperature_type(home);
 	}
 	
@@ -1355,7 +1355,7 @@ int get_room_temperature(room_data *room) {
 * @return int Any TEMPERATURE_ type const.
 */
 int get_temperature_type(room_data *room) {
-	int ttype = TEMPERATURE_USE_LOCAL;
+	int ttype = TEMPERATURE_USE_CLIMATE;
 	
 	if (!room) {
 		return ttype;	// missing arg?
@@ -1373,13 +1373,13 @@ int get_temperature_type(room_data *room) {
 		ttype = GET_SECT_TEMPERATURE_TYPE(SECT(room));
 		
 		// attempt base if cascade is required here
-		if (ttype == TEMPERATURE_USE_LOCAL && ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+		if (ttype == TEMPERATURE_USE_CLIMATE && ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
 			ttype = GET_SECT_TEMPERATURE_TYPE(BASE_SECT(room));
 		}
 	}
 	
-	// check adventure, too, IF we're on use-local
-	if (ttype == TEMPERATURE_USE_LOCAL && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+	// check adventure, too, IF we're on use-climate
+	if (ttype == TEMPERATURE_USE_CLIMATE && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 		ttype = GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(room)->instance));
 	}
 	

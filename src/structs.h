@@ -3051,7 +3051,7 @@ typedef enum {
 
 
 // TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
-#define TEMPERATURE_USE_LOCAL  0	// inherit from local tile
+#define TEMPERATURE_USE_CLIMATE  0	// inherit from local tile
 #define TEMPERATURE_ALWAYS_COMFORTABLE  1	// no penalties from temperature
 #define TEMPERATURE_MILDER  2	// milder than local tile
 #define TEMPERATURE_HARSHER  3	// harsher than local tile

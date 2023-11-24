@@ -4011,7 +4011,7 @@ const int sun_temperature[] = {
 
 // TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
 const char *temperature_types[] = {
-	"use local",	// 0
+	"use climate",	// 0
 	"always comfortable",
 	"milder",
 	"harsher",
