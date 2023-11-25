@@ -281,6 +281,30 @@ emote $n twists into an enormous coil, its scales screeching as their sharp edge
 M
 7
 emote $n claps its tremendous jaws as if to taunt you -- or perhaps deter you.~
+M
+8
+emote $n slaps $s tail against the ice!~
+M
+8
+echo You cover your ears against the loud twangs of cracks forming under the ice!~
+M
+8
+emote $n slaps $s tail against the ice again!~
+M
+8
+echo You struggle keep your footing as a crack spreads through the ice!~
+M
+9
+emote $n coils around the vast, icy landscape.~
+M
+9
+echo There's a loud, painful screeching noise as the serragon's scales cut grooves in the ice.~
+M
+9
+emote $n stops and looks at you...~
+M
+9
+emote $n clacks its jaws open and shut as it watches you.~
 T 12350
 T 12352
 T 12353
@@ -306,6 +330,21 @@ A hoarfrost spreader is here.
 D
 This invisible mob helps spread hoarfrost.
 ~
+M
+0
+You hear strange chittering noises echo off the icy landscape.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise off of the frost.~
 T 12350
 T 12353
 T 12355
@@ -368,12 +407,16 @@ Wisps of steam rise off of the frost.~
 M
 0
 $n creeps toward you.~
+M
+0
+$n's scales cut fine grooves in the ice as it moves.~
 T 12355
 T 9600
 T 9601
 T 9604
 T 12361
 T 12362
+T 12363
 S
 #12353
 rabbit ice~
@@ -385,6 +428,21 @@ Some ice has formed on the ground in the shape of a rabbit.
 D
 You can't tell if it's a frozen rabbit or just a clump of ice!
 ~
+M
+0
+You hear strange chittering noises echo off the icy landscape.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise off of the frost.~
 T 12361
 T 12362
 S

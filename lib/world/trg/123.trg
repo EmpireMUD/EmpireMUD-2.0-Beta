@@ -900,8 +900,8 @@ Hoarfrost Serragon: Terraformer~
 ~
 * freezes the tile as the creature walks in, or leashes it
 * configs:
-set avoid_sects 15 16 27 28 29 34 35 55 61 62 63 64 65
-set ignore_sects 6 8 9
+set avoid_sects 15 16 27 28 29 34 35 55 61 62 63 64 65 6
+set ignore_sects 8 9
 set frozen_plains 0 7 13 36 40 41 46 50 54 56 59
 set frozen_forest 1 2 3 4 37 38 39 42 43 44 45 47 60 90
 set frozen_desert 20 23
@@ -915,14 +915,19 @@ set irrigated_oasis 88 89
 set frozen_lake 32 33
 * note: sects 5, 19, 51, 53, 57, 58, 85, and 87 are checked individually below as well
 * basic checks
+set room %self.room%
 if %self.fighting% || %self.disabled%
   halt
 end
+if %avoid_sects% ~= %room.sector_vnum%
+  * don't go there at all
+  return 0
+  halt
+end
 wait 1
-set room %self.room%
 * check leash
 set dist %room.distance(%instance.location%)%
-if %instance.location% && ((%dist% > 6 && %random.2% == 2) || %avoid_sects% ~= %room.sector_vnum%)
+if %instance.location% && (%dist% > 6 && %random.2% == 2)
   if !%self.aff_flagged(!SEE)%
     %echo% ~%self% burrows down and vanishes from sight!
   end
@@ -1236,10 +1241,10 @@ elseif %move% == 2
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
-          %send% %person% &&CYou scream in pain as the serrated scales cut you!&&0 (struggle)
+          %send% %person% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
           %dot% #12355 %person% 100 30 physical 5
         else
-          %send% %person% &&CYou strain to breath as the serrated scales coil around you!&&0 (struggle)
+          %send% %person% &&C**** You strain to breath as the serrated scales coil around you! ****&&0 (struggle)
         end
       end
       set person %person.next_in_room%
@@ -1389,6 +1394,121 @@ switch %self.vnum%
       %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
     break
   done
+~
+#12363
+Hoarfrost Serragon: Frostscale hatchling combat: Coil, Snapping Jaws~
+0 k 100
+~
+if %self.cooldown(12352)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.var(difficulty,1)%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 12352 30 25
+if %move% == 1
+  * Coil
+  scfight clear struggle
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  %send% %targ% &&C**** &&Z~%self% launches itself through the air and coils its body around you! ****&&0 (struggle)
+  %echoaround% %targ% &&C~%self% launches itself through the air and coils itself around ~%targ%!&&0
+  dg_affect #12353 %self% HARD-STUNNED on 20
+  scfight setup struggle %targ% 20
+  * messages
+  set cycle 0
+  set done 0
+  while %cycle% < 5 && !%done%
+    wait 4 s
+    if !%targ% || %targ_id% != %targ.id%
+      * gone?
+      set done 1
+    elseif !%targ.affect(9602)%
+      * struggled out
+      set done 1
+    else
+      %send% %targ% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
+      %dot% #12355 %person% 33 30 physical 5
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #12353 %self% off
+elseif %move% == 2
+  * Snapping Jaws
+  scfight clear dodge
+  %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
+  wait 3 s
+  if %self.disabled% || %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #12353 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&C**** &&Z~%self% leans in and snaps its jaws... at you! ****&&0 (dodge)
+  %echoaround% %targ% &&C~%self% leans in and snaps its jaws... at ~%targ%!&&0
+  scfight setup dodge %targ%
+  set cycle 0
+  eval times %diff% * 2
+  eval when 9 - %diff%
+  set done 0
+  while %cycle% < %times% && !%done%
+    wait %when% s
+    if %targ.id% != %targ_id%
+      set done 1
+    elseif !%targ.var(did_scfdodge)%
+      %echo% &&C~%self% bites down on ~%targ% hard!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% 50 physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %times% && !%done%
+      wait 1
+      %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+      %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
+      scfight clear dodge
+      scfight setup dodge %targ%
+    else if %done% && %targ.id% == %targ_id% && %diff% == 1
+      dg_affect #12358 %targ% TO-HIT 25 20
+    end
+  done
+  scfight clear dodge
+  dg_affect #12353 %self% off
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12364
 Hoarfrost Serragon: Fighting characters cannot flee~
