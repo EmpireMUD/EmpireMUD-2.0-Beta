@@ -478,4 +478,14 @@ end
 * wait between stories
 wait %story_gap%
 ~
+#9680
+Force look after wait~
+1 n 100
+~
+wait 1
+if %self.carried_by% && %self.carried_by.position% != Sleeping
+  %force% %self.carried_by% look
+end
+%purge% %self%
+~
 $
