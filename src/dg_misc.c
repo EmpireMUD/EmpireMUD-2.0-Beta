@@ -1138,7 +1138,7 @@ void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL;
 	struct companion_data *cd;
-	char_data *mob = NULL;
+	char_data *find, *mob = NULL;
 	obj_data *obj = NULL;
 	room_data *room = NULL;
 	bool clear;
@@ -1217,6 +1217,21 @@ void script_modify(char *argument) {
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			change_short_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "tag")) {
+			if (IS_NPC(mob)) {
+				if (*value && *value == UID_CHAR && (find = find_char(atoi(value+1)))) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+					tag_mob(mob, find);
+				}
+				else if (!str_cmp(value, "none")) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+				}
+				else {
+					script_log("%%mod%% tag: unable to find target");
+				}
+			}
+			// silent fail otherwise
 		}
 		else {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);
