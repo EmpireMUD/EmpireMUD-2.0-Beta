@@ -23,13 +23,16 @@ would surely bring glory to the empire. Defeat the serragon -- several, if you
 have to -- and bring back an in-tact skull. Build a shrine to the creature so
 that the whole world can see the empire's might!
 ~
-3 4 0 5 c
+4 4 0 5 c
 K 7 5
-W
+W+
 3 12350 0 1 a
-W
+Kill a hoarfrost serragon~
+W+
 7 12354 0 1 a
-W
+Build a shrine to the serragon~
+W+
 2 12359 0 1 a
+Store a transluscsent serragon skull in a Cabinet of Curiosities~
 S
 $
