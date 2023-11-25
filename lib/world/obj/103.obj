@@ -41,9 +41,11 @@ A firefruit is flickering and sputtering on the ground.~
    The firefruit flickers shades of red, orange and yellow. It's warm to the
 touch, but juicy and delicious. It's probably bright enough to see by.
 ~
-6 bcel a 0 0 7
+6 bcel a 0 0 8
 24 10300 0
 7 48
+A
+30 2 0
 M
 4
 You begin to sweat as you eat $p.~
