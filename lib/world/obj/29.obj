@@ -421,4 +421,71 @@ This formula will teach you to brew: imperial waterwalking potion.
 C
 100 100
 S
+#2930
+potion imperial warming imperial-warming-potion~
+an imperial warming potion~
+An imperial warming potion is lying here.~
+   The glass flask contains a runny orange liquid that sloshes freely as you
+turn it. A bit of this should help you stay warm in the winter.
+Hint: create an alias for 'quaff imperial-warming-potion' to make sure you
+target the right one.
+~
+25 m a 0 0 19
+-1 0 3030
+8 0
+A
+30 6 0
+C
+200 200
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#2931
+formula imperial warming potion~
+the imperial warming potion formula~
+The imperial warming potion formula is on the ground.~
+This formula will teach you to brew: imperial warming potion.
+~
+7 0 a 0 0 3
+2930 0 0
+0 0
+C
+100 100
+S
+#2932
+potion imperial waterwalking imperial-cooling-potion~
+an imperial cooling potion~
+An imperial cooling potion is lying here.~
+   The azure liquid in the flask is so thick that it barely moves when you
+invert it. Still, a little of this should help you keep cool in the blazing
+summer heat.
+Hint: create an alias for 'quaff imperial-cooling-potion' to make sure you
+target the right one.
+~
+25 m a 0 0 20
+-1 0 3030
+8 0
+A
+31 6 0
+C
+200 200
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
+R
+4 5130 0
+S
+#2933
+formula imperial cooling potion~
+the imperial cooling potion formula~
+The imperial cooling potion formula is on the ground.~
+This formula will teach you to brew: imperial cooling potion.
+~
+7 0 a 0 0 4
+2932 0 0
+0 0
+C
+100 100
+S
 $
