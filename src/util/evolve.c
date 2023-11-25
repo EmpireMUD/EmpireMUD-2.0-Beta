@@ -622,6 +622,31 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				free(tmp);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_SECT_TEMPERATURE_TYPE(sect) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", error, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", error, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", error);
+					exit(1);
+				}
+				break;
+			}
 			
 			case '_': {	// notes -- unneeded
 				tmp = fread_string(fl, error);
