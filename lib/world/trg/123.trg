@@ -1172,7 +1172,7 @@ if %move% == 1
   end
   scfight setup dodge all
   wait 5 s
-  if %self.disabled%
+  if %self.disabled% || %self.var(phase)% == 2
     dg_affect #12357 %self% off
     nop %self.remove_mob_flag(NO-ATTACK)%
     halt
@@ -1186,11 +1186,11 @@ if %move% == 1
   set cycle 1
   set hit 0
   eval wait 9 - %diff%
-  while %cycle% <= %diff%
+  while %cycle% <= %diff% && %self.var(phase)% != 2
     scfight setup dodge all
     wait %wait% s
     set ch %room.people%
-    while %ch%
+    while %ch% && %self.var(phase)% != 2
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_scfdodge)%
@@ -1240,7 +1240,7 @@ elseif %move% == 2
     wait 4 s
     set ongoing 0
     set person %room.people%
-    while %person%
+    while %person% && %self.var(phase)% != 2
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
@@ -1261,7 +1261,7 @@ elseif %move% == 3
   scfight clear dodge
   %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
   wait 3 s
-  if %self.disabled% || %self.aff_flagged(BLIND)%
+  if %self.disabled% || %self.aff_flagged(BLIND)% || %self.var(phase)% == 2
     halt
   end
   set targ %random.enemy%
@@ -1286,7 +1286,7 @@ elseif %move% == 3
   set done 0
   while %cycle% < %times% && !%done%
     wait %when% s
-    if %targ.id% != %targ_id%
+    if %targ.id% != %targ_id% || %self.var(phase)% == 2
       set done 1
     elseif !%targ.var(did_scfdodge)%
       %echo% &&C~%self% bites down on ~%targ% hard!&&0
@@ -1323,7 +1323,7 @@ elseif %move% == 4
     wait 4 s
     set ongoing 0
     set person %room.people%
-    while %person%
+    while %person% && %self.var(phase)% != 2
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
