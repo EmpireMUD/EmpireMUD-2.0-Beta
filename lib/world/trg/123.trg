@@ -1695,7 +1695,7 @@ switch %self.var(difficulty)%
   break
   case 3
     set limit 150
-  end
+  break
   default
     set limit 150
   break
