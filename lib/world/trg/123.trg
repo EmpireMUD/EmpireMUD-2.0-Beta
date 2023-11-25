@@ -1362,7 +1362,14 @@ Hoarfrost Serragon: Leash for ice creatures~
 0 i 100
 ~
 set room %self.room%
-if %room.sector_vnum% < 12350 || %room.sector_vnum% > 12399
+if %room.building_vnum% == 12350
+  * pit
+  return 1
+elseif %room.sector_vnum% >= 12350 && %room.sector_vnum% <= 12399
+  * frost
+  return 1
+else
+  *nope
   return 0
 end
 ~
@@ -1651,9 +1658,9 @@ if %to_room%
       * nothing (these mobs are part of the fight)
     elseif %ch.is_pc% || !%ch.linked_to_instance%
       * Move ch
-      %send% %ch% &&CYou're thrown violently out the serragon's mouth!&&0
+      %send% %ch% &&CYou're hurled out of the serragon's mouth!&&0
       %teleport% %ch% %to_room%
-      %at% %to_room% %echoaround% %ch% ~%ch% comes flying out the serragon's mouth!
+      %at% %to_room% %echoaround% %ch% ~%ch% is hurled out of the serragon's mouth!
     end
     set ch %next_ch%
   done
@@ -1662,7 +1669,9 @@ if %to_room%
     dg_affect #12360 %mob% off
     * tag mob for player
     %mod% %mob% tag %actor%
-    * and kill it
+    * reskin self to change the kill message
+    %mod% %self% shortdesc %actor.name%
+    * and kill the mob
     %slay% %mob%
   end
 end
