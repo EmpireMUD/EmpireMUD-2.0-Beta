@@ -900,7 +900,7 @@ Hoarfrost Serragon: Terraformer~
 ~
 * freezes the tile as the creature walks in, or leashes it
 * configs:
-set avoid_sects 15 16 27 28 29 34 35 55 61 62 63 64 65 6
+set avoid_sects 6 15 16 27 28 29 34 35 55 61 62 63 64 65
 set ignore_sects 8 9
 set frozen_plains 0 7 13 36 40 41 46 50 54 56 59
 set frozen_forest 1 2 3 4 37 38 39 42 43 44 45 47 60 90
@@ -1112,7 +1112,7 @@ end
 ~
 #12358
 Hoarfrost Serragon: Resume wandering if nobody fights.~
-0 b 10
+0 ab 10
 ~
 * cancel sentinel and resume movement if nobody is around and fighting me
 if !%self.affect(12351)% && !%self.affect(12360)% && !%self.fighting% && %room.players_present% == 0
@@ -1217,7 +1217,7 @@ if %move% == 1
   done
   dg_affect #12357 %self% off
   if !%hit% && %diff% == 1
-    %echo% &&C~%self% seems to have stunned itself with that slam!&&0
+    %echo% &&C~%self% seems to exhaust *%self%self from all that spinning.&&0
     dg_affect #12353 %self% HARD-STUNNED on 10
   end
   wait 8 s
@@ -1225,9 +1225,9 @@ elseif %move% == 2
   * Coil
   scfight clear struggle
   if %room.players_present% > 1
-    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around the whole party! ****&&0 (struggle)
+    %echo% &&CThere's a screeching sound as ~%self% begins to coil around the whole party!&&0 (struggle)
   else
-    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around you! ****&&0 (struggle)
+    %echo% &&CThere's a screeching sound as ~%self% begins to coil around you!&&0 (struggle)
   end
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
@@ -1310,7 +1310,7 @@ elseif %move% == 4
   * Frost Pores / Heat Drain
   scfight clear struggle
   %echo% &&CA cold mist seeps from |%self% pores and flows over you...&&0
-  %echo% &&C**** You begin to freeze in place! ****&&0 (struggle)
+  %echo% &&CYou begin to freeze in place!&&0 (struggle)
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
   end
@@ -1327,12 +1327,12 @@ elseif %move% == 4
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
-          %send% %person% &&C**** You feel the heat draining out of your body! ****&&0 (struggle)
+          %send% %person% &&CYou feel the heat draining out of your body!&&0 (struggle)
           dg_affect #12356 %person% BONUS-PHYSICAL %punish% 20
           dg_affect #12356 %person% BONUS-MAGICAL %punish% 20
           dg_affect #12356 %person% COOLING 20 20
         else
-          %send% %person% &&C**** You're trapped in the frost! ****&&0 (struggle)
+          %send% %person% &&CYou're trapped in the frost!&&0 (struggle)
         end
       end
       set person %person.next_in_room%
@@ -1461,15 +1461,12 @@ if %move% == 1
     if !%targ% || %targ_id% != %targ.id%
       * gone?
       set done 1
-    elseif %targ.room% != %room%
-      * moved
-      set done 1
     elseif !%targ.affect(9602)%
       * struggled out
       set done 1
     else
       %send% %targ% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
-      %dot% #12355 %targ% 33 30 physical 5
+      %dot% #12355 %person% 33 30 physical 5
     end
     eval cycle %cycle% + 1
   done
@@ -1480,7 +1477,7 @@ elseif %move% == 2
   scfight clear dodge
   %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
   wait 3 s
-  if %self.disabled% || %self.aff_flagged(BLIND)% || %targ.room% != %room%
+  if %self.disabled% || %self.aff_flagged(BLIND)%
     halt
   end
   set targ %random.enemy%
@@ -1500,7 +1497,7 @@ elseif %move% == 2
   set done 0
   while %cycle% < %times% && !%done%
     wait %when% s
-    if %targ.id% != %targ_id% || %targ.room% != %room%
+    if %targ.id% != %targ_id%
       set done 1
     elseif !%targ.var(did_scfdodge)%
       %echo% &&C~%self% bites down on ~%targ% hard!&&0
@@ -1595,12 +1592,7 @@ while %ch%
     eval moved %moved% + 1
     %teleport% %ch% %to_room%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
-    %load% obj 9680 %ch% inv
-    set last %ch%
-    if %craw%
-      set entry_time_%ch.id% %timestamp%
-      remote entry_time_%ch.id% %craw.id%
-    end
+    %load% obj 11805 %ch% inv
   elseif %ch.is_npc% && %ch.leader%
     if %self.is_tagged_by(%ch.leader%)%
       %teleport% %ch% %to_room%
@@ -1608,15 +1600,11 @@ while %ch%
   end
   set ch %next_ch%
 done
-if %moved% > 1
-  %echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
-elseif %moved% == 1
-  %echo% &&C**** &&Z~%self% swallows ~%last%! ****&0
-end
+%echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
 ~
 #12366
 Hoarfrost Serragon: Check end of phase 2~
-0 b 100
+0 ab 100
 ~
 * Brings the serragon out of phase 2 if everyone died inside
 set cancel 0
@@ -1636,7 +1624,6 @@ if %cancel%
   set phase 1
   remote phase %self.id%
   dg_affect #12360 %self% off
-  nop %self.remove_mob_flag(!RESCALE)%
   * remove interior mob (always needs a fresh one)
   set craw %instance.mob(12357)%
   if %craw%
@@ -1707,10 +1694,10 @@ switch %self.var(difficulty)%
     set limit 90
   break
   case 3
-    set limit 160
-  break
+    set limit 150
+  end
   default
-    set limit 160
+    set limit 150
   break
 done
 set ch %room.people%
@@ -1778,7 +1765,7 @@ while %ch%
   elseif %ch.is_pc% || !%ch.linked_to_instance%
     * Move ch
     %teleport% %ch% %to_room%
-    %load% obj 9680 %ch%
+    %load% obj 11805 %ch%
   end
   set ch %next_ch%
 done
@@ -1815,8 +1802,7 @@ done
 %echoaround% %actor% ~%actor% disappears down the serragon's gullet!
 %teleport% %actor% %outside%
 %at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
-set name %actor.real_name%
-%slay% %actor% %name.cap% has been eaten by the hoarfrost serragon at %outside.coords%!
+%slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
 %purge% %self%
 ~
 $
