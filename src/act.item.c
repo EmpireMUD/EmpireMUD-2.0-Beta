@@ -5406,12 +5406,12 @@ ACMD(do_drink) {
 	
 	// check warming/cooling needs
 	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_WARMING) && get_relative_temperature(ch) < 0) {
-		// needs warming: drink at least 6
-		amount = MAX(6, amount);
+		// needs warming: drink at least 4
+		amount = MAX(4, amount);
 	}
 	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_COOLING) && get_relative_temperature(ch) > 0) {
-		// needs cooling: drink at least 6
-		amount = MAX(6, amount);
+		// needs cooling: drink at least 4
+		amount = MAX(4, amount);
 	}
 	
 	// amount is now the number of gulps to take to fill the player

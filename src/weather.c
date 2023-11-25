@@ -1572,7 +1572,7 @@ void update_player_temperature(char_data *ch) {
 */
 int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 	generic_data *gen = real_generic(liquid);
-	int val = 0, amount;
+	int val = 0, ambient, amount;
 	bool any = FALSE;
 	
 	if (!ch || !gen || hours_drank < 1 || GEN_TYPE(gen) != GENERIC_LIQUID) {
@@ -1583,7 +1583,9 @@ int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 	amount = round(hours_drank / 4.0);
 	amount = MAX(1, amount);
 	
-	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_COOLING) && GET_TEMPERATURE(ch) > 0) {
+	ambient = get_room_temperature(IN_ROOM(ch));
+	
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_COOLING) && GET_TEMPERATURE(ch) > ambient - 5) {
 		// cool
 		GET_TEMPERATURE(ch) -= amount;
 		
@@ -1594,7 +1596,7 @@ int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
 		any = TRUE;
 	}
 	
-	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WARMING) && GET_TEMPERATURE(ch) < 0) {
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WARMING) && GET_TEMPERATURE(ch) < ambient + 5) {
 		// warm
 		GET_TEMPERATURE(ch) += amount;
 		
