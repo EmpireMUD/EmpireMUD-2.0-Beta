@@ -5226,6 +5226,9 @@ ACMD(do_drink) {
 	room_data *to_room;
 	char *argptr = arg;
 	size_t size;
+	generic_data *liq_generic;
+	
+	#define LIQ_VAL(val)  (liq_generic ? GEN_VALUE(liq_generic, (val)) : 0)
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -5359,7 +5362,7 @@ ACMD(do_drink) {
 		return;
 	}
 
-	// this both sends the message & returns the amount for some reason
+	// send message
 	drink_message(ch, obj, type, subcmd, &liquid);
 	
 	// no modifiers on sip
@@ -5367,37 +5370,48 @@ ACMD(do_drink) {
 		return;
 	}
 	
+	// load the generic now (after drink_message, which can modify liquid
+	liq_generic = real_generic(liquid);
+	if (!liq_generic || GEN_TYPE(liq_generic) != GENERIC_LIQUID) {
+		// clear it if invalid
+		liq_generic = NULL;
+	}
+	
 	// "amount" will be how many gulps to take from the CAPACITY
-
 	if (liquid == LIQ_BLOOD) {
 		// drinking blood?
 		amount = GET_MAX_BLOOD(ch) - GET_BLOOD(ch);
 	}
-	else if ((get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
+	else if ((LIQ_VAL(GVAL_LIQUID_THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (LIQ_VAL(GVAL_LIQUID_FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (LIQ_VAL(GVAL_LIQUID_DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
 		// if theirs is unlimited
 		amount = 1;
 	}
 	else {
 		// how many hours of thirst I have, divided by how much thirst it gives per hour
-		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST));
-		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL));
+		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) LIQ_VAL(GVAL_LIQUID_THIRST));
+		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) LIQ_VAL(GVAL_LIQUID_FULL));
 		
-		// poor man's round-up
-		if (((int)(thirst_amt * 10)) % 10 > 0) {
-			thirst_amt += 1;
-		}
-		// poor man's round-up
-		if (((int)(hunger_amt * 10)) % 10 > 0) {
-			hunger_amt += 1;
-		}
+		// round up
+		thirst_amt = ceil(thirst_amt);
+		hunger_amt = ceil(hunger_amt);
 	
 		// whichever is more
 		amount = MAX((int)thirst_amt, (int)hunger_amt);
 	
 		// if it causes drunkenness, minimum of 1
-		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) > 0) {
+		if (LIQ_VAL(GVAL_LIQUID_DRUNK) > 0) {
 			amount = MAX(1, amount);
 		}
+	}
+	
+	// check warming/cooling needs
+	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_WARMING) && get_relative_temperature(ch) < 0) {
+		// needs warming: drink at least 6
+		amount = MAX(6, amount);
+	}
+	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_COOLING) && get_relative_temperature(ch) > 0) {
+		// needs cooling: drink at least 6
+		amount = MAX(6, amount);
 	}
 	
 	// amount is now the number of gulps to take to fill the player
@@ -5413,10 +5427,10 @@ ACMD(do_drink) {
 	}
 	
 	// -1 to remove condition, amount = number of gulps
-	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
-	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, THIRST, -1 * LIQ_VAL(GVAL_LIQUID_THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, FULL, -1 * LIQ_VAL(GVAL_LIQUID_FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	// drunk goes positive instead of negative
-	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, DRUNK, 1 * LIQ_VAL(GVAL_LIQUID_DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	
 	// check warming
 	warmed = warm_player_from_liquid(ch, amount, liquid);
@@ -5428,13 +5442,13 @@ ACMD(do_drink) {
 	}
 	
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_DRUNK) != 0) {
+	if (GET_COND(ch, DRUNK) > 150 && LIQ_VAL(GVAL_LIQUID_DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_THIRST) != 0) {
+	if (GET_COND(ch, THIRST) < 75 && LIQ_VAL(GVAL_LIQUID_THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, GVAL_LIQUID_FULL) != 0) {
+	if (GET_COND(ch, FULL) < 75 && LIQ_VAL(GVAL_LIQUID_FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 
