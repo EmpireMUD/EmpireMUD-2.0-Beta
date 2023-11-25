@@ -3341,8 +3341,8 @@ const struct climate_temperature_t climate_temperature[] = {
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },
 	
-	{ 15, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_HOT
-	{ -15, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 5: CLIM_COLD
+	{ 15, NO_TEMP_MOD, NO_TEMP_MOD, 0.75, 1.25 },	// CLIM_HOT
+	{ -15, NO_TEMP_MOD, NO_TEMP_MOD, 1.25, 0.75 },	// 5: CLIM_COLD
 	{ -7, 0.5, 0.5, 1.0, 1.0 },	// CLIM_HIGH
 	{ 7, 0.5, 0.5, 1.0, 1.0 },	// CLIM_LOW
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_MAGICAL
@@ -3356,7 +3356,7 @@ const struct climate_temperature_t climate_temperature[] = {
 	{ 0, 0.25, 1.5, 1.0, 1.0 },	// CLIM_FOREST
 	{ 0, 0.75, 1.0, 1.0, 1.0 },	// CLIM_GRASSLAND
 	{ 0, 0.5, 0.75, 1.0, 1.0 },	// CLIM_COASTAL
-	{ 0, 3.0, 0.5, 1.0, 1.0 },	// CLIM_OCEAN
+	{ 0, 3.0, 1.0, 1.0, 1.0 },	// CLIM_OCEAN
 	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// 20: CLIM_LAKE
 	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_WATERSIDE
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 0.5, 0.5 },	// CLIM_MILD
