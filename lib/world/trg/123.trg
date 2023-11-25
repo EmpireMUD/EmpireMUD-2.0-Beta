@@ -1801,7 +1801,7 @@ done
 %send% %actor% The world goes dark as you slip away down the serragon's gullet!
 %echoaround% %actor% ~%actor% disappears down the serragon's gullet!
 %teleport% %actor% %outside%
-%echo% ~%actor% comes flying out the serragon's mouth!
+%at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
 %slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
 %purge% %self%
 ~
