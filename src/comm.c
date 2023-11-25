@@ -1268,6 +1268,41 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
+	if (!IS_NPC(to) && IS_SET(act_flags, TO_ABILITY)) {
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_ABILITIES);
+		}
+		if (!show && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_ABILITIES);
+		}
+		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ME);
+		}
+		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ALLIES);
+		}
+		if (!show && vict_obj && FIGHTING(to) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TARGET);
+		}
+		if (!show && vict_obj && FIGHTING(FIGHTING(to)) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TANK);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_ABILITIES);
+		}
+		
+		// no?
+		if (!show) {
+			return;
+		}
+	}
 	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
 		show = any = FALSE;
 		// hits

@@ -1145,15 +1145,15 @@ ACMD(do_skybrand) {
 	
 	// counterspell??
 	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
-		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_MISS);
-		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_MISS);
-		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_MISS);
+		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 	}
 	else {
 		// succeed
-		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
-		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
-		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
+		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);

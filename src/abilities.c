@@ -136,16 +136,18 @@ char *ability_data_display(struct ability_data_list *adl) {
 */
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
 	bool invis;
-	bitvector_t act_flags = NOBITS;
+	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
 	}
 	
+	/* not currently sending abilities as a miss
 	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
 		act_flags |= TO_COMBAT_MISS;
 	}
-	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+	*/
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
@@ -1005,16 +1007,18 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 */
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
 	bool invis;
-	bitvector_t act_flags = NOBITS;
+	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
 	}
 	
+	/* not currently showing abilities as a hit
 	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
 		act_flags |= TO_COMBAT_HIT;
 	}
-	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+	*/
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
@@ -1463,7 +1467,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	char buf[MAX_STRING_LENGTH];
 	bool violent, invis;
 	int iter;
-	bitvector_t act_flags = NOBITS;
+	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;
@@ -1472,10 +1476,12 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT));
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
+	/* not currenly showing abilities as a hit
 	if (violent && cvict) {
 		act_flags |= TO_COMBAT_HIT;
 	}
-	else if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+	*/
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
@@ -1556,29 +1562,29 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | TO_COMBAT_MISS);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | TO_ABILITY);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_CHAR | TO_COMBAT_MISS);
+			act(buf, FALSE, ch, NULL, cvict, TO_CHAR | TO_ABILITY);
 		}
 		
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT | TO_COMBAT_MISS);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT | TO_ABILITY);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_VICT | TO_COMBAT_MISS);
+			act(buf, FALSE, ch, NULL, cvict, TO_VICT | TO_ABILITY);
 		}
 		
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT | TO_COMBAT_MISS);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT | TO_ABILITY);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT | TO_COMBAT_MISS);
+			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT | TO_ABILITY);
 		}
 		
 		data->stop = TRUE;	// prevent routines from firing

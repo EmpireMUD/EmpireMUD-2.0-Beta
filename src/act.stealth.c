@@ -925,8 +925,8 @@ ACMD(do_howl) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30, WAIT_COMBAT_ABILITY);
 		
-		act("You let out a fearsome howl!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
-		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM | TO_COMBAT_HIT);
+		act("You let out a fearsome howl!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
+		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM | TO_ABILITY);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1082,14 +1082,14 @@ ACMD(do_jab) {
 
 		if (IS_NPC(ch)) {
 			// NPC has no weapon
-			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
-			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
-			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
+			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 		}
 		else {
-			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR | TO_COMBAT_HIT);
-			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT | TO_COMBAT_HIT);
-			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT | TO_COMBAT_HIT);
+			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR | TO_ABILITY);
+			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT | TO_ABILITY);
+			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT | TO_ABILITY);
 		}
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
@@ -1280,13 +1280,13 @@ ACMD(do_prick) {
 			appear(ch);
 		}
 
-		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR | TO_COMBAT_HIT);
-		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT | TO_COMBAT_HIT);
-		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT | TO_COMBAT_HIT);
+		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 
 		// possibly fatal
 		if (apply_poison(ch, vict) == 0) {
-			act("It seems to have no effect.", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_MISS);
+			act("It seems to have no effect.", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
 		}
 		
 		// apply_poison could have killed vict -- check location, etc
@@ -1450,8 +1450,8 @@ ACMD(do_shadowcage) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30, WAIT_COMBAT_ABILITY);
 		
-		act("You shoot webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
-		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM | TO_COMBAT_HIT);
+		act("You shoot webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
+		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM | TO_ABILITY);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1465,7 +1465,7 @@ ACMD(do_shadowcage) {
 				af = create_mod_aff(ATYPE_SHADOWCAGE, 15, APPLY_DODGE, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
-				act("You can't seem to dodge as well in the shadowcage!", FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_HIT);
+				act("You can't seem to dodge as well in the shadowcage!", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
 				engage_combat(ch, victim, TRUE);
 			}
 		}

@@ -648,6 +648,13 @@ const char *combat_message_types[] = {
 	"my affects in combat",
 	"ally affects in combat",	// 20
 	"other affects in combat",
+	"my abilities",
+	"ally abilities",
+	"other abilities",
+	"abilities against me",	// 25
+	"abilities against allies",
+	"abilities against target",
+	"abilities against tank",
 	"\n"
 };
 
