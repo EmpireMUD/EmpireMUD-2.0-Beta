@@ -1223,20 +1223,21 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	
 	// check fight messages (may exit early)
 	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_BUFF)) {
-		show = FALSE;
+		show = any = FALSE;
 		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
 		}
 		if (!show && !vict_obj && to == ch) {
+			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
 		}
 		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_BUFFS_IN_COMBAT);
 		}
-		if (!show && vict_obj && to != vict_obj) {
-			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
-		}
-		if (!show && !vict_obj && to != ch) {
+		if (!show && !any) {
+			// other?
 			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
 		}
 		// are we supposed to show it?
@@ -1246,25 +1247,21 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_AFFECT)) {
 		// aff flags in combat
-		show = FALSE;
+		show = any = FALSE;
 		if (!show && to == ch) {
+			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_AFFECTS_IN_COMBAT);
 		}
-		if (!show && !vict_obj && to != ch) {
-			if (is_fight_ally((char_data*)to, (char_data*)ch)) {
-				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
-			}
-			else {
-				show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
-			}
+		if (!show && !vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
 		}
-		if (!show && vict_obj && to != ch) {
-			if (is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
-				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
-			}
-			else {
-				show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
-			}
+		if (!show && vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
 		}
 		// triggered an affect but not showing it
 		if (!show) {
