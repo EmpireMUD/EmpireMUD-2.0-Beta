@@ -1266,6 +1266,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
 			}
 		}
+		// triggered an affect but not showing it
+		if (!show) {
+			return;
+		}
 	}
 	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
 		show = any = FALSE;
