@@ -1284,6 +1284,20 @@ M
 18
 $p melts away to nothing.~
 S
+#12369
+corpse enormous absolutely hoarfrost frost serragon~
+the absolutely enormous corpse of the hoarfrost serragon~
+An absolutely enormous serragon corpse is draped across the landscape.~
+   The corpse is too large to move. You'll have to skin and butcher it here. 
+The serragon is blanketed in delicate hoarfrost and ice cold to the touch. 
+It's large, overlapping scales are toothed on the margins and dangerous even in
+death. Around the serragon's body, the desert has already started to thaw out,
+and things have begun to return to normal.
+~
+10 m 0 0 0 4
+12350 6 0
+7 72
+S
 #12370
 death impending~
 impending death~

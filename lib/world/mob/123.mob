@@ -130,7 +130,7 @@ serragon hoarfrost frost enormous~
 the hoarfrost serragon~
 An enormous serragon coils around the frozen landscape, baring its teeth.
 ~
-100 200 dxyAJK cEGL 6
+100 200 dhxyAJK cEGL 6
 0 0 51 25 -1
 D
    The serragon is so big it could be mistaken for a mountain of ice! Its long,
@@ -209,6 +209,7 @@ I 1 1351 20.00 2 k  # SKIN: large skin
 I 1 1351 40.00 4 k  # SKIN: large skin
 I 1 1351 30.00 8 k  # SKIN: large skin
 I 1 1351 10.00 16 k  # SKIN: large skin
+I 4 12369 100.00 1  # LOOT: absolutely enormous corpse of the hoarfrost serragon
 I 4 12355 10.00 1 m  # LOOT: shaggy frost worm mount whistle
 I+ 3 0  # Normal
 I+ 4 0  # Hard
