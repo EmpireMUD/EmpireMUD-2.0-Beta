@@ -1595,7 +1595,7 @@ while %ch%
     eval moved %moved% + 1
     %teleport% %ch% %to_room%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
-    %load% obj 11805 %ch% inv
+    %load% obj 9680 %ch% inv
     set last %ch%
     if %craw%
       set entry_time_%ch.id% %timestamp%
@@ -1778,7 +1778,7 @@ while %ch%
   elseif %ch.is_pc% || !%ch.linked_to_instance%
     * Move ch
     %teleport% %ch% %to_room%
-    %load% obj 11805 %ch%
+    %load% obj 9680 %ch%
   end
   set ch %next_ch%
 done
