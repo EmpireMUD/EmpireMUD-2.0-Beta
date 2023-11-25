@@ -1551,7 +1551,7 @@ set mob %instance.mob(12357)%
 if %mob%
   %purge% %mob%
 end
-%at% i12351 %load% %mob% 12357
+%at% i12351 %load% mob 12357
 set craw %instance.mob(12357)%
 if %craw%
   nop %craw.remove_mob_flag(HARD)%
