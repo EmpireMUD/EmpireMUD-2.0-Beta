@@ -1362,7 +1362,7 @@ int get_temperature_type(room_data *room) {
 	}
 	
 	// check for a temperature type (building or room template)
-	if (GET_BUILDING(room)) {
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		ttype = GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(room));
 	}
 	else if (GET_ROOM_TEMPLATE(room)) {
