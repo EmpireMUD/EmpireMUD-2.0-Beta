@@ -2628,7 +2628,8 @@ while %ch%
         %teleport% %ch% %exit%
         %load% obj 11805 %ch%
       else
-        %slay% %ch% %ch.name% has drowned at %room.coords%!
+        set name %ch.real_name%
+        %slay% %ch% %name.cap% has drowned!
       end
     elseif %left% < 50
       %send% %ch% &&rYour nose and throat HURT as water presses its way in...&&0
@@ -3694,7 +3695,8 @@ switch %self.vnum%
       %send% %actor% You eat the little white mushroom but you don't feel so good...
       %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
       %echoaround% %actor% ~%actor% eats a little white mushroom...
-      %slay% %actor% %actor.name% has accidentally died at %actor.room.coords%!
+      set name %actor.real_name%
+      %slay% %actor% %name.cap% has accidentally died at %actor.room.coords%!
       return 0
       %purge% %self%
     end
@@ -5012,7 +5014,8 @@ elseif %mm%
   %purge% %self%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
-  %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
+  set name %actor.real_name%
+  %slay% %actor% %name.cap% has died of hubris at %actor.room.coords%!
   * aaaand...
   if %knezz%
     wait 1
