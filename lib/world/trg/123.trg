@@ -1466,7 +1466,7 @@ if %move% == 1
       set done 1
     else
       %send% %targ% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
-      %dot% #12355 %person% 33 30 physical 5
+      %dot% #12355 %targ% 33 30 physical 5
     end
     eval cycle %cycle% + 1
   done
@@ -1802,7 +1802,7 @@ done
 %echoaround% %actor% ~%actor% disappears down the serragon's gullet!
 %teleport% %actor% %outside%
 %at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
-%slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
+%slay% %actor% &&Z%actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
 %purge% %self%
 ~
 $
