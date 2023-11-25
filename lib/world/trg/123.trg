@@ -1688,16 +1688,16 @@ Hoarfrost Serragon: Craw survival timer~
 set room %self.room%
 switch %self.var(difficulty)%
   case 1
-    set limit 60
+    set limit 50
   break
   case 2
     set limit 90
   break
   case 3
-    set limit 150
+    set limit 160
   end
   default
-    set limit 150
+    set limit 160
   break
 done
 set ch %room.people%
