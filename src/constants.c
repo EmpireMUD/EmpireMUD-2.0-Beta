@@ -1013,19 +1013,20 @@ const char *status_message_types[] = {
 	"animal movement",	// 0
 	"channel joins",
 	"cooldowns",
+	"empire logs",
 	"hunger",
-	"thirst",
-	"low blood",	// 5
+	"thirst",	// 5
+	"low blood",
 	"mortlog",
 	"prompt",
 	"skill gains",
-	"sun",
-	"sun auto look",	// 10
+	"sun",	// 10
+	"sun auto look",
 	"temperature",
 	"extreme temperature",
 	"travel auto look",
-	"vehicle movement",
-	"weather",	// 15
+	"vehicle movement",	// 15
+	"weather",
 	"\n"
 };
 

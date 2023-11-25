@@ -2572,22 +2572,23 @@ typedef enum {
 #define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
 #define SM_CHANNEL_JOINS  BIT(1)	// players joining/leaving slash-channels
 #define SM_COOLDOWNS  BIT(2)	// message when a cooldown expires
-#define SM_HUNGER  BIT(3)	// hunger messages
-#define SM_THIRST  BIT(4)	// thirst messages
-#define SM_LOW_BLOOD  BIT(5)	// vampire starvation messages
-#define SM_MORTLOG  BIT(6)	// player creation logs, etc
-#define SM_PROMPT  BIT(7)	// show or hide prompt
-#define SM_SKILL_GAINS  BIT(8) // message when player gains skill points
-#define SM_SUN  BIT(9)	// sunrise/sunset messages
-#define SM_SUN_AUTO_LOOK  BIT(10)	// player looks when sun goes up or down
-#define SM_TEMPERATURE  BIT(11)	// basic temperature change messages
-#define SM_EXTREME_TEMPERATURE  BIT(12)	// warning messages for dangerous temperature
-#define SM_TRAVEL_AUTO_LOOK  BIT(13)	// auto-look when running
-#define SM_VEHICLE_MOVEMENT  BIT(14)	// messages shown to interior when vehicle moves
-#define SM_WEATHER  BIT(15)	// weather change messages
+#define SM_EMPIRE_LOGS   BIT(3)	// can turn off elog messages
+#define SM_HUNGER  BIT(4)	// hunger messages
+#define SM_THIRST  BIT(5)	// thirst messages
+#define SM_LOW_BLOOD  BIT(6)	// vampire starvation messages
+#define SM_MORTLOG  BIT(7)	// player creation logs, etc
+#define SM_PROMPT  BIT(8)	// show or hide prompt
+#define SM_SKILL_GAINS  BIT(9) // message when player gains skill points
+#define SM_SUN  BIT(10)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(11)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(12)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(13)	// warning messages for dangerous temperature
+#define SM_TRAVEL_AUTO_LOOK  BIT(14)	// auto-look when running
+#define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(16)	// weather change messages
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

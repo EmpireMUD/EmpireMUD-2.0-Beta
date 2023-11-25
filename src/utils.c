@@ -1807,10 +1807,15 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 	// show to players
 	if (show_empire_log_type[type] == TRUE) {
 		for (i = descriptor_list; i; i = i->next) {
-			if (STATE(i) != CON_PLAYING || IS_NPC(i->character))
+			if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) {
 				continue;
-			if (GET_LOYALTY(i->character) != emp)
-				continue;
+			}
+			if (GET_LOYALTY(i->character) != emp) {
+				continue;	// wrong empire
+			}
+			if (!SHOW_STATUS_MESSAGES(i->character, SM_EMPIRE_LOGS)) {
+				continue;	// elogs off
+			}
 
 			stack_msg_to_desc(i, "%s[ %s ]&0\r\n", EMPIRE_BANNER(emp), output);
 		}
