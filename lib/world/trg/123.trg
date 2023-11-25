@@ -1233,6 +1233,20 @@ elseif %move% == 2
     dg_affect #12353 %self% HARD-STUNNED on 20
   end
   scfight setup struggle all 20
+  set person %room.people%
+  while %person%
+    if %person.affect(9602)%
+      set scf_strug_char You struggle in pain against the serrated scales...
+      set scf_strug_room ~%%actor%% struggles against the serrated scales...
+      set scf_free_char You squeeze free of the serrated scales!
+      set scf_free_room ~%%actor%% squeezes free of the serrated scales!
+      remote scf_strug_char %person.id%
+      remote scf_strug_room %person.id%
+      remote scf_free_char %person.id%
+      remote scf_free_room %person.id%
+    end
+    set person %person.next_in_room%
+  done
   * messages
   set cycle 0
   set ongoing 1
@@ -1315,6 +1329,20 @@ elseif %move% == 4
     dg_affect #12353 %self% HARD-STUNNED on 20
   end
   scfight setup struggle all 20
+  set person %room.people%
+  while %person%
+    if %person.affect(9602)%
+      set scf_strug_char You struggle against the draining frost...
+      set scf_strug_room ~%%actor%% struggles against the draining frost...
+      set scf_free_char You manage to get free of the frost!
+      set scf_free_room ~%%actor%% manages to get free of the frost!
+      remote scf_strug_char %person.id%
+      remote scf_strug_room %person.id%
+      remote scf_free_char %person.id%
+      remote scf_free_room %person.id%
+    end
+    set person %person.next_in_room%
+  done
   * messages
   eval punish -2 * %diff%
   set cycle 0
@@ -1453,6 +1481,14 @@ if %move% == 1
   %echoaround% %targ% &&C~%self% launches itself through the air and coils itself around ~%targ%!&&0
   dg_affect #12353 %self% HARD-STUNNED on 20
   scfight setup struggle %targ% 20
+  set scf_strug_char You struggle in pain against the hatchling's serrated scales...
+  set scf_strug_room ~%%actor%% struggles against the hatchling's serrated scales...
+  set scf_free_char You slip free of the frostscale hatchling!
+  set scf_free_room ~%%actor%% slips free of the frostscale hatchling!
+  remote scf_strug_char %targ.id%
+  remote scf_strug_room %targ.id%
+  remote scf_free_char %targ.id%
+  remote scf_free_room %targ.id%
   * messages
   set cycle 0
   set done 0
@@ -1466,7 +1502,7 @@ if %move% == 1
       set done 1
     else
       %send% %targ% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
-      %dot% #12355 %person% 33 30 physical 5
+      %dot% #12355 %targ% 33 30 physical 5
     end
     eval cycle %cycle% + 1
   done
