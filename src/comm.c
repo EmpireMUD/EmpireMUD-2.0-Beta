@@ -1290,7 +1290,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TARGET);
 		}
-		if (!show && vict_obj && FIGHTING(FIGHTING(to)) == vict_obj) {
+		if (!show && vict_obj && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TANK);
 		}
