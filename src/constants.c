@@ -3352,11 +3352,11 @@ const struct climate_temperature_t climate_temperature[] = {
 	{ -5, 1.25, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_MOUNTAIN
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_RIVER
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_FRESH_WATER
-	{ 5, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 15: CLIM_SALT_WATER
+	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 1.0, 1.0 },	// 15: CLIM_SALT_WATER
 	{ 0, 0.25, 1.5, 1.0, 1.0 },	// CLIM_FOREST
 	{ 0, 0.75, 1.0, 1.0, 1.0 },	// CLIM_GRASSLAND
 	{ 0, 0.5, 0.75, 1.0, 1.0 },	// CLIM_COASTAL
-	{ 0, 3.0, 1.0, 1.0, 1.0 },	// CLIM_OCEAN
+	{ 5, 3.5, 0.75, 1.0, 1.0 },	// CLIM_OCEAN
 	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// 20: CLIM_LAKE
 	{ 0, 0.75, NO_TEMP_MOD, 1.0, 1.0 },	// CLIM_WATERSIDE
 	{ 0, NO_TEMP_MOD, NO_TEMP_MOD, 0.5, 0.5 },	// CLIM_MILD
