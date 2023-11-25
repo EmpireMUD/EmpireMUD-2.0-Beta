@@ -1225,9 +1225,9 @@ elseif %move% == 2
   * Coil
   scfight clear struggle
   if %room.players_present% > 1
-    %echo% &&CThere's a screeching sound as ~%self% begins to coil around the whole party!&&0 (struggle)
+    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around the whole party! ****&&0 (struggle)
   else
-    %echo% &&CThere's a screeching sound as ~%self% begins to coil around you!&&0 (struggle)
+    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around you! ****&&0 (struggle)
   end
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
@@ -1310,7 +1310,7 @@ elseif %move% == 4
   * Frost Pores / Heat Drain
   scfight clear struggle
   %echo% &&CA cold mist seeps from |%self% pores and flows over you...&&0
-  %echo% &&CYou begin to freeze in place!&&0 (struggle)
+  %echo% &&C**** You begin to freeze in place! ****&&0 (struggle)
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
   end
@@ -1327,12 +1327,12 @@ elseif %move% == 4
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
-          %send% %person% &&CYou feel the heat draining out of your body!&&0 (struggle)
+          %send% %person% &&C**** You feel the heat draining out of your body! ****&&0 (struggle)
           dg_affect #12356 %person% BONUS-PHYSICAL %punish% 20
           dg_affect #12356 %person% BONUS-MAGICAL %punish% 20
           dg_affect #12356 %person% COOLING 20 20
         else
-          %send% %person% &&CYou're trapped in the frost!&&0 (struggle)
+          %send% %person% &&C**** You're trapped in the frost! ****&&0 (struggle)
         end
       end
       set person %person.next_in_room%
@@ -1461,6 +1461,9 @@ if %move% == 1
     if !%targ% || %targ_id% != %targ.id%
       * gone?
       set done 1
+    elseif %targ.room% != %room%
+      * moved
+      set done 1
     elseif !%targ.affect(9602)%
       * struggled out
       set done 1
@@ -1477,7 +1480,7 @@ elseif %move% == 2
   scfight clear dodge
   %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
   wait 3 s
-  if %self.disabled% || %self.aff_flagged(BLIND)%
+  if %self.disabled% || %self.aff_flagged(BLIND)% || %targ.room% != %room%
     halt
   end
   set targ %random.enemy%
@@ -1497,7 +1500,7 @@ elseif %move% == 2
   set done 0
   while %cycle% < %times% && !%done%
     wait %when% s
-    if %targ.id% != %targ_id%
+    if %targ.id% != %targ_id% || %targ.room% != %room%
       set done 1
     elseif !%targ.var(did_scfdodge)%
       %echo% &&C~%self% bites down on ~%targ% hard!&&0
@@ -1624,6 +1627,7 @@ if %cancel%
   set phase 1
   remote phase %self.id%
   dg_affect #12360 %self% off
+  nop %self.remove_mob_flag(!RESCALE)%
   * remove interior mob (always needs a fresh one)
   set craw %instance.mob(12357)%
   if %craw%
