@@ -1284,4 +1284,15 @@ M
 18
 $p melts away to nothing.~
 S
+#12370
+death impending~
+impeding death~
+Impending death is here.~
+This item kills the player and teleports them out of the instance.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+T 12370
+S
 $

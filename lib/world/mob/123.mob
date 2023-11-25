@@ -319,6 +319,7 @@ T 12359
 T 12360
 T 12362
 T 12364
+T 12365
 S
 #12351
 spreader hoarfrost frost~
@@ -488,5 +489,33 @@ times, especially when you try to touch it.
 M
 0
 The hoarfrost gleams on the ground.~
+S
+#12357
+serragon wall craw hoarfrost frost~
+the wall of the craw~
+The serragon convulses and contracts around you as it thrashes.
+~
+100 200 bdhnG 0 6
+0 0 0 15 -1
+D
+From here, all you can see of the serragon is the wall of its dark blue stomach.
+~
+M
+0
+A booming heartbeat echoes down the serragon.~
+T 12367
+T 12368
+S
+#12358
+completion sense teleporter~
+a sense of completion~
+A sense of completion hangs in the air (toggle hassle off to prevent being teleported).
+~
+100 200 bd ln 3
+0 0 0 15 -1
+D
+This mob teleports people out of the hoarfrost serragon after the fight is complete.
+~
+T 12369
 S
 $

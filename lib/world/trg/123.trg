@@ -1097,7 +1097,10 @@ attach 12358 %self.id%
 Hoarfrost Serragon: Instruction to diff-sel~
 0 B 0
 ~
-if %self.affect(12350)% && %actor.char_target(%arg%)% == %self%
+if %self.affect(12360)%
+  %send% %actor% You can't attack ~%self% while it's in its death throes!
+  return 0
+elseif %self.affect(12350)% && %actor.char_target(%arg%)% == %self%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
@@ -1112,7 +1115,7 @@ Hoarfrost Serragon: Resume wandering if nobody fights.~
 0 b 10
 ~
 * cancel sentinel and resume movement if nobody is around and fighting me
-if !%self.affect(12351)% && !%self.fighting% && %room.players_present% == 0
+if !%self.affect(12351)% && !%self.affect(12360)% && !%self.fighting% && %room.players_present% == 0
   nop %self.remove_mob_flag(SENTINEL)%
   dg_affect #12350 %self% !ATTACK on -1
   * reset no-sentinel for storytime
@@ -1297,7 +1300,7 @@ elseif %move% == 3
       %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
       scfight clear dodge
       scfight setup dodge %targ%
-    else if %done% && %targ.id% == %targ_id% && %diff% == 1
+    elseif %done% && %targ.id% == %targ_id% && %diff% == 1
       dg_affect #12358 %targ% TO-HIT 25 20
     end
   done
@@ -1501,7 +1504,7 @@ elseif %move% == 2
       %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
       scfight clear dodge
       scfight setup dodge %targ%
-    else if %done% && %targ.id% == %targ_id% && %diff% == 1
+    elseif %done% && %targ.id% == %targ_id% && %diff% == 1
       dg_affect #12358 %targ% TO-HIT 25 20
     end
   done
@@ -1520,5 +1523,277 @@ if %actor.fighting%
 else
   return 0
 end
+~
+#12365
+Hoarfrost Serragon: Phase Transition~
+0 l 10
+~
+* Serragon has dropped below 10% and will teleport players inside for phase 2
+makeuid to_room room i12351
+if !%instance.location% || !%to_room%
+  * no instance?
+  halt
+end
+set phase 2
+remote phase %self.id%
+attach 12366 %self.id%
+* remove safety teleporter, if any
+set mob %instance.mob(12358)%
+if %mob%
+  %purge% %mob%
+end
+* Make me unattackable
+%restore% %self%
+nop %self.add_mob_flag(!RESCALE)%
+dg_affect #12360 %self% !ATTACK on -1
+* ensure a craw mob inside
+set mob %instance.mob(12357)%
+if %mob%
+  %purge% %mob%
+end
+%at% i12351 %load% %mob% 12357
+set craw %instance.mob(12357)%
+if %craw%
+  nop %craw.remove_mob_flag(HARD)%
+  nop %craw.remove_mob_flag(GROUP)%
+  switch %self.var(difficulty,2)%
+    case 1
+      set difficulty 1
+    break
+    case 2
+      set difficulty 1
+    break
+    case 3
+      set difficulty 2
+      nop %craw.add_mob_flag(HARD)%
+    break
+    case 4
+      set difficulty 3
+      nop %craw.add_mob_flag(GROUP)%
+    break
+  done
+  remote difficulty %craw.id%
+  nop %craw.unscale_and_reset%
+  %scale% %craw% %self.level%
+end
+* And transfer players inside
+set moved 0
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %self.is_tagged_by(%ch%)%
+    eval moved %moved% + 1
+    %teleport% %ch% %to_room%
+    %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
+    %load% obj 11805 %ch% inv
+  elseif %ch.is_npc% && %ch.leader%
+    if %self.is_tagged_by(%ch.leader%)%
+      %teleport% %ch% %to_room%
+    end
+  end
+  set ch %next_ch%
+done
+%echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
+~
+#12366
+Hoarfrost Serragon: Check end of phase 2~
+0 b 100
+~
+* Brings the serragon out of phase 2 if everyone died inside
+set cancel 0
+if !%instance.location%
+  * no instance at all?
+  set cancel 1
+else
+  makeuid inside room i12351
+  if !%inside%
+    set cancel 1
+  elseif %inside.players_present% == 0
+    set cancel 1
+  end
+end
+* did we find a reason to cancel?
+if %cancel%
+  set phase 1
+  remote phase %self.id%
+  dg_affect #12360 %self% off
+  * remove interior mob (always needs a fresh one)
+  set craw %instance.mob(12357)%
+  if %craw%
+    %purge% %craw%
+  end
+  * put a safety mob inside
+  makeuid inside room i12351
+  if %inside%
+    %at% %inside% %load% mob 12358
+  end
+  * and remove this script
+  detach 12366 %self.id%
+end
+~
+#12367
+Hoarfrost Serragon: Inside serragon craw death trig~
+0 f 100
+~
+set room %self.room%
+set mob %instance.mob(12350)%
+if %mob%
+  set to_room %mob.room%
+else
+  set to_room %instance.location%
+end
+* teleport players out
+if %to_room%
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch.vnum% == 12357 || %ch.vnum% == 12358
+      * nothing (these mobs are part of the fight)
+    elseif %ch.is_pc% || !%ch.linked_to_instance%
+      * Move ch
+      %send% %ch% &&CYou're thrown violently out the serragon's mouth!&&0
+      %teleport% %ch% %to_room%
+      %at% %to_room% %echoaround% %ch% ~%ch% comes flying out the serragon's mouth!
+    end
+    set ch %next_ch%
+  done
+  if %mob%
+    * remove immunity
+    dg_affect #12360 %mob% off
+    * tag mob for player
+    %mod% %mob% tag %actor%
+    * and kill it
+    %slay% %mob%
+  end
+end
+* load safety mob
+%load% mob 12358
+* no death cry
+return 0
+~
+#12368
+Hoarfrost Serragon: Craw survival timer~
+0 bw 100
+~
+* Tracks each player's time inside and kills them if it's been too long.
+set room %self.room%
+switch %self.var(difficulty)%
+  case 1
+    set limit 60
+  break
+  case 2
+    set limit 90
+  break
+  case 3
+    set limit 150
+  end
+  default
+    set limit 150
+  break
+done
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_pc%
+    * find or set an entry time
+    set entry_time %self.var(entry_time_%ch.id%)%
+    if !%entry_time%
+      set entry_time %timestamp%
+      set entry_time_%ch.id% %timestamp%
+      remote entry_time_%ch.id% %self.id%
+    end
+    eval inside_time %timestamp% - %entry_time%
+    if %inside_time% >= %limit%
+      * death!
+      %load% obj 12370 %ch% inv
+    elseif %inside_time% >= %limit% / 2
+      %send% %ch% &&CIt's getting hard to breathe in here!
+    end
+  end
+  set ch %next_ch%
+done
+~
+#12369
+Hoarfrost Serragon: Post-kill safety teleporter~
+0 h 100
+~
+* Ensure no players accidentally log in inside this creature when it's not in phase 2
+if %actor.nohassle%
+  halt
+end
+wait 0
+set room %self.room%
+if %room.template% != 12351
+  * Only works inside the serragon's craw
+  %purge% %self%
+  halt
+end
+* Ensure part of the instance
+nop %self.link_instance%
+set to_room %instance.location%
+if !%to_room%
+  * No destination
+  %purge% %self%
+  halt
+end
+* Message now
+%echo% You're ejected from the hoarfrost serragon!
+* Check items here
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.can_wear(TAKE)%
+    %teleport% %obj% %to_room%
+  end
+  set obj %next_obj%
+done
+* Check people here
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.nohassle% || %ch.vnum% == 12357 || %ch.vnum% == 12358
+    * nothing (these mobs are part of the fight)
+  elseif %ch.is_pc% || !%ch.linked_to_instance%
+    * Move ch
+    %teleport% %ch% %to_room%
+    %load% obj 11805 %ch%
+  end
+  set ch %next_ch%
+done
+~
+#12370
+Hoarfrost Serragon: You died in the craw~
+1 n 100
+~
+wait 0
+set actor %self.carried_by%
+set room %self.room%
+set outside %instance.location%
+if !%actor%
+  %purge% %self%
+  halt
+elseif !%outside%
+  %send% %actor% Error: Instance not detected.
+  %purge% %self%
+  halt
+end
+* teleport player and npc followers out
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor%
+    %echo% ~%ch% vanishes down the gullet!
+    %teleport% %ch% %outside%
+    %at% %outside% %slay% %ch%
+  end
+  set ch %next_ch%
+done
+* and the person themselves
+%send% %actor% The world goes dark as you slip away down the serragon's gullet!
+%echoaround% %actor% ~%actor% disappears down the serragon's gullet!
+%teleport% %actor% %outside%
+%echo% ~%actor% comes flying out the serragon's mouth!
+%slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
+%purge% %self%
 ~
 $
