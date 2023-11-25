@@ -1596,6 +1596,7 @@ while %ch%
     %teleport% %ch% %to_room%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
     %load% obj 11805 %ch% inv
+    set last %ch%
   elseif %ch.is_npc% && %ch.leader%
     if %self.is_tagged_by(%ch.leader%)%
       %teleport% %ch% %to_room%
@@ -1603,7 +1604,11 @@ while %ch%
   end
   set ch %next_ch%
 done
-%echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
+if %moved% > 1
+  %echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
+elseif %moved% == 1
+  %echo% &&C**** &&Z~%self% swallows ~%last%! ****&0
+end
 ~
 #12366
 Hoarfrost Serragon: Check end of phase 2~
@@ -1806,7 +1811,8 @@ done
 %echoaround% %actor% ~%actor% disappears down the serragon's gullet!
 %teleport% %actor% %outside%
 %at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
-%slay% %actor% &&Z%actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
+set name %actor.real_name%
+%slay% %actor% %name.cap% has been eaten by the hoarfrost serragon at %outside.coords%!
 %purge% %self%
 ~
 $
