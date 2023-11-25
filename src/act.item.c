@@ -5405,11 +5405,11 @@ ACMD(do_drink) {
 	}
 	
 	// check warming/cooling needs
-	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_WARMING) && GET_TEMPERATURE(ch) < (get_room_temperature(IN_ROOM(ch)) + 5)) {
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_WARMING) && GET_TEMPERATURE(ch) < (get_room_temperature(IN_ROOM(ch)) + 5)) {
 		// needs warming: drink at least 4
 		amount = MAX(4, amount);
 	}
-	if (liq_generic && GEN_FLAGGED(liq_generic, LIQF_COOLING) && GET_TEMPERATURE(ch) > (get_room_temperature(IN_ROOM(ch)) - 5)) {
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_COOLING) && GET_TEMPERATURE(ch) > (get_room_temperature(IN_ROOM(ch)) - 5)) {
 		// needs cooling: drink at least 4
 		amount = MAX(4, amount);
 	}

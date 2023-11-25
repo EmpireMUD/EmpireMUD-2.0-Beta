@@ -10304,7 +10304,7 @@ ACMD(do_restore) {
 	int i, iter;
 	
 	// modes
-	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE;
+	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE, temperature = FALSE;
 
 	type_args = one_argument(argument, name_arg);
 	skip_spaces(&type_args);
@@ -10378,6 +10378,9 @@ ACMD(do_restore) {
 			}
 			else if (is_abbrev(arg, "thirsty")) {
 				thirst = TRUE;
+			}
+			else if (is_abbrev(arg, "temperature")) {
+				temperature = TRUE;
 			}
 			else {
 				msg_to_char(ch, "Unknown restore type '%s'.\r\n", arg);
@@ -10467,6 +10470,12 @@ ACMD(do_restore) {
 			GET_COND(vict, DRUNK) = 0;
 		}
 		sprintf(types + strlen(types), "%s drunkenness", *types ? "," : "");
+	}
+	
+	// temperature
+	if (all || temperature) {
+		reset_player_temperature(vict);
+		sprintf(types + strlen(types), "%s temperature", *types ? "," : "");
 	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {

@@ -935,7 +935,7 @@ Usage:  restore <player | mobile | vehicle> [types]
 RESTORE is used to heal and cure a player or mobile. If you use it without a
 type argument, it fully restores the target. Or, you can choose one or more
 types to restore from: health, mana, movement, blood, hunger, thirst,
-drunkenness, cooldowns, and DoTs.
+drunkenness, temperature, cooldowns, and DoTs.
 
 When used on a vehicle, restore removes any damage and any needed resources or
 maintentance, and puts out any fire. It will complete the vehicle if it is
