@@ -1217,7 +1217,7 @@ if %move% == 1
   done
   dg_affect #12357 %self% off
   if !%hit% && %diff% == 1
-    %echo% &&C~%self% seems to exhaust *%self%self from all that spinning.&&0
+    %echo% &&C~%self% seems to have stunned itself with that slam!&&0
     dg_affect #12353 %self% HARD-STUNNED on 10
   end
   wait 8 s
@@ -1597,6 +1597,10 @@ while %ch%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
     %load% obj 11805 %ch% inv
     set last %ch%
+    if %craw%
+      set entry_time_%ch.id% %timestamp%
+      remote entry_time_%ch.id% %craw.id%
+    end
   elseif %ch.is_npc% && %ch.leader%
     if %self.is_tagged_by(%ch.leader%)%
       %teleport% %ch% %to_room%
@@ -1703,10 +1707,10 @@ switch %self.var(difficulty)%
     set limit 90
   break
   case 3
-    set limit 150
+    set limit 160
   break
   default
-    set limit 150
+    set limit 160
   break
 done
 set ch %room.people%
