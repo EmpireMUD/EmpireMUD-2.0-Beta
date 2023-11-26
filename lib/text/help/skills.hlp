@@ -267,7 +267,7 @@ See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT TORCH
 
-Usage:  light <item | building | vehicle | area | direction>
+Usage:  light <item>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp

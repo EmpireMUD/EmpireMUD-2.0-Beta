@@ -369,7 +369,7 @@ Usage:  burn <building | vehicle | area | direction>
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
-building (burn building), or from an adjecent tile (burn <direction>). If the
+building (burn building), or from an adjacent tile (burn <direction>). If the
 building is claimed, you must be at war with the owner to do this. Buildings
 may also catch fire when a torch is dropped or thrown into them.
 
