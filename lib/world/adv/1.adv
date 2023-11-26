@@ -239,7 +239,7 @@ countryside! Can you hunt it down and kill it? Just follow the swath of
 scorched earth. The dragon is tough -- you might want to bring a partner.
 ~
 10300 10329 100-150
-5 0 d 0
+5 0 dn 0
 L
 5 0
 43200 -1 -1 -1
@@ -261,7 +261,7 @@ nearby. Can you find and defeat it? Be careful, it might take a pair of stout
 adventurers -- but the rewards will be worth it.
 ~
 10330 10359 125-175
-10 0 0 0
+10 0 n 0
 L
 1 0
 10330 -1 -1 -1
