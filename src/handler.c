@@ -6379,7 +6379,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
 	}
 	
-	// certain things that must always copy over
+	// ITEM_x: certain things that must always copy over
 	switch (GET_OBJ_TYPE(new)) {
 		case ITEM_AMMO: {
 			set_obj_val(new, VAL_AMMO_QUANTITY, GET_OBJ_VAL(obj, VAL_AMMO_QUANTITY));
@@ -6389,9 +6389,47 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 			set_obj_val(new, VAL_BOOK_ID, GET_OBJ_VAL(obj, VAL_BOOK_ID));
 			break;
 		}
+		case ITEM_COINS: {
+			set_obj_val(new, VAL_COINS_AMOUNT, GET_OBJ_VAL(obj, VAL_COINS_AMOUNT));
+			set_obj_val(new, VAL_COINS_EMPIRE_ID, GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID));
+			break;
+		}
+		case ITEM_CORPSE: {
+			set_obj_val(new, VAL_CORPSE_IDNUM, GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM));
+			set_obj_val(new, VAL_CORPSE_SIZE, GET_OBJ_VAL(obj, VAL_CORPSE_SIZE));
+			set_obj_val(new, VAL_CORPSE_FLAGS, GET_OBJ_VAL(obj, VAL_CORPSE_FLAGS));
+			break;
+		}
 		case ITEM_DRINKCON: {
 			set_obj_val(new, VAL_DRINK_CONTAINER_CONTENTS, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
 			set_obj_val(new, VAL_DRINK_CONTAINER_TYPE, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+			
+			// check capacity
+			if (GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CONTENTS) > GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CAPACITY)) {
+				set_obj_val(new, VAL_DRINK_CONTAINER_CONTENTS, GET_OBJ_VAL(new, VAL_DRINK_CONTAINER_CAPACITY));
+			}
+			break;
+		}
+		case ITEM_LIGHT: {
+			// only copy hours-remaining if not unlimited on either end
+			if (GET_OBJ_VAL(new, VAL_LIGHT_HOURS_REMAINING) != UNLIMITED && GET_OBJ_VAL(obj, VAL_LIGHT_HOURS_REMAINING) != UNLIMITED) {
+				set_obj_val(new, VAL_LIGHT_HOURS_REMAINING, GET_OBJ_VAL(obj, VAL_LIGHT_HOURS_REMAINING));
+			}
+			set_obj_val(new, VAL_LIGHT_IS_LIT, GET_OBJ_VAL(obj, VAL_LIGHT_IS_LIT));
+			break;
+		}
+		case ITEM_LIGHTER: {
+			// only copy uses if not unlimited on either end
+			if (GET_OBJ_VAL(new, VAL_LIGHTER_USES) != UNLIMITED && GET_OBJ_VAL(obj, VAL_LIGHTER_USES) != UNLIMITED) {
+				set_obj_val(new, VAL_LIGHTER_USES, GET_OBJ_VAL(obj, VAL_LIGHTER_USES));
+			}
+			break;
+		}
+		case ITEM_OTHER: {
+			// copy everything for "other"
+			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
+				set_obj_val(new, iter, GET_OBJ_VAL(obj, iter));
+			}
 			break;
 		}
 		case ITEM_PORTAL: {
@@ -6400,6 +6438,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		}
 		case ITEM_POISON: {
 			set_obj_val(new, VAL_POISON_CHARGES, GET_OBJ_VAL(obj, VAL_POISON_CHARGES));
+			break;
+		}
+		case ITEM_RECIPE: {
+			set_obj_val(new, VAL_RECIPE_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM));
 			break;
 		}
 		case ITEM_SHIP: {
