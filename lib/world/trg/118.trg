@@ -5145,7 +5145,11 @@ elseif %move% == 5
   set mob %room.people%
   if %mob.vnum% == 11850
     %echo% &&mA corpse climbs out of its coffin and joins the fray!&&0
-    %force% %mob% mkill %self.fighting%
+    if %self.fighting%
+      %force% %mob% mkill %self.fighting%
+    else
+      %force% %mob% maggro
+    end
   end
 end
 * in case
