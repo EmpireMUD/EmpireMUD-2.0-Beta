@@ -2310,39 +2310,44 @@ ACMD(do_buffs) {
 		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
 			continue;	// no buff we can detect
 		}
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM)) {
+			continue;	// not a targeted character buff
+		}
 		
 		// build output
 		any = TRUE;
+		error = FALSE;
 		line_size = snprintf(line, sizeof(line), " %s:", ABIL_NAME(abil));
 		
-		// check self
-		own = other = FALSE;
-		caster = NULL;
-		error = FALSE;
-		LL_FOREACH(ch->affected, aff) {
-			if (aff->type == ABIL_AFFECT_VNUM(abil)) {
-				if (aff->cast_by == GET_IDNUM(ch)) {
-					own = TRUE;
+		// check self?
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+			own = other = FALSE;
+			caster = NULL;
+			LL_FOREACH(ch->affected, aff) {
+				if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+					if (aff->cast_by == GET_IDNUM(ch)) {
+						own = TRUE;
+					}
+					else {
+						other = TRUE;
+						caster = is_playing(aff->cast_by);
+					}
+					// only need 1 match
+					break;
 				}
-				else {
-					other = TRUE;
-					caster = is_playing(aff->cast_by);
-				}
-				// only need 1 match
-				break;
 			}
-		}
-		if (!own && other) {
-			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
-			error = TRUE;
-		}
-		else if (!own) {
-			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on self\t0");
-			error = TRUE;
+			if (!own && other) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				error = TRUE;
+			}
+			else if (!own) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on self\t0");
+				error = TRUE;
+			}
 		}
 		
 		// check party?
-		if (GROUP(ch)) {
+		if (GROUP(ch) && !IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
 			LL_FOREACH(GROUP(ch)->members, mem) {
 				if (mem->member == ch) {
 					continue;
