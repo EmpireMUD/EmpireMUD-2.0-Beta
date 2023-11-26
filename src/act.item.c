@@ -5630,7 +5630,7 @@ ACMD(do_drop) {
 ACMD(do_eat) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH], line[256], *argptr = arg;
+	char buf[MAX_STRING_LENGTH], some_part[256], line[256], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food, *check_list[2], *obj;
@@ -5761,12 +5761,30 @@ ACMD(do_eat) {
 	
 	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
+		// determine how the "some" will be shown
+		if (extract) {
+			// eating the whole thing
+			*some_part = '\0';
+		}
+		else {
+			if (!strn_cmp(GET_OBJ_SHORT_DESC(food), "a ", 2) || !strn_cmp(GET_OBJ_SHORT_DESC(food), "an ", 3) || !strn_cmp(GET_OBJ_SHORT_DESC(food), "the ", 4)) {
+				strcpy(some_part, "some of ");
+			}
+			else if (!strn_cmp(GET_OBJ_SHORT_DESC(food), "some ", 5)) {
+				// prevents "some of some"
+				strcpy(some_part, "part of ");
+			}
+			else {
+				strcpy(some_part, "some ");
+			}
+		}
+		
 		// message to char
 		if (obj_has_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
+			snprintf(buf, sizeof(buf), "You eat %s$p.", some_part);
 			act(buf, FALSE, ch, food, NULL, TO_CHAR);
 		}
 
@@ -5775,7 +5793,7 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
+			snprintf(buf, sizeof(buf), "$n eats %s$p.", some_part);
 			act(buf, TRUE, ch, food, NULL, TO_ROOM);
 		}
 	}
