@@ -174,7 +174,7 @@ have. For example, if you have an alias named "foo" and you import aliases, it
 won't overwrite the "foo" you already have with one from an alt.
 
 You can import: aliases, prompt, fprompt, preferences, fightmessages, recolors,
-slash-channels, and ignores.
+slash-channels, statusmessages, and ignores.
 
 "Preferences" will import some toggles, as well as mapsize.
 
@@ -316,6 +316,15 @@ to 3.
 
 See also: COMPACT, MAPSIZE, TOGGLE
 #
+BUFFS
+
+Usage:  buffs
+
+This command lists your buff abilities and whether or not they are currently
+active on you and your group.
+
+See also: BUFF
+#
 BUG TYPO IDEA
 
 Usage:  bug <bug report>
@@ -369,7 +378,7 @@ Usage:  burn <building | vehicle | area | direction>
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
-building (burn building), or from an adjecent tile (burn <direction>). If the
+building (burn building), or from an adjacent tile (burn <direction>). If the
 building is claimed, you must be at war with the owner to do this. Buildings
 may also catch fire when a torch is dropped or thrown into them.
 
@@ -420,12 +429,12 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  toggle channel-joins [on/off]
+Usage:  smessage channel joins [on | off]
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
 
-See also: SLASH-CHANNELS, TOGGLE
+See also: SLASH-CHANNELS, STATUS MESSAGES
 #
 CHART CHARTS
 
@@ -865,7 +874,7 @@ This command gets quick info on your empire (or another). It is a short version
 of the longer info shown with the "empire" command, and it defaults to your
 empire if you give no argument.
 
-See also: EMPIRE
+See also: EMPIRE, COINS, TREASURE
 #
 EVENT EVENTS
 
@@ -991,14 +1000,14 @@ Reputation levels and values:
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
-Usage:  fightmessages [type]
+Usage:  fightmessages [type] [on | off]
         fmessages all <on | off>
 
 This command lets you toggle which fight messages you do or don't see. This can
 make combat less spammy and easier to understand. You can use multi-word
 abbreviations for these toggles, like "miss ag me" for "misses against me".
 
-See also: TOGGLE
+See also: SMESSAGES, TOGGLE
 #
 FILL
 
@@ -1557,7 +1566,7 @@ This shows your combat meters from your recent fights. If you turn on the
 "clearmeters" toggle, your meters will clear before every new fight. You can
 also type "clearmeters" to clear them at any time.
 
-See also: CLEARMETERS
+See also: CLEARMETERS, DAMAGE, DAMAGE NUMBERS
 #
 MINIPET MINIPETS MINI-PET MINI-PETS "MINI PET" "MINI PETS" PET PETS
 
@@ -1575,11 +1584,13 @@ There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 
-Usage:  toggle mortlog [on/off]
+Usage:  smessages mortlog [on | off]
 
-This will give you periodic updates, such as when a player creates, logs in, or
-leaves (depending on the game's settings). It's useful in keeping up on current
-events. Mortlog is colored cyan.
+This toggles mortlogs on and off. Mortlogs give you periodic updates, such as
+when a player creates, logs in, or leaves (depending on the game's settings).
+It's useful in keeping up on current events. Mortlog is colored cyan.
+
+See also: STATUS MESSAGES
 #
 MOTD
 
@@ -1884,7 +1895,7 @@ Here are the prompt codes and what they do:
   %i  Health text         %u  Move text          %n  Mana text
   
   %b  Current blood       %t  Time               %I  Inventory size
-  %B  Maximum blood       %a  Current action
+  %B  Maximum blood       %T  Temperature        %a  Current action
   %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
@@ -2180,6 +2191,9 @@ gatehouses and tunnels) and sail requires continuous water (including buildings
 you can sail through, like bridges). If automatic pathfinding takes too long or
 creates too complex a path, it will fail.
 
+Anybody inside the vehicle will receive a message each time the vehicle moves.
+This can be disabled with the "smessages" command.
+
 Examples:
  > drive east
  > sail 3e 4n 7nw
@@ -2189,7 +2203,7 @@ Examples:
 Many vehicles cannot move through portals.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
-STOP, TOGGLE, RUN
+STATUS MESSAGES, STOP, TOGGLE, RUN
 #
 SAVE
 
@@ -2297,8 +2311,12 @@ Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
  * toggle political - Indicates who owns each map tile.
+ * fightmessages - Reduce combat spam.
+ * statusmessages - Turn off some status messages.
+ * /leave and /join - Control which slash-channels you're on.
 
-See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
+See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, SMESSAGES, MAPSCAN, CHART,
+   SLASH CHANNELS
 #
 SCROLLING
 
@@ -2454,6 +2472,18 @@ usually from progress goals, it will be indicated here.
 
 See also: SAY, SHOUT
 #
+STATUSMESSAGES "STATUS MESSAGES" SMESSAGES
+
+Usage:  statusmessages [type] [on | off]
+        smessages all <on | off>
+
+This command lets you toggle which status messages you do or don't see. This may
+reduce spam for messages you see regularly. Type "smessages" by itself to see
+what options are available. You can use multi-word abbreviations for these
+toggles, like "extr temp" for "extreme temperature".
+
+See also: FMESSAGES, TOGGLE
+#
 STEALTHABLE
 
 Usage:  toggle stealthable [on/off]
@@ -2566,7 +2596,36 @@ Example:
  > tellhistory
  Khufu tells you, 'hi!'
 
-See also: SAYHISTORY, TELL
+See also: HISTORY, TELL
+#
+TEMPERATURE COLD HOT FREEZING SWELTERING BALMY SCORCHING CHILLY
+
+Usage:  temperature
+
+This command tells you how warm or cold it is around you right now as well as
+how warm or cold you are.
+
+When you move to a location that's warmer or colder, your temperature rises or
+falls over the course of an in-game hour. Having a lit torch or camp fire will
+help keep you warm in the winter, and being in the water will help keep you
+cool in the summer. Drinking warm or cool liquids may also provide some relief
+from the temperature as well.
+
+Cold temperatures (in order): &Cchilly, cold, frosty, icy, frigid, freezing&0
+Comfortable temperatures: &Jcool, pleasant, balmy&0
+Hot temperatures: &Owarm, hot, scorching, sweltering, blistering, searing&0
+
+Some EmpireMUDs have penalties for being too cold or too hot:
+
+Cold penalties: slow effect, get hungry faster, actions are slow
+Freezing penalties: distracted from timed actions, damage over time
+
+Hot penalties: poor regeneration rate, get thirsty faster, actions are slow
+Sweltering penalties: distracted from timed actions, damage over time
+
+You can turn off alerts about changes in temperature with "smessages".
+
+See also: SURVEY, STATUS MESSAGES, TIME, WEATHER
 #
 THROW
 
@@ -2609,7 +2668,7 @@ Handy time-conversion chart:
  - 1 day in-game = 30 minutes
  - 1 year in-game = 7.5 days
 
-See also: TIME ZONE, YEARLY RESET
+See also: SURVEY, TEMPERATURE, TIME ZONE, WEATHER, YEARLY RESET
 #
 TITLE
 
@@ -2639,7 +2698,6 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   autoswim - can enter water without typing 'swim'
   bother - allows "bothersome" things like bite and purify
-  channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
@@ -2648,7 +2706,6 @@ Toggles:
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
-  mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
@@ -2662,7 +2719,6 @@ Toggles:
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
-  travel-look - automatically 'looks' after each run or when your vehicle moves
   tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
@@ -2678,7 +2734,7 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, STATUS MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
@@ -2720,13 +2776,15 @@ Basic tombs:
 
 See also: TOMB BUILDING, STARTING LOCATION
 #
-TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+TRAVEL-LOOK TRAVEL-AUTO-LOOK "TRAVEL LOOK" "TRAVEL AUTO LOOK"
 
-Usage:  toggle travel-look [on/off]
+Usage:  smessage travel auto look [on | off]
 
-This toggle causes you to automatically 'look' after each time you move when
-running or when driving, piloting, or sailing a vehicle. With this toggle off,
+This setting causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this message off,
 you only see a short message indicating you moved.
+
+See alos: STATUS MESSAGES
 #
 TUNNEL "TUNNEL COMMAND"
 
@@ -2825,6 +2883,11 @@ Usage:  weather
 If you're uncertain whether the sun is shining or the rain is pouring down. 
 You'll have to be outside in order to tell however. It will also tell you if
 the sun or moon are up.
+
+You also receive alerts as the weather changes when you're outdoors or near a
+window. These messages can be disabled with the "smessages" command.
+
+See also: STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
 #
 WHO
 

@@ -5,7 +5,7 @@ The North Portal is blowing snow all over the place!~
    The portal howls with wind as snow blows through it. There's a blizzard on
 the other side, but through the noise you think you hear caroling.
 ~
-8 0 0 0 3
+8 0 0 0 0 3
 0 0 0
 10 0
 S
@@ -16,7 +16,7 @@ The North Portal leads back out of the winter wonderland.~
    The fierce wind blows snow out through the portal but the weather otherwise
 seems to be better on the other side.
 ~
-8 0 0 0 3
+8 0 0 0 0 3
 0 0 0
 10 0
 S
@@ -26,7 +26,7 @@ a carefully-wrapped gift~
 A wrapped gift is sitting on the ground.~
 It looks like you could 'open gift'.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 0
 T 10702
@@ -37,7 +37,7 @@ a honey-cured ham~
 A large ham is lying in the dirt.~
 The ham is mouth-watering.
 ~
-6 m a 0 3
+6 m a 0 0 3
 72 0 0
 7 336
 A
@@ -53,9 +53,11 @@ the honey-cured ham recipe~
 The honey-cured ham recipe is lying here.~
 You can cook: honey-cured ham
 ~
-7 p a 0 4
+7 p a 0 0 5
 10703 0 0
 0 0
+C
+1 1
 S
 #10705
 fruitcake cake~
@@ -63,7 +65,7 @@ a fruitcake~
 A fruitcake is lying on the ground.~
 This fruitcake looks like it might have been re-gifted.
 ~
-6 m a 0 5
+6 m a 0 0 5
 72 0 0
 7 336
 A
@@ -82,9 +84,11 @@ the fruitcake recipe~
 The fruitcake recipe is lying on the ground.~
 You can bake: fruitcake
 ~
-7 p a 0 6
+7 p a 0 0 7
 10705 0 0
 0 0
+C
+1 1
 S
 #10707
 goose roast~
@@ -92,7 +96,7 @@ roast goose~
 A roast goose is lying here.~
 This plump roast goose is perfect for Christmas dinner.
 ~
-6 m a 0 4
+6 m a 0 0 4
 72 0 0
 7 336
 A
@@ -108,9 +112,11 @@ the roast goose recipe~
 The roast goose recipe is lying here.~
 You can bake: roast goose
 ~
-7 p a 0 6
+7 p a 0 0 7
 10707 0 0
 0 0
+C
+1 1
 S
 #10709
 bell minipet cheerful elf~
@@ -119,7 +125,7 @@ A cheerful elf minipet bell is lying here.~
 This bell can summon a cheerful elf (a noncombat pet)!
 Type 'use bell' to gain the cheerful elf minipet.
 ~
-19 p a 0 7
+19 p a 0 0 7
 10709 0 0
 2 0
 S
@@ -131,7 +137,7 @@ A snowglobe is lying here.~
 snowglobe' to teleport home, like a hestian trinket. Use the home command to
 set your home.
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 8 0
 T 10710
@@ -144,7 +150,7 @@ A red Christmas hat is lying on the ground.~
    The hat is red with white fur lining, with the scent of peppermint and a
 brisk winter breeze.
 ~
-2 mp ae 0 4
+2 mp ae 0 0 4
 0 0 0
 11 0
 A
@@ -158,7 +164,7 @@ a bottomless gift sack~
 A bottomless sack is lying on the ground.~
 You really can't see the bottom!
 ~
-24 mp ar 0 3
+24 mp ar 0 0 3
 1 0 0
 0 0
 T 10712
@@ -174,7 +180,7 @@ must already have seen one today, and another won't spawn for you until
 tomorrow.
 NOTE: This object formerly spawned the reindeer; was replaced by mob 10713.
 ~
-3 0 0 0 5
+3 0 0 0 0 5
 0 0 0
 0 0
 S
@@ -186,7 +192,7 @@ An elfish screwdriver is lying on the floor.~
 Flecks of brightly colored paint mar each part of the tool, no doubt the result
 of centuries of toymaking.
 ~
-3 p ao 0 8
+3 p ao 0 0 8
 0 0 0
 2 0
 A
@@ -200,7 +206,7 @@ a plate of christmas cookies~
 A plate of cookies is lying here.~
 A variety of delicious cookies are spread across the plate.
 ~
-6 m a 0 6
+6 m a 0 0 6
 72 0 0
 7 336
 A
@@ -219,9 +225,11 @@ the Christmas cookie recipe~
 The Christmas cookie recipe is lying here.~
 Learn this recipe and you'll be able to bake Christmas cookies.
 ~
-7 p a 0 7
+7 p a 0 0 8
 10716 0 0
 0 0
+C
+1 1
 S
 #10718
 schematic sleigh~
@@ -229,9 +237,11 @@ the sleigh schematic~
 The sleigh schematic is lying on the ground.~
 This schematic teaches you to craft a sleigh.
 ~
-7 p a 0 3
+7 p a 0 0 4
 10715 0 0
 0 0
+C
+1 1
 S
 #10719
 statuette christmas morphing~
@@ -243,7 +253,7 @@ you minor shapeshifting abilities!
 'morph large snowman' (no ability): Immobile disguise morph.
 'morph Christmas elf' (no ability): Cosmetic morph.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 1 0
 S
@@ -254,7 +264,7 @@ A basket of sweet chestnuts is lying here.~
    The pale yellow insides of these smooth, brown nuts can be roasted and
 eaten, if you can remove them from their prickly green cases.
 ~
-6 b a 0 5
+6 b a 0 0 5
 12 10700 0
 7 336
 I 15 10721 100.00 4  # SEPARATE: handful of chestnuts
@@ -276,7 +286,7 @@ A handful of chestnuts are lying here.~
    The insides of these smooth brown nuts can be eaten. Or you could roast
 them, if you can find some more.
 ~
-6 0 a 0 4
+6 0 a 0 0 4
 1 0 0
 7 48
 I 14 10720 100.00 4  # COMBINE: basket of chestnuts
@@ -294,7 +304,7 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 m a 0 3
+6 m a 0 0 3
 18 0 0
 7 336
 A
@@ -311,7 +321,7 @@ Someone has left their Christmas tree whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to gain the little pine sapling minipet.
 ~
-19 p a 0 4
+19 p a 0 0 4
 10723 0 0
 2 0
 S
@@ -322,7 +332,7 @@ Someone has left their reindeer fawn whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to gain the reindee fawn minipet.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10724 0 0
 2 0
 S
@@ -333,7 +343,7 @@ Someone has left their animated snowman whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to gain the animated snowman minipet.
 ~
-19 p a 0 7
+19 p a 0 0 7
 10725 0 0
 2 0
 S
@@ -344,7 +354,7 @@ Someone has left their toy soldier whistle here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to gain the toy soldier minipet.
 ~
-19 p a 0 7
+19 p a 0 0 7
 10726 0 0
 2 0
 S
@@ -355,7 +365,7 @@ A Winter Wonderland minipet whistle is lying here.~
    Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
 are any left you don't have.
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 10 0
 T 10727
@@ -367,7 +377,7 @@ A pile of magical coal lumps is lying here, twinkling slightly.~
    This pile of enchanted coal lumps can be used to build snowmen even in the
 middle of summer! Just 'use coal' to get started.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 7 0
 T 10728
@@ -379,7 +389,7 @@ A Winter Wonderland minipet whistle is lying here.~
    Type 'use whistle' to gain a minipet from the Winter Wonderland, if there
 are any left you don't have.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 10 0
 T 10729
@@ -394,7 +404,7 @@ can also play it as an instrument.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where musical' to find the cat.
 ~
-22 p ao 0 8
+22 p ao 0 0 8
 0 0 0
 0 0
 M
@@ -420,7 +430,7 @@ A starry cloak is draped on the ground.~
 its inside. The outside of the cloak is dark blue, with glittering stars all
 over it.
 ~
-2 mp ak 0 1
+2 mp ak 0 0 1
 0 0 0
 11 0
 A
@@ -437,7 +447,7 @@ would reward you if you gave it back to them.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where jack' or 'where jill' to find them.
 ~
-5 p a 0 4
+5 p a 0 0 4
 32 32 0
 0 0
 T 10738
@@ -450,7 +460,7 @@ A pair of fetching trousers are lying on the ground.~
    This fetching pair of trousers would look good on you, although it seems to
 have gotten wet somehow.
 ~
-2 mp af 0 2
+2 mp af 0 0 2
 0 0 0
 11 0
 A
@@ -469,7 +479,7 @@ could find its owner, he'd reward you.
 adventure. From there, try 'where nimble' to find the right Jack.
    You can also 'light' and 'douse' the candlestick.
 ~
-29 p ao 0 7
+29 p ao 0 0 7
 168 0 3
 13 0
 T 10738
@@ -486,7 +496,7 @@ could find its owner, he'd reward you.
 adventure. From there, try 'where nimble' to find the right Jack.
    You can also 'light' and 'douse' the candlestick.
 ~
-29 p ao 0 9
+29 p ao 0 0 9
 168 1 3
 13 0
 T 10738
@@ -499,7 +509,7 @@ A pair of burnt shoes are simmering here.~
    These shoes are a little burnt, as if their former owner missed a jump over
 a candlestick.
 ~
-2 mp ag 0 2
+2 mp ag 0 0 2
 0 0 0
 11 0
 A
@@ -517,7 +527,7 @@ if you returned it.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where sprat' to find the right Jack.
 ~
-6 p a 0 8
+6 p a 0 0 8
 72 0 0
 7 336
 A
@@ -538,7 +548,7 @@ A lean belt is lying here.~
    This belt makes your waistline look good. It must have been made for someone
 who eats no fat.
 ~
-2 mp al 0 4
+2 mp al 0 0 4
 0 0 0
 11 0
 A
@@ -556,7 +566,7 @@ would reward you if you returned it to him.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where horner' to find the right Jack.
 ~
-6 p a 0 8
+6 p a 0 0 8
 72 0 0
 7 336
 M
@@ -587,7 +597,7 @@ A pair of plum-stained gloves are lying on the ground.~
    These gloves are actually white, but are stained a deep plum color on the
 fingers, perhaps from being worn while eating.
 ~
-2 mp ah 0 3
+2 mp ah 0 0 3
 0 0 0
 11 0
 A
@@ -604,7 +614,7 @@ find her, she might reward you for their safe return.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where muffet' to find her.
 ~
-6 p a 0 8
+6 p a 0 0 8
 72 0 0
 7 336
 M
@@ -625,7 +635,7 @@ a dangling spider~
 A spider is dangling nearby.~
 This adorable little spider looks like it would look good on your ear.
 ~
-2 mp am 0 3
+2 mp am 0 0 3
 0 0 0
 11 0
 A
@@ -640,13 +650,15 @@ Some warm fleece is lying here.~
    This warm fleece is white as snow. It looks like it would protect you, a
 little bit.
 ~
-2 mp ad 0 9
+2 mp ad 0 0 10
 0 0 0
 11 0
 A
 15 1 0
 A
 12 2 0
+A
+30 2 0
 C
 25 25
 M
@@ -663,7 +675,7 @@ will gain a little lamb minipet.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure. From there, try 'where mary' to find her.
 ~
-3 p a 0 10
+3 p a 0 0 10
 10744 0 0
 2 0
 T 10744
@@ -677,7 +689,7 @@ A fetching skirt is lying here.~
    This fetching skirt would look good on you, although it looks like it took a
 tumble.
 ~
-2 mp af 0 2
+2 mp af 0 0 2
 0 0 0
 11 0
 A
@@ -694,7 +706,7 @@ lives in the shoe. If you returned it, she might reward you.
    You can 'use' this item to teleport back to the nearest Mother Goose
 adventure, where you can turn in this quest.
 ~
-6 p a 0 10
+6 p a 0 0 10
 72 0 0
 7 336
 A
@@ -715,7 +727,7 @@ A spare shoestring is coiled up on the ground.~
    This shoestring is quite large, but you could easily loop it around your
 wrist.
 ~
-2 mp aj 0 5
+2 mp aj 0 0 5
 0 0 0
 11 0
 A
@@ -732,7 +744,7 @@ you to your home. To use these, you must already have a home that you set with
 the 'home' command. Type 'use breadcrumbs' to teleport to it. If you don't use
 these soon, they'll be lost.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 7 24
 C
@@ -749,7 +761,7 @@ heard goblins sometimes use them to brew potions, so you might be able to sell
 them if you can find the right buyer.
 (Type 'sell parts' when you find Miner Nynar.)
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 7 0
 T 10750
@@ -762,7 +774,7 @@ Some spider meat is globbed on the ground.~
 or you could probably just sell it to the goblins.
 (Type 'sell meat' when you find Miner Meena.)
 ~
-6 0 a 0 3
+6 0 a 0 0 3
 4 0 0
 7 24
 T 10751
@@ -774,7 +786,7 @@ Some spider meat is lying on the ground.~
    Spider meat actually improves significantly after you cook it. Now it just
 tastes like rancid chicken.
 ~
-6 0 a 0 3
+6 0 a 0 0 3
 12 0 0
 7 24
 T 10751
@@ -785,7 +797,7 @@ a spider egg~
 A spider egg is lying here.~
 This egg will summon a spiderling minipet if you use it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 10753 0 0
 7 0
 S
@@ -795,7 +807,7 @@ a bug potion~
 A bug potion is sitting here.~
 This potion smells foul, but it will help you in combat.
 ~
-25 0 a 0 5
+25 0 a 0 0 5
 -1 0 3030
 8 0
 A
@@ -811,7 +823,7 @@ crusty goblin bread~
 Some crusty goblin bread is lying on the ground.~
 This bread is a bit tough to eat, but it doesn't taste too bad.
 ~
-6 0 a 0 2
+6 0 a 0 0 2
 24 0 0
 7 336
 S
@@ -821,7 +833,7 @@ a rusty goblin ring~
 A rusty goblin ring is lying on the ground.~
 This iron ring pokes at your finger, and leaves your skin stained.
 ~
-2 mp ab 0 1
+2 mp ab 0 0 1
 0 0 0
 2 0
 A
@@ -834,7 +846,7 @@ A rusty goblin idol is planted in the ground.~
    This old idol looks like it was once shaped like an animal, but you can't
 tell whether it was a warg or a cow.
 ~
-2 mp ao 0 2
+2 mp ao 0 0 2
 0 0 0
 2 0
 A
@@ -846,7 +858,7 @@ a rusty goblin helmet~
 A rusty goblin helmet is lying in the dust.~
 This old helmet probably helped a goblin out in battle once or twice.
 ~
-2 mp ae 0 3
+2 mp ae 0 0 3
 0 0 0
 2 0
 A
@@ -858,7 +870,7 @@ a rusty flask~
 A rusty flask is lying here.~
 This old flask certainly doesn't taste as good as it looks.
 ~
-5 0 a 0 1
+5 0 a 0 0 1
 24 24 4
 2 0
 S
@@ -868,7 +880,7 @@ a spidersilk gown~
 A silk gown is draped on the ground.~
 This fine gown looks like it was actually woven by a spider.
 ~
-2 o ad 0 2
+2 o ad 0 0 2
 0 0 0
 11 0
 M
@@ -881,7 +893,7 @@ a spidersilk pouch~
 A silk pouch is lying here.~
 This pouch is actually just a hatched cocoon!
 ~
-24 mp ar 0 1
+24 mp ar 0 0 1
 1 0 0
 11 0
 S
@@ -891,7 +903,7 @@ a spidersilk whip~
 A silk whip is coiled here.~
 This whip is actually just a thick strand of spiderweb.
 ~
-1 hmp an 0 2
+1 hmp an 0 0 2
 0 1 7
 11 0
 A
@@ -904,7 +916,7 @@ A spidersilk lantern is lying on the ground.~
    The lantern is made from spidersilk! You can 'light' or 'douse' it to make
 it last longer.
 ~
-29 0 ao 0 3
+29 0 ao 0 0 3
 168 0 6
 11 0
 S
@@ -915,7 +927,7 @@ A spidersilk lantern is lying on the ground.~
    The lantern is made from spidersilk! You can 'light' or 'douse' it to make
 it last longer.
 ~
-29 0 ao 0 4
+29 0 ao 0 0 4
 168 1 6
 11 0
 S
@@ -925,7 +937,7 @@ spidersilk slippers~
 A pair of silk slippers sits here.~
 These slippers are comfortable, but sort of stick when you walk.
 ~
-2 mp ag 0 6
+2 mp ag 0 0 6
 0 0 0
 11 0
 A
@@ -937,7 +949,7 @@ a spidersilk mask~
 A silk mask has fallen here.~
 This mask makes you look like some kind of superhero.
 ~
-2 mp ae 0 5
+2 mp ae 0 0 5
 0 0 0
 11 0
 A
@@ -949,7 +961,7 @@ some goblin coins~
 A pile of goblin coins are lying here.~
 The coins appear to be made of rusted iron.
 ~
-11 mp a 0 6
+11 mp a 0 0 6
 1 -1 0
 2 0
 S
@@ -959,7 +971,7 @@ a goblin pick~
 A goblin pick is stabbed into the ground.~
 It's a fine pick, if somewhat small.
 ~
-1 mp ano h 3
+1 mp ano h 0 3
 0 1 8
 2 0
 C
@@ -971,7 +983,7 @@ a sense of victory~
 There is a sense of victory as the spiders are defeated.~
 It seems you have completed the adventure.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 10 8
 T 10769
@@ -983,7 +995,7 @@ A goblin coffin is lying here.~
    You can use this to 'build coffin', and then set it as your tomb in order to
 have a nearby respawn point when you die.
 ~
-3 g a 0 5
+3 g a 0 0 5
 0 0 0
 0 0
 T 10770
@@ -995,7 +1007,7 @@ A decaying coffin is sticking up from the gravesite.~
    The coffin looks small and cramped, but you might be able to fit a human in
 it. It's in poor condition and doesn't look like it will last very long.
 ~
-3 0 0 0 7
+3 0 0 0 0 7
 0 0 0
 0 288
 T 10771
@@ -1008,7 +1020,7 @@ A goblin raft replacer has bugged out.~
 'drag' the raft to the edge of the water, then 'sit' on it and type 'sail
 <direction>'.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 1
 T 10773
@@ -1020,7 +1032,7 @@ The fruit of knowledge is lying on the ground.~
    The fruit of knowledge resembles an apple on the outside, with the thick
 peel of an orange, and the arils of a pomegranate. Eat it to unlock its power.
 ~
-6 p a 0 3
+6 p a 0 0 3
 24 0 0
 0 0
 A
@@ -1035,7 +1047,7 @@ forbidden knowledge~
 There's some forbidden knowledge here.~
 This knowledge is so forbidden, you don't even know what it is.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 0 0
 S
@@ -1045,7 +1057,7 @@ the seed of knowledge~
 The seed of knowledge has been planted here.~
 This tiny seed grants great knowledge to those who know where to look.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 0 2
 T 10780
@@ -1057,7 +1069,7 @@ A buffalo leash is lying here.~
 This leash will summon a noncombat pet!
 Type 'use leash' to summon it.
 ~
-19 o a 0 6
+19 o a 0 0 6
 10781 0 0
 2 0
 S
@@ -1068,7 +1080,7 @@ A zebra leash is lying here.~
 This leash will summon a noncombat pet!
 Type 'use leash' to summon it.
 ~
-19 o a 0 7
+19 o a 0 0 7
 10782 0 0
 2 0
 S

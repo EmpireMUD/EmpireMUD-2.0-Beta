@@ -1807,10 +1807,15 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 	// show to players
 	if (show_empire_log_type[type] == TRUE) {
 		for (i = descriptor_list; i; i = i->next) {
-			if (STATE(i) != CON_PLAYING || IS_NPC(i->character))
+			if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) {
 				continue;
-			if (GET_LOYALTY(i->character) != emp)
-				continue;
+			}
+			if (GET_LOYALTY(i->character) != emp) {
+				continue;	// wrong empire
+			}
+			if (!SHOW_STATUS_MESSAGES(i->character, SM_EMPIRE_LOGS)) {
+				continue;	// elogs off
+			}
 
 			stack_msg_to_desc(i, "%s[ %s ]&0\r\n", EMPIRE_BANNER(emp), output);
 		}
@@ -1833,7 +1838,7 @@ void mortlog(const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
+		if (STATE(i) == CON_PLAYING && i->character && SHOW_STATUS_MESSAGES(i->character, SM_MORTLOG)) {
 			stack_msg_to_desc(i, "&c[ %s ]&0\r\n", output);
 		}
 	}
@@ -2787,6 +2792,12 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_WHERE_RANGE: {
 			return GET_EXTRA_ATT(ch, ATT_WHERE_RANGE);
 		}
+		case APPLY_WARMTH: {
+			return GET_EXTRA_ATT(ch, ATT_WARMTH);
+		}
+		case APPLY_COOLING: {
+			return GET_EXTRA_ATT(ch, ATT_COOLING);
+		}
 	}
 	return 0;	// if we got this far
 }
@@ -3095,7 +3106,7 @@ void command_lag(char_data *ch, int wait_type) {
 			break;
 		}
 		case WAIT_MOVEMENT: {	// normal movement (special handling)
-			if (AFF_FLAGGED(ch, AFF_SLOW)) {
+			if (IS_SLOWED(ch)) {
 				wait = 1 RL_SEC;
 			}
 			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
@@ -5419,12 +5430,12 @@ int strn_cmp(const char *arg1, const char *arg2, int n) {
 /*
 * Version of str_str from dg_scripts -- better than the base CircleMUD version.
 *
-* @param char *cs The string to search.
-* @param char *ct The string to search for...
+* @param const char *cs The string to search.
+* @param const char *ct The string to search for...
 * @return char* A pointer to the substring within cs, or NULL if not found.
 */
-char *str_str(char *cs, char *ct) {
-	char *s, *t;
+char *str_str(const char *cs, const char *ct) {
+	const char *s, *t;
 
 	if (!cs || !ct || !*ct)
 		return NULL;
@@ -5443,7 +5454,7 @@ char *str_str(char *cs, char *ct) {
 		}
 
 		if (!*t)
-			return s;
+			return (char*)s;
 	}
 
 	return NULL;
@@ -5771,6 +5782,38 @@ int distance_to_nearest_player(room_data *room) {
 	}
 	
 	return best;
+}
+
+
+/**
+* Determines the full climate type of a given room. This should be used instead
+* of GET_SECT_CLIMATE() in most cases because it checks additional fields.
+*
+* @param room_data *room The room to check climate for.
+* @return bitvector_t The full set of CLIM_ flags for the room.
+*/
+bitvector_t get_climate(room_data *room) {
+	bitvector_t flags = GET_SECT_CLIMATE(SECT(room));
+	room_data *home = HOME_ROOM(room);
+	
+	// base sect?
+	if (ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+		flags |= GET_SECT_CLIMATE(BASE_SECT(room));
+		
+		// home room -- only if checking base sect
+		if (home != room) {
+			flags |= GET_SECT_CLIMATE(SECT(home));
+			
+			// and base of the home room?
+			if (ROOM_SECT_FLAGGED(home, SECTF_INHERIT_BASE_CLIMATE)) {
+				flags |= GET_SECT_CLIMATE(BASE_SECT(home));
+			}
+		}
+	}
+	
+	// should this check for TEMPERATURE_USE_CLIMATE too? I think "maybe not" -pc
+	
+	return flags;
 }
 
 

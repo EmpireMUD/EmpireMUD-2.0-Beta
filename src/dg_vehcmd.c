@@ -808,26 +808,26 @@ VCMD(do_vteleport) {
 	struct instance_data *inst;
 	char_data *ch, *next_ch;
 	vehicle_data *v;
-	obj_data *obj;
+	obj_data *obj, *cont;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
 
 	if (!*arg1 || !*arg2) {
-		veh_log(veh, "vteleport called with too few args");
+		veh_log(veh, "vteleport: called with too few args");
 		return;
 	}
 
-	target = get_room(orm, arg2);
-
-	if (!target) {
-		veh_log(veh, "vteleport target is an invalid room");
-		return;
-	}
+	// try to find a target for later -- this can fail
+	target = (*arg2 == UID_CHAR ? find_room(atoi(arg2 + 1)) : get_room(orm, arg2));
 	
 	if (!str_cmp(arg1, "all")) {
-		if (target == orm) {
-			veh_log(veh, "vteleport target is itself");
+		if (!target) {
+			veh_log(veh, "vteleport all: target is an invalid room");
+			return;
+		}
+		else if (target == orm) {
+			veh_log(veh, "vteleport all: target is itself");
 			return;
 		}
 		
@@ -839,6 +839,7 @@ VCMD(do_vteleport) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 			qt_visit_room(ch, IN_ROOM(ch));
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 	}
@@ -846,6 +847,10 @@ VCMD(do_vteleport) {
 		// teleport all players in the adventure
 		if (!orm || (!(inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) && !(inst = find_instance_by_room(orm, FALSE, TRUE)))) {
 			veh_log(veh, "vteleport: 'adventure' mode called outside any adventure");
+			return;
+		}
+		else if (!target) {
+			veh_log(veh, "vteleport adventure: target is an invalid room");
 			return;
 		}
 		
@@ -864,30 +869,75 @@ VCMD(do_vteleport) {
 						GET_LAST_DIR(ch) = NO_DIR;
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 						qt_visit_room(ch, IN_ROOM(ch));
+						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
 				}
 			}
 		}
 	}
-	else {
+	else {	// single-target teleport
 		if ((ch = get_char_by_vehicle(veh, arg1))) {
+			if (!target) {
+				veh_log(veh, "vteleport character: target is an invalid room");
+				return;
+			}
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
 				qt_visit_room(ch, IN_ROOM(ch));
+				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
+			if (!target) {
+				veh_log(veh, "vteleport vehicle: target is an invalid room");
+				return;
+			}
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
 			entry_vtrigger(v, "script");
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
-			obj_to_room(obj, target);
+			// teleport object
+			if (target) {
+				// move obj to room
+				obj_to_room(obj, target);
+			}
+			else if ((ch = get_char_by_vehicle(veh, arg2))) {
+				// move obj to character
+				obj_to_char(obj, ch);
+			}
+			else if ((v = get_vehicle_near_vehicle(veh, arg2))) {
+				// move obj to vehicle
+				if (!VEH_FLAGGED(v, VEH_CONTAINER)) {
+					veh_log(veh, "wteleport object: attempting to put an object in a vehicle that's not a container");
+					return;
+				}
+				else {
+					obj_to_vehicle(obj, v);
+				}
+			}
+			else if ((cont = get_obj_by_vehicle(veh, arg2))) {
+				if (cont == obj || get_top_object(obj) == cont || get_top_object(cont) == obj) {
+					veh_log(veh, "mteleport object: attempting to put an object inside itself");
+					return;
+				}
+				else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CORPSE) {
+					veh_log(veh, "mteleport object: attempting to put an object in something that's not a container");
+					return;
+				}
+				else {
+					// move obj into obj
+					obj_to_obj(obj, cont);
+				}
+			}
+			else {
+				veh_log(veh, "wteleport object: no valid target location found");
+			}
 		}
 		else {
 			veh_log(veh, "vteleport: no target found");

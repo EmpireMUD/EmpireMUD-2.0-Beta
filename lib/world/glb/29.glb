@@ -8,13 +8,15 @@ I 4 2919 20.00 1 p  # LOOT: imperial healing potion formula
 I 4 2921 20.00 1 p  # LOOT: imperial stamina potion formula
 I 4 2923 20.00 1 p  # LOOT: imperial mana potion formula
 I 4 2929 6.00 1 p  # LOOT: imperial waterwalking potion formula
-I 4 2925 4.85 1 p  # LOOT: imperial wayfarer's potion formula
-I 4 2927 4.85 1 p  # LOOT: imperial hex-purging potion formula
-I 4 2417 4.86 1 p  # LOOT: imperial fortitude potion formula
-I 4 2517 4.86 1 p  # LOOT: imperial medicament potion formula
-I 4 2617 4.86 1 p  # LOOT: imperial ferocity potion formula
-I 4 2717 4.86 1 p  # LOOT: imperial magister's potion formula
-I 4 2817 4.86 1 p  # LOOT: imperial duelist's potion formula
+I 4 2925 3.78 1 p  # LOOT: imperial wayfarer's potion formula
+I 4 2927 3.78 1 p  # LOOT: imperial hex-purging potion formula
+I 4 2417 3.78 1 p  # LOOT: imperial fortitude potion formula
+I 4 2517 3.78 1 p  # LOOT: imperial medicament potion formula
+I 4 2617 3.78 1 p  # LOOT: imperial ferocity potion formula
+I 4 2717 3.78 1 p  # LOOT: imperial magister's potion formula
+I 4 2817 3.78 1 p  # LOOT: imperial duelist's potion formula
+I 4 2931 3.77 1 p  # LOOT: imperial warming potion formula
+I 4 2933 3.77 1 p  # LOOT: imperial cooling potion formula
 S
 #2901
 Tier 1 Global Potions: Hard~
@@ -26,13 +28,15 @@ I 4 2919 20.00 1 p  # LOOT: imperial healing potion formula
 I 4 2921 20.00 1 p  # LOOT: imperial stamina potion formula
 I 4 2923 20.00 1 p  # LOOT: imperial mana potion formula
 I 4 2929 6.00 1 p  # LOOT: imperial waterwalking potion formula
-I 4 2925 4.85 1 p  # LOOT: imperial wayfarer's potion formula
-I 4 2927 4.85 1 p  # LOOT: imperial hex-purging potion formula
-I 4 2417 4.86 1 p  # LOOT: imperial fortitude potion formula
-I 4 2517 4.86 1 p  # LOOT: imperial medicament potion formula
-I 4 2617 4.86 1 p  # LOOT: imperial ferocity potion formula
-I 4 2717 4.86 1 p  # LOOT: imperial magister's potion formula
-I 4 2817 4.86 1 p  # LOOT: imperial duelist's potion formula
+I 4 2925 3.78 1 p  # LOOT: imperial wayfarer's potion formula
+I 4 2927 3.78 1 p  # LOOT: imperial hex-purging potion formula
+I 4 2417 3.78 1 p  # LOOT: imperial fortitude potion formula
+I 4 2517 3.78 1 p  # LOOT: imperial medicament potion formula
+I 4 2617 3.78 1 p  # LOOT: imperial ferocity potion formula
+I 4 2717 3.78 1 p  # LOOT: imperial magister's potion formula
+I 4 2817 3.78 1 p  # LOOT: imperial duelist's potion formula
+I 4 2931 3.77 1 p  # LOOT: imperial warming potion formula
+I 4 2933 3.77 1 p  # LOOT: imperial cooling potion formula
 S
 #2902
 Tier 1 Global Potions: Group~
@@ -44,13 +48,15 @@ I 4 2919 20.00 1 p  # LOOT: imperial healing potion formula
 I 4 2921 20.00 1 p  # LOOT: imperial stamina potion formula
 I 4 2923 20.00 1 p  # LOOT: imperial mana potion formula
 I 4 2929 6.00 1 p  # LOOT: imperial waterwalking potion formula
-I 4 2925 4.85 1 p  # LOOT: imperial wayfarer's potion formula
-I 4 2927 4.85 1 p  # LOOT: imperial hex-purging potion formula
-I 4 2417 4.86 1 p  # LOOT: imperial fortitude potion formula
-I 4 2517 4.86 1 p  # LOOT: imperial medicament potion formula
-I 4 2617 4.86 1 p  # LOOT: imperial ferocity potion formula
-I 4 2717 4.86 1 p  # LOOT: imperial magister's potion formula
-I 4 2817 4.86 1 p  # LOOT: imperial duelist's potion formula
+I 4 2925 3.78 1 p  # LOOT: imperial wayfarer's potion formula
+I 4 2927 3.78 1 p  # LOOT: imperial hex-purging potion formula
+I 4 2417 3.78 1 p  # LOOT: imperial fortitude potion formula
+I 4 2517 3.78 1 p  # LOOT: imperial medicament potion formula
+I 4 2617 3.78 1 p  # LOOT: imperial ferocity potion formula
+I 4 2717 3.78 1 p  # LOOT: imperial magister's potion formula
+I 4 2817 3.78 1 p  # LOOT: imperial duelist's potion formula
+I 4 2931 3.77 1 p  # LOOT: imperial warming potion formula
+I 4 2933 3.77 1 p  # LOOT: imperial cooling potion formula
 S
 #2903
 Tier 1 Global Potions: Boss~
@@ -62,12 +68,14 @@ I 4 2919 20.00 1 p  # LOOT: imperial healing potion formula
 I 4 2921 20.00 1 p  # LOOT: imperial stamina potion formula
 I 4 2923 20.00 1 p  # LOOT: imperial mana potion formula
 I 4 2929 6.00 1 p  # LOOT: imperial waterwalking potion formula
-I 4 2925 4.85 1 p  # LOOT: imperial wayfarer's potion formula
-I 4 2927 4.85 1 p  # LOOT: imperial hex-purging potion formula
-I 4 2417 4.86 1 p  # LOOT: imperial fortitude potion formula
-I 4 2517 4.86 1 p  # LOOT: imperial medicament potion formula
-I 4 2617 4.86 1 p  # LOOT: imperial ferocity potion formula
-I 4 2717 4.86 1 p  # LOOT: imperial magister's potion formula
-I 4 2817 4.86 1 p  # LOOT: imperial duelist's potion formula
+I 4 2925 3.78 1 p  # LOOT: imperial wayfarer's potion formula
+I 4 2927 3.78 1 p  # LOOT: imperial hex-purging potion formula
+I 4 2417 3.78 1 p  # LOOT: imperial fortitude potion formula
+I 4 2517 3.78 1 p  # LOOT: imperial medicament potion formula
+I 4 2617 3.78 1 p  # LOOT: imperial ferocity potion formula
+I 4 2717 3.78 1 p  # LOOT: imperial magister's potion formula
+I 4 2817 3.78 1 p  # LOOT: imperial duelist's potion formula
+I 4 2931 3.77 1 p  # LOOT: imperial warming potion formula
+I 4 2933 3.77 1 p  # LOOT: imperial cooling potion formula
 S
 $

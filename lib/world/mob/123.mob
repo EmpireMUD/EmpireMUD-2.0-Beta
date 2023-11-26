@@ -125,4 +125,398 @@ It looks like the fur dragon has had kittens, and boy are they sharp!
 T 12318
 T 12321
 S
+#12350
+serragon hoarfrost frost enormous~
+the hoarfrost serragon~
+An enormous serragon coils around the frozen landscape, baring its teeth.
+~
+100 200 dhxyAJK cEGL 6
+0 0 51 25 -1
+D
+   The serragon is so big it could be mistaken for a mountain of ice! Its long,
+slender, limbless body twists and coils around the area, making it difficult to
+escape. Each time you turn around, you're facing another of its coils.
+   The serrated scales down the creature's snake-like body leave long grooves
+in the ice as the serragon moves. Underneath, the scales look furry, with icy
+tufts visible whenever the creature turns. Cold vapor oozes from the creature's
+pores, freezing the ground on contact. You turn and find yourself face-to-face
+with the serragon's massive head, like a frilled snake with the maw of a lion,
+with rows of swordlike teeth that seem to go all the way down its throat.
+   The serragon clacks its gaping jaw at you as you try to back away. It's seen
+you now, and there's nowhere to run!
+   Type 'adventure' for more information.
+~
+F 12350
+I 0 3012 20.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 30.00 8 b  # BUTCHER: fillet of raw meat
+I 0 3012 10.00 16 b  # BUTCHER: fillet of raw meat
+I 0 12362 40.00 1 f  # BUTCHER: arctic char
+I 0 12362 30.00 2 f  # BUTCHER: arctic char
+I 0 12362 20.00 3 f  # BUTCHER: arctic char
+I 0 12362 10.00 4 f  # BUTCHER: arctic char
+I 0 12354 10.00 1 g  # BUTCHER: icy skein of serragon blood
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 0 12360 10.00 1 g  # BUTCHER: icy columella of a serragon
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 0 12364 10.00 1 g  # BUTCHER: enormous lung of a serragon
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 0 12366 10.00 1 g  # BUTCHER: drained bladder of a tremendous serragon
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 0 12354 20.00 1 g  # BUTCHER: icy skein of serragon blood
+I+ 5 0  # Group
+I 0 12360 20.00 1 g  # BUTCHER: icy columella of a serragon
+I+ 5 0  # Group
+I 0 12364 20.00 1 g  # BUTCHER: enormous lung of a serragon
+I+ 5 0  # Group
+I 0 12366 20.00 1 g  # BUTCHER: drained bladder of a tremendous serragon
+I+ 5 0  # Group
+I 0 12354 25.00 1 g  # BUTCHER: icy skein of serragon blood
+I+ 6 0  # Boss
+I 0 12360 25.00 1 g  # BUTCHER: icy columella of a serragon
+I+ 6 0  # Boss
+I 0 12364 25.00 1 g  # BUTCHER: enormous lung of a serragon
+I+ 6 0  # Boss
+I 0 12366 25.00 1 g  # BUTCHER: drained bladder of a tremendous serragon
+I+ 6 0  # Boss
+I 0 12357 60.00 1 w  # BUTCHER: frosty serragon scale
+I+ 3 0  # Normal
+I 0 12358 30.00 1 w  # BUTCHER: icy serragon spleen
+I+ 3 0  # Normal
+I 0 12359 10.00 1 w  # BUTCHER: translucent serragon skull
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 0 12357 40.00 1 w  # BUTCHER: frosty serragon scale
+I+ 4 0  # Hard
+I 0 12358 50.00 1 w  # BUTCHER: icy serragon spleen
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I 0 12357 20.00 1 w  # BUTCHER: frosty serragon scale
+I+ 5 0  # Group
+I 0 12359 30.00 1 w  # BUTCHER: translucent serragon skull
+I+ 5 0  # Group
+I 0 12357 20.00 1 w  # BUTCHER: frosty serragon scale
+I+ 6 0  # Boss
+I 0 12358 40.00 1 w  # BUTCHER: icy serragon spleen
+I+ 6 0  # Boss
+I 0 12359 40.00 1 w  # BUTCHER: translucent serragon skull
+I+ 6 0  # Boss
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 30.00 8 k  # SKIN: large skin
+I 1 1351 10.00 16 k  # SKIN: large skin
+I 4 12369 100.00 1  # LOOT: absolutely enormous corpse of the hoarfrost serragon
+I 4 12355 10.00 1 m  # LOOT: shaggy frost worm mount whistle
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 4 12356 10.00 1 m  # LOOT: enchanted hoarfrost minipet whistle
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 4 12351 10.00 1 m  # LOOT: hoarfrost-covered seed
+I+ 3 0  # Normal
+I+ 4 0  # Hard
+I 4 12355 20.00 1 m  # LOOT: shaggy frost worm mount whistle
+I+ 5 0  # Group
+I+ 6 0  # Boss
+I 4 12356 20.00 1 m  # LOOT: enchanted hoarfrost minipet whistle
+I+ 5 0  # Group
+I+ 6 0  # Boss
+I 4 12351 20.00 1 m  # LOOT: hoarfrost-covered seed
+I+ 5 0  # Group
+I+ 6 0  # Boss
+M
+4
+$n chitters at you.~
+M
+5
+$n chitters in the dark.~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+0
+There's a thud behind you as $n beats $s tail against the ground.~
+M
+0
+Hoarfrost seems to grow on everything in sight -- including your armor!~
+M
+0
+There's a cold silence as hoarfrost forms around you.~
+M
+0
+A painful scraping sound pierces your ears as $n slides along the frozen landscape.~
+M
+0
+$n's scales cut enormous grooves in the ice as it moves.~
+M
+4
+Wisps of steam rise off of the frost.~
+M
+0
+$n creeps toward you.~
+M
+7
+emote A biting frost drains the heat from your face as $n inches toward you.~
+M
+7
+emote $n sniffs loudly as $e twitches $s nose, itself the size of a horse, at you.~
+M
+7
+emote Icy fog forms in the air around $n as it smells you from head to toe.~
+M
+7
+emote $n rears its head back and makes a cold chittering noise with its dagger-like teeth.~
+M
+7
+emote $n twists into an enormous coil, its scales screeching as their sharp edges cut against the ice.~
+M
+7
+emote $n claps its tremendous jaws as if to taunt you -- or perhaps deter you.~
+M
+8
+emote $n slaps $s tail against the ice!~
+M
+8
+echo You cover your ears against the loud twangs of cracks forming under the ice!~
+M
+8
+emote $n slaps $s tail against the ice again!~
+M
+8
+echo You struggle keep your footing as a crack spreads through the ice!~
+M
+9
+emote $n coils around the vast, icy landscape.~
+M
+9
+echo There's a loud, painful screeching noise as the serragon's scales cut grooves in the ice.~
+M
+9
+emote $n stops and looks at you...~
+M
+9
+emote $n clacks its jaws open and shut as it watches you.~
+T 12350
+T 12352
+T 12353
+T 12355
+T 9620
+T 12356
+T 12357
+T 9600
+T 9601
+T 9604
+T 12359
+T 12360
+T 12362
+T 12364
+T 12365
+S
+#12351
+spreader hoarfrost frost~
+the hoarfrost spreader~
+A hoarfrost spreader is here.
+~
+100 200 dhxyAJK cklnEGL 0
+0 0 51 25 -1
+D
+This invisible mob helps spread hoarfrost.
+~
+M
+0
+You hear strange chittering noises echo off the icy landscape.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise off of the frost.~
+T 12350
+T 12353
+T 12355
+S
+#12352
+hatchling frostscale~
+a frostscale hatchling~
+A frostscale hatchling coils and raises its head above you.
+~
+100 200 acdouxyJK cEGL 5
+0 0 51 25 -1
+D
+   Though it's larger than a horse, the hatchling is miniscule in comparison to
+the full-grown serragon that left the long grooves in the frost. The palm-sized
+scales that run the length of the hatchling's body are serrated on the edges,
+though they lay flatter than the scales on the adults. Around the margins of
+each scale, beneath a delicate layer of cold vapor, you can see feathery
+hoarfrost that barely protrudes.
+   When the hatchling sees you, it starts clacking its toothy jaws and,
+ominously, you hear more clacking in the distance in response.
+~
+F 12350
+I 0 3012 20.00 1 b  # BUTCHER: fillet of raw meat
+I 0 3012 40.00 2 b  # BUTCHER: fillet of raw meat
+I 0 3012 30.00 4 b  # BUTCHER: fillet of raw meat
+I 0 3012 10.00 6 b  # BUTCHER: fillet of raw meat
+I 0 12362 40.00 1 f  # BUTCHER: arctic char
+I 0 12362 60.00 2 f  # BUTCHER: arctic char
+I 1 1351 20.00 2 k  # SKIN: large skin
+I 1 1351 40.00 4 k  # SKIN: large skin
+I 1 1351 30.00 5 k  # SKIN: large skin
+I 1 1351 10.00 6 k  # SKIN: large skin
+M
+4
+$n chitters at you.~
+M
+5
+$n chitters in the dark.~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+0
+Hoarfrost seems to grow on everything in sight -- including your armor!~
+M
+0
+There's a cold silence as hoarfrost forms around you.~
+M
+0
+A painful scraping sound pierces your ears as $n slides along the frozen landscape.~
+M
+4
+Wisps of steam rise off of the frost.~
+M
+0
+$n creeps toward you.~
+M
+0
+$n's scales cut fine grooves in the ice as it moves.~
+T 12355
+T 9600
+T 9601
+T 9604
+T 12361
+T 12362
+T 12363
+S
+#12353
+rabbit ice~
+some rabbit ice~
+Some ice has formed on the ground in the shape of a rabbit.
+~
+30 50 djo 0 1
+0 0 15 20 -1
+D
+You can't tell if it's a frozen rabbit or just a clump of ice!
+~
+M
+0
+You hear strange chittering noises echo off the icy landscape.~
+M
+4
+Wisps of steam rise from the frozen landscape.~
+M
+4
+You hear a thunderous crack in the distance as ice breaks in the sun!~
+M
+5
+The air seems to freeze around you.~
+M
+4
+Wisps of steam rise off of the frost.~
+T 12361
+T 12362
+S
+#12354
+phoenix chillflame flame~
+a chillflame phoenix~
+A chillflame phoenix billows above you!
+~
+100 200 dehjo mG 3
+0 0 2 20 -1
+D
+   This mighty phoenix is an icy shade of white as blue flames billow from its
+wings and tail. It pays you little mind as it circles overhead, perhaps in
+search of its next meal. It looks like it might be possible to ride it!
+~
+S
+#12355
+worm frost shaggy~
+a shaggy frost worm~
+A shaggy frost worm is coiled up before you.
+~
+100 100 dehj L 4
+0 0 5 9 -1
+D
+   This odd creature is nearly the size of a horse, with the appearance of a
+fuzzy snake or worm. Its fur is pale blue, nearly white, though that could
+as easily be the reflection of the sky. It seems that it might be possible to
+ride the frost worm.
+~
+S
+#12356
+hoarfrost frost enchanted~
+the enchanted hoarfrost~
+Hoarfrost covers the area.
+~
+1 1 bdo dn 3
+0 0 11 9 -1
+D
+   The area is covered in a delicate carpet of crystalline ice though, you
+notice, this is no ordinary hoarfrost. It seems to be enchanted, moving at
+times, especially when you try to touch it.
+~
+M
+0
+The hoarfrost gleams on the ground.~
+S
+#12357
+serragon wall craw hoarfrost frost~
+the wall of the craw~
+The serragon convulses and contracts around you as it thrashes.
+~
+100 200 bdhnG 0 6
+0 0 0 15 -1
+D
+From here, all you can see of the serragon is the wall of its dark blue stomach.
+~
+M
+0
+A booming heartbeat echoes down the serragon.~
+T 12367
+T 12368
+S
+#12358
+completion sense teleporter~
+a sense of completion~
+A sense of completion hangs in the air (toggle hassle off to prevent being teleported).
+~
+100 200 bd ln 3
+0 0 0 15 -1
+D
+This mob teleports people out of the hoarfrost serragon after the fight is complete.
+~
+T 12369
+S
 $

@@ -9,6 +9,7 @@ D
 your fine skin from the sun. Truly this is how an emperor was meant to ride:
 with all the luxuries and comforts of home.
 ~
+Z1 12
 S
 #2911
 Pigeon Station~
@@ -46,6 +47,7 @@ F
 hv
 M
 255 20.00 c
+Z1 11
 S
 #2913
 Wagon Smithy~
@@ -63,6 +65,7 @@ doesn't burn down the caravan.
 ~
 F
 hv
+Z1 11
 S
 #2914
 Wagon Bedroom~
@@ -79,6 +82,7 @@ for a king, covered in downy pillows and warm furs.
 ~
 F
 d
+Z1 12
 S
 #2915
 Wagon Galley~
@@ -95,6 +99,7 @@ curtains and tapestries, accented with gold and silver.
 ~
 F
 GL
+Z1 11
 S
 #2916
 Inside Caravan~
@@ -113,6 +118,7 @@ never have to see the peasants outside.
 ~
 F
 m
+Z1 12
 S
 #2917
 On Deck~

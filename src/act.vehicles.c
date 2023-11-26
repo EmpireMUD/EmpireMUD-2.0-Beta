@@ -337,10 +337,12 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 	}
 	
-	// message driver
+	// message driver and update MSDP
 	if (VEH_DRIVER(veh)) {
-		snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
-		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
+		if (SHOW_STATUS_MESSAGES(VEH_DRIVER(veh), SM_VEHICLE_MOVEMENT)) {
+			snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
+			act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
+		}
 		msdp_update_room(VEH_DRIVER(veh));
 	}
 	
@@ -376,8 +378,13 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
-					snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
-					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
+					// message if desired
+					if (SHOW_STATUS_MESSAGES(ch_iter, SM_VEHICLE_MOVEMENT)) {
+						snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
+						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
+					}
+					
+					// but always msdp-update
 					msdp_update_room(ch_iter);
 				}
 			}
@@ -745,7 +752,7 @@ void process_driving(char_data *ch) {
 	}
 	
 	// not stopped by anything? auto-look each move
-	if (PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
+	if (SHOW_STATUS_MESSAGES(ch, SM_TRAVEL_AUTO_LOOK)) {
 		look_at_room(ch);
 	}
 }

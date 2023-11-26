@@ -307,7 +307,10 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 	
 	// other stuff that's room-based
-	MSDPSetString(desc, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
+	MSDPSetString(desc, eMSDP_WORLD_SEASON, icon_types[GET_SEASON(IN_ROOM(ch))]);
+	
+	// temperature likely changed too
+	update_MSDP_temperature(ch, TRUE, NO_UPDATE);
 	
 	MSDPUpdate(desc);
 }
@@ -809,8 +812,14 @@ void heartbeat(unsigned long heart_pulse) {
 	
 	HEARTBEAT_LOG("start")
 	
+	// time goes first because it changes the hour
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		weather_and_time();
+		HEARTBEAT_LOG("0")
+	}
+	
 	dg_event_process();
-	HEARTBEAT_LOG("0")
+	HEARTBEAT_LOG("0.1")
 	
 	free_freeable_dots();
 	HEARTBEAT_LOG("0.5")
@@ -864,11 +873,8 @@ void heartbeat(unsigned long heart_pulse) {
 		real_update();
 		HEARTBEAT_LOG("11")
 	}
-
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		weather_and_time();
-		HEARTBEAT_LOG("12")
-	}
+	
+	// 12 was moved up (weather_and_time)
 	
 	if (HEARTBEAT(WORKFORCE_CYCLE)) {
 		chore_update();
@@ -1009,7 +1015,7 @@ void heartbeat(unsigned long heart_pulse) {
 
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
 	char_data *to, *list = NULL;
-	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
+	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE, is_animal_move = FALSE;
 
 	if (!str || !*str) {
 		return;
@@ -1024,6 +1030,10 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 	
 	if (IS_SET(act_flags, TO_SPAMMY)) {
 		is_spammy = TRUE;
+	}
+	
+	if (IS_SET(act_flags, TO_ANIMAL_MOVE)) {
+		is_animal_move = TRUE;
 	}
 
 	if (IS_SET(act_flags, TO_NODARK)) {
@@ -1212,11 +1222,96 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
 	
 	// check fight messages (may exit early)
+	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_BUFF)) {
+		show = any = FALSE;
+		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
+		}
+		if (!show && !vict_obj && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
+		}
+		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_BUFFS_IN_COMBAT);
+		}
+		if (!show && !any) {
+			// other?
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
+		}
+		// are we supposed to show it?
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_AFFECT)) {
+		// aff flags in combat
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && !vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
+		}
+		// triggered an affect but not showing it
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && IS_SET(act_flags, TO_ABILITY)) {
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_ABILITIES);
+		}
+		if (!show && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_ABILITIES);
+		}
+		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ME);
+		}
+		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ALLIES);
+		}
+		if (!show && vict_obj && FIGHTING(to) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TARGET);
+		}
+		if (!show && vict_obj && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TANK);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_ABILITIES);
+		}
+		
+		// no?
+		if (!show) {
+			return;
+		}
+	}
 	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
 		show = any = FALSE;
 		// hits
 		if (IS_SET(act_flags, TO_COMBAT_HIT)) {
-			if (!show && to == ch) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HITS);
 			}
@@ -1228,15 +1323,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_HITS);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TANK);
 			}
@@ -1246,7 +1341,11 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		// misses
 		if (IS_SET(act_flags, TO_COMBAT_MISS)) {
-			if (!show && to == ch) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_MISSES);
 			}
@@ -1258,15 +1357,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_MISSES);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TANK);
 			}
@@ -2979,6 +3078,10 @@ char *prompt_str(char_data *ch) {
 	if (FIGHTING(ch)) {
 		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
 	}
+	else if (!SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_PROMPT)) {
+		// no prompt at all please
+		return "";
+	}
 	else {
 		str = GET_PROMPT(REAL_CHAR(ch));
 	}
@@ -3077,6 +3180,16 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALK(ch)) {
 						strcat(i, "\t0W");
 					}
+					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_discomfort");
+						if (temperature <= -1 * t_limit) {
+							strcat(i, "\tcC");
+						}
+						if (temperature >= t_limit) {
+							strcat(i, "\toH");
+						}
+					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
 							strcat(i, "\tMR");
@@ -3128,6 +3241,16 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					if (HAS_WATERWALK(ch)) {
 						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
+					}
+					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_discomfort");
+						if (temperature <= -1 * t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
+						if (temperature >= t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
@@ -3304,8 +3427,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case 't':	/* Sun timer */
-				case 'T': {
+				case 't': {	/* Sun timer */
 					tinfo = get_local_time(IN_ROOM(ch));
 					sun = get_sun_status(IN_ROOM(ch));
 					
@@ -3333,6 +3455,25 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 							strcpy(i+2, "noon\t0");
 						}
 					}
+					tmp = i;
+					break;
+				}
+				case 'T': {	// temperature
+					int temperature = get_room_temperature(IN_ROOM(ch));
+					int limit = config_get_int("temperature_discomfort");
+					char *temp_color;
+					
+					if (temperature <= -1 * limit) {
+						temp_color = "\tc";
+					}
+					else if (temperature >= limit) {
+						temp_color = "\to";
+					}
+					else {
+						temp_color = "\t0";
+					}
+					
+					sprintf(i, "%s%s\t0", temp_color, temperature_to_string(temperature));
 					tmp = i;
 					break;
 				}

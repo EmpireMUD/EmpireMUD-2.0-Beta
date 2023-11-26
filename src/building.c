@@ -2759,7 +2759,7 @@ ACMD(do_lay) {
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
-	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS, GET_SECT_CLIMATE(check_sect));
+	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS, get_climate(IN_ROOM(ch)));
 	struct resource_data *charged = NULL;
 	
 	if (!cost) {

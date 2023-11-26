@@ -36,6 +36,8 @@ BAKERY
 
 (BB)  Bakery  (Foundations goal)
 
+Temperature:  warmer than outside
+
 The bakery is a warm, pleasant building that always smells of fresh breads.
 You can use its oven to bake or cook all manner of foods.
 
@@ -140,6 +142,7 @@ BURIALCAVERN "BURIAL CAVERN"
 &y/&0()&y\&0  Burial Cavern  (Mountain Engineering goal)
 
 Chameleon:  &y/\/\&0
+Temperature:  cooler than outside
 
 Some people prefer to be buried in hidden caves in the mountains.
 
@@ -153,6 +156,7 @@ Extra rooms:  6
 Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &g^^^^&0
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -205,6 +209,7 @@ CASTLE PORTCULLIS
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+Temperature:  milder than outside
 
 This building serves as the entrance to a castle, with a huge number of rooms
 available to designate. You can also interlink it with other buildings to make
@@ -225,6 +230,7 @@ Extra rooms:  6
 Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &y/\/\&0
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -249,6 +255,7 @@ CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS
 
 Command:  shatter <item to destroy>
 Fame:  5
+Temperature:  always comfortable
 
 The celestial forge is a place not only to forge gear, but to destroy gear you
 no longer need and recycle it into shards. The number and type of shards you
@@ -292,6 +299,7 @@ CLIFFDWELLING "CLIFF DWELLING"
 
 Extra rooms:  3, interlink
 Citizens:  2
+Temperature:  warmer when cold
 
 Cliff dwellings are an ancient type of home, generally built directly into
 the hollow sides of cliffs. Their location makes them resistant to sieges, as
@@ -430,6 +438,7 @@ FOUNDRY
 {FF}  Foundry  (Build ability)
 
 Stored here:  metals
+Temperature:  warmer than outside
 
 A foundry is a place for smelting and storing the empire's metal. Like all
 storage facilities, your NPCs move metal between yards so that you can retrieve
@@ -473,6 +482,8 @@ See also: INFILTRATE, PUBLICIZE, WALL, WALLED TOWN
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
 (GG)  Glass Blower  (Foundations goal)
+
+Temperature:  warmer than outside
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
 many other glass items for the empire. Most of these require Basic Crafts.
@@ -571,6 +582,7 @@ HOUSE "SMALL HOUSE"
 
 Extra rooms:  2
 Citizens:  2
+Temperature:  warmer when cold
 
 A house is slightly larger than a cabin and supports extra rooms. You
 can build this type of home only on regular plains; the desert equivalent is
@@ -585,6 +597,7 @@ HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 Extra rooms:  6
 Special rooms:  crypt
 Citizens:  1
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -620,6 +633,7 @@ LARGEHOUSE "LARGE HOUSE"
 
 Extra rooms:  7
 Citizens:  4
+Temperature:  warmer when cold
 
 This is the largest of the ordinary houses.
 
@@ -654,6 +668,7 @@ MINECOMPLEX "MINE COMPLEX"
 Extra rooms:  7, interlink
 Special rooms:  tunnel
 Citizens:  4
+Temperature:  milder than outside
 
 A mine complex looks like a mine from the surface, but is really a network of
 tunnels adapted for living. These complexes can hold a large number of people.
@@ -665,6 +680,7 @@ MOUNTAINCRYPT "MOUNTAIN CRYPT"
 &y[oo]&0  Mountain Crypt  (Mountain Engineering goal)
 
 Fame: 2
+Temperature:  cooler than outside
 
 This crypt is constructed near the mountain peaks to bring glory to the hero
 interred within.
@@ -677,6 +693,7 @@ MOUNTAINGARRISON "MOUNTAIN GARRISON"
 
 Extra rooms:  10, interlink
 Military:  20
+Temperature:  warmer when cold
 
 House your military in the mountains, out of the reach of your enemies.
 
@@ -688,6 +705,7 @@ MOUNTAINHALL "MOUNTAIN HALL"
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory, tunnel
+Temperature:  warmer when cold
 
 This great hall is carved into the side of the mountain, the most defensible
 type of terrain. Build your mountain empire by interlinking mountain halls and
@@ -703,6 +721,7 @@ MOUNTAINLODGE "MOUNTAIN LODGE"
 
 Extra rooms:  3
 Citizens:  2
+Temperature:  warmer when cold
 
 Live comfortably atop a snowy mountain with this rustic lodge.
 
@@ -730,6 +749,7 @@ MUDHUT "MUD HUT"
 &y.&0()&y.&0  Mud Hut  (Build ability)
 
 Citizens:  1
+Temperature:  cooler when warm
 
 A mud hut is a small, simple house which is built in the desert using any
 available water. Construction starts with a small pit, usually just two feet
@@ -742,6 +762,7 @@ OASISGARDEN "OASIS GARDEN"
 &G^&C##&G^&0  Oasis Garden  (Luxury Resources goal)
 
 Grows:  daggerbite, magewhisper
+Temperature:  milder than the surroundings
 
 The best gardeners have learned to farm both daggerbite and magewhisper -- two
 rare desert herbs -- in the fertile soil around oases.
@@ -781,6 +802,7 @@ PALACE
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+Temperature:  milder than outside
 
 A palace is a lavish place for a king or queen to hold audience with
 dignitaries and to rule from their throne. It holds a huge number of rooms and
@@ -811,6 +833,7 @@ PUEBLO
 
 Citizens:  2
 Extra rooms:  2
+Temperature:  cooler when warm
 
 A pueblo is a common desert home, easily built from local materials. It is
 constructed in a shallow pit to help insulate against summer temperatures.
@@ -826,6 +849,7 @@ PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 Extra rooms:  6
 Special rooms:  crypt
 Citizens:  1
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -907,6 +931,7 @@ SHADYGARDEN "SHADY GARDEN"
 &g|&y##&g|&0  Shady Garden  (Luxury Resources goal)
 
 Grows:  fiveleaf
+Temperature:  cooler when warm
 
 It is possible to grow the rare fiveleaf plant, if the soil is right and the
 area is shady. This garden helps you grow a lot of it in one place.
@@ -932,6 +957,7 @@ SMOKEHOUSE "SMOKE HOUSE"
 
 Features: cooking fire
 Stored here:  meats
+Temperature:  warmer than outside
 
 A smoke house is a place to preserve and store meat for the empire. Like all
 storage facilities, your NPCs move meats between yards so that you can retrieve
@@ -986,6 +1012,7 @@ STONEHOUSE "STONE HOUSE"
 
 Extra rooms:  3
 Citizens:  2
+Temperature:  warmer when cold
 
 A stone house is a larger, more permanent home that resists burning. It has
 more space than a regular house, and can be built on plains or desert.
@@ -1087,6 +1114,7 @@ TAVERN
 Tavern building (Foundations goal)
 
 Building:  [TT]  Tavern
+Temperature:  milder than outside
 Command:  tavern [type]
 
 You can use this command to change what a Tavern is brewing. It will charge
@@ -1152,6 +1180,7 @@ Special rooms: sorcery tower, skybridge
 Citizens:  1
 Fame:  1
 Stored here:  magical gems
+Temperature:  milder than outside
 
 The Tower of Sorcery is a shining symbol to people for miles around. It is
 the home of the masters of High Sorcery. This is where you can come to study
@@ -1257,6 +1286,8 @@ See also: CABINET OF CURIOSITIES, STORAGE
 
 &y/&0OO&y\&0  Tunnel  (Mountain Engineering goal)
 
+Temperature:  cooler than outside
+
 A pair of tunnel entrances on opposite sides of a mountain allow you to cross
 the mountains with ease. Start one with the 'tunnel' command.
 
@@ -1272,6 +1303,7 @@ Extra rooms:  7, interlink
 Special rooms:  tunnel
 Citizens:  4
 Chameleon:  &g....&0 or &Y....&0
+Temperature:  milder than outside
 
 The underground complex is a large subterranean home which is easy to obscure,
 due to its shallow entrance.
@@ -1296,6 +1328,8 @@ See also: STORAGE
 VOLCANICFORGE "VOLCANIC FORGE"
 
 &y(FF)&0  Volcanic Forge  (Mountain Engineering goal)
+
+Temperature:  hot
 
 This forge uses a magma chamber deep inside the mountain to smelt and shape
 powerful metals.

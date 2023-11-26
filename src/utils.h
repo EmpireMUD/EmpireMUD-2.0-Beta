@@ -159,6 +159,7 @@
 #define GET_ADV_LINKING(adv)  ((adv)->linking)
 #define GET_ADV_PLAYER_LIMIT(adv)  ((adv)->player_limit)
 #define GET_ADV_SCRIPTS(adv)  ((adv)->proto_script)
+#define GET_ADV_TEMPERATURE_TYPE(adv)  ((adv)->temperature_type)
 
 // utils
 #define ADVENTURE_FLAGGED(adv, flg)  (IS_SET(GET_ADV_FLAGS(adv), (flg)) ? TRUE : FALSE)
@@ -258,6 +259,7 @@
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
+#define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
 #define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
 
 
@@ -358,6 +360,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
 #define GET_MANA_DEFICIT(ch)  GET_DEFICIT((ch), MANA)
 #define GET_BONUS_INVENTORY(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_INVENTORY)
+#define GET_COOLING(ch)  GET_EXTRA_ATT(ch, ATT_COOLING)
 #define GET_RESIST_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_PHYSICAL)
 #define GET_RESIST_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_RESIST_MAGICAL)
 #define GET_BLOCK(ch)  GET_EXTRA_ATT(ch, ATT_BLOCK)
@@ -370,6 +373,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_HEAL_OVER_TIME(ch)  GET_EXTRA_ATT(ch, ATT_HEAL_OVER_TIME)
 #define GET_CRAFTING_BONUS(ch)  GET_EXTRA_ATT(ch, ATT_CRAFTING_BONUS)
 #define GET_AGE_MODIFIER(ch)  GET_EXTRA_ATT(ch, ATT_AGE_MODIFIER)
+#define GET_WARMTH(ch)  GET_EXTRA_ATT(ch, ATT_WARMTH)
 
 // ch->char_specials: char_special_data
 #define FIGHTING(ch)  ((ch)->char_specials.fighting.victim)
@@ -416,9 +420,11 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define HAS_WATERWALK(ch)  (AFF_FLAGGED((ch), AFF_WATERWALK) || MOUNT_FLAGGED((ch), MOUNT_WATERWALK))
+#define IS_HASTENED(ch)  (AFF_FLAGGED((ch), AFF_HASTE) && !AFF_FLAGGED((ch), AFF_SLOW))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
+#define IS_SLOWED(ch)  (AFF_FLAGGED((ch), AFF_SLOW) && !AFF_FLAGGED((ch), AFF_HASTE))
 #define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
@@ -500,7 +506,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 
 // helpers
 #define CROP_FLAGGED(crp, flg)  (IS_SET(GET_CROP_FLAGS(crp), (flg)))
-#define MATCH_CROP_SECTOR_CLIMATE(crop, sect)  (!GET_CROP_CLIMATE(crop) || (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect)) == GET_CROP_CLIMATE(crop) || (CROP_FLAGGED((crop), CROPF_ANY_LISTED_CLIMATE) && (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect))))
+#define MATCH_CROP_SECTOR_CLIMATE(crop, climate)  (!GET_CROP_CLIMATE(crop) || (GET_CROP_CLIMATE(crop) & (climate)) == GET_CROP_CLIMATE(crop) || (CROP_FLAGGED((crop), CROPF_ANY_LISTED_CLIMATE) && (GET_CROP_CLIMATE(crop) & (climate))))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -709,13 +715,18 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 // GENERIC_x: value definitions and getters
 
 // GENERIC_LIQUID
+#define GVAL_LIQUID_DRUNK  0
+#define GVAL_LIQUID_FULL  1
+#define GVAL_LIQUID_THIRST  2
+#define GVAL_LIQUID_FLAGS  3
 #define GSTR_LIQUID_NAME  0
 #define GSTR_LIQUID_COLOR  1
 #define GET_LIQUID_NAME(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_NAME) : "")
 #define GET_LIQUID_COLOR(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_COLOR) : "")
-#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), DRUNK) : 0)
-#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), FULL) : 0)
-#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), THIRST) : 0)
+#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_DRUNK) : 0)
+#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_FULL) : 0)
+#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_THIRST) : 0)
+#define GET_LIQUID_FLAGS(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), GVAL_LIQUID_FLAGS) : 0)
 
 // GENERIC_ACTION
 #define GSTR_ACTION_BUILD_TO_CHAR  0
@@ -736,12 +747,20 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GSTR_AFFECT_APPLY_TO_ROOM  3
 #define GSTR_AFFECT_LOOK_AT_CHAR  4
 #define GSTR_AFFECT_LOOK_AT_ROOM  5
+#define GSTR_AFFECT_DOT_TO_CHAR  6
+#define GSTR_AFFECT_DOT_TO_ROOM  7
+#define GSTR_AFFECT_DEATH_TO_CHAR  8
+#define GSTR_AFFECT_DEATH_TO_ROOM  9
 #define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
 #define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 #define GET_AFFECT_APPLY_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_CHAR) : NULL)
 #define GET_AFFECT_APPLY_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_ROOM) : NULL)
 #define GET_AFFECT_LOOK_AT_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_CHAR) : NULL)
 #define GET_AFFECT_LOOK_AT_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_ROOM) : NULL)
+#define GET_AFFECT_DOT_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DOT_TO_CHAR) : NULL)
+#define GET_AFFECT_DOT_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DOT_TO_ROOM) : NULL)
+#define GET_AFFECT_DEATH_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DEATH_TO_CHAR) : NULL)
+#define GET_AFFECT_DEATH_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DEATH_TO_ROOM) : NULL)
 
 // GENERIC_CURRENCY
 #define GSTR_CURRENCY_SINGULAR  0
@@ -1208,6 +1227,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
 #define GET_LAST_AFF_WEAR_OFF_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_vnum))
 #define GET_LAST_AFF_WEAR_OFF_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_time))
+#define GET_LAST_COLD_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cold_time))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
 #define GET_LAST_COND_MESSAGE_TIME(ch, cond)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cond_message_time[(cond)]))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
@@ -1216,12 +1236,14 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LAST_HOME_SET_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_home_set_time))
 #define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_known_level))
 #define GET_LAST_LOOK_SUN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_look_sun))
+#define GET_LAST_MESSAGED_TEMPERATURE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_messaged_temperature))
 #define GET_LAST_OFFENSE_SEEN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_offense_seen))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
 #define GET_LASTNAME_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname_list))
 #define GET_LAST_VEHICLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_vehicle))
+#define GET_LAST_WARM_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_warm_time))
 #define GET_LEARNED_CRAFTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->learned_crafts))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
@@ -1257,7 +1279,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SKILL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->skill_level))
 #define GET_SLASH_CHANNELS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->slash_channels))
 #define GET_SPEAKING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->speaking))
+#define GET_STATUS_MESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->status_messages))
 #define GET_TECHS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->techs))
+#define GET_TEMPERATURE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temperature))
 #define GET_TEMPORARY_ACCOUNT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_account_id))
 #define GET_TITLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->title))
 #define GET_TOMB_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->tomb_room))
@@ -1275,6 +1299,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // helpers
 #define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
+#define CUSTOM_COLOR_CHAR(ch, which)  ((!IS_NPC(ch) && GET_CUSTOM_COLOR((ch), (which))) ? GET_CUSTOM_COLOR((ch), (which)) : '0')
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define INFORMATIVE_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_INFORMATIVE_FLAGS(ch), (flag)))
@@ -1287,9 +1312,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define PLR_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PLR_FLAGS(ch), (flag)))
 #define PRF_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PRF_FLAGS(ch), (flag)))
 #define OLC_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_OLC_FLAGS(ch), (flag)))
+#define RESET_LAST_MESSAGED_TEMPERATURE(ch)  { if (!IS_NPC(ch)) { GET_LAST_MESSAGED_TEMPERATURE(ch) = get_room_temperature(IN_ROOM(ch)); } }
 #define SAVE_ACCOUNT(acct)  save_library_file_for_vnum(DB_BOOT_ACCT, (acct)->id)
 #define SHOW_CLASS_NAME(ch)  ((!IS_NPC(ch) && GET_CLASS(ch)) ? CLASS_NAME(GET_CLASS(ch)) : config_get_string("default_class_name"))
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
+#define SHOW_STATUS_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_STATUS_MESSAGES(ch), (bit)))
 
 // definitions
 #define HAS_CLOCK(ch)  (HAS_BONUS_TRAIT((ch), BONUS_CLOCK) || has_player_tech((ch), PTECH_CLOCK))
@@ -1306,7 +1333,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
-#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy))
+#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!is_spammy || !PRF_FLAGGED((ch), PRF_NOSPAM)) && (!is_animal_move || IS_NPC(ch) || SHOW_STATUS_MESSAGES((ch), SM_ANIMAL_MOVEMENT)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1426,7 +1453,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
 #define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || can_interact_room((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
-#define GET_SEASON(room)  y_coord_to_season[Y_COORD(room)]
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
@@ -1485,6 +1511,26 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define DEEP_WATER_SECT(room)	(ROOM_SECT_FLAGGED((room), SECTF_OCEAN))
 
 
+/**
+* Determine season by room location. This was a short macro but needed coord-
+* safety.
+*
+* @param room_data *room The room to get the current season for.
+* @return int A TILESET_ const (default: TILESET_SPRING).
+*/
+static inline int GET_SEASON(room_data *room) {
+	extern byte y_coord_to_season[MAP_HEIGHT];
+	int coord;
+	
+	if (room && (coord = Y_COORD(room)) >= 0 && coord < MAP_HEIGHT) {
+		return y_coord_to_season[coord];
+	}
+	else {
+		return TILESET_SPRING;	// default
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM TEMPLATE UTILS /////////////////////////////////////////////////////
 
@@ -1502,6 +1548,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 #define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
+#define GET_RMT_TEMPERATURE_TYPE(rmt)  ((rmt)->temperature_type)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1521,6 +1568,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_SECT_NOTES(sect)  ((sect)->notes)
 #define GET_SECT_ROADSIDE_ICON(sect)  ((sect)->roadside_icon)
 #define GET_SECT_SPAWNS(sect)  ((sect)->spawns)
+#define GET_SECT_TEMPERATURE_TYPE(sect)  ((sect)->temperature_type)
 #define GET_SECT_TITLE(sect)  ((sect)->title)
 #define GET_SECT_VNUM(sect)  ((sect)->vnum)
 
@@ -1896,7 +1944,7 @@ char *shared_by(obj_data *obj, char_data *ch);
 char *show_color_codes(char *string);
 char *str_dup(const char *source);
 char *str_replace(const char *search, const char *replace, const char *subject);
-char *str_str(char *cs, char *ct);
+char *str_str(const char *cs, const char *ct);
 char *strip_color(char *input);
 char *stripcr(char *dest, const char *src);
 void strip_crlf(char *buffer);
@@ -1931,6 +1979,7 @@ bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t wi
 room_data *find_other_starting_location(room_data *current_room);
 bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
+bitvector_t get_climate(room_data *room);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
@@ -2233,6 +2282,7 @@ void combat_meter_heal_taken(char_data *ch, int amt);
 
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag);
 
 // instance.c
 int adjusted_instance_limit(adv_data *adv);
@@ -2540,6 +2590,17 @@ moon_pos_t get_moon_position(moon_phase_t phase, int hour);
 bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
+// weather.c temperature
+int calculate_temperature(int temp_type, bitvector_t climates, int season, int sun);
+void check_temperature_penalties(char_data *ch);
+int get_relative_temperature(char_data *ch);
+int get_room_temperature(room_data *room);
+int get_temperature_type(room_data *room);
+void reset_player_temperature(char_data *ch);
+const char *temperature_to_string(int temperature);
+void update_player_temperature(char_data *ch);
+int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid);
+
 // weather.c time
 double get_hours_of_sun(room_data *room);
 struct time_info_data get_local_time(room_data *room);
@@ -2584,7 +2645,7 @@ void sort_einv_for_empire(empire_data *emp);
 
 
 // supplementary math
-#define ABSOLUTE(x)  ((x < 0) ? ((x) * -1) : (x))
+#define ABSOLUTE(x)  (((x) < 0) ? ((x) * -1) : (x))
 
 
 // time: converts 0-23 to 1-12am, 1-12pm

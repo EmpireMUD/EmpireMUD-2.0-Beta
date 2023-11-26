@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: weather.c                                       EmpireMUD 2.0b5 *
-*  Usage: functions handling time and the weather                         *
+*  Usage: functions handling time, the weather, and temperature           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
@@ -23,12 +23,15 @@
 #include "db.h"
 #include "skills.h"
 #include "constants.h"
+#include "vnums.h"
 
 /**
 * Contents:
-*   Unsorted Code
+*   Seasons Engine
+*   Weather Handling
 *   Time Handling
 *   Moon System
+*   Temperature System
 */
 
 // external vars
@@ -37,14 +40,10 @@ extern unsigned long main_game_pulse;
 // local prototypes
 void another_hour();
 void send_hourly_sun_messages();
-void weather_change();
 
 
-void weather_and_time(void) {
-	another_hour();
-	weather_change();
-}
-
+ //////////////////////////////////////////////////////////////////////////////
+//// SEASONS ENGINE //////////////////////////////////////////////////////////
 
 /**
 * This is called at startup and once per game day to update the seasons for the
@@ -147,6 +146,9 @@ void determine_seasons(void) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// WEATHER HANDLING ////////////////////////////////////////////////////////
+
 /**
 * Reset weather data on startup (or request).
 */
@@ -176,8 +178,15 @@ void reset_weather(void) {
 }
 
 
+/**
+* Hourly update of weather conditions. This is global but I dream of some day
+* coming up with a good way to do local weather systems that move around. -pc
+*/
 void weather_change(void) {
-	int diff, change;
+	int diff, change, was_state;
+	descriptor_data *desc;
+	char_data *ch;
+	
 	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))
 		diff = (weather_info.pressure > 985 ? -2 : 2);
 	else
@@ -241,38 +250,118 @@ void weather_change(void) {
 			weather_info.sky = SKY_CLOUDLESS;
 			break;
 	}
-
+	
+	// save for later
+	was_state = weather_info.sky;
+	
+	// SKY_x: update sky based on change
 	switch (change) {
-		case 1:
-			send_to_outdoor(TRUE, "The sky starts to get cloudy.\r\n");
+		case 1: {
 			weather_info.sky = SKY_CLOUDY;
 			break;
-		case 2:
-			send_to_outdoor(TRUE, "It starts to rain.\r\n");
+		}
+		case 2: {
 			weather_info.sky = SKY_RAINING;
 			break;
-		case 3:
-			send_to_outdoor(TRUE, "The clouds disappear.\r\n");
+		}
+		case 3: {
 			weather_info.sky = SKY_CLOUDLESS;
 			break;
-		case 4:
-			send_to_outdoor(TRUE, "Lightning starts to show in the sky.\r\n");
+		}
+		case 4: {
 			weather_info.sky = SKY_LIGHTNING;
 			break;
-		case 5:
-			send_to_outdoor(TRUE, "The rain stops.\r\n");
+		}
+		case 5: {
 			weather_info.sky = SKY_CLOUDY;
 			break;
-		case 6:
-			send_to_outdoor(TRUE, "The lightning stops.\r\n");
+		}
+		case 6: {
 			weather_info.sky = SKY_RAINING;
 			break;
+		}
+	}
+	
+	// messaging to outdoor players
+	if (change > 0) {
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || (ch = desc->character) == NULL) {
+				continue;	// not playing
+			}
+			if (!SHOW_STATUS_MESSAGES(ch, SM_WEATHER)) {
+				continue;	// does not want weather messages
+			}
+			if (!AWAKE(ch)) {
+				continue;	// sleeping
+			}
+			if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+				continue;	// no weather here
+			}
+			if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
+				continue;	// can't see weather from here
+			}
+			
+			// SKY_x: ok, we can see weather
+			switch (weather_info.sky) {
+				case SKY_CLOUDY: {
+					if (was_state != SKY_RAINING) {
+						msg_to_char(ch, "\t%cThe sky starts to get cloudy.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+					}
+					else {	// was raining
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+							msg_to_char(ch, "\t%cThe snow stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+						else {
+							msg_to_char(ch, "\t%cThe rain stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+					}
+					break;
+				}
+				case SKY_RAINING: {
+					if (was_state != SKY_LIGHTNING) {
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+							msg_to_char(ch, "\t%cIt starts to snow.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+						else {
+							msg_to_char(ch, "\t%cIt starts to rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+					}
+					else {	// was lightning
+						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+							msg_to_char(ch, "\t%cThe blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+						else {
+							msg_to_char(ch, "\t%cThe intense lightning storm gives way to a soothing rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						}
+					}
+					break;
+				}
+				case SKY_CLOUDLESS: {
+					msg_to_char(ch, "\t%cThe clouds disappear.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+					break;
+				}
+				case SKY_LIGHTNING: {
+					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+						msg_to_char(ch, "\t%cThe gentle snowfall becomes a serious blizzard.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+					}
+					else {
+						msg_to_char(ch, "\t%cLightning starts to show in the sky.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+					}
+					break;
+				}
+			}
+		}
 	}
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// WEATHER HANDLING ////////////////////////////////////////////////////////
+/**
+* Called once per game hour.
+*/
+void weather_and_time(void) {
+	another_hour();
+	weather_change();
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -591,28 +680,36 @@ void send_hourly_sun_messages(void) {
 			
 			switch (sun) {
 				case SUN_RISE: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN_AUTO_LOOK) && !HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
 						// show map if needed
 						look_at_room(desc->character);
 						msg_to_char(desc->character, "\r\n");
 					}
-					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
+						msg_to_char(desc->character, "\t%cThe sun rises over the horizon.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
+					}
 					break;
 				}
 				case SUN_LIGHT: {
-					msg_to_char(desc->character, "The day has begun.\r\n");
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
+						msg_to_char(desc->character, "\t%cThe day has begun.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
+					}
 					break;
 				}
 				case SUN_SET: {
-					msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
+						msg_to_char(desc->character, "\t%cThe sun slowly disappears beneath the horizon.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
+					}
 					break;
 				}
 				case SUN_DARK: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN_AUTO_LOOK) && !HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
 						look_at_room(desc->character);
 						msg_to_char(desc->character, "\r\n");
 					}
-					msg_to_char(desc->character, "The night has begun.\r\n");
+					if (SHOW_STATUS_MESSAGES(desc->character, SM_SUN)) {
+						msg_to_char(desc->character, "\t%cThe night has begun.\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
+					}
 					break;
 				}
 			}
@@ -620,7 +717,8 @@ void send_hourly_sun_messages(void) {
 		
 		// check and show zenith
 		if (tinfo.hours == 12 && is_zenith_day(IN_ROOM(desc->character))) {
-			msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
+			// I think this should ignore the SM_SUN setting and show anyway -pc
+			msg_to_char(desc->character, "\t%cYou watch as the sun passes directly overhead -- today is the zenith passage!\t0\r\n", CUSTOM_COLOR_CHAR(desc->character, CUSTOM_COLOR_SUN));
 		}
 	}
 }
@@ -846,4 +944,691 @@ void show_visible_moons(char_data *ch) {
 		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
+
+/**
+* Modifies a base temperature based on a TEMPERATURE_ type const.
+*
+* @param int base_temp The base temperature, before modifications.
+* @param int temp_type Any TEMPERATURE_ type const.
+* @return int The final temperature.
+*/
+int apply_temperature_type(int base_temp, int temp_type) {
+	int temperature = base_temp;
+	
+	// TEMPERATURE_x: modifications based on temperature
+	switch (temp_type) {
+		case TEMPERATURE_FREEZING: {
+			temperature = -1 * config_get_int("temperature_extreme");
+			break;
+		}
+		case TEMPERATURE_COLD: {
+			temperature = -1 * config_get_int("temperature_discomfort");
+			break;
+		}
+		case TEMPERATURE_COOL: {
+			temperature = -1 * config_get_int("temperature_discomfort") + 1;
+			break;
+		}
+		case TEMPERATURE_NEUTRAL: {
+			temperature = 0;
+			break;
+		}
+		case TEMPERATURE_WARM: {
+			temperature = config_get_int("temperature_discomfort") - 1;
+			break;
+		}
+		case TEMPERATURE_HOT: {
+			temperature = config_get_int("temperature_discomfort");
+			break;
+		}
+		case TEMPERATURE_SWELTERING: {
+			temperature = config_get_int("temperature_extreme");
+			break;
+		}
+		case TEMPERATURE_MILDER: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 20);
+			}
+			else if (temperature < 0) {
+				temperature = MIN(0, temperature + 20);
+			}
+			break;
+		}
+		case TEMPERATURE_HARSHER: {
+			if (temperature > 0) {
+				temperature += 20;
+			}
+			else if (temperature < 0) {
+				temperature -= 20;
+			}
+			break;
+		}
+		case TEMPERATURE_COOLER: {
+			temperature -= 15;
+			break;
+		}
+		case TEMPERATURE_COOLER_WHEN_HOT: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 15);
+			}
+			break;
+		}
+		case TEMPERATURE_WARMER: {
+			temperature += 15;
+			break;
+		}
+		case TEMPERATURE_WARMER_WHEN_COLD: {
+			if (temperature < 0) {
+				temperature = MIN(0, temperature + 15);
+			}
+			break;
+		}
+	}
+	
+	return temperature;
+}
+
+
+/**
+* Calculates temperature for a hypothetical room based on various data. This
+* can be used for real rooms or for hypotheticals.
+*
+* @param int temp_type Any TEMPERATURE_ type const; pass TEMPERATURE_USE_CLIMATE as a default.
+* @param bitvector_t climates Any CLIM_ flags that apply here.
+* @param int season Any TILESET_ season const.
+* @param int sun Any SUN_ const.
+* @return int The rounded temperature value.
+*/
+int calculate_temperature(int temp_type, bitvector_t climates, int season, int sun) {
+	int climate_val, season_count, season_val, sun_count, sun_val, bit;
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[season];
+	sun_val = sun_temperature[sun];
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
+	
+	// determine climate modifiers
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			climate_val += climate_temperature[bit].base_add;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+			}
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
+			}
+		}
+	}
+	
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
+	}
+	
+	return apply_temperature_type(round(temperature), temp_type);
+}
+
+
+/**
+* Cancels all affects caused by temperature.
+*
+* @param char_data *ch The player.
+* @param int keep_type If not NOTHING, will keep an affect of this type ONLY.
+* @param bool send_messages If TRUE, sends wear-off messages for the affects.
+*/
+void cancel_temperature_penalties(char_data *ch, int keep_type, bool send_messages) {
+	int iter;
+	
+	// terminate this list with a NOTHING
+	any_vnum type_list[] = { ATYPE_COOL_PENALTY, ATYPE_COLD_PENALTY, ATYPE_WARM_PENALTY, ATYPE_HOT_PENALTY, NOTHING };
+	
+	for (iter = 0; type_list[iter] != NOTHING; ++iter) {
+		if (type_list[iter] != keep_type) {
+			affect_from_char(ch, type_list[iter], send_messages);
+		}
+	}
+}
+
+
+/**
+* Checks whether a player should have penalties from high or low temperature,
+* adds them if needed, or removes them if not.
+*
+* @param char_data *ch The player.
+*/
+void check_temperature_penalties(char_data *ch) {
+	int atype, iter, limit, extreme, room_temp, temperature;
+	struct affected_type *af;
+	obj_data *obj;
+	bool any, room_safe;
+	char buf[MAX_STRING_LENGTH];
+	
+	// some items provide warmth when lit
+	#define IS_WARM_OBJ(obj)  (GET_LIGHT_IS_LIT(obj) && LIGHT_FLAGGED((obj), LIGHT_FLAG_LIGHT_FIRE | LIGHT_FLAG_COOKING_FIRE))
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	if (IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_IMMUNE_TEMPERATURE) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_TEMPERATURE_PENALTIES) || !config_get_bool("temperature_penalties") || get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		// no penalties-- remove them, though, in case it was just shut off
+		cancel_temperature_penalties(ch, NOTHING, TRUE);
+		return;
+	}
+	
+	// base temperature and numbers
+	limit = config_get_int("temperature_discomfort");
+	extreme = config_get_int("temperature_extreme");
+	temperature = get_relative_temperature(ch);
+	room_temp = get_room_temperature(IN_ROOM(ch));
+	room_safe = (room_temp < limit && room_temp > (-1 * limit));
+	if (extreme < limit) {
+		extreme = limit;	// in case it's not set correctly
+	}
+	
+	// little fires everywhere (only if cold)
+	if (temperature < 0) {
+		// look for a warm obj
+		any = FALSE;
+		
+		// room
+		if (!any) {
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+				if (IS_WARM_OBJ(obj)) {
+					any = TRUE;
+					break;	// only need one
+				}
+			}
+		}
+		
+		// equipped
+		for (iter = 0; iter < NUM_WEARS && !any; ++iter) {
+			if ((obj = GET_EQ(ch, iter)) && IS_WARM_OBJ(obj)) {
+				any = TRUE;
+			}
+		}
+		
+		// inventory
+		if (!any) {
+			DL_FOREACH2(ch->carrying, obj, next_content) {
+				if (IS_WARM_OBJ(obj)) {
+					any = TRUE;
+					break;	// only need one
+				}
+			}
+		}
+		
+		if (any) {
+			temperature += config_get_int("temperature_from_fire");
+		}
+	}
+	else if (temperature > 0) {
+		// look for temperature relief from water (any water tile + not sitting on a vehicle)
+		if ((ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_SHALLOW_WATER) || WATER_SECT(IN_ROOM(ch))) && !GET_SITTING_ON(ch)) {
+			temperature -= config_get_int("temperature_from_water");
+		}
+	}
+	
+	// do we need penalties
+	if (ABSOLUTE(temperature) >= limit && !room_safe) {
+		if (temperature > 0) {
+			// start HOT penalty
+			if (temperature >= extreme) {
+				// extreme hot
+				atype = ATYPE_HOT_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
+				
+				// message only if it's new
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
+					snprintf(buf, sizeof(buf), "\t%cYou start to feel faint in the sweltering temperature -- you're too hot!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				// pain
+				apply_dot_effect(ch, atype, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				af = create_flag_aff(atype, UNLIMITED, AFF_DISTRACTED, ch);
+				affect_join(ch, af, NOBITS);
+			}
+			else {
+				// mild hot
+				atype = ATYPE_WARM_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
+				
+				// message only if it's new
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
+					snprintf(buf, sizeof(buf), "\t%cYou start to feel like you're getting too warm.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				// discomfort
+				af = create_flag_aff(atype, UNLIMITED, AFF_SLOWER_ACTIONS, ch);
+				affect_join(ch, af, NOBITS);
+			}
+			
+			// stats penalties (warm/hot)
+			af = create_flag_aff(atype, UNLIMITED, AFF_POOR_REGENS | AFF_THIRSTIER, ch);
+			affect_join(ch, af, NOBITS);
+		}
+		else {
+			// start COLD penalty
+			if (temperature <= -1 * extreme) {
+				// extreme cold
+				atype = ATYPE_COLD_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
+				
+				// message only if it's new
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
+					snprintf(buf, sizeof(buf), "\t%cThe bitter cold is starting to get to you -- you're freezing!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				// pain
+				apply_dot_effect(ch, atype, MAX(SECS_PER_REAL_UPDATE, SECS_PER_MUD_HOUR), DAM_DIRECT, 5, 1000, ch);
+				af = create_flag_aff(atype, UNLIMITED, AFF_DISTRACTED, ch);
+				affect_join(ch, af, NOBITS);
+			}
+			else {
+				// mild cold
+				atype = ATYPE_COOL_PENALTY;
+				cancel_temperature_penalties(ch, atype, FALSE);
+				
+				// message only if it's new
+				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
+					snprintf(buf, sizeof(buf), "\t%cYou're starting to feel a little too cold.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				}
+				
+				af = create_flag_aff(atype, UNLIMITED, AFF_SLOWER_ACTIONS, ch);
+				affect_join(ch, af, NOBITS);
+			}
+			
+			// stats penalties (cool/cold)
+			af = create_flag_aff(atype, UNLIMITED, AFF_SLOW | AFF_HUNGRIER, ch);
+			affect_join(ch, af, NOBITS);
+		}
+	}
+	else if (ABSOLUTE(temperature) < limit) {
+		// remove all penalties if the player has cooled down or warmed up
+		cancel_temperature_penalties(ch, NOTHING, TRUE);
+	}
+}
+
+
+/**
+* Computes a player's current temperature including any warmth/cooling gear
+* and effects.
+*
+* Warmth is penalized by half of the player's cooling attribute, and vice
+* versa, meaning if a player has 100 warmth and 20 cooling, they are really
+* at 90 warmth.
+*
+* @param char_data *ch The player (NPCs always return 0).
+* @return int The adjusted temperature that the character is feeling (usually -100 to 100; 0 is pleasant).
+*/
+int get_relative_temperature(char_data *ch) {
+	int temp, warm, cool;
+	
+	if (IS_NPC(ch)) {
+		return 0;	// NPCs do not have this property
+	}
+	if (get_temperature_type(IN_ROOM(ch)) == TEMPERATURE_ALWAYS_COMFORTABLE) {
+		return 0;	// always comfortable here
+	}
+	
+	temp = GET_TEMPERATURE(ch);
+	warm = GET_WARMTH(ch);
+	warm = MAX(0, warm);		// do not apply negative warmth
+	cool = GET_COOLING(ch);
+	cool = MAX(0, cool);		// do not apply negative cooling
+	
+	// penalize half of the other trait
+	if (temp < 0) {
+		temp += warm - (cool / 2);
+	}
+	else if (temp > 0) {
+		temp -= cool + (warm / 2);
+	}
+	
+	// character bonus
+	if (HAS_BONUS_TRAIT(ch, BONUS_WARM_RESIST) && temp > 0) {
+		temp = MAX(0, temp - 10);
+	}
+	else if (HAS_BONUS_TRAIT(ch, BONUS_COLD_RESIST) && temp < 0) {
+		temp = MIN(0, temp + 10);
+	}
+	
+	return temp;
+}
+
+
+/**
+* Determine the temperature of a room. Positive numbers are hot and negative
+* numbers are cold. These do not use real-life units; temperature is counter-
+* balanced by a player's WARMTH or COOLING trait.
+*
+* @param room_data *room Get the temperature for this room.
+* @return int The temperature (zero is neutral).
+*/
+int get_room_temperature(room_data *room) {
+	int temperature;
+	room_data *home;
+	
+	if (!IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
+		// inside of a building: get home temperature then apply own temperature type to it
+		temperature = get_room_temperature(home);
+		temperature = apply_temperature_type(temperature, get_temperature_type(room));
+	}
+	else {
+		// normal room
+		temperature = calculate_temperature(get_temperature_type(room), get_climate(room), GET_SEASON(room), get_sun_status(room));
+	}
+	
+	return temperature;
+}
+
+
+/**
+* Determines what TEMPERATURE_ type const to use for a given room, based on
+* whether or not it's in a building or adventure.
+*
+* @param room_data *room The room to check.
+* @return int Any TEMPERATURE_ type const.
+*/
+int get_temperature_type(room_data *room) {
+	int ttype = TEMPERATURE_USE_CLIMATE;
+	
+	if (!room) {
+		return ttype;	// missing arg?
+	}
+	
+	// check for a temperature type (building or room template)
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		ttype = GET_BLD_TEMPERATURE_TYPE(GET_BUILDING(room));
+	}
+	else if (GET_ROOM_TEMPLATE(room)) {
+		ttype = GET_RMT_TEMPERATURE_TYPE(GET_ROOM_TEMPLATE(room));
+	}
+	else {
+		// try sector(s)
+		ttype = GET_SECT_TEMPERATURE_TYPE(SECT(room));
+		
+		// attempt base if cascade is required here
+		if (ttype == TEMPERATURE_USE_CLIMATE && ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+			ttype = GET_SECT_TEMPERATURE_TYPE(BASE_SECT(room));
+		}
+	}
+	
+	// check adventure, too, IF we're on use-climate
+	if (ttype == TEMPERATURE_USE_CLIMATE && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+		ttype = GET_ADV_TEMPERATURE_TYPE(INST_ADVENTURE(COMPLEX_DATA(room)->instance));
+	}
+	
+	return ttype;
+}
+
+
+/**
+* Initializes a player's temperature, generally when they get a free restore on
+* login. If they would be comfortable, sets them to room temperature. Otherwise
+* it will set them to neutral temperature.
+*
+* @param char_data *ch The player.
+*/
+void reset_player_temperature(char_data *ch) {
+	int room_temp, warm, cool, limit;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	
+	// basic values
+	room_temp = get_room_temperature(IN_ROOM(ch));
+	limit = config_get_int("temperature_discomfort");
+	warm = MAX(0, GET_WARMTH(ch));
+	cool = MAX(0, GET_COOLING(ch));
+	
+	if (room_temp > 0 && (room_temp - cool + (warm / 2)) >= limit) {
+		// going to be too warm -- start at 0
+		GET_TEMPERATURE(ch) = 0;
+	}
+	else if (room_temp < 0 && (room_temp + warm - (cool / 2)) <= limit) {
+		// going to be too cold -- start at 0
+		GET_TEMPERATURE(ch) = 0;
+	}
+	else {
+		// player should be comfortable -- start at room temp
+		GET_TEMPERATURE(ch) = room_temp;
+	}
+}
+
+
+/**
+* Gives a user-readable word for a given temperature.
+*
+* @param int temperature A temperature (normally -100 to 100).
+* @return const char* An adjective for it such as "chilly" or "sweltering".
+*/
+const char *temperature_to_string(int temperature) {
+	int iter;
+	
+	struct temperature_name_t {
+		int min_temp;
+		const char *text;
+	} temperature_name[] = {
+		// { over temp, show text }
+		{ INT_MIN, "freezing" },
+		{ -49, "frigid" },
+		{ -39, "icy" },
+		{ -34, "frosty" },
+		{ -29, "cold" },
+		{ -24, "chilly" },
+		{ -19, "cool" },
+		{ -9, "pleasant" },
+		{ 10, "balmy" },
+		{ 20, "warm" },
+		{ 25, "hot" },
+		{ 30, "scorching" },
+		{ 35, "sweltering" },
+		{ 40, "blistering" },
+		{ 50, "searing" },
+
+		{ INT_MAX, "\n" }	// must be last
+	};
+	
+	for (iter = 0; *temperature_name[iter].text != '\n'; ++iter) {
+		if (temperature_name[iter].min_temp <= temperature && temperature_name[iter+1].min_temp > temperature) {
+			return temperature_name[iter].text;
+		}
+	}
+	
+	// should not get here but
+	return "searing";
+}
+
+
+/**
+* Shifts the player's temperature slightly toward room temperature. Ideally
+* this should run during the 5-second "real updates".
+*
+* @param char_data *ch The player experiencing temperature and life.
+*/
+void update_player_temperature(char_data *ch) {
+	int ambient, was_temp, relative, limit;
+	double change;
+	bool gain = FALSE, loss = FALSE;
+	bool showed_warm_room = FALSE, showed_cold_room = FALSE;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;	// no temperature
+	}
+	
+	ambient = get_room_temperature(IN_ROOM(ch));
+	limit = config_get_int("temperature_discomfort");
+	
+	// check if room itself changed
+	if (AWAKE(ch) && ambient != GET_LAST_MESSAGED_TEMPERATURE(ch) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+		if (ambient > GET_LAST_MESSAGED_TEMPERATURE(ch)) {
+			// higher temp
+			msg_to_char(ch, "\t%cIt's %s %s%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient >= limit) ? "getting hot" : "warming up", IS_OUTDOORS(ch) ? "out here" : "in here", (ambient <= (-1 * limit) ? ", but still quite cold" : ""));
+			showed_warm_room = TRUE;
+		}
+		else {	// lower temp
+			msg_to_char(ch, "\t%cIt's %s %s%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (ambient <= -1 * limit) ? "getting cold" : "cooling down", IS_OUTDOORS(ch) ? "out here" : "in here", (ambient >= limit ? ", but still too hot" : ""));
+			showed_cold_room = TRUE;
+		}
+		
+		// update temp for later
+		GET_LAST_MESSAGED_TEMPERATURE(ch) = ambient;
+	}
+	
+	// check player's own temperature
+	if (GET_TEMPERATURE(ch) != ambient) {
+		was_temp = get_relative_temperature(ch);
+		change = (double)ambient / ((double) SECS_PER_MUD_HOUR / SECS_PER_REAL_UPDATE);
+		change = ABSOLUTE(change);	// change is positive
+		change = MAX(1.0, change);	// minimum of 1
+		
+		// apply
+		if (GET_TEMPERATURE(ch) < ambient) {
+			GET_TEMPERATURE(ch) += change;
+			GET_TEMPERATURE(ch) = MIN(ambient, GET_TEMPERATURE(ch));
+			gain = TRUE;
+		}
+		else {
+			GET_TEMPERATURE(ch) -= change;
+			GET_TEMPERATURE(ch) = MAX(ambient, GET_TEMPERATURE(ch));
+			loss = TRUE;
+		}
+		
+		// messaging?
+		if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			relative = get_relative_temperature(ch);
+			
+			if (gain && relative > was_temp && GET_LAST_WARM_TIME(ch) < time(0) - 60) {
+				if (relative >= limit - (limit / 10) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're getting too hot!\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+				}
+				else if (!showed_warm_room && relative >= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're getting warm.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+				}
+				else if (!showed_warm_room && relative <= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're warming up%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (relative <= -1 * limit) ? " but still quite cold" : "");
+				}
+			
+				GET_LAST_WARM_TIME(ch) = time(0);
+			}
+			else if (loss && relative < was_temp && GET_LAST_COLD_TIME(ch) < time(0) - 60) {
+				limit *= -1;	// negative limit
+				if (relative <= (limit + (limit / -10)) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're getting too cold!\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+				}
+				else if (!showed_cold_room && relative <= (limit / 2) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're getting cold.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+				}
+				else  if (!showed_cold_room && relative >= (-1 * limit) && SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE)) {
+					msg_to_char(ch, "\t%cYou're cooling down%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE), (relative >= -1 * limit) ? " but still rather warm" : "");
+				}
+			
+				GET_LAST_COLD_TIME(ch) = time(0);
+			}
+		}
+		
+		// probably not worth triggering a character save for a temperature change alone
+		// ... but they almost certainly save when this runs, anyway, due to other events
+		
+		// update MSDP under the assumption there was a change
+		update_MSDP_temperature(ch, FALSE, UPDATE_SOON);
+	}
+}
+
+
+/**
+* Warms (or cools) a player from drinking a liquid.
+*
+* @param char_data *ch The player who drank the liquid.
+* @param int hours_drank How much they drank (in game hours).
+* @param any_vnum liquid Which generic liquid vnum they drank.
+* @return int 1 if it warmed the player up at all; -1 if it cooled them down; 0 if neither or both.
+*/
+int warm_player_from_liquid(char_data *ch, int hours_drank, any_vnum liquid) {
+	generic_data *gen = real_generic(liquid);
+	int val = 0, ambient, amount;
+	bool any = FALSE;
+	
+	if (!ch || !gen || hours_drank < 1 || GEN_TYPE(gen) != GENERIC_LIQUID) {
+		return 0;	// no work
+	}
+	
+	// how much heating/cooling is possible
+	amount = round(hours_drank / 4.0);
+	amount = MAX(1, amount);
+	
+	ambient = get_room_temperature(IN_ROOM(ch));
+	
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_COOLING) && GET_TEMPERATURE(ch) > ambient - 5) {
+		// cool
+		GET_TEMPERATURE(ch) -= amount;
+		
+		// don't cool past 0 from drinking
+		GET_TEMPERATURE(ch) = MAX(0, GET_TEMPERATURE(ch));
+		
+		val -= 1;
+		any = TRUE;
+	}
+	
+	if (IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WARMING) && GET_TEMPERATURE(ch) < ambient + 5) {
+		// warm
+		GET_TEMPERATURE(ch) += amount;
+		
+		// don't warm past 0 from drinking
+		GET_TEMPERATURE(ch) = MIN(0, GET_TEMPERATURE(ch));
+		
+		val += 1;
+		any = TRUE;
+	}
+	
+	if (any) {
+		update_MSDP_temperature(ch, FALSE, UPDATE_SOON);
+	}
+	
+	return val;
 }

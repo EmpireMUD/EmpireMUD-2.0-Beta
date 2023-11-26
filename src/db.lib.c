@@ -254,6 +254,32 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				break;
 			}
 			
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_ADV_TEMPERATURE_TYPE(adv) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -295,6 +321,11 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
+	
+	// Z: misc data
+	if (GET_ADV_TEMPERATURE_TYPE(adv)) {
+		fprintf(fl, "Z1 %d\n", GET_ADV_TEMPERATURE_TYPE(adv));
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -815,6 +846,31 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				LL_APPEND(GET_BLD_RELATIONS(bld), relat);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_BLD_TEMPERATURE_TYPE(bld) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -910,6 +966,11 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// U: relations (formerly upgrades_to)
 	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
 		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
+	}
+	
+	// Z: misc data
+	if (GET_BLD_TEMPERATURE_TYPE(bld)) {
+		fprintf(fl, "Z1 %d\n", GET_BLD_TEMPERATURE_TYPE(bld));
 	}
 	
 	// end
@@ -6085,6 +6146,31 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				parse_trig_proto(line, &GET_RMT_SCRIPTS(rmt), buf2);
 				break;
 			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_RMT_TEMPERATURE_TYPE(rmt) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6150,6 +6236,11 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_RMT_SCRIPTS(rmt));
+	
+	// Z: misc data
+	if (GET_RMT_TEMPERATURE_TYPE(rmt)) {
+		fprintf(fl, "Z1 %d\n", GET_RMT_TEMPERATURE_TYPE(rmt));
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -6268,7 +6359,8 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	sector_data *sect, *find;
 	double dbl_in;
 	int int_in[4];
-		
+	bitvector_t bit_in;
+	
 	// for error messages
 	sprintf(buf2, "sector vnum %d", vnum);
 	
@@ -6322,14 +6414,14 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			
 			// evolution
 			case 'E': {
-				if (!get_line(fl, line) || sscanf(line, "%d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) != 4) {
+				if (!get_line(fl, line) || sscanf(line, "%d %lld %lf %d", &int_in[0], &bit_in, &dbl_in, &int_in[2]) != 4) {
 					log("SYSERR: Bad data in E line of %s", buf2);
 					exit(1);
 				}
 				
 				CREATE(evo, struct evolution_data, 1);
 				evo->type = int_in[0];
-				evo->value = int_in[1];
+				evo->value = bit_in;
 				evo->percent = dbl_in;
 				evo->becomes = int_in[2];
 				LL_APPEND(GET_SECT_EVOS(sect), evo);
@@ -6358,6 +6450,31 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			
 			case 'X': {	// extra desc
 				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
+				break;
+			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_SECT_TEMPERATURE_TYPE(sect) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", buf2, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", buf2, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", buf2);
+					exit(1);
+				}
 				break;
 			}
 			
@@ -6419,7 +6536,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	// E: evolution
 	for (evo = GET_SECT_EVOS(st); evo; evo = evo->next) {
 		fprintf(fl, "E\n");
-		fprintf(fl, "%d %d %.2f %d\n", evo->type, evo->value, evo->percent, evo->becomes);
+		fprintf(fl, "%d %lld %.2f %d\n", evo->type, evo->value, evo->percent, evo->becomes);
 	}
 	
 	// I: interactions
@@ -6433,6 +6550,11 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));
+	
+	// Z: misc data
+	if (GET_SECT_TEMPERATURE_TYPE(st)) {
+		fprintf(fl, "Z1 %d\n", GET_SECT_TEMPERATURE_TYPE(st));
+	}
 	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
 		strcpy(temp, GET_SECT_NOTES(st));
@@ -8188,6 +8310,7 @@ void free_whole_library(void) {
 	struct global_data *glb, *next_glb;
 	struct int_hash *int_iter, *next_int_iter;
 	struct island_info *island, *next_island;
+	struct message_list *msg_set, *next_msg_set;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
 	player_index_data *pid, *next_pid;
@@ -8391,6 +8514,10 @@ void free_whole_library(void) {
 		free_quest_lookups(MOB_QUEST_LOOKUPS(mob));
 		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
+	}
+	HASH_ITER(hh, fight_messages, msg_set, next_msg_set) {
+		HASH_DEL(fight_messages, msg_set);
+		free_message_list(msg_set);
 	}
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		remove_morph_from_table(morph);

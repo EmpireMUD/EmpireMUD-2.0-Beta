@@ -680,7 +680,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		return;
 	}
 	
-	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, GET_SECT_CLIMATE(SECT(target))))) {
+	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(target)))) {
 		// no crop sects?
 		return;
 	}
@@ -788,12 +788,15 @@ void send_char_pos(char_data *ch, int dam) {
 			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
 			send_to_char("You are dead!  Sorry...\r\n", ch);
 			break;
-		default:                        /* >= POSITION SLEEPING */
-			if (dam > (GET_MAX_HEALTH(ch) / 4))
-				act("That really did HURT!", FALSE, ch, 0, 0, TO_CHAR);
-			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4))
-				msg_to_char(ch, "&rYou wish that your wounds would stop BLEEDING so much!&0\r\n");
+		default: {                        /* >= POSITION SLEEPING */
+			if (dam > (GET_MAX_HEALTH(ch) / 4)) {
+				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+			}
+			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4)) {
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+			}
 			break;
+		}
 	}
 }
 
@@ -1135,7 +1138,7 @@ void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL;
 	struct companion_data *cd;
-	char_data *mob = NULL;
+	char_data *find, *mob = NULL;
 	obj_data *obj = NULL;
 	room_data *room = NULL;
 	bool clear;
@@ -1214,6 +1217,21 @@ void script_modify(char *argument) {
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			change_short_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "tag")) {
+			if (IS_NPC(mob)) {
+				if (*value && *value == UID_CHAR && (find = find_char(atoi(value+1)))) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+					tag_mob(mob, find);
+				}
+				else if (!str_cmp(value, "none")) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+				}
+				else {
+					script_log("%%mod%% tag: unable to find target");
+				}
+			}
+			// silent fail otherwise
 		}
 		else {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);

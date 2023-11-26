@@ -88,7 +88,10 @@ down by one. When they run out, the effect ends until the daily skill reset.
 You can keep yourself from accidentally spending your daily bonus experience
 in the wrong skill by using 'noskill'.
 
-See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL
+You can put your amount of bonus experience in your prompt if you want an easy
+way to see it.
+
+See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL, PROMPT
 #
 DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY GREATHALL "GREAT HALL"
 
@@ -264,7 +267,7 @@ See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT TORCH
 
-Usage:  light <item | building | vehicle | area | direction>
+Usage:  light <item>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
@@ -571,10 +574,13 @@ When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
 
-The ability/abilities commands are identical to the skills command.
+If you don't want to see alerts each time you gain a skill level, you can turn
+them off with the "smessages" command.
+
+The ability (or abilities) command is identical to the skills command.
 
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
-   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
+   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 

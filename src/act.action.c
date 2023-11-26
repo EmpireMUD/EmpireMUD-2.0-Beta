@@ -343,7 +343,7 @@ void update_actions(void) {
 		if (IS_SET(act_flags, ACTF_EVEN_FASTER)) {
 			speed += ACTION_CYCLE_SECOND;
 		}
-		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
+		if (IS_SET(act_flags, ACTF_HASTE) && IS_HASTENED(ch)) {
 			speed += ACTION_CYCLE_HALF_SEC;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
@@ -391,7 +391,7 @@ void update_actions(void) {
 		}
 		
 		// things that slow you down
-		if ((AFF_FLAGGED(ch, AFF_SLOW) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) && !IS_SET(act_flags, ACTF_IGNORE_COND)) {
+		if ((IS_SLOWED(ch) || AFF_FLAGGED(ch, AFF_SLOWER_ACTIONS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) && !IS_SET(act_flags, ACTF_IGNORE_COND)) {
 			speed /= 2.0;
 			speed = MAX(1.0, speed);	// don't stall them completely
 		}
@@ -3557,7 +3557,7 @@ ACMD(do_plant) {
 	else if (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"))) {
 		msg_to_char(ch, "You must plant that closer to fresh water.\r\n");
 	}
-	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
+	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, get_climate(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
 			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
 			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);

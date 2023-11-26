@@ -837,6 +837,8 @@ void olc_show_adventure(char_data *ch) {
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
 	
+	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	
 	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
 	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
@@ -1553,6 +1555,12 @@ OLC_MODULE(advedit_reset) {
 OLC_MODULE(advedit_script) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	olc_process_script(ch, argument, &(GET_ADV_SCRIPTS(adv)), WLD_TRIGGER);
+}
+
+
+OLC_MODULE(advedit_temperature) {
+	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+	GET_ADV_TEMPERATURE_TYPE(adv) = olc_process_type(ch, argument, "temperature", "temperature", temperature_types, GET_ADV_TEMPERATURE_TYPE(adv));
 }
 
 

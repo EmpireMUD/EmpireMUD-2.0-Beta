@@ -1757,7 +1757,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 				data->x_coord = X_COORD(room);
 				data->y_coord = Y_COORD(room);
 				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, NULL, 0, validate_global_map_spawns, data);
 				free(data);
 			}
 		}
@@ -1925,6 +1925,9 @@ bool check_reset_mob(char_data *ch, bool force) {
 	
 	if (!IS_NPC(ch)) {
 		return FALSE;	// oops
+	}
+	if (AFF_FLAGGED(ch, AFF_POOR_REGENS)) {
+		return FALSE;	// delay due to poor-regen affect
 	}
 	
 	// things to check first (if not forced)
@@ -2149,6 +2152,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 	}
 	else if (room_max > 0 && !GET_MIN_SCALE_LEVEL(mob)) {
 		level = MIN(room_max, level);
+	}
+	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
 	}
 	
 	// insanity!

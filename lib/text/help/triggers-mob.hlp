@@ -497,7 +497,7 @@ When using field  - The variable returns:
 &chas_tech(ptech)&0 - Character has a given tech (see &yHELP PTECH&0)
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &chealth&0 - The current hit points of the actor.
-&cheshe&0 - Returns the correct pronoun (he/she/it). Use &%actor% for this in
+&cheshe&0 - Returns the correct pronoun (he/she/it). Use &&%actor% for this in
    echoes and sends.
 &chighest_level&0 - Returns the highest-ever level for a player or maximum scale
    level for NPCs.
@@ -604,6 +604,9 @@ When using field  - The variable returns:
 &cskill(name)&0 - The player's level in the given skill.
 &cspeaking&0 - Vnum of the language the character is set to speak.
 &cstr&0 - The actor's Strength.
+&ctemperature&0 - Player's current temperature as a number (usually -100 to 100).
+   &ctemperature(base)&0 - Player's base temperature without gear/affects.
+   &ctemperature(amount)&0 - Sets player's base temperature to amount.
 &cthirst&0 or &cthirst(hours)&0 - Returns how thirsty the player is, or makes
    them more or less thirsty (0 is not thirsty).
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.

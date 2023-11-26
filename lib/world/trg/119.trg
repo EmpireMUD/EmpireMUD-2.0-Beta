@@ -508,9 +508,13 @@ if %item%
 end
 * and check quests:
 if %actor.on_quest(11907)%
+  * send a blank line first
+  %send% %actor% &&0
   %quest% %actor% trigger 11907
 end
 if %actor.on_quest(11908)%
+  * send a blank line first
+  %send% %actor% &&0
   %quest% %actor% trigger 11908
   %quest% %actor% finish 11908
 end
@@ -2628,7 +2632,8 @@ while %ch%
         %teleport% %ch% %exit%
         %load% obj 11805 %ch%
       else
-        %slay% %ch% %ch.name% has drowned at %room.coords%!
+        set name %ch.real_name%
+        %slay% %ch% %name.cap% has drowned!
       end
     elseif %left% < 50
       %send% %ch% &&rYour nose and throat HURT as water presses its way in...&&0
@@ -3694,7 +3699,8 @@ switch %self.vnum%
       %send% %actor% You eat the little white mushroom but you don't feel so good...
       %send% %actor% Oh no... the world goes black and the last thing you feel is your head hitting something hard.
       %echoaround% %actor% ~%actor% eats a little white mushroom...
-      %slay% %actor% %actor.name% has accidentally died at %actor.room.coords%!
+      set name %actor.real_name%
+      %slay% %actor% %name.cap% has accidentally died at %actor.room.coords%!
       return 0
       %purge% %self%
     end
@@ -4797,6 +4803,14 @@ Skycleave: Shared get trigger (diary replacement, struggle)~
 1 g 100
 ~
 if %self.vnum% == 11890
+  * struggle
+  if %self.carried_by%
+    if %self.carried_by.affect(11822)%
+      * likely called during load trigger
+      return 1
+      halt
+    end
+  end
   * the struggle-- just purge
   %send% %actor% # You can't get that.
   return 0
@@ -5004,7 +5018,8 @@ elseif %mm%
   %purge% %self%
 else
   %echo% A bolt of lightning from nowhere strikes ~%actor% right in the chest!
-  %slay% %actor% %actor.name% has died of hubris at %actor.room.coords%!
+  set name %actor.real_name%
+  %slay% %actor% %name.cap% has died of hubris at %actor.room.coords%!
   * aaaand...
   if %knezz%
     wait 1

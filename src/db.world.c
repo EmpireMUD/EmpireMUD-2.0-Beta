@@ -1004,6 +1004,7 @@ void uncrop_tile(room_data *room) {
 	
 	// 4. attempt to find one
 	if (!to_sect) {
+		// should this be get_climate(room) rather than GET_SECT_CLIMATE(SECT(room)) ?
 		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags, GET_SECT_CLIMATE(SECT(room)));
 	}
 	
@@ -3313,6 +3314,7 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 	struct island_info *isle = NULL;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
+	bitvector_t climate;
 	
 	// small amount of random so the edges of the crops are less linear on the map
 	x += number(-10, 10);
@@ -3322,11 +3324,13 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 	x = WRAP_X_COORD(x);
 	y = WRAP_Y_COORD(y);
 	
+	climate = get_climate(location);
+	
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		// basic checks
-		if (!MATCH_CROP_SECTOR_CLIMATE(crop, SECT(location))) {
+		if (!MATCH_CROP_SECTOR_CLIMATE(crop, climate)) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {

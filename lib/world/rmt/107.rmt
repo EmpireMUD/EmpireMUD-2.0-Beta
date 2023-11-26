@@ -13,6 +13,7 @@ steps ice stairs~
 Stairs have been cut from the ice to make it easier to climb the mountain.
 ~
 M 0 10704 50.00 3
+Z1 1
 S
 #10701
 A Winter Wonderland~
@@ -37,6 +38,7 @@ staircase stairs icy~
 The staircase is cut from the ice and spirals up the whole mountain.
 ~
 M 0 10702 100.00 1
+Z1 1
 S
 #10702
 A Winter Wonderland~
@@ -53,6 +55,7 @@ D2
 0 10703
 M 0 10704 50.00 3
 M 0 10713 100.00 1
+Z1 1
 S
 #10703
 A Winter Wonderland~
@@ -76,6 +79,7 @@ sugarplums~
 The sugarplums appear to be dancing.
 ~
 M 0 10704 50.00 3
+Z1 1
 S
 #10704
 A Winter Wonderland~
@@ -96,6 +100,7 @@ staircase stairs icy~
 The staircase is cut from the ice and spirals up the whole mountain.
 ~
 M 0 10701 100.00 1
+Z1 1
 S
 #10705
 The Snowy Peak~
@@ -118,6 +123,7 @@ throne~
 actually be made from candy canes.
 ~
 M 0 10703 100.00 1
+Z1 1
 S
 #10706
 An Icy Cave~
@@ -129,6 +135,7 @@ aci 0 0 10700
 D4
 ~
 0 10703
+Z1 1
 S
 #10730
 Misplaced Mother Goose Spawning Chamber~

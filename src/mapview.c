@@ -21,7 +21,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "utils.h"
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"

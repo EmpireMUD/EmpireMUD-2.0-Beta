@@ -141,6 +141,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	char_from_room(ch);
 	char_to_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 
 	if (!IS_NPC(ch) && POOFIN(ch)) {
 		if (!strstr(POOFIN(ch), "$n"))
@@ -326,6 +327,7 @@ ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
+ADMIN_UTIL(util_temperature);
 ADMIN_UTIL(util_tool);
 ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
@@ -351,6 +353,7 @@ struct {
 	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
+	{ "temperature", LVL_START_IMM, util_temperature },
 	{ "tool", LVL_IMPL, util_tool },
 	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
@@ -1397,6 +1400,120 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_temperature) {
+	int calc_temp, climate_val, season_count, season_val, sun_count, sun_val, bit, find;
+	int use_sun = get_sun_status(IN_ROOM(ch)), use_season = GET_SEASON(IN_ROOM(ch));
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
+	bitvector_t climates;
+	char cold_mod_part[256], heat_mod_part[256], season_part[256], sun_part[256], arg[MAX_INPUT_LENGTH];
+	
+	argument = one_argument(argument, arg);
+	while (*arg) {
+		if ((find = search_block(arg, sun_types, FALSE)) != NOTHING) {
+			use_sun = find;
+		}
+		else if ((find = search_block(arg, icon_types, FALSE)) != NOTHING && find != TILESET_ANY) {
+			use_season = find;
+		}
+		else {
+			msg_to_char(ch, "Invalid argument: %s\r\n", arg);
+			return;
+		}
+		
+		// repeat
+		argument = one_argument(argument, arg);
+	}
+	
+	msg_to_char(ch, "Temperature information for this room:\r\n");
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[use_season];
+	sun_val = sun_temperature[use_sun];
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
+	climates = get_climate(IN_ROOM(ch));
+	
+	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[use_season]);
+	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[use_sun]);
+	
+	// determine climates
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			climate_val += climate_temperature[bit].base_add;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+				snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
+			}
+			else {
+				strcpy(season_part, "no mod for");
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+				snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
+			}
+			else {
+				strcpy(sun_part, "no mod for");
+			}
+			
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD && climate_temperature[bit].cold_modifier != 1.0) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+				snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
+			}
+			else {
+				*cold_mod_part = '\0';
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD && climate_temperature[bit].heat_modifier != 1.0) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
+				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
+			}
+			else {
+				*heat_mod_part = '\0';
+			}
+			
+			msg_to_char(ch, "%s: %+d, %s sun, %s seasonal%s%s\r\n", climate_flags[bit], climate_temperature[bit].base_add, sun_part, season_part, cold_mod_part, heat_mod_part);
+		}
+	}
+	
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
+	}
+	
+	msg_to_char(ch, "Final temperature: %.1f (%s), %.1f%% sun, %.1f%% seasonal\r\n", temperature, temperature_to_string((int) (temperature + 0.5)), 100.0 * sun_mod, 100.0 * season_mod);
+	
+	// and now using internal funcs
+	calc_temp = calculate_temperature(TEMPERATURE_USE_CLIMATE, get_climate(IN_ROOM(ch)), use_season, use_sun);
+	msg_to_char(ch, "Computed temperature for verification: %d %s.\r\n", calc_temp, temperature_to_string(calc_temp));
 }
 
 
@@ -3040,6 +3157,46 @@ SHOW(show_factions) {
 }
 
 
+SHOW(show_fmessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show fmessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Fight message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_FIGHT_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_home) {
 	char name[MAX_INPUT_LENGTH];
 	bool file = FALSE;
@@ -3748,6 +3905,46 @@ SHOW(show_resource) {
 		msg_to_char(ch, "Highest active empire: %s (%lld stored)\r\n", EMPIRE_NAME(highest_emp), highest_amt);
 	}
 	msg_to_char(ch, "%d total empire%s: %lld stored, %lld mean, %d empires have any\r\n", total_emps, PLURAL(total_emps), total, (total / MAX(1, total_emps)), emps_storing);
+}
+
+
+SHOW(show_smessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show smessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Status message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *status_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_STATUS_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", status_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
 }
 
 
@@ -6026,6 +6223,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
 	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
 	
@@ -6127,6 +6326,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
 	msg_to_char(ch, "Base affects: &g%s&0\r\n", buf);
+	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
@@ -6339,6 +6540,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
+		msg_to_char(ch, "Temperature: %d (%s), Warmth: %d, Cooling: %d\r\n", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
 		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
@@ -7161,6 +7363,13 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
 	}
 	
+	// temperature info
+	msg_to_char(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	if (get_climate(IN_ROOM(ch)) != NOBITS) {
+		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
+		msg_to_char(ch, "Climate: \tc%s\t0\r\n", buf);
+	}
+	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
 	}
@@ -7429,6 +7638,8 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
 	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
@@ -7485,7 +7696,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
 	
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Climate: &c%s&0\r\n", buf);
+	msg_to_char(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0\r\n", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
@@ -9996,6 +10207,9 @@ ACMD(do_reload) {
 		top_of_helpt = 0;
 		index_boot_help();
 	}
+	else if (!str_cmp(arg, "fmessages") || !str_cmp(arg, "fightmessages")) {
+		load_fight_messages();
+	}
 	else if (!str_cmp(arg, "data")) {
 		load_data_table();
 	}
@@ -10090,7 +10304,7 @@ ACMD(do_restore) {
 	int i, iter;
 	
 	// modes
-	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE;
+	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE, temperature = FALSE;
 
 	type_args = one_argument(argument, name_arg);
 	skip_spaces(&type_args);
@@ -10164,6 +10378,9 @@ ACMD(do_restore) {
 			}
 			else if (is_abbrev(arg, "thirsty")) {
 				thirst = TRUE;
+			}
+			else if (is_abbrev(arg, "temperature")) {
+				temperature = TRUE;
 			}
 			else {
 				msg_to_char(ch, "Unknown restore type '%s'.\r\n", arg);
@@ -10253,6 +10470,12 @@ ACMD(do_restore) {
 			GET_COND(vict, DRUNK) = 0;
 		}
 		sprintf(types + strlen(types), "%s drunkenness", *types ? "," : "");
+	}
+	
+	// temperature
+	if (all || temperature) {
+		reset_player_temperature(vict);
+		sprintf(types + strlen(types), "%s temperature", *types ? "," : "");
 	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
@@ -10530,6 +10753,8 @@ ACMD(do_show) {
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 		{ "subzone", LVL_START_IMM, show_subzone },
 		{ "tomb", LVL_START_IMM, show_tomb },
+		{ "fmessages", LVL_START_IMM, show_fmessages },
+		{ "smessages", LVL_START_IMM, show_smessages },
 
 		// last
 		{ "\n", 0, NULL }
@@ -10988,6 +11213,7 @@ ACMD(do_trans) {
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+				RESET_LAST_MESSAGED_TEMPERATURE(victim);
 				msdp_update_room(victim);	// once we're sure we're staying
 			}
 		}
@@ -11016,6 +11242,7 @@ ACMD(do_trans) {
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+			RESET_LAST_MESSAGED_TEMPERATURE(victim);
 			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
 		}

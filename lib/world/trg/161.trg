@@ -172,7 +172,7 @@ adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.real_location%
   %force% %actor% adventure
-  %teleport% %actor% %self%
+  %teleport% %actor% %self.room%
   return 1
   halt
 end

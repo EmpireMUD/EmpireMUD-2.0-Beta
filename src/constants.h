@@ -68,6 +68,7 @@ extern const char *class_role_color[];
 extern const struct toggle_data_type toggle_data[];
 extern const char *connected_types[];
 extern const char *player_tech_types[];
+extern const char *status_message_types[];
 extern const char *syslog_types[];
 
 // direction and room constants
@@ -153,6 +154,7 @@ extern const char *generic_types[];
 extern const bool generic_types_uses_in_dev[];
 extern const char *generic_flags[];
 extern const char *language_types[];
+extern const char *liquid_flags[];
 
 // mob constants
 extern const char *action_bits[];
@@ -213,6 +215,7 @@ extern const char *bld_flags[];
 extern const char *bld_relationship_types[];
 extern const int bld_relationship_vnum_types[];
 extern const char *climate_flags[];
+extern const struct climate_temperature_t climate_temperature[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
@@ -235,7 +238,10 @@ extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *seasons[];
 extern const char *icon_types[];
+extern const int season_temperature[];
 extern const char *sun_types[];
+extern const int sun_temperature[];
+extern const char *temperature_types[];
 extern const char *weather_types[];
 
 // for the second dimension of: climate_ruins_vehicle_slowly[climate][when]
@@ -247,6 +253,7 @@ extern const char *shop_flags[];
 
 // skill constants
 extern const char *damage_types[];
+extern const int damage_type_to_dot_attack[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
 extern const char *weapon_types[];
@@ -314,6 +321,7 @@ extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
 extern const int primary_attributes[];
 extern struct promo_code_list promo_codes[];
+extern const int round_level_scaling_to_nearest;
 extern const double score_levels[];
 extern const int techs_requiring_same_island[];
 extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];

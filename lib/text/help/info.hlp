@@ -356,6 +356,8 @@ Advanced traits (require 12 hours of playtime):
  Salt blooded (never thirsty)
  Tenacious waif (never hungry)
  Surveyor (+1 view height)
+ Fireborn (tolerates warm climates)
+ Frostborn (tolerates cold climates)
 #
 BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 
@@ -390,6 +392,14 @@ opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
 See also: SCORE
+#
+"BRIEF RESPITE" RESPITE
+
+After death, your character receives a brief respite during which they are
+unaffected by heat or cold. This should give you time to move if the location
+of your tomb is suffering inclement weather.
+
+See also: RESPAWN
 #
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
@@ -512,7 +522,7 @@ on claimed land, or disappear over time on unclaimed land.
 The 'coins' command also shows special currencies (e.g. from adventures). You
 can search for specific ones by typing the name, such as 'coins permafrost'.
 
-See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
+See also: DEPOSIT, EXCHANGE, MINT, SPLIT, TREASURE, WITHDRAW
 #
 COMPONENT COMPONENTS RESOURCE RESOURCES
 
@@ -568,6 +578,11 @@ This command lists abilities and actions that you currently have cooling down.
 That is, things you can't use yet because the timer hasn't expired. Some
 abilities can only be used every so often, usually for reasons relating to
 game balance.
+
+If you don't want to see alerts when your cooldowns expire, you can turn them
+off with the "smessages" command.
+
+See also: STATUS MESSAGES
 #
 DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
 
@@ -602,7 +617,17 @@ Examples:
   You SLAUGHTER the pig with your chop!
   You **LIQUIDATE** the ice sculpture with your fire!
 
-See also: CASTER DPS, DOT, HIT, MELEE DPS, METERS
+See also: CASTER DPS, DAMAGE NUMBERS, DOT, HIT, MELEE DPS, METERS
+#
+"DAMAGE NUMBERS"
+
+You can see the amount of damage you deal, as well as the amount dealt to you,
+by turning on "fmessages damage numbers". Damage you deal is shown as a
+positive number, and damage dealt to you is shown as a negative number.
+
+To see cumulative damage over the course of a fight, use "meters".
+
+See also: METERS
 #
 DARK NIGHT DIM "DIMLY-LIT" "DIMLY LIT"
 
@@ -777,7 +802,7 @@ Temperate crops (plains):
  &g%&Bo&g%%&0  Blueberries         &Y^^&Ro&Y^&0  Cherries             &Y^&to&Y^^&0  Coffee
  &giiii&0  Corn                &T,,,,&0  Garlic               &gxgxx&0  Grapes
  &g::::&0  Hops                &Tiiii&0  Oats                 &Y^o^^&0  Peaches
- &G....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
+ &G&u....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
  &gn&Rv&gnn&0  Strawberries        &Ro&g88&Ro&0  Tomatoes             &Y;;;;&0  Wheat
 
 River crops (plains near river):
@@ -941,7 +966,12 @@ are hungry, thirsty, or blood-starved.
 Regeneration drops to very low levels when a character is hungry, thirsty, or
 starving. Sleeping may be the only way to regenerate in this case.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, REGENS, SATED THIRST, SLEEP, TIME
+You can turn off the hunger, thirst, and low blood warnings with the
+"smessages" command. These conditions can also be put into your prompt or found
+through MSDP.
+
+See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
+   STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
 INFRA INFRAVISION
 
@@ -1017,6 +1047,9 @@ Gear level: Your gear level raises your total level to 50 more than the average
 Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
+
+Levels for mobs and items are rounded up to the next 5 (e.g. 73 to 75, 109 to
+110).
 
 Note: Until level 100, you must be in the same level range as an item
    (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
@@ -1161,6 +1194,8 @@ EmpireMUD supports the following MSDP variables:
  BONUS_EXP - Daily bonus experience remaining
  INVENTORY - Current inventory size
  INVENTORY_MAX - Maximum inventory size
+ TEMPERATURE - Numeric value of player's temperature
+ TEMPERATURE_LABEL - Player's temperature as a string
 
  Current attributes: STR, DEX, CHA, GRT, INT, WIT
  Natural attributes: STR_PERM, DEX_PERM, CHA_PERM, GRT_PERM, INT_PERM, WIT_PERM
@@ -1205,6 +1240,8 @@ EmpireMUD supports the following MSDP variables:
  WORLD_MONTH - Current month (January, etc)
  WORLD_YEAR - Current year number
  WORLD_SEASON - Current season
+ AMBIENT_TEMPERATURE - Numeric value of room temperature
+ AMBIENT_TEMPERATURE_LABEL - Room temperature as a string
 
  The following GUI variables are provided, for a generic GUI:
   BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5
@@ -1454,6 +1491,8 @@ to the level of the player or group that is fighting them. Each mob has a
 minimum and maximum scale level, and will scale to any level in that range,
 based on the composite skill of the player.
 
+Levels for mobs are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
+
 Some mobs have additional adjustments that make them harder or require more
 effort to beat them. You can use the 'consider' command to determine if you
 should be fighting a given mob.
@@ -1624,6 +1663,21 @@ Characters will normally recover from this through normal regeneration.
 Note: Some scripting NPCs can stun characters even while they have stun
 immunity. This is part of the combat script.
 #
+SUN SUNRISE SUNSET DAY
+
+The sun generally rises and sets each day, with the exact time determined by
+the time of year and the latitude where you're standing on the map.
+
+If you have not already typed "look" or moved around as the sun rises or sets,
+you will automatically look at the map (you can disable this with the command
+"smessages sun auto look"). The "smessages" command can also be used to turn
+off sunrise and sunset messages.
+
+You can check the current time of day with the "time" command, which will also
+tell you whether it's daytime or nighttime.
+
+See also: PROMPT, STATUS MESSAGES, TIME
+#
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
 When a player damages a mob, that mob becomes tagged by the player and his or
@@ -1693,6 +1747,17 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+TREASURE TREASURES
+
+An empire's treasure is the part of their wealth that's made of valuable items
+and precious metals, excluding coins. Storing an item that gives wealth (as
+shown on "identify") will increase the treasure shown on your "estats".
+
+Many types of treasure can be minted to produce coins. This does not change the
+value; you get 10x the wealth rating in coins, and coins are worth 0.1 wealth.
+
+See also: COINS, ESTATS, IDENTIFY, MINT, WEALTH
 #
 TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
 

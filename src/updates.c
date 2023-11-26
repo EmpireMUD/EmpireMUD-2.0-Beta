@@ -2645,6 +2645,45 @@ PLAYER_UPDATE_FUNC(b5_153_player_repair) {
 }
 
 
+// b5.162: Players now have status message preferences.
+PLAYER_UPDATE_FUNC(b5_162_status_messages) {
+	// bits to migrate
+	bitvector_t PRF_MORTLOG = BIT(6);
+	bitvector_t PRF_NO_CHANNEL_JOINS = BIT(15);
+	bitvector_t PRF_TRAVEL_LOOK = BIT(35);
+
+	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
+	GET_FIGHT_MESSAGES(ch) |= FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK;
+	
+	// mortlog
+	if (PRF_FLAGGED(ch, PRF_MORTLOG)) {
+		SET_BIT(GET_STATUS_MESSAGES(ch), SM_MORTLOG);
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_MORTLOG);
+	}
+	else {
+		REMOVE_BIT(GET_STATUS_MESSAGES(ch), SM_MORTLOG);
+	}
+	
+	// !channel-joins
+	if (PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS)) {
+		REMOVE_BIT(GET_STATUS_MESSAGES(ch), SM_CHANNEL_JOINS);
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_NO_CHANNEL_JOINS);
+	}
+	else {
+		SET_BIT(GET_STATUS_MESSAGES(ch), SM_CHANNEL_JOINS);
+	}
+	
+	// travel-look
+	if (PRF_FLAGGED(ch, PRF_TRAVEL_LOOK)) {
+		SET_BIT(GET_STATUS_MESSAGES(ch), SM_TRAVEL_AUTO_LOOK);
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_TRAVEL_LOOK);
+	}
+	else {
+		REMOVE_BIT(GET_STATUS_MESSAGES(ch), SM_TRAVEL_AUTO_LOOK);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2708,6 +2747,7 @@ const struct {
 	{ "b5.151.1", b5_151_terrain_fix, NULL, "Repairing bad terrains and updating with new oases and irrigated terrains" },
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
+	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

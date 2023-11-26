@@ -210,7 +210,7 @@ ACMD(do_damage_spell) {
 	// check counterspell and then damage
 	if (!trigger_counterspell(vict)) {
 		//msg_to_char(ch, "Damage: %d\r\n", dmg);
-		result = damage(ch, vict, dmg, damage_spell[type].attack_type, DAM_MAGICAL);
+		result = damage(ch, vict, dmg, damage_spell[type].attack_type, DAM_MAGICAL, NULL);
 		
 		// damage returns -1 on death
 		if (result > 0 && !IS_DEAD(vict) && !EXTRACTED(vict) && (damage_spell[type].aff_immunity == NOBITS || !AFF_FLAGGED(vict, damage_spell[type].aff_immunity))) {
@@ -225,7 +225,7 @@ ACMD(do_damage_spell) {
 	}
 	else {
 		// counterspell
-		damage(ch, vict, 0, damage_spell[type].attack_type, DAM_MAGICAL);
+		damage(ch, vict, 0, damage_spell[type].attack_type, DAM_MAGICAL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {

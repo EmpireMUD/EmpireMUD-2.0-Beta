@@ -14,12 +14,11 @@
 #include "sysdep.h"
 
 #include "structs.h"
+#include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
 #include "db.h"
-#include "utils.h"
 #include "handler.h"
-#include "utils.h"
 #include "olc.h"
 #include "skills.h"
 #include "vnums.h"
@@ -76,6 +75,7 @@ ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
+ACMD(do_buffs);
 ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
@@ -413,6 +413,7 @@ ACMD(do_tan);
 ACMD(do_tavern);
 ACMD(do_tedit);
 ACMD(do_tell);
+ACMD(do_temperature);
 ACMD(do_territory);
 ACMD(do_throw);
 ACMD(do_tie);
@@ -604,6 +605,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	STANDARD_CMD( "brew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "buffs", POS_SLEEPING, do_buffs, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	SCMD_CMD( "burn", POS_SITTING, do_burn, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
@@ -729,8 +731,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "factions", POS_DEAD, do_factions, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "fastmorph", POS_RESTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_FASTMORPH ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_FIGHT ),
+	SCMD_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_FIGHT ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "finish", POS_DEAD, do_finish, NO_MIN, CTYPE_UTIL ),
@@ -1001,6 +1003,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "stake", POS_FIGHTING, do_stake, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "start", POS_DEAD, do_start, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SCMD_CMD( "statusmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
+	SCMD_CMD( "smessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
 	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
@@ -1024,6 +1028,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_TELL_HISTORY ),
+	SIMPLE_CMD( "temperature", POS_DEAD, do_temperature, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
@@ -2911,7 +2916,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("This game does not allow existing 'approved' characters to log in from public\r\n", d);
 				SEND_TO_Q("hosts (such as Mudconnector) that do not provide your IP address. You can only\r\n", d);
 				SEND_TO_Q("log in from this host using a character that is not 'approved', or a new\r\n", d);
-				SEND_TO_Q("character (which will not be approved.\r\n", d);
+				SEND_TO_Q("character (which will not be approved). To install a MUD client on your own\r\n", d);
+				SEND_TO_Q("computer, visit https://empiremud.net/play-now.html\r\n", d);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Approved character %s connecting from anonymous host [%s]", GET_NAME(d->character), d->host);
 				
 				STATE(d) = CON_GOODBYE;

@@ -524,8 +524,8 @@ automatically format itself.
 
 Supported fields are:
  Players: companion <vnum | none>
- Mobs: keywords, longdesc, sex, shortdesc, lookdesc, append-lookdesc,
-          append-lookdesc-noformat **
+ Mobs: keywords, longdesc, sex, tag *, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
  Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
@@ -535,7 +535,9 @@ Supported fields are:
 Appending to descriptions triggers string formatting. Using the 'noformat'
 version will prevent this.
 
-** NOTE: Regular mobs do not save lookdescs to file (except companions).
+Special fields:
+ %mod% %mob% tag %player% - Changes who tagged the mob (and will get the loot)
+    to the specified player. Also accepts "none" to clear tags.
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d
@@ -898,6 +900,7 @@ See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
 
 %teleport% <victim | vehicle | object> <location>
+%teleport% <object> <person | vehicle | object | location>
 %teleport% all <location>
 %teleport% adventure <location>
 
@@ -908,6 +911,9 @@ command. Teleport can also move vehicles or objects.
 
 If you target 'adventure', all players in the entire adventure zone instance,
 plus their NPC followers, will be teleported to the target.
+
+Objects can be moved into other objects, into a person's inventory, or into
+a vehicle's inventory with this command.
 
 You can use i### to target a room in the current adventure instance by its
 room template vnum instead of live room number (if used in an instanced zone).

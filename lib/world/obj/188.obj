@@ -4,7 +4,7 @@ an empty grave~
 A grave lies empty here.~
 Something must have come out of the grave.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 1 24
 S
@@ -18,7 +18,7 @@ lantern to summon one.
    Type 'use turnip <difficulty>' to summon the horse man. You can choose
 Normal, Hard, Group, or Boss difficulty. The horse man is level 25-400.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 Q 18801
@@ -33,7 +33,7 @@ like someone might have dropped it, so it might be a bit dodgy. These candies
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 mp a 0 11
+6 mp a 0 0 11
 24 0 0
 0 72
 A
@@ -54,7 +54,7 @@ Some candy bonkers are on the ground.~
    This candy sure packs a punch. These candies start some of the daily
 Halloween quests -- look for more types of candy to find more quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -76,7 +76,7 @@ A handful of smarties have been scattered here.~
 of the daily Halloween quests -- look for more types of candy to find more
 quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -92,7 +92,7 @@ A full-size candy bar has been foolishly left behind.~
 These candies start some of the daily Halloween quests -- look for more types
 of candy to find more quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -108,7 +108,7 @@ Some stolen candy has been dropped here.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -124,7 +124,7 @@ Some pixy sticks are lying on the ground.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -140,7 +140,7 @@ Some sour demon heads have been scattered here.~
 part is merely a coating, though. These candies start some of the daily
 Halloween quests -- look for more types of candy to find more quests.
 ~
-6 mp a 0 9
+6 mp a 0 0 9
 24 0 0
 0 72
 A
@@ -156,7 +156,7 @@ Some everlasting goblin stoppers are scattered on the ground.~
 These candies start some of the daily Halloween quests -- look for more types
 of candy to find more quests.
 ~
-6 mp a 0 11
+6 mp a 0 0 11
 24 0 0
 0 72
 A
@@ -171,7 +171,7 @@ A manatomic fireball candy is hovering here.~
    This candy is bright red and ready to explode! These candies start some of
 the daily Halloween quests -- look for more types of candy to find more quests.
 ~
-6 mp a 0 11
+6 mp a 0 0 11
 24 0 0
 0 72
 A
@@ -193,7 +193,7 @@ Some necro wafers are rotting on the ground.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 mp a 0 12
+6 mp a 0 0 12
 24 0 0
 0 72
 A
@@ -207,7 +207,7 @@ a ghost costume~
 A ghost costume has been hanged here.~
 It's really just a sheet with two holes in it.
 ~
-2 mo ad 0 3
+2 mo ad 0 0 3
 0 0 0
 0 0
 A
@@ -225,7 +225,7 @@ A pirate costume is half-buried here.~
    It's got a peg leg, a hook hand, an eyepatch, and a piece of fruit that
 almost looks like a parrot.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 0 0
 A
@@ -242,7 +242,7 @@ a princess costume~
 A princess costume is draped elegantly before you.~
 A dress with stitches this fine could only have been made by mice.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 0 0
 A
@@ -259,7 +259,7 @@ a witch costume~
 A witch costume sits in a puddle of water.~
 The pointed hat and fake wart really complete the costume.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 0 0
 A
@@ -276,7 +276,7 @@ a skeleton costume~
 A skeleton costume is piled on the ground.~
 It's really just a bunch of bones and some string.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 0 0
 A
@@ -294,7 +294,7 @@ A wizard costume is sweeping up the floor.~
    This wizard robe is actually quite comfortable, and seems to appreciate that
 you think so.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 0 0
 A
@@ -313,7 +313,7 @@ A costume kit is lying here.~
 princess, witch, skeleton, and wizard). You can type 'learn costumes' to learn
 them all, but you'll need the Sew ability to make them.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 T 18818
@@ -325,7 +325,7 @@ A costume trunk is sitting here.~
    This trunk is filled with odds and ends to quickly put together a good
 costume. Type 'costume <citizen>' to put a costume onto a friendly citizen.
 ~
-3 ep a 0 5
+3 ep a 0 0 5
 18812 0 0
 0 0
 Q 18819
@@ -339,7 +339,7 @@ An empty costume trunk is sitting here.~
 costumes are etched into the sides of the trunk. Type 'sew halloween costume
 trunk' to make the costumes you'll need to complete the quest.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 0 0
 Q 18819
@@ -352,7 +352,7 @@ A warty wand is here.~
 side is etched with the words 'polymorph <citizen>' -- you spend a moment
 wondering what that does.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 4 0 0
 0 0
 Q 18821
@@ -364,7 +364,7 @@ the veil between the worlds~
 The veil between this world and the next has been shattered!~
 As you peer through the veil, a howling demon chases you back!
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 10 48
 T 18822
@@ -377,7 +377,7 @@ The spirit ritual notes are here.~
 and brings spirits into the realm of the living. You must merely find a city
 center and type 'rite spirits'.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 18823
@@ -391,7 +391,7 @@ A bog roll is here.~
 its most important use is for decoration. Visit three houses in your city and
 type 'use roll' to redecorate them.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 3 0 0
 0 0
 Q 18824
@@ -403,7 +403,7 @@ some paper remnants~
 The house is decked in long strands of white paper.~
 This looks like someone has thrown a bog roll over the house, repeatedly!
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 0 144
 S
@@ -414,7 +414,7 @@ A whistle that's slightly psychic has been left here.~
 This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 18826 0 0
 2 0
 S
@@ -427,7 +427,7 @@ to have the power to reflect Dracula himself, although you're certain he's just
 a myth. Regardless of whether or not he is real, you have the power to type
 'morph Dracula' while this mirror is in your possession.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 8 0
 Q 18827
@@ -439,7 +439,7 @@ the deed to an unearthly manor~
 The deed to an unearthly manor is here.~
 This deed allows you to build the 'unearthly manor' house.
 ~
-3 g a 0 4
+3 g a 0 0 4
 0 0 0
 0 0
 Q 18828
@@ -452,7 +452,7 @@ A goody bag has been dropped here.~
 goody' to find out what's in there. But be sure to open it before the event
 ends, or you'll miss out.
 ~
-3 p a 0 5
+3 p a 0 0 5
 0 0 0
 11 0
 T 18829
@@ -465,7 +465,7 @@ A glowing bone shield is resting on the ground.~
 filaments. The entire thing emits a strange orange glow, barely visible in
 daylight but overpowering at night.
 ~
-23 emp ao 0 3
+23 emp ao 0 0 3
 0 0 0
 14 0
 A
@@ -486,7 +486,7 @@ it is somehow strong enough to repel a mace. The whole shield has been crafted
 into the shape of a single large bat wing, and gives a faint violet glow in the
 dark.
 ~
-23 emp ao 0 3
+23 emp ao 0 0 3
 0 0 0
 7 0
 A
@@ -507,7 +507,7 @@ larger with magic. Leather wrapped around the top forms a sort of handle, and
 the talon has been hardened with some black metal that glows red in faint
 light.
 ~
-1 mp ao f 6
+1 mp ao f 0 6
 0 3 4
 14 0
 A
@@ -529,7 +529,7 @@ The Tome of the Nightmare Empire is hidden in the corner.~
 arcane magic. In bright light, the book emits a black glow as it devours stray
 beams of light and leaves only nightmares in their place.
 ~
-3 emp ao 0 6
+3 emp ao 0 0 6
 0 0 0
 14 0
 A
@@ -552,7 +552,7 @@ point. The lower jaw is missing, and the flesh is long gone. But the faint red
 glow that pulses from the skull gives you the feeling that you could kill
 anyone.
 ~
-3 mp ao 0 7
+3 mp ao 0 0 7
 0 0 0
 14 0
 A
@@ -570,7 +570,7 @@ A flaming gourd burns brightly on the ground.~
 wildfire placed in its mouth. It emits a pale yellow light, clearly visible in
 darkness, though it casts no light on the room.
 ~
-3 emp ao 0 8
+3 emp ao 0 0 8
 0 0 0
 7 0
 A
@@ -590,7 +590,7 @@ An oversized candy bag has been dropped here.~
 hold enough candy to last the winter. If only you could enchant it to hold even
 more...
 ~
-24 emp ar 0 4
+24 emp ar 0 0 4
 1 0 0
 11 0
 S
@@ -602,7 +602,7 @@ The headless centaur's saddle is lying here.~
 bleeds every time it rides into battle. It is said this saddle was once used to
 ride a headless centaur in the Great War.
 ~
-2 emp as 0 3
+2 emp as 0 0 3
 0 0 0
 2 0
 A
@@ -621,7 +621,7 @@ use it to upgrade the plague doctor mask, oversized candy bag, ghastly
 shackles, or haunted mask.
 Usage:  upgrade <item>
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 8 0
 T 18838
@@ -632,7 +632,7 @@ a headless horse whistle~
 A headless horse whistle is lying here.~
 This whistle will summon an eerie new mount.
 ~
-3 p a 0 6
+3 p a 0 0 6
 18839 0 0
 14 0
 T 9910
@@ -643,7 +643,7 @@ a nightmare whistle~
 A nightmare whistle dangles in the air.~
 This whistle will summon an eerie flying mount.
 ~
-3 p a 0 7
+3 p a 0 0 7
 18840 0 0
 14 0
 T 9910
@@ -655,7 +655,7 @@ A ghoul whistle has been dropped here.~
 This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 18841 0 0
 2 0
 S
@@ -667,7 +667,7 @@ A tray of candy apples is sitting on the ground.~
 irresistible. Through some strange magic, the apples actually grow this way on
 the tree. Perhaps some clever mage has cross-bred them with caramels.
 ~
-6 bg a 0 7
+6 bg a 0 0 7
 36 18842 0
 7 168
 O+ 1 6131
@@ -681,7 +681,7 @@ A piece of caramel is stuck to the ground.~
    This little piece of fresh caramel has a stem stuck in it. Perhaps it grew
 on a tree.
 ~
-6 0 a 0 6
+6 0 a 0 0 6
 2 0 0
 7 48
 O+ 1 6340
@@ -693,9 +693,11 @@ A mausoleum cornerstone is lying here.~
    This magnificent marble cornerstone allows you to build a 'mausoleum', a
 large tomb with multiple rooms.
 ~
-3 eg a 0 1
+3 eg a 0 0 2
 0 0 0
 1 0
+C
+1 1
 S
 #18845
 tree dead spooky~
@@ -704,7 +706,7 @@ A spooky dead tree is laying here.~
    This tree looks like it has been dead for some time, but you can probably
 still get some good lumber out of it.
 ~
-3 e a 0 5
+3 e a 0 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -719,9 +721,11 @@ some candy seeds~
 Some candy seeds are scattered here.~
 Who knows what you'd get if you planted these?
 ~
-3 b a 0 1
+3 b a 0 0 2
 0 18842 0
 0 0
+C
+1 1
 S
 #18847
 mask haunted~
@@ -739,7 +743,7 @@ forms, if you have the right skills:
 
 You must take off the mask to use these morphs.
 ~
-2 mp ae 0 4
+2 mp ae 0 0 4
 0 0 0
 0 0
 A
@@ -754,7 +758,7 @@ A pillaging pillowcase is standing up on its own!~
    If you are seeing this, it is broken. Please report to an immortal via the
 bug command.
 ~
-3 p a 0 10
+3 p a 0 0 10
 0 0 0
 7 0
 T 18809
@@ -767,7 +771,7 @@ the spirits of the dead~
 The spirits of the dead are appeased.~
 You must seek out a different tomb to make the rest of your sacrifices.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 10 48
 S
@@ -778,7 +782,7 @@ The metal offering instructions are lying here.~
    Take 10x (common metal ingots) to 'offer' at 5 different tombs to complete
 this quest. Common metals include iron and bronze ingots.
 ~
-3 0 a 0 9
+3 0 a 0 0 9
 5 0 0
 0 0
 Q 18829
@@ -791,7 +795,7 @@ The block offering instructions are lying here.~
    Take 10x (blocks) to 'offer' at 5 different tombs to complete this quest.
 You can use stone blocks or piles of bricks for the offerings.
 ~
-3 0 a 0 10
+3 0 a 0 0 10
 5 0 0
 0 0
 Q 18830
@@ -804,7 +808,7 @@ The rock offering instructions are lying here.~
    Take 10x (rocks) to 'offer' at 5 different tombs to complete this quest.
 Any generic rock, including flint and obsidian, will work.
 ~
-3 0 a 0 12
+3 0 a 0 0 12
 5 0 0
 0 0
 Q 18831
@@ -818,7 +822,7 @@ The fiber offering instructions are lying here.~
 quest. Common types of plant fiber are straw, sticks, leaves, branches, vines,
 and cotton.
 ~
-3 0 a 0 11
+3 0 a 0 0 11
 5 0 0
 0 0
 Q 18832
@@ -832,7 +836,7 @@ A simple grab bag is folded over here.~
 boring to look at. But you know that it is where you'll be hiding your
 pickpocketed candy from the citizens of your empire.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 11 0
 C
@@ -847,7 +851,7 @@ A small pack of freshly picked candy waits to be eaten.~
    Doesn't quite matter to you what kind of candy it is, and it isn't likely
 the spirits will care either. Just so long as you have five packs to turn in.
 ~
-6 k a 0 3
+6 k a 0 0 3
 1 0 0
 7 0
 C
@@ -861,7 +865,7 @@ A mirror, clearly coated in magic, floats around face height.~
    If you're seeing this, then report it to the immortals. This should be
 hidden text.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 10 0
 C
@@ -877,7 +881,7 @@ This wooden bucket is on the larger side and filled with water and apples.
 Type:  challenge <player>
 Then type:  bob bucket
 ~
-3 z a 0 8
+3 z a 0 0 8
 0 0 0
 0 0
 C
@@ -895,7 +899,7 @@ A wheel made up of dismantled skeleton lays here.~
 up of various bones, human from the look of them.
    With this wheel, you can 'manufacture' a 'corpse wagon'.
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 14 0
 C
@@ -910,7 +914,7 @@ through it and you have trouble grasping or blowing the whistle. What sort of
 thing is both bone and ghost at once?
    Type 'use whistle' to gain a new non-combat minipet.
 ~
-19 p a 0 7
+19 p a 0 0 7
 18859 0 0
 14 0
 S
@@ -923,7 +927,7 @@ from wood and straw, with a leather outer coating. You'll need to build it in
 one of your cities and animate it with magic. Type 'build info Bylda' to see
 what it requires and 'build Bylda' to start it.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 Q 18860
@@ -937,7 +941,7 @@ scarlet letters cover nearly every page in a spidery scrall, detailing how to
 summon various demons into the physical world.
 Type:  ritual demons
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 10 0
 Q 18861
@@ -949,7 +953,7 @@ Nether words~
 Nether words are here.~
 This just makes it impossible to maintain the nether portal.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 0 0
 S
@@ -962,7 +966,7 @@ unblinking eyes seem to follow your every move, though it's probably just your
 imagination.
    Type 'use doll' to add it as a minipet.
 ~
-19 p a 0 8
+19 p a 0 0 8
 18863 0 0
 6 0
 S
@@ -975,7 +979,7 @@ from bones and has an eerie orange glow. It looks like you need to 'bind' the
 spirits of three animals to it and then 'unleash <animal>' or 'unleash cage' to
 release one in your city.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 14 0
 C
@@ -992,7 +996,7 @@ A blooddrop-shaped charm rolls about here.~
 feel it would have something to do with being a vampire, but aren't quite sure
 what.
 ~
-3 k a 0 8
+3 k a 0 0 8
 0 0 0
 10 0
 C
@@ -1008,7 +1012,7 @@ A sheet of haunting music is folded here.~
    Carefully hand-drawn on a scroll of velum skin, there's music to play a
 haunting melody with nearly any instrument.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 7 0
 C
@@ -1023,7 +1027,7 @@ A sheet of haunting music is folded here.~
    Carefully hand-drawn on a scroll of velum skin, there's music to play a
 haunting melody with nearly any instrument.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 7 0
 C
@@ -1041,7 +1045,7 @@ for the dying adventurer, build a 'medical tent' at the tomb where he chose to
 summon the centaur and failed to defeat it (any cemetery should do). Then
 soothe the fallen adventurer into his final rest by playing some music.
 ~
-3 0 a 0 11
+3 0 a 0 0 11
 0 0 0
 7 0
 C
@@ -1055,7 +1059,7 @@ A hollowed out tooth has been shaped into a whistle.~
    Use this whistle to call a special zombie mount, whom this tooth was
 originally ripped from.
 ~
-3 p a 0 3
+3 p a 0 0 3
 18875 0 0
 14 0
 C
@@ -1070,7 +1074,7 @@ A reddened butcher's block has been dropped here.~
 split with a cleaver, and the color is suspiciously red. Use this block to
 build a 'slaughterhouse'.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 S
@@ -1084,9 +1088,11 @@ small ones. A few taps at the xylophone release a haunting, ethereal sound.
 The music it makes might be macabre enough to make even dead men danse.
    Hold the xylophone and type 'play' to use it.
 ~
-22 0 ao 0 2
+22 0 ao 0 0 3
 0 0 0
 0 0
+C
+1 1
 M
 2
 The rib cage xylophone releases melodic groans as you strike its bars.~
@@ -1122,7 +1128,7 @@ fly. You can use it on your headless horse or giant tarantula. You must already
 have one of these in your mount list, and you must be at a stable.
 Usage:  use ooze <headless horse OR giant tarantula>
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 8 0
 T 18878
@@ -1134,7 +1140,7 @@ A tarantula whistle is lying here.~
    Using this whistle will summon a giant tarantula mount. If it's as hairy as
 the whistle, you're not sure you want to see it.
 ~
-3 p a 0 7
+3 p a 0 0 7
 18879 0 0
 14 0
 T 9910
@@ -1148,7 +1154,7 @@ problem is you need to find her spirit first. Head to her tomb (or any tomb,
 really) and type 'invoke ancestor'. Afterwards, head to your family home (or
 any home, really) and type 'paint spirit'.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 C
@@ -1164,7 +1170,7 @@ A portrait of grandmother is lying here.~
 her family home. It's obvious the artist took great care in creating this
 loving image.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 C
@@ -1182,7 +1188,7 @@ marigolds. The portrait is of an elegant elderly woman in a mauve dress,
 standing in her family home. It's obvious the artist took great care in
 creating this loving image.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 0 576
 C
@@ -1199,7 +1205,7 @@ A set of ghastly shackles are hanging in thin air.~
 when you wear them, you feel a phantasmal lightness. And for some reason, you
 keep seeing ghosts.
 ~
-2 mp aj 0 1
+2 mp aj 0 0 1
 0 0 0
 2 0
 A
@@ -1224,7 +1230,7 @@ eyes but amplify the impression that you are looking at an enormous bird. It is
 said these masks protect you from disease, because birds are commonly known to
 be immune to the plague.
 ~
-2 mp ae 0 6
+2 mp ae 0 0 6
 0 0 0
 11 0
 A
@@ -1239,7 +1245,7 @@ a well-stitched whistle~
 A well-stitched whistle is lying here.~
 This whistle grants you a zombie terrier minipet. Use the whistle to get it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 18885 0 0
 2 0
 S
@@ -1249,7 +1255,7 @@ a roll of copper coins~
 A roll of copper coins is lying here.~
 It looks like someone rolled 10 worthless coins in a little wrapper.
 ~
-15 0 a 0 2
+15 0 a 0 0 2
 1 0 0
 2 0
 R
@@ -1264,7 +1270,7 @@ its top, in the shape of a little ball. These flowers are often used in rituals
 of remembrance for the dead. Drop the marigold at a grave and perhaps something
 special will happen.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 1024
 C
@@ -1280,7 +1286,7 @@ curving petals give it an elegant appearance that stands out even at a
 distance. These flowers are often placed on graves in remembrance of the dead.
 Drop the chrysanthemum at a grave and see what happens.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 1024
 C
@@ -1296,7 +1302,7 @@ bright light. Though roses symbolize many thing, from love to respect, this
 black rose represents only death. Drop the rose at a grave and perhaps
 something unexpected will happen.
 ~
-3 p a 0 5
+3 p a 0 0 5
 0 0 0
 0 1024
 C
@@ -1313,7 +1319,7 @@ the garden. At the top, the long vertical ridges on the pumpkin converge at a
 short green stem. You can craft a jack-o-lantern or bake a roast pumpkin from
 this.
 ~
-6 bg a 0 12
+6 bg a 0 0 12
 12 18890 0
 7 168
 C
@@ -1331,7 +1337,7 @@ a bunch of pumpkin seeds~
 Some pumpkin seeds are scattered here.~
 The oval seeds are pale and tough. Try baking roast pumpkin seeds.
 ~
-3 b a 0 10
+3 b a 0 0 10
 0 18890 0
 7 1152
 C
@@ -1347,7 +1353,7 @@ A pumpkin blossom has fallen here.~
 achieve, like a little blossom wearing a flowing dress. You've heard that some
 people eat these flowers.
 ~
-6 g a 0 1
+6 g a 0 0 1
 1 0 0
 0 48
 C
@@ -1361,7 +1367,7 @@ A roast pumpkin is lying here.~
    The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
 but tastes a lot better than it did fresh.
 ~
-6 gm a 0 13
+6 gm a 0 0 13
 24 18890 0
 7 1680
 A
@@ -1378,7 +1384,7 @@ some roasted pumpkin seeds~
 Some roast pumpkin seeds have been dropped here.~
 These seeds have been roasted and they taste great.
 ~
-6 m a 0 13
+6 m a 0 0 13
 6 0 0
 0 1680
 A
@@ -1393,7 +1399,7 @@ A jack-o-lantern is sitting here.~
    This big orange pumpkin has been cut to look like a face. Use 'light
 jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-29 0 ao 0 7
+29 0 ao 0 0 7
 36 0 6
 7 168
 C
@@ -1412,7 +1418,7 @@ A jack-o-lantern is sitting here.~
    This big orange pumpkin has been cut to look like a face. Use 'light
 jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-29 0 ao 0 7
+29 0 ao 0 0 7
 36 1 4
 7 168
 C
@@ -1426,7 +1432,7 @@ A parchment is lying on the ground with the spell for a pumpkin coach.~
 ordinary pumpkin large enough to create an elegant traveling coach.
 Usage:  make pumpkin coach
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 0
 S
@@ -1437,7 +1443,7 @@ A parchment is lying on the ground with the spell for a flying pumpkin coach.~
 This amazing spell will allow a pumpkin coach to fly!
 Usage:  enchant coach
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 0 0
 T 18898
@@ -1452,7 +1458,7 @@ on closer inspection, ash. And the grass around the little mansion appears to
 be dead. Etched into the snowglobe's base are the words 'build haunted
 mansion'.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 8 0
 C

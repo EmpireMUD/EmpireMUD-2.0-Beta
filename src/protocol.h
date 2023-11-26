@@ -26,6 +26,12 @@ typedef struct char_data char_data_t;
 typedef struct descriptor_data descriptor_t;
 typedef struct empire_data empire_t;
 
+#if defined(__cplusplus)
+	typedef bool bool_type;
+#else
+	typedef char bool_type;
+#endif
+
 
 /******************************************************************************
  Color support options
@@ -159,6 +165,8 @@ typedef enum {
 	eMSDP_BONUS_EXP,
 	eMSDP_INVENTORY,
 	eMSDP_INVENTORY_MAX,
+	eMSDP_TEMPERATURE,
+	eMSDP_TEMPERATURE_LABEL,
 	
 	eMSDP_STR,
 	eMSDP_DEX,
@@ -216,6 +224,8 @@ typedef enum {
 	eMSDP_WORLD_MONTH,
 	eMSDP_WORLD_YEAR,
 	eMSDP_WORLD_SEASON,
+	eMSDP_AMBIENT_TEMPERATURE,
+	eMSDP_AMBIENT_TEMPERATURE_LABEL,
 	
 	// Configuration
 	eMSDP_CLIENT_ID,
@@ -628,6 +638,7 @@ void update_MSDP_level(char_data_t *ch, int send_update);
 void update_MSDP_money(char_data_t *ch, int send_update);
 void update_MSDP_name(char_data_t *ch, int send_update);
 void update_MSDP_skills(char_data_t *ch, int send_update);
+void update_MSDP_temperature(char_data_t *ch, bool_type room_only, int send_update);
 
 // for the updaters
 #define NO_UPDATE  0

@@ -239,6 +239,7 @@ typedef unsigned short int ush_int;
 // 'unsigned long long' will give you at least 64 bits if you have GCC (or C99+)
 // -- THIS IS REQUIRED because some bit sets already use it
 typedef unsigned long long	bitvector_t;
+typedef signed long long sbitvector_t;	// signed version needed for some uses
 
 
 // vnums
@@ -329,6 +330,8 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
 #define APPLY_NEARBY_RANGE  28	// larger "nearby"
 #define APPLY_WHERE_RANGE  29	// larger "where"
+#define APPLY_WARMTH  30	// protects against cold weather
+#define APPLY_COOLING  31	// protects against warm weather
 
 
 // AUTOMSG_x: automessage types
@@ -972,7 +975,9 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_NIGHT_VISION  14	// bonus light radius at night
 #define ATT_NEARBY_RANGE  15	// larger "nearby"
 #define ATT_WHERE_RANGE  16		// larger "where"
-#define NUM_EXTRA_ATTRIBUTES  17
+#define ATT_WARMTH  17	// from gear that keeps you warm in the cold
+#define ATT_COOLING  18	// from gear that keeps you cool in the heat
+#define NUM_EXTRA_ATTRIBUTES  19
 
 
 // AFF_x: Affect bits
@@ -1016,6 +1021,11 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
 #define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
 #define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
+#define AFF_POOR_REGENS  BIT(39)	// N. dramatically lower regens
+#define AFF_SLOWER_ACTIONS  BIT(40)	// O. timed actions are slower
+#define AFF_HUNGRIER  BIT(41)	// P. character becomes hungry faster
+#define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
+#define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
 
 
 // Injury flags -- IS_INJURED
@@ -1442,6 +1452,7 @@ typedef struct vehicle_data vehicle_data;
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
 #define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
 #define FCT_HIDE_IN_LIST  BIT(2)	// c. not shown in player's list
+#define FCT_HIDE_ON_MOB  BIT(3)	// d. does not appear under mob's description
 
 
 // FCTR_x: Relationship flags
@@ -1589,7 +1600,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // how many strings a generic stores (can be safely raised with no updates)
-#define NUM_GENERIC_STRINGS  6
+#define NUM_GENERIC_STRINGS  10
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
@@ -1599,6 +1610,13 @@ typedef struct vehicle_data vehicle_data;
 #define LANG_UNKNOWN  0	// default: does not speak it, cannot recognize it
 #define LANG_RECOGNIZE  1	// knows which language it is, but can't speak it
 #define LANG_SPEAK  2	// full comprehension and speaking
+
+
+// LIQF_x: flags for liquids
+#define LIQF_WATER  BIT(0)	// counts as water for certain commands
+#define LIQF_COOLING  BIT(1)	// cools down the player, if warm
+#define LIQF_WARMING  BIT(2)	// warms up the player, if cold
+// BIT(31) limit: this is stored as an int (in the generic values)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2155,15 +2173,15 @@ typedef enum {
 #define BONUS_NO_THIRST  BIT(18)	// "salt blooded" - never thirsty
 #define BONUS_NO_HUNGER  BIT(19)	// "tenacious waif" - never hungry
 #define BONUS_VIEW_HEIGHT  BIT(20)	// "surveyor" - +1 view height
-#define BONUS_HEAT_RESIST  BIT(21)	// "fire born" - tolerant of hot climates (UNIMPLEMENTED)
-#define BONUS_COLD_RESIST  BIT(22)	// "frost born" - tolerant of cold climates (UNIMPLEMENTED)
+#define BONUS_WARM_RESIST  BIT(21)	// "fireborn" - tolerant of warm climates
+#define BONUS_COLD_RESIST  BIT(22)	// "frostborn" - tolerant of cold climates
 #define NUM_BONUS_TRAITS  23
 
 // bonus traits available to newbies (first 12h)
 #define NEWBIE_BONUS_TRAITS  (BONUS_STRENGTH | BONUS_DEXTERITY | BONUS_CHARISMA | BONUS_GREATNESS | BONUS_INTELLIGENCE | BONUS_WITS | BONUS_HEALTH | BONUS_MOVES | BONUS_MANA | BONUS_MOVE_REGEN | BONUS_MANA_REGEN | BONUS_EXTRA_DAILY_SKILLS)
 
 // bonus traits not available at all (not used on this mud)
-#define FORBIDDEN_BONUS_TRAITS  (BONUS_CLOCK | BONUS_HEAT_RESIST | BONUS_COLD_RESIST)
+#define FORBIDDEN_BONUS_TRAITS  (BONUS_CLOCK)
 
 
 // CDU_x: delayed update types
@@ -2234,7 +2252,7 @@ typedef enum {
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 
 
-// custom color types
+// CUSTOM_COLOR_x: custom color types
 #define CUSTOM_COLOR_EMOTE  0
 #define CUSTOM_COLOR_ESAY  1
 #define CUSTOM_COLOR_GSAY  2
@@ -2243,7 +2261,10 @@ typedef enum {
 #define CUSTOM_COLOR_SLASH  5
 #define CUSTOM_COLOR_TELL  6
 #define CUSTOM_COLOR_STATUS  7
-#define NUM_CUSTOM_COLORS  8	// total
+#define CUSTOM_COLOR_SUN  8
+#define CUSTOM_COLOR_TEMPERATURE  9
+#define CUSTOM_COLOR_WEATHER  10
+#define NUM_CUSTOM_COLORS  11	// total
 
 
 // COND_x: Player conditions
@@ -2269,8 +2290,23 @@ typedef enum {
 #define FM_OTHER_HITS  BIT(12)	// hits not covered by other rules
 #define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
 #define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
+#define FM_MY_BUFFS_IN_COMBAT  BIT(15)	// buffs on me while fighting
+#define FM_ALLY_BUFFS_IN_COMBAT  BIT(16)	// buffs on allies while fighting
+#define FM_OTHER_BUFFS_IN_COMBAT  BIT(17)	// buffs on others while fighting
+#define FM_DAMAGE_NUMBERS  BIT(18)	// shows numbers after damage strings
+#define FM_MY_AFFECTS_IN_COMBAT  BIT(19)	// shows affects applying/wearing off me in combat
+#define FM_ALLY_AFFECTS_IN_COMBAT  BIT(20)	// ally affects applying/wearing off when in combat
+#define FM_OTHER_AFFECTS_IN_COMBAT  BIT(21)	// others' affects applying/wearing off when in combat
+#define FM_MY_ABILITIES  BIT(22)	// abilities I used
+#define FM_ALLY_ABILITIES  BIT(23)	// abilities allies used
+#define FM_OTHER_ABILITIES  BIT(24)	// abilities others used
+#define FM_ABILITIES_AGAINST_ME  BIT(25)	// abilities targeting me
+#define FM_ABILITIES_AGAINST_ALLIES  BIT(26)	// abilities targeting allies
+#define FM_ABILITIES_AGAINST_TARGET  BIT(27)	// abilities targeting my target
+#define FM_ABILITIES_AGAINST_TANK  BIT(28)	// abilities targeting the tank
 
-#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
+// flags set at character creation
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE | FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK)
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -2416,7 +2452,7 @@ typedef enum {
 #define PRF_NOTELL  BIT(3)	// Can't receive tells
 #define PRF_POLITICAL  BIT(4)	// Changes map to political colors
 #define PRF_RP  BIT(5)	// RP-only
-#define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
+	#define PRF_UNUSED_1  BIT(6)	// was MORTLOG before b5.162
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
 #define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
@@ -2425,7 +2461,7 @@ typedef enum {
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
 #define PRF_NO_IDLE_OUT  BIT(13)	// Player won't idle out
 #define PRF_ROOMFLAGS  BIT(14)	// Sees vnums and flags on look
-#define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
+	#define PRF_UNUSED_2  BIT(15)	// was !CHANNEL-JOINS before b5.162
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
 #define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
@@ -2445,7 +2481,7 @@ typedef enum {
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 #define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
-#define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
+	#define PRF_UNUSED_3  BIT(35)	// was TRAVEL-LOOK before b5.162
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
@@ -2540,6 +2576,29 @@ typedef enum {
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
+
+
+// SM_x: status messages
+#define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
+#define SM_CHANNEL_JOINS  BIT(1)	// players joining/leaving slash-channels
+#define SM_COOLDOWNS  BIT(2)	// message when a cooldown expires
+#define SM_EMPIRE_LOGS   BIT(3)	// can turn off elog messages
+#define SM_HUNGER  BIT(4)	// hunger messages
+#define SM_THIRST  BIT(5)	// thirst messages
+#define SM_LOW_BLOOD  BIT(6)	// vampire starvation messages
+#define SM_MORTLOG  BIT(7)	// player creation logs, etc
+#define SM_PROMPT  BIT(8)	// show or hide prompt
+#define SM_SKILL_GAINS  BIT(9) // message when player gains skill points
+#define SM_SUN  BIT(10)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(11)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(12)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(13)	// warning messages for dangerous temperature
+#define SM_TRAVEL_AUTO_LOOK  BIT(14)	// auto-look when running
+#define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(16)	// weather change messages
+
+// flags set at character creation
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2686,6 +2745,9 @@ typedef enum {
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
 #define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
 #define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
+#define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
+#define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
+// note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2862,6 +2924,9 @@ typedef enum {
 #define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
 #define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
 #define CLIM_WATERSIDE  BIT(21)	// t. adjacent to fresh water
+#define CLIM_MILD  BIT(22)	// u. reduces temperature effects of other terrains
+#define CLIM_HARSH  BIT(23)	// v. increases temperature effects of other terrains
+#define CLIM_FROZEN_WATER  BIT(24)	// w. this would be a water sect but it's frozen
 
 
 // DPLTN_x: depletion types
@@ -2904,12 +2969,17 @@ typedef enum {
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
 #define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
-#define NUM_EVOS  24	// total
+#define EVO_ADJACENT_SECTOR_FLAG  24	// evolves adjacent to a sector flag
+#define EVO_NOT_ADJACENT_SECTOR_FLAG  25	// evolves when NOT adjacent to a sector flag
+#define EVO_NEAR_SECTOR_FLAG  26	// evolves within 2 tiles of a sector flag
+#define EVO_NOT_NEAR_SECTOR_FLAG  27	// evolves when NOT within 2 tiles of a sector flag
+#define NUM_EVOS  28	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
 #define EVO_VAL_SECTOR  1
 #define EVO_VAL_NUMBER  2
+#define EVO_VAL_SECTOR_FLAG  3
 
 
 // Exit info (doors)
@@ -2917,13 +2987,14 @@ typedef enum {
 #define EX_CLOSED  BIT(1)	// The door is closed
 
 
-// Island flags -- ISLE_x
+// ISLE_x: Island flags
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
+#define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -2990,6 +3061,24 @@ typedef enum {
 #define SAVE_INFO_PACK_SAVED  BIT(0)	// indicates an obj/veh pack is already saved
 
 
+// TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
+#define TEMPERATURE_USE_CLIMATE  0	// inherit from local tile
+#define TEMPERATURE_ALWAYS_COMFORTABLE  1	// no penalties from temperature
+#define TEMPERATURE_MILDER  2	// milder than local tile
+#define TEMPERATURE_HARSHER  3	// harsher than local tile
+#define TEMPERATURE_FREEZING  4	// always freezing
+#define TEMPERATURE_COLD  5	// always cold
+#define TEMPERATURE_COOL  6	// always cool (no penalty)
+#define TEMPERATURE_COOLER  7	// cooler than local tile
+#define TEMPERATURE_COOLER_WHEN_HOT  8	// cooler than local tile when > 0
+#define TEMPERATURE_NEUTRAL  9	// temperature is always 0 (neutral)
+#define TEMPERATURE_WARM  10	// always warm (no penalty)
+#define TEMPERATURE_WARMER  11	// warmer than local tile
+#define TEMPERATURE_WARMER_WHEN_COLD  12	// warmer than local tile when < 0
+#define TEMPERATURE_HOT  13	// always hot
+#define TEMPERATURE_SWELTERING  14	// always sweltering
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAXIMA AND LIMITS ///////////////////////////////////////////////////////
 
@@ -3013,7 +3102,6 @@ typedef enum {
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
-#define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
@@ -3703,6 +3791,7 @@ struct adventure_data {
 	int reset_time;	// how often to reset things (minutes)
 	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_link_rule *linking;
@@ -3805,6 +3894,7 @@ struct room_template {
 	bitvector_t base_affects;	// ROOM_AFF_
 	bitvector_t functions;	// FNC_
 	rmt_vnum subzone;	// for subdividing where/shout/etc
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -3965,6 +4055,7 @@ struct bld_data {
 	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	int height;	// 0+ addition to terrain height (map buildings only)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
@@ -4521,6 +4612,7 @@ struct player_special_data {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_
 	bitvector_t fight_messages;	// FM_ flags
+	bitvector_t status_messages;	// SM_ flags
 	bitvector_t informative_flags;	// INFORMATIVE_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
@@ -4559,6 +4651,7 @@ struct player_special_data {
 	ubyte apparent_age;	// for vampires	
 	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
+	int temperature;	// how warm/cold the player currently is
 	
 	// various lists
 	struct coin_data *coins;	// linked list of coin data
@@ -4659,7 +4752,10 @@ struct player_special_data {
 	int beckoned_by;	// idnum of player who beckoned (for follow)
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
-	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
+	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
+	time_t last_cold_time;	// last time a player was told they're getting colder
+	time_t last_warm_time;	// last time a player was told they're getting warmer
+	int last_messaged_temperature;	// last temperature a player was warned about
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet
@@ -5644,12 +5740,17 @@ struct msg_type {
 };
 
 
+// MSG_x: each fight message has these 4 types
+#define MSG_DIE  0	// messages when death
+#define MSG_MISS  1	// messages when miss
+#define MSG_HIT  2	// messages when hit
+#define MSG_GOD  3	// messages when hit on god
+#define NUM_MSG_TYPES  4	// total
+
+
 // part of fight messages
 struct message_type {
-	struct msg_type die_msg;	// messages when death
-	struct msg_type miss_msg;	// messages when miss
-	struct msg_type hit_msg;	// messages when hit
-	struct msg_type god_msg;	// messages when hit on god
+	struct msg_type msg[NUM_MSG_TYPES];	// the 4 message types
 	struct message_type *next;	// to next messages of this kind
 };
 
@@ -5659,6 +5760,8 @@ struct message_list {
 	int a_type;	// Attack type
 	int number_of_attacks;	// How many attack messages to chose from
 	struct message_type *msg;	// List of messages
+	
+	UT_hash_handle hh;	// fight_messages hash (by a_type)
 };
 
 
@@ -5970,8 +6073,9 @@ struct sector_data {
 	
 	int movement_loss;	// move point cost
 	bitvector_t climate;	// CLIM_ flags
-	bitvector_t flags;	// SECTF_ flags
+	bitvector_t flags;	// SECTF_ flags: warning: evolutions use these as flags in a SIGNED sbitvector_t
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
+	int temperature_type;	// TEMPERATURE_ const modifies the sector
 	
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
@@ -5987,7 +6091,7 @@ struct sector_data {
 // for sector_data, to describe how a tile changes over time
 struct evolution_data {
 	int type;	// EVO_
-	int value;	// used by some types, e.g. # of adjacent forests
+	sbitvector_t value;	// used by some types, e.g. # of adjacent forests; sector flags; etc
 	double percent;	// chance of happening per zone update
 	sector_vnum becomes;	// sector to transform to
 	
@@ -6191,6 +6295,20 @@ struct vehicle_room_list {
  //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON STRUCTS //////////////////////////////////////////////
 
+// for climate-based temperature
+struct climate_temperature_t {
+	int base_add;	// core temperature from this climate
+	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double season_weight;	// how much season affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double cold_modifier;	// multiplies cold temperatures by this
+	double heat_modifier;	// multiplies hot temperatures by this
+};
+
+
+// for climate temperatures
+#define NO_TEMP_MOD  -1.0
+
+
 // TILESET_x, used in sector_data
 struct tileset_data {
 	char *icon;  // ^^^^
@@ -6198,6 +6316,8 @@ struct tileset_data {
 };
 
 
+// global weather data
+// TODO - I dream of making this regional or per-island -pc
 struct weather_data {
 	int pressure;	// How is the pressure ( Mb )
 	int change;	// How fast and what way does it change

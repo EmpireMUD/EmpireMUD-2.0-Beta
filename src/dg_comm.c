@@ -162,7 +162,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 	char_data *to;
 	obj_data *obj;
 	int i;
-	int to_sleeping = 1, is_spammy = 0; /* mainly for windows compiles */
+	int to_sleeping = 1, is_spammy = 0, is_animal_move = 0; /* mainly for windows compiles */
 
 	if (!arg)
 		return;

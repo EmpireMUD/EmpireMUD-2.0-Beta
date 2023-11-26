@@ -96,7 +96,7 @@ S
 #602
 Starwood Copse~
 A Starwood Copse~
-'.' 35 ijq 4 d np
+'.' 35 ijqw 4 d np
 C
 chop, dig~
 D1
@@ -166,7 +166,7 @@ S
 #603
 Starwood Stand~
 A Stand of Starwood~
-'.' 35 ijq 6 d np
+'.' 35 ijqw 6 d np
 C
 chop, dig~
 D1
@@ -248,7 +248,7 @@ S
 #604
 Starwood Forest~
 An Enchanting Starwood Forest~
-'^' 35 ijq 8 d dnp
+'^' 35 ijqw 8 d dnp
 C
 chop, dig~
 D1
@@ -552,7 +552,7 @@ S
 #606
 Sprouting Starwood Stumps~
 A Field of Sprouting Starwood Stumps~
-'.' 38 ijq 4 a p
+'.' 38 ijqw 4 a p
 C
 dig~
 D1
@@ -642,7 +642,7 @@ S
 #607
 Sprouting Starwood Copse~
 A Sprouting Starwood Copse~
-'.' 6 ijq 4 a p
+'.' 6 ijqw 4 a p
 C
 dig~
 D1
@@ -756,7 +756,7 @@ S
 #608
 Sprouting Starwood Stand~
 A Sprouting Stand of Starwood~
-'w' 38 ijq 6 a p
+'w' 38 ijqw 6 a p
 C
 dig~
 D1
@@ -1037,7 +1037,7 @@ S
 #612
 Weirdwood Thicket~
 A Weirdwood Thicket~
-'.' 38 ikq 4 d np
+'.' 38 ikqw 4 d np
 C
 chop, dig~
 D1
@@ -1111,7 +1111,7 @@ S
 #613
 Weirdwood Grove~
 A Weirdwood Grove~
-'.' 38 ikq 6 d np
+'.' 38 ikqw 6 d np
 C
 chop, dig~
 D1
@@ -1257,7 +1257,7 @@ S
 #614
 Weirdwood Weald~
 A Weirdwood Weald~
-'w' 39 ikq 8 dl dnp
+'w' 39 ikqw 8 dl dnp
 C
 chop, dig~
 D1
@@ -1529,7 +1529,7 @@ S
 #616
 Enchanted Oasis~
 An Enchanted Oasis~
-'.' 35 ikov 6 iw jp
+'.' 35 ikovw 6 iw jp
 C
 dig, drink, fill, pick~
 D0
@@ -1551,12 +1551,6 @@ E
 10 613 5.00 21
 E
 10 614 5.00 21
-E
-17 70 0.40 612
-E
-17 51 0.40 612
-E
-17 20 0.40 612
 E
 22 0 50.00 21
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -1597,7 +1591,7 @@ S
 #617
 Lush Enchanted Oasis~
 A Lush Enchanted Oasis~
-'.' 35 ikoqv 6 adiw jp
+'.' 35 ikoqvw 6 adiw jp
 C
 chop, dig, drink, fill, pick~
 D0
@@ -1630,12 +1624,6 @@ E
 10 613 5.00 80
 E
 10 614 5.00 80
-E
-17 70 0.40 612
-E
-17 51 0.40 612
-E
-17 20 0.40 612
 E
 22 0 50.00 80
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -1677,7 +1665,7 @@ S
 #618
 Shady Enchanted Oasis~
 A Shady Enchanted Oasis~
-'.' 35 ikoqv 6 adiw jp
+'.' 35 ikoqvw 6 adiw jp
 C
 chop, dig, drink, fill, pick~
 D0
@@ -1708,12 +1696,6 @@ E
 10 613 5.00 81
 E
 10 614 5.00 81
-E
-17 70 0.40 612
-E
-17 51 0.40 612
-E
-17 20 0.40 612
 E
 22 0 50.00 81
 I 5 103 2.00 1 d  # DIG: yellow lightning stone
@@ -1755,7 +1737,7 @@ S
 #621
 Sprouting Weirdwood Stumps~
 A Grove of Sprouting Weirdwood Stumps~
-'.' 6 ik 2 a p
+'.' 6 ikw 2 a p
 C
 dig~
 D1
@@ -1831,7 +1813,7 @@ S
 #622
 Sprouting Weirdwood Thicket~
 A Sprouting Thicket of Weirdwood~
-'.' 36 ikq 4 a p
+'.' 36 ikqw 4 a p
 C
 dig~
 D1
@@ -1974,7 +1956,7 @@ S
 #623
 Sprouting Weirdwood Grove~
 A Sprouting Grove of Weirdwood~
-'n' 35 ikq 6 a p
+'n' 35 ikqw 6 a p
 C
 dig~
 D1

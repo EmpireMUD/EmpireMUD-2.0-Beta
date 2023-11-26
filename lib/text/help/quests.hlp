@@ -3,8 +3,9 @@ QUEST QUESTS
 Usage:  quest <command> <...>
 
 The following quest commands are most commonly used:
- &cquest finish&0 - &yTurn in&0 one or more quests.
+ &cquest finish&0 - &yTurn in&0 one or more quests. (Or just use "&cfinish&0".)
  &cquest start&0 - &yBegin&0 a quest, or see which ones are &yavailable&0.
+    (You can also use "&cstart&0" instead of "quest start".)
  &cquest tracker&0 - Show the quest &yprogress&0 tracker for one quest you're on.
  
 The following quest commands are also available:
@@ -12,10 +13,9 @@ The following quest commands are also available:
  &cquest drop&0 - &yCancel&0 a quest you're on.
  &cquest group&0 - See which quests you share with group members.
  &cquest info&0 - See &ydetails&0 on a quest you're on or one available here.
+    (You can also just type "&cquest <name>&0" instead of "quest info <name>".)
  &cquest list&0 - Show your quests and progress.
  &cquest share&0 - Offer a quest to members of your group.
-
-You can also get &ydetails&0 on a quest by typing 'quest <name>'.
 
 Hint: You can abbreviate "q t", or even alias these commands if you use them
 a lot. You can also abbreviate quest names, including multi-word abbreviations
@@ -77,8 +77,7 @@ in somewhere.
 
 To finish a quest, you must have finished the tasks on its tracker.
 
-You can turn in all available quests with "quest finish all". You can also use
-the "finish" command instead of "quest finish".
+You can turn in all available quests with "finish all".
 
 Note: If you 'keep' an item, it can't be turned in as part of a quest and won't
 be counted by the quest tracker. Unkeep it for it to appear.
@@ -98,6 +97,7 @@ See also: QUEST
 "QUEST FINISH"
 
 Usage:  quest finish <quest name | all>
+        finish <quest name | all>
 
 Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
@@ -149,9 +149,9 @@ Usage:  quest list
 
 This command shows all the quests you're on, and their progress.
 
-To see quests available here instead of ones you're on, see QUEST START.
+To see quests available here instead of ones you're on, see START.
 
-See also: QUEST, LEVEL COLORS
+See also: QUEST, LEVEL COLORS, START
 #
 "QUEST SHARE"
 
@@ -169,6 +169,7 @@ See also: ACCEPT, REJECT
 "QUEST START" "QUEST CHECK"
 
 Usage:  quest start [quest name | all]
+        start [quest name | all]
 
 This command begins a quest that's available in the room you're in. You can
 abbreviate any part of the quest name, or provide a multi-word abbreviation

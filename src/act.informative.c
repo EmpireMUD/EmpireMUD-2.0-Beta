@@ -19,7 +19,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "utils.h"
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
@@ -687,7 +686,7 @@ void display_attributes(char_data *ch, char_data *to) {
 void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, count, pts, cols, val;
+	int i, j, count, pts, cols, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
@@ -745,16 +744,23 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// row 2 col 1: conditions
 	*lbuf = '\0';
 	if (IS_HUNGRY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&yhungry&0");
+		sprintf(lbuf + strlen(lbuf), "%s&yhungry&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_THIRSTY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&cthirsty&0");
+		sprintf(lbuf + strlen(lbuf), "%s&cthirsty&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_DRUNK(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&mdrunk&0");
+		sprintf(lbuf + strlen(lbuf), "%s&mdrunk&0", (strlen(lbuf) > 0 ? ", " : ""));
 	}
 	if (IS_BLOOD_STARVED(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", (strlen(lbuf) > 0 ? ", " : ""), "&rstarving&0");
+		sprintf(lbuf + strlen(lbuf), "%s&rstarving&0", (strlen(lbuf) > 0 ? ", " : ""));
+	}
+	temperature = get_relative_temperature(ch);
+	if (temperature <= -1 * config_get_int("temperature_discomfort")) {
+		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
+	}
+	if (temperature >= config_get_int("temperature_discomfort")) {
+		sprintf(lbuf + strlen(lbuf), "%s&o%s&0", (strlen(lbuf) > 0 ? ", " : ""), temperature_to_string(temperature));
 	}
 	if (*lbuf == '\0') {
 		strcpy(lbuf, "&gnone&0");
@@ -1337,7 +1343,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(i))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(i))));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
-	if (IS_NPC(i) && MOB_FACTION(i)) {
+	if (IS_NPC(i) && MOB_FACTION(i) && !FACTION_FLAGGED(MOB_FACTION(i), FCT_HIDE_ON_MOB)) {
 		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
 		int idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(MOB_FACTION(i)));
 		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
@@ -2270,6 +2276,160 @@ ACMD(do_affects) {
 	}
 
 	show_character_affects(ch, ch);
+}
+
+
+ACMD(do_buffs) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t out_size, line_size;
+	bool any = FALSE, error, other, own;
+	ability_data *abil;
+	struct affected_type *aff;
+	char_data *caster;
+	struct group_member_data *mem;
+	struct player_ability_data *plab, *next_plab;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs don't have abilities.\r\n");
+		return;
+	}
+	
+	// start string
+	out_size = snprintf(output, sizeof(output), "Your buff abilities:\r\n");
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!(abil = plab->ptr)) {
+			continue;	// no abil somehow?
+		}
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;	// not purchased on current set
+		}
+		if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF) || ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+			continue;	// ability is not a buff, or is a debuff
+		}
+		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
+			continue;	// no buff we can detect
+		}
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM)) {
+			continue;	// not a targeted character buff
+		}
+		
+		// build output
+		any = TRUE;
+		error = FALSE;
+		line_size = snprintf(line, sizeof(line), " %s:", ABIL_NAME(abil));
+		
+		// check self?
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+			own = other = FALSE;
+			caster = NULL;
+			LL_FOREACH(ch->affected, aff) {
+				if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+					if (aff->cast_by == GET_IDNUM(ch)) {
+						own = TRUE;
+					}
+					else {
+						other = TRUE;
+						caster = is_playing(aff->cast_by);
+					}
+					// only need 1 match
+					break;
+				}
+			}
+			if (!own && other) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				error = TRUE;
+			}
+			else if (!own) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on self\t0");
+				error = TRUE;
+			}
+		}
+		
+		// check companion?
+		if (GET_COMPANION(ch) && !IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+			own = other = FALSE;
+			caster = NULL;
+			LL_FOREACH(GET_COMPANION(ch)->affected, aff) {
+				if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+					if (aff->cast_by == GET_IDNUM(ch)) {
+						own = TRUE;
+					}
+					else {
+						other = TRUE;
+						caster = is_playing(aff->cast_by);
+					}
+					// only need 1 match
+					break;
+				}
+			}
+			if (!own && other) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
+				error = TRUE;
+			}
+			else if (!own) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on companion\t0", (error ? "," : ""));
+				error = TRUE;
+			}
+		}
+		
+		// check party?
+		if (GROUP(ch) && !IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+			LL_FOREACH(GROUP(ch)->members, mem) {
+				if (mem->member == ch) {
+					continue;
+				}
+				
+				own = other = FALSE;
+				caster = NULL;
+				LL_FOREACH(mem->member->affected, aff) {
+					if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+						if (aff->cast_by == GET_IDNUM(ch)) {
+							own = TRUE;
+						}
+						else {
+							other = TRUE;
+							caster = is_playing(aff->cast_by);
+						}
+						// only need 1 match
+						break;
+					}
+				}
+				if (!own && other) {
+					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
+					error = TRUE;
+				}
+				else if (!own) {
+					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
+					error = TRUE;
+				}
+			}
+		}
+		
+		// ok?
+		if (!error) {
+			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tgok\t0");
+		}
+		
+		// append?
+		if (out_size + line_size + 20 < sizeof(output)) {
+			out_size += snprintf(output + out_size, sizeof(output) - out_size, "%s\r\n", line);
+		}
+		else {
+			// space is reserved for an OVERFLOW
+			out_size += snprintf(output + out_size, sizeof(output) - out_size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!any) {
+		// always room left if none were found
+		out_size += snprintf(output + out_size, sizeof(output) - out_size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
 }
 
 
@@ -3487,7 +3647,7 @@ ACMD(do_nearby) {
 						*trait_buf = '\0';
 					}
 					
-					snprintf(line, sizeof(line), "%8s: the %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
+					snprintf(line, sizeof(line), "%8s: The %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -3775,10 +3935,11 @@ ACMD(do_survey) {
 		}
 	}
 	
-	if (IS_OUTDOOR_TILE(IN_ROOM(ch)) && GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))) {
-		ordered_sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, climate_flags_order, FALSE, buf);
+	if (get_climate(IN_ROOM(ch)) != NOBITS) {
+		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
 		msg_to_char(ch, "Climate: %s\r\n", buf);
 	}
+	msg_to_char(ch, "Temperature: %s\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
 	
 	base_height = ROOM_HEIGHT(HOME_ROOM(IN_ROOM(ch)));
 	mod_height = get_room_blocking_height(IN_ROOM(ch), NULL);
@@ -3827,6 +3988,75 @@ ACMD(do_survey) {
 	//	- room name
 	//	- building info (name)
 	
+}
+
+
+ACMD(do_temperature) {
+	int ch_temp, room_temp, temp_limit;
+	char imm_part[256], change_part[256], dire_part[256];
+	
+	room_temp = get_room_temperature(IN_ROOM(ch));
+	
+	// imm part for room
+	if (IS_IMMORTAL(ch)) {
+		snprintf(imm_part, sizeof(imm_part), " (%d)", room_temp);
+	}
+	else {
+		*imm_part = '\0';
+	}
+	
+	msg_to_char(ch, "It's %s %s%s.\r\n", temperature_to_string(room_temp), IS_OUTDOORS(ch) ? "out" : "in here", imm_part);
+	
+	ch_temp = get_relative_temperature(ch);
+	temp_limit = config_get_int("temperature_discomfort");
+	
+	// imm part for character
+	*imm_part = '\0';
+	if (IS_IMMORTAL(ch)) {
+		snprintf(imm_part, sizeof(imm_part), " (%d)", ch_temp);
+	}
+	
+	// change part?
+	*change_part = '\0';
+	*dire_part = '\0';
+	if (GET_TEMPERATURE(ch) != room_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		if (GET_TEMPERATURE(ch) > room_temp) {
+			if (room_temp > 0) {
+				snprintf(change_part, sizeof(change_part), " and cooling down");
+			}
+			else {
+				snprintf(change_part, sizeof(change_part), " %s getting colder", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
+			}
+		
+			// dire part? (warning that it won't get better
+			if (room_temp >= temp_limit) {
+				snprintf(dire_part, sizeof(dire_part), ", but it's still too %s", (room_temp >= config_get_int("temperature_extreme") ? "hot" : "warm"));
+			}
+		}
+		else {
+			if (room_temp < 0) {
+				snprintf(change_part, sizeof(change_part), " and warming up");
+			}
+			else if (GET_TEMPERATURE(ch) < temp_limit) {
+				snprintf(change_part, sizeof(change_part), " %s getting warmer", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
+			}
+			else {
+				snprintf(change_part, sizeof(change_part), " and getting hotter");
+			}
+		
+			// dire part? (warning that it won't get better
+			if (room_temp <= -1 * temp_limit) {
+				snprintf(dire_part, sizeof(dire_part), ", but it's still %stoo cold", (room_temp <= -1 * config_get_int("temperature_extreme") ? "way " : ""));
+			}
+		}
+	}
+	
+	if (ch_temp < temp_limit && ch_temp > -1 * temp_limit) {
+		msg_to_char(ch, "You're comfortable right now%s%s%s.\r\n", imm_part, change_part, dire_part);
+	}
+	else {
+		msg_to_char(ch, "You are %s%s%s%s%s\r\n", temperature_to_string(ch_temp), imm_part, change_part, dire_part, (ABSOLUTE(ch_temp) >= temp_limit * 2) ? "!" : ".");
+	}
 }
 
 
@@ -3909,8 +4139,15 @@ ACMD(do_time) {
 	}
 	
 	// check season
-	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+	if (IS_OUTDOORS(ch) && !NO_LOCATION(IN_ROOM(ch))) {
+		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
+		
+		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			msg_to_char(ch, " and %s out.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
+		}
+		else {
+			send_to_char(".\r\n", ch);
+		}
 	}
 	
 	// check solstices
@@ -3948,24 +4185,83 @@ ACMD(do_tip) {
 
 
 ACMD(do_weather) {
-	const char *sky_look[] = {
-		"cloudless",
-		"cloudy",
-		"rainy",
-		"lit by flashes of lightning"
-	};
+	char *sky_text, *change_text;
+	bool showed_temp = FALSE;
 	
 	// weather, if available
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
 	}
 	else if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
+		// these may be overridden below
+		if (weather_info.change >= 0) {
+			change_text = "and you feel a warm wind from the south";
+		}
+		else {
+			change_text = "but your foot tells you bad weather is due";
+		}
+		
+		// main weather messages
+		switch (weather_info.sky) {
+			case SKY_CLOUDLESS: {
+				sky_text = "cloudless";
+				break;
+			}
+			case SKY_CLOUDY: {
+				sky_text = "cloudy";
+				break;
+			}
+			case SKY_RAINING: {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+					sky_text = "snowy";
+					if (weather_info.change >= 0) {
+						change_text = "but better weather is due any day now";
+					}
+					else {
+						change_text = "and the chill in your bones tells you it's getting worse";
+					}
+				}
+				else {
+					sky_text = "rainy";
+				}
+				break;
+			}
+			case SKY_LIGHTNING: {
+				if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
+					sky_text = "white with snow";
+					if (weather_info.change >= 0) {
+						change_text = "but it seems to be clearing up";
+					}
+					else {
+						change_text = "and it's getting worse";
+					}
+				}
+				else {
+					sky_text = "lit by flashes of lightning";
+				}
+				break;
+			}
+			default: {
+				sky_text = "clear";
+				// change-text already set
+				break;
+			}
+		}
+		
+		msg_to_char(ch, "The sky is %s %s.\r\n", sky_text, change_text);
 	}
 	
 	// show season unless in a no-location room
 	if (!NO_LOCATION(IN_ROOM(ch))) {
-		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+		msg_to_char(ch, "It's %s", seasons[GET_SEASON(IN_ROOM(ch))]);
+		
+		if (get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+			msg_to_char(ch, " and %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+			showed_temp = TRUE;
+		}
+		else {
+			send_to_char(".\r\n", ch);
+		}
 	}
 	
 	// show sun/daytime
@@ -4004,6 +4300,12 @@ ACMD(do_weather) {
 	// final message if not outdoors
 	if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
+	}
+	
+	// temperature
+	if (!showed_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+		msg_to_char(ch, "It's %s %s.\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))), IS_OUTDOORS(ch) ? "out" : "in here");
+		showed_temp = TRUE;
 	}
 }
 

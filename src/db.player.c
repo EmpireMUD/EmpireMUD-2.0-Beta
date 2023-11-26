@@ -2127,6 +2127,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Speaking: ", 10)) {
 					GET_SPEAKING(ch) = atoi(line + 10);
 				}
+				else if (!strn_cmp(line, "Status Messages: ", 17)) {
+					GET_STATUS_MESSAGES(ch) = asciiflag_conv(line + 17);
+				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
@@ -2134,7 +2137,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'T': {
-				if (!strn_cmp(line, "Temporary Account: ", 19)) {
+				if (!strn_cmp(line, "Temperature: ", 13)) {
+					GET_TEMPERATURE(ch) = atoi(line + 13);
+				}
+				else if (!strn_cmp(line, "Temporary Account: ", 19)) {
 					GET_TEMPORARY_ACCOUNT_ID(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Title: ", 7)) {
@@ -2837,11 +2843,15 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_SPEAKING(ch) != NOTHING) {
 		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
 	}
+	fprintf(fl, "Status Messages: %s\n", bitv_to_alpha(GET_STATUS_MESSAGES(ch)));
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
 	}
 	
 	// 'T'
+	if (GET_TEMPERATURE(ch)) {
+		fprintf(fl, "Temperature: %d\n", GET_TEMPERATURE(ch));
+	}
 	if (GET_TITLE(ch)) {
 		fprintf(fl, "Title: %s\n", GET_TITLE(ch));
 	}
@@ -4366,6 +4376,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_passive_buffs(ch);
 	convert_and_schedule_player_affects(ch);
 	schedule_all_obj_timers(ch);
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -4412,6 +4423,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);
 		clean_player_kills(ch);
+		reset_player_temperature(ch);
 		affect_total(ch);	// again, in case things changed
 	}
 	else {
@@ -4648,6 +4660,7 @@ void init_player(char_data *ch) {
 	
 	ch->char_specials.affected_by = 0;
 	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
+	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
 
 	for (i = 0; i < NUM_CONDS; i++) {
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
@@ -4799,7 +4812,6 @@ void start_new_character(char_data *ch) {
 	set_title(ch, NULL);
 
 	/* Default Flags */
-	SET_BIT(PRF_FLAGS(ch), PRF_MORTLOG);
 	if (GET_ACCOUNT(ch) && config_get_bool("siteok_everyone")) {
 		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_SITEOK);
 	}
@@ -4931,6 +4943,9 @@ void start_new_character(char_data *ch) {
 	set_move(ch, GET_MAX_MOVE(ch));
 	set_mana(ch, GET_MAX_MANA(ch));
 	set_blood(ch, GET_MAX_BLOOD(ch));
+	
+	// starting temperature
+	reset_player_temperature(ch);
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);

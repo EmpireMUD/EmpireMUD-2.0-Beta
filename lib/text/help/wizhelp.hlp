@@ -569,6 +569,7 @@ Island flags:
  !CUSTOMIZE - Cannot be renamed by players
  CONTINENT - Is a whole continent (affects adventure spawns)
  !CHART - Cannot be charted by players
+ !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
 
 See also: CHART, GRANT
 #d
@@ -888,10 +889,10 @@ RELOAD
 Usage:  reload < '*' | all | file >
 
 Reload is used to reload text files such as the MOTD from disk into memory. 
-Reload * reloads all the text files below. This command is grantable.
+Reload * reloads all the text files below. This command is grantable. Available
+files to reload are:
 
-Valid files are:
-
+Text files:
   credits    (/mud_dir/lib/text/credits)
   intros     (/mud_dir/lib/text/intros/*)
   handbook   (/mud_dir/lib/text/handbook)
@@ -903,8 +904,11 @@ Valid files are:
   info       (/mud_dir/lib/text/info)
   policy     (/mud_dir/lib/text/policies)
   wizlist    (/mud_dir/lib/text/wizlist)
-  xhelp      (/mud_dir/lib/text/help/*)
-  data       (/mud_dir/lib/misc/game_data)
+  
+Other:
+  xhelp          (/mud_dir/lib/text/help/*)
+  data           (/mud_dir/lib/misc/game_data)
+  fightmessages  (/mud_dir/lib/misc/messages)
 
 See also: GRANT
 #d
@@ -931,7 +935,7 @@ Usage:  restore <player | mobile | vehicle> [types]
 RESTORE is used to heal and cure a player or mobile. If you use it without a
 type argument, it fully restores the target. Or, you can choose one or more
 types to restore from: health, mana, movement, blood, hunger, thirst,
-drunkenness, cooldowns, and DoTs.
+drunkenness, temperature, cooldowns, and DoTs.
 
 When used on a vehicle, restore removes any damage and any needed resources or
 maintentance, and puts out any fire. It will complete the vehicle if it is
@@ -1140,6 +1144,7 @@ currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
+fmessages  Immort   Shows a player's fight message toggles.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
@@ -1170,6 +1175,7 @@ storage    Immort   Shows items that can be stored in a given building/room type
 subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
 sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
+smessages  Immort   Shows a player's status message toggles.
 terrain    Immort   Same as 'sectors' (for historical reasons).
 tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
@@ -1252,6 +1258,14 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW FMESSAGES" "SHOW FIGHTMESSAGES" "SHOW FIGHT MESSAGES"
+
+Usage:  show fmessages <player>
+
+This command shows which fight messages a player has toggled on or off.
+
+See also: FMESSAGES
 #e
 "SHOW HOME"
 
@@ -1452,6 +1466,14 @@ shows the player's alternate set of abilities.
 The numbers displayed are: [level, experience, unspent points]
 If there is an asterisk after the unspent ability points, it indicates that the
 player has skill resets available for that skill.
+#e
+"SHOW SMESSAGES" "SHOW STATUSMESSAGES" "SHOW STATUS MESSAGES"
+
+Usage:  show smessages <player>
+
+This command shows which status messages a player has toggled on or off.
+
+See also: SMESSAGES
 #e
 "SHOW SPAWNS"
 
@@ -1807,6 +1829,8 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
+ &ctemperature&0 - Gives a temperature breakdown of the room. You can also
+    give it any sun status or season to simulate those here (e.g. spring dark).
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
  &cyearly&0 - Runs a full annual update on the world.
 #d

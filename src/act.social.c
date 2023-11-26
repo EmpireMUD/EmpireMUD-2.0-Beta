@@ -172,7 +172,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 	}
 
 	if (!*buf) {
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
+		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
@@ -188,7 +188,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+				sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
 				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -200,7 +200,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		return;
 	}
 	if (!(vict = get_char_room_vis(ch, buf, NULL))) {
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
+		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
@@ -213,7 +213,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			return;
 		}
 		
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
+		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
@@ -229,7 +229,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+				sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
 				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -278,7 +278,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 				
 				if (c->desc->last_act_message) {
 					// the message was sent via act(), we can retrieve it from the desc
-					sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
+					sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
 					add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
 				}
 				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -365,7 +365,7 @@ ACMD(do_point) {
 		msg_to_char(ch, "Point at what?\r\n");
 	}
 	else if ((dir = parse_direction(ch, arg)) != NO_DIR && dir != DIR_RANDOM) {
-		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0';
+		color = CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE);
 		
 		sprintf(buf, "\t%cYou point %s.\t0\r\n", color, dirs[get_direction_for_char(ch, dir)]);
 		send_to_char(buf, ch);
@@ -379,7 +379,7 @@ ACMD(do_point) {
 					clear_last_act_message(pers->desc);
 				}
 				
-				color = (!IS_NPC(pers) && GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE) : '0';
+				color = CUSTOM_COLOR_CHAR(pers, CUSTOM_COLOR_EMOTE);
 				sprintf(buf, "\t%c$n points %s.\t0", color, dirs[get_direction_for_char(pers, dir)]);
 				act(buf, FALSE, ch, NULL, pers, TO_VICT | TO_NOT_IGNORING);
 				
@@ -400,7 +400,7 @@ ACMD(do_point) {
 	}
 	else if (obj || veh) {
 		// combine these as they both do the same loop
-		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0';
+		color = CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE);
 		
 		if (obj) {
 			snprintf(to_char, sizeof(to_char), "\t%cYou point at $p.\t0", color);
@@ -431,7 +431,7 @@ ACMD(do_point) {
 					clear_last_act_message(pers->desc);
 				}
 				
-				color = (!IS_NPC(pers) && GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(pers, CUSTOM_COLOR_EMOTE) : '0';
+				color = CUSTOM_COLOR_CHAR(pers, CUSTOM_COLOR_EMOTE);
 				sprintf(buf, "\t%c%s", color, to_room);
 				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING);
 				

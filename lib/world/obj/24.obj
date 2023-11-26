@@ -5,7 +5,7 @@ A suit of imperial eagle plate armor is racked here.~
    This suit of plate armor is made from gleaming imperium, hammered by a
 master such that the breastplate looks like the face of an eagle.
 ~
-27 emo aq 0 4
+27 emo aq 0 0 4
 3 0 0
 2 0
 A
@@ -29,9 +29,11 @@ the imperial eagle plate armor pattern~
 The imperial eagle plate armor pattern is on the ground.~
 This pattern will teach you to forge: imperial eagle plate armor.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2400 0 0
 0 0
+C
+100 100
 S
 #2402
 helm eagle imperial~
@@ -42,7 +44,7 @@ eagle's head. Huge metal feathers line the back of the helmet and though you
 couldn't lay down on your back with this on your head, it certainly strikes
 fear in your enemies' hearts.
 ~
-27 mo ae 0 4
+27 mo ae 0 0 4
 3 0 0
 2 0
 A
@@ -64,9 +66,11 @@ the imperial eagle helm pattern~
 The imperial eagle helm pattern is on the ground.~
 This pattern will teach you to forge: imperial eagle helm.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2402 0 0
 0 0
+C
+100 100
 S
 #2404
 vambraces imperial eagle~
@@ -75,7 +79,7 @@ A pair of imperial eagle vambraces is lying here.~
    These plate vambraces are ridged with razor-sharp imperium feathers, proving
 that anyone who would attack you is a fool.
 ~
-27 emo ai 0 3
+27 emo ai 0 0 3
 3 0 0
 2 0
 A
@@ -97,9 +101,11 @@ the imperial eagle vambraces pattern~
 The imperial eagle vambraces pattern is on the ground.~
 This pattern will teach you to forge: imperial eagle vambraces.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2404 0 0
 0 0
+C
+100 100
 S
 #2406
 shield eagle imperial eagle-shaped tower~
@@ -107,7 +113,7 @@ an imperial eagle shield~
 An eagle-shaped tower shield is lying here.~
 This grand tower shield has been hammered into the face of an eagle.
 ~
-23 emo ao 0 4
+23 emo ao 0 0 4
 0 0 0
 2 0
 A
@@ -121,9 +127,11 @@ the imperial eagle shield design~
 The imperial eagle shield design is on the ground.~
 This design will teach you to forge: imperial eagle shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2406 0 0
 0 0
+C
+100 100
 S
 #2408
 mail plate griffin heroic suit~
@@ -133,7 +141,7 @@ A suit of heroic griffin plate mail is hanging here.~
 beak and claws of a griffin, the mythical beast that combines a lion and an
 eagle.
 ~
-27 emo aq 0 5
+27 emo aq 0 0 5
 3 0 0
 2 0
 A
@@ -157,9 +165,11 @@ the heroic griffin plate mail pattern~
 The heroic griffin plate mail pattern is on the ground.~
 This pattern will teach you to forge: heroic griffin plate mail.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2408 0 0
 0 0
+C
+200 200
 S
 #2410
 helm griffin heroic~
@@ -168,7 +178,7 @@ A heroic griffin helm is hung nearby.~
    This argentine helm has been hammered into the shape of a griffin's head,
 with feathers made of briar hide and eyes made from prismatic crystals.
 ~
-27 mo ae 0 5
+27 mo ae 0 0 5
 3 0 0
 2 0
 A
@@ -190,9 +200,11 @@ the heroic griffin helm pattern~
 The heroic griffin helm pattern is on the ground.~
 This pattern will teach you to forge: heroic griffin helm.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2410 0 0
 0 0
+C
+200 200
 S
 #2412
 bracers heroic griffin pair~
@@ -201,7 +213,7 @@ A pair of heroic griffin bracers lies on the ground.~
    These bracers are made in the shape of feathers, alternating between
 argentine imperium and briar hide, and give you the look of a fearsome griffin.
 ~
-27 emo ai 0 4
+27 emo ai 0 0 4
 3 0 0
 2 0
 A
@@ -223,9 +235,11 @@ the heroic griffin bracers pattern~
 The heroic griffin bracers pattern is on the ground.~
 This pattern will teach you to forge: heroic griffin bracers.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2412 0 0
 0 0
+C
+200 200
 S
 #2414
 shield tower griffin-shaped heroic~
@@ -235,7 +249,7 @@ A griffin-shaped tower shield stands before you.~
 life-sized, posed as though it is attacking your foe. It's tremendously heavy,
 but worth its weight.
 ~
-23 emo ao 0 6
+23 emo ao 0 0 6
 0 0 0
 2 0
 A
@@ -249,9 +263,11 @@ the heroic griffin shield design~
 The heroic griffin shield design is on the ground.~
 This design will teach you to forge: heroic griffin shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2414 0 0
 0 0
+C
+200 200
 S
 #2416
 potion imperial fortitude imperial-fortitude~
@@ -261,7 +277,7 @@ An imperial potion of fortitude is on the ground.~
 swirling potion within. Hint: create an alias for 'quaff imperial-fortitude' to
 make sure you target the right potion.
 ~
-25 m a 0 7
+25 m a 0 0 7
 -1 0 3030
 8 0
 A
@@ -272,10 +288,10 @@ A
 13 2 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #2417
 formula imperial fortitude potion~
@@ -283,8 +299,10 @@ the imperial fortitude potion formula~
 The imperial fortitude potion formula is on the ground.~
 This formula will teach you to brew: imperial fortitude potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2416 0 0
 0 0
+C
+100 100
 S
 $

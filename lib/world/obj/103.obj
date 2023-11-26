@@ -4,7 +4,7 @@ the flame dragon's hoard~
 The dragon's hoard is piled here!~
 The hoard is a stack of rare and precious golden coins.
 ~
-15 e a 0 3
+15 e a 0 0 3
 25 0 0
 4 0
 R
@@ -17,7 +17,7 @@ A dragon egg is sitting here.~
 This dragon egg looks ready to hatch and summon you a noncombat pet!
 Type 'use egg' to summon it.
 ~
-19 p a 0 4
+19 p a 0 0 4
 10301 0 0
 14 0
 S
@@ -27,7 +27,7 @@ some firefruit seeds~
 Some firefruit seeds are scattered on the ground.~
 These seeds have a faint glow.
 ~
-3 b a 0 6
+3 b a 0 0 6
 0 10300 0
 7 468
 O+ 1 6180
@@ -41,9 +41,11 @@ A firefruit is flickering and sputtering on the ground.~
    The firefruit flickers shades of red, orange and yellow. It's warm to the
 touch, but juicy and delicious. It's probably bright enough to see by.
 ~
-6 bcel a 0 7
+6 bcel a 0 0 8
 24 10300 0
 7 48
+A
+30 2 0
 M
 4
 You begin to sweat as you eat $p.~
@@ -60,7 +62,7 @@ A dragon's breath charm is lying here.~
    This charm is made from pure gold and imbued with the breath of a dragon.
 It's suspended from a gold necklace, and is much heavier than it looks.
 ~
-2 mp ac 0 1
+2 mp ac 0 0 1
 0 0 0
 4 0
 A
@@ -75,7 +77,7 @@ A dragon's ferocity charm is lying here.~
    This charm is made of gold, in the shape of a dragon's tooth, and imbued
 with all the ferocity a dragon can muster. As a result, it's quite heavy.
 ~
-2 mp ac 0 1
+2 mp ac 0 0 1
 0 0 0
 4 0
 A
@@ -90,7 +92,7 @@ A dragon's courage charm is lying here.~
    This golden charm is made in the shape of a dragon's eye, and enchanted with
 the courage of a dragon. It's much heavier than it looks.
 ~
-2 mp ac 0 1
+2 mp ac 0 0 1
 0 0 0
 4 0
 A
@@ -108,7 +110,7 @@ A dragon's wind charm is lying here.~
 with the wind of a dragon (a fact you try not to think too hard about), and is
 much lighter than it looks.
 ~
-2 mp ac 0 1
+2 mp ac 0 0 1
 0 0 0
 0 0
 A
@@ -123,7 +125,7 @@ Some dragonscale leggings are on the ground.~
    These leggings are lined with fine cloth, but the outside is made from
 stitched chips of dragonscale.
 ~
-27 mo af 0 1
+27 mo af 0 0 1
 0 0 0
 14 0
 A
@@ -141,7 +143,7 @@ dragonweave stockings~
 Some dragonweave stockings are crumpled here.~
 These leggings are stitched from the sinews of dragonscale.
 ~
-27 mo af 0 3
+27 mo af 0 0 3
 0 0 0
 14 0
 A
@@ -159,7 +161,7 @@ dragonplate breeches~
 Some dragonplate breeches are stacked here.~
 These short pants are made from hardened dragonscales, and fastened by imperium.
 ~
-27 mo af 0 2
+27 mo af 0 0 2
 3 0 0
 14 0
 A
@@ -179,7 +181,7 @@ dragonmail chaps~
 Some dragonmail chaps are piled here.~
 These leggings are made from tiny ringlets of dragonscale.
 ~
-27 mo af 0 3
+27 mo af 0 0 3
 1 0 0
 14 0
 A
@@ -197,9 +199,11 @@ the dragonscale leggings pattern~
 The dragonscale leggings pattern is sitting here.~
 This pattern teaches you to sew dragonscale leggings.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10308 0 0
 0 0
+C
+1 1
 S
 #10313
 pattern stockings dragonweave~
@@ -207,9 +211,11 @@ the dragonweave stockings pattern~
 The dragonweave stockings pattern is sitting here.~
 This pattern teaches you to sew dragonweave stockings.
 ~
-7 0 a 0 6
+7 0 a 0 0 7
 10309 0 0
 0 0
+C
+1 1
 S
 #10314
 pattern dragonplate breeches~
@@ -217,9 +223,11 @@ the dragonplate breeches pattern~
 The dragonplate breeches pattern is sitting here.~
 This pattern teaches you to forge dragonplate breeches.
 ~
-7 0 a 0 6
+7 0 a 0 0 7
 10310 0 0
 0 0
+C
+1 1
 S
 #10315
 pattern dragonmail chaps~
@@ -227,9 +235,11 @@ the dragonmail chaps pattern~
 The dragonmail chaps pattern is sitting here.~
 This pattern teaches you to craft dragonmail chaps.
 ~
-7 0 a 0 8
+7 0 a 0 0 9
 10311 0 0
 0 0
+C
+1 1
 S
 #10316
 sorrow dragons~
@@ -237,7 +247,7 @@ the sorrow of dragons~
 The sorrow of dragons hangs heavy in the air.~
 A dragon has died and an air of sorrow looms over the cave.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 10 144
 T 10307
@@ -248,7 +258,7 @@ the abandoned nest~
 The abandoned nest looks empty.~
 There's nothing in the nest.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 0 0
 T 10331
@@ -260,7 +270,7 @@ A wyvern whistle is lying here.~
 The wyvern whistle can be used to summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10334 0 0
 14 0
 S
@@ -271,7 +281,7 @@ An emerald whistle is lying here.~
 This whistle is sure to summon an emerald dragon mount.
 Type 'use whistle' to use it.
 ~
-3 p a 0 1
+3 p a 0 0 1
 10335 0 0
 13 0
 T 10335
@@ -285,7 +295,7 @@ of summoning a dragonguard to patrol your city just like a cityguard. The
 dragonguard will stay where you summon him, so choose wisely.
 Type 'use dragonguard' to summon it.
 ~
-3 p a 0 5
+3 p a 0 0 5
 10336 0 0
 1 0
 T 10339
@@ -299,7 +309,7 @@ similar to a cow, except slightly more on fire. Still, they never burn down the
 stable and their milk is top shelf.
 Type 'use cowbell' to summon the fire ox.
 ~
-3 p a 0 2
+3 p a 0 0 2
 10337 0 0
 13 0
 T 10336
@@ -310,7 +320,7 @@ a scaly dragonfruit~
 A scaly dragonfruit is lying here.~
 This exotic red fruit has green, scaly leaves coming out of its leathery skin.
 ~
-6 0 a 0 5
+6 0 a 0 0 5
 2 0 0
 7 48
 I 14 10339 100.00 4 x  # COMBINE: basket of dragonfruit
@@ -323,7 +333,7 @@ A basket of dragonfruit is sitting here.~
 on a cactus, and as they require little water, they should be easy to farm in
 the desert. You could probably preserve the dragonfruit by making it into jam.
 ~
-6 b a 0 5
+6 b a 0 0 5
 24 10338 0
 7 168
 I 15 10338 100.00 4 x  # SEPARATE: scaly dragonfruit
@@ -336,7 +346,7 @@ dragonfruit jam~
 A jar of dragonfruit jam is lying here.~
 The jam is bright red, and doesn't really smell like anything.
 ~
-6 0 a 0 3
+6 0 a 0 0 3
 48 0 0
 7 336
 I 26 801 100.00 1  # DECAYS-TO: glass jar
@@ -353,7 +363,7 @@ A dragonscale wristguard is lying on the ground.~
    This finely crafted wristguard looks like it could take quite a beating.
 It's made from actual dragon scales.
 ~
-27 mo aj 0 2
+27 mo aj 0 0 2
 3 0 0
 14 0
 A
@@ -371,9 +381,11 @@ the dragonscale wristguard pattern~
 The dragonscale wristguard pattern is lying here.~
 This pattern teaches you to forge dragonscale wristguards.
 ~
-7 0 a 0 4
+7 0 a 0 0 5
 10341 0 0
 0 0
+C
+1 1
 S
 #10343
 bangles dragonscale~
@@ -382,7 +394,7 @@ Some dragonscale bangles have been left here.~
    These bangles appear to have been cut from dragonscale, a truly rare
 material. What's more, there's a nocturnium mesh woven around them.
 ~
-27 mo aj 0 1
+27 mo aj 0 0 1
 0 0 0
 14 0
 A
@@ -400,9 +412,11 @@ the dragonscale bangles pattern~
 The dragonscale bangles pattern is here.~
 This pattern teaches you to craft dragonscale bangles.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10343 0 0
 0 0
+C
+1 1
 S
 #10345
 bracers dragonscale~
@@ -411,7 +425,7 @@ Some dragonscale bracers are lying here.~
    These bracers are made from rare dragon scales, fixed to tough leather, and
 edges with sharpened imperium.
 ~
-27 mo aj 0 2
+27 mo aj 0 0 2
 1 0 0
 14 0
 A
@@ -429,9 +443,11 @@ the dragonscale bracers pattern~
 The dragonscale bracers pattern is here.~
 This pattern teaches you to sew dragonscale bracers.
 ~
-7 0 a 0 6
+7 0 a 0 0 7
 10345 0 0
 0 0
+C
+1 1
 S
 #10347
 saddle dragonscale~
@@ -439,7 +455,7 @@ a dragonscale saddle~
 A dragonscale saddle is lying on the ground.~
 This saddle is made from molded dragon scales!
 ~
-3 mo as 0 1
+3 mo as 0 0 1
 0 0 0
 14 0
 A
@@ -455,9 +471,11 @@ the dragonscale saddle pattern~
 The dragonscale saddle pattern is here.~
 This pattern teaches you to sew a dragonscale saddle.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10347 0 0
 0 0
+C
+1 1
 S
 #10349
 gloves unlucky adventurer's adventurers~
@@ -465,7 +483,7 @@ an unlucky adventurer's gloves~
 An unlucky adventurer's gloves are lying here.~
 The gloves still have bits of the charred flesh of the previous occupant.
 ~
-27 mp ah 0 1
+27 mp ah 0 0 1
 3 0 0
 2 0
 A
@@ -481,7 +499,7 @@ an unlucky adventurer's earrings~
 An unlucky adventurer's earrings were left here.~
 These earrings still smell of burnt flesh. They're otherwise quite handsome.
 ~
-2 mp am 0 1
+2 mp am 0 0 1
 0 0 0
 4 0
 A
@@ -497,7 +515,7 @@ an unlucky adventurer's cloak~
 An unlucky adventurer's cloak is draped here, empty.~
 This cloak is singed around the edges, and smells faintly of burnt hair.
 ~
-27 mp ak 0 1
+27 mp ak 0 0 1
 0 0 0
 7 0
 A
@@ -515,7 +533,7 @@ an unlucky adventurer's spellbook~
 An unlucky adventurer has left his spellbook behind.~
 The book looks slightly singed, and there's more dried blood than just the ink.
 ~
-3 mp ao 0 2
+3 mp ao 0 0 2
 0 0 0
 7 0
 A
@@ -531,7 +549,7 @@ an unlucky adventurer's dagger~
 An unlucky adventurer's dagger is stabbed into the ground.~
 This dagger has plenty of dried blood, but only on the handle.
 ~
-1 hmp ano f 2
+1 hmp ano f 0 2
 0 3 4
 2 0
 A
@@ -545,7 +563,7 @@ an unlucky adventurer's shield~
 An unlucky adventurer has lost her shield.~
 This shield looks like it once bore a crest, long scorched off.
 ~
-23 mp ao 0 1
+23 mp ao 0 0 1
 0 0 0
 13 0
 A
@@ -563,7 +581,7 @@ an effigy of an unlucky adventurer~
 An effigy of an unlucky adventurer is lying here.~
 This clay effigy looks like it spent too long in the kiln.
 ~
-3 mp ao 0 1
+3 mp ao 0 0 1
 0 0 0
 6 0
 A

@@ -245,6 +245,8 @@ void perform_escape(char_data *ch) {
 		greet_mtrigger(ch, NO_DIR, "ability");
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR, "ability");
+				
+		RESET_LAST_MESSAGED_TEMPERATURE(ch);
 		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -623,7 +625,7 @@ ACMD(do_backstab) {
 		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
 		if (!success) {
-			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL);
+			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL);
 		}
 		else {
 			dam = GET_STRENGTH(ch) + (!IS_NPC(ch) ? GET_WEAPON_DAMAGE_BONUS(GET_EQ(ch, WEAR_WIELD)) : MOB_DAMAGE(ch));
@@ -635,7 +637,7 @@ ACMD(do_backstab) {
 				dam *= 2;
 			}
 
-			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL) > 0) {
+			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL) > 0) {
 				if (has_player_tech(ch, PTECH_POISON)) {
 					if (!number(0, 1) && apply_poison(ch, vict) < 0) {
 						// dedz
@@ -923,8 +925,8 @@ ACMD(do_howl) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30, WAIT_COMBAT_ABILITY);
 		
-		msg_to_char(ch, "You let out a fearsome howl!\r\n");
-		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("You let out a fearsome howl!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
+		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM | TO_ABILITY);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1018,6 +1020,8 @@ ACMD(do_infiltrate) {
 			greet_mtrigger(ch, NO_DIR, "move");
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "move");
+	
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
@@ -1078,14 +1082,14 @@ ACMD(do_jab) {
 
 		if (IS_NPC(ch)) {
 			// NPC has no weapon
-			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT);
-			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 		}
 		else {
-			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR);
-			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT);
-			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT);
+			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR | TO_ABILITY);
+			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT | TO_ABILITY);
+			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT | TO_ABILITY);
 		}
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
@@ -1276,13 +1280,13 @@ ACMD(do_prick) {
 			appear(ch);
 		}
 
-		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT);
+		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
 
 		// possibly fatal
 		if (apply_poison(ch, vict) == 0) {
-			msg_to_char(ch, "It seems to have no effect.\r\n");
+			act("It seems to have no effect.", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
 		}
 		
 		// apply_poison could have killed vict -- check location, etc
@@ -1446,8 +1450,8 @@ ACMD(do_shadowcage) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30, WAIT_COMBAT_ABILITY);
 		
-		msg_to_char(ch, "You shoot webs of pure shadow, forming a tight cage!\r\n");
-		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("You shoot webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
+		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM | TO_ABILITY);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
@@ -1461,7 +1465,7 @@ ACMD(do_shadowcage) {
 				af = create_mod_aff(ATYPE_SHADOWCAGE, 15, APPLY_DODGE, -value, ch);
 				affect_join(victim, af, NOBITS);
 				
-				msg_to_char(victim, "You can't seem to dodge as well in the shadowcage!\r\n");
+				act("You can't seem to dodge as well in the shadowcage!", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
 				engage_combat(ch, victim, TRUE);
 			}
 		}
@@ -1562,6 +1566,8 @@ ACMD(do_shadowstep) {
 			greet_mtrigger(ch, NO_DIR, "ability");
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "ability");
+			
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 
@@ -1755,8 +1761,8 @@ ACMD(do_whisperstride) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
 		
-		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
-		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("You cloak yourself with dark whispers, muffling your movement...", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
 		
 		af = create_flag_aff(ATYPE_WHISPERSTRIDE, 30, AFF_SNEAK, ch);
 		affect_join(ch, af, 0);

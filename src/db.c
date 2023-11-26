@@ -36,6 +36,7 @@
 *   Post-Processing
 *   I/O Helpers
 *   Help I/O
+*   Fight Messages
 *   Island Setup
 *   Mobile Loading
 *   Object Loading
@@ -173,7 +174,7 @@ int MAX_REPUTATION = 0;	// highest possible rep value, auto-detected at startup
 int MIN_REPUTATION = 0;	// lowest possible rep value, auto-detected at startup
 
 // fight system
-struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
+struct message_list *fight_messages = NULL;	// hash table of fighting messages by a_type/ATTACK_ const
 
 // game config
 time_t boot_time = 0;	// time of mud boot
@@ -1187,26 +1188,6 @@ int file_to_string_alloc(const char *name, char **buf) {
 }
 
 
-// reads in one action line
-char *fread_action(FILE * fl, int nr) {
-	char buf[MAX_STRING_LENGTH], *rslt;
-
-	fgets(buf, MAX_STRING_LENGTH, fl);
-	if (feof(fl)) {
-		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
-		exit(1);
-		}
-	if (*buf == '#')
-		return (NULL);
-	else {
-		*(buf + strlen(buf) - 1) = '\0';
-		CREATE(rslt, char, strlen(buf) + 1);
-		strcpy(rslt, buf);
-		return (rslt);
-	}
-}
-
-
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE * fl, char *error) {
 	char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH], *rslt;
@@ -1468,6 +1449,228 @@ void index_boot_help(void) {
 
 	qsort(help_table, top_of_helpt, sizeof(struct help_index_element), help_sort);
 	top_of_helpt--;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FIGHT MESSAGES //////////////////////////////////////////////////////////
+
+/**
+* Adds messages to a set of fight messages.
+*
+* @param struct message_list *add_to Which set of messages to add to.
+* @param struct message_type *messages The messages to put in there.
+*/
+void add_fight_message(struct message_list *add_to, struct message_type *messages) {
+	if (add_to && messages) {
+		add_to->number_of_attacks++;
+		LL_PREPEND(add_to->msg, messages);
+	}
+}
+
+
+/**
+* Creates a blank message list for use in the damage() function.
+*
+* @param int a_type Usually an ATTACK_ const.
+* @return struct message_list* The allocated list.
+*/
+struct message_list *create_fight_message(int a_type) {
+	struct message_list *list;
+	CREATE(list, struct message_list, 1);
+	list->a_type = a_type;
+	return list;
+}
+
+
+/**
+* Creates an entry for a fight message. Any strings may be NULL.
+*
+* @param bool duplicate_strings If TRUE, will str_dup any strings that are provided. Otherwise, uses the provided pointers.
+* @param char *die_to_attacker Message shown to the attacker when fatal (may be NULL).
+* @param char *die_to_victim Message shown to the victim when fatal (may be NULL).
+* @param char *die_to_room Message shown to the room when fatal (may be NULL).
+* @param char *miss_to_attacker Message shown to the attacker when missing (may be NULL).
+* @param char *miss_to_victim Message shown to the victim when missing (may be NULL).
+* @param char *miss_to_room Message shown to the room when missing (may be NULL).
+* @param char *hit_to_attacker Message shown to the attacker when hit (may be NULL).
+* @param char *hit_to_victim Message shown to the victim when hit (may be NULL).
+* @param char *hit_to_room Message shown to the room when hit (may be NULL).
+* @param char *god_to_attacker Message shown to the attacker when hitting a god (may be NULL).
+* @param char *god_to_victim Message shown to the victim when hitting a god (may be NULL).
+* @param char *god_to_room Message shown to the room when hitting a god (may be NULL).
+*/
+struct message_type *create_fight_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room) {
+	struct message_type *messages;
+	
+	CREATE(messages, struct message_type, 1);
+
+	messages->msg[MSG_DIE].attacker_msg = (die_to_attacker && *die_to_attacker) ? (duplicate_strings ? str_dup(die_to_attacker) : die_to_attacker) : NULL;
+	messages->msg[MSG_DIE].victim_msg = (die_to_victim && *die_to_victim) ? (duplicate_strings ? str_dup(die_to_victim) : die_to_victim) : NULL;
+	messages->msg[MSG_DIE].room_msg = (die_to_room && *die_to_room) ? (duplicate_strings ? str_dup(die_to_room) : die_to_room) : NULL;
+	messages->msg[MSG_MISS].attacker_msg = (miss_to_attacker && *miss_to_attacker) ? (duplicate_strings ? str_dup(miss_to_attacker) : miss_to_attacker) : NULL;
+	messages->msg[MSG_MISS].victim_msg = (miss_to_victim && *miss_to_victim) ? (duplicate_strings ? str_dup(miss_to_victim) : miss_to_victim) : NULL;
+	messages->msg[MSG_MISS].room_msg = (miss_to_room && *miss_to_room) ? (duplicate_strings ? str_dup(miss_to_room) : miss_to_room) : NULL;
+	messages->msg[MSG_HIT].attacker_msg = (hit_to_attacker && *hit_to_attacker) ? (duplicate_strings ? str_dup(hit_to_attacker) : hit_to_attacker) : NULL;
+	messages->msg[MSG_HIT].victim_msg = (hit_to_victim && *hit_to_victim) ? (duplicate_strings ? str_dup(hit_to_victim) : hit_to_victim) : NULL;
+	messages->msg[MSG_HIT].room_msg = (hit_to_room && *hit_to_room) ? (duplicate_strings ? str_dup(hit_to_room) : hit_to_room) : NULL;
+	messages->msg[MSG_GOD].attacker_msg = (god_to_attacker && *god_to_attacker) ? (duplicate_strings ? str_dup(god_to_attacker) : god_to_attacker) : NULL;
+	messages->msg[MSG_GOD].victim_msg = (god_to_victim && *god_to_victim) ? (duplicate_strings ? str_dup(god_to_victim) : god_to_victim) : NULL;
+	messages->msg[MSG_GOD].room_msg = (god_to_room && *god_to_room) ? (duplicate_strings ? str_dup(god_to_room) : god_to_room) : NULL;
+	
+	return messages;
+}
+
+
+/**
+* Finds or creates an entry in the fight_messages hash.
+*
+* @param int a_type The ATTACK_ const to find the fight message list for.
+* @param bool create_if_missing If TRUE, will create the entry for the a_type.
+* @return struct message_list* The fight message list, if any (guaranteed if create_if_missing=TRUE).
+*/
+struct message_list *find_fight_message(int a_type, bool create_if_missing) {
+	struct message_list *fmes;
+	
+	HASH_FIND_INT(fight_messages, &a_type, fmes);
+	if (!fmes && create_if_missing) {
+		fmes = create_fight_message(a_type);
+		HASH_ADD_INT(fight_messages, a_type, fmes);
+	}
+	
+	return fmes;	// if any
+}
+
+
+/**
+* Reads in one "action line" for a damage message. This also checks for:
+*   # - send no message for this line
+*
+* @param FILE *fl The open fight messages file.
+* @param int type The attack type for this record (for error reporting).
+* @param int type_pos Which message for that attack type (for error reporting).
+* @return char* The string as read from the file, or NULL for no message.
+*/
+char *fread_action(FILE *fl, int type, int type_pos) {
+	char buf[MAX_STRING_LENGTH], *rslt;
+	
+	fgets(buf, MAX_STRING_LENGTH, fl);
+	if (feof(fl)) {
+		log("SYSERR: fread_action - unexpected EOF in fight message type %d, message %d", type, type_pos);
+		exit(1);
+	}
+	if (*buf == '#') {
+		return (NULL);
+	}
+	else {
+		*(buf + strlen(buf) - 1) = '\0';
+		CREATE(rslt, char, strlen(buf) + 1);
+		strcpy(rslt, buf);
+		return (rslt);
+	}
+}
+
+
+/**
+* Frees a fight message set (message_list) and any strings it contains.
+*
+* @param struct message_list *list The list to free.
+*/
+void free_message_list(struct message_list *list) {
+	struct message_type *msg, *next_msg;
+	
+	if (list) {
+		LL_FOREACH_SAFE(list->msg, msg, next_msg) {
+			free_message_type(msg);
+		}
+		free(list);
+	}
+}
+
+
+/**
+* Frees a single fight message (message_type) and its strings.
+*
+* @param struct message_type *type The fight message to free.
+*/
+void free_message_type(struct message_type *type) {
+	int iter;
+	if (type) {
+		for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
+			if (type->msg[iter].attacker_msg) {
+				free(type->msg[iter].attacker_msg);
+			}
+			if (type->msg[iter].victim_msg) {
+				free(type->msg[iter].victim_msg);
+			}
+			if (type->msg[iter].room_msg) {
+				free(type->msg[iter].room_msg);
+			}
+		}
+		free(type);
+	}
+}
+
+
+/**
+* Loads the "messages" file, which contains damage messages for various attack
+* types.
+*/
+void load_fight_messages(void) {
+	FILE *fl;
+	int type;
+	struct message_type *messages;
+	struct message_list *msg_set, *next_set;
+	char chk[128];
+
+	if (!(fl = fopen(MESS_FILE, "r"))) {
+		log("SYSERR: Error reading combat message file %s: %s", MESS_FILE, strerror(errno));
+		exit(1);
+	}
+	
+	// free existing messages if any (for reload)
+	HASH_ITER(hh, fight_messages, msg_set, next_set) {
+		HASH_DEL(fight_messages, msg_set);
+		free_message_list(msg_set);
+	}
+
+	fgets(chk, 128, fl);
+	while (!feof(fl) && (*chk == '\n' || *chk == '*')) {
+		fgets(chk, 128, fl);
+	}
+
+	while (*chk == 'M') {
+		fgets(chk, 128, fl);
+		sscanf(chk, " %d\n", &type);
+		
+		msg_set = find_fight_message(type, TRUE);
+		
+		CREATE(messages, struct message_type, 1);
+		
+		// does not use create_fight_message_entry():
+		messages->msg[MSG_DIE].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_DIE].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_DIE].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_MISS].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_MISS].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_MISS].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_HIT].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_HIT].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_HIT].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_GOD].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_GOD].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		messages->msg[MSG_GOD].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		
+		add_fight_message(msg_set, messages);
+		
+		// skip to next real line
+		fgets(chk, 128, fl);
+		while (!feof(fl) && (*chk == '\n' || *chk == '*')) {
+			fgets(chk, 128, fl);
+		}
+	}
+
+	fclose(fl);
 }
 
 
@@ -2082,65 +2285,6 @@ void setup_start_locations(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LOADERS ///////////////////////////////////////////////////
-
-/**
-* Loads the "messages" file, which contains damage messages for various attack
-* types.
-*/
-void load_fight_messages(void) {
-	FILE *fl;
-	int i, type;
-	struct message_type *messages;
-	char chk[128];
-
-	if (!(fl = fopen(MESS_FILE, "r"))) {
-		log("SYSERR: Error reading combat message file %s: %s", MESS_FILE, strerror(errno));
-		exit(1);
-	}
-	for (i = 0; i < MAX_MESSAGES; i++) {
-		fight_messages[i].a_type = NOTHING;
-		fight_messages[i].number_of_attacks = 0;
-		fight_messages[i].msg = 0;
-	}
-
-	fgets(chk, 128, fl);
-	while (!feof(fl) && (*chk == '\n' || *chk == '*'))
-		fgets(chk, 128, fl);
-
-	while (*chk == 'M') {
-		fgets(chk, 128, fl);
-		sscanf(chk, " %d\n", &type);
-		for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) && (fight_messages[i].a_type != NOTHING); i++);
-		if (i >= MAX_MESSAGES) {
-			log("SYSERR: Too many combat messages. Increase MAX_MESSAGES and recompile.");
-			exit(1);
-		}
-		CREATE(messages, struct message_type, 1);
-		fight_messages[i].number_of_attacks++;
-		fight_messages[i].a_type = type;
-		
-		LL_PREPEND(fight_messages[i].msg, messages);
-
-		messages->die_msg.attacker_msg = fread_action(fl, i);
-		messages->die_msg.victim_msg = fread_action(fl, i);
-		messages->die_msg.room_msg = fread_action(fl, i);
-		messages->miss_msg.attacker_msg = fread_action(fl, i);
-		messages->miss_msg.victim_msg = fread_action(fl, i);
-		messages->miss_msg.room_msg = fread_action(fl, i);
-		messages->hit_msg.attacker_msg = fread_action(fl, i);
-		messages->hit_msg.victim_msg = fread_action(fl, i);
-		messages->hit_msg.room_msg = fread_action(fl, i);
-		messages->god_msg.attacker_msg = fread_action(fl, i);
-		messages->god_msg.victim_msg = fread_action(fl, i);
-		messages->god_msg.room_msg = fread_action(fl, i);
-		fgets(chk, 128, fl);
-		while (!feof(fl) && (*chk == '\n' || *chk == '*'))
-			fgets(chk, 128, fl);
-	}
-
-	fclose(fl);
-}
-
 
 /**
 * Loads the game's various connect screens.

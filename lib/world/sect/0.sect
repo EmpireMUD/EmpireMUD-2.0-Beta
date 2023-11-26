@@ -499,11 +499,12 @@ outcroppings, with streams cascading down their sides. Above, the sky is a
 crystal clear, and you can see birds soaring in the distance. The sheer size
 and beauty of the mountains is both awe-inspiring and humbling.
 ~
+Z1 7
 S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mry opx
+'-' 26 0 1 mryB opx
 D1
 ----~
 &0~
@@ -530,7 +531,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dopuy 0
+'?' 27 0 1 dopuyB 0
 D1
 [..]~
 &0~
@@ -547,7 +548,7 @@ S
 #11
 Inside~
 Inside~
-'?' 0 0 1 dq 0
+'?' 0 0 1 dqB 0
 D1
 (..)~
 &0~
@@ -773,7 +774,7 @@ S
 #19
 Canal~
 A Canal~
-'~' 17 o 8 gi af
+'~' 17 o 8 giC af
 D0
 @w&?~~@e~
 &c~
@@ -814,15 +815,11 @@ E
 E
 5 0 100.00 22
 E
-7 19 4.00 70
-E
-7 87 4.00 70
-E
-7 85 4.00 70
-E
 8 0 100.00 14
 E
 9 0 50.00 25
+E
+26 268435456 4.00 70
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -846,7 +843,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'.' 18 kov 6 iw jp
+'.' 18 kovw 6 iw jp
 C
 dig, drink, fill, gather, pick~
 D0
@@ -855,17 +852,13 @@ D0
 E
 4 0 2.00 80
 E
-7 19 4.00 88
-E
-7 87 4.00 88
-E
-7 85 4.00 88
-E
 8 0 100.00 83
 E
 9 0 75.00 80
 E
 17 20 2.00 25
+E
+26 268435456 4.00 88
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -953,17 +946,13 @@ E
 E
 4 0 2.50 24
 E
-7 19 4.00 73
-E
-7 87 4.00 73
-E
-7 85 4.00 73
-E
 9 0 50.00 24
 E
 16 0 100.00 20
 E
 23 0 100.00 20
+E
+26 268435456 4.00 73
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1017,13 +1006,9 @@ E
 E
 4 0 0.40 26
 E
-7 19 4.00 74
-E
-7 87 4.00 74
-E
-7 85 4.00 74
-E
 9 0 50.00 26
+E
+26 268435456 4.00 74
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1073,13 +1058,9 @@ E
 E
 4 0 0.40 26
 E
-7 19 4.00 74
-E
-7 87 4.00 74
-E
-7 85 4.00 74
-E
 9 0 50.00 26
+E
+26 268435456 4.00 74
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1122,11 +1103,7 @@ E
 E
 2 57 10.00 51
 E
-7 19 4.00 71
-E
-7 87 4.00 71
-E
-7 85 4.00 71
+26 268435456 4.00 71
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
@@ -1304,7 +1281,7 @@ S
 #30
 Tundra~
 The Arctic Tundra~
-',' 16 fs 50 cev 0
+',' 16 fsx 50 cev 0
 D0
 ,,,,~
 &W~
@@ -1322,11 +1299,12 @@ and the sky overhead is a perpetual gray, offering no warmth or comfort. In the
 distance, jagged peaks rise up like teeth, a foreboding reminder of the
 harshness of this unforgiving land.
 ~
+Z1 7
 S
 #31
 Adventure~
 An Adventure~
-'?' 0 j 2 b 0
+'?' 0 0 2 bB 0
 D0
 ....~
 &0~
@@ -1358,7 +1336,7 @@ S
 #33
 Frozen Lake~
 A Frozen Lake~
-'~' 2 f 10 x a
+'~' 2 fy 10 x a
 D0
 ~~~~~
 &W~
@@ -2159,15 +2137,11 @@ D4
 E
 5 0 100.00 22
 E
-7 19 4.00 70
-E
-7 87 4.00 70
-E
-7 85 4.00 70
-E
 8 0 100.00 14
 E
 10 57 5.00 20
+E
+26 268435456 4.00 70
 I 5 107 75.00 1 x  # DIG: bag of sand
 I 5 101 25.00 1 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
@@ -2817,7 +2791,7 @@ S
 #70
 Irrigated Field~
 An Irrigated Field~
-'.' 10 jklrv 2 il bp
+'.' 10 jklrvw 2 il bp
 C
 dig, gather, pick~
 D0
@@ -2840,11 +2814,7 @@ E
 E
 9 0 50.00 71
 E
-11 19 4.00 20
-E
-11 87 4.00 20
-E
-11 85 4.00 20
+27 268435456 4.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -2870,7 +2840,7 @@ S
 #71
 Irrigated Forest~
 An Irrigated Forest~
-'.' 14 jkqv 3 adil np
+'.' 14 jkqvw 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -2894,11 +2864,7 @@ E
 E
 9 0 50.00 79
 E
-11 19 4.00 26
-E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2927,7 +2893,7 @@ S
 #72
 Irrigated Jungle~
 An Irrigated Jungle~
-'^' 14 klqv 3 adi g
+'^' 14 klqvw 3 adi g
 C
 chop, dig, gather, pick~
 D0
@@ -2953,11 +2919,7 @@ E
 E
 0 0 100.00 72
 E
-11 19 4.00 26
-E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -2988,7 +2950,7 @@ S
 #73
 Irrigated Stumps~
 An Irrigated Field of Stumps~
-'.' 10 jkrv 2 adil bp
+'.' 10 jkrvw 2 adil bp
 C
 burn stumps, dig, gather, pick~
 D0
@@ -3002,15 +2964,11 @@ E
 E
 9 0 50.00 74
 E
-11 19 4.00 23
-E
-11 87 4.00 23
-E
-11 85 4.00 23
-E
 16 0 100.00 70
 E
 23 0 100.00 70
+E
+27 268435456 4.00 23
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
@@ -3037,7 +2995,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'.' 13 jkrv 3 adi p
+'.' 13 jkrvw 3 adi p
 C
 chop, dig, pick~
 D0
@@ -3061,11 +3019,7 @@ E
 E
 9 0 50.00 71
 E
-11 19 4.00 24
-E
-11 87 4.00 24
-E
-11 85 4.00 24
+27 268435456 4.00 24
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3092,7 +3046,7 @@ S
 #75
 Irrigated Jungle Stumps~
 An Irrigated Field of Stumps~
-'.' 10 klrv 3 adil p
+'.' 10 klrvw 3 adil p
 C
 chop, dig, pick~
 D0
@@ -3106,15 +3060,11 @@ E
 E
 9 0 50.00 76
 E
-11 19 4.00 23
-E
-11 87 4.00 23
-E
-11 85 4.00 23
-E
 16 0 100.00 70
 E
 23 0 100.00 70
+E
+27 268435456 4.00 23
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3139,7 +3089,7 @@ S
 #76
 Irrigated Jungle Copse~
 An Irrigated Jungle Copse~
-'w' 13 klv 6 adi p
+'w' 13 klvw 6 adi p
 C
 chop, dig, pick~
 D0
@@ -3169,11 +3119,7 @@ E
 E
 9 0 50.00 72
 E
-11 19 4.00 24
-E
-11 87 4.00 24
-E
-11 85 4.00 24
+27 268435456 4.00 24
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3200,7 +3146,7 @@ S
 #77
 Planted Irrigated Field~
 A Planted Irrigated Field~
-',' 10 jkl 3 ij kp
+',' 10 jklw 3 ij kp
 C
 dig~
 D0
@@ -3211,15 +3157,11 @@ E
 E
 9 0 20.00 78
 E
-11 85 4.00 20
-E
-11 87 4.00 20
-E
-11 19 4.00 20
-E
 16 0 100.00 70
 E
 19 0 100.00 70
+E
+27 268435456 4.00 20
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
@@ -3237,20 +3179,16 @@ S
 #78
 Irrigated Crop~
 An Irrigated Crop~
-'.' 10 jkl 3 dijk kp
+'.' 10 jklw 3 dijk kp
 D0
 ????~
 &G~
 E
-11 87 4.00 20
-E
-11 85 4.00 20
-E
-11 19 4.00 20
-E
 16 0 100.00 70
 E
 19 0 100.00 70
+E
+27 268435456 4.00 20
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3258,7 +3196,7 @@ S
 #79
 Shady Irrigated Forest~
 A Shady Irrigated Forest~
-'^' 14 jkqv 3 adil np
+'^' 14 jkqvw 3 adil np
 C
 chop, dig, gather, pick~
 D0
@@ -3290,9 +3228,7 @@ E
 E
 0 0 100.00 79
 E
-11 87 4.00 26
-E
-11 85 4.00 26
+27 268435456 4.00 26
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
@@ -3321,7 +3257,7 @@ S
 #80
 Lush Oasis~
 A Lush Oasis~
-'.' 18 koqv 6 adiw jp
+'.' 18 koqvw 6 adiw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -3335,15 +3271,11 @@ E
 E
 4 0 2.00 81
 E
-7 19 4.00 89
-E
-7 87 4.00 89
-E
-7 85 4.00 89
-E
 9 0 75.00 81
 E
 17 20 2.00 25
+E
+26 268435456 4.00 89
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3370,7 +3302,7 @@ S
 #81
 Shady Oasis~
 A Shady Oasis~
-'.' 18 koqv 6 diw jp
+'.' 18 koqvw 6 diw jp
 C
 chop, dig, drink, fill, gather, pick~
 D0
@@ -3379,13 +3311,9 @@ D0
 E
 0 0 100.00 80
 E
-7 19 4.00 89
-E
-7 87 4.00 89
-E
-7 85 4.00 89
-E
 17 20 2.00 25
+E
+26 268435456 4.00 89
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3412,7 +3340,7 @@ S
 #82
 Dry Oasis~
 A Dry Oasis~
-'.' 21 k 6 l ep
+'.' 21 kw 6 l ep
 C
 dig, gather, pick~
 D1
@@ -3430,17 +3358,13 @@ D4
 E
 5 0 100.00 86
 E
-7 19 4.00 88
-E
-7 87 4.00 88
-E
-7 85 4.00 88
-E
 8 0 100.00 91
 E
 9 0 50.00 21
 E
 22 0 0.50 21
+E
+26 268435456 4.00 88
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3467,7 +3391,7 @@ S
 #83
 Planted Oasis~
 A Planted Oasis~
-'.' 18 kov 6 ijw kp
+'.' 18 kovw 6 ijw kp
 C
 dig, drink, fill~
 D0
@@ -3498,7 +3422,7 @@ S
 #84
 Oasis Crop~
 An Oasis Crop~
-'.' 18 kov 6 dijkw kp
+'.' 18 kovw 6 dijkw kp
 D0
 ????~
 &y~
@@ -3513,7 +3437,7 @@ S
 #85
 Irrigation Canal~
 An Irrigation Canal~
-'~' 17 ko 8 gi af
+'~' 17 kow 8 giC af
 D0
 @w&?~~@e~
 &C~
@@ -3563,7 +3487,7 @@ S
 #87
 Verdant Canal~
 A Verdant Canal~
-'~' 17 ko 8 gi af
+'~' 17 ko 8 giC af
 D0
 @w&?~~@e~
 &C~
@@ -3583,7 +3507,7 @@ S
 #88
 Irrigated Oasis~
 An Oasis on the Irrigated Field~
-'.' 18 jklov 6 iw jp
+'.' 18 jklovw 6 iw jp
 C
 dig, drink, fill, gather, pick~
 D0
@@ -3596,15 +3520,11 @@ E
 E
 9 0 75.00 89
 E
-11 19 4.00 80
-E
-11 87 4.00 80
-E
-11 85 4.00 80
-E
 17 20 2.00 25
 E
 17 70 2.00 74
+E
+27 268435456 4.00 80
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
@@ -3627,7 +3547,7 @@ S
 #89
 Shady Irrigated Oasis~
 A Shady Oasis on the Irrigated Field~
-'.' 18 jkloqv 6 diw jp
+'.' 18 jkloqvw 6 diw jp
 C
 dig, drink, fill, gather, pick~
 D0
@@ -3638,15 +3558,11 @@ E
 E
 0 0 100.00 89
 E
-11 19 4.00 81
-E
-11 87 4.00 81
-E
-11 85 4.00 81
-E
 17 20 2.00 25
 E
 17 70 2.00 74
+E
+27 268435456 4.00 81
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock

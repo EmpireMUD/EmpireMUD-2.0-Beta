@@ -96,7 +96,7 @@ void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 
 // local file scope variables
-static int char_extractions_pending = 0;
+int char_extractions_pending = 0;
 static int veh_extractions_pending = 0;
 
 
@@ -152,6 +152,8 @@ EVENTFUNC(dot_update_event) {
 	struct over_time_effect_type *dot;
 	char_data *ch, *caster;
 	int type, result;
+	struct message_list *custom_fmessage = NULL;
+	generic_data *gen;
 	
 	// grab data and free it
 	ch = data->ch;
@@ -163,16 +165,34 @@ EVENTFUNC(dot_update_event) {
 	// damage them if any time remains (if not, this dot is actually already over)
 	if (dot->time_remaining > 0) {
 		// determine type:
-		// TODO could this be an array or function
-		type = dot->damage_type == DAM_MAGICAL ? ATTACK_MAGICAL_DOT : (
-			dot->damage_type == DAM_FIRE ? ATTACK_FIRE_DOT : (
-			dot->damage_type == DAM_POISON ? ATTACK_POISON_DOT : 
-			ATTACK_PHYSICAL_DOT
-		));
+		type = damage_type_to_dot_attack[dot->damage_type];
 		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
 		
+		// custom messages?
+		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
+			custom_fmessage = create_fight_message(NOTHING);
+			add_fight_message(custom_fmessage, create_fight_message_entry(TRUE,
+				NULL,	// death to-attacker
+				GET_AFFECT_DEATH_TO_CHAR(gen),
+				GET_AFFECT_DEATH_TO_ROOM(gen),
+				NULL,	// miss to-attacker
+				NULL,	// miss to_vict
+				NULL,	// miss to-room
+				NULL,	// hit to-attacker
+				GET_AFFECT_DOT_TO_CHAR(gen),
+				GET_AFFECT_DOT_TO_ROOM(gen),
+				NULL,	// god to-attacker
+				NULL,	// god to_vict
+				NULL	// god to-room
+			));
+		}
+		
 		// bam! (damage func shows the messaging)
-		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type, custom_fmessage);
+		
+		if (custom_fmessage) {
+			free_message_list(custom_fmessage);
+		}
 		
 		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
 			// done here (death and extraction should both remove the DOT themselves)
@@ -508,10 +528,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 			// send the message, if needed
 			if (!IS_SET(flags, SILENT_AFF) && (gen = find_generic(af->type, GENERIC_AFFECT))) {
 				if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
-					act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+					act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
 				}
 				if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
-					act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+					act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
 				}
 			}
 			
@@ -766,6 +786,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_WHERE_RANGE), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
+		case APPLY_WARMTH: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_WARMTH), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
+		case APPLY_COOLING: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_COOLING), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		default:
 			log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
 			break;
@@ -873,10 +901,10 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
 	
 	if (gen && GET_AFFECT_APPLY_TO_CHAR(gen)) {
-		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
 	}
 	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
-		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
 	}
 	
 	affect_to_char_silent(ch, af);
@@ -1054,7 +1082,7 @@ void affect_total(char_data *ch) {
 	
 	// delayed re-send of msdp affects
 	if (ch->desc) {
-		queue_delayed_update(ch, CDU_MSDP_AFFECTS);
+		queue_delayed_update(ch, CDU_MSDP_AFFECTS | CDU_MSDP_ATTRIBUTES);
 	}
 }
 
@@ -1287,10 +1315,10 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 	// any messaging
 	if ((gen = find_generic(type, GENERIC_AFFECT))) {
 		if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
-			act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR);
+			act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
 		}
 		if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
-			act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
+			act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
 		}
 	}
 }
@@ -1481,7 +1509,7 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 	}
 	
 	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+		msg_to_char(ch, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
 		GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
 		GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
 	}
@@ -3044,8 +3072,8 @@ EVENTFUNC(cooldown_expire_event) {
 	free(data);
 	
 	// messaging is a maybe
-	if (!IS_NPC(ch) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
-		msg_to_char(ch, "\t%c%s\t0\r\n", (GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0'), GET_COOLDOWN_WEAR_OFF(gen));
+	if (SHOW_STATUS_MESSAGES(ch, SM_COOLDOWNS) && IN_ROOM(ch) && (gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+		msg_to_char(ch, "\t%c%s\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_COOLDOWN_WEAR_OFF(gen));
 	}
 	
 	remove_cooldown(ch, cool);
@@ -6291,7 +6319,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct obj_binding *bind;
 	obj_data *proto, *new;
 	trig_data *trig;
+	struct eq_set_obj *eq_set, *new_set;
+	struct obj_apply *apply_iter, *old_apply, *new_apply;
 	int iter;
+	bool found;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -6300,7 +6331,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 	new = read_object(GET_OBJ_VNUM(obj), FALSE);
 	
-	// preserve some flags
+	// preserve some flags (see later for enchanted)
 	GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & OBJ_PRESERVE_FLAGS;
 	
 	// remove preservable flags that are absent in the original
@@ -6325,6 +6356,14 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
+	
+	// copy eq sets
+	LL_FOREACH(GET_OBJ_EQ_SETS(obj), eq_set) {
+		CREATE(new_set, struct eq_set_obj, 1);
+		*new_set = *eq_set;
+		new_set->next = NULL;
+		LL_APPEND(GET_OBJ_EQ_SETS(new), new_set);
+	}
 	
 	// custom strings?
 	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
@@ -6393,6 +6432,33 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 	if (scale_level > 0) {
 		scale_item_to_level(new, scale_level);
+	}
+	
+	// copy enchantment ONLY if level is the same
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
+		SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+		
+		LL_FOREACH(GET_OBJ_APPLIES(obj), apply_iter) {
+			if (apply_iter->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				// ensure it's not on the proto
+				found = FALSE;
+				LL_FOREACH(GET_OBJ_APPLIES(proto), old_apply) {
+					if (old_apply->apply_type == apply_iter->apply_type && old_apply->location == apply_iter->location) {
+						found = TRUE;
+						break;
+					}
+				}
+				if (found) {
+					continue;	// no need to copy
+				}
+				
+				// copy enchantment
+				CREATE(new_apply, struct obj_apply, 1);
+				*new_apply = *apply_iter;
+				new_apply->next = NULL;
+				LL_APPEND(GET_OBJ_APPLIES(new), new_apply);
+			}
+		}
 	}
 	
 	return new;
@@ -6828,6 +6894,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 		
 		// TODO this seems like a huge error: why is it adding to is-carrying when equipping a container
+		// or is it because contents still need to count against it?
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) += obj_carry_size(obj);
 			update_MSDP_inventory(ch, UPDATE_SOON);

@@ -28,4 +28,83 @@ pounce cooldown~
 3 0
 0 0 0 0
 S
+#12350
+difficult~
+4 0
+0 0 0 0
+T4
+Type 'difficult <normal | hard | group | boss>' to fight it.~
+T5
+...type 'difficulty' to prepare to fight $m!~
+S
+#12351
+angered~
+4 0
+0 0 0 0
+S
+#12352
+serragon combat~
+3 0
+0 0 0 0
+S
+#12353
+hoarfrost serragon~
+4 0
+0 0 0 0
+T5
+...$e's not looking -- now is the time to strike!~
+S
+#12354
+invoke the hoarfrost serragon~
+2 0
+0 0 0 0
+T0
+A chill descends on the shrine as you invoke the hoarfrost serragon.~
+T1
+A chill descends on the shrine as $n invokes the hoarfrost serragon.~
+T4
+You invoke the hoarfrost serragon, ensuring the shrine stays cool for another year.~
+T5
+$n invokes the hoarfrost serragon, ensuring the shrine stays cool for another year.~
+S
+#12355
+serrated cuts~
+4 0
+0 0 0 0
+T5
+...$e's bleeding from serrated cuts all over!~
+S
+#12356
+drained of heat~
+4 0
+0 0 0 0
+T0
+You start to warm up again.~
+S
+#12357
+up in the air~
+4 0
+0 0 0 0
+T5
+...$e has lifted $s neck way up into the air!~
+S
+#12358
+timely dodge~
+4 0
+0 0 0 0
+S
+#12359
+snowpacked~
+4 0
+0 0 0 0
+T0
+You start to warm up again.~
+S
+#12360
+death throes~
+4 0
+0 0 0 0
+T5
+...$e's in $s death throes... something isn't agreeing with $s stomach.~
+S
 $

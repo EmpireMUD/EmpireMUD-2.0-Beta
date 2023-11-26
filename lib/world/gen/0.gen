@@ -1,7 +1,7 @@
 #0
 Water~
 1 0
-0 0 3 0
+0 0 3 3
 T0
 water~
 T1
@@ -73,7 +73,7 @@ S
 #8
 Bean Soup~
 1 0
-0 4 0 0
+0 4 0 4
 T0
 bean soup~
 T1
@@ -82,7 +82,7 @@ S
 #9
 Coffee~
 1 0
-0 0 1 0
+0 0 1 4
 T0
 coffee~
 T1
@@ -91,7 +91,7 @@ S
 #10
 Green Tea~
 1 0
-0 0 1 0
+0 0 1 4
 T0
 green tea~
 T1
@@ -145,7 +145,7 @@ S
 #16
 Coconut Water~
 1 0
-0 1 2 0
+0 1 2 1
 T0
 coconut water~
 T1

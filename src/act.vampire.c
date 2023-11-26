@@ -98,7 +98,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 		any = FALSE;
 		LL_FOREACH(ch->affected, aff) {
 			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
-				if (!messaged) {
+				if (!messaged && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 					msg_to_char(ch, "You're too low on blood...\r\n");
 					messaged = TRUE;
 				}
@@ -129,7 +129,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 		
 		LL_FOREACH(obj->applies, app) {
 			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
-				if (!messaged) {
+				if (!messaged && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 					msg_to_char(ch, "You're too low on blood...\r\n");
 					messaged = TRUE;
 				}
@@ -1037,10 +1037,10 @@ ACMD(do_bite) {
 			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
 			
 			if (success) {
-				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, (2 * GET_STRENGTH(ch)) + GET_BONUS_PHYSICAL(ch), ATTACK_VAMPIRE_BITE, DAM_PHYSICAL, NULL);
 			}
 			else {
-				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL);
+				result = damage(ch, victim, 0, ATTACK_VAMPIRE_BITE, DAM_PHYSICAL, NULL);
 			}
 			
 			// reduce DODGE
@@ -1141,16 +1141,16 @@ ACMD(do_boost) {
 		int apply;	// which APPLY_ const
 		int base_amt;	// how much with low-level skill
 		int high_amt;	// how much with high skill (TODO: should it just scale?)
-		char *msg;	// string shown to the user
+		char *msg;	// string shown to the user via act()
 	} boost_data[] = {
-		{ "charisma", "charisma", ROLE_NONE, CHARISMA, APPLY_CHARISMA, 1, 2, "You focus your blood into your skin and voice, increasing your charisma!\r\n" },
-		{ "strength", "strength", ROLE_NONE, STRENGTH, APPLY_STRENGTH, 1, 2, "You force blood into your muscles, boosting your strength!\r\n" },
-		{ "intelligence", "intelligence", ROLE_NONE, INTELLIGENCE, APPLY_INTELLIGENCE, 1, 2, "You focus your blood into your mind, increasing your intelligence!\r\n" },
+		{ "charisma", "charisma", ROLE_NONE, CHARISMA, APPLY_CHARISMA, 1, 2, "You focus your blood into your skin and voice, increasing your charisma!" },
+		{ "strength", "strength", ROLE_NONE, STRENGTH, APPLY_STRENGTH, 1, 2, "You force blood into your muscles, boosting your strength!" },
+		{ "intelligence", "intelligence", ROLE_NONE, INTELLIGENCE, APPLY_INTELLIGENCE, 1, 2, "You focus your blood into your mind, increasing your intelligence!" },
 		
-		{ "bonus-physical", "physical", ROLE_MELEE, NOTHING, APPLY_BONUS_PHYSICAL, 1, 2, "You focus your blood into a blinding rage, increasing your physical damage!\r\n" },
-		{ "bonus-magical", "magical", ROLE_CASTER, NOTHING, APPLY_BONUS_MAGICAL, 1, 2, "You turn your blood into pure mental focus, increasing your magical damage!\r\n" },
-		{ "bonus-healing", "healing", ROLE_HEALER, NOTHING, APPLY_BONUS_HEALING, 1, 2, "You draw the magic from your blood, increasing your magical healing!\r\n" },
-		{ "dodge", "dodge", ROLE_TANK, NOTHING, APPLY_DODGE, 1, 2, "You focus your blood to increase your speed, boosting your ability to dodge!\r\n" },
+		{ "bonus-physical", "physical", ROLE_MELEE, NOTHING, APPLY_BONUS_PHYSICAL, 1, 2, "You focus your blood into a blinding rage, increasing your physical damage!" },
+		{ "bonus-magical", "magical", ROLE_CASTER, NOTHING, APPLY_BONUS_MAGICAL, 1, 2, "You turn your blood into pure mental focus, increasing your magical damage!" },
+		{ "bonus-healing", "healing", ROLE_HEALER, NOTHING, APPLY_BONUS_HEALING, 1, 2, "You draw the magic from your blood, increasing your magical healing!" },
+		{ "dodge", "dodge", ROLE_TANK, NOTHING, APPLY_DODGE, 1, 2, "You focus your blood to increase your speed, boosting your ability to dodge!" },
 		
 		{ "\n", "\n", ROLE_NONE, NOTHING, NOTHING, 0, 0, "\n" }	// must be last
 	};
@@ -1225,7 +1225,7 @@ ACMD(do_boost) {
 	free(af);
 	
 	if (boost_data[pos].msg) {
-		msg_to_char(ch, "%s", boost_data[pos].msg);
+		act(boost_data[pos].msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
 	}
 	
 	gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -1263,9 +1263,9 @@ ACMD(do_claws) {
 		}
 	}
 
-	msg_to_char(ch, "You focus your blood into your hands...\r\n");
-	msg_to_char(ch, "Your fingers grow into grotesque claws!\r\n");
-	act("$n's fingers grow into giant claws!", TRUE, ch, 0, 0, TO_ROOM);
+	act("You focus your blood into your hands...", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+	act("Your fingers grow into grotesque claws!", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+	act("$n's fingers grow into giant claws!", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
 	
 	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
 	affect_join(ch, af, 0);

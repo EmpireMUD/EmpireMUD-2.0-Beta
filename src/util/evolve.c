@@ -86,8 +86,11 @@ const int shift_dir[][2] = {
 //// PROTOTYPES //////////////////////////////////////////////////////////////
 
 bool check_near_evo_sector(struct map_t *tile, int type, struct evolution_data *for_evo);
+bool check_near_evo_sector_flagged(struct map_t *tile, int type, struct evolution_data *for_evo);
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
+int count_adjacent_flagged(struct map_t *tile, sbitvector_t with_flags, bool count_original_sect);
 void empire_srandom(unsigned long initial_seed);
+sector_data *find_sect(any_vnum vnum);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
 void index_boot_sectors();
 void load_base_map();
@@ -95,6 +98,7 @@ double map_distance(struct map_t *start, struct map_t *end);
 int number(int from, int to);
 int season(struct map_t *tile);
 bool sect_within_distance(struct map_t *tile, sector_vnum sect, double distance, bool count_original_sect);
+bool sect_flagged_within_distance(struct map_t *tile, sbitvector_t with_flags, double distance, bool count_original_sect);
 struct map_t *shift_tile(struct map_t *origin, int x_shift, int y_shift);
 void write_tile(struct map_t *tile, sector_vnum old);
 
@@ -111,18 +115,16 @@ void basic_mud_log(const char *format, ...) { }
 * @param struct map_t *tile The tile to evolve.
 */
 void evolve_one(struct map_t *tile) {
-	sector_data *original, *new_sect;
+	sector_data *original;
 	struct evolution_data *evo;
-	sector_vnum become, vnum;
+	sector_vnum become;
 	
 	if (IS_SET(tile->affects, ROOM_AFF_NO_EVOLVE)) {
 		return;	// never
 	}
 	
 	// find sect
-	vnum = tile->sector_type;
-	HASH_FIND_INT(sector_table, &vnum, original);
-	if (!original || vnum == BASIC_OCEAN || !GET_SECT_EVOS(original)) {
+	if (!(original = find_sect(tile->sector_type)) || tile->sector_type == BASIC_OCEAN || !GET_SECT_EVOS(original)) {
 		return;	// no sector to evolve
 	}
 	
@@ -195,9 +197,32 @@ void evolve_one(struct map_t *tile) {
 		}
 	}
 	
+	// adjacent/not-adjacent to flagged sector
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_ADJACENT_SECTOR_FLAG))) {
+		if (count_adjacent_flagged(tile, evo->value, TRUE) >= 1) {
+			become = evo->becomes;
+		}
+	}
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_ADJACENT_SECTOR_FLAG))) {
+		if (!check_near_evo_sector_flagged(tile, EVO_NOT_ADJACENT_SECTOR_FLAG, evo)) {
+			become = evo->becomes;
+		}
+	}
+	
+	// near/not-near flagged sector
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NEAR_SECTOR_FLAG))) {
+		if (sect_flagged_within_distance(tile, evo->value, nearby_distance, TRUE)) {
+			become = evo->becomes;
+		}
+	}
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR_FLAG))) {
+		if (!check_near_evo_sector_flagged(tile, EVO_NOT_NEAR_SECTOR_FLAG, evo)) {
+			become = evo->becomes;
+		}
+	}
+	
 	// DONE: now change it
-	HASH_FIND_INT(sector_table, &become, new_sect);
-	if (become != NOTHING && new_sect) {
+	if (become != NOTHING && find_sect(become)) {
 		tile->sector_type = become;
 	}
 }
@@ -211,18 +236,16 @@ void evolve_one(struct map_t *tile) {
 * @return int The number of adjacent tiles that changed.
 */
 int spread_one(struct map_t *tile) {
-	sector_vnum become = NOTHING, old, vnum;
+	sector_vnum become = NOTHING, old;
 	struct evolution_data *evo;
-	sector_data *new_sect, *st;
+	sector_data *st;
 	bool done_dir[NUM_2D_DIRS];
 	struct map_t *to_room;
 	int dir, changed = 0;
 	
 	
 	// load the sector
-	vnum = tile ? tile->sector_type : NOTHING;
-	HASH_FIND_INT(sector_table, &vnum, st);
-	if (!st) {
+	if (!tile || !(st = find_sect(tile->sector_type))) {
 		return 0;
 	}
 	
@@ -257,8 +280,7 @@ int spread_one(struct map_t *tile) {
 			
 			// apply it!
 			become = evo->becomes;
-			HASH_FIND_INT(sector_table, &become, new_sect);
-			if (become != NOTHING && new_sect) {
+			if (become != NOTHING && find_sect(become)) {
 				old = to_room->sector_type;
 				to_room->sector_type = become;
 				write_tile(to_room, old);
@@ -508,6 +530,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	sector_data *sect, *find;
 	double dbl_in;
 	int int_in[4];
+	sbitvector_t bit_in;
 		
 	// for error messages
 	sprintf(error, "sector vnum %d", vnum);
@@ -516,8 +539,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	CREATE(sect, sector_data, 1);
 	sect->vnum = vnum;
 	
-	HASH_FIND_INT(sector_table, &vnum, find);
-	if (find) {
+	if ((find = find_sect(vnum))) {
 		printf("WARNING: Duplicate sector vnum #%d\n", vnum);
 		// but have to load it anyway to advance the file
 	}
@@ -550,14 +572,14 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 		}
 		switch (*line) {
 			case 'E': {	// evolution
-				if (!get_line(fl, line) || sscanf(line, "%d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) != 4) {
+				if (!get_line(fl, line) || sscanf(line, "%d %lld %lf %d", &int_in[0], &bit_in, &dbl_in, &int_in[2]) != 4) {
 					printf("ERROR: Bad data in E line of %s\n", error);
 					exit(1);
 				}
 				
 				CREATE(evo, struct evolution_data, 1);
 				evo->type = int_in[0];
-				evo->value = int_in[1];
+				evo->value = bit_in;
 				evo->percent = dbl_in;
 				evo->becomes = int_in[2];
 				evo->next = NULL;
@@ -598,6 +620,31 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				free(tmp);
 				tmp = fread_string(fl, error);
 				free(tmp);
+				break;
+			}
+			case 'Z': {	// Z: misc data
+				if (line[1] && isdigit(line[1])) {
+					switch (atoi(line + 1)) {
+						case 1: {	// Z1: temperature type
+							if (sscanf(line, "Z1 %d", &int_in[0]) == 1) {
+								GET_SECT_TEMPERATURE_TYPE(sect) = int_in[0];
+							}
+							else {
+								log("SYSERR: Format error in Z1 section of %s: %s", error, line);
+								exit(1);
+							}
+							break;
+						}
+						default: {
+							log("SYSERR: Format error in Z section of %s, bad Z number %d", error, atoi(line+1));
+							exit(1);
+						}
+					}
+				}
+				else {
+					log("SYSERR: Format error in Z section of %s", error);
+					exit(1);
+				}
 				break;
 			}
 			
@@ -798,6 +845,7 @@ void write_tile(struct map_t *tile, sector_vnum old) {
 * SEPARATE-NOT-NEARS or SEPARATE-NOT-ADJACENTS flags.
 *
 * @param struct map_t *tile The tile to check evolutions and neighbors for.
+* @param int type The EVO_ type to use (EVO_NOT_NEAR_SECTOR, EVO_NOT_ADJACENT).
 * @param struct evolution_data *for_evo Optional: If the flagged SEPARATE-NOT-*, it will only check this one evolution rule. May be NULL.
 * @return bool TRUE if it has at least 1 matching sector near it, FALSE if it has none.
 */
@@ -806,18 +854,53 @@ bool check_near_evo_sector(struct map_t *tile, int type, struct evolution_data *
 	sector_data *sect;
 	bool found = FALSE;
 	
-	HASH_FIND_INT(sector_table, &(tile->sector_type), sect);
-	if (!sect) {
+	if (!(sect = find_sect(tile->sector_type))) {
 		return FALSE;
 	}
 	
 	// iterate over evolutions checking all of them
 	LL_FOREACH(GET_SECT_EVOS(sect), evo) {
 		if (for_evo && for_evo != evo && SECT_FLAGGED(sect, (type == EVO_NOT_NEAR_SECTOR ? SECTF_SEPARATE_NOT_NEARS : SECTF_SEPARATE_NOT_ADJACENTS))) {
-			// skipping because we're not doing this one
+			// skip all but for-evo if these are checked separately
 			continue;
 		}
 		if (evo->type == type && sect_within_distance(tile, evo->value, evo->type == EVO_NOT_NEAR_SECTOR ? nearby_distance : 1.5, TRUE)) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* Ensures the tile is not near ANY of the NOT-NEAR-SECTOR-FLAGGED or
+* NOT-ADJACENT-SECTOR-FLAGGED tiles for an evolution to trigger. This is only
+* used if the sector doesn't have the SEPARATE-NOT-NEARS or
+* SEPARATE-NOT-ADJACENTS flags.
+*
+* @param struct map_t *tile The tile to check evolutions and neighbors for.
+* @param int type The EVO_ type to use (EVO_NOT_NEAR_SECTOR_FLAG, EVO_NOT_ADJACENT_SECTOR_FLAG).
+* @param struct evolution_data *for_evo Optional: If the flagged SEPARATE-NOT-*, it will only check this one evolution rule. May be NULL.
+* @return bool TRUE if it has at least 1 matching sector near it, FALSE if it has none.
+*/
+bool check_near_evo_sector_flagged(struct map_t *tile, int type, struct evolution_data *for_evo) {
+	struct evolution_data *evo;
+	sector_data *sect;
+	bool found = FALSE;
+	
+	if (!(sect = find_sect(tile->sector_type))) {
+		return FALSE;
+	}
+	
+	// iterate over evolutions checking all of them
+	LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+		if (for_evo && for_evo != evo && SECT_FLAGGED(sect, (type == EVO_NOT_NEAR_SECTOR_FLAG ? SECTF_SEPARATE_NOT_NEARS : SECTF_SEPARATE_NOT_ADJACENTS))) {
+			// skip all but for-evo if these are checked separately
+			continue;
+		}
+		if (evo->type == type && sect_flagged_within_distance(tile, evo->value, evo->type == EVO_NOT_NEAR_SECTOR_FLAG ? nearby_distance : 1.5, TRUE)) {
 			found = TRUE;
 			break;
 		}
@@ -848,6 +931,52 @@ int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sec
 	}
 	
 	return count;
+}
+
+
+/**
+* Counts how many adjacent tiles have the given sector flags...
+*
+* @param struct map_t *tile The location to check.
+* @param sbitvector_t with_flags The sector flag(s) to find (all must match).
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
+* @return int The number of matching adjacent tiles.
+*/
+int count_adjacent_flagged(struct map_t *tile, sbitvector_t with_flags, bool count_original_sect) {
+	int iter, count = 0;
+	struct map_t *to_room;
+	sector_data *st;
+	
+	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
+		if (!(to_room = shift_tile(tile, shift_dir[iter][0], shift_dir[iter][1]))) {
+			continue;	// no room
+		}
+		
+		// test sector / base
+		if ((st = find_sect(to_room->sector_type)) && (GET_SECT_FLAGS(st) & with_flags) == with_flags) {
+			// main type
+			++count;
+		}
+		else if (count_original_sect && to_room->base_sector != to_room->sector_type && (st = find_sect(to_room->base_sector)) && (GET_SECT_FLAGS(st) & with_flags) == with_flags) {
+			// base sect
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Gets a sector from the table, by vnum.
+*
+* @param any_vnum vnum The sector vnum.
+* @return sector_data* The found sector, or NULL for none.
+*/
+sector_data *find_sect(any_vnum vnum) {
+	sector_data *sect;
+	HASH_FIND_INT(sector_table, &vnum, sect);
+	return sect;
 }
 
 
@@ -932,8 +1061,7 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 	struct evolution_data *evo, *found = NULL;
 	sector_data *st;
 	
-	HASH_FIND_INT(sector_table, &sect, st);
-	if (!st) {
+	if (!(st = find_sect(sect))) {
 		return NULL;
 	}
 	
@@ -1061,6 +1189,46 @@ bool sect_within_distance(struct map_t *tile, sector_vnum sect, double distance,
 		for (y = -1 * distance; y <= distance && !found; ++y) {
 			shift = shift_tile(tile, x, y);
 			if (shift && shift != tile && (shift->sector_type == sect || (count_original_sect && shift->base_sector == sect)) && map_distance(tile, shift) <= distance) {
+				found = TRUE;
+			}
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* This determines if tile is close enough to a tile with given sector flags.
+* Ignores the tile itself; only checks nearby ones.
+*
+* @param struct map_t *tile Source tile.
+* @param sbitvector_t with_flags The sector flag(s) to find (all must match)
+* @param double distance how far away to check
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
+* @return bool TRUE if the sect is found
+*/
+bool sect_flagged_within_distance(struct map_t *tile, sbitvector_t with_flags, double distance, bool count_original_sect) {
+	bool found = FALSE;
+	struct map_t *shift;
+	int x, y;
+	sector_data *st;
+	
+	for (x = -1 * distance; x <= distance && !found; ++x) {
+		for (y = -1 * distance; y <= distance && !found; ++y) {
+			if (!(shift = shift_tile(tile, x, y)) || shift == tile) {
+				continue;	// invalid location
+			}
+			if (map_distance(tile, shift) > distance) {
+				continue;	// too far (we're using circles)
+			}
+			
+			// test sect / base
+			if ((st = find_sect(shift->sector_type)) && (GET_SECT_FLAGS(st) & with_flags) == with_flags) {
+				// current sector passed
+				found = TRUE;
+			}
+			else if (count_original_sect && shift->base_sector != shift->sector_type && (st = find_sect(shift->base_sector)) && (GET_SECT_FLAGS(st) & with_flags) == with_flags) {
 				found = TRUE;
 			}
 		}

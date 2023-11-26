@@ -191,9 +191,9 @@ CLOTHING CLOTHES
 These are items you can sew and wear, but which have no affect on your stats.
 
 Leather clothing:
- head: traveling hat, leather hood, fur hat
+ head: traveling hat (cooling), leather hood, fur hat (warm)
  body: leather jacket, spotted robe
- about body: cape, cloak, shawl
+ about body: cape, cloak, shawl (warm)
  hands: leather gloves
  feet: moccasins, sandals
  waist: belt
@@ -201,7 +201,8 @@ Leather clothing:
 
 Cloth clothing:
  head: hood, barbette, brimmed cap, bonnet, wimple, coif
- body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic
+ body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic,
+       breezy clothes (cooling), layered clothes (warm)
  about body: mantle
  hands: gloves
  waist: girdle
@@ -354,6 +355,9 @@ Armor:
   viper helm
   shark skin vambraces
 
+Clothing:
+  warm leather outfit (warm)
+
 Misc:
   leather boots
   large backpack
@@ -460,6 +464,7 @@ FORGE
 Forge (Trade ability)
 
 Building:  (FF)  Forge  (Build ability)
+Temperature:  warmer than outside
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
@@ -740,6 +745,8 @@ You can make:
   armbands of power
   earth-hewn sandals
   magewhisper pouch
+  snakeskin robe (cooling)
+  white fur robe (warm)
 
 Sew -> Magic Attire -> Magical Vestments
 
@@ -837,6 +844,7 @@ POTTER POTTERY
 Pottery (Trade ability)
 
 Building:  (PP) potter
+Temperature:  warmer than outside
 Command:  craft [number] <item>
 
 A good potter can mold clay into many different useful items. You will need
@@ -932,6 +940,9 @@ Worn:
   rawhide skullcap
   rawhide bracers
 
+Clothing:
+  warm hide clothing (warm)
+
 Misc:
   rawhide boots
   rawhide knapsack
@@ -997,6 +1008,8 @@ For most recipes, the level of the resulting item will be the lowest of:
 
 For example, the arming sword from Iron Blades cannot be higher than level 75,
 since this ability is from the 50-75 level range.
+
+Levels for all items are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
 
 Recipes which come from crafting patterns follow slightly different rules - see
 HELP CRAFTING PATTERNS for more information. Most importantly, they aren't

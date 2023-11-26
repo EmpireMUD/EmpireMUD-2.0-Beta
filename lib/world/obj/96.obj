@@ -4,7 +4,7 @@ the struggle~
 The remains of a struggle are evident all around.~
 Sometimes it's necessary to 'struggle' to get free.
 ~
-3 0 0 0 9
+3 0 0 0 0 9
 0 0 0
 0 5
 C
@@ -17,5 +17,18 @@ M
 The signs of struggle fade.~
 T 9603
 T 9602
+S
+#9680
+looker~
+a looker~
+A looker is here.~
+This item causes the player to 'look' when it loads, then vanishes.
+~
+3 0 a 0 0 4
+0 0 0
+0 1
+C
+1 1
+T 9680
 S
 $

@@ -96,6 +96,7 @@ OLC_MODULE(advedit_name);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
+OLC_MODULE(advedit_temperature);
 OLC_MODULE(advedit_startvnum);
 OLC_MODULE(advedit_uncascade);
 
@@ -153,6 +154,7 @@ OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
 OLC_MODULE(bedit_spawns);
+OLC_MODULE(bedit_temperature);
 OLC_MODULE(bedit_title);
 
 // class modules
@@ -225,6 +227,7 @@ OLC_MODULE(fedit_startingreputation);
 
 // generic modules
 OLC_MODULE(genedit_flags);
+OLC_MODULE(genedit_liquidflags);
 OLC_MODULE(genedit_name);
 OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
@@ -242,6 +245,10 @@ OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
 OLC_MODULE(genedit_lookatchar);
 OLC_MODULE(genedit_lookatroom);
+OLC_MODULE(genedit_deathtochar);
+OLC_MODULE(genedit_deathtoroom);
+OLC_MODULE(genedit_dottochar);
+OLC_MODULE(genedit_dottoroom);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
 OLC_MODULE(genedit_quick_cooldown);
@@ -431,9 +438,11 @@ OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
 OLC_MODULE(rmedit_subzone);
+OLC_MODULE(rmedit_temperature);
 
 // sector modules
 OLC_MODULE(sectedit_buildflags);
+OLC_MODULE(sectedit_checktemperature);
 OLC_MODULE(sectedit_climate);
 OLC_MODULE(sectedit_commands);
 OLC_MODULE(sectedit_evolution);
@@ -447,6 +456,7 @@ OLC_MODULE(sectedit_name);
 OLC_MODULE(sectedit_notes);
 OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
+OLC_MODULE(sectedit_temperature);
 OLC_MODULE(sectedit_title);
 
 // shops
@@ -597,6 +607,7 @@ const struct olc_command_data olc_data[] = {
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "temperature", advedit_temperature, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
 	
 	// adventures: special
@@ -658,6 +669,7 @@ const struct olc_command_data olc_data[] = {
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "script", bedit_script, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "temperature", bedit_temperature, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "title", bedit_title, OLC_BUILDING, OLC_CF_EDITOR },
 	
 	// class commands
@@ -746,6 +758,10 @@ const struct olc_command_data olc_data[] = {
 	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "lookatchar", genedit_lookatchar, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "lookatroom", genedit_lookatroom, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "deathtochar", genedit_deathtochar, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "deathtoroom", genedit_deathtoroom, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "dottochar", genedit_dottochar, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "dottoroom", genedit_dottoroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
@@ -756,6 +772,7 @@ const struct olc_command_data olc_data[] = {
 	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "liquid", genedit_liquid, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "liquidflags", genedit_liquidflags, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: currency
 	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },
@@ -946,9 +963,11 @@ const struct olc_command_data olc_data[] = {
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "subzone", rmedit_subzone, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "temperature", rmedit_temperature, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	
 	// sector commands	
 	{ "buildflags", sectedit_buildflags, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "checktemperature", sectedit_checktemperature, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "climate", sectedit_climate, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "commands", sectedit_commands, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "evolution", sectedit_evolution, OLC_SECTOR, OLC_CF_EDITOR },
@@ -962,6 +981,7 @@ const struct olc_command_data olc_data[] = {
 	{ "notes", sectedit_notes, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "temperature", sectedit_temperature, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
 	
 	// shop commands
@@ -4351,7 +4371,7 @@ OLC_MODULE(olc_wordcount) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_evolution_display(struct evolution_data *list, char *save_buffer) {
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
 	
@@ -4360,11 +4380,16 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 	for (evo = list; evo; evo = evo->next) {
 		switch (evo_val_types[evo->type]) {
 			case EVO_VAL_SECTOR: {
-				sprintf(lbuf, " [%s (%d)]", GET_SECT_NAME(sector_proto(evo->value)), evo->value);
+				sprintf(lbuf, " [%s (%lld)]", GET_SECT_NAME(sector_proto(evo->value)), evo->value);
 				break;
 			}
 			case EVO_VAL_NUMBER: {
-				sprintf(lbuf, " [%d]", evo->value);
+				sprintf(lbuf, " [%lld]", evo->value);
+				break;
+			}
+			case EVO_VAL_SECTOR_FLAG: {
+				sprintbit(evo->value, sector_flags, part, TRUE);
+				sprintf(lbuf, " [%s]", trim(part));
 				break;
 			}
 			default: {

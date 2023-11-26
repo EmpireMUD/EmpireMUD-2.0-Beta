@@ -1769,48 +1769,83 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
+"ADVEDIT TEMPERATURE" "BEDIT TEMPERATURE" "REDIT TEMPERATURE" "SECTEDIT TEMPERATURE"
+
+Usage:  .temperature <type>
+
+This field determines how warm or cold the area will be. Most of these are
+relative to the temperature of the tile the adventure/building/room or sector
+is on.
+
+A room template will override the adventure's setting unless the room is set
+to "use climate", which will then defer to the adventure setting.
+
+Available temperature types:
+ &cuse climate&0 - Inherits its temperature from the climate of the tile it's on.
+ &calways comfortable&0 - Player receives no temperature penalties.
+ &cmilder&0 - Temperature is milder (less hot/cold) than local area.
+ &charsher&0 - Temperature is harsher (more hot/cold).
+ &cfreezing&0 - Always extremely cold (high penalties).
+ &ccold&0 - Always cold (low penalties).
+ &ccool&0 - Always cool (no penalties).
+ &ccooler&0 - Cooler than the local area.
+ &ccooler when hot&0 - Cooler than the local area when temperature is over 0.
+ &cneutral&0 - Temperature is between hot and cold.
+ &cwarm&0 - Always warm (no penalties).
+ &cwarmer&0 - Warmer than the local area.
+ &cwarmer when cold&0 - Warmer than the local area when temperature is below 0.
+ &chot&0 - Always hot (low penalties).
+ &csweltering&0 - Always extremely hot (high penalties).
+
+See also: OLC ADVENTURES, OLC BUILDINGS, OLC ROOM TEMPLATES, TEMPERATURE
+#d
 "AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:
- BLIND - Unable to see.
- MAJESTY - Hard to attack.
- INFRA - Can see in the dark (glowing red eyes).
- SNEAK - Cannot be seen while moving.
- HIDE - Cannot be seen in room (without search).
- *CHARM - NPC will take orders from its master -- do not use this on items.
- INVIS - Can't be seen, except by magic.
- IMMUNE-PHYSICAL-DEBUFFS - Immune to any 'physical' debuffs.
- SENSE-HIDE - Can see hidden people.
- !PHYSICAL - Immune to physical damage -- do not use this on items.
- !TARGET - Cannot be targeted in the room -- do not use this on items.
- !SEE - Cannot be seen in the room at all -- do not use this on items.
- FLY - Is flying.
- !ATTACK - Cannot be attacked -- do not use this on items.
- IMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
- DISARMED - Has lost their weapon -- do not use this on items.
- HASTE - Has the effect of the Hasten ability.
- IMMOBILIZED - Cannot move -- do not use this on items.
- SLOW - Combat speed reduced, like the Slow spell.
- STUNNED - Can't participate in combat or move -- do not use this on items.
- STONED - Sees the world in strange, trippy colors.
- !BLOOD - Cannot spend blood points.
- CLAWS - Boosted vampire claws as barehand melee attack.
- DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
- EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
- MUMMIFY - Immune to attack and cannot act -- do not use this on items.
- SOULMASK - Immune to soulsight.
- NO-TRACKS - Does not leave tracks.
- IMMUNE-POISON-DEBUFFS - Immune to any 'poison' debuffs.
- IMMUNE-MENTAL-DEBUFFS - Immune to any 'mental' debuffs.
- !STUN - Immune to stun effects.
- !DRINK-BLOOD - Can't be bitten/sired by vampires.
- DISTRACTED - Cannot perform timed actions.
- HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
- IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
- !WHERE - Cannot be found using the 'where' command.
- WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
+ &cBLIND&0 - Unable to see.
+ &cMAJESTY&0 - Hard to attack.
+ &cINFRA&0 - Can see in the dark (glowing red eyes).
+ &cSNEAK&0 - Cannot be seen while moving.
+ &cHIDE&0 - Cannot be seen in room (without search).
+ &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
+ &cINVIS&0 - Can't be seen, except by magic.
+ &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
+ &cSENSE-HIDE&0 - Can see hidden people.
+ &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
+ &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
+ &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.
+ &cFLY&0 - Is flying.
+ &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
+ &cIMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
+ &cDISARMED&0 - Has lost their weapon -- do not use this on items.
+ &cHASTE&0 - Has the effect of the Hasten ability.
+ &cIMMOBILIZED&0 - Cannot move -- do not use this on items.
+ &cSLOW&0 - Combat speed reduced, like the Slow spell.
+ &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
+ &cSTONED&0 - Sees the world in strange, trippy colors.
+ &c!BLOOD&0 - Cannot spend blood points.
+ &cCLAWS&0 - Boosted vampire claws as barehand melee attack.
+ &cDEATHSHROUD&0 - Appears as a corpse and cannot act -- do not use this on items.
+ &cEARTHMELD&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
+ &cMUMMIFY&0 - Immune to attack and cannot act -- do not use this on items.
+ &cSOULMASK&0 - Immune to soulsight.
+ &cNO-TRACKS&0 - Does not leave tracks.
+ &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
+ &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
+ &c!STUN&0 - Immune to stun effects.
+ &c!DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
+ &cDISTRACTED&0 - Cannot perform timed actions.
+ &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
+ &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
+ &c!WHERE&0 - Cannot be found using the 'where' command.
+ &cWATERWALK&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
    flag, this allows it to move on both water and land.
- LIGHT - Character provides light to the room.
+ &cLIGHT&0 - Character provides light to the room.
+ &cPOOR-REGENS&0 - Players regenerate very slowly. Mobs won't regenerate.
+ &cSLOWER-ACTIONS&0 - Timed actions (e.g. chopping) are slower.
+ &cHUNGRIER&0 - Player becomes hungry faster.
+ &cTHIRSTIER&0 - Player becomes thirsty faster.
+ &cIMMUNE-TEMPERATURE&0 - Player does not suffer effects of heat or cold.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -2116,6 +2151,20 @@ the TAKE wear flag could be used on virtually any item.
 Usually an augment should be locked down to just one wear flag.
 
 See also: OEDIT WEAR, OLC AUGMENTS
+#d
+"BASE SECTOR" "BASE SECTORS" "BASE TERRAIN"
+
+A map tile's "base sector" is the sector underneath its current one. It is used
+for roads, buildings, and other temporary map changes. You can view it with
+"stat room".
+
+Most map tiles have the same base and current sectors.
+
+In some cases, tiles inherit properties from the base sector. For example,
+roads have the same climate as their base sector due to their
+INHERIT-BASE-CLIMATE flag.
+
+See also: SECTOR, STAT
 #d
 "BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
 
@@ -3105,9 +3154,14 @@ If a crop has multiple climate flags, the sector must match ALL of them for the
 crop to be planted there, unless the crop has the ANY-LISTED-CLIMATE flag, in
 which case they must only match at least 1 climate.
 
+For sectors, you can test climate temperatures with ".checktemp" while editing
+a sector.
+
 Climates:
  &chot&0 - Hotter than normal for this type (modifier).
- &ccold&0 - Coler than normal for this type (modifier).
+ &ccold&0 - Colder than normal for this type (modifier).
+ &cmild&0 - Milder temperatures than normal for this type (modifier).
+ &charsh&0 - Harsher temperatures than normal for this type (modifier).
  &chigh&0 - Higher than normal for this type (modifier), e.g. mountain peak.
  &clow&0 - Lower than normal for this type (modifier).
  &cmagical&0 - Magical in some way (enchanted forest).
@@ -3121,8 +3175,9 @@ Climates:
  &cforest&0 - Any kind of forest or jungle.
  &cgrassland&0 - Plains, savannah, or steppe.
  &cwaterside&0 - Adjacent (or near) fresh water.
+ &cfrozen water&0 - Would be water but is currently frozen.
 
-See also: OLC CROPS, OLC SECTORS
+See also: OLC CROPS, OLC SECTORS, SECTEDIT CHECK TEMPERATURE
 #d
 "CROPEDIT FLAGS" "CROP FLAGS"
 
@@ -3453,9 +3508,10 @@ See also: FACTION, OLC FACTIONS, STRING EDITOR
 Usage:  .flags [add | remove] <flags>
 
 The following faction flags are available:
- IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
- REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
- HIDE-IN-LIST - Does not appear in the 'factions' command for players.
+ &cIN-DEVELOPMENT&0 - The faction can't be seen by players, and won't gain rep.
+ &cREP-FROM-KILLS&0 - Players can gain/lose rep by killing faction mobs.
+ &cHIDE-IN-LIST&0 - Does not appear in the 'factions' command for players.
+ &cHIDE-ON-MOB&0 - Does not appear below the mob description.
 
 See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
 #d
@@ -3581,7 +3637,7 @@ See also: OLC GENERICS, DOLLAR SIGN CODES
 Generic 'affects' are used by spells, abilities, and scripts to show names on
 the affect list, and to show messages when these effects wear off.
 
-Affects have 4 properties:
+Affects have several properties:
   <&yapply2char&0> An optional message shown to the character when the affect
     is applied.
   <&yapply2room&0> An optional message shown to the room when the affect is
@@ -3590,6 +3646,15 @@ Affects have 4 properties:
   <&ywearoff2room&0> An optional message shown to the rest of the room.
   <&ylookatchar&0> An optional message shown after description on 'look name'.
   <&ylookatroom&0> An optional message shown after the character on 'look'.
+
+Optional properties used for damage-over-time effects (DoTs):
+  <&ydottochar&0> Damage shown to the character when taking DoT damage.
+  <&ydottoroom&0> Damage shown to the room when character takes DoT damage.
+  <&ydeathtochar&0> Damage shown to the character when dying from DoT damage.
+  <&ydeathtoroom&0> Damage shown to the room when character dies from DoT damage.
+  Note: If no dot-to or death-to messages are set, this will use the standard
+      DoT messaging. But if any are set, omitted messages won't show at all.
+      DoT and death messages should use uppercase placeholder pronouns like $N.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3697,16 +3762,89 @@ You must set 2 properties on currency:
 
 See also: OLC GENERICS, GENEDIT PLURAL
 #d
+"GENEDIT DOTTOCHAR" "GENEDIT DOT-TO-CHAR" "GENEDIT DOT TO CHAR"
+
+Usage:  .dottochar <message | none>
+
+This message is shown to the character each time they take damage from a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottoroom, deathtochar, or deathtoroom
+message are set but dottochar is not, no message will be displayed. However, if
+all of these messages are omitted, standard DoT messages will appear.
+
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
+
+Example:
+"You shiver as you slowly freeze."
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+"GENEDIT DOTTOROOM" "GENEDIT DOT-TO-ROOM" "GENEDIT DOT TO ROOM"
+
+Usage:  .dottoroom <message | none>
+
+This message is shown to the room each time the character takes damage from a
+DoT (damage-over-time) affect.
+
+This message is optional. If any of the dottochar, deathtochar, or deathtoroom
+message are set but dottoroom is not, no message will be displayed. However, if
+all of these messages are omitted, standard DoT messages will appear.
+
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
+
+Example: $N shivers as $E slowly freezes.
+"Paris shivers as he slowly freezes."
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+"GENEDIT DEATHTOCHAR" "GENEDIT DEATH-TO-CHAR" "GENEDIT DEATH TO CHAR"
+
+Usage:  .deathtochar <message | none>
+
+This message is shown to the character if they are killed by a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottochar, dottoroom, or deathtoroom
+message are set but deathtochar is not, no message will be displayed. However,
+if all of these messages are omitted, standard DoT messages will appear.
+
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
+
+Example:
+"Oh no... you froze to death!"
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
+"GENEDIT DEATHTOROOM" "GENEDIT DEATH-TO-ROOM" "GENEDIT DEATH TO ROOM"
+
+Usage:  .deathtoroom <message | none>
+
+This message is shown to the room if a character is killed by a DoT
+(damage-over-time) affect.
+
+This message is optional. If any of the dottochar, dottoroom, or deathtochar
+message are set but deathtoroom is not, no message will be displayed. However,
+if all of these messages are omitted, standard DoT messages will appear.
+
+Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
+
+Example: $N is frozen solid in place as $E dies of the cold!
+"Paris is frozen solid in place as he dies of the cold!"
+
+See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
+#d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
 The 'liquid' generic type is used in drink containers and resource lists.
 
-You must set 5 properties on liquids:
+You must set 6 properties on liquids:
   <&yliquid&0> the name as it appears in descriptions (a bottle of 'water')
   <&ycolor&0> the color of the liquid when the player looks in the bottle
   <&yhunger&0> number of hours to satiate hunger per unit of liquid
   <&ythirst&0> number of hours to satiate thirst per unit
   <&ydrunk&0> number of hours to cause drunknness per unit
+  <&yliquidflags&0> optional flags for liquids (see LIQUID FLAGS)
 
 Stock liquids can be found in the 0-99 vnum block, but new liquids should
 usually be added within an adventure zone's vnums.
@@ -3756,6 +3894,17 @@ EmpireMUD comes with language [150] English and all characters start with this
 language. Add the IN-DEV flag to disable it.
 
 See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
+#d
+"GENEDIT LIQUIDFLAGS" "GENEDIT LIQUID FLAGS" "LIQUID FLAGS"
+
+Usage:  .liquidflags [add | remove] <flags>
+
+The following flags are available for liquids:
+ &cWATER&0 - Counts as water for certain game commands (douse).
+ &cCOOLING&0 - Drinking this liquid makes the player cooler, if warm.
+ &cWARMING&0 - Drinking this liquid makes the player warmer, if cold.
+
+See also: OLC GENERICS, GENERIC LIQUIDS
 #d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 
@@ -5728,7 +5877,10 @@ the available options:
  &cCOOKING-FIRE&0 - Can be used to cook.
  &cDESTROY-WHEN-DOUSED&0 - If the player douses this light, it is destroyed.
 
-See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
+See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT, TEMPERATURE
 #d
 "OEDIT LIGHTISLIT" "OEDIT LIGHT IS LIT" "OEDIT IS LIT"
 
@@ -7463,6 +7615,15 @@ to one word, such as: "plains full desert" (the full stands for 'full forest').
 
 See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
 #d
+"SECTEDIT CHECKTEMPERATURE" "SECTEDIT CHECK TEMPERATURE"
+
+Usage:  .checktemperature
+
+Use this command while editing a sector to see what temperatures its climate
+flags will give it during various parts of the year.
+
+See also: SECTEDIT CLIMATE
+#d
 "SECTEDIT COMMANDS"
 
 Usage:  .commands <list>
@@ -7529,6 +7690,11 @@ Available types ([value] isn't used unless specified):
  &cOWNED&0 - Evolves if the tile is claimed.
  &cUNOWNED&0 - Evolves if the tile is not claimed.
  &cBURN-STUMPS&0 - Sector this tile becomes when burnt by workforce.
+ &cADJACENT-SECTOR-FLAG&0 - Evolves when adjacent to a sector with this flag.
+    Note: For multiple sector flags, use quotes like "CROP IRRIGATES-AREA".
+ &cNOT-ADJACENT-SECTOR-FLAG&0 - ... NOT adjacent to a sector with this flag.
+ &cNEAR-SECTOR-FLAG&0 - Evolves within 2 tiles of a sector with this flag.
+ &cNOT-NEAR-SECTOR-FLAG&0 - ... NOT within 2 tiles of a sector with this flag.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -7542,37 +7708,40 @@ See also: OLC SECTORS
 Usage:  .flags [add | remove] <flags>
 
 Available sector flags:
- LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
- IS-ADVENTURE - used only for adventure rooms
- NON-ISLAND - won't be detected as part of an island by the island detection
+ &cLOCK-ICON&0 - a random icon is chosen when the terrain changes to this, and kept
+ &cIS-ADVENTURE&0 - used only for adventure rooms
+ &cNON-ISLAND&0 - won't be detected as part of an island by the island detection
     system.
- CHORE - This sector may have a chore (required, or the chore will never trigger)
- !CLAIM - Cannot be claimed.
- START-LOCATION - A starting location for players; prevents combat here
- FRESH-WATER - Requires a boat, counts as a river
- OCEAN - Requires a boat, counts as ocean
- DRINK - Provides drinkable water; can also be used from adjacent rooms
- HAS-CROP-DATA - Has an associated crop (like a seeded field or a crop tile)
- CROP - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
- LAY-ROAD - The lay command here can be used to create a road
- IS-ROAD - This tile is a road
- CAN-MINE - The tile is mine-able; this allows the Prospect ability
- SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
- MAP-BUILDING - This sector represents a building on the map; shown using building data
- INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
- OBSCURE-VISION - Players can't be seen here; also blocks guard towers
- IS-TRENCH - Sector counts as a trench and fills with water
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
- ROUGH - This is rough, raised terrain, like a mountain
- SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
- NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
+ &cCHORE&0 - This sector may have a chore (required, or the chore will never trigger)
+ &c!CLAIM&0 - Cannot be claimed.
+ &cSTART-LOCATION&0 - A starting location for players; prevents combat here
+ &cFRESH-WATER&0 - Requires a boat, counts as a river
+ &cOCEAN&0 - Requires a boat, counts as ocean
+ &cDRINK&0 - Provides drinkable water; can also be used from adjacent rooms
+ &cHAS-CROP-DATA&0 - Has an associated crop (like a seeded field or a crop tile)
+ &cCROP&0 - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
+ &cLAY-ROAD&0 - The lay command here can be used to create a road
+ &cIS-ROAD&0 - This tile is a road
+ &cCAN-MINE&0 - The tile is mine-able; this allows the Prospect ability
+ &cSHOW-ON-POLITICAL-MAPOUT&0 - Still appears on the political version of the graphical map
+ &cMAP-BUILDING&0 - This sector represents a building on the map; shown using building data
+ &cINSIDE-ROOM&0 - This sector represents an interior (designated) ROOM building
+ &cLARGE-CITY-RADIUS&0 - This tile counts as in-city even in the outskirts
+ &cOBSCURE-VISION&0 - Players can't be seen here; also blocks guard towers
+ &cIS-TRENCH&0 - Sector counts as a trench and fills with water
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cROUGH&0 - This is rough, raised terrain, like a mountain
+ &cSHALLOW-WATER&0 - The tile has water but requires no boat (like a swamp)
+ &cNEEDS-HEIGHT&0 - Uses the 'height' property in some way and will set itself from
     nearby tiles if missing.
- KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
- SEPARATE-NOT-ADJACENTS - Runs each NOT-ADJACENT evolution separately rather
+ &cKEEPS-HEIGHT&0 - Uses the 'height' property but won't change it (for roads etc).
+ &cSEPARATE-NOT-ADJACENTS&0 - Runs each NOT-ADJACENT evolution separately rather
     than making sure the tile isn't adjacent to ANY of them.
- SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
+ &cSEPARATE-NOT-NEARS&0 - Runs each NOT-NEAR-SECTOR evolution separately rather
     than making sure the tile isn't near ANY of them.
+ &cINHERIT-BASE-CLIMATE&0 - Uses the climate flags of the base sector in addition
+    to the ones set on this sector. For example, a road or building sector.
+ &cIRRIGATES-AREA&0 - This flag is used to trigger irrigation evolutions.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -7686,6 +7855,17 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SECTOR SECTORS "SECTOR TYPE" "CURRENT SECTOR"
+
+A "sector" is a terrain type, such as "Plains" or "Calamander Jungle". These
+are configured in the sector editor (SECTEDIT), appear on "show sector", and
+can be manually added to the map with MAPEDIT TERRAIN.
+
+Each map room also has a BASE SECTOR and a NATURAL SECTOR. You can view all
+three sector types on a room using "stat room".
+
+See also: BASE SECTOR, MAPEDIT TERRAIN, NATURAL SECTOR, SECTEDIT, SHOW SECTORS
 #d
 SHOPEDIT "OLC SHOPS" "SHOP OLC"
 
@@ -8397,6 +8577,9 @@ Light items also use these custom messages:
    carried.
  decays-in-room - When the light burns out (or its timer expires) in a room.
 
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
 Example lights:
 - torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
 - campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
@@ -8404,7 +8587,7 @@ Example lights:
 - lantern: 24 hours of light, CAN-DOUSE
 
 See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
-   OEDIT LIGHT FLAGS
+   OEDIT LIGHT FLAGS, TEMPERATURE
 #d
 "LIGHTER ITEM" "LIGHTER OBJECT"
 

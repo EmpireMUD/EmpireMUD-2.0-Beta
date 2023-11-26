@@ -740,7 +740,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 			break;
 		case ITEM_DRINKCON:
 			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-				msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WATER) && !str_str(get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), "water")) {
+					snprintf(part, sizeof(part), " (water)");
+				}
+				else {
+					*part = '\0';
+				}
+				msg_to_char(ch, "Contains %d units of %s%s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), part);
+				
+				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_COOLING)) {
+					msg_to_char(ch, "It will cool you down if you're warm.\r\n");
+				}
+				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WARMING)) {
+					msg_to_char(ch, "It will warm you up if you're cold.\r\n");
+				}
 			}
 			else {
 				msg_to_char(ch, "It is empty.\r\n");
@@ -2895,6 +2908,11 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// hard lower limit -- the stats are the same at 0 or 1, but 0 shows as "unscalable" because unscalable items have 0 scale level
 	level = MAX(1, level);
+	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
 	
 	// if it's not scalable, we can still set its scale level if the prototype is not scalable
 	// (if the prototype IS scalable, but this instance isn't, we can't rescale it this way)
@@ -5204,10 +5222,13 @@ ACMD(do_drink) {
 	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ, number, iter;
+	int type = drink_OBJ, number, iter, warmed;
 	room_data *to_room;
 	char *argptr = arg;
 	size_t size;
+	generic_data *liq_generic;
+	
+	#define LIQ_VAL(val)  (liq_generic ? GEN_VALUE(liq_generic, (val)) : 0)
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -5341,7 +5362,7 @@ ACMD(do_drink) {
 		return;
 	}
 
-	// this both sends the message & returns the amount for some reason
+	// send message
 	drink_message(ch, obj, type, subcmd, &liquid);
 	
 	// no modifiers on sip
@@ -5349,37 +5370,48 @@ ACMD(do_drink) {
 		return;
 	}
 	
+	// load the generic now (after drink_message, which can modify liquid
+	liq_generic = real_generic(liquid);
+	if (!liq_generic || GEN_TYPE(liq_generic) != GENERIC_LIQUID) {
+		// clear it if invalid
+		liq_generic = NULL;
+	}
+	
 	// "amount" will be how many gulps to take from the CAPACITY
-
 	if (liquid == LIQ_BLOOD) {
 		// drinking blood?
 		amount = GET_MAX_BLOOD(ch) - GET_BLOOD(ch);
 	}
-	else if ((get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
+	else if ((LIQ_VAL(GVAL_LIQUID_THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (LIQ_VAL(GVAL_LIQUID_FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (LIQ_VAL(GVAL_LIQUID_DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
 		// if theirs is unlimited
 		amount = 1;
 	}
 	else {
 		// how many hours of thirst I have, divided by how much thirst it gives per hour
-		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST));
-		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL));
+		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) LIQ_VAL(GVAL_LIQUID_THIRST));
+		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) LIQ_VAL(GVAL_LIQUID_FULL));
 		
-		// poor man's round-up
-		if (((int)(thirst_amt * 10)) % 10 > 0) {
-			thirst_amt += 1;
-		}
-		// poor man's round-up
-		if (((int)(hunger_amt * 10)) % 10 > 0) {
-			hunger_amt += 1;
-		}
+		// round up
+		thirst_amt = ceil(thirst_amt);
+		hunger_amt = ceil(hunger_amt);
 	
 		// whichever is more
 		amount = MAX((int)thirst_amt, (int)hunger_amt);
 	
 		// if it causes drunkenness, minimum of 1
-		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0) {
+		if (LIQ_VAL(GVAL_LIQUID_DRUNK) > 0) {
 			amount = MAX(1, amount);
 		}
+	}
+	
+	// check warming/cooling needs
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_WARMING) && GET_TEMPERATURE(ch) < (get_room_temperature(IN_ROOM(ch)) + 5)) {
+		// needs warming: drink at least 4
+		amount = MAX(4, amount);
+	}
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_COOLING) && GET_TEMPERATURE(ch) > (get_room_temperature(IN_ROOM(ch)) - 5)) {
+		// needs cooling: drink at least 4
+		amount = MAX(4, amount);
 	}
 	
 	// amount is now the number of gulps to take to fill the player
@@ -5395,19 +5427,28 @@ ACMD(do_drink) {
 	}
 	
 	// -1 to remove condition, amount = number of gulps
-	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
-	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, THIRST, -1 * LIQ_VAL(GVAL_LIQUID_THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, FULL, -1 * LIQ_VAL(GVAL_LIQUID_FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	// drunk goes positive instead of negative
-	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
-
+	gain_condition(ch, DRUNK, 1 * LIQ_VAL(GVAL_LIQUID_DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	
+	// check warming
+	warmed = warm_player_from_liquid(ch, amount, liquid);
+	if (warmed > 0) {
+		msg_to_char(ch, "It warms you up%s\r\n", (get_relative_temperature(ch) >= config_get_int("temperature_discomfort") ? " -- you're getting too hot!" : "."));
+	}
+	else if (warmed < 0) {
+		msg_to_char(ch, "It cools you down%s\r\n", (get_relative_temperature(ch) <= (-1 * config_get_int("temperature_discomfort")) ? " -- you're getting too cold!" : "."));
+	}
+	
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) != 0) {
+	if (GET_COND(ch, DRUNK) > 150 && LIQ_VAL(GVAL_LIQUID_DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) != 0) {
+	if (GET_COND(ch, THIRST) < 75 && LIQ_VAL(GVAL_LIQUID_THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) != 0) {
+	if (GET_COND(ch, FULL) < 75 && LIQ_VAL(GVAL_LIQUID_FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 
@@ -5589,7 +5630,7 @@ ACMD(do_drop) {
 ACMD(do_eat) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH], line[256], *argptr = arg;
+	char buf[MAX_STRING_LENGTH], some_part[256], line[256], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food, *check_list[2], *obj;
@@ -5720,12 +5761,30 @@ ACMD(do_eat) {
 	
 	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
+		// determine how the "some" will be shown
+		if (extract) {
+			// eating the whole thing
+			*some_part = '\0';
+		}
+		else {
+			if (!strn_cmp(GET_OBJ_SHORT_DESC(food), "a ", 2) || !strn_cmp(GET_OBJ_SHORT_DESC(food), "an ", 3) || !strn_cmp(GET_OBJ_SHORT_DESC(food), "the ", 4)) {
+				strcpy(some_part, "some of ");
+			}
+			else if (!strn_cmp(GET_OBJ_SHORT_DESC(food), "some ", 5)) {
+				// prevents "some of some"
+				strcpy(some_part, "part of ");
+			}
+			else {
+				strcpy(some_part, "some ");
+			}
+		}
+		
 		// message to char
 		if (obj_has_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You eat %s$p.", (extract ? "" : "some of "));
+			snprintf(buf, sizeof(buf), "You eat %s$p.", some_part);
 			act(buf, FALSE, ch, food, NULL, TO_CHAR);
 		}
 
@@ -5734,7 +5793,7 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n eats %s$p.", (extract ? "" : "some of "));
+			snprintf(buf, sizeof(buf), "$n eats %s$p.", some_part);
 			act(buf, TRUE, ch, food, NULL, TO_ROOM);
 		}
 	}
@@ -6840,7 +6899,7 @@ ACMD(do_pour) {
 			}
 			
 			// shortcut through do_douse_room if it's water and burning
-			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER) {
+			if (IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(HOME_ROOM(IN_ROOM(ch))) && liquid_flagged(GET_DRINK_CONTAINER_TYPE(from_obj), LIQF_WATER)) {
 				do_douse_room(ch, IN_ROOM(ch), from_obj);
 				return;
 			}
@@ -6849,7 +6908,7 @@ ACMD(do_pour) {
 			act("You empty $p.", FALSE, ch, from_obj, 0, TO_CHAR);
 
 			/* If it's a trench, fill her up */
-			if (GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
+			if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(from_obj), LIQF_WATER) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
 				add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_FILL_TIME, -25 * GET_DRINK_CONTAINER_CONTENTS(from_obj));
 				if (find_stored_event(SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL)) {
 					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);

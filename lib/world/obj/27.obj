@@ -6,7 +6,7 @@ A set of imperial raven robes is hanging here.~
 thin-hammered nocturnium. Each feather is dripping with red mana, which pools
 at your feet.
 ~
-27 emo aq 0 5
+27 emo aq 0 0 5
 0 0 0
 2 0
 A
@@ -32,9 +32,11 @@ the imperial raven robes pattern~
 The imperial raven robes pattern is on the ground.~
 This pattern will teach you to sew: imperial raven robes.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2700 0 0
 0 0
+C
+100 100
 S
 #2702
 crown raven imperial~
@@ -44,7 +46,7 @@ An imperial raven crown is hanging nearby.~
 seashells, lined in fur, and shaped to look like the beak and feathers of a
 raven.
 ~
-27 mo ae 0 7
+27 mo ae 0 0 7
 0 0 0
 2 0
 A
@@ -70,9 +72,11 @@ the imperial raven crown design~
 The imperial raven crown design is on the ground.~
 This design will teach you to sew: imperial raven crown.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2702 0 0
 0 0
+C
+100 100
 S
 #2704
 wings imperial raven set~
@@ -82,7 +86,7 @@ A set of imperial raven wings lies on the ground.~
 they can attach to the arms. You're not sure how nimble they would be in
 combat, but you can feel the mana coming off of them.
 ~
-27 mo ai 0 7
+27 mo ai 0 0 7
 0 0 0
 2 0
 A
@@ -102,9 +106,11 @@ the imperial raven wings design~
 The imperial raven wings design is on the ground.~
 This design will teach you to sew: imperial raven wings.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2704 0 0
 0 0
+C
+100 100
 S
 #2706
 effigy raven imperial~
@@ -114,7 +120,7 @@ An imperial raven effigy floats in the air.~
 glowing green gems. When you squeeze it, its mana flows through you, crackling
 and ready to explode.
 ~
-3 mo ao 0 8
+3 mo ao 0 0 8
 0 0 0
 2 0
 A
@@ -130,9 +136,11 @@ the imperial raven effigy design~
 The imperial raven effigy design is on the ground.~
 This design will teach you to craft: imperial raven effigy.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2706 0 0
 0 0
+C
+100 100
 S
 #2708
 armor pegasus heroic suit~
@@ -142,7 +150,7 @@ A suit of heroic pegasus armor is hanging here.~
 shape of a pegasus, complete with wings standing proudly behind you. Despite
 its size, it's surprisingly light and agile in combat.
 ~
-27 emo aq 0 6
+27 emo aq 0 0 6
 0 0 0
 2 0
 A
@@ -168,9 +176,11 @@ the heroic pegasus armor pattern~
 The heroic pegasus armor pattern is on the ground.~
 This pattern will teach you to sew: heroic pegasus armor.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2708 0 0
 0 0
+C
+200 200
 S
 #2710
 hood pegasus heroic~
@@ -179,7 +189,7 @@ A heroic pegasus hood is hanging here.~
    This black sparkfiber hood is hardened in the shape of a pegasus's head,
 highlighted by gleaming black eventide metal.
 ~
-27 mo ae 0 8
+27 mo ae 0 0 8
 0 0 0
 2 0
 A
@@ -205,9 +215,11 @@ the heroic pegasus hood pattern~
 The heroic pegasus hood pattern is on the ground.~
 This pattern will teach you to sew: heroic pegasus hood.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2710 0 0
 0 0
+C
+200 200
 S
 #2712
 bands blessing heroic pegasus's~
@@ -217,7 +229,7 @@ Heroic bands of the pegasus's blessing are lying here.~
 with a blessing in a language you don't understand, perhaps the language of the
 pegasus itself.
 ~
-27 mo ai 0 8
+27 mo ai 0 0 8
 0 0 0
 2 0
 A
@@ -237,9 +249,11 @@ the heroic bands of the pegasus's blessing pattern~
 The heroic bands of the pegasus's blessing pattern is on the ground.~
 This pattern will teach you to sew: heroic bands of the pegasus's blessing.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2712 0 0
 0 0
+C
+200 200
 S
 #2714
 shoe pegasus heroic~
@@ -249,7 +263,7 @@ A heroic pegasus shoe is lying in the dirt.~
 strands of sparkfiber cloth. No horse could run wearing this, but one would
 certainly look majestic flying with it.
 ~
-3 mo ao 0 9
+3 mo ao 0 0 9
 0 0 0
 2 0
 A
@@ -265,9 +279,11 @@ the heroic pegasus shoe design~
 The heroic pegasus shoe design is on the ground.~
 This design will teach you to forge: heroic pegasus shoe.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 2714 0 0
 0 0
+C
+200 200
 S
 #2716
 potion imperial magister's magisters imperial-magisters imperial-magister's~
@@ -277,7 +293,7 @@ An imperial magister's potion is on the ground.~
 swirling potion within. Hint: create an alias for 'quaff imperial-magisters' to
 make sure you target the right potion.
 ~
-25 m a 0 11
+25 m a 0 0 11
 -1 0 3030
 8 0
 A
@@ -288,10 +304,10 @@ A
 22 2 0
 C
 200 200
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #2717
 formula imperial magister's potion~
@@ -299,8 +315,10 @@ the imperial magister's potion formula~
 The imperial magister's potion formula is on the ground.~
 This formula will teach you to brew: imperial magister's potion.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 2716 0 0
 0 0
+C
+100 100
 S
 $

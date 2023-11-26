@@ -188,6 +188,8 @@ const char *slow_nameserver_ips[] = {
 const char *anonymous_public_hosts[] = {
 	"mudconnector.com",
 	"ec2-34-228-95-236.compute-1.amazonaws.com",	// mudportal.com
+	"ec2-3-128-186-25.us-east-2.compute.amazonaws.com",	// mudverse
+	"107.170.209.113",	// mudslinger
 	"\n"
 };
 
@@ -216,6 +218,8 @@ const int base_hit_chance = 50;
 // how much hit/dodge 1 point of Dexterity gives
 const double hit_per_dex = 5.0;
 
+// rounds up when scaling mobs/gear if this is > 1; ignored if 0 or 1
+const int round_level_scaling_to_nearest = 5;
 
 // Books must contain one of these terms (prevents abuse like naming the book "a gold bar")
 const char *book_name_list[] = {
@@ -1979,6 +1983,11 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
 	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel file logs");
+	init_config(CONFIG_PLAYERS, "temperature_discomfort", CONFTYPE_INT, "temperature after which penalties begin");
+	init_config(CONFIG_PLAYERS, "temperature_extreme", CONFTYPE_INT, "temperature after which players take damage");
+	init_config(CONFIG_PLAYERS, "temperature_from_fire", CONFTYPE_INT, "warmth value from certain lights");
+	init_config(CONFIG_PLAYERS, "temperature_from_water", CONFTYPE_INT, "cooling value from water tiles");
+	init_config(CONFIG_PLAYERS, "temperature_penalties", CONFTYPE_BOOL, "whether or not players must manage warmth and cooling");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");
@@ -2112,12 +2121,7 @@ ACMD(do_config) {
 	argument = any_one_word(argument, arg1);
 	skip_spaces(&argument);
 	
-	if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
-		// now accepts abbrevs ONLY if there's no value
-		// will use: <key> [value]
-		val_arg = argument;
-	}
-	else if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
+	if (*arg1 && (set = search_block(arg1, config_groups, FALSE)) != NOTHING) {
 		// will use: <type> [key] [value]
 		verbose = (!str_cmp(argument, "-v") ? TRUE : FALSE);
 		
@@ -2130,6 +2134,11 @@ ACMD(do_config) {
 				return;
 			}
 		}
+	}
+	else if (*arg1 && (cnf = get_config_by_key(arg1, (*argument ? TRUE : FALSE)))) {
+		// now accepts abbrevs ONLY if there's no value
+		// will use: <key> [value]
+		val_arg = argument;
 	}
 	else {	// no arg or invalid arg
 		if (*arg1) {

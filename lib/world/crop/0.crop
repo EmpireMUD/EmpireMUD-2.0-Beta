@@ -184,7 +184,7 @@ X
 peaches orchard trees crop~
    You find yourself surrounded by the lush greenery of a peach orchard, its
 gnarled branches heavy with fruit. The air is filled with the sweet scent of
-ripening peaches, a fragrance that seems to permeate everything around you. 
+ripening peaches, a fragrance that seems to permeate everything around you.
 The peach trees are arranged in rows, their leaves a vibrant green, providing
 welcome shade from the sun. As you walk along the narrow paths between the
 trees, you can see the fuzzy, velvety skin of the peaches, each one a brilliant
@@ -240,7 +240,7 @@ a fragrance that seems to hang in the stillness of the air. The cherry trees
 are arranged in neat rows, their branches crisscrossing above you to form a
 leafy canopy. As you make your way between the trees, you can see the clusters
 of cherries hanging heavy on the branches, each one a brilliant shade of red.
-The fruit seems almost within reach, just waiting to be plucked and savored. 
+The fruit seems almost within reach, just waiting to be plucked and savored.
 Looking closer, you can see the delicate white blossoms that have already given
 way to the fruit, promising an even greater bounty next year.
 ~
@@ -302,7 +302,7 @@ fresh soil and water. The paddies are a patchwork of small, rectangular fields,
 each one separated by narrow dirt walkways. The water in the paddies is still
 and shallow, just deep enough to allow the rice to grow. The rice itself is a
 bright green, the small plants swaying gently in the light breeze. You can see
-the occasional bird hopping around the fields, pecking at insects and seeds. 
+the occasional bird hopping around the fields, pecking at insects and seeds.
 The walkways between the paddies are soft and muddy, the earth having been
 turned over and moistened to allow for the growth of the rice. Looking out over
 the fields, you can see nothing but a sea of green, stretching out in every
@@ -354,7 +354,7 @@ A Field of Peas~
 4 j 0
 75 25 50 100
 D0
-....~
+&u....&0~
 &G~
 I 6 3020 100.00 1  # FORAGE: handful of peas
 I 8 3021 20.00 2 H  # HARVEST: basket of peas

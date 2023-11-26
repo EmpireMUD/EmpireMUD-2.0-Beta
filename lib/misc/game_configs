@@ -188,6 +188,11 @@ offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
 slash_message_log_days 7
+temperature_discomfort 20
+temperature_extreme 30
+temperature_from_fire 10
+temperature_from_water 10
+temperature_penalties 0
 *
 * Skills configs
 enchant_points_at_100 2.000000

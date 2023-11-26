@@ -21,6 +21,7 @@ R
 1009 1 5 0
 R
 6000 1 1 0
+Z1 13
 S
 #5201
 Burial Cavern~
@@ -48,6 +49,7 @@ R
 1002 1 5 0
 R
 1000 1 5 0
+Z1 7
 S
 #5202
 Mountain Crypt~
@@ -77,6 +79,7 @@ M
 9199 2.00 0
 R
 1002 1 5 0
+Z1 7
 S
 #5203
 Mountain Hall~
@@ -95,6 +98,7 @@ R
 6000 2 1 0
 R
 6790 2 1 0
+Z1 12
 S
 #5204
 Mountain Garrison~
@@ -110,6 +114,7 @@ always be at the ready, it provides a warm home for the soldiers.
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 2 1 0
+Z1 12
 S
 #5205
 Mountain Lodge~
@@ -128,6 +133,7 @@ R
 6790 1 1 0
 R
 1003 1 5 0
+Z1 12
 S
 #5206
 Boardwalk~

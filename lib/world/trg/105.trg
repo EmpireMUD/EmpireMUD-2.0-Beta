@@ -75,7 +75,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-if %room.sector_vnum% <= 4 || (%room.sector_vnum% >= 40 && %room.sector_vnum% <= 45) || %room.sector_vnum% == 50 || (%room.sector_vnum% >= 54 && %room.sector_vnum% <= 56)
+if %room.sector_vnum% <= 4 || (%room.sector_vnum% >= 40 && %room.sector_vnum% <= 45) || %room.sector_vnum% == 50 || %room.sector_vnum% == 90 || (%room.sector_vnum% >= 54 && %room.sector_vnum% <= 56)
   * valid, plains/forest or shore-jungle (55)
   set sector_valid 1
 elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum% == 15 || %room.sector_vnum% == 16 || %room.sector_vnum% == 27 || %room.sector_vnum% == 28 || %room.sector_vnum% == 34
@@ -871,7 +871,7 @@ end
 Permafrost weather~
 2 c 0
 weather look~
-if %cmd% /= look
+if look /= %cmd%
   if out == %arg%
     %force% %actor% look snow
     return 1

@@ -1053,7 +1053,6 @@ while %cycles_left% >= 0
           %echo% ~%person% looks pacified.
           if %person.vnum% >= 12654 && %person.vnum% <= 12657
             set give_token 1
-            %quest% %person% trigger 12650
           end
         end
         set person %next_person%
@@ -1074,12 +1073,13 @@ while %cycles_left% >= 0
       set person %self.room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(12650)%
+          %quest% %person% trigger 12650
           if %give_token%
             set curname %currency.12650(1)%.
             %send% %person% You receive %curname.ana% %curname%.
             nop %person.give_currency(12650, 1)%
           end
-          if %done%
+          if %person.quest_finished(12650)%
             %send% %person% You have tranquilized all four of the druid leaders.
           end
         end
@@ -1412,14 +1412,14 @@ if %success% && !%failure%
   set person %self.room.people%
   while %person%
     if %person.is_pc% && %person.on_quest(12650)%
+      %quest% %person% trigger 12650
       if %give_token%
         set curname %currency.12650(1)%
         %send% %person% You receive %curname.ana% %curname%.
         nop %person.give_currency(12650, 1)%
       end
-      if %done%
+      if %person.quest_finished(12650)%
         %send% %person% You have tranquilized all four of the druid leaders.
-        %quest% %person% trigger 12650
       end
     end
     set person %person.next_in_room%
