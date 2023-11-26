@@ -4818,6 +4818,9 @@ if %self.vnum% == 11890
   halt
 end
 * otherwise: Time-traveler's diary:
+if !%actor%
+  halt
+end
 * gives the pages in order if not owned, or at random if owned
 set diary_list 11918 11920 11919
 set list_size 3
