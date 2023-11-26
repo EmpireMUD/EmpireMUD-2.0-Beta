@@ -2364,11 +2364,11 @@ ACMD(do_buffs) {
 				}
 			}
 			if (!own && other) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon companion from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
 				error = TRUE;
 			}
 			else if (!own) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on companion\t0");
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on companion\t0", (error ? "," : ""));
 				error = TRUE;
 			}
 		}
