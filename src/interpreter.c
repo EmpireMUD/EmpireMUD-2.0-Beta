@@ -75,6 +75,7 @@ ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
+ACMD(do_buffs);
 ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
@@ -604,6 +605,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	STANDARD_CMD( "brew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "buffs", POS_SLEEPING, do_buffs, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	SCMD_CMD( "burn", POS_SITTING, do_burn, NO_MIN, CTYPE_UTIL, SCMD_BURN ),

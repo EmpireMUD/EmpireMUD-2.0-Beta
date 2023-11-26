@@ -2279,6 +2279,128 @@ ACMD(do_affects) {
 }
 
 
+ACMD(do_buffs) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t out_size, line_size;
+	bool any = FALSE, error, other, own;
+	ability_data *abil;
+	struct affected_type *aff;
+	char_data *caster;
+	struct group_member_data *mem;
+	struct player_ability_data *plab, *next_plab;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs don't have abilities.\r\n");
+		return;
+	}
+	
+	// start string
+	out_size = snprintf(output, sizeof(output), "Your buff abilities:\r\n");
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!(abil = plab->ptr)) {
+			continue;	// no abil somehow?
+		}
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;	// not purchased on current set
+		}
+		if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF) || ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+			continue;	// ability is not a buff, or is a debuff
+		}
+		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
+			continue;	// no buff we can detect
+		}
+		
+		// build output
+		any = TRUE;
+		line_size = snprintf(line, sizeof(line), " %s:", ABIL_NAME(abil));
+		
+		// check self
+		own = other = FALSE;
+		caster = NULL;
+		error = FALSE;
+		LL_FOREACH(ch->affected, aff) {
+			if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+				if (aff->cast_by == GET_IDNUM(ch)) {
+					own = TRUE;
+				}
+				else {
+					other = TRUE;
+					caster = is_playing(aff->cast_by);
+				}
+				// only need 1 match
+				break;
+			}
+		}
+		if (!own && other) {
+			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+			error = TRUE;
+		}
+		else if (!own) {
+			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on self\t0");
+			error = TRUE;
+		}
+		
+		// check party?
+		if (GROUP(ch)) {
+			LL_FOREACH(GROUP(ch)->members, mem) {
+				if (mem->member == ch) {
+					continue;
+				}
+				
+				own = other = FALSE;
+				caster = NULL;
+				LL_FOREACH(mem->member->affected, aff) {
+					if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+						if (aff->cast_by == GET_IDNUM(ch)) {
+							own = TRUE;
+						}
+						else {
+							other = TRUE;
+							caster = is_playing(aff->cast_by);
+						}
+						// only need 1 match
+						break;
+					}
+				}
+				if (!own && other) {
+					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
+					error = TRUE;
+				}
+				else if (!own) {
+					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
+					error = TRUE;
+				}
+			}
+		}
+		
+		// ok?
+		if (!error) {
+			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tgok\t0");
+		}
+		
+		// append?
+		if (out_size + line_size + 20 < sizeof(output)) {
+			out_size += snprintf(output + out_size, sizeof(output) - out_size, "%s\r\n", line);
+		}
+		else {
+			// space is reserved for an OVERFLOW
+			out_size += snprintf(output + out_size, sizeof(output) - out_size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!any) {
+		// always room left if none were found
+		out_size += snprintf(output + out_size, sizeof(output) - out_size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 ACMD(do_chart) {
 	struct chart_territory *citer, *next_citer, *hash = NULL;
 	struct empire_city_data *city;

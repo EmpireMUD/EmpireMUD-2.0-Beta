@@ -316,6 +316,15 @@ to 3.
 
 See also: COMPACT, MAPSIZE, TOGGLE
 #
+BUFFS
+
+Usage:  buffs
+
+This command lists your buff abilities and whether or not they are currently
+active on you and your group.
+
+See also: BUFF
+#
 BUG TYPO IDEA
 
 Usage:  bug <bug report>
