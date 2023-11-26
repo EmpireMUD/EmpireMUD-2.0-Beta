@@ -6552,16 +6552,16 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			return FALSE;
 		}
 	}
-	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && !str_cmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
+	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && strcmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
 		return FALSE;
 	}
-	if (GET_OBJ_SHORT_DESC(obj_a) != GET_OBJ_SHORT_DESC(obj_b) && !str_cmp(GET_OBJ_SHORT_DESC(obj_a), GET_OBJ_SHORT_DESC(obj_b))) {
+	if (GET_OBJ_SHORT_DESC(obj_a) != GET_OBJ_SHORT_DESC(obj_b) && strcmp(GET_OBJ_SHORT_DESC(obj_a), GET_OBJ_SHORT_DESC(obj_b))) {
 		return FALSE;
 	}
-	if (GET_OBJ_LONG_DESC(obj_a) != GET_OBJ_LONG_DESC(obj_b) && !str_cmp(GET_OBJ_LONG_DESC(obj_a), GET_OBJ_LONG_DESC(obj_b))) {
+	if (GET_OBJ_LONG_DESC(obj_a) != GET_OBJ_LONG_DESC(obj_b) && strcmp(GET_OBJ_LONG_DESC(obj_a), GET_OBJ_LONG_DESC(obj_b))) {
 		return FALSE;
 	}
-	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && !str_cmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
+	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && strcmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
 		return FALSE;
 	}
 	if (!identical_bindings(obj_a, obj_b)) {
