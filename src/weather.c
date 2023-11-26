@@ -951,6 +951,90 @@ void show_visible_moons(char_data *ch) {
 //// TEMPERATURE SYSTEM //////////////////////////////////////////////////////
 
 /**
+* Modifies a base temperature based on a TEMPERATURE_ type const.
+*
+* @param int base_temp The base temperature, before modifications.
+* @param int temp_type Any TEMPERATURE_ type const.
+* @return int The final temperature.
+*/
+int apply_temperature_type(int base_temp, int temp_type) {
+	int temperature = base_temp;
+	
+	// TEMPERATURE_x: modifications based on temperature
+	switch (temp_type) {
+		case TEMPERATURE_FREEZING: {
+			temperature = -1 * config_get_int("temperature_extreme");
+			break;
+		}
+		case TEMPERATURE_COLD: {
+			temperature = -1 * config_get_int("temperature_discomfort");
+			break;
+		}
+		case TEMPERATURE_COOL: {
+			temperature = -1 * config_get_int("temperature_discomfort") + 1;
+			break;
+		}
+		case TEMPERATURE_NEUTRAL: {
+			temperature = 0;
+			break;
+		}
+		case TEMPERATURE_WARM: {
+			temperature = config_get_int("temperature_discomfort") - 1;
+			break;
+		}
+		case TEMPERATURE_HOT: {
+			temperature = config_get_int("temperature_discomfort");
+			break;
+		}
+		case TEMPERATURE_SWELTERING: {
+			temperature = config_get_int("temperature_extreme");
+			break;
+		}
+		case TEMPERATURE_MILDER: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 20);
+			}
+			else if (temperature < 0) {
+				temperature = MIN(0, temperature + 20);
+			}
+			break;
+		}
+		case TEMPERATURE_HARSHER: {
+			if (temperature > 0) {
+				temperature += 20;
+			}
+			else if (temperature < 0) {
+				temperature -= 20;
+			}
+			break;
+		}
+		case TEMPERATURE_COOLER: {
+			temperature -= 15;
+			break;
+		}
+		case TEMPERATURE_COOLER_WHEN_HOT: {
+			if (temperature > 0) {
+				temperature = MAX(0, temperature - 15);
+			}
+			break;
+		}
+		case TEMPERATURE_WARMER: {
+			temperature += 15;
+			break;
+		}
+		case TEMPERATURE_WARMER_WHEN_COLD: {
+			if (temperature < 0) {
+				temperature = MIN(0, temperature + 15);
+			}
+			break;
+		}
+	}
+	
+	return temperature;
+}
+
+
+/**
 * Calculates temperature for a hypothetical room based on various data. This
 * can be used for real rooms or for hypotheticals.
 *
@@ -971,32 +1055,6 @@ int calculate_temperature(int temp_type, bitvector_t climates, int season, int s
 	season_count = sun_count = 0;
 	season_mod = sun_mod = 0.0;
 	cold_mod = heat_mod = 1.0;
-	
-	// shortcut types?
-	switch (temp_type) {
-		case TEMPERATURE_FREEZING: {
-			return -1 * config_get_int("temperature_extreme");
-		}
-		case TEMPERATURE_COLD: {
-			return -1 * config_get_int("temperature_discomfort");
-		}
-		case TEMPERATURE_COOL: {
-			return -1 * config_get_int("temperature_discomfort") + 1;
-		}
-		case TEMPERATURE_NEUTRAL: {
-			return 0;
-		}
-		case TEMPERATURE_WARM: {
-			return config_get_int("temperature_discomfort") - 1;
-		}
-		case TEMPERATURE_HOT: {
-			return config_get_int("temperature_discomfort");
-		}
-		case TEMPERATURE_SWELTERING: {
-			return config_get_int("temperature_extreme");
-		}
-		// no default: keep working
-	}
 	
 	// determine climate modifiers
 	for (bit = 0; climates; ++bit, climates >>= 1) {
@@ -1047,49 +1105,7 @@ int calculate_temperature(int temp_type, bitvector_t climates, int season, int s
 		temperature *= heat_mod;
 	}
 	
-	// ttype modifiers
-	switch (temp_type) {
-		case TEMPERATURE_MILDER: {
-			if (temperature > 0) {
-				temperature = MAX(0, temperature - 20);
-			}
-			else if (temperature < 0) {
-				temperature = MIN(0, temperature + 20);
-			}
-			break;
-		}
-		case TEMPERATURE_HARSHER: {
-			if (temperature > 0) {
-				temperature += 20;
-			}
-			else if (temperature < 0) {
-				temperature -= 20;
-			}
-			break;
-		}
-		case TEMPERATURE_COOLER: {
-			temperature -= 15;
-			break;
-		}
-		case TEMPERATURE_COOLER_WHEN_HOT: {
-			if (temperature > 0) {
-				temperature = MAX(0, temperature - 15);
-			}
-			break;
-		}
-		case TEMPERATURE_WARMER: {
-			temperature += 15;
-			break;
-		}
-		case TEMPERATURE_WARMER_WHEN_COLD: {
-			if (temperature < 0) {
-				temperature = MIN(0, temperature + 15);
-			}
-			break;
-		}
-	}
-	
-	return round(temperature);
+	return apply_temperature_type(round(temperature), temp_type);
 }
 
 
@@ -1333,17 +1349,20 @@ int get_relative_temperature(char_data *ch) {
 * @return int The temperature (zero is neutral).
 */
 int get_room_temperature(room_data *room) {
-	int temp_type;
+	int temperature;
 	room_data *home;
 	
-	temp_type = get_temperature_type(room);
-	
-	// check temperature of parent building if using local and not the home-room (e.g. a bedroom in a warm house)
-	if (temp_type == TEMPERATURE_USE_CLIMATE && !IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
-		temp_type = get_temperature_type(home);
+	if (!IS_ADVENTURE_ROOM(room) && (home = HOME_ROOM(room)) != room) {
+		// inside of a building: get home temperature then apply own temperature type to it
+		temperature = get_room_temperature(home);
+		temperature = apply_temperature_type(temperature, get_temperature_type(room));
+	}
+	else {
+		// normal room
+		temperature = calculate_temperature(get_temperature_type(room), get_climate(room), GET_SEASON(room), get_sun_status(room));
 	}
 	
-	return calculate_temperature(temp_type, get_climate(room), GET_SEASON(room), get_sun_status(room));
+	return temperature;
 }
 
 
