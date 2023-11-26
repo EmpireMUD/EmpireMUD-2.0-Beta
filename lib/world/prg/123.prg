@@ -33,6 +33,6 @@ W+
 Build a shrine to the serragon~
 W+
 2 12359 0 1 a
-Store a transluscsent serragon skull in a Cabinet of Curiosities~
+Store a translucent serragon skull in a Cabinet of Curiosities~
 S
 $
