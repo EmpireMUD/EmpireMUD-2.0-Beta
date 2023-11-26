@@ -2346,6 +2346,33 @@ ACMD(do_buffs) {
 			}
 		}
 		
+		// check companion?
+		if (GET_COMPANION(ch) && !IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+			own = other = FALSE;
+			caster = NULL;
+			LL_FOREACH(GET_COMPANION(ch)->affected, aff) {
+				if (aff->type == ABIL_AFFECT_VNUM(abil)) {
+					if (aff->cast_by == GET_IDNUM(ch)) {
+						own = TRUE;
+					}
+					else {
+						other = TRUE;
+						caster = is_playing(aff->cast_by);
+					}
+					// only need 1 match
+					break;
+				}
+			}
+			if (!own && other) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon companion from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				error = TRUE;
+			}
+			else if (!own) {
+				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on companion\t0");
+				error = TRUE;
+			}
+		}
+		
 		// check party?
 		if (GROUP(ch) && !IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
 			LL_FOREACH(GROUP(ch)->members, mem) {
