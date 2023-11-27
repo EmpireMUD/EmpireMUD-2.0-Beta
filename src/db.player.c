@@ -420,7 +420,7 @@ void parse_account(FILE *fl, int nr) {
 		switch (*line) {
 			case 'D': { // data
 				switch (*(line+1)) {
-					case 0: {	// D0: unlocked archetypes
+					case '0': {	// D0: unlocked archetypes
 						if ((sscanf(line, "D0: %d", &int_in[0])) != 1) {
 							log("SYSERR: Format error in D0 data section of %s", err_buf);
 							exit(1);
@@ -434,6 +434,10 @@ void parse_account(FILE *fl, int nr) {
 							HASH_ADD_INT(acct->unlocked_archetypes, vnum, unarch);
 						}
 						break;
+					}
+					default: {
+						log("SYSERR: Format error in D%c data section of %s", *(line+1), err_buf);
+						exit(1);
 					}
 				}
 				break;
