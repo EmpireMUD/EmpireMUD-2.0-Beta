@@ -508,6 +508,10 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
+	if (ARCHETYPE_FLAGGED(arch, ARCH_BASIC) && ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "BASIC and LOCKED");
+		problem = TRUE;
+	}
 	if (!GET_ARCH_NAME(arch) || !*GET_ARCH_NAME(arch) || !str_cmp(GET_ARCH_NAME(arch), default_archetype_name)) {
 		olc_audit_msg(ch, GET_ARCH_VNUM(arch), "No name set");
 		problem = TRUE;
