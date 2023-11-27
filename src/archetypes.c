@@ -1217,7 +1217,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (unlocked && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
 			continue;	// only showing locked
 		}
-		if (!unlocked && !all && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+		if (!unlocked && !all && ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
 			continue;	// not showing locked
 		}
 		
