@@ -1167,22 +1167,28 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 * @param char *argument All, basic, or search string.
 */
 void display_archetype_list(descriptor_data *desc, int type, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[256];
+	char buf[MAX_STRING_LENGTH], line[256], color[8];
 	archetype_data *arch, *next_arch;
-	bool basic = FALSE, all = FALSE;
+	bool basic = FALSE, unlocked = FALSE, all = FALSE;
 	struct archetype_skill *sk;
 	bool skill_match, any;
 	size_t size;
 	
 	if (!*argument) {
-		msg_to_desc(desc, "Usage: list <all | basic | keywords>\r\n");
+		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
 		return;
 	}
 	else if (!str_cmp(argument, "basic")) {
 		basic = TRUE;
+		*argument = '\0';	// prevent string matches
+	}
+	else if (!str_cmp(argument, "unlocked")) {
+		basic = TRUE;
+		*argument = '\0';	// prevent string matches
 	}
 	else if (!str_cmp(argument, "all")) {
 		all = TRUE;
+		*argument = '\0';	// prevent string matches
 	}
 	
 	size = 0;
@@ -1196,21 +1202,42 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (GET_ARCH_TYPE(arch) != type) {
 			continue;
 		}
+		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype(desc->character, GET_ARCH_VNUM(arch))) {
+			continue;	// locked
+		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
 			continue;
+		}
+		if (unlocked && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+			continue;	// only showing locked
+		}
+		if (!unlocked && !all && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+			continue;	// not showing locked
 		}
 		
 		// check skill match
 		skill_match = FALSE;
-		for (sk = GET_ARCH_SKILLS(arch); sk && !skill_match; sk = sk->next) {
-			if (multi_isname(argument, get_skill_name_by_vnum(sk->skill))) {
-				skill_match = TRUE;
+		if (*argument) {
+			for (sk = GET_ARCH_SKILLS(arch); sk && !skill_match; sk = sk->next) {
+				if (multi_isname(argument, get_skill_name_by_vnum(sk->skill))) {
+					skill_match = TRUE;
+				}
 			}
 		}
 		
 		// match strings
-		if (all || basic || skill_match || multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))) {
-			snprintf(line, sizeof(line), " %s%s\t0 - %s", ARCHETYPE_FLAGGED(arch, ARCH_BASIC) ? "\tc" : "\ty", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+		if (all || basic || unlocked || skill_match || (*argument && (multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))))) {
+			if (ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
+				strcpy(color, "\tc");
+			}
+			else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+				strcpy(color, "\tm");
+			}
+			else {
+				strcpy(color, "\ty");
+			}
+			
+			snprintf(line, sizeof(line), " %s%s\t0 - %s", color, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 			any = TRUE;
 			
 			if (size + strlen(line) + 40 < sizeof(buf)) {
@@ -1300,6 +1327,9 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	else {	// picking one
 		if (!(arch = find_archetype_by_name(archetype_menu[pos].type, argument))) {
 			msg_to_desc(desc, "Unknown %s '%s'. Try 'list' for more options.\r\n", archetype_menu[pos].name, argument);
+		}
+		else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype(desc->character, GET_ARCH_VNUM(arch))) {
+			msg_to_desc(desc, "%s: You have not unlocked this archetype.\r\n", GET_ARCH_NAME(arch));
 		}
 		else {
 			// success!
