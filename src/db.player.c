@@ -6299,20 +6299,20 @@ PROMO_APPLY(promo_facebook) {
 }
 
 
-// 1.5x skills
+// +10 to starting skills
 PROMO_APPLY(promo_skillups) {
 	struct player_skill_data *skill, *next_skill;
 	
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		if (skill->level > 0) {
 			if (get_skill_level(ch, skill->vnum) < BASIC_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level + 10));
 			}
 			else if (get_skill_level(ch, skill->vnum) < SPECIALTY_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level + 10));
 			}
 			else {
-				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level + 10));
 			}
 		}
 	}
