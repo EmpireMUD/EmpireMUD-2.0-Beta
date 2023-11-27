@@ -424,8 +424,9 @@ const char *room_template_flags[] = {
 
 // ARCH_x: archetype flags
 const char *archetype_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"BASIC",
+	"LOCKED",
 	"\n"
 };
 
@@ -3157,6 +3158,7 @@ const char *quest_reward_types[] = {
 	"RECOGNIZE-LANGUAGE",
 	"GRANT-PROGRESS",
 	"START-PROGRESS",
+	"UNLOCK-ARCHETYPE",
 	"\n",
 };
 

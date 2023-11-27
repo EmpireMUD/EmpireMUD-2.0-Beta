@@ -683,6 +683,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	char buf[MAX_STRING_LENGTH];
+	archetype_data *arch;
 	struct quest_reward *reward;
 	struct empire_goal *goal;
 	progress_data *prog;
@@ -835,6 +836,15 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 							msg_to_char(ch, "\tyYour empire starts the progress goal: %s\t0\r\n", PRG_NAME(prog));
 							refresh_one_goal_tracker(GET_LOYALTY(ch), goal);
 						}
+					}
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if ((arch = archetype_proto(reward->vnum))) {
+					if (!has_unlocked_archetype(ch, reward->vnum)) {
+						msg_to_char(ch, "\tyYou have unlocked the starting archetype '%s' for your account! (Available on new characters.)\t0\r\n", GET_ARCH_NAME(arch));
+						add_unlocked_archetype(ch, reward->vnum);
 					}
 				}
 				break;
@@ -995,6 +1005,11 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 		}
 		case QR_START_PROGRESS: {
 			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			break;
+		}
+		case QR_UNLOCK_ARCHETYPE: {
+			archetype_data *arch = archetype_proto(reward->vnum);
+			snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
 			break;
 		}
 		default: {
@@ -3452,6 +3467,7 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
+	archetype_data *arch;
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	progress_data *prog;
@@ -3558,6 +3574,17 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 				}
 				else if (!PRG_FLAGGED(prog, PRG_NO_AUTOSTART)) {
 					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards progress goal without NO-AUTOSTART");
+					problem = TRUE;
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if (!(arch = archetype_proto(rew->vnum))) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-existent archetype unlock");
+					problem = TRUE;
+				}
+				else if (!ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards archetype without LOCKED flag: %d %s", rew->vnum, GET_ARCH_NAME(arch));
 					problem = TRUE;
 				}
 				break;
@@ -3981,6 +4008,19 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 				return PARSE_QRV_FAILED;
 			}
 			if (real_progress(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_UNLOCK_ARCHETYPE: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid archetype vnum '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			if (archetype_proto(vnum)) {
 				ok = TRUE;
 			}
 			break;

@@ -1299,6 +1299,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // helpers
 #define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
+#define ACCOUNT_UNLOCKED_ARCHETYPES(ch)  (GET_ACCOUNT(ch)->unlocked_archetypes)
 #define CUSTOM_COLOR_CHAR(ch, which)  ((!IS_NPC(ch) && GET_CUSTOM_COLOR((ch), (which))) ? GET_CUSTOM_COLOR((ch), (which)) : '0')
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
@@ -2189,6 +2190,13 @@ vehicle_data *get_current_piloted_vehicle(char_data *ch);
 room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island);
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
 bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
+
+// archetypes.c
+void add_unlocked_archetype(char_data *ch, any_vnum vnum);
+void check_unlocked_archetypes(char_data *ch);
+void free_unlocked_archetypes(account_data *account);
+struct unlocked_archetype *has_unlocked_archetype(char_data *ch, any_vnum vnum);
+void remove_unlocked_archetype(char_data *ch, any_vnum vnum);
 
 // augments.c
 bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);

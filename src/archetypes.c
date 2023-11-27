@@ -29,6 +29,7 @@
 *   Utilities
 *   Database
 *   Character Creation
+*   Unlockable Archetypes
 *   OLC Handlers
 *   Displays
 *   Edit Modules
@@ -655,7 +656,9 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 void olc_search_archetype(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	archetype_data *arch = archetype_proto(vnum);
+	quest_data *qiter, *next_qiter;
 	int size, found;
+	bool any;
 	
 	if (!arch) {
 		msg_to_char(ch, "There is no archetype %d.\r\n", vnum);
@@ -665,7 +668,19 @@ void olc_search_archetype(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of archetype %d (%s):\r\n", vnum, GET_ARCH_NAME(arch));
 	
-	// archetype are not actually used anywhere else
+	// check quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x, REQ_x: quest types
+		any = find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_UNLOCK_ARCHETYPE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -1306,6 +1321,115 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// UNLOCKABLE ARCHETYPES ///////////////////////////////////////////////////
+
+/**
+* Unlocks an archetype for a player/account.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The archetype vnum to grant them.
+*/
+void add_unlocked_archetype(char_data *ch, any_vnum vnum) {
+	struct unlocked_archetype *unarch;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return;	// oops?
+	}
+	
+	if (!has_unlocked_archetype(ch, vnum)) {
+		CREATE(unarch, struct unlocked_archetype, 1);
+		unarch->vnum = vnum;
+		HASH_ADD_INT(ACCOUNT_UNLOCKED_ARCHETYPES(ch), vnum, unarch);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+/**
+* Audits for bad unlocked archetypes on login.
+*
+* @param char_data *ch The player to check.
+*/
+void check_unlocked_archetypes(char_data *ch) {
+	struct unlocked_archetype *unarch, *next;
+	bool any = FALSE;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return;	// oops?
+	}
+	
+	HASH_ITER(hh, ACCOUNT_UNLOCKED_ARCHETYPES(ch), unarch, next) {
+		if (!archetype_proto(unarch->vnum)) {
+			any = TRUE;
+			HASH_DEL(ACCOUNT_UNLOCKED_ARCHETYPES(ch), unarch);
+			free(unarch);
+		}
+	}
+	
+	if (any) {
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+/**
+* Frees the memory for unlocked archetypes e.g. before an account is deleted,
+* or when shutting down.
+*
+* @param account_data *account The account to free archetypes for.
+*/
+void free_unlocked_archetypes(account_data *account) {
+	struct unlocked_archetype *iter, *next;
+	
+	HASH_ITER(hh, account->unlocked_archetypes, iter, next) {
+		HASH_DEL(account->unlocked_archetypes, iter);
+		free(iter);
+	}
+}
+
+
+/**
+* Determines if the player/account has unlocked a given archetype, and returns
+* it if so.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The archetype vnum to check for.
+* @return struct unlocked_archetype* The player's entry if unlocked; NULL if not unlocked.
+*/
+struct unlocked_archetype *has_unlocked_archetype(char_data *ch, any_vnum vnum) {
+	struct unlocked_archetype *unarch;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(ACCOUNT_UNLOCKED_ARCHETYPES(ch), &vnum, unarch);
+	return unarch;	// if any
+}
+
+
+/**
+* Removes/cancels an unlocked archetype from a player/account's list. This does
+* not affect any existing characters on their account using that archetype.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The archetype vnum to take away.
+*/
+void remove_unlocked_archetype(char_data *ch, any_vnum vnum) {
+	struct unlocked_archetype *unarch;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch)) {
+		return;	// oops?
+	}
+	
+	if ((unarch = has_unlocked_archetype(ch, vnum))) {
+		HASH_DEL(ACCOUNT_UNLOCKED_ARCHETYPES(ch), unarch);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
 
 
@@ -1349,7 +1473,10 @@ archetype_data *create_archetype_table_entry(any_vnum vnum) {
 */
 void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 	archetype_data *arch;
+	descriptor_data *desc;
+	quest_data *qiter, *next_qiter;
 	char name[256];
+	bool found;
 	
 	if (!(arch = archetype_proto(vnum))) {
 		msg_to_char(ch, "There is no such archetype %d.\r\n", vnum);
@@ -1360,6 +1487,31 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 	
 	// remove it from the hash table first
 	remove_archetype_from_table(arch);
+	
+	// remove from quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QR_x: quest types
+		found = delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_UNLOCK_ARCHETYPE, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Quest %d %s set IN-DEV due to deleted archetype", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
+	// remove from active editors
+	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_QUEST(desc)) {
+			// QR_x: quest types
+			found = delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_UNLOCK_ARCHETYPE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An archetype rewarded by the quest you are editing was deleted.\r\n");
+			}
+		}
+	}
 
 	// save index and archetype file now
 	save_index(DB_BOOT_ARCH);

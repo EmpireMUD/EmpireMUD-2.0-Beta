@@ -1917,8 +1917,9 @@ Usage:  .flags [add | remove] <flags>
 Archetype flags are properties that affect how the archetype behaves.
 
 Available flags:
- IN-DEV - Cannot be chosen or displayed.
- BASIC - Shows up in the basic set of archetypes (others must be searched).
+ &cIN-DEV&0 - Cannot be chosen or displayed.
+ &cBASIC&0 - Shows up in the basic set of archetypes (others must be searched).
+ &cLOCKED&0 - Requires the player/account to unlock it via a quest reward.
 
 See also: OLC ARCHETYPES
 #d
@@ -7302,23 +7303,24 @@ as few rewards as possible, and you can also use quest scripts to give more
 complicated rewards instead.
 
 Available reward types:
- BONUS-EXP - Give the player additional bonus exp today.
- COINS - Give the player some coins (empire or misc).
- OBJECT - Give the player items.
- SET-SKILL - Set the player's skill to a specific level (usually 0, 50, 75,
+ &cBONUS-EXP&0 - Give the player additional bonus exp today.
+ &cCOINS&0 - Give the player some coins (empire or misc).
+ &cOBJECT&0 - Give the player items.
+ &cSET-SKILL&0 - Set the player's skill to a specific level (usually 0, 50, 75,
     100). You should use prereqs to be sure what the player's skill is first.
- SKILL-EXP - Give the player some skill experience and a chance for skill gain.
- SKILL-LEVELS - Raise the player's skill level, if possible.
- QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
+ &cSKILL-EXP&0 - Give the player some skill experience and a chance for skill gain.
+ &cSKILL-LEVELS&0 - Raise the player's skill level, if possible.
+ &cQUEST-CHAIN&0 - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
- REPUTATION - Gain/lose faction reputation.
- CURRENCY - Gives generic currency (e.g. tokens).
- EVENT-POINTS - Points toward an event (only happens if the event is running).
- SPEAK-LANGUAGE - Can now speak a language.
- RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+ &cREPUTATION&0 - Gain/lose faction reputation.
+ &cCURRENCY&0 - Gives generic currency (e.g. tokens).
+ &cEVENT-POINTS&0 - Points toward an event (only happens if the event is running).
+ &cSPEAK-LANGUAGE&0 - Can now speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Can now recognize a language (will not override one the
     player can already speak).
- GRANT-PROGRESS - Player's empire completes a progress goal.
- START-PROGRESS - Player's empire starts a NO-AUTOSTART progress goal.
+ &cGRANT-PROGRESS&0 - Player's empire completes a progress goal.
+ &cSTART-PROGRESS&0 - Player's empire starts a NO-AUTOSTART progress goal.
+ &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.

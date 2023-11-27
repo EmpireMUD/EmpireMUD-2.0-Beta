@@ -2119,6 +2119,7 @@ struct set_struct {
 		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
 		{ "companion", LVL_START_IMM, PC, MISC },
+		{ "unlockedarchetype", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -2853,6 +2854,42 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		amt = add_currency(vict, GEN_VNUM(gen), amt - get_currency(vict, GEN_VNUM(gen)));
 		sprintf(output, "%s's %d %s set to %d.", GET_NAME(vict), GEN_VNUM(gen), GEN_NAME(gen), amt);
+	}
+	else if SET_CASE("unlockedarchetype") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		archetype_data *arch;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> unlockedarchetype <archetype vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(arch = archetype_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid archetype vnum.\r\n");
+			return 0;
+		}
+		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Archetype %d %s is set IN-DEVELOPMENT.\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			return 0;
+		}
+		if (!ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+			msg_to_char(ch, "Archetype %d %s is not LOCKED.\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_unlocked_archetype(vict, GET_ARCH_VNUM(arch));
+			sprintf(output, "%s: unlocked archetype %d %s.", GET_NAME(vict), GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_unlocked_archetype(vict, GET_ARCH_VNUM(arch));
+			sprintf(output, "%s: removed unlocked archetype %d %s.", GET_NAME(vict), GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
 	}
 
 	else if SET_CASE("account") {
@@ -6099,6 +6136,70 @@ SHOW(show_spawns) {
 	}
 	else {
 		msg_to_char(ch, "No spawns found for mob %d.\r\n", vnum);
+	}
+}
+
+
+SHOW(show_unlocked_archetypes) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	archetype_data *arch;
+	struct unlocked_archetype *unarch, *next_unarch;
+	char_data *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show unlockedarchetypes <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Unlocked archetypes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Unlocked archetypes for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, ACCOUNT_UNLOCKED_ARCHETYPES(plr), unarch, next_unarch) {
+			if (!(arch = archetype_proto(unarch->vnum))) {
+				continue;	// no archetype?
+			}
+			if (*argument && !multi_isname(argument, GET_ARCH_NAME(arch))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -10755,6 +10856,7 @@ ACMD(do_show) {
 		{ "tomb", LVL_START_IMM, show_tomb },
 		{ "fmessages", LVL_START_IMM, show_fmessages },
 		{ "smessages", LVL_START_IMM, show_smessages },
+		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
 
 		// last
 		{ "\n", 0, NULL }
