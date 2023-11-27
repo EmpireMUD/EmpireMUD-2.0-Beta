@@ -1171,12 +1171,14 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 * @param char *argument All, basic, or search string.
 */
 void display_archetype_list(descriptor_data *desc, int type, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[256], color[8];
+	char buf[MAX_STRING_LENGTH], line[256], color[8], search[MAX_INPUT_LENGTH];
 	archetype_data *arch, *next_arch;
 	bool basic = FALSE, unlocked = FALSE, all = FALSE;
 	struct archetype_skill *sk;
 	bool skill_match, any;
 	size_t size;
+	
+	*search = '\0';
 	
 	if (!*argument) {
 		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
@@ -1184,15 +1186,15 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	}
 	else if (!str_cmp(argument, "basic")) {
 		basic = TRUE;
-		*argument = '\0';	// prevent string matches
 	}
 	else if (!str_cmp(argument, "unlocked")) {
 		basic = TRUE;
-		*argument = '\0';	// prevent string matches
 	}
 	else if (!str_cmp(argument, "all")) {
 		all = TRUE;
-		*argument = '\0';	// prevent string matches
+	}
+	else {
+		strcpy(search, argument);
 	}
 	
 	size = 0;
@@ -1221,16 +1223,16 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		
 		// check skill match
 		skill_match = FALSE;
-		if (*argument) {
+		if (*search) {
 			for (sk = GET_ARCH_SKILLS(arch); sk && !skill_match; sk = sk->next) {
-				if (multi_isname(argument, get_skill_name_by_vnum(sk->skill))) {
+				if (multi_isname(search, get_skill_name_by_vnum(sk->skill))) {
 					skill_match = TRUE;
 				}
 			}
 		}
 		
 		// match strings
-		if (all || basic || unlocked || skill_match || (*argument && (multi_isname(argument, GET_ARCH_NAME(arch)) || multi_isname(argument, GET_ARCH_DESC(arch))))) {
+		if (all || basic || unlocked || skill_match || (*search && (multi_isname(search, GET_ARCH_NAME(arch)) || multi_isname(search, GET_ARCH_DESC(arch))))) {
 			if (ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
 				strcpy(color, "\tc");
 			}
