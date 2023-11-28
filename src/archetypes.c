@@ -1184,7 +1184,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
 		return;
 	}
-	else if (!strcmp(argument, "--main")) {
+	else if (!strcmp(argument, "basic+")) {
 		main_display = TRUE;
 	}
 	else if (!str_cmp(argument, "basic")) {
@@ -1281,7 +1281,7 @@ void display_archetype_menu(descriptor_data *desc, int type_pos) {
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
-	display_archetype_list(desc, archetype_menu[type_pos].type, "--main");
+	display_archetype_list(desc, archetype_menu[type_pos].type, "basic+");
 }
 
 
