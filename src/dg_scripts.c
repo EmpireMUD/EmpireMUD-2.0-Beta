@@ -3353,6 +3353,52 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					
+					else if (!str_cmp(field, "coins")) {
+						empire_data *coin_emp;
+						struct coin_data *coin;
+						int total;
+						
+						if (IS_NPC(c)) {
+							// no coins
+							snprintf(str, slen, "0");
+						}
+						else if (subfield && (isdigit(*subfield) || *subfield == '-')) {
+							// numeric subfield
+							if (atoi(subfield) > 0) {
+								if ((coin_emp = real_empire(atoi(subfield))) && (coin = find_coin_entry(GET_PLAYER_COINS(c), coin_emp))) {
+									snprintf(str, slen, "%d", coin->amount);
+								}
+								else {
+									// empire not found, thus coins not found
+									snprintf(str, slen, "0");
+								}
+							}
+							else if (!strcmp(subfield, "-1") || (isdigit(*subfield) && atoi(subfield) == 0)) {
+								// misc coins
+								coin = find_coin_entry(GET_PLAYER_COINS(c), REAL_OTHER_COIN);
+								snprintf(str, slen, "%d", coin ? coin->amount : 0);
+							}
+						}
+						else if (subfield && *subfield) {
+							// non-numeric subfield
+							if ((coin_emp = get_empire(subfield)) && (coin = find_coin_entry(GET_PLAYER_COINS(c), coin_emp))) {
+								snprintf(str, slen, "%d", coin->amount);
+							}
+							else {
+								// empire not found, thus coins not found
+								snprintf(str, slen, "0");
+							}
+						}
+						else {	// empty subfield: total coins
+							total = 0;
+							LL_FOREACH(GET_PLAYER_COINS(c), coin) {
+								SAFE_ADD(total, coin->amount, 0, INT_MAX, FALSE);
+							}
+							snprintf(str, slen, "%d", total);
+						}
+					}
+					
 					else if (!str_cmp(field, "command_lag")) {
 						// true/false if the character is in a "wait", OR sets a wait
 						int wait_type;
