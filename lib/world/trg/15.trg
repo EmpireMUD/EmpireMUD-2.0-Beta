@@ -12,7 +12,7 @@ elseif !%actor.on_quest(1502)% || !%actor.ability(Pickpocket)%
 elseif %target.empire% == %actor.empire%
   * must be different empire
   halt
-elseif %target.mob_flagged(*PICKPOCKETED)% || !%target.mob_flagged(HUMAN)%
+elseif %target.mob_flagged(*PICKPOCKETED)%
   halt
 end
 * ok to proceed
