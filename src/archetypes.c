@@ -1173,7 +1173,7 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[256], color[8], search[MAX_INPUT_LENGTH];
 	archetype_data *arch, *next_arch;
-	bool basic = FALSE, unlocked = FALSE, all = FALSE;
+	bool main = FALSE, basic = FALSE, unlocked = FALSE, all = FALSE;
 	struct archetype_skill *sk;
 	bool skill_match, any;
 	size_t size;
@@ -1183,6 +1183,9 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	if (!*argument) {
 		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
 		return;
+	}
+	else if (!str_cmp(argument, "--main")) {
+		main = TRUE;
 	}
 	else if (!str_cmp(argument, "basic")) {
 		basic = TRUE;
@@ -1211,14 +1214,14 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
 			continue;	// locked
 		}
+		if (main && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC | ARCH_LOCKED)) {
+			continue;	// main display requires basic or locked
+		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
-			continue;
+			continue;	// must be basic
 		}
 		if (unlocked && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
 			continue;	// only showing locked
-		}
-		if (!unlocked && !all && ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
-			continue;	// not showing locked
 		}
 		
 		// check skill match
@@ -1278,7 +1281,7 @@ void display_archetype_menu(descriptor_data *desc, int type_pos) {
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
-	display_archetype_list(desc, archetype_menu[type_pos].type, "basic");
+	display_archetype_list(desc, archetype_menu[type_pos].type, "--main");
 }
 
 
