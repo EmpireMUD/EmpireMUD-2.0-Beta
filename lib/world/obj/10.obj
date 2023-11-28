@@ -51,4 +51,22 @@ still be autostored.
 200 1 0
 0 0
 S
+#1011
+coin watcher~
+a watcher coin~
+A watcher coin lies hidden on the ground.~
+   This odd iron coin depicts only a veiled eye, and only on one side. The
+reverse side of the coin is blank. No writing or value is marked on the coin.
+The coin reminds you of the sort used by a certain shadowy guild to watch the
+activities of its members. Perhaps its purpose is to track your progress as a
+master pickpocket.
+~
+3 p a 0 0 2
+0 0 0
+2 0
+C
+100 100
+Q 1502
+T 1502
+S
 $

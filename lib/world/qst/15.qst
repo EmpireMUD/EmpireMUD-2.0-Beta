@@ -99,11 +99,28 @@ Z
 S
 #1502
 Stealth: Silent Ascension~
-tba
+   The guildmaster glances around carefully to ensure you're alone before
+leaning in to say, 'You've come to the attention of the Thieves Guild, and I do
+mean that in the best way. I know the Guild does not officially exist, so we'll
+speak no further of that, but it has taken a keen interest in you nonetheless.'
+   The guildmaster slips you an iron coin. You glance at it before sliding it
+into your pocket, but it appears blank.
+   'The Guild greatly anticipates your legacy among the shadows, but would like
+to see your prowess firsthand. If you wish to ascend in its esteem, do so by
+accepting this task: you will pickpocket, without being caught, no fewer than
+50 times. And let us be clear: It cannot be from your own citizens, who might
+be disarmed by a familiar face. These must be strangers. Do it, and return to
+any master of the Guild.'
+   The tasks set before you are thus:
+   1. Master the Stealth skill,
+   2. Reach level 100, and
+   3. Pickpocket 50 people who are not members of your empire
 ~
-tba
+   The guildmaster silently and covertly takes the iron coin back from you. No
+words are exchanged, but the two of you have an understanding. Your name shall
+go unknown, but your deeds will be legend among the shadows.
 ~
-4 adf 100 0 -1
+6 df 100 0 -1
 A
 1 221
 A
@@ -118,12 +135,16 @@ R
 14 1502 1500
 R
 14 503 500
+T 1506
 W
 9 4 0 100 a
 W
 39 0 0 100 a
 W
 0 18290 0 1 a
+W+
+11 0 0 50 a
+Pickpocket successfully~
 Z
 1 221
 Z
