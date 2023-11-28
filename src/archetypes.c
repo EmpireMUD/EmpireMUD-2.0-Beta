@@ -1188,7 +1188,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		basic = TRUE;
 	}
 	else if (is_abbrev(argument, "unlocked") || is_abbrev(argument, "locked")) {
-		basic = TRUE;
+		unlocked = TRUE;
 	}
 	else if (!str_cmp(argument, "all")) {
 		all = TRUE;
