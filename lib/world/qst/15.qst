@@ -1,0 +1,36 @@
+#1500
+High Sorcery: Master of the Mythic Arts~
+   The High Sorcerer sees potential in you. You are tasked with studying the
+most noble and ancient art of High Sorcery to its utmost, practicing it to the
+point of mastery. Your devotion to these studies shall surely lead the empire
+on the path to great prosperity. Complete these tasks for the High Sorcerer:
+   1. Achieve the top level of High Sorcery,
+   2. Attain level 100,
+   3. Obtain four powerful magic gems, and
+   4. Demonstrate your mastery by exploring the Primeval Forest
+~
+   You have proven yourself to the academy of High Sorcery, establishing your
+house in the annals of history, and bringing prosperity to the empire. Venture
+forth on the path to your destiny as the greatest sorcerer in the land!
+~
+1 f 100 0 -1
+A
+1 228
+P
+9 2 0 51 -
+R
+14 1500 1500
+R
+14 500 500
+W
+9 2 0 100 a
+W
+39 0 0 100 a
+W
+1 6601 0 4 a
+W
+0 10250 0 1 a
+Z
+1 228
+S
+$
