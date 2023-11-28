@@ -2196,6 +2196,8 @@ void add_unlocked_archetype(char_data *ch, any_vnum vnum);
 void check_unlocked_archetypes(char_data *ch);
 void free_unlocked_archetypes(account_data *account);
 struct unlocked_archetype *has_unlocked_archetype(char_data *ch, any_vnum vnum);
+bool has_unlocked_archetype_during_creation(char_data *ch, any_vnum vnum);
+struct unlocked_archetype *account_unlocked_archetype(account_data *acct, any_vnum vnum);
 void remove_unlocked_archetype(char_data *ch, any_vnum vnum);
 
 // augments.c

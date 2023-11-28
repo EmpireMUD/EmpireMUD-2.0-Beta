@@ -1208,7 +1208,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (GET_ARCH_TYPE(arch) != type) {
 			continue;
 		}
-		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype(desc->character, GET_ARCH_VNUM(arch))) {
+		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
 			continue;	// locked
 		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
@@ -1334,7 +1334,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 		if (!(arch = find_archetype_by_name(archetype_menu[pos].type, argument))) {
 			msg_to_desc(desc, "Unknown %s '%s'. Try 'list' for more options.\r\n", archetype_menu[pos].name, argument);
 		}
-		else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype(desc->character, GET_ARCH_VNUM(arch))) {
+		else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
 			msg_to_desc(desc, "%s: You have not unlocked this archetype.\r\n", GET_ARCH_NAME(arch));
 		}
 		else {
@@ -1426,7 +1426,8 @@ void free_unlocked_archetypes(account_data *account) {
 
 /**
 * Determines if the player/account has unlocked a given archetype, and returns
-* it if so.
+* it if so. Note this does not work during character creation -- use
+* has_unlocked_archetype_during_creation instead.
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The archetype vnum to check for.
@@ -1440,6 +1441,46 @@ struct unlocked_archetype *has_unlocked_archetype(char_data *ch, any_vnum vnum) 
 	}
 	
 	HASH_FIND_INT(ACCOUNT_UNLOCKED_ARCHETYPES(ch), &vnum, unarch);
+	return unarch;	// if any
+}
+
+
+/**
+* For use during character creation when the account is not linked.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The archetype vnum to check for.
+* @return bool TRUE if the account has the archetype unlocked, FALSE if not.
+*/
+bool has_unlocked_archetype_during_creation(char_data *ch, any_vnum vnum) {
+	struct unlocked_archetype *unarch;
+	account_data *acct;
+	
+	if (ch && !IS_NPC(ch) && (acct = find_account(GET_TEMPORARY_ACCOUNT_ID(ch)))) {
+		HASH_FIND_INT(acct->unlocked_archetypes, &vnum, unarch);
+		return unarch ? TRUE : FALSE;
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Determines if the player/account has unlocked a given archetype, and returns
+* it if so.
+*
+* @param account_data *acct The account;
+* @param any_vnum vnum The archetype vnum to check for.
+* @return struct unlocked_archetype* The player's entry if unlocked; NULL if not unlocked.
+*/
+struct unlocked_archetype *account_unlocked_archetype(account_data *acct, any_vnum vnum) {
+	struct unlocked_archetype *unarch;
+	
+	if (!acct) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(acct->unlocked_archetypes, &vnum, unarch);
 	return unarch;	// if any
 }
 
