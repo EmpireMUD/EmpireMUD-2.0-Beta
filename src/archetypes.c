@@ -1173,7 +1173,7 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[256], color[8], search[MAX_INPUT_LENGTH];
 	archetype_data *arch, *next_arch;
-	bool main = FALSE, basic = FALSE, unlocked = FALSE, all = FALSE;
+	bool main_display = FALSE, basic = FALSE, unlocked = FALSE, all = FALSE;
 	struct archetype_skill *sk;
 	bool skill_match, any;
 	size_t size;
@@ -1185,7 +1185,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		return;
 	}
 	else if (!str_cmp(argument, "--main")) {
-		main = TRUE;
+		main_display = TRUE;
 	}
 	else if (!str_cmp(argument, "basic")) {
 		basic = TRUE;
@@ -1214,7 +1214,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
 			continue;	// locked
 		}
-		if (main && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC | ARCH_LOCKED)) {
+		if (main_display && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC | ARCH_LOCKED)) {
 			continue;	// main display requires basic or locked
 		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
