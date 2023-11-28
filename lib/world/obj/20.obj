@@ -686,4 +686,137 @@ $n is bundled up and warm.~
 R
 4 5617 0
 S
+#2042
+robes court sorcerer's sorcerers~
+a court sorcerer's robes~
+The robes of a court sorcerer hang in the air.~
+The robes are thickly layered, though they are surprisingly light.
+~
+2 0 ad 0 0 4
+0 0 0
+11 0
+C
+1 1
+M
+14
+The court sorcerer, $n, stands before you.~
+M
+13
+The court sorceress, $n, stands before you.~
+R
+4 5617 0
+S
+#2043
+leathers pitfighter's pitfighters fighter's fighters~
+a pitfighter's leathers~
+A pitfighter's leathers are lying here.~
+   There isn't much to this leather outfit; it protects little to nothing on
+the body. In fact, it looks like it was designed to show off your muscles
+instead.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+12
+The pitfighting champion, $n, stands proudly before you.~
+R
+4 5617 0
+S
+#2044
+robe arboreweaver weaver~
+an arborweaver robe~
+An arborweaver robe is crumpled up on the ground.~
+   The robe is made of brown jute, intricately textured to resemble the bark of
+a tree.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+12
+Arborweaver $n is standing here in simple robes.~
+R
+4 5617 0
+S
+#2045
+clothes clothing city fine set~
+fine city clothes~
+A set of fine clothing lies on the ground.~
+This shirt, though simple, is the height of men's fashion in the city.
+These stylish garments would be at home on any market street.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+8
+You put on your finest clothing.~
+M
+9
+$n puts on $s finest clothing.~
+M
+12
+A well-to-do citizen, $n, is standing here.~
+R
+4 5617 0
+S
+#2046
+pelts nomad's monads set~
+nomad's pelts~
+A set of pelts belonging to a nomad are lying here.~
+These pelts have been stitched together by a large needle.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+12
+The outlander, $n, is standing here.~
+R
+4 5617 0
+S
+#2047
+ensemble craftsman's craftsmans~
+a craftsman's ensemble~
+A craftsman's ensemble has been left here.~
+The trousers and shirt are rather well-stitched.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+12
+The artisan, $n, is standing here.~
+R
+4 5617 0
+S
+#2048
+regalia red noble set~
+noble regalia in red~
+A set of noble regalia in red lies here.~
+   These fine clothes certainly belong to a member of the high nobility. The
+sanguine red hue surely matches their banner.
+~
+2 0 ad 0 0 3
+0 0 0
+11 0
+C
+1 1
+M
+12
+The noble $n stands here in red.~
+R
+4 5617 0
+S
 $

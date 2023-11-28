@@ -20,7 +20,7 @@ A
 G
 0 2002  # a red hood
 G
-4 2012  # a brown robe
+4 2042  # a court sorcerer's robes
 G
 14 2032  # a pair of sandals
 G
@@ -30,6 +30,240 @@ G
 K
 2 40
 K
-0 20
+0 10
+K
+6 10
+S
+#501
+Champion Pitfighter~
+Proven in the arena~
+Became arena champion~
+Pitlord~
+Pitlord~
+0 c -1
+A
+0 3
+A
+1 2
+A
+2 1
+A
+3 2
+A
+4 1
+A
+5 2
+G
+0 2006  # a coif
+G
+4 2043  # a pitfighter's leathers
+G
+13 2028  # a pair of breeches
+G
+14 2032  # a pair of sandals
+G
+19 2102  # a short sword
+G
+21 2104  # a torch
+K
+0 40
+K
+5 10
+K
+4 10
+S
+#502
+Arborweaver~
+An experienced nature mage and protector of the forest~
+Left the Arbor~
+Sage~
+Sage~
+0 c -1
+A
+0 1
+A
+1 2
+A
+2 1
+A
+3 2
+A
+4 3
+A
+5 2
+G
+0 2001  # a leather hood
+G
+4 2044  # an arborweaver robe
+G
+14 2032  # a pair of sandals
+G
+19 2100  # a stone axe
+G
+21 2104  # a torch
+G
+22 2148  # a hobby knife
+K
+3 40
+K
+5 10
+K
+0 10
+S
+#503
+Veiled Specter~
+A phantom in the shadows, elusive and silent~
+Vanished into the shadows~
+Underlord~
+Underlord~
+0 c -1
+A
+0 2
+A
+1 2
+A
+2 3
+A
+3 2
+A
+4 1
+A
+5 1
+G
+0 2002  # a red hood
+G
+4 2045  # fine city clothes
+G
+13 2028  # a pair of breeches
+G
+14 2032  # a pair of sandals
+G
+19 2103  # a shiv
+G
+21 2104  # a torch
+K
+4 40
+K
+0 10
+K
+5 10
+S
+#504
+Untamed Outlander~
+Born of the wilderness~
+Arrived from lands unknown~
+Outlander~
+Outlander~
+0 c -1
+A
+0 2
+A
+1 3
+A
+2 1
+A
+3 2
+A
+4 1
+A
+5 2
+G
+0 2001  # a leather hood
+G
+4 2046  # nomad's pelts
+G
+13 2027  # leather pants
+G
+14 2031  # a pair of moccasins
+G
+19 2101  # a woodsman's axe
+G
+21 2104  # a torch
+G
+22 2147  # a simple skinning knife
+K
+5 40
+K
+6 10
+K
+0 10
+S
+#505
+Accomplished Artisan~
+A well-respected craftsman~
+Took the market by storm~
+Maestro~
+Maestra~
+0 c -1
+A
+0 2
+A
+1 3
+A
+2 1
+A
+3 2
+A
+4 2
+A
+5 1
+G
+0 2006  # a coif
+G
+4 2047  # a craftsman's ensemble
+G
+13 2028  # a pair of breeches
+G
+14 2032  # a pair of sandals
+G
+19 2102  # a short sword
+G
+21 2104  # a torch
+G
+-1 2145  # a feather sewing kit
+G
+22 2148  # a hobby knife
+K
+6 50
+K
+5 10
+S
+#506
+Twilight Sovereign~
+Rule -- and feed -- from the shadows~
+Arrived by night~
+Sovereign~
+Sovereign~
+0 c -1
+A
+0 2
+A
+1 2
+A
+2 1
+A
+3 2
+A
+4 1
+A
+5 3
+G
+0 2002  # a red hood
+G
+4 2048  # noble regalia in red
+G
+13 2028  # a pair of breeches
+G
+14 2032  # a pair of sandals
+G
+19 2102  # a short sword
+G
+21 2104  # a torch
+K
+7 40
+K
+0 10
+K
+5 10
 S
 $
