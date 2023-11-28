@@ -325,4 +325,25 @@ R
 U
 1 5164
 S
+#5213
+Hero Statue~
+At the Foot of the Hero Statue~
+.&0><&?.~
+48 18 dh 0
+0 0 0 -1
+C
+dedicate~
+E
+statue hero monument building around~
+   Expertly sculpted from stone, the hero towers over the city with all the
+magnificence and grace of the kingdom. You can't help but stop and salute as
+you pass, humbled by the magnitude of achievement it must take to earn such a
+statue.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+1001 1 5 0
+R
+6075 1 1 0
+S
 $

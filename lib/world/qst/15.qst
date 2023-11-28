@@ -13,7 +13,7 @@ on the path to great prosperity. Complete these tasks for the High Sorcerer:
 house in the annals of history, and bringing prosperity to the empire. Venture
 forth on the path to your destiny as the greatest sorcerer in the land!
 ~
-1 f 100 0 -1
+2 df 100 0 -1
 A
 1 228
 P
@@ -32,5 +32,241 @@ W
 0 10250 0 1 a
 Z
 1 228
+S
+#1501
+Natural Magic: Whispers of the Elder Grove~
+   You sit in the shadow of the henge and contemplate its meaning. Through your
+travels, you've learned that the use of these henges by druids is merely a
+recent trend -- henges are far older, and have been built far longer, than
+druids have roamed the earth. Truly the depths of time are filled with
+boundless mysteries.
+   Whatever the true origin of the henges, this one is yours, and you decide it
+is time to dedicate it. The first step is a benevolent gift to nature. You
+decide to seek out the driest desert and soak it in rain as a gift to the many
+plants and animals who eke out their existence under the hot sun. Second, you
+must create tinctures of the six sacred herbs. And lastly, return to the henge
+to peform the dedication. The steps are summarized thusly:
+   1. Achieve mastery of Natural Magic,
+   2. Reach level 100,
+   3. Visit a Monsoon Rift and quench the desert,
+   4. Extract concentrated versions of each herb, and
+   5. Return to the henge with the herb extracts
+~
+   You slowly and methodically daub the henge with the distilled whitegrass,
+the fiveleaf resin, the redthorn extract, the essence of magewhisper, the
+concentrated daggerbite, and the bileberry juice. As you do, you dance freely
+around the monument, at one with nature.
+   You sit under the henge and contemplate the depths of time and the gift of
+the nature mages who came before you, though their ways are lost to history.
+The sun rises and sets and rises and sets as uncountable time passes before
+you, and still the henge stands.
+   Your dedication goes unwitnessed by any except nature itself. But, perhaps,
+it's enough that you know you performed this devotion.
+~
+4 df 100 0 -1
+A
+0 5142
+A
+0 12671
+P
+9 3 0 51 -
+R
+14 1501 1500
+R
+14 502 500
+W
+9 3 0 100 a
+W
+39 0 0 100 a
+W
+0 10147 0 1 a
+W
+2 1210 0 1 a
+W
+2 1211 0 1 a
+W
+2 1212 0 1 a
+W
+2 1213 0 1 a
+W
+2 1214 0 1 a
+W
+2 1215 0 1 a
+Z
+0 5142
+Z
+0 12671
+S
+#1502
+Stealth: Silent Ascension~
+tba
+~
+tba
+~
+4 adf 100 0 -1
+A
+1 221
+A
+1 10016
+A
+1 18211
+A
+1 18219
+P
+9 4 0 51 -
+R
+14 1502 1500
+R
+14 503 500
+W
+9 4 0 100 a
+W
+39 0 0 100 a
+W
+0 18290 0 1 a
+Z
+1 221
+Z
+1 10016
+Z
+1 18211
+Z
+1 18219
+S
+#1503
+Vampire: A Legacy in Crimson~
+tba
+~
+tba
+~
+5 adf 100 0 -1
+P
+9 7 0 51 -
+R
+14 1503 1500
+R
+14 506 500
+W
+9 7 0 100 a
+W
+39 0 0 100 a
+S
+#1504
+Battle: Campaign of Triumphs~
+tba
+~
+tba
+~
+5 adf 100 0 -1
+A
+0 5171
+P
+9 0 0 51 -
+R
+14 501 500
+W
+9 0 0 100 a
+W
+39 0 0 100 a
+Z
+0 5009
+S
+#1505
+Survival: The Wilder Heart~
+   While exchanging stories with the old bartender, a discussion on survival
+leads you to compare the rugged terrains you've explored over your storied
+travels. It's a short-lived topic in the rowdy tavern, but it sparks something
+deep within you and you resolve to travel the world once more, visiting each of
+its magnificent climates to reflect on what it truly means to live in nature.
+   Return to the tavern when you've completed this hero's journey through the
+wilds, and tell the tale. You'll need to:
+   1. Master your Survival skills,
+   2. Reach level 100, and
+   3. Visit the plains, forests, mountains, deserts, oases, jungles, swamps,
+      lakes, and tundras of the world
+~
+   The old bartender lists to your tales of travel and survival, deeply
+interested in your reflections on the harsh beauty of nature. You can already
+tell these stories will be told in taverns throughout the land for years to
+come!
+~
+7 f 100 0 -1
+A
+1 220
+P
+9 5 0 51 -
+R
+14 504 500
+W
+9 5 0 100 a
+W
+39 0 0 100 a
+W
+14 0 0 1 a
+W
+14 4 0 1 a
+W
+14 8 0 1 a
+W
+14 20 0 1 a
+W
+14 21 0 1 a
+W
+14 28 0 1 a
+W
+14 29 0 1 a
+W
+14 32 0 1 a
+W
+14 30 0 1 a
+Z
+1 220
+S
+#1506
+Trade: Forged in Myth and Metal~
+   You chat with the smith, who seems rather excited to meet you, about the
+many intricacies of crafting tools and weapons. You're surprised to find that
+you've acquired a reputation for fine goods -- a reputation that could be
+increased if you could accomplish this poor smith's dream of forging the
+largest sword of all time. Show the empire that you have truly mastered your
+art -- forge an impressively large sword and bring it back to the smith for
+appraisal.
+   1. Reach the pinnacle the Trade skill,
+   2. Attain skill level 100 and crafting level 200, and
+   3. Forge an impressively large sword
+~
+   The smith looks the sword up and down, rubs its smooth sides, and turns it
+over with great effort.
+   'Truly a wonder,' the smith says. 'Like nothing I could have imagined. Had I
+done this myself, it might only be half the size. But no man or woman alive
+could wield this. Your skill has exceeded your reach, masterful though you are.
+I shall boast until the day I die that I was first to see this beautiful sword,
+but I wouldn't recommend selling it. It would look nice on a hero's statue,
+though, wouldn't it?'
+   The smith hands the sword back to you with both hands. Despite the outcome,
+you have firmly established your family's legacy as prized artisans of the
+empire!
+~
+9 f 100 0 -1
+A
+1 212
+A
+1 278
+P
+9 6 0 51 -
+R
+14 505 500
+T 1506
+W
+9 6 0 100 a
+W
+39 0 0 100 a
+W+
+2 2150 0 1 a
+Forge an impressively large sword~
+Z
+1 212
+Z
+1 278
 S
 $

@@ -5,7 +5,7 @@ A corpse is lying on the ground.~
    The corpse has begun to stink, so you should loot it while you can ('get all
 from corpse'). You can also skin or butcher most corpses.
 ~
-10 gkp a 0 6
+10 gkp a 0 0 6
 0 0 0
 7 36
 M
@@ -15,13 +15,28 @@ M
 1
 $n buries $p.~
 S
+#1001
+gem rare fine~
+a rare, fine gem~
+A rare, fine gem is lying here.~
+   This gem is one of a kind! It would be perfect for the hilt of the sword
+you're preparing to forge.
+   Use it to forge an 'impressively large sword'.
+~
+3 p a 0 0 1
+0 0 0
+12 0
+C
+200 200
+Q 1506
+S
 #1002
 fire roaring~
 a roaring fire~
 A fire is roaring here!~
 It's warm and cozy.
 ~
-29 0 0 0 4
+29 0 0 0 0 4
 24 1 31
 0 0
 S
@@ -32,7 +47,7 @@ A gilded chest sits at the foot of the bed.~
    You can store your bound items safely in here. Items not bound to you may
 still be autostored.
 ~
-4 0 0 0 2
+4 0 0 0 0 2
 200 1 0
 0 0
 S
