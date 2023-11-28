@@ -1184,7 +1184,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
 		return;
 	}
-	else if (!strcmp(argument, "basic+")) {
+	else if (!strcmp(argument, "--main")) {
 		main_display = TRUE;
 	}
 	else if (!str_cmp(argument, "basic")) {
@@ -1234,28 +1234,30 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 			}
 		}
 		
-		// match strings
-		if (all || basic || unlocked || skill_match || (*search && (multi_isname(search, GET_ARCH_NAME(arch)) || multi_isname(search, GET_ARCH_DESC(arch))))) {
-			if (ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
-				strcpy(color, "\tc");
-			}
-			else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
-				strcpy(color, "\tm");
-			}
-			else {
-				strcpy(color, "\ty");
-			}
-			
-			snprintf(line, sizeof(line), " %s%s\t0 - %s", color, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
-			any = TRUE;
-			
-			if (size + strlen(line) + 40 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, " ... and more\r\n");
-				break;
-			}
+		if (*search && !skill_match && !multi_isname(search, GET_ARCH_NAME(arch)) && !multi_isname(search, GET_ARCH_DESC(arch))) {
+			continue;	// search requested but not matched
+		}
+		
+		// show it
+		if (ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
+			strcpy(color, "\tc");
+		}
+		else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+			strcpy(color, "\tm");
+		}
+		else {
+			strcpy(color, "\ty");
+		}
+		
+		snprintf(line, sizeof(line), " %s%s\t0 - %s", color, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+		any = TRUE;
+		
+		if (size + strlen(line) + 40 < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, " ... and more\r\n");
+			break;
 		}
 	}
 	
@@ -1281,7 +1283,7 @@ void display_archetype_menu(descriptor_data *desc, int type_pos) {
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
-	display_archetype_list(desc, archetype_menu[type_pos].type, "basic+");
+	display_archetype_list(desc, archetype_menu[type_pos].type, "--main");
 }
 
 
