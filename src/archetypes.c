@@ -1168,7 +1168,7 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 *
 * @param descriptor_data *desc The user to send it to.
 * @param int type Which ARCH_ to display.
-* @param char *argument All, basic, or search string.
+* @param char *argument All, basic, unlocked, or search string.
 */
 void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[256], color[8], search[MAX_INPUT_LENGTH];
@@ -1184,7 +1184,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		msg_to_desc(desc, "Usage: list <all | basic | unlocked | keywords>\r\n");
 		return;
 	}
-	else if (!str_cmp(argument, "--main")) {
+	else if (!strcmp(argument, "--main")) {
 		main_display = TRUE;
 	}
 	else if (!str_cmp(argument, "basic")) {
