@@ -1214,7 +1214,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 		if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
 			continue;	// locked
 		}
-		if (main_display && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC | ARCH_LOCKED)) {
+		if (main_display && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC) && !ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
 			continue;	// main display requires basic or locked
 		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
