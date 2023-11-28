@@ -683,6 +683,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	char buf[MAX_STRING_LENGTH];
+	int sub;
 	archetype_data *arch;
 	struct quest_reward *reward;
 	struct empire_goal *goal;
@@ -842,8 +843,15 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			}
 			case QR_UNLOCK_ARCHETYPE: {
 				if ((arch = archetype_proto(reward->vnum))) {
+					// look up name
+					for (sub = 0; archetype_menu[sub].type != NOTHING; ++sub) {
+						if (archetype_menu[sub].type == GET_ARCH_TYPE(arch)) {
+							break;
+						}
+					}
+					
 					if (!has_unlocked_archetype(ch, reward->vnum)) {
-						msg_to_char(ch, "\tyYou have unlocked the starting archetype '%s' for your account! (Available on new characters.)\t0\r\n", GET_ARCH_NAME(arch));
+						msg_to_char(ch, "\tyYou have unlocked the starting %s '%s' for your account (available on new characters)!\t0\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch));
 						add_unlocked_archetype(ch, reward->vnum);
 					}
 				}
