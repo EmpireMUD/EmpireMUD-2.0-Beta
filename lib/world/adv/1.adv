@@ -239,7 +239,7 @@ countryside! Can you hunt it down and kill it? Just follow the swath of
 scorched earth. The dragon is tough -- you might want to bring a partner.
 ~
 10300 10329 100-150
-5 0 dn 0
+5 0 n 0
 L
 5 0
 43200 -1 -1 -1
@@ -311,7 +311,7 @@ crafting patterns and items at the end of the quest.
 can enter the nest at a time.
 ~
 11000 11074 100-125
-50 0 dg 1
+50 0 dgp 1
 L
 5 0
 1440 -1 -1 -1
