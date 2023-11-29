@@ -320,6 +320,7 @@ const char *adventure_flags[] = {
 	"IGNORE-ISLAND-LEVELS",
 	"CHECK-OUTSIDE-FIGHTS",
 	"GLOBAL-NEARBY",
+	"DETECTABLE",	// 15
 	"\n"
 };
 

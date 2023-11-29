@@ -1316,23 +1316,24 @@ See also: OLC ADVENTURES
 Usage:  .flags [add | remove] <flags>
 
 The following adventure flags are available:
- IN-DEVELOPMENT - The adventure will not be instantiated in the world.
- LOCK-LEVEL-ON-ENTER - Instance level locks when a player enters.
- LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
- !NEARBY - Instances do not show up when players type nearby.
- ROTATABLE - Each instance will have a random orientation (whole zone rotates).
- CONFUSING-RANDOMS - The instancer will not logically match random exits.
- !NEWBIE - Will not spawn on newbie islands.
- NEWBIE-ONLY - Only spawns on newbie islands.
- NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
- EMPTY-RESET-ONLY - Won't reset while players are inside.
- CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+ &cIN-DEVELOPMENT&0 - The adventure will not be instantiated in the world.
+ &cLOCK-LEVEL-ON-ENTER&0 - Instance level locks when a player enters.
+ &cLOCK-LEVEL-ON-COMBAT&0 - Instance level locks when a player fights.
+ &c!NEARBY&0 - Instances do not show up when players type nearby.
+ &cROTATABLE&0 - Each instance will have a random orientation (whole zone rotates).
+ &cCONFUSING-RANDOMS&0 - The instancer will not logically match random exits.
+ &c!NEWBIE&0 - Will not spawn on newbie islands.
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands.
+ &cNO-MOB-CLEANUP&0 - Won't despawn mobs that got out of the instance on cleanup.
+ &cEMPTY-RESET-ONLY&0 - Won't reset while players are inside.
+ &cCAN-DELAY-LOAD&0 - Saves memory by not loading until a player arrives for the
     first time.
- IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
- IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
- CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
-    outside the adventure, before despawning.
- GLOBAL-NEARBY - Shows the nearest location from any distance.
+ &cIGNORE-WORLD-SIZE&0 - Won't adjust the number of instances based on the world.
+ &cIGNORE-ISLAND-LEVELS&0 - Will spawn on an island without checking player levels.
+ &cCHECK-OUTSIDE-FIGHTS&0 - Makes sure nobody is fighting a mob from the instance
+ &c   outside the adventure, before despawning.
+ &cGLOBAL-NEARBY&0 - Shows the nearest location from any distance.
+ &cDETECTABLE&0 - Can be detected e.g. with Ritual of Detection.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
