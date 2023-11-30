@@ -62,7 +62,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.162.1";
+const char *version = "EmpireMUD 2.0 beta 5.163";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -320,6 +320,7 @@ const char *adventure_flags[] = {
 	"IGNORE-ISLAND-LEVELS",
 	"CHECK-OUTSIDE-FIGHTS",
 	"GLOBAL-NEARBY",
+	"DETECTABLE",	// 15
 	"\n"
 };
 
@@ -424,8 +425,9 @@ const char *room_template_flags[] = {
 
 // ARCH_x: archetype flags
 const char *archetype_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"BASIC",
+	"LOCKED",
 	"\n"
 };
 
@@ -3157,6 +3159,7 @@ const char *quest_reward_types[] = {
 	"RECOGNIZE-LANGUAGE",
 	"GRANT-PROGRESS",
 	"START-PROGRESS",
+	"UNLOCK-ARCHETYPE",
 	"\n",
 };
 
@@ -4735,6 +4738,7 @@ const char *requirement_types[] = {
 	"OWN-VEHICLE-FUNCTION",	// 40
 	"SPEAK-LANGUAGE",
 	"RECOGNIZE-LANGUAGE",
+	"COMPLETED-QUEST-EVER",
 	"\n",
 };
 

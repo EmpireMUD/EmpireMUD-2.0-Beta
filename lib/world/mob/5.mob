@@ -431,4 +431,16 @@ M
 $n shuffles around on the ground.~
 T 9805
 S
+#550
+minion dark~
+a dark minion~
+A dark minion is standing here.
+~
+0 200 bdqvG cm 3
+0 0 0 11 -1
+D
+This hapless citizen has a strange pallor about them.
+~
+T 550
+S
 $

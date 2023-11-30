@@ -47,7 +47,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
@@ -87,7 +86,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_MOBILE: {
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
-					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
+					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob) && !AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 						*giver_emp = GET_LOYALTY(mob);
 						return TRUE;
 					}
@@ -683,6 +682,8 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	char buf[MAX_STRING_LENGTH];
+	int sub;
+	archetype_data *arch;
 	struct quest_reward *reward;
 	struct empire_goal *goal;
 	progress_data *prog;
@@ -835,6 +836,22 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 							msg_to_char(ch, "\tyYour empire starts the progress goal: %s\t0\r\n", PRG_NAME(prog));
 							refresh_one_goal_tracker(GET_LOYALTY(ch), goal);
 						}
+					}
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if ((arch = archetype_proto(reward->vnum))) {
+					// look up name
+					for (sub = 0; archetype_menu[sub].type != NOTHING; ++sub) {
+						if (archetype_menu[sub].type == GET_ARCH_TYPE(arch)) {
+							break;
+						}
+					}
+					
+					if (!has_unlocked_archetype(ch, reward->vnum)) {
+						msg_to_char(ch, "\tyYou have unlocked the starting %s '%s' for your account (available on new characters)!\t0\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch));
+						add_unlocked_archetype(ch, reward->vnum);
 					}
 				}
 				break;
@@ -997,6 +1014,11 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
+		case QR_UNLOCK_ARCHETYPE: {
+			archetype_data *arch = archetype_proto(reward->vnum);
+			snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
@@ -1024,6 +1046,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 		switch (task->type) {
 			case REQ_COMPLETED_QUEST: {
 				task->current = has_completed_quest(ch, task->vnum, pq->instance_id) ? task->needed : 0;
+				break;
+			}
+			case REQ_COMPLETED_QUEST_EVER: {
+				task->current = has_completed_quest_any(ch, task->vnum) ? task->needed : 0;
 				break;
 			}
 			case REQ_GET_COMPONENT: {
@@ -1723,7 +1749,7 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	bool any = FALSE;
 	bool dailies, event_dailies;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
@@ -2006,7 +2032,7 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 	int complete, total;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
@@ -3192,6 +3218,9 @@ void qt_quest_completed(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = task->needed;
 			}
+			else if (task->type == REQ_COMPLETED_QUEST_EVER && task->vnum == vnum) {
+				task->current = task->needed;
+			}
 			else if (task->type == REQ_NOT_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = 0;
 			}
@@ -3452,6 +3481,7 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
+	archetype_data *arch;
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	progress_data *prog;
@@ -3558,6 +3588,17 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 				}
 				else if (!PRG_FLAGGED(prog, PRG_NO_AUTOSTART)) {
 					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards progress goal without NO-AUTOSTART");
+					problem = TRUE;
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if (!(arch = archetype_proto(rew->vnum))) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-existent archetype unlock");
+					problem = TRUE;
+				}
+				else if (!ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards archetype without LOCKED flag: %d %s", rew->vnum, GET_ARCH_NAME(arch));
 					problem = TRUE;
 				}
 				break;
@@ -3764,6 +3805,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -3780,7 +3822,9 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -3816,6 +3860,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -3981,6 +4026,19 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 				return PARSE_QRV_FAILED;
 			}
 			if (real_progress(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_UNLOCK_ARCHETYPE: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid archetype vnum '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			if (archetype_proto(vnum)) {
 				ok = TRUE;
 			}
 			break;
@@ -4979,6 +5037,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -4994,7 +5053,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
 		// REQ_x, QR_x: quest types
 		found = delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -5026,6 +5087,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5050,6 +5112,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5061,7 +5124,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_ON_QUEST, vnum);
@@ -5087,6 +5152,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_SOCIAL(desc)) {
 			// REQ_x: quest types
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_ON_QUEST, vnum);
 			

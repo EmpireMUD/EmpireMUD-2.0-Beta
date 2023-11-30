@@ -1316,23 +1316,24 @@ See also: OLC ADVENTURES
 Usage:  .flags [add | remove] <flags>
 
 The following adventure flags are available:
- IN-DEVELOPMENT - The adventure will not be instantiated in the world.
- LOCK-LEVEL-ON-ENTER - Instance level locks when a player enters.
- LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
- !NEARBY - Instances do not show up when players type nearby.
- ROTATABLE - Each instance will have a random orientation (whole zone rotates).
- CONFUSING-RANDOMS - The instancer will not logically match random exits.
- !NEWBIE - Will not spawn on newbie islands.
- NEWBIE-ONLY - Only spawns on newbie islands.
- NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
- EMPTY-RESET-ONLY - Won't reset while players are inside.
- CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+ &cIN-DEVELOPMENT&0 - The adventure will not be instantiated in the world.
+ &cLOCK-LEVEL-ON-ENTER&0 - Instance level locks when a player enters.
+ &cLOCK-LEVEL-ON-COMBAT&0 - Instance level locks when a player fights.
+ &c!NEARBY&0 - Instances do not show up when players type nearby.
+ &cROTATABLE&0 - Each instance will have a random orientation (whole zone rotates).
+ &cCONFUSING-RANDOMS&0 - The instancer will not logically match random exits.
+ &c!NEWBIE&0 - Will not spawn on newbie islands.
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands.
+ &cNO-MOB-CLEANUP&0 - Won't despawn mobs that got out of the instance on cleanup.
+ &cEMPTY-RESET-ONLY&0 - Won't reset while players are inside.
+ &cCAN-DELAY-LOAD&0 - Saves memory by not loading until a player arrives for the
     first time.
- IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
- IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
- CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
-    outside the adventure, before despawning.
- GLOBAL-NEARBY - Shows the nearest location from any distance.
+ &cIGNORE-WORLD-SIZE&0 - Won't adjust the number of instances based on the world.
+ &cIGNORE-ISLAND-LEVELS&0 - Will spawn on an island without checking player levels.
+ &cCHECK-OUTSIDE-FIGHTS&0 - Makes sure nobody is fighting a mob from the instance
+ &c   outside the adventure, before despawning.
+ &cGLOBAL-NEARBY&0 - Shows the nearest location from any distance.
+ &cDETECTABLE&0 - Can be detected e.g. with Ritual of Detection.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1917,8 +1918,9 @@ Usage:  .flags [add | remove] <flags>
 Archetype flags are properties that affect how the archetype behaves.
 
 Available flags:
- IN-DEV - Cannot be chosen or displayed.
- BASIC - Shows up in the basic set of archetypes (others must be searched).
+ &cIN-DEV&0 - Cannot be chosen or displayed.
+ &cBASIC&0 - Shows up in the basic set of archetypes (others must be searched).
+ &cLOCKED&0 - Requires the player/account to unlock it via a quest reward.
 
 See also: OLC ARCHETYPES
 #d
@@ -7162,7 +7164,7 @@ Task types that do not apply to empire progression:
  SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
  VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
  GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER, SPEAK-LANGUAGE,
- RECOGNIZE-LANGUAGE&0
+ RECOGNIZE-LANGUAGE, COMPLETED-QUEST-EVER&0
 
 See also: OLC PROGRESS, REQUIREMENTS
 #d
@@ -7302,23 +7304,24 @@ as few rewards as possible, and you can also use quest scripts to give more
 complicated rewards instead.
 
 Available reward types:
- BONUS-EXP - Give the player additional bonus exp today.
- COINS - Give the player some coins (empire or misc).
- OBJECT - Give the player items.
- SET-SKILL - Set the player's skill to a specific level (usually 0, 50, 75,
+ &cBONUS-EXP&0 - Give the player additional bonus exp today.
+ &cCOINS&0 - Give the player some coins (empire or misc).
+ &cOBJECT&0 - Give the player items.
+ &cSET-SKILL&0 - Set the player's skill to a specific level (usually 0, 50, 75,
     100). You should use prereqs to be sure what the player's skill is first.
- SKILL-EXP - Give the player some skill experience and a chance for skill gain.
- SKILL-LEVELS - Raise the player's skill level, if possible.
- QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
+ &cSKILL-EXP&0 - Give the player some skill experience and a chance for skill gain.
+ &cSKILL-LEVELS&0 - Raise the player's skill level, if possible.
+ &cQUEST-CHAIN&0 - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
- REPUTATION - Gain/lose faction reputation.
- CURRENCY - Gives generic currency (e.g. tokens).
- EVENT-POINTS - Points toward an event (only happens if the event is running).
- SPEAK-LANGUAGE - Can now speak a language.
- RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+ &cREPUTATION&0 - Gain/lose faction reputation.
+ &cCURRENCY&0 - Gives generic currency (e.g. tokens).
+ &cEVENT-POINTS&0 - Points toward an event (only happens if the event is running).
+ &cSPEAK-LANGUAGE&0 - Can now speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Can now recognize a language (will not override one the
     player can already speak).
- GRANT-PROGRESS - Player's empire completes a progress goal.
- START-PROGRESS - Player's empire starts a NO-AUTOSTART progress goal.
+ &cGRANT-PROGRESS&0 - Player's empire completes a progress goal.
+ &cSTART-PROGRESS&0 - Player's empire starts a NO-AUTOSTART progress goal.
+ &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -7525,7 +7528,7 @@ custom text, you MUST provide the [group] argument first, but it can be '-' or
 "none".
 
 Available tasks:
- &cCOMPLETED-QUEST&0 - Must complete a certain quest.
+ &cCOMPLETED-QUEST&0 - Must complete a certain quest (some need same-instance).
  &cGET-COMPONENT&0 - Must have components.
  &cGET-OBJECT&0 - Must have items.
  &cKILL-MOB &r*&0&0 - Must kill a certain mob.
@@ -7569,6 +7572,7 @@ Available tasks:
  &cLEVEL-OVER&0 - Composite/total level not lower than this.
  &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
  &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
+ &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

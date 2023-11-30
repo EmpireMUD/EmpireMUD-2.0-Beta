@@ -476,6 +476,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_OWN_VEHICLE_FUNCTION  40
 #define REQ_SPEAK_LANGUAGE  41
 #define REQ_RECOGNIZE_LANGUAGE  42
+#define REQ_COMPLETED_QUEST_EVER  43
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -668,6 +669,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
 #define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
 #define ADV_GLOBAL_NEARBY  BIT(14)	// o. will show the closest one no matter how far away
+#define ADV_DETECTABLE  BIT(15)	// p. can be found e.g. with ritual of detection
 
 
 // ADV_LINK_x: adventure link rule types
@@ -738,6 +740,7 @@ typedef struct vehicle_data vehicle_data;
 // ARCH_x: archetype flags
 #define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define ARCH_BASIC  BIT(1)	// b. will show on the basic list
+#define ARCH_LOCKED  BIT(2)	// c. requires the player to unlock it
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2708,6 +2711,7 @@ typedef enum {
 #define QR_RECOGNIZE_LANGUAGE  11
 #define QR_GRANT_PROGRESS  12
 #define QR_START_PROGRESS  13
+#define QR_UNLOCK_ARCHETYPE  14
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -4228,7 +4232,9 @@ struct account_data {
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
+	// lists/hashes
 	struct pk_data *killed_by;	// LL of players who killed this player recently
+	struct unlocked_archetype *unlocked_archetypes;	// hash (vnum)
 	
 	UT_hash_handle hh;	// account_table
 };
@@ -4768,6 +4774,13 @@ struct player_special_data {
 	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
+};
+
+
+// unlockable account perks
+struct unlocked_archetype {
+	any_vnum vnum;	// which archetype
+	UT_hash_handle hh;	// hashed in account_data->unlocked_archetypes by vnum
 };
 
 

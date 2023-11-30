@@ -362,6 +362,9 @@ void free_account(account_data *acct) {
 		free(pkd);
 	}
 	
+	// free unlocks
+	free_unlocked_archetypes(acct);
+	
 	free(acct);
 }
 
@@ -377,6 +380,7 @@ void parse_account(FILE *fl, int nr) {
 	struct account_player *plr;
 	account_data *acct, *find;
 	struct pk_data *pk;
+	struct unlocked_archetype *unarch;
 	int int_in[3];
 	long l_in;
 	
@@ -414,6 +418,30 @@ void parse_account(FILE *fl, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': { // data
+				switch (*(line+1)) {
+					case '0': {	// D0: unlocked archetypes
+						if ((sscanf(line, "D0 %d", &int_in[0])) != 1) {
+							log("SYSERR: Format error in D0 data section of %s", err_buf);
+							exit(1);
+						}
+						
+						// add if not present
+						HASH_FIND_INT(acct->unlocked_archetypes, &int_in[0], unarch);
+						if (!unarch) {
+							CREATE(unarch, struct unlocked_archetype, 1);
+							unarch->vnum = int_in[0];
+							HASH_ADD_INT(acct->unlocked_archetypes, vnum, unarch);
+						}
+						break;
+					}
+					default: {
+						log("SYSERR: Format error in D%c data section of %s", *(line+1), err_buf);
+						exit(1);
+					}
+				}
+				break;
+			}
 			case 'K': {	// killed by
 				if (sscanf(line, "K %d %d %d %ld", &int_in[0], &int_in[1], &int_in[2], &l_in) != 4) {
 					log("SYSERR: Format error in K section of %s", err_buf);
@@ -565,6 +593,7 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	char temp[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	struct pk_data *pk;
+	struct unlocked_archetype *unarch, *next_unarch;
 	
 	if (!fl || !acct) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_account_to_file called without %s", !fl ? "file" : "account");
@@ -577,6 +606,12 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	strcpy(temp, NULLSAFE(acct->notes));
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
+	
+	// D: data
+	// D0: unlocked archetypes
+	HASH_ITER(hh, acct->unlocked_archetypes, unarch, next_unarch) {
+		fprintf(fl, "D0 %d\n", unarch->vnum);
+	}
 	
 	// K: player kills
 	LL_FOREACH(acct->killed_by, pk) {
@@ -4373,6 +4408,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
+	check_unlocked_archetypes(ch);
 	refresh_passive_buffs(ch);
 	convert_and_schedule_player_affects(ch);
 	schedule_all_obj_timers(ch);
@@ -6267,20 +6303,20 @@ PROMO_APPLY(promo_facebook) {
 }
 
 
-// 1.5x skills
+// +10 to starting skills
 PROMO_APPLY(promo_skillups) {
 	struct player_skill_data *skill, *next_skill;
 	
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		if (skill->level > 0) {
 			if (get_skill_level(ch, skill->vnum) < BASIC_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level + 10));
 			}
 			else if (get_skill_level(ch, skill->vnum) < SPECIALTY_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level + 10));
 			}
 			else {
-				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level + 10));
 			}
 		}
 	}

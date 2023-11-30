@@ -20,8 +20,8 @@ Legend of the Hoarfrost Serragon~
 one. There are rumors that the desert around its lair has frozen over and your
 sources believe this is the deadly hoarfrost serragon. Slaying such a beast
 would surely bring glory to the empire. Defeat the serragon -- several, if you
-have to -- and bring back an in-tact skull. Build a shrine to the creature so
-that the whole world can see the empire's might!
+have to -- and bring back an in-tact skull. Build a proper shrine to the
+creature so that the whole world can see the empire's might!
 ~
 4 4 0 5 c
 K 7 5
@@ -30,7 +30,7 @@ W+
 Kill a hoarfrost serragon~
 W+
 7 12354 0 1 a
-Build a shrine to the serragon~
+Build a shrine using the serragon's blood~
 W+
 2 12359 0 1 a
 Store a translucent serragon skull in a Cabinet of Curiosities~

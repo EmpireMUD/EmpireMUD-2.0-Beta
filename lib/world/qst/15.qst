@@ -1,0 +1,387 @@
+#1500
+High Sorcery: Master of the Mythic Arts~
+   The High Sorcerer sees potential in you. You are tasked with studying the
+most noble and ancient art of High Sorcery to its utmost, practicing it to the
+point of mastery. Your devotion to these studies shall surely lead the empire
+on the path to great prosperity. Complete these tasks for the High Sorcerer:
+   1. Achieve the top level of High Sorcery,
+   2. Attain level 100,
+   3. Obtain four powerful magic gems, and
+   4. Demonstrate your mastery by exploring the Primeval Forest
+~
+   You have proven yourself to the academy of High Sorcery, establishing your
+house in the annals of history, and bringing prosperity to the empire. Venture
+forth on the path to your destiny as the greatest sorcerer in the land!
+~
+2 df 100 0 -1
+A
+1 228
+P
+9 2 0 51 -
+R
+14 1500 1500
+R
+14 500 500
+W
+9 2 0 100 a
+W
+39 0 0 100 a
+W
+1 6601 0 4 a
+W
+0 10250 0 1 a
+Z
+1 228
+S
+#1501
+Natural Magic: Whispers of the Elder Grove~
+   You sit in the shadow of the henge and contemplate its meaning. Through your
+travels, you've learned that the use of these henges by druids is merely a
+recent trend -- henges are far older, and have been built far longer, than
+druids have roamed the earth. Truly the depths of time are filled with
+boundless mysteries.
+   Whatever the true origin of the henges, this one is yours, and you decide it
+is time to dedicate it. The first step is a study in tranquility. Travel to the
+deepest grove of the Magiterranean and perform the chant of tranquility on the
+druids there. Second, you must create tinctures of the six sacred herbs. And
+lastly, return to the henge to perform the dedication. The steps are summarized
+thusly:
+   1. Achieve mastery of Natural Magic,
+   2. Reach level 100,
+   3. Visit the Magiterranean grove and perform the chant of tranquility,
+   4. Extract concentrated versions of each herb, and
+   5. Return to the henge with the herb extracts
+~
+   You slowly and methodically daub the henge with the distilled whitegrass,
+the fiveleaf resin, the redthorn extract, the essence of magewhisper, the
+concentrated daggerbite, and the bileberry juice. As you do, you dance freely
+around the monument, at one with nature.
+   You sit under the henge and contemplate the depths of time and the gift of
+the nature mages who came before you, though their ways are lost to history.
+The sun rises and sets and rises and sets as uncountable time passes before
+you, and still the henge stands.
+   Your dedication goes unwitnessed by any except nature itself. But, perhaps,
+it's enough that you know you performed this devotion.
+~
+4 df 100 0 -1
+A
+0 5142
+A
+0 12671
+P
+9 3 0 51 -
+R
+14 1501 1500
+R
+14 502 500
+W
+9 3 0 100 a
+W
+39 0 0 100 a
+W
+43 12650 0 1 a
+W
+2 1210 0 1 a
+W
+2 1211 0 1 a
+W
+2 1212 0 1 a
+W
+2 1213 0 1 a
+W
+2 1214 0 1 a
+W
+2 1215 0 1 a
+Z
+0 5142
+Z
+0 12671
+S
+#1502
+Stealth: Silent Ascension~
+   The guildmaster glances around carefully to ensure you're alone before
+leaning in to say, 'You've come to the attention of the Thieves Guild, and I do
+mean that in the best way. I know the Guild does not officially exist, so we'll
+speak no further of that, but it has taken a keen interest in you nonetheless.'
+   The guildmaster slips you an iron coin. You glance at it before sliding it
+into your pocket, but it appears blank.
+   'The Guild greatly anticipates your legacy among the shadows, but would like
+to see your prowess firsthand. If you wish to ascend in its esteem, do so by
+accepting this task: you will pickpocket, without being caught, no fewer than
+50 times. And let us be clear: It cannot be from your own citizens, who might
+be disarmed by a familiar face. These must be strangers. Lastly, aid the Guild
+until you make contact with its agent in the Tower Skycleave, and help him bug
+the Grand High Sorcerer's office. Do all this, and return to any master of the
+Guild.'
+   The tasks set before you are thus:
+   1. Master the Stealth skill,
+   2. Reach level 100,
+   3. Pickpocket 50 people who are not members of your empire, and
+   4. Aid the Guild by placing a bug in the Grand High Sorcerer's office in
+      the Tower Skycleave
+~
+   The guildmaster silently and covertly takes the iron coin back from you. No
+words are exchanged, but the two of you have an understanding. Your name shall
+go unknown, but your deeds will be legend among the shadows.
+~
+6 df 100 0 -1
+A
+1 221
+A
+1 10016
+A
+1 18211
+A
+1 18219
+P
+9 4 0 51 -
+R
+14 1502 1500
+R
+14 503 500
+T 1506
+W
+9 4 0 100 a
+W
+39 0 0 100 a
+W
+0 18290 0 1 a
+W+
+11 0 0 50 a
+Pickpocket successfully~
+Z
+1 221
+Z
+1 10016
+Z
+1 18211
+Z
+1 18219
+S
+#1503
+Vampire: A Legacy in Crimson~
+   You exchange pleasantries with the vampire and share your condolences over
+being trapped in the tiny store room during the day.
+   'If only I hadn't lost my minion', the vampire laments. 'What's that? You
+don't have one? How will you ever establish your legacy without a minion? Here,
+take this spare peeping stone. It'll help you find the perfect minion. Of
+course, if you really want to be a powerful vampire, you also need to
+demonstrate power over our greatest enemy: the sun. Ever caused an eclipse
+yourself? I managed it once. A truly difficult ritual. But it's the only path
+to greatness. That, and a good minion.'
+   The vampire hands you a blood-red stone and gives you a brief description of
+its use. It seems it can transform an ordinary citizen into the perfect minion.
+Use it to 'peep <citizen>' until you find the right one, then type 'minionize
+<citizen>' to transform them into your own personal minion!
+   To cement your legacy, perform the following:
+   1. Master your vampire powers,
+   2. Reach level 100,
+   3. Complete the Eclipse Ritual, and, most importantly,
+   4. Find yourself a dark minion using the peeping stone
+~
+   'Yes, m'lord,' your minion says. 'Your legacy is secure.'
+~
+8 0 100 0 -1
+A
+1 10370
+P
+9 7 0 51 -
+R
+14 1503 1500
+R
+14 506 500
+T 1506
+W
+9 7 0 100 a
+W
+39 0 0 100 a
+W
+43 10156 0 1 a
+W
+43 10157 0 1 a
+W+
+11 0 0 1 a
+Find a citizen to become your dark minion~
+Z
+1 550
+S
+#1504
+Battle: Campaign of Triumphs~
+   A city guard stops you as you pass, saying, 'Wow, I've actually heard of
+you! I didn't think we had anybody famous here. Well, almost famous, anyway.
+You've got to show the world how great you are. To think, our own champion
+right here at home.'
+   The guard rattles off a list of battles you might fight in order to show off
+your might and start your own legends, from a flame dragon to a polar baron,
+and plenty in-between. You realize, of course, that the guard is right.
+   In fact, you resolve to defeat ALL the challenges on the list and establish
+yourself amongst the legends. You'll just need to finish the Battle skill tree,
+reach level 100, and defeat all of these foes:
+   1. A swamp hag
+   2. A flame dragon
+   3. A hoarfrost serragon
+   4. A loch colossus in Burrow Canyons
+   5. The undead caretaker of Mill Manor
+   6. An Archdruid of the Grove
+   7. Garlgarl in a Goblin Challenge
+   8. Vanguard Leader Dryleef at a Goblin Outpost
+   9. Scylla beneath the Golden Goblin
+   10. The Saguaro Treant beyond a Monsoon Rift
+   11. Aquilo, Polar Baron of the Permafrost
+   12. The Sun King inside a Lost Temple
+~
+   'Wow, I can't believe it's you! I heard you beat Aquilo, Dryleef, even
+Scylla! Us guards had a bet going and, just between you and me, you made me a
+lot of coin,' the city guard says as you stop. 'I knew you could do it.'
+   The renown of your battle prowess has spread to the corners of the empire
+and, perhaps the world. Someday you might be the most famous warrior alive!
+~
+7 f 100 0 -1
+A
+1 251
+P
+9 0 0 51 -
+R
+14 501 500
+W
+9 0 0 100 a
+W
+39 0 0 100 a
+W+
+3 19000 0 1 a
+Defeat a swamp hag~
+W+
+3 10300 0 1 a
+Defeat a flame dragon~
+W+
+3 12350 0 1 a
+Defeat a hoarfrost serragon~
+W+
+3 11103 0 1 a
+Defeat a loch colossus in Burrow Canyons~
+W+
+3 11136 0 1 a
+Defeat the undead caretaker of Mill Manor~
+W+
+3 12655 0 1 a
+Defeat an Archdruid of the Grove~
+W+
+3 10201 0 1 a
+Defeat Garlgarl in a Goblin Challenge~
+W+
+3 10451 0 1 a
+Defeat Vanguard Leader Dryleef at a Goblin Outpost~
+W+
+3 12420 0 1 a
+Defeat Scylla beneath the Golden Goblin~
+W+
+3 10143 0 1 a
+Defeat the Saguaro Treant beyond a Monsoon Rift~
+W+
+3 10550 0 1 a
+Defeat Aquilo, Polar Baron of the Permafrost~
+W+
+3 18500 0 1 a
+Defeat the Sun King inside a Lost Temple~
+Z
+1 251
+S
+#1505
+Survival: The Wilder Heart~
+   While exchanging stories with the old bartender, a discussion on survival
+leads you to compare the rugged terrains you've explored over your storied
+travels. It's a short-lived topic in the rowdy tavern, but it sparks something
+deep within you and you resolve to travel the world once more, visiting each of
+its magnificent climates to reflect on what it truly means to live in nature.
+   Return to the tavern when you've completed this hero's journey through the
+wilds, and tell the tale. You'll need to:
+   1. Master your Survival skills,
+   2. Reach level 100, and
+   3. Visit the plains, forests, mountains, deserts, oases, jungles, swamps,
+      lakes, and tundras of the world
+~
+   The old bartender listens to your tales of travel and survival, deeply
+interested in your reflections on the harsh beauty of nature. You can already
+tell these stories will be told in taverns throughout the land for years to
+come!
+~
+7 f 100 0 -1
+A
+1 220
+P
+9 5 0 51 -
+R
+14 504 500
+W
+9 5 0 100 a
+W
+39 0 0 100 a
+W
+14 0 0 1 a
+W
+14 4 0 1 a
+W
+14 8 0 1 a
+W
+14 20 0 1 a
+W
+14 21 0 1 a
+W
+14 28 0 1 a
+W
+14 29 0 1 a
+W
+14 32 0 1 a
+W
+14 30 0 1 a
+Z
+1 220
+S
+#1506
+Trade: Forged in Myth and Metal~
+   You chat with the smith, who seems rather excited to meet you, about the
+many intricacies of crafting tools and weapons. You're surprised to find that
+you've acquired a reputation for fine goods -- a reputation that could be
+increased if you could accomplish this poor smith's dream of forging the
+largest sword of all time. Show the empire that you have truly mastered your
+art -- forge an impressively large sword and bring it back to the smith for
+appraisal.
+   1. Reach the pinnacle the Trade skill,
+   2. Attain skill level 100 and crafting level 200, and
+   3. Forge an impressively large sword
+~
+   The smith looks the sword up and down, rubs its smooth sides, and turns it
+over with great effort.
+   'Truly a wonder,' the smith says. 'Like nothing I could have imagined. Had I
+done this myself, it might only be half the size. But no man or woman alive
+could wield this. Your skill has exceeded your reach, masterful though you are.
+I shall boast until the day I die that I was first to see this beautiful sword,
+but I wouldn't recommend selling it. It would look nice on a hero's statue,
+though, wouldn't it?'
+   The smith hands the sword back to you with both hands. Despite the outcome,
+you have firmly established your family's legacy as prized artisans of the
+empire!
+~
+9 f 100 0 -1
+A
+1 212
+A
+1 278
+P
+9 6 0 51 -
+R
+14 505 500
+T 1506
+W
+9 6 0 100 a
+W
+39 0 0 100 a
+W+
+2 2150 0 1 a
+Forge an impressively large sword~
+Z
+1 212
+Z
+1 278
+S
+$

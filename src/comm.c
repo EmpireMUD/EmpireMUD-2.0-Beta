@@ -927,7 +927,7 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("23")
 	}
 	
-	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
+	if (HEARTBEAT(2 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
 		HEARTBEAT_LOG("24")
 	}
@@ -1554,6 +1554,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		act_mtrigger(to, lbuf, ch, dg_victim, IS_SET(act_flags, ACT_VEHICLE_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
+
 
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
 void send_to_char(const char *messg, char_data *ch) {
@@ -2288,6 +2289,7 @@ int new_descriptor(int s) {
 	struct hostent *from;
 	bool slow_ip;
 	time_t when;
+	char buf[MAX_STRING_LENGTH];
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -2364,7 +2366,8 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	SEND_TO_Q(intro_screens[number(0, num_intro_screens-1)], newd);
+	snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
+	SEND_TO_Q(buf, newd);
 
 	return (0);
 }
@@ -2795,8 +2798,9 @@ static int process_output(descriptor_data *t) {
 		close_socket(t);
 		return (-1);
 	}
-	else if (result == 0)	/* Socket buffer full. Try later. */
+	else if (result == 0) {	/* Socket buffer full. Try later. */
 		return (0);
+	}
 
 	/* Handle snooping: prepend "% " and send to snooper. */
 	if (t->snoop_by && *t->output) {
@@ -2872,6 +2876,23 @@ int set_sendbuf(socket_t s) {
 #endif
 
 	return (0);
+}
+
+
+/**
+* For use on lines that are prompts and don't end in a crlf; this sends the
+* telnet codes IAC GA, if needed.
+*
+* @param descriptor_data *desc The descriptor that might need it.
+*/
+const char *telnet_go_ahead(descriptor_data *desc) {
+	if (desc) {
+		static const char string[3] = { IAC, GA, '\0' };
+		return string;
+	}
+	else {
+		return "";
+	}
 }
 
 
@@ -3034,7 +3055,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
 	}
 	else {
 		*prompt = '\0';

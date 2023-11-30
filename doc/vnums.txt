@@ -8,19 +8,20 @@ blocks that are currently in use.
   50  clay/pottery items
  300  Barded mount mobs
  400  High Sorcery mobs
- 500  Natural Magic mobs
+ 500  Natural Magic mobs, unlockable archetypes
  600  level 200-300 crafting resources, with related sectors and mobs
  700 
  800  Glass and wax items
  900  Carpentry items and carts
   50  Ships
 
-1000  System objects
+1000  System objects, hobby archetypes
 1100  Magic/Sorcery/Vampire skill items
 1200  Herbs, potions, and poisons
 1300  Fishing and misc crafts
   50  Skins, leather, and wool
 1400  Paints and paint recipes
+1500  Unlockable hobby archetypes
 
 2000  Sewing items
 2100  Primitive gear, forge, and low leather items
@@ -113,6 +114,7 @@ Included Adventure Zones
 [12000] Binding Circle: Anat [12000-12029] (225-325) 5 mobs, 22 objs, 1 room
 [12030] Binding Circle: Ba'al Hadad [12030-12059] (225-325) 5 mobs, 25 objs, 2 rooms
 [12300] Fur Dragon [12300-12349] (225-325) 5 mobs, 40 objs, 1 room
+[12350] Hoarfrost Serragon [12350-12399] (100-200) 9 mobs, 21 objs, 2 rooms
 [12400] The Golden Goblin [12400-12499] (50-150) 24 mobs, 62 objs, 21 rooms
 [12500] Clockwork Colossus [12500-12599] (100-200) 13 mobs, 62 objs, 8 rooms
 [12600] Elemental Escape [12600-12624] (1-25) 11 mobs, 18 objs, 1 room

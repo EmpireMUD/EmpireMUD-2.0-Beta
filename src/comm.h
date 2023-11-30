@@ -31,6 +31,7 @@ void send_to_outdoor(bool weather, const char *messg, ...) __attribute__((format
 void send_stacked_msgs(descriptor_data *desc);
 void stack_msg_to_desc(descriptor_data *desc, const char *messg, ...);
 void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg);
+const char *telnet_go_ahead(descriptor_data *desc);
 void perform_to_all(const char *messg, char_data *ch);
 char *replace_prompt_codes(char_data *ch, char *str);
 char *prompt_color_by_prc(int cur, int max);

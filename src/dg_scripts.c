@@ -2959,6 +2959,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "add_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							archetype_data *arch = archetype_proto(atoi(subfield));
+							if (arch && ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+								add_unlocked_archetype(c, GET_ARCH_VNUM(arch));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid archetype: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
 					else if (!str_cmp(field, "adventure_summoned_from")) {
 						room_data *find;
 						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED) && (find = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(c)))) {
@@ -3353,6 +3366,52 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					
+					else if (!str_cmp(field, "coins")) {
+						empire_data *coin_emp;
+						struct coin_data *coin;
+						int total;
+						
+						if (IS_NPC(c)) {
+							// no coins
+							snprintf(str, slen, "0");
+						}
+						else if (subfield && (isdigit(*subfield) || *subfield == '-')) {
+							// numeric subfield
+							if (atoi(subfield) > 0) {
+								if ((coin_emp = real_empire(atoi(subfield))) && (coin = find_coin_entry(GET_PLAYER_COINS(c), coin_emp))) {
+									snprintf(str, slen, "%d", coin->amount);
+								}
+								else {
+									// empire not found, thus coins not found
+									snprintf(str, slen, "0");
+								}
+							}
+							else if (!strcmp(subfield, "-1") || (isdigit(*subfield) && atoi(subfield) == 0)) {
+								// misc coins
+								coin = find_coin_entry(GET_PLAYER_COINS(c), REAL_OTHER_COIN);
+								snprintf(str, slen, "%d", coin ? coin->amount : 0);
+							}
+						}
+						else if (subfield && *subfield) {
+							// non-numeric subfield
+							if ((coin_emp = get_empire(subfield)) && (coin = find_coin_entry(GET_PLAYER_COINS(c), coin_emp))) {
+								snprintf(str, slen, "%d", coin->amount);
+							}
+							else {
+								// empire not found, thus coins not found
+								snprintf(str, slen, "0");
+							}
+						}
+						else {	// empty subfield: total coins
+							total = 0;
+							LL_FOREACH(GET_PLAYER_COINS(c), coin) {
+								SAFE_ADD(total, coin->amount, 0, INT_MAX, FALSE);
+							}
+							snprintf(str, slen, "%d", total);
+						}
+					}
+					
 					else if (!str_cmp(field, "command_lag")) {
 						// true/false if the character is in a "wait", OR sets a wait
 						int wait_type;
@@ -3364,7 +3423,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
-							if (!IS_NPC(c) && has_completed_quest(c, vnum, NOTHING)) {
+							if (!IS_NPC(c) && has_completed_quest_any(c, vnum)) {
 								strcpy(str, "1");
 							}
 							else {
@@ -3829,6 +3888,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							snprintf(str, slen, "0");	// no vnum provided
+						}
+					}
+					else if (!str_cmp(field, "has_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_unlocked_archetype(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
 						}
 					}
 					
@@ -4396,6 +4463,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "remove_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							remove_unlocked_archetype(c, atoi(subfield));
+						}
+						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "resist_magical")) {
 						snprintf(str, slen, "%d", GET_RESIST_MAGICAL(c));

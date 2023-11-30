@@ -1011,6 +1011,7 @@ password       PC      STRING       Change password
 sex            BOTH    MISC         Person's sex
 skill          PC      MISC         Changes a skill level
 title          PC      STRING       Player's title
+unlockedarchetype  PC  MISC         Add or remove an unlocked archetype
 vampire        PC      BINARY       Makes/unmakes vampires
 
 blood          BOTH    NUMBER       Current blood
@@ -1167,19 +1168,20 @@ progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 resource   Immort   Shows stats on an item based on global empire storage.
+sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 shops      Immort   Shows any shops available in your current location.
 skills     Immort   Shows skill levels and abilities for a player.
+smessages  Immort   Shows a player's status message toggles.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
-sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
-smessages  Immort   Shows a player's status message toggles.
 terrain    Immort   Same as 'sectors' (for historical reasons).
 tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
+unlockedarchetypes Immrt  Shows unlocked archetypes for a player's account.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
@@ -1551,6 +1553,17 @@ or progression goal that grants them.
 
 Warning: If a craft recipe is given by a script, this command will still show
 it as unlearnable.
+#e
+"SHOW UNLOCKED ARCHETYPES" "SHOW UNLOCKEDARCHETYPES" "UNLOCKED ARCHETYPES"
+
+Usage:  show unlockedarchetypes <player> [keywords]
+
+Shows which archetypes a player has unlocked for their account. These allow the
+player to choose those archetypes during character creation.
+
+Immortals can use the set command to give or take away unlocked archetypes.
+
+See also: SHOW
 #e
 "SHOW USES"
 

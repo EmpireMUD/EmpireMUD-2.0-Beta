@@ -14,7 +14,7 @@ An EmpireMUD could choose to use classes by adding some new ones in OLC.
 Players will automatically be assigned any class that matches their skills,
 but the class is not currently displayed anywhere.
 #
-ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS" ORIGIN HOBBY
+ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS" ORIGIN ORIGINS HOBBY HOBBIES
 
 All player characters start with some gear, low attributes, and at least 30
 skill points. Generally, one attribute will be 3, two will be 1, and the rest
@@ -24,6 +24,9 @@ any meaningful way.
 There are two types of archetypes:
 - Origins: Your character's background and upbringing.
 - Hobbies: Bonus skills for your character.
+
+More archetypes can be unlocked through gameplay. Once unlocked, they can be
+used on any future characters you create on the same account.
 #
 BUFF "BUFF ROLE" "BUFFS ROLE" "BUFFER ROLE"
 

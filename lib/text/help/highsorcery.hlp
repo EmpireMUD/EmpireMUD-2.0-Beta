@@ -382,12 +382,15 @@ Usage:  ritual detection
 Cost:  15 mana
 
 This ability finds all players currently in your city, whether hidden, earth-
-melded, invisible, or any other condition. This ability only works inside of a
-city owned by your empire.
+melded, invisible, or any other condition. It can also find some adventures.
+This ability only works inside of a city owned by your empire.
+
+This can also detect players outside (but near) the city (up to your "where"
+range) and some adventures near the city (up to your base "nearby" range).
 
 Gains experience when you complete the ritual.
 
-See also: RITUAL
+See also: RITUAL, NEARBY, WHERE
 #
 "RITUAL OF SENSE LIFE" "SENSE LIFE RITUAL"
 

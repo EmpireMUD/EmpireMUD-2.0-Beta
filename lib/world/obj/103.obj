@@ -593,4 +593,49 @@ A
 A
 2 1 0
 S
+#10370
+box unusual long middle~
+the unusual box~
+A long box takes up most of the floor space.~
+   This single wooden box takes up most of the spare floor space. It's at least
+as long as you are tall, and a little over two feet wide. It's the only thing
+in here that isn't covered in dust.
+~
+3 p 0 0 0 6
+0 0 0
+0 24
+C
+1 1
+T 10370
+T 10373
+S
+#10371
+boards pile middle~
+a pile of boards~
+There is a pile of boards in the middle of the room.~
+   A pile of boards lies in the middle of the floor. Some of them are still
+attached to each other by cross-boards but if this was a box, it wasn't a very
+good one.
+~
+3 0 0 0 0 3
+0 0 0
+0 0
+C
+1 1
+T 10371
+S
+#10372
+whistle rat winged minipet~
+a winged rat minipet whistle~
+A winged rat minipet whistle is lying here.~
+   The whistle is a long hollow bone with a pair of holes carved in the top of
+it. You can 'use' it to gain a winged rat as a minipet.
+   Nobody knows how the rat got wings, but it seems to enjoy them.
+~
+19 p a 0 0 12
+10372 0 0
+14 0
+C
+1 1
+S
 $
