@@ -2289,6 +2289,7 @@ int new_descriptor(int s) {
 	struct hostent *from;
 	bool slow_ip;
 	time_t when;
+	char buf[MAX_STRING_LENGTH];
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -2365,7 +2366,8 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	SEND_TO_Q(intro_screens[number(0, num_intro_screens-1)], newd);
+	snprintf(buf, sizeof(buf), "%s%c%c", intro_screens[number(0, num_intro_screens-1)], IAC, GA);
+	SEND_TO_Q(buf, newd);
 
 	return (0);
 }

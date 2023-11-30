@@ -24,6 +24,7 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "telnet.h"
 
 /**
 * Contents:
@@ -1831,8 +1832,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	char buf[MAX_STRING_LENGTH];
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1840,7 +1839,7 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
 			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);
 			SEND_TO_Q("HELP SCREEN READER once you're in the game for more information.\r\n", d);
-			SEND_TO_Q("\r\nAre you using a screen reader (y/n)? ", d);
+			msg_to_desc(d, "\r\nAre you using a screen reader (y/n)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_Q_HAS_ALT: {
@@ -1850,27 +1849,26 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("your characters together so that the game can process you as the same person.\r\n", d);
 			SEND_TO_Q("Other players will NOT be informed who your alts are. Only immortals will know.\r\n", d);
 			SEND_TO_Q("\r\n", d);
-			SEND_TO_Q("Do you have an existing character (y/n)? ", d);
+			msg_to_desc(d, "Do you have an existing character (y/n)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_Q_ALT_NAME: {
-			SEND_TO_Q("\r\nEnter the name of any one of your other characters (leave blank to cancel): ", d);
+			msg_to_desc(d, "\r\nEnter the name of any one of your other characters (leave blank to cancel): %c%c", IAC, GA);
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			SEND_TO_Q("\r\nEnter the password for that character: ", d);
+			msg_to_desc(d, "\r\nEnter the password for that character: %c%c", IAC, GA);
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
-			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
-			SEND_TO_Q(buf, d);
+			msg_to_desc(d, "Give me a password for %s: %c%c", GET_PC_NAME(d->character), IAC, GA);
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
-			SEND_TO_Q("\r\n\r\nPlease retype password: ", d);
+			msg_to_desc(d, "\r\n\r\nPlease retype password: %c%c", IAC, GA);
 			break;
 		}
 		case CON_QLAST_NAME: {
@@ -1880,7 +1878,7 @@ void prompt_creation(descriptor_data *d) {
 				break;
 			}
 			
-			SEND_TO_Q("\r\n\r\nWould you like a last name (y/n)? ", d);
+			msg_to_desc(d, "\r\n\r\nWould you like a last name (y/n)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_SLAST_NAME: {
@@ -1888,15 +1886,15 @@ void prompt_creation(descriptor_data *d) {
 			if (rules && *rules) {
 				msg_to_desc(d, "\r\n%s", rules);
 			}
-			SEND_TO_Q("\r\nEnter your last name: ", d);
+			msg_to_desc(d, "\r\nEnter your last name: %c%c", IAC, GA);
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? %c%c", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "", IAC, GA);
 			break;
 		}
 		case CON_QSEX: {
-			SEND_TO_Q("\r\nWhat is your sex (M/F)? ", d);
+			msg_to_desc(d, "\r\nWhat is your sex (M/F)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -1928,20 +1926,20 @@ void prompt_creation(descriptor_data *d) {
 				}
 			}
 			
-			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
+			msg_to_desc(d, "\r\nIs this correct (y/n)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_PROMO_CODE: {
-			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);
+			msg_to_desc(d, "\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > %c%c", IAC, GA);
 			break;
 		}
 		case CON_CONFIRM_PROMO_CODE: {
-			SEND_TO_Q("\r\nUnknown promo code. Proceed without one (y/n)? ", d);
+			msg_to_desc(d, "\r\nUnknown promo code. Proceed without one (y/n)? %c%c", IAC, GA);
 			break;
 		}
 		case CON_REFERRAL: {
 			if (!GET_REFERRED_BY(d->character)) {
-				SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+				msg_to_desc(d, "\r\nWhere did you hear about us (optional, but please mention which website or friend): %c%c", IAC, GA);
 			}
 			else {
 				next_creation_step(d);
@@ -1949,7 +1947,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_FINISH_CREATION: {
-			SEND_TO_Q("\r\n*** Press ENTER: ", d);
+			msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
 			break;
 		}
 		case CON_BONUS_TRAIT: {
@@ -1959,7 +1957,7 @@ void prompt_creation(descriptor_data *d) {
 			else if (GET_ACCESS_LEVEL(d->character) > 0) {
 				// existing: send player to game
 				send_login_motd(d, GET_BAD_PWS(d->character));
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
 				STATE(d) = CON_RMOTD;
 			}
 			else {
@@ -2009,7 +2007,7 @@ void process_alt_name(descriptor_data *d, char *arg) {
 		next_creation_step(d);
 	}
 	else {
-		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: ", arg);
+		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: %c%c", arg, IAC, GA);
 	}
 }
 
@@ -2036,7 +2034,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 				STATE(d) = CON_CLOSE;
 			}
 			else {
-				SEND_TO_Q("Wrong password.\r\nPassword: ", d);
+				msg_to_desc(d, "Wrong password.\r\nPassword: %c%c", IAC, GA);
 				ProtocolNoEcho(d, true);
 			}
 		}
@@ -2079,7 +2077,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 		// state was set above
 	}
 	else {
-		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: ");
+		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: %c%c", IAC, GA);
 	}
 }
 
@@ -2157,7 +2155,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, "%2d. %s%s\r\n", ++count, bonus_bit_descriptions[iter], (HAS_BONUS_TRAIT(ch, BIT(iter)) ? " &g(already chosen)&0" : ""));
 	}
 	
-	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > ");
+	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > %c%c", IAC, GA);
 }
 
 
@@ -2470,12 +2468,12 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			else if (!str_cmp(arg, "new")) {
 				// special case for players who typed "new"
-				SEND_TO_Q("\r\nEnter new character name: ", d);
+				msg_to_desc(d, "\r\nEnter new character name: %c%c", IAC, GA);
 				return;
 			}
 			else {
 				if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name) || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
+					msg_to_desc(d, "Invalid name, please try another.\r\nName: %c%c", IAC, GA);
 					return;
 				}
 				if ((temp_char = load_player(tmp_name, TRUE))) {
@@ -2490,7 +2488,7 @@ void nanny(descriptor_data *d, char *arg) {
 					// flush messages because updated items appear here
 					send_stacked_msgs(d);
 					
-					SEND_TO_Q("Password: ", d);
+					msg_to_desc(d, "Password: %c%c", IAC, GA);
 					ProtocolNoEcho(d, true);
 					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
@@ -2501,7 +2499,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 					/* Check for multiple creations of a character. */
 					if (!Valid_Name(tmp_name)) {
-						SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
+						msg_to_desc(d, "Invalid name, please try another.\r\nName: %c%c", IAC, GA);
 						return;
 					}
 					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
@@ -2547,7 +2545,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_GET_NAME;
 			}
 			else {
-				SEND_TO_Q("Please type Yes or No: ", d);
+				msg_to_desc(d, "Please type Yes or No: %c%c", IAC, GA);
 			}
 			break;
 		}
@@ -2581,7 +2579,7 @@ void nanny(descriptor_data *d, char *arg) {
 						STATE(d) = CON_CLOSE;
 					}
 					else {
-						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
+						msg_to_desc(d, "Wrong password.\r\nPassword: %c%c", IAC, GA);
 					}
 					return;
 				}
@@ -2650,7 +2648,7 @@ void nanny(descriptor_data *d, char *arg) {
 				send_login_motd(d, load_result);
 				
 				// send on to motd
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
 				STATE(d) = CON_RMOTD;
 			}
 			break;
@@ -2659,7 +2657,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_NEWPASSWD: {
 			if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 || !str_cmp(arg, GET_PC_NAME(d->character))) {
 				SEND_TO_Q("\r\nIllegal password.\r\n", d);
-				SEND_TO_Q("Password: ", d);
+				msg_to_desc(d, "Password: %c%c", IAC, GA);
 				return;
 			}
 			
@@ -2671,7 +2669,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_CNFPASSWD: {
 			if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
 				SEND_TO_Q("\r\nPasswords don't match... start over.\r\n", d);
-				SEND_TO_Q("Password: ", d);
+				msg_to_desc(d, "Password: %c%c", IAC, GA);
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
@@ -2690,7 +2688,7 @@ void nanny(descriptor_data *d, char *arg) {
 				break;
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
 			}
 			
 			break;
@@ -2706,7 +2704,7 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
 			}
 			break;
 		}
@@ -2719,7 +2717,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
 			}
 			break;
 		}
@@ -2736,12 +2734,12 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_SLAST_NAME: {	/* What's yer last name? */
 			if (!*arg) {
-				SEND_TO_Q("\r\nEnter a last name: ", d);
+				msg_to_desc(d, "\r\nEnter a last name: %c%c", IAC, GA);
 				return;
 			}
 			else if ((_parse_name(arg, tmp_name)) || !Valid_Name(tmp_name) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-				SEND_TO_Q("\r\nInvalid last name, please try another.\r\n"
-						  "Enter a last name: ", d);
+				msg_to_desc(d, "\r\nInvalid last name, please try another.\r\n"
+						  "Enter a last name: %c%c", IAC, GA);
 				return;
 			}
 			else {
@@ -2764,7 +2762,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_SLAST_NAME;
 			}
 			else {
-				SEND_TO_Q("Please type Yes or No: ", d);
+				msg_to_desc(d, "Please type Yes or No: %c%c", IAC, GA);
 			}
 			break;
 		}
@@ -2812,7 +2810,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			send_login_motd(d, GET_BAD_PWS(d->character));
 			
-			SEND_TO_Q("\r\n*** Press ENTER: ", d);
+			msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
 			STATE(d) = CON_RMOTD;
 
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (promo: %s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "none");
@@ -2835,7 +2833,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type YES or NO: ");
+				msg_to_desc(d, "\r\nPlease type YES or NO: %c%c", IAC, GA);
 			}
 			break;
 		}
@@ -2881,7 +2879,7 @@ void nanny(descriptor_data *d, char *arg) {
 					break;
 				}
 				default: {
-					SEND_TO_Q("Please type YES or NO: ", d);
+					msg_to_desc(d, "Please type YES or NO: %c%c", IAC, GA);
 					return;
 				}
 			}
@@ -2905,7 +2903,7 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("member in charge of authorization. When you are able to log into the mud,\r\n", d);
 				SEND_TO_Q("type HELP AUTHORIZATION for the appropriate e-mail address, or contact the\r\n", d);
 				SEND_TO_Q("staff member via the game.\r\n", d);
-				SEND_TO_Q("\r\nPress ENTER to continue: ", d);
+				msg_to_desc(d, "\r\nPress ENTER to continue: %c%c", IAC, GA);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
 				
 				STATE(d) = CON_GOODBYE;
@@ -3016,7 +3014,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if ((i = atoi(arg)) < 1 || i > NUM_BONUS_TRAITS) {
-					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %c%c", IAC, GA);
 					return;
 				}
 				
@@ -3047,12 +3045,12 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if (!bit) {
-					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %c%c", IAC, GA);
 					return;
 				}
 				
 				if (HAS_BONUS_TRAIT(d->character, bit)) {
-					SEND_TO_Q("\r\nYou already have that trait! Try again > ", d);
+					msg_to_desc(d, "\r\nYou already have that trait! Try again > %c%c", IAC, GA);
 					return;
 				}
 			
@@ -3076,7 +3074,7 @@ void nanny(descriptor_data *d, char *arg) {
 				// now send them to the motd
 				send_login_motd(d, GET_BAD_PWS(d->character));
 				
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
 				STATE(d) = CON_RMOTD;
 			}
 			else {
