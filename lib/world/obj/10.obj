@@ -69,4 +69,23 @@ C
 Q 1502
 T 1502
 S
+#1012
+stone peeping blood-red bloodred red~
+a blood-red peeping stone~
+A blood-red peeping stone is lying here.~
+   The odd gem is no larger than your eyeball, flat, and blood-red. It isn't
+cold, nor is it warm. It doesn't feel like anything in your hand. When you hold
+it up to your eye, people take on a faint outline.
+   Type 'peep <person>' to find the right citizen to become your minion. Once
+you find them, type 'minionize <person>' to complete the process.
+   Many vampires find a loyal minion crucial for survival
+~
+3 p a 0 0 3
+0 0 0
+12 0
+C
+1 1
+Q 1503
+T 1503
+S
 $

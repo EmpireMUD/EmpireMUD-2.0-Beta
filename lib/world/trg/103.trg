@@ -293,11 +293,13 @@ end
 while %vampire%
   wait 300 s
   set vampire %self.room.people(10370)%
-  if %vampire% && !%vampire.fighting%
-    if !%vampire.aff_flagged(!SEE)%
-      %echo% ~%vampire% leaves.
+  if %vampire%
+    if !%vampire.fighting%
+      if !%vampire.aff_flagged(!SEE)%
+        %echo% ~%vampire% leaves.
+      end
+      %purge% %vampire%
     end
-    %purge% %vampire%
   end
 done
 ~

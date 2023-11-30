@@ -160,21 +160,50 @@ Z
 S
 #1503
 Vampire: A Legacy in Crimson~
-tba
+   You exchange pleasantries with the vampire and share your condolences over
+being trapped in the tiny store room during the day.
+   'If only I hadn't lost my minion', the vampire laments. 'What's that? You
+don't have one? How will you ever establish your legacy without a minion? Here,
+take this spare peeping stone. It'll help you find the perfect minion. Of
+course, if you really want to be a powerful vampire, you also need to
+demonstrate power over our greatest enemy: the sun. Ever caused an eclipse
+yourself? I managed it once. A truly difficult ritual. But it's the only path
+to greatness. That, and a good minion.'
+   The vampire hands you a blood-red stone and gives you a brief description of
+its use. It seems it can transform an ordinary citizen into the perfect minion.
+Use it to 'peep <citizen>' until you find the right one, then type 'minionize
+<citizen>' to transform them into your own personal minion!
+   To cement your legacy, perform the following:
+   1. Master your vampire powers,
+   2. Reach level 100,
+   3. Complete the Eclipse Ritual, and, most importantly,
+   4. Find yourself a dark minion using the peeping stone
 ~
-tba
+   'Yes, m'lord,' your minion says. 'Your legacy is secure.'
 ~
-5 adf 100 0 -1
+7 f 100 0 -1
+A
+1 10370
 P
 9 7 0 51 -
 R
 14 1503 1500
 R
 14 506 500
+T 1506
 W
 9 7 0 100 a
 W
 39 0 0 100 a
+W
+0 10156 0 1 a
+W
+0 10157 0 1 a
+W+
+11 0 0 1 a
+Find a citizen to become your dark minion~
+Z
+1 550
 S
 #1504
 Battle: Campaign of Triumphs~

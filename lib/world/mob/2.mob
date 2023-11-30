@@ -882,7 +882,7 @@ This citizen is shearing wool. (workforce shearing)
 ~
 S
 #269
-maker coinmaker #n~
+#n maker coinmaker~
 #n the coin maker~
 #n is working the coin mill.
 ~
@@ -893,7 +893,7 @@ This citizen is minting coins at the mill. (workforce minting)
 ~
 S
 #270
-dockworker worker #n~
+#n dockworker worker~
 dockworker #n~
 #n is moving crates around the docks.
 ~
@@ -937,7 +937,7 @@ This citizen is fixing up a vehicle. (workforce repair-vehicles)
 ~
 S
 #274
-overseer #n~
+#n overseer~
 Overseer #n~
 Overseer #n is standing here.
 ~
