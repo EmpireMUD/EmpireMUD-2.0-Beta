@@ -2959,6 +2959,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "add_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							archetype_data *arch = archetype_proto(atoi(subfield));
+							if (arch && ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+								add_unlocked_archetype(c, GET_ARCH_VNUM(arch));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid archetype: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
 					else if (!str_cmp(field, "adventure_summoned_from")) {
 						room_data *find;
 						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED) && (find = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(c)))) {
@@ -3877,6 +3890,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
+					else if (!str_cmp(field, "has_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_unlocked_archetype(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					
 					else if (!str_cmp(field, "hisher"))
 						snprintf(str, slen, "%s", HSHR(c));
@@ -4442,6 +4463,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "remove_unlocked_archetype")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							remove_unlocked_archetype(c, atoi(subfield));
+						}
+						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "resist_magical")) {
 						snprintf(str, slen, "%d", GET_RESIST_MAGICAL(c));
