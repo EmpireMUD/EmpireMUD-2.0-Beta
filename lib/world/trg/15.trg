@@ -115,7 +115,7 @@ elseif minionize /= %cmd%
       set name %target.alias.car%
       %mod% %minion% sex %target.sex%
       %mod% %minion% keywords %name% dark minion
-      %mod% %minion% shortdesc %name%
+      %mod% %minion% shortdesc Dark %name%
       %mod% %minion% longdesc %name% stands here, tapping %target.hisher% fingers.
       %mod% %minion% lookdesc %name% has a strange pallor and an odd habit about %target.himher%.
       * messaging
