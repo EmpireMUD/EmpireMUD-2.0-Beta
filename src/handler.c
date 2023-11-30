@@ -8517,6 +8517,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_COMPLETED_QUEST_EVER: {
+				if (!has_completed_quest_any(ch, req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
 			case REQ_GET_CURRENCY: {
 				if (get_currency(ch, req->vnum) < req->needed) {
 					ok = FALSE;
@@ -8833,7 +8839,8 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 	
 	// REQ_x
 	switch (req->type) {
-		case REQ_COMPLETED_QUEST: {
+		case REQ_COMPLETED_QUEST:	// both the same
+		case REQ_COMPLETED_QUEST_EVER: {
 			snprintf(output, sizeof(output), "Complete quest: %s%s", vnum, get_quest_name_by_proto(req->vnum));
 			break;
 		}

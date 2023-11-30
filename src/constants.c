@@ -4738,6 +4738,7 @@ const char *requirement_types[] = {
 	"OWN-VEHICLE-FUNCTION",	// 40
 	"SPEAK-LANGUAGE",
 	"RECOGNIZE-LANGUAGE",
+	"COMPLETED-QUEST-EVER",
 	"\n",
 };
 

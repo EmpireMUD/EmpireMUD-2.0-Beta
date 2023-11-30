@@ -3410,7 +3410,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
-							if (!IS_NPC(c) && has_completed_quest(c, vnum, NOTHING)) {
+							if (!IS_NPC(c) && has_completed_quest_any(c, vnum)) {
 								strcpy(str, "1");
 							}
 							else {

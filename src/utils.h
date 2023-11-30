@@ -2471,6 +2471,7 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool
 void get_tracker_display(struct req_data *tracker, char *save_buffer);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
+struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
 char *quest_giver_string(struct quest_giver *giver, bool show_vnums);

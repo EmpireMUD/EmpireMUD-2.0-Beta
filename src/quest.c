@@ -47,7 +47,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
@@ -1047,6 +1046,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 		switch (task->type) {
 			case REQ_COMPLETED_QUEST: {
 				task->current = has_completed_quest(ch, task->vnum, pq->instance_id) ? task->needed : 0;
+				break;
+			}
+			case REQ_COMPLETED_QUEST_EVER: {
+				task->current = has_completed_quest_any(ch, task->vnum) ? task->needed : 0;
 				break;
 			}
 			case REQ_GET_COMPONENT: {
@@ -3215,6 +3218,9 @@ void qt_quest_completed(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = task->needed;
 			}
+			else if (task->type == REQ_COMPLETED_QUEST_EVER && task->vnum == vnum) {
+				task->current = task->needed;
+			}
 			else if (task->type == REQ_NOT_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = 0;
 			}
@@ -3799,6 +3805,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -3815,7 +3822,9 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -3851,6 +3860,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5027,6 +5037,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5042,7 +5053,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
 		// REQ_x, QR_x: quest types
 		found = delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -5074,6 +5087,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5098,6 +5112,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5109,7 +5124,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_ON_QUEST, vnum);
@@ -5135,6 +5152,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_SOCIAL(desc)) {
 			// REQ_x: quest types
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_ON_QUEST, vnum);
 			

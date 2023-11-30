@@ -5606,6 +5606,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	// REQ_x: determine which args we need
 	switch (type) {
 		case REQ_COMPLETED_QUEST:
+		case REQ_COMPLETED_QUEST_EVER:
 		case REQ_NOT_COMPLETED_QUEST:
 		case REQ_NOT_ON_QUEST: {
 			need_quest = TRUE;
