@@ -3458,8 +3458,10 @@ ACMD(do_prompt) {
 	}
 
 	if (!*argument) {
-		sprintf(buf, "Your %s is currently: %s\r\n", types[subcmd], (*prompt ? show_color_codes(*prompt) : "n/a"));
-		send_to_char(buf, ch);
+		msg_to_char(ch, "Your %s is currently: %s\r\n", types[subcmd], (*prompt ? show_color_codes(*prompt) : "n/a"));
+		if (!SHOW_STATUS_MESSAGES(ch, SM_PROMPT)) {
+			msg_to_char(ch, "(Use 'smessages prompt' to turn your prompt back on.)\r\n");
+		}
 		return;
 	}
 
@@ -3482,6 +3484,9 @@ ACMD(do_prompt) {
 		}
 		*prompt = NULL;	// restores default prompt
 		send_config_msg(ch, "ok_string");
+		if (!SHOW_STATUS_MESSAGES(ch, SM_PROMPT)) {
+			msg_to_char(ch, "(Use 'smessages prompt' to turn your prompt back on.)\r\n");
+		}
 	}
 	else {
 		if (*prompt) {
@@ -3489,8 +3494,10 @@ ACMD(do_prompt) {
 		}
 		*prompt = str_dup(argument);
 
-		sprintf(buf, "Okay, set your %s to: %s\r\n", types[subcmd], show_color_codes(*prompt));
-		send_to_char(buf, ch);
+		msg_to_char(ch, "Okay, set your %s to: %s\r\n", types[subcmd], show_color_codes(*prompt));
+		if (!SHOW_STATUS_MESSAGES(ch, SM_PROMPT)) {
+			msg_to_char(ch, "(Use 'smessages prompt' to turn your prompt back on.)\r\n");
+		}
 	}
 }
 
