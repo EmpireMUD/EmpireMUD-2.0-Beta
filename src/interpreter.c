@@ -1969,6 +1969,9 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 	}
+	
+	// ensure screen readers know they can type
+	send_telnet_go_ahead(d);
 }
 
 

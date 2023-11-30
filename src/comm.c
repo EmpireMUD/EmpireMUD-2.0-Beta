@@ -1555,6 +1555,20 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 }
 
+
+/**
+* Informs the client they can go ahead. Screen readers may require this to show
+* a line that wasn't terminated with a crlf (e.g. a prompt). This sends IAC GA
+*
+* @param descriptor_data *desc The descriptor to send the go-ahead to.
+*/
+void send_telnet_go_ahead(descriptor_data *desc) {
+	if (desc) {
+		msg_to_desc(desc, "%c%c", IAC, GA);
+	}
+}
+
+
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
 void send_to_char(const char *messg, char_data *ch) {
 	if (ch->desc && messg)
@@ -2747,6 +2761,7 @@ int process_input(descriptor_data *t) {
 static int process_output(descriptor_data *t) {
 	char i[MAX_SOCK_BUF], *osb = i + 2;
 	int result;
+	bool sent_prompt = FALSE;
 
 	/* we may need this \r\n for later -- see below */
 	strcpy(i, "\r\n");	/* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
@@ -2776,6 +2791,7 @@ static int process_output(descriptor_data *t) {
 		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
+		sent_prompt = TRUE;
 	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
@@ -2795,8 +2811,13 @@ static int process_output(descriptor_data *t) {
 		close_socket(t);
 		return (-1);
 	}
-	else if (result == 0)	/* Socket buffer full. Try later. */
+	else if (result == 0) {	/* Socket buffer full. Try later. */
 		return (0);
+	}
+	
+	if (sent_prompt) {
+		send_telnet_go_ahead(t);
+	}
 
 	/* Handle snooping: prepend "% " and send to snooper. */
 	if (t->snoop_by && *t->output) {
@@ -3895,6 +3916,7 @@ void game_loop(socket_t mother_desc) {
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;
+					send_telnet_go_ahead(d);
 				}
 			}
 		}
