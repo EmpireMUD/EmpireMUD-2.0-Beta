@@ -2921,7 +2921,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_GOODBYE;
 				return;
 			}
-			else if (IS_APPROVED(d->character) && has_anonymous_host(d)) {
+			else if (IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
 				SEND_TO_Q("\r\n\033[31mAccess Denied: Anonymous public host detected\033[0m\r\n", d);
 				SEND_TO_Q("This game does not allow existing 'approved' characters to log in from public\r\n", d);
 				SEND_TO_Q("hosts (such as Mudconnector) that do not provide your IP address. You can only\r\n", d);
