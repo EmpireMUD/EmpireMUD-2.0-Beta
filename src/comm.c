@@ -1563,8 +1563,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 * @param descriptor_data *desc The descriptor to send the go-ahead to.
 */
 void send_telnet_go_ahead(descriptor_data *desc) {
+	char msg[3] = { IAC, GA, '\0' };
 	if (desc) {
-		msg_to_desc(desc, "%c%c", IAC, GA);
+		SEND_TO_Q(msg, desc);
 	}
 }
 
