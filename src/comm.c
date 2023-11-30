@@ -1068,8 +1068,9 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 				if (IS_SET(act_flags, TO_NOT_IGNORING) && is_ignoring(to, ch)) {
 					continue;
 				}
-				if (hide_invisible && ch && !CAN_SEE(to, ch))
+				if (hide_invisible && ch && (AFF_FLAGGED(ch, AFF_NO_SEE_IN_ROOM) || !CAN_SEE(to, ch))) {
 					continue;
+				}
 				if (IS_SET(act_flags, TO_NOTVICT) && to == vict_obj)
 					continue;
 				if (ch && !WIZHIDE_OK(to, ch)) {
