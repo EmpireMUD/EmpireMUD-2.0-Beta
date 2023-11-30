@@ -1845,8 +1845,8 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_Q_HAS_ALT: {
 			SEND_TO_Q("\r\n&cMultiple characters and Alts:&0\r\n", d);
-			SEND_TO_Q("If you have an existing character on this game, you must link this new char-\r\n", d);
-			SEND_TO_Q("acter to your other one. This is not optional. We require that you link all\r\n", d);
+			SEND_TO_Q("If you have an existing character on this game, you must link this new\r\n", d);
+			SEND_TO_Q("character to your other one. This is not optional. We require that you link all\r\n", d);
 			SEND_TO_Q("your characters together so that the game can process you as the same person.\r\n", d);
 			SEND_TO_Q("Other players will NOT be informed who your alts are. Only immortals will know.\r\n", d);
 			SEND_TO_Q("\r\n", d);
