@@ -1098,4 +1098,17 @@ if %selected_ability%
   halt
 end
 ~
+#550
+Dark Minion: Rescale on load~
+0 n 100
+~
+set actor %self.leader%
+if %actor%
+  set skill %actor.skill(Vampire)%
+  if %skill% < 100
+    %scale% %self% %skill%
+    %restore% %self%
+  end
+end
+~
 $
