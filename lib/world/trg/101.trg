@@ -1367,7 +1367,7 @@ if (!(eclipse /= %arg%) || %actor.position% != Standing)
 end
 set room %actor.room%
 * Check time of day (only at start to avoid sunset annoyances)
-if %room.time(hour)% < 7 || %room.time(hour)% > 19
+if %room.sun% != light
   %send% %actor% You can only perform this ritual during the day.
   halt
 end
