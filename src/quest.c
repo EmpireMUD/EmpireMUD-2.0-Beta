@@ -87,7 +87,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_MOBILE: {
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
-					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
+					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob) && !AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 						*giver_emp = GET_LOYALTY(mob);
 						return TRUE;
 					}
@@ -1746,7 +1746,7 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	bool any = FALSE;
 	bool dailies, event_dailies;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
@@ -2029,7 +2029,7 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 	int complete, total;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
