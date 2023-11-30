@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "constants.h"
+#include "telnet.h"
 
 /**
 * Contents:
