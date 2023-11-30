@@ -24,7 +24,6 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "constants.h"
-#include "telnet.h"
 
 /**
 * Contents:
@@ -1839,7 +1838,7 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
 			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);
 			SEND_TO_Q("HELP SCREEN READER once you're in the game for more information.\r\n", d);
-			msg_to_desc(d, "\r\nAre you using a screen reader (y/n)? %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nAre you using a screen reader (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_HAS_ALT: {
@@ -1849,26 +1848,26 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("your characters together so that the game can process you as the same person.\r\n", d);
 			SEND_TO_Q("Other players will NOT be informed who your alts are. Only immortals will know.\r\n", d);
 			SEND_TO_Q("\r\n", d);
-			msg_to_desc(d, "Do you have an existing character (y/n)? %c%c", IAC, GA);
+			msg_to_desc(d, "Do you have an existing character (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ALT_NAME: {
-			msg_to_desc(d, "\r\nEnter the name of any one of your other characters (leave blank to cancel): %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nEnter the name of any one of your other characters (leave blank to cancel): %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			msg_to_desc(d, "\r\nEnter the password for that character: %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nEnter the password for that character: %s", telnet_go_ahead(d));
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
-			msg_to_desc(d, "Give me a password for %s: %c%c", GET_PC_NAME(d->character), IAC, GA);
+			msg_to_desc(d, "Give me a password for %s: %s", GET_PC_NAME(d->character), telnet_go_ahead(d));
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
-			msg_to_desc(d, "\r\n\r\nPlease retype password: %c%c", IAC, GA);
+			msg_to_desc(d, "\r\n\r\nPlease retype password: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_QLAST_NAME: {
@@ -1878,7 +1877,7 @@ void prompt_creation(descriptor_data *d) {
 				break;
 			}
 			
-			msg_to_desc(d, "\r\n\r\nWould you like a last name (y/n)? %c%c", IAC, GA);
+			msg_to_desc(d, "\r\n\r\nWould you like a last name (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_SLAST_NAME: {
@@ -1886,15 +1885,15 @@ void prompt_creation(descriptor_data *d) {
 			if (rules && *rules) {
 				msg_to_desc(d, "\r\n%s", rules);
 			}
-			msg_to_desc(d, "\r\nEnter your last name: %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nEnter your last name: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? %c%c", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "", IAC, GA);
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? %s", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "", telnet_go_ahead(d));
 			break;
 		}
 		case CON_QSEX: {
-			msg_to_desc(d, "\r\nWhat is your sex (M/F)? %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nWhat is your sex (M/F)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -1926,20 +1925,20 @@ void prompt_creation(descriptor_data *d) {
 				}
 			}
 			
-			msg_to_desc(d, "\r\nIs this correct (y/n)? %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nIs this correct (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_PROMO_CODE: {
-			msg_to_desc(d, "\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_CONFIRM_PROMO_CODE: {
-			msg_to_desc(d, "\r\nUnknown promo code. Proceed without one (y/n)? %c%c", IAC, GA);
+			msg_to_desc(d, "\r\nUnknown promo code. Proceed without one (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_REFERRAL: {
 			if (!GET_REFERRED_BY(d->character)) {
-				msg_to_desc(d, "\r\nWhere did you hear about us (optional, but please mention which website or friend): %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nWhere did you hear about us (optional, but please mention which website or friend): %s", telnet_go_ahead(d));
 			}
 			else {
 				next_creation_step(d);
@@ -1947,7 +1946,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_FINISH_CREATION: {
-			msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
+			msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_BONUS_TRAIT: {
@@ -1957,7 +1956,7 @@ void prompt_creation(descriptor_data *d) {
 			else if (GET_ACCESS_LEVEL(d->character) > 0) {
 				// existing: send player to game
 				send_login_motd(d, GET_BAD_PWS(d->character));
-				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			else {
@@ -2007,7 +2006,7 @@ void process_alt_name(descriptor_data *d, char *arg) {
 		next_creation_step(d);
 	}
 	else {
-		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: %c%c", arg, IAC, GA);
+		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: %s", arg, telnet_go_ahead(d));
 	}
 }
 
@@ -2034,7 +2033,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 				STATE(d) = CON_CLOSE;
 			}
 			else {
-				msg_to_desc(d, "Wrong password.\r\nPassword: %c%c", IAC, GA);
+				msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
 				ProtocolNoEcho(d, true);
 			}
 		}
@@ -2077,7 +2076,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 		// state was set above
 	}
 	else {
-		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: %c%c", IAC, GA);
+		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: %s", telnet_go_ahead(d));
 	}
 }
 
@@ -2155,7 +2154,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, "%2d. %s%s\r\n", ++count, bonus_bit_descriptions[iter], (HAS_BONUS_TRAIT(ch, BIT(iter)) ? " &g(already chosen)&0" : ""));
 	}
 	
-	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > %c%c", IAC, GA);
+	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > %s", telnet_go_ahead(ch->desc));
 }
 
 
@@ -2468,12 +2467,12 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			else if (!str_cmp(arg, "new")) {
 				// special case for players who typed "new"
-				msg_to_desc(d, "\r\nEnter new character name: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nEnter new character name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else {
 				if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name) || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-					msg_to_desc(d, "Invalid name, please try another.\r\nName: %c%c", IAC, GA);
+					msg_to_desc(d, "Invalid name, please try another.\r\nName: %s", telnet_go_ahead(d));
 					return;
 				}
 				if ((temp_char = load_player(tmp_name, TRUE))) {
@@ -2488,7 +2487,7 @@ void nanny(descriptor_data *d, char *arg) {
 					// flush messages because updated items appear here
 					send_stacked_msgs(d);
 					
-					msg_to_desc(d, "Password: %c%c", IAC, GA);
+					msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 					ProtocolNoEcho(d, true);
 					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
@@ -2499,7 +2498,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 					/* Check for multiple creations of a character. */
 					if (!Valid_Name(tmp_name)) {
-						msg_to_desc(d, "Invalid name, please try another.\r\nName: %c%c", IAC, GA);
+						msg_to_desc(d, "Invalid name, please try another.\r\nName: %s", telnet_go_ahead(d));
 						return;
 					}
 					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
@@ -2509,7 +2508,7 @@ void nanny(descriptor_data *d, char *arg) {
 						msg_to_desc(d, "%s\r\n", rules);
 					}
 
-					msg_to_desc(d, "Did I get that name right, %s (Y/N)? %c%c", tmp_name, IAC, GA);
+					msg_to_desc(d, "Did I get that name right, %s (Y/N)? %s", tmp_name, telnet_go_ahead(d));
 					STATE(d) = CON_NAME_CNFRM;
 				}
 			}
@@ -2538,13 +2537,13 @@ void nanny(descriptor_data *d, char *arg) {
 				start_creation_process(d);
 			}
 			else if (*arg == 'n' || *arg == 'N') {
-				msg_to_desc(d, "Okay, what IS it, then? %c%c", IAC, GA);
+				msg_to_desc(d, "Okay, what IS it, then? %s", telnet_go_ahead(d));
 				free(GET_PC_NAME(d->character));
 				GET_PC_NAME(d->character) = NULL;
 				STATE(d) = CON_GET_NAME;
 			}
 			else {
-				msg_to_desc(d, "Please type Yes or No: %c%c", IAC, GA);
+				msg_to_desc(d, "Please type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2578,7 +2577,7 @@ void nanny(descriptor_data *d, char *arg) {
 						STATE(d) = CON_CLOSE;
 					}
 					else {
-						msg_to_desc(d, "Wrong password.\r\nPassword: %c%c", IAC, GA);
+						msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
 					}
 					return;
 				}
@@ -2647,7 +2646,7 @@ void nanny(descriptor_data *d, char *arg) {
 				send_login_motd(d, load_result);
 				
 				// send on to motd
-				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			break;
@@ -2656,7 +2655,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_NEWPASSWD: {
 			if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 || !str_cmp(arg, GET_PC_NAME(d->character))) {
 				SEND_TO_Q("\r\nIllegal password.\r\n", d);
-				msg_to_desc(d, "Password: %c%c", IAC, GA);
+				msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 				return;
 			}
 			
@@ -2668,7 +2667,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_CNFPASSWD: {
 			if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
 				SEND_TO_Q("\r\nPasswords don't match... start over.\r\n", d);
-				msg_to_desc(d, "Password: %c%c", IAC, GA);
+				msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
@@ -2687,7 +2686,7 @@ void nanny(descriptor_data *d, char *arg) {
 				break;
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			
 			break;
@@ -2703,7 +2702,7 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2716,7 +2715,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type Yes or No: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2733,12 +2732,12 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_SLAST_NAME: {	/* What's yer last name? */
 			if (!*arg) {
-				msg_to_desc(d, "\r\nEnter a last name: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nEnter a last name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else if ((_parse_name(arg, tmp_name)) || !Valid_Name(tmp_name) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
 				msg_to_desc(d, "\r\nInvalid last name, please try another.\r\n"
-						  "Enter a last name: %c%c", IAC, GA);
+						  "Enter a last name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else {
@@ -2756,12 +2755,12 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else if (UPPER(*arg) == 'N') {
-				msg_to_desc(d, "Okay, what IS it, then? %c%c", IAC, GA);
+				msg_to_desc(d, "Okay, what IS it, then? %s", telnet_go_ahead(d));
 				change_personal_lastname(d->character, NULL);
 				STATE(d) = CON_SLAST_NAME;
 			}
 			else {
-				msg_to_desc(d, "Please type Yes or No: %c%c", IAC, GA);
+				msg_to_desc(d, "Please type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2775,7 +2774,7 @@ void nanny(descriptor_data *d, char *arg) {
 					d->character->player.sex = SEX_FEMALE;
 					break;
 				default:
-					msg_to_desc(d, "That is not a sex...\r\nWhat IS your sex? %c%c", IAC, GA);
+					msg_to_desc(d, "That is not a sex...\r\nWhat IS your sex? %s", telnet_go_ahead(d));
 					return;
 			}
 
@@ -2809,7 +2808,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			send_login_motd(d, GET_BAD_PWS(d->character));
 			
-			msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
+			msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 			STATE(d) = CON_RMOTD;
 
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (promo: %s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "none");
@@ -2832,7 +2831,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type YES or NO: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nPlease type YES or NO: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2878,7 +2877,7 @@ void nanny(descriptor_data *d, char *arg) {
 					break;
 				}
 				default: {
-					msg_to_desc(d, "Please type YES or NO: %c%c", IAC, GA);
+					msg_to_desc(d, "Please type YES or NO: %s", telnet_go_ahead(d));
 					return;
 				}
 			}
@@ -2902,7 +2901,7 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("member in charge of authorization. When you are able to log into the mud,\r\n", d);
 				SEND_TO_Q("type HELP AUTHORIZATION for the appropriate e-mail address, or contact the\r\n", d);
 				SEND_TO_Q("staff member via the game.\r\n", d);
-				msg_to_desc(d, "\r\nPress ENTER to continue: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\nPress ENTER to continue: %s", telnet_go_ahead(d));
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
 				
 				STATE(d) = CON_GOODBYE;
@@ -3013,7 +3012,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if ((i = atoi(arg)) < 1 || i > NUM_BONUS_TRAITS) {
-					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %c%c", IAC, GA);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 				
@@ -3044,12 +3043,12 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if (!bit) {
-					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %c%c", IAC, GA);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 				
 				if (HAS_BONUS_TRAIT(d->character, bit)) {
-					msg_to_desc(d, "\r\nYou already have that trait! Try again > %c%c", IAC, GA);
+					msg_to_desc(d, "\r\nYou already have that trait! Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 			
@@ -3073,7 +3072,7 @@ void nanny(descriptor_data *d, char *arg) {
 				// now send them to the motd
 				send_login_motd(d, GET_BAD_PWS(d->character));
 				
-				msg_to_desc(d, "\r\n*** Press ENTER: %c%c", IAC, GA);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			else {

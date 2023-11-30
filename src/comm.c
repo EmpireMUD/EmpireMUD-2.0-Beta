@@ -2366,7 +2366,7 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	snprintf(buf, sizeof(buf), "%s%c%c", intro_screens[number(0, num_intro_screens-1)], IAC, GA);
+	snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
 	SEND_TO_Q(buf, newd);
 
 	return (0);
@@ -2879,6 +2879,23 @@ int set_sendbuf(socket_t s) {
 }
 
 
+/**
+* For use on lines that are prompts and don't end in a crlf; this sends the
+* telnet codes IAC GA, if needed.
+*
+* @param descriptor_data *desc The descriptor that might need it.
+*/
+const char *telnet_go_ahead(descriptor_data *desc) {
+	if (desc) {
+		static const char string[3] = { IAC, GA, '\0' };
+		return string;
+	}
+	else {
+		return "";
+	}
+}
+
+
 /* write_to_descriptor takes a descriptor, and text to write to the descriptor.
  * It keeps calling the system-level write() until all the text has been
  * delivered to the OS, or until an error is encountered. Returns:
@@ -3038,7 +3055,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%c%c", prompt_str(d->character), IAC, GA);
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
 	}
 	else {
 		*prompt = '\0';
