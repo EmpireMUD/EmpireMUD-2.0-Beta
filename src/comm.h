@@ -18,7 +18,6 @@
 // TODO: organize these externs and probably move them down
 void clear_last_act_message(descriptor_data *desc);
 void flush_queues(descriptor_data *d);
-void send_telnet_go_ahead(descriptor_data *desc);
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void send_to_char(const char *messg, char_data *ch);
 void msdp_update_room(char_data *ch);

@@ -1556,20 +1556,6 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 }
 
 
-/**
-* Informs the client they can go ahead. Screen readers may require this to show
-* a line that wasn't terminated with a crlf (e.g. a prompt). This sends IAC GA
-*
-* @param descriptor_data *desc The descriptor to send the go-ahead to.
-*/
-void send_telnet_go_ahead(descriptor_data *desc) {
-	char msg[3] = { IAC, GA, '\0' };
-	if (desc) {
-		SEND_TO_Q(msg, desc);
-	}
-}
-
-
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
 void send_to_char(const char *messg, char_data *ch) {
 	if (ch->desc && messg)
@@ -2762,7 +2748,6 @@ int process_input(descriptor_data *t) {
 static int process_output(descriptor_data *t) {
 	char i[MAX_SOCK_BUF], *osb = i + 2;
 	int result;
-	bool sent_prompt = FALSE;
 
 	/* we may need this \r\n for later -- see below */
 	strcpy(i, "\r\n");	/* strcpy: OK (for 'MAX_SOCK_BUF >= 3') */
@@ -2792,7 +2777,6 @@ static int process_output(descriptor_data *t) {
 		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
-		sent_prompt = TRUE;
 	}
 
 	/* now, send the output.  If this is an 'interruption', use the prepended
@@ -2814,10 +2798,6 @@ static int process_output(descriptor_data *t) {
 	}
 	else if (result == 0) {	/* Socket buffer full. Try later. */
 		return (0);
-	}
-	
-	if (sent_prompt) {
-		send_telnet_go_ahead(t);
 	}
 
 	/* Handle snooping: prepend "% " and send to snooper. */
@@ -3056,7 +3036,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%c%c", prompt_str(d->character), IAC, GA);
 	}
 	else {
 		*prompt = '\0';
@@ -3917,7 +3897,6 @@ void game_loop(socket_t mother_desc) {
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;
-					send_telnet_go_ahead(d);
 				}
 			}
 		}
