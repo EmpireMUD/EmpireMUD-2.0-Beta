@@ -504,4 +504,12 @@ if %self.varexists(no_silent)%
   nop %self.remove_mob_flag(SILENT)%
 end
 ~
+#10377
+Uninvited Guest: Put vampire in box on load~
+0 n 100
+~
+if %self.room.sun% != light
+  dg_affect #10370 %self% !SEE on -1
+end
+~
 $

@@ -480,9 +480,9 @@ S
 sandals pair~
 a pair of sandals~
 A pair of sandals are sitting on the ground.~
-These simple shoes are comfortable around the city.
+These simple sandals are comfortable around the city.
 ~
-2 0 ag 0 0 2
+2 0 ag 0 0 3
 0 0 0
 7 0
 C
@@ -816,6 +816,20 @@ C
 M
 12
 The noble $n stands here in red.~
+R
+4 5617 0
+S
+#2049
+shoes pair~
+a pair of shoes~
+A pair of shoes are standing on the ground.~
+These simple shoes are comfortable around the city.
+~
+2 0 ag 0 0 3
+0 0 0
+7 0
+C
+1 1
 R
 4 5617 0
 S

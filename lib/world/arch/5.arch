@@ -18,8 +18,6 @@ A
 A
 5 2
 G
-0 2002  # a red hood
-G
 4 2042  # a court sorcerer's robes
 G
 14 2032  # a pair of sandals
@@ -130,13 +128,11 @@ A
 A
 5 1
 G
-0 2002  # a red hood
-G
 4 2045  # fine city clothes
 G
 13 2028  # a pair of breeches
 G
-14 2032  # a pair of sandals
+14 2049  # a pair of shoes
 G
 19 2103  # a shiv
 G
@@ -254,7 +250,7 @@ G
 G
 13 2028  # a pair of breeches
 G
-14 2032  # a pair of sandals
+14 2049  # a pair of shoes
 G
 19 2102  # a short sword
 G
