@@ -95,6 +95,7 @@ elseif minionize /= %cmd%
   * MINIONIZE command
   if %actor.has_companion(550)%
     %send% %actor% You already have a dark minion. Use 'companions' to summon it.
+    %quest% %actor% trigger 1503
   elseif !(%cit_list% ~= %target.vnum%)
     %send% %actor% ~%target% would't make much of a minion.
   elseif !%target.var(minion_%actor.id%)% && !%target.var(peeped_%actor.id%)%
