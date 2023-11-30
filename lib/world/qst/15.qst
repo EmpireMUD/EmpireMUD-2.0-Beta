@@ -181,7 +181,7 @@ Use it to 'peep <citizen>' until you find the right one, then type 'minionize
 ~
    'Yes, m'lord,' your minion says. 'Your legacy is secure.'
 ~
-7 f 100 0 -1
+8 0 100 0 -1
 A
 1 10370
 P
@@ -217,20 +217,18 @@ and plenty in-between. You realize, of course, that the guard is right.
    In fact, you resolve to defeat ALL the challenges on the list and establish
 yourself amongst the legends. You'll just need to finish the Battle skill tree,
 reach level 100, and defeat all of these foes:
-   1. The thief, Chiv
-   2. The thief, Sly
-   3. A swamp hag
-   4. A flame dragon
-   5. A hoarfrost serragon
-   6. A loch colossus in Burrow Canyons
-   7. The undead caretaker of Mill Manor
-   8. An Archdruid of the Grove
-   9. Garlgarl in a Goblin Challenge
-   10. Vanguard Leader Dryleef at a Goblin Outpost
-   11. Scylla beneath the Golden Goblin
-   12. The Saguaro Treant beyond a Monsoon Rift
-   13. Aquilo, Polar Baron of the Permafrost
-   14. The Sun King inside a Lost Temple
+   1. A swamp hag
+   2. A flame dragon
+   3. A hoarfrost serragon
+   4. A loch colossus in Burrow Canyons
+   5. The undead caretaker of Mill Manor
+   6. An Archdruid of the Grove
+   7. Garlgarl in a Goblin Challenge
+   8. Vanguard Leader Dryleef at a Goblin Outpost
+   9. Scylla beneath the Golden Goblin
+   10. The Saguaro Treant beyond a Monsoon Rift
+   11. Aquilo, Polar Baron of the Permafrost
+   12. The Sun King inside a Lost Temple
 ~
    'Wow, I can't believe it's you! I heard you beat Aquilo, Dryleef, even
 Scylla! Us guards had a bet going and, just between you and me, you made me a
@@ -238,7 +236,7 @@ lot of coin,' the city guard says as you stop. 'I knew you could do it.'
    The renown of your battle prowess has spread to the corners of the empire
 and, perhaps the world. Someday you might be the most famous warrior alive!
 ~
-6 f 100 0 -1
+7 f 100 0 -1
 A
 1 251
 P
@@ -249,12 +247,6 @@ W
 9 0 0 100 a
 W
 39 0 0 100 a
-W+
-3 10111 0 1 a
-Defeat the thief, Chiv~
-W+
-3 10110 0 1 a
-Defeat the thief, Sly~
 W+
 3 19000 0 1 a
 Defeat a swamp hag~
