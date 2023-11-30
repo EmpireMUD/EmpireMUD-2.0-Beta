@@ -2509,8 +2509,7 @@ void nanny(descriptor_data *d, char *arg) {
 						msg_to_desc(d, "%s\r\n", rules);
 					}
 
-					sprintf(buf, "Did I get that name right, %s (Y/N)? ", tmp_name);
-					SEND_TO_Q(buf, d);
+					msg_to_desc(d, "Did I get that name right, %s (Y/N)? %c%c", tmp_name, IAC, GA);
 					STATE(d) = CON_NAME_CNFRM;
 				}
 			}
@@ -2539,7 +2538,7 @@ void nanny(descriptor_data *d, char *arg) {
 				start_creation_process(d);
 			}
 			else if (*arg == 'n' || *arg == 'N') {
-				SEND_TO_Q("Okay, what IS it, then? ", d);
+				msg_to_desc(d, "Okay, what IS it, then? %c%c", IAC, GA);
 				free(GET_PC_NAME(d->character));
 				GET_PC_NAME(d->character) = NULL;
 				STATE(d) = CON_GET_NAME;
@@ -2757,7 +2756,7 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else if (UPPER(*arg) == 'N') {
-				SEND_TO_Q("Okay, what IS it, then? ", d);
+				msg_to_desc(d, "Okay, what IS it, then? %c%c", IAC, GA);
 				change_personal_lastname(d->character, NULL);
 				STATE(d) = CON_SLAST_NAME;
 			}
@@ -2776,7 +2775,7 @@ void nanny(descriptor_data *d, char *arg) {
 					d->character->player.sex = SEX_FEMALE;
 					break;
 				default:
-					SEND_TO_Q("That is not a sex...\r\nWhat IS your sex? ", d);
+					msg_to_desc(d, "That is not a sex...\r\nWhat IS your sex? %c%c", IAC, GA);
 					return;
 			}
 
