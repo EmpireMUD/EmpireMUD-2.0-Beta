@@ -15,18 +15,18 @@ it throw you off from great height. The colossus shoots powerful laser beams
 from its eyes, so be prepared to type '&rdodge&0'.
 ~
 12500 12599 100-200
-5 0 bln 4
+5 0 blnp 4
 L
 1 0
-12500 -1 -1
+12500 -1 -1 -1
 9 beln 0
 L
 6 0
-150 -1 -1
+150 -1 -1 -1
 -1 0 0
 L
 5 0
-2880 -1 -1
+2880 -1 -1 -1
 -1 0 0
 S
 $
