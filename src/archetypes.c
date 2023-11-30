@@ -1356,7 +1356,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	
 	// still here? add a prompt
 	if (STATE(desc) == CON_Q_ARCHETYPE) {
-		msg_to_desc(desc, "\r\nType \tcinfo\t0, \tclist\t0, or %s %s name > ", AN(archetype_menu[pos].name), archetype_menu[pos].name);
+		msg_to_desc(desc, "\r\nType \tcinfo\t0, \tclist\t0, or %s %s name > %c%c", AN(archetype_menu[pos].name), archetype_menu[pos].name, IAC, GA);
 	}
 }
 
