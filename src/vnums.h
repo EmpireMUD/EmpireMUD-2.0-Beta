@@ -127,7 +127,7 @@
 #define TANNER  267
 #define SHEARER  268
 #define COIN_MAKER  269
-#define DOCKWORKER  270
+#define DOCKWORKER  270	// unused?
 #define APPRENTICE_EXARCH  271	// unused now
 #define MILL_WORKER  272
 #define VEHICLE_REPAIRMAN  273
