@@ -81,6 +81,7 @@ if peep /= %cmd%
     remote peeped_%actor.id% %target.id%
     eval counter %counter% - 1
     remote counter %self.id%
+    nop %actor.set_cooldown(1503,10)%
   else
     * success
     %send% %actor% You look through @%self% and see a powerful aura around ~%target%... &%target% would make the perfect minion!
@@ -88,10 +89,13 @@ if peep /= %cmd%
     remote minion_%actor.id% %target.id%
     eval counter %counter% - 1
     remote counter %self.id%
+    nop %actor.set_cooldown(1503,10)%
   end
 elseif minionize /= %cmd%
   * MINIONIZE command
-  if !(%cit_list% ~= %target.vnum%)
+  if %actor.has_companion(550)%
+    %send% %actor% You already have a dark minion. Use 'companions' to summon it.
+  elseif !(%cit_list% ~= %target.vnum%)
     %send% %actor% ~%target% would't make much of a minion.
   elseif !%target.var(minion_%actor.id%)% && !%target.var(peeped_%actor.id%)%
     %send% %actor% You haven't peeped ~%target% through the stone yet.
@@ -112,14 +116,19 @@ elseif minionize /= %cmd%
       %mod% %minion% sex %target.sex%
       %mod% %minion% keywords %name% dark minion
       %mod% %minion% shortdesc %name%
-      %mod% %minion% longdesc %name% stands here, tapping ^%target% fingers.
-      %mod% %minion% lookdesc %name% has a strange pallor and an odd habit about *%target%.
+      %mod% %minion% longdesc %name% stands here, tapping %target.hisher% fingers.
+      %mod% %minion% lookdesc %name% has a strange pallor and an odd habit about %target.himher%.
       * messaging
       %send% %actor% (Use the 'companions' command to re-summon *%target% at any time.)
       %quest% %actor% trigger 1503
       * remove citizen?
+      set targ_id %target.id%
+      dg_affect %target% !SEE on 5
       %own% %target% none
-      %purge% %target%
+      * still here?
+      if %target% && %target.id% == %targ_id%
+        %purge% %target%
+      end
     else
       * huh? minion failed
       nop %actor.remove_companion(550)%
