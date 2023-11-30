@@ -556,7 +556,7 @@ See also: MORPH, MORPHEDIT
 #d
 %OWN% MOWN OOWN VOWN WOWN
 
-Usage:  %own% [type] <target> <empire>
+Usage:  %own% [type] <target> <empire | none>
 
 This command changes empire ownership of a thing (mob, obj, vehicle, or room).
 Be very careful using this command in scripts, as it wields a great deal of
