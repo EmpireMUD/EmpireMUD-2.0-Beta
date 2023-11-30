@@ -2626,6 +2626,8 @@ void nanny(descriptor_data *d, char *arg) {
 					SEND_TO_Q("\r\n", d);
 					SEND_TO_Q("Press ENTER to continue:\r\n", d);
 					syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
+					
+					send_telnet_go_ahead(d);
 
 					STATE(d) = CON_GOODBYE;
 					return;
@@ -2641,6 +2643,7 @@ void nanny(descriptor_data *d, char *arg) {
 				// check if traits need to be reset
 				if (check_bonus_trait_reset(d->character)) {
 					SEND_TO_Q("Press ENTER to continue:\r\n", d);
+					send_telnet_go_ahead(d);
 					STATE(d) = CON_BONUS_RESET;
 					return;
 				}
@@ -2654,6 +2657,7 @@ void nanny(descriptor_data *d, char *arg) {
 				
 				// send on to motd
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				send_telnet_go_ahead(d);
 				STATE(d) = CON_RMOTD;
 			}
 			break;
@@ -2816,6 +2820,7 @@ void nanny(descriptor_data *d, char *arg) {
 			send_login_motd(d, GET_BAD_PWS(d->character));
 			
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
+			send_telnet_go_ahead(d);
 			STATE(d) = CON_RMOTD;
 
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (promo: %s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "none");
@@ -2911,6 +2916,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("\r\nPress ENTER to continue: ", d);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
 
+				send_telnet_go_ahead(d);
+				
 				STATE(d) = CON_GOODBYE;
 				return;
 			}
@@ -3080,6 +3087,7 @@ void nanny(descriptor_data *d, char *arg) {
 				send_login_motd(d, GET_BAD_PWS(d->character));
 				
 				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				send_telnet_go_ahead(d);
 				STATE(d) = CON_RMOTD;
 			}
 			else {
