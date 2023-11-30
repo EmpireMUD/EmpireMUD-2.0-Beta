@@ -927,7 +927,7 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("23")
 	}
 	
-	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
+	if (HEARTBEAT(2 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
 		HEARTBEAT_LOG("24")
 	}
