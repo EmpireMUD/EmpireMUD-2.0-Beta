@@ -2498,6 +2498,11 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 int lock_instance_level(room_data *room, int level) {
 	struct instance_data *inst;
 	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
+	
 	if (IS_ADVENTURE_ROOM(room) && COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
 		if (INST_LEVEL(inst) <= 0) {
 			scale_instance_to_level(inst, level);
