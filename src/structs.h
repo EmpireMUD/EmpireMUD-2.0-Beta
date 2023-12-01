@@ -5728,6 +5728,7 @@ struct faction_relation {
 struct faction_reputation_type {
 	int type;	// REP_ type
 	char *name;
+	char *by_to;	// You are now [Reputation] [by | to] [Faction Name].
 	char *color;	// & or \t color code
 	int value;	// points total a player must be at for this
 };
