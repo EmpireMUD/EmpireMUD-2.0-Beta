@@ -2361,7 +2361,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	
 	if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict) {
+			if (ch != vict && msg->msg[MSG_GOD].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
 				}
@@ -2370,23 +2370,27 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 				}
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
-			act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			if (msg->msg[MSG_GOD].room_msg) {
+				act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			}
 		}
 		
 		// victim message
-		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+		if (msg->msg[MSG_GOD].victim_msg) {
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+			}
+			else {	// no damage numbers
+				// normally this would be red, but it's basically a miss against a god
+				snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | miss_flags);
 		}
-		else {	// no damage numbers
-			// normally this would be red, but it's basically a miss against a god
-			snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
-		}
-		act(message, FALSE, ch, weap, vict, TO_VICT | miss_flags);
 	}
 	else if (dam != 0) {
 		if (GET_POS(vict) == POS_DEAD) {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict) {
+				if (ch != vict && msg->msg[MSG_DIE].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
 					}
@@ -2396,21 +2400,25 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
 				
-				act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				if (msg->msg[MSG_DIE].room_msg) {
+					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				}
 			}
 			
 			// victim death message
-			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+			if (msg->msg[MSG_DIE].victim_msg) {
+				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
-			else {	// no damage numbers
-				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
-			}
-			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 		}
 		else {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict) {
+				if (ch != vict && msg->msg[MSG_HIT].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
 					}
@@ -2420,22 +2428,26 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
 				
-				act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				if (msg->msg[MSG_HIT].room_msg) {
+					act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				}
 			}
 			
 			// victim hit message
-			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+			if (msg->msg[MSG_HIT].victim_msg) {
+				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
-			else {	// no damage numbers
-				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
-			}
-			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 		}
 	}
 	else if (ch != vict) {	/* Dam == 0 */
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict) {
+			if (ch != vict && msg->msg[MSG_MISS].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
 				}
@@ -2445,17 +2457,21 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
 			
-			act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			if (msg->msg[MSG_MISS].room_msg) {
+				act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			}
 		}
 		
 		// victim miss message
-		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+		if (msg->msg[MSG_MISS].victim_msg) {
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+			}
+			else {	// no damage numbers
+				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | miss_flags);
 		}
-		else {	// no damage numbers
-			snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
-		}
-		act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | miss_flags);
 	}
 	
 	// if we got here
