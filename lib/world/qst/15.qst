@@ -223,7 +223,7 @@ reach level 100, and defeat all of these foes:
    4. A loch colossus in Burrow Canyons
    5. The undead caretaker of Mill Manor
    6. An Archdruid of the Grove
-   7. Garlgarl in a Goblin Challenge
+   7. Furl, war shaman, in a Goblin Challenge
    8. Vanguard Leader Dryleef at a Goblin Outpost
    9. Scylla beneath the Golden Goblin
    10. The Saguaro Treant beyond a Monsoon Rift
@@ -266,8 +266,8 @@ W+
 3 12655 0 1 a
 Defeat an Archdruid of the Grove~
 W+
-3 10201 0 1 a
-Defeat Garlgarl in a Goblin Challenge~
+3 10205 0 1 a
+Defeat Furl in a Goblin Challenge~
 W+
 3 10451 0 1 a
 Defeat Vanguard Leader Dryleef at a Goblin Outpost~
@@ -346,7 +346,7 @@ increased if you could accomplish this poor smith's dream of forging the
 largest sword of all time. Show the empire that you have truly mastered your
 art -- forge an impressively large sword and bring it back to the smith for
 appraisal.
-   1. Reach the pinnacle the Trade skill,
+   1. Reach the pinnacle of the Trade skill,
    2. Attain skill level 100 and crafting level 200, and
    3. Forge an impressively large sword
 ~
