@@ -1662,7 +1662,7 @@ de-spawns.
 
 See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
-"ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
+"ADVEDIT LINKING" ""ADVEDIT LINK" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
 
 Usage: linking add <type> <data> [flags]
        linking change <number> <field> <value>
