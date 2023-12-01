@@ -102,6 +102,7 @@ void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
 void update_instance_world_size();
+void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
@@ -641,6 +642,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	perform_force_upgrades();
+	verify_daily_quest_cycles();
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
