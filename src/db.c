@@ -1354,7 +1354,7 @@ void load_help(FILE *fl) {
 		
 		// convert ampersand codes like &0 to tab codes like \t0 -- string length won't change
 		for (iter = 0; iter < strlen(entry); ++iter) {
-			if (entry[iter] == '&') {
+			if (entry[iter] == COLOUR_CHAR) {
 				entry[iter] = '\t';
 				// skip next letter as part of the code:
 				++iter;

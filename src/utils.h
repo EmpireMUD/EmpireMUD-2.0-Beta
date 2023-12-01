@@ -1930,6 +1930,7 @@ sector_data *get_sect_by_name(char *name);
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
 char *delete_doubledollar(char *string);
+char *double_map_ampersands(char *icon);;
 const char *double_percents(const char *string);
 bool has_keyword(char *string, const char *list[], bool exact);
 bool isname(const char *str, const char *namelist);
@@ -1965,6 +1966,7 @@ void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space
 void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
 char *time_length_string(int seconds);
 char *trim(char *string);
+char *undouble_map_ampersands(char *icon);
 
 // world functions in utils.c
 bool check_sunny(room_data *room);

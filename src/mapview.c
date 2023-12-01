@@ -1440,7 +1440,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 							// close enough to see
 							if (show_blocked) {
 								if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
-									msg_to_char(ch, "\tw%-4.4s", memory);
+									msg_to_char(ch, "\tw%-4s", memory);
 								}
 								else {
 									send_to_char(blocked_tile, ch);
@@ -1458,7 +1458,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						else {
 							// too far (or color is off): show blank
 							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
-								msg_to_char(ch, "\tb%-4.4s", memory);
+								msg_to_char(ch, "\tb%-4s", memory);
 							}
 							else {
 								send_to_char("    ", ch);
@@ -1469,7 +1469,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						if ((MAGIC_DARKNESS(to_room) || get_sun_status(to_room) == SUN_DARK) && (compute_distance(room, to_room) > can_see_in_dark_distance)) {
 							// blocked dark tile
 							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
-								msg_to_char(ch, "\tb%-4.4s", memory);
+								msg_to_char(ch, "\tb%-4s", memory);
 							}
 							else {
 								send_to_char("    ", ch);
@@ -1478,7 +1478,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						else {
 							// blocked light tile
 							if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && (memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_ICON))) {
-								msg_to_char(ch, "\tw%-4.4s", memory);
+								msg_to_char(ch, "\tw%-4s", memory);
 							}
 							else {
 								send_to_char(blocked_tile, ch);

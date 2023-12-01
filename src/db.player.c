@@ -5491,7 +5491,7 @@ void load_map_memory(char_data *ch) {
 					*name = '\0';
 				}
 				// and add
-				add_player_map_memory(ch, vnum, icon, name, timestamp);
+				add_player_map_memory(ch, vnum, double_map_ampersands(icon), name, timestamp);
 			}
 			else {
 				log("Warning: Unknown map memory line for %s: %s", GET_PC_NAME(ch), line);
@@ -5551,7 +5551,7 @@ void write_map_memory(char_data *ch) {
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
 		if (map_mem->icon) {
-			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, undouble_map_ampersands(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
 		}
 		else {	// no icon
 			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");

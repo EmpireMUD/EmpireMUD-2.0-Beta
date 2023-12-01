@@ -4674,6 +4674,39 @@ int count_icon_codes(char *string) {
 
 
 /**
+* Doubles the ampersands in a 4-char icon and returns the result. This is
+* mainly for loading stored map memories.
+*
+* @param char *icon The incoming 4-char icon.
+* @return char* The modified icon, or the original if there were no ampersands.
+*/
+char *double_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR) {
+			// double the ampersand
+			output[pos++] = COLOUR_CHAR;
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
+}
+
+
+/**
 * @param const char *string A string that might contain stray % signs.
 * @return const char* A string with % signs doubled.
 */
@@ -5530,6 +5563,38 @@ char *trim(char *string) {
 	}
 	
 	return ptr;
+}
+
+
+/**
+* Un-doubles ampersands in 4-char map icons and returns the result. This is
+* used for writing map memory, which does not have room for doubled ampersands.
+*
+* @param char *icon The incoming icon, which may have doubled ampersands.
+* @return char* The modified icon with any doubled ampersands reduced to one, or the original icon if there were no ampersands.
+*/
+char *undouble_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR && icon[iter+1] == COLOUR_CHAR) {
+			++iter;	// skip 1
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
 }
 
 
