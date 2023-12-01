@@ -2579,6 +2579,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_companion(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			if (GET_COMPANION(vict) && GET_MOB_VNUM(GET_COMPANION(vict)) == GET_MOB_VNUM(pet)) {
+				act("$n leaves.", TRUE, GET_COMPANION(vict), NULL, NULL, TO_ROOM);
+				extract_char(GET_COMPANION(vict));
+			}
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
