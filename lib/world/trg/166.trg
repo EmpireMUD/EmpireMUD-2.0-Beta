@@ -2845,6 +2845,10 @@ set male_list boy man gentleman farmhand merchant apprentice
 set male_count 6
 set female_list girl woman lady milkmaid merchant apprentice
 set female_count 6
+* check completion
+if !%self.complete%
+  halt
+end
 * ensure a crowd is present or just spawn one
 set found 0
 set room %self.room%
