@@ -312,9 +312,8 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		}
 	}
 	
-	// apply maintenance if not dismantling
-	if (!VEH_IS_DISMANTLING(veh)) {
-		// add maintenance (if not dismantling)
+	// apply maintenance if not dismantling -- and is either complete OR has had at least 1 item added
+	if (!VEH_IS_DISMANTLING(veh) && (VEH_IS_COMPLETE(veh) || VEH_BUILT_WITH(veh))) {
 		old_list = VEH_NEEDS_RESOURCES(veh);
 		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
 		free_resource_list(old_list);
