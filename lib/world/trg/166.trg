@@ -2831,7 +2831,7 @@ return 1
 ~
 #16660
 Straw Goat vandalism driver~
-5 ab 50
+5 ab 66
 ~
 * configs
 set quest_vnum 16660
