@@ -1518,7 +1518,7 @@ void verify_daily_quest_cycles(void) {
 		// if we have an inactive daily then see if something else on the same cycle is active yet
 		any = FALSE;
 		HASH_ITER(hh, quest_table, iter, next_iter) {
-			if (QUEST_DAILY_CYCLE(iter) == QUEST_DAILY_CYCLE(qst) && QUEST_DAILY_ACTIVE(iter) && !QUEST_FLAGGED(iter, QST_IN_DEVELOPMENT)) {
+			if (iter != qst && QUEST_DAILY_ACTIVE(iter) && QUEST_DAILY_CYCLE(iter) == QUEST_DAILY_CYCLE(qst) && !QUEST_FLAGGED(iter, QST_IN_DEVELOPMENT)) {
 				any = TRUE;
 				break;
 			}
