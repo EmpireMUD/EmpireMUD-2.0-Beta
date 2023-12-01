@@ -2063,15 +2063,15 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			replace_question_color(show_icon, base_color, lbuf);
 			strcpy(show_icon, lbuf);
 		}
-		// need a leading color?
-		if (*show_icon != COLOUR_CHAR) {
+		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
+		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
-		// need a leading color?
-		if (*show_icon != COLOUR_CHAR) {
+		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
+		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
 			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
