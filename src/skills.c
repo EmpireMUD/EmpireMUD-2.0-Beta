@@ -1000,7 +1000,8 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 	
 	if (any) {
 		if (from_abil) {
-			snprintf(abil_buf, sizeof(abil_buf), " using %s", ABIL_NAME(from_abil));
+			// reports 1 gain higher than currently-recorded because it's only incremented after the gain is successful
+			snprintf(abil_buf, sizeof(abil_buf), " using %s (%d/%d)", ABIL_NAME(from_abil), levels_gained_from_ability(ch, from_abil) + 1, GAINS_PER_ABILITY);
 		}
 		else {
 			*abil_buf = '\0';
