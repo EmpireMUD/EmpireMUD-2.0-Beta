@@ -809,7 +809,7 @@ static void print_group(char_data *ch) {
 	char_data *k;
 
 	if (GROUP(ch)) {
-		msg_to_char(ch, "Your group consists of:\r\n");
+		msg_to_char(ch, "Your group:\r\n");
 		for (mem = GROUP(ch)->members; mem; mem = mem->next) {
 			k = mem->member;
 			
@@ -851,7 +851,7 @@ static void print_group(char_data *ch) {
 			}
 			
 			// name: lvl class (spec) -- location (x, y)
-			msg_to_char(ch, "%s%s [%d%s]%s%s%s\r\n", PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", get_approximate_level(k), class, status, alerts, loc);
+			msg_to_char(ch, "%s%s%s %s [%d%s]%s%s%s\r\n", class_role_color[GET_CLASS_ROLE(k)], PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[GET_CLASS_ROLE(k)] : "\t0"), get_approximate_level(k), class, status, alerts, loc);
 		}
 	}
 	else {
@@ -2570,7 +2570,9 @@ ACMD(do_group) {
 
 	// no-arg
 	if (!*buf) {
-		msg_to_char(ch, "Available group options: new, invite, join, kick, leave, leader\r\n");
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "Available group options: new, invite, join, kick, leave, leader, options\r\n");
+		}
 		
 		if (GROUP(ch)) {
 			// should we replace this with the group summary? -pc
@@ -2578,6 +2580,9 @@ ACMD(do_group) {
 		}
 		else if ((vict = is_playing(GET_GROUP_INVITE(ch)))) {
 			msg_to_char(ch, "You have been invited to a group by %s.\r\n", PERS(vict, vict, TRUE));
+		}
+		else {
+			msg_to_char(ch, "You are not in a group.\r\n");
 		}
 		return;
 	}
