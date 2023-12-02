@@ -848,7 +848,7 @@ INTERACTION_FUNC(finish_chopping) {
 		act(cust ? cust : "$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
 		
 		if (IN_ROOM(obj)) {
-			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	
@@ -902,7 +902,7 @@ INTERACTION_FUNC(finish_digging) {
 			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
 			
 			if (IN_ROOM(obj)) {
-				act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 			}
 		}
 	}
@@ -1001,7 +1001,7 @@ INTERACTION_FUNC(finish_foraging) {
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
 		if (IN_ROOM(obj)) {
-			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	else {
@@ -1047,7 +1047,7 @@ INTERACTION_FUNC(finish_gathering) {
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
 		
 		if (IN_ROOM(obj)) {
-			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
 		gain_player_tech_exp(ch, PTECH_GATHER, 10);
@@ -1102,7 +1102,7 @@ INTERACTION_FUNC(finish_harvesting) {
 			act(cust ? cust : "$n gets $p!", FALSE, ch, obj, NULL, TO_ROOM);
 			
 			if (IN_ROOM(obj)) {
-				act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 			}
 		}
 	}
@@ -1140,7 +1140,7 @@ INTERACTION_FUNC(finish_mining) {
 	
 	if (obj && obj_ok) {
 		if (IN_ROOM(obj)) {
-			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	
@@ -4076,7 +4076,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		}
 		
 		if (IN_ROOM(obj)) {
-			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	
