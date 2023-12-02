@@ -954,9 +954,6 @@ ACMD(do_bite) {
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
-		msg_to_char(ch, "Bite is still on cooldown.\r\n");
-	}
 	else if (GET_ACTION(ch) != ACT_SIRING && GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	else if (!*arg && !(victim = FIGHTING(ch))) {
@@ -1016,6 +1013,12 @@ ACMD(do_bite) {
 		// trying to sire? deny in this case
 		if (in_combat && subcmd) {
 			msg_to_char(ch, "You can't do that while someone else is attacking you!\r\n");
+			return;
+		}
+		
+		// check cooldown late: allow free bites without cooldown
+		if ((in_combat || !free_bite) && get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
+			msg_to_char(ch, "Bite is still on cooldown.\r\n");
 			return;
 		}
 		
@@ -1083,6 +1086,9 @@ ACMD(do_bite) {
 		// actually drink the blood
 		if (!attacked && !GET_FEEDING_FROM(ch) && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && IN_ROOM(ch) == IN_ROOM(victim) && !IS_DEAD(victim)) {
 			start_drinking_blood(ch, victim);
+			
+			// also clear the bite cooldown in this case (they can do non-attack bites during the cooldown)
+			remove_cooldown_by_type(ch, COOLDOWN_BITE);
 		}
 	}
 }
