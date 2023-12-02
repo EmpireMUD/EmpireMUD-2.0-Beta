@@ -4530,6 +4530,9 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// 'all' skips buildings
+			}
 			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
 				continue;
 			}
