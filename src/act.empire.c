@@ -1598,7 +1598,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		}
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
