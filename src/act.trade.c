@@ -2371,7 +2371,8 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_CHAR);
+		snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}
