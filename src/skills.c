@@ -1831,7 +1831,7 @@ ACMD(do_skills) {
 	ability_data *abil;
 	int points, level, iter, count;
 	empire_data *emp;
-	bool found, any, line, has_param_details;
+	bool found, any, same, line, has_param_details;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
 	int min_level = -1, max_level = -1;
 	size_t size, l_size;
@@ -2380,6 +2380,18 @@ ACMD(do_skills) {
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			
+			// check purchased
+			any = same = FALSE;
+			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+				if (has_ability_in_set(ch, ABIL_VNUM(abil), iter)) {
+					any = TRUE;
+					if (iter == GET_CURRENT_SKILL_SET(ch)) {
+						same = TRUE;
+					}
+				}
+			}
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
 			
 			if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
 				size += snprintf(outbuf + size, sizeof(outbuf) - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
