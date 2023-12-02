@@ -7991,8 +7991,10 @@ ACMD(do_workforce) {
 		msg_to_char(ch, "Your empire has no workforce.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Usage: workforce [chore] [on | off | <limit>] [island name | all]\r\n");
 		show_workforce_setup_to_char(emp, ch);
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "See 'help workforce' for options.\r\n");
+		}
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
