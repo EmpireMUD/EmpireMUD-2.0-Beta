@@ -3209,7 +3209,7 @@ ACMD(do_morph) {
 	
 	if (!*argument) {
 		count = 1;	// counting 'normal'
-		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-38.38s%s", "normal", PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
+		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %s%-38.38s%s%s", (!GET_MORPH(ch) ? "\tg" : ""), "normal", (!GET_MORPH(ch) ? " (current)\t0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
