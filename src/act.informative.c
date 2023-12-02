@@ -2716,7 +2716,7 @@ ACMD(do_cooldowns) {
 	for (cool = ch->cooldowns; cool; cool = cool->next) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
-		if (diff > 0) {
+		if (diff >= 0) {
 			if (diff >= SECS_PER_REAL_HOUR) {
 				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
 			}
