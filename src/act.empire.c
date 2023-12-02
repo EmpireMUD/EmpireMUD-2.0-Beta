@@ -7407,7 +7407,7 @@ ACMD(do_territory) {
 		skip_spaces(&argument);
 		argument = any_one_word(argument, arg);
 		
-		if (is_abbrev(arg, "-city") || is_abbrev(arg, "-cities")) {
+		if (!str_cmp(arg, "city") || !str_cmp(arg, "cities") || is_abbrev(arg, "-city") || is_abbrev(arg, "-cities")) {
 			check_city = TRUE;
 			if (!any_type_found) {
 				// first type requested: shut off the others
@@ -7416,7 +7416,7 @@ ACMD(do_territory) {
 				any_type_found = TRUE;
 			}
 		}
-		else if (is_abbrev(arg, "-outskirts")) {
+		else if (!str_cmp(arg, "outskirts") || is_abbrev(arg, "-outskirts")) {
 			check_outskirts = TRUE;
 			if (!any_type_found) {
 				// first type requested: shut off the others
@@ -7425,7 +7425,7 @@ ACMD(do_territory) {
 				any_type_found = TRUE;
 			}
 		}
-		else if (is_abbrev(arg, "-frontier")) {
+		else if (!str_cmp(arg, "frontier") || is_abbrev(arg, "-frontier")) {
 			check_frontier = TRUE;
 			if (!any_type_found) {
 				// first type requested: shut off the others
@@ -7602,7 +7602,7 @@ ACMD(do_territory) {
 			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
 		}
 		if (*search_str) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontains '%s'", (*option_buf ? ", " : ""), search_str);
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
 		}
 		if (*exclude_str) {
 			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
