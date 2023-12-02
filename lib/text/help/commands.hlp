@@ -2315,6 +2315,12 @@ Available options:
  * statusmessages - Turn off some status messages.
  * /leave and /join - Control which slash-channels you're on.
 
+Tips:
+ - If you're having trouble finding the entrance to a building, try looking in
+   the direction of the building. If it says the entrance is "from the east",
+   it means you need to be on the east side of the building and moving west to
+   enter it.
+
 See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, SMESSAGES, MAPSCAN, CHART,
    SLASH CHANNELS
 #

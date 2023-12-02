@@ -2340,6 +2340,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
+			act("$n renames the room.", FALSE, ch, NULL, NULL, TO_ROOM);
 			command_lag(ch, WAIT_ABILITY);
 		}
 		else if (color_code_length(arg2) > 0) {
@@ -2359,6 +2360,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
+			act("$n renames the room.", FALSE, ch, NULL, NULL, TO_ROOM);
 			command_lag(ch, WAIT_ABILITY);
 		}
 	}

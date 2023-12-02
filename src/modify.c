@@ -322,7 +322,10 @@ void string_add(descriptor_data *d, char *str) {
 		else if (d->save_room_id != NOWHERE) {
 			if (action != STRINGADD_ABORT) {
 				request_world_save(d->save_room_id, WSAVE_ROOM);
-				SEND_TO_Q("Room description saved.\r\n", d);
+				SEND_TO_Q("Description saved.\r\n", d);
+				if (d->character && IN_ROOM(d->character)) {
+					act("$n updates the room.", FALSE, d->character, NULL, NULL, TO_ROOM);
+				}
 			}
 			else {
 				SEND_TO_Q("Edit aborted.\r\n", d);
