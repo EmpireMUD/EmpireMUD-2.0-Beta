@@ -2264,11 +2264,11 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 * @param int max_dist How far to show (invalid distances <= 0 will use the default map size).
 */
 void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist) {
-	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], color[4];
 	char dirbuf[MAX_STRING_LENGTH];
 	int dist, dist_iter, can_see_in_dark_distance, view_height, r_height;
 	room_data *to_room;
-	int repeats, top_height;
+	int count, repeats, top_height;
 	bool blocking_veh, check_blocking, is_blocked = FALSE;
 	bool allow_stacking = TRUE;	// always
 	const char *memory;
@@ -2289,6 +2289,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 	*lastroom = '\0';
 	repeats = 0;
 	top_height = 0;
+	count = 0;
 	view_height = get_view_height(ch, origin);
 
 	// show distance that direction		
@@ -2353,11 +2354,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 		else {
 			// different
 			if (*lastroom) {
+				snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 				if (repeats > 0) {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%dx %s", *dirbuf ? ", " : "", repeats+1, lastroom);
+					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 				}
 				else {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s", *dirbuf ? ", " : "", lastroom);
+					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 				}
 			}
 			
@@ -2377,15 +2379,16 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 	
 	// check for lingering data to append
 	if (*lastroom) {
+		snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 		if (repeats > 0) {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%dx %s", *dirbuf ? ", " : "", repeats+1, lastroom);
+			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 		}
 		else {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s", *dirbuf ? ", " : "", lastroom);
+			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 		}
 	}
 
-	snprintf(buf, sizeof(buf), "%s: %s\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
+	snprintf(buf, sizeof(buf), "%s: %s\t0\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
 	CAP(buf);
 	msg_to_char(ch, "%s", buf);
 }
