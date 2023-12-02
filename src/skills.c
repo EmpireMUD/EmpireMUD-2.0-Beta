@@ -1013,8 +1013,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 			if (SHOW_STATUS_MESSAGES(ch, SM_SKILL_GAINS)) {
 				msg_to_char(ch, "\tyYou improve your %s skill to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
 				
-				points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
-				if (points > 0) {
+				if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && (points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill))) > 0) {
 					msg_to_char(ch, "\tyYou have %d ability point%s to spend. Type 'skill %s' to see %s.\t0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
 				}
 			}
