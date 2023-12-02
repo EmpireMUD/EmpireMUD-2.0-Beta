@@ -6501,6 +6501,11 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 	}
 	
+	if (k->desc) {
+		// protocol info
+		msg_to_char(ch, "Connection info [%s %s]: X-Colors: [%s\t0], MSDP: [%s\t0], MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString), NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), (k->desc->pProtocol->b256Support ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMXP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+	}
+	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
 		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
