@@ -707,8 +707,10 @@ See also: ATTRIBUTES, MELEE, CASTER, TANK, TO-HIT, DODGE
 "DIMINISHING RETURNS"
 
 Diminishing returns are numbers that increase quickly at low levels, but more
-slowly at higher levels. For example, the first +20 dodge you get is applied
-directly, but the next +20 dodge only brings you up to +30.
+slowly at higher levels. For example, the first +20 you get in a diminishing
+stat is applied directly, but the next +20 only brings you up to +30.
+
+This is currently only used for resistances.
 #
 DISPLAY
 
