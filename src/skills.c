@@ -2374,10 +2374,13 @@ ACMD(do_skills) {
 		}
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			
 			if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
-				size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill levels gained: %d/%d\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
+			}
+			else {
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "\r\n");
 			}
 			
 			// parent/prerequisite ability (chain?) -- maybe?
