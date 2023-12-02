@@ -7567,46 +7567,47 @@ ACMD(do_territory) {
 		}
 	}
 	
+		
+	// build option buf for output
+	*option_buf = '\0';
+	if (find_island) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
+	}
+	if (dist_from_me >= 0) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
+	}
+	if (any_type_found) {
+		if (check_city) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
+		}
+		if (check_outskirts) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
+		}
+		if (check_frontier) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
+		}
+	}
+	if (no_abandon) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
+	}
+	if (no_dismantle) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
+	}
+	if (no_work) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
+	}
+	if (public_only) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+	}
+	if (*search_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
+	}
+	if (*exclude_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
+	}
+	
 	if (node_list) {
 		node_list = reduce_territory_node_list(node_list);
-		
-		// build output
-		*option_buf = '\0';
-		if (find_island) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
-		}
-		if (dist_from_me >= 0) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
-		}
-		if (any_type_found) {
-			if (check_city) {
-				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
-			}
-			if (check_outskirts) {
-				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
-			}
-			if (check_frontier) {
-				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
-			}
-		}
-		if (no_abandon) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
-		}
-		if (no_dismantle) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
-		}
-		if (no_work) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
-		}
-		if (public_only) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
-		}
-		if (*search_str) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
-		}
-		if (*exclude_str) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
-		}
 		
 		// start buf
 		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
@@ -7649,7 +7650,13 @@ ACMD(do_territory) {
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
-		msg_to_char(ch, "No matching territory found.\r\n");
+		// none found
+		if (*option_buf) {
+			msg_to_char(ch, "No matching territory found: %s\r\n", option_buf);
+		}
+		else {
+			msg_to_char(ch, "No territory found.\r\n");
+		}
 	}
 }
 
