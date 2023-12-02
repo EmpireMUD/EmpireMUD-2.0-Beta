@@ -2150,7 +2150,12 @@ ACMD(do_skills) {
 			msg_to_char(ch, "Usage: skill drop <skill> <0/%d/%d>\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
 		}
 		else if (!(skill = find_skill_by_name(arg))) {
-			msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
+			if (find_ability_by_name(arg)) {
+				msg_to_char(ch, "You cannot drop abilities with this command. Use \"skill reset\" instead.\r\n");
+			}
+			else {
+				msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
+			}
 		}
 		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
 			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
