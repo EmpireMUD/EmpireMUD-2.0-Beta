@@ -1565,7 +1565,7 @@ Examples:
  > workforce keep 200 spruce lumber
  > workforce keep default 1
 
-See also: WORKFORCE
+See also: WORKFORCE, WORKFORCE LIMIT
 #
 "WORKFORCE LIMIT" "WORKFORCE LIMITS"
 
@@ -1583,7 +1583,7 @@ Using this command without an amount lets you search your current limits.
 You can also set limits for a whole chore when turning a chore on using
 "workforce <chore> <limit> [island name]".
 
-See also: WORKFORCE
+See also: WORKFORCE, WORKFORCE KEEP
 #
 "WORKFORCE NEARBY"
 
