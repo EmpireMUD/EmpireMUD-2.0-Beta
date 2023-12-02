@@ -1279,7 +1279,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 */
 void display_archetype_menu(descriptor_data *desc, int type_pos) {
 	msg_to_desc(desc, "\tcChoose your \%s\t0:\r\n%s", archetype_menu[type_pos].name, archetype_menu[type_pos].description);
-	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n");
+	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n\r\n");
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
@@ -1356,7 +1356,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	
 	// still here? add a prompt
 	if (STATE(desc) == CON_Q_ARCHETYPE) {
-		msg_to_desc(desc, "\r\nType \tcinfo\t0, \tclist\t0, or %s %s name > %s", AN(archetype_menu[pos].name), archetype_menu[pos].name, telnet_go_ahead(desc));
+		msg_to_desc(desc, "\r\nType \tcinfo\t0 for details, \tclist\t0 for more, or %s %s name to choose > %s", AN(archetype_menu[pos].name), archetype_menu[pos].name, telnet_go_ahead(desc));
 	}
 }
 
