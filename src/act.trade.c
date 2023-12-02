@@ -933,12 +933,15 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	}
 	
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		sprintf(buf, "%s%s", (has_ability(ch, GET_CRAFT_ABILITY(craft)) ? "" : "\tr"), get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
 		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
+		if (!has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+			sprintf(buf + strlen(buf), " (not learned)\t0");
+		}
 		if (abil && ABIL_MASTERY_ABIL(abil) != NOTHING) {
-			sprintf(buf + strlen(buf), ", Mastery: %s", get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+			sprintf(buf + strlen(buf), ", Mastery: %s%s%s", (has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : "\tr"), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : " (not learned)\t0");
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
 	}
