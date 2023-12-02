@@ -6503,7 +6503,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	if (k->desc) {
 		// protocol info
-		msg_to_char(ch, "Connection info [%s %s]: X-Colors: [%s\t0], MSDP: [%s\t0], MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_VERSION]->pValueString), NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), (k->desc->pProtocol->b256Support ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMXP ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+		msg_to_char(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0], MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
 	}
 	
 	if (IS_MOB(k)) {
