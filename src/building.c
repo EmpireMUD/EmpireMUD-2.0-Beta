@@ -2162,7 +2162,7 @@ ACMD(do_dismantle) {
 	
 	// otherwise args are not welcome
 	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		msg_to_char(ch, "You don't see that to dismantle here.\r\n");
 		return;
 	}
 	
