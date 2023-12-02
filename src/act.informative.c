@@ -4462,7 +4462,7 @@ ACMD(do_whois) {
 	char part[MAX_STRING_LENGTH];
 	char_data *victim = NULL;
 	bool file = FALSE;
-	int level;
+	int level, diff, math;
 
 	skip_spaces(&argument);
 
@@ -4495,6 +4495,29 @@ ACMD(do_whois) {
 	if (GET_LOYALTY(victim)) {
 		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
 		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
+	}
+	
+	// last login info
+	if (!IS_IMMORTAL(victim) && !IN_ROOM(victim)) {
+		diff = time(0) - victim->prev_logon;
+		
+		if (diff > SECS_PER_REAL_YEAR) {
+			math = diff / SECS_PER_REAL_YEAR;
+			msg_to_char(ch, "Last online: over %d year%s ago\r\n", math, PLURAL(math));
+		}
+		else if (diff > (SECS_PER_REAL_DAY * 30.5)) {
+			math = diff / (SECS_PER_REAL_DAY * 30.5);
+			msg_to_char(ch, "Last online: over %d month%s ago\r\n", math, PLURAL(math));
+		}
+		else if (diff > SECS_PER_REAL_WEEK) {
+			msg_to_char(ch, "Last online: more than a week ago\r\n");
+		}
+		else if (diff > SECS_PER_REAL_DAY) {
+			msg_to_char(ch, "Last online: more than a day ago\r\n");
+		}
+		else {
+			msg_to_char(ch, "Last online: today\r\n");
+		}
 	}
 
 	if (GET_LORE(victim)) {
