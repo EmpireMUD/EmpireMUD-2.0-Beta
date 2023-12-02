@@ -7360,17 +7360,19 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], line[256], *ptr;
-	struct find_territory_node *node_list = NULL, *node, *next_node;
-	empire_data *emp = GET_LOYALTY(ch);
-	room_data *iter, *next_iter;
-	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk, full;
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], option_buf[1024], line[256], *remain;
+	bool ok, junk, full;
+	bool check_city, check_outskirts, check_frontier, any_type_found;
+	bool no_abandon, no_dismantle, no_work, public_only;
+	int dist_from_me, total, ttype;
 	size_t size, lsize;
-	int total;
 	crop_data *crop = NULL;
-	char *remain;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	struct island_info *find_island;
+	room_data *iter, *next_iter;
 	
-	// imms can target an empire, otherwise the only arg is optional sector type
+	// imms can target an empire as the FIRST argument
 	remain = any_one_word(argument, arg);
 	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
 		if ((emp = get_empire_by_name(arg))) {
@@ -7382,9 +7384,7 @@ ACMD(do_territory) {
 		}
 	}
 	
-	skip_spaces(&argument);
-	*search_str = *exclude_str = '\0';
-	
+	// preliminaries
 	if (!emp) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
@@ -7394,53 +7394,151 @@ ACMD(do_territory) {
 		return;
 	}
 	
-	// only if no argument (optional)
-	if (*argument && is_abbrev(argument, "outskirts") && strlen(argument) >= 4) {
-		// (allow partial abbrev)
-		outskirts_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else if (*argument && is_abbrev(argument, "frontier") && strlen(argument) >= 5) {
-		// (allow partial abbrev)
-		frontier_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else {
-		outside_only = *argument ? FALSE : TRUE;
+	// prepare options
+	*search_str = *exclude_str = '\0';
+	check_city = check_outskirts = check_frontier = TRUE;
+	any_type_found = FALSE;
+	no_abandon = no_dismantle = no_work = public_only = FALSE;
+	dist_from_me = -1;
+	find_island = NULL;
+	
+	// parse options
+	while (*argument) {
+		skip_spaces(&argument);
+		argument = any_one_word(argument, arg);
 		
-		// process the argument into search_str, exclude_str
-		ptr = argument;
-		while (*ptr) {
-			ptr = any_one_word(ptr, arg);
-			
-			if (*arg == '-') {
-				sprintf(exclude_str + strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
+		if (is_abbrev(arg, "-city") || is_abbrev(arg, "-cities")) {
+			check_city = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_outskirts = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-outskirts")) {
+			check_outskirts = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-frontier")) {
+			check_frontier = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_outskirts = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-distance")) {
+			argument = any_one_arg(argument, arg2);
+			if (*arg2 && isdigit(*arg2)) {
+				dist_from_me = atoi(arg2);
 			}
 			else {
-				sprintf(search_str + strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+				msg_to_char(ch, "Territory: The -distance argument requires a number.\r\n");
+				return;
+			}
+		}
+		else if (is_abbrev(arg, "-island")) {
+			argument = any_one_word(argument, arg2);
+			if (!*arg2) {
+				msg_to_char(ch, "You must specify which island with -island \"Island Name\".\r\n");
+				return;
+			}
+			else if (find_island) {
+				msg_to_char(ch, "You can't specify more than one island at a time.\r\n");
+				return;
+			}
+			else if (!(find_island = get_island_by_name(ch, arg2))) {
+				msg_to_char(ch, "Unknown island '%s'.\r\n", arg2);
+				return;
+			}
+			// else: we found an island
+		}
+		else if (!str_cmp(arg, "no-abandon") || !str_cmp(arg, "noabandon") || is_abbrev(arg, "-no-abandon") || is_abbrev(arg, "-noabandon")) {
+			no_abandon = TRUE;
+		}
+		else if (!str_cmp(arg, "no-dismantle") || !str_cmp(arg, "nodismantle") || is_abbrev(arg, "-no-dismantle") || is_abbrev(arg, "-nodismantle")) {
+			no_dismantle = TRUE;
+		}
+		else if (!str_cmp(arg, "no-work") || !str_cmp(arg, "nowork") || is_abbrev(arg, "-no-work") || is_abbrev(arg, "-nowork")) {
+			no_work = TRUE;
+		}
+		else if (!str_cmp(arg, "public") || is_abbrev(arg, "-public")) {
+			public_only = TRUE;
+		}
+		else {
+			// unknown arg: treat as search
+			if (*arg != '-') {
+				// positive search term
+				snprintf(search_str + strlen(search_str), sizeof(search_str) - strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+			}
+			else if (*(arg+1) == '-') {
+				// double dash: negative term
+				if (*arg+2) {
+					snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+2);
+				}
+				// else: empty/ignore
+			}
+			else if (*(arg+1)) {
+				// single dash: also a negative term
+				snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
 			}
 		}
 	}
 	
 	// ready?
 	HASH_ITER(hh, world_table, iter, next_iter) {	
-		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;	// not on map
+		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+			continue;	// not on map: ignore if no search terms given
 		}
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) == TER_CITY) {
-			continue;	// not outside
-		}
-		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_OUTSKIRTS) {
-			continue;	// not outskirts
-		}
-		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_FRONTIER) {
-			continue;	// not outskirts
+		
+		// territory type flags: only if any where requested
+		if (any_type_found) {
+			ttype = get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL);
+			if (!check_city && ttype == TER_CITY) {
+				continue;
+			}
+			else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+				continue;
+			}
+			else if (!check_frontier && ttype == TER_FRONTIER) {
+				continue;
+			}
 		}
 		
-		// compare request
+		// manage flags
+		if (no_abandon && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_ABANDON)) {
+			continue;
+		}
+		if (no_dismantle && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_DISMANTLE)) {
+			continue;
+		}
+		if (no_work && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_WORK)) {
+			continue;
+		}
+		if (public_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC)) {
+			continue;
+		}
+		
+		// distance?
+		if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), iter) > dist_from_me) {
+			continue;
+		}
+		if (find_island && GET_ISLAND(iter) != find_island) {
+			continue;
+		}
+		
+		// compare requested text
+		ok = FALSE;
 		if (!*search_str && !*exclude_str) {
 			ok = TRUE;
 		}
@@ -7460,6 +7558,7 @@ ACMD(do_territory) {
 			ok = FALSE;
 		}
 		
+		// final ok: add to the list
 		if (ok) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
@@ -7470,14 +7569,47 @@ ACMD(do_territory) {
 	
 	if (node_list) {
 		node_list = reduce_territory_node_list(node_list);
-	
-		if (!*argument) {
-			size = snprintf(buf, sizeof(buf), "%s%s&0 territory outside of cities:\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
+		
+		// build output
+		*option_buf = '\0';
+		if (find_island) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
 		}
-		else {
-			size = snprintf(buf, sizeof(buf), "'%s' tiles owned by %s%s&0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-			CAP(buf);
+		if (dist_from_me >= 0) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
 		}
+		if (any_type_found) {
+			if (check_city) {
+				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
+			}
+			if (check_outskirts) {
+				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
+			}
+			if (check_frontier) {
+				snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
+			}
+		}
+		if (no_abandon) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
+		}
+		if (no_dismantle) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
+		}
+		if (no_work) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
+		}
+		if (public_only) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+		}
+		if (*search_str) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontains '%s'", (*option_buf ? ", " : ""), search_str);
+		}
+		if (*exclude_str) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
+		}
+		
+		// start buf
+		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
 		
 		// display and free the nodes
 		total = 0;
