@@ -3233,10 +3233,15 @@ ACMD(do_morph) {
 				lsize = snprintf(line, sizeof(line), "%s", skip_filler(MORPH_SHORT_DESC(morph)));
 			}
 			
+			// current?
+			if (GET_MORPH(ch) == morph) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (current)");
+			}
+			
 			// append
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 2) || lsize > 38) {
 				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+					size += snprintf(buf + size, sizeof(buf) - size, " %s%s\t0\r\n", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 				}
 				else {
 					full = TRUE;
@@ -3244,7 +3249,7 @@ ACMD(do_morph) {
 			}
 			else {
 				if (size + 39 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s", line);
+					size += snprintf(buf + size, sizeof(buf) - size, " %s%-38.38s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 				}
 				else {
 					full = TRUE;
