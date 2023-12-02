@@ -378,7 +378,9 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Magical will generally help you in the Caster or Solo roles.
+
+See also: CASTER, ROLE, SCORE, SOLO
 #
 BONUS-PHYSICAL "BONUS PHYSICAL" "PHYSICAL ATTRIBUTE" "PHYSICAL TRAIT"
 
@@ -391,7 +393,9 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Physical will generally only help you in the Melee or Solo roles.
+
+See also: MELEE, ROLE, SCORE, SOLO
 #
 "BRIEF RESPITE" RESPITE
 
