@@ -227,7 +227,9 @@ bool dismiss_any_minipet(char_data *ch) {
 	char_data *mob;
 	
 	while ((mob = find_minipet(ch))) {	// ensures there aren't more than 1
-		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+		if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+			act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+		}
 		extract_char(mob);
 		any = TRUE;
 	}
