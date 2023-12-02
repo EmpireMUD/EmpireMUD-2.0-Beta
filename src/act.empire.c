@@ -7371,6 +7371,7 @@ ACMD(do_territory) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	struct island_info *find_island;
 	room_data *iter, *next_iter;
+	vehicle_data *veh;
 	
 	// imms can target an empire as the FIRST argument
 	remain = any_one_word(argument, arg);
@@ -7492,7 +7493,7 @@ ACMD(do_territory) {
 		}
 	}
 	
-	// ready?
+	// ready? check world:
 	HASH_ITER(hh, world_table, iter, next_iter) {	
 		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;	// not on map: ignore if no search terms given
@@ -7565,9 +7566,80 @@ ACMD(do_territory) {
 			node->count = 1;
 			DL_PREPEND(node_list, node);
 		}
-	}
+	} // end territory
 	
+	// check vehicles (except under certain options):	
+	if (!no_abandon && !public_only) {
+		DL_FOREACH(vehicle_list, veh) {
+			if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// not a building or not owned by emp
+			}
 		
+			// do we already have this location?
+			ok = TRUE;
+			DL_FOREACH(node_list, node) {
+				if (node->loc == IN_ROOM(veh)) {
+					ok = FALSE;
+					break;
+				}
+			}
+			if (!ok) {
+				continue;	// already marked this room
+			}
+		
+			// check options:
+			// territory type flags: only if any where requested
+			if (any_type_found) {
+				ttype = get_territory_type_for_empire(IN_ROOM(veh), emp, FALSE, &junk, NULL);
+				if (!check_city && ttype == TER_CITY) {
+					continue;
+				}
+				else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+					continue;
+				}
+				else if (!check_frontier && ttype == TER_FRONTIER) {
+					continue;
+				}
+			}
+		
+			// manage flags
+			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
+				continue;
+			}
+			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
+				continue;
+			}
+		
+			// distance?
+			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
+				continue;
+			}
+			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
+				continue;
+			}
+		
+			// compare requested text
+			ok = FALSE;
+			if (!*search_str && !*exclude_str) {
+				ok = TRUE;
+			}
+			else if ((!*search_str || multi_isname(search_str, VEH_SHORT_DESC(veh))) && (!*exclude_str || !multi_isname(exclude_str, VEH_SHORT_DESC(veh)))) {
+				ok = TRUE;
+			}
+			else {
+				ok = FALSE;
+			}
+		
+			// final ok: add to the list
+			if (ok) {
+				CREATE(node, struct find_territory_node, 1);
+				node->loc = IN_ROOM(veh);
+				node->count = 1;
+				DL_PREPEND(node_list, node);
+			}
+		}
+	} // end vehicles
+	
 	// build option buf for output
 	*option_buf = '\0';
 	if (find_island) {
