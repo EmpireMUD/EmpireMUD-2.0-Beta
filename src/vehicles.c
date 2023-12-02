@@ -4006,6 +4006,9 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Interior: [\tc%d\t0 - \ty%s\t0], Rooms: [\tc%d\t0], Designate: \ty%s\t0\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none", VEH_MAX_ROOMS(veh), part);
 	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Interior: [\tc-1\t0 - \tynone\t0], Rooms: [\tc0\t0]\r\n");
+	}
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
