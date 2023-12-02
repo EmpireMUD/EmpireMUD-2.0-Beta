@@ -823,9 +823,14 @@ static void print_group(char_data *ch) {
 			}
 			
 			// show class section if they have one
-			if (!IS_NPC(k) && GET_CLASS(k)) {
+			if (!IS_NPC(k)) {
 				get_player_skill_string(k, skills, TRUE);
-				snprintf(class, sizeof(class), "/%s/%s", skills, class_role[(int) GET_CLASS_ROLE(k)]);
+				snprintf(class, sizeof(class), "/%s", skills);
+				
+				// screenreader sees role here; otherwise the name is highlighted
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
+				}
 			}
 			else {
 				*class = '\0';
@@ -851,7 +856,7 @@ static void print_group(char_data *ch) {
 			}
 			
 			// name: lvl class (spec) -- location (x, y)
-			msg_to_char(ch, "%s%s%s %s [%d%s]%s%s%s\r\n", class_role_color[GET_CLASS_ROLE(k)], PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? class_role[GET_CLASS_ROLE(k)] : "\t0"), get_approximate_level(k), class, status, alerts, loc);
+			msg_to_char(ch, "%s%s%s\t0 [%d%s]%s%s%s\r\n", class_role_color[(int)GET_CLASS_ROLE(k)], PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", get_approximate_level(k), class, status, alerts, loc);
 		}
 	}
 	else {
