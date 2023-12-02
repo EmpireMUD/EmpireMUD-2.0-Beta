@@ -1016,7 +1016,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
 	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 									// note: build does not use the message strings
-	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
+	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
 	{ "workforce", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
@@ -1026,7 +1026,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
-	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making a %s." } },
+	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making %s." } },
 };
 
 
