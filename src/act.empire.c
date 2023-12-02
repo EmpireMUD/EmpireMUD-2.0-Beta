@@ -7564,6 +7564,7 @@ ACMD(do_territory) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
+			node->is_vehicle = FALSE;
 			DL_PREPEND(node_list, node);
 		}
 	} // end territory
@@ -7635,6 +7636,7 @@ ACMD(do_territory) {
 				CREATE(node, struct find_territory_node, 1);
 				node->loc = IN_ROOM(veh);
 				node->count = 1;
+				node->is_vehicle = TRUE;
 				DL_PREPEND(node_list, node);
 			}
 		}
@@ -7692,10 +7694,10 @@ ACMD(do_territory) {
 			
 			if (!full) {
 				if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s%s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				else {
-					lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%s %s%s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				
 				if (size + lsize < sizeof(buf)) {

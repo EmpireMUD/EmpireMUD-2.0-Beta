@@ -3283,6 +3283,7 @@ struct find_territory_node {
 	room_data *loc;
 	char *details;	// optional string with vehicles, etc
 	int count;
+	bool is_vehicle;	// notes if the marked territory was from a vehicle
 	
 	struct find_territory_node *prev, *next;	// doubly-linked list
 };
