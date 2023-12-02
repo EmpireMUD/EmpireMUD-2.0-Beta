@@ -7607,10 +7607,10 @@ ACMD(do_territory) {
 			}
 		
 			// manage flags
-			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
+			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
 				continue;
 			}
-			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
+			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
 				continue;
 			}
 		
