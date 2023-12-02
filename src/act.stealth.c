@@ -1199,8 +1199,12 @@ ACMD(do_pickpocket) {
 				if (ch->desc) {
 					stack_msg_to_desc(ch->desc, "You find %s!\r\n", money_amount(vict_emp, coins));
 				}
+				act("$n pickpockets $N.", TRUE, ch, NULL, vict, TO_NOTVICT | TO_GROUP_ONLY);
 			}
-			else if (!any) {
+			else if (any) {
+				act("$n pickpockets $N.", TRUE, ch, NULL, vict, TO_NOTVICT | TO_GROUP_ONLY);
+			}
+			else {
 				if (ch->desc) {
 					stack_msg_to_desc(ch->desc, "You find nothing of any use.\r\n");
 				}

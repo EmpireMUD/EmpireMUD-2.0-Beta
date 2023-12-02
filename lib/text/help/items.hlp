@@ -882,18 +882,19 @@ citizens. Drink containers are usually emptied out when you store them. Items
 can be stored from your inventory or from the ground.
 
 If you don't have the "storage" empire privilege, you can store items, but
-can't retrieve them.
+can't retrieve them. This does not apply to home storage.
 
 Unique, enchanted, superior, leveled, or otherwise-modified items can't be
 stored in regular storage buildings, but you can store them with the
-"warehouse" command in a warehouse or vault. 
+"warehouse" command in a warehouse or vault.  Bound items can be stored in your
+personal home with the "home store" command.
 
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
 
 You can identify an item to see where it can be stored.
 
-See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
+See also: AUTO-STORE, HOME, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
    WAREHOUSE, VAULT
 #
 SUPERIOR MASTERWORK "MASTERY ABILITY"

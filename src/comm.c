@@ -1221,6 +1221,11 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	const char *ACTNULL = "<NULL>";
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
 	
+	// check group?
+	if (IS_SET(act_flags, TO_GROUP_ONLY) && to != ch && (!GROUP(to) || GROUP(to) != GROUP(ch))) {
+		return;
+	}
+	
 	// check fight messages (may exit early)
 	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_BUFF)) {
 		show = any = FALSE;

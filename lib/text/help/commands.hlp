@@ -2320,6 +2320,7 @@ Tips:
    the direction of the building. If it says the entrance is "from the east",
    it means you need to be on the east side of the building and moving west to
    enter it.
+ - You can type 'tip' to cycle through the tips that show when you log in.
 
 See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, SMESSAGES, MAPSCAN, CHART,
    SLASH CHANNELS
