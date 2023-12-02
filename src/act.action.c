@@ -846,6 +846,10 @@ INTERACTION_FUNC(finish_chopping) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	
 	return TRUE;
@@ -896,6 +900,10 @@ INTERACTION_FUNC(finish_digging) {
 			// to-room
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			if (IN_ROOM(obj)) {
+				act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
 		}
 	}
 	
@@ -991,6 +999,10 @@ INTERACTION_FUNC(finish_foraging) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	else {
 		msg_to_char(ch, "You find nothing.\r\n");
@@ -1033,6 +1045,10 @@ INTERACTION_FUNC(finish_gathering) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 		
 		gain_player_tech_exp(ch, PTECH_GATHER, 10);
 		
@@ -1080,10 +1096,14 @@ INTERACTION_FUNC(finish_harvesting) {
 			else {
 				strcpy(buf, cust ? cust : "You got $p!");
 			}
-			act(buf, FALSE, ch, obj, FALSE, TO_CHAR);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n gets $p!", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			if (IN_ROOM(obj)) {
+				act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
 		}
 	}
 	else {
@@ -1096,9 +1116,9 @@ INTERACTION_FUNC(finish_harvesting) {
 
 INTERACTION_FUNC(finish_mining) {
 	bool any = FALSE;
-	obj_data *obj;
+	obj_data *obj = NULL;
 	char *cust;
-	int iter;
+	int iter, obj_ok = 0;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -1112,10 +1132,16 @@ INTERACTION_FUNC(finish_mining) {
 		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		if (load_otrigger(obj)) {
+		if ((obj_ok = load_otrigger(obj))) {
 			get_otrigger(obj, ch, FALSE);
 		}
 		any = TRUE;
+	}
+	
+	if (obj && obj_ok) {
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	
 	// mark gained
@@ -4047,6 +4073,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		if (cust || data->msg.finish[1]) {
 			act(cust ? cust : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
+		}
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p is on the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	
