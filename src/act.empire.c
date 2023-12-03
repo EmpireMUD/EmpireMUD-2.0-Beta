@@ -63,8 +63,10 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 struct einv_type {
 	obj_vnum vnum;
 	int local;
-	int total;
 	int keep;
+	
+	int total;
+	int total_keep;
 	UT_hash_handle hh;
 };
 
@@ -1019,7 +1021,7 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256], totalstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store, *next_store;
@@ -1073,6 +1075,12 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		
 			// add
 			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
+			if (store->keep == UNLIMITED) {
+				einv->total_keep = UNLIMITED;
+			}
+			else if (einv->total_keep != UNLIMITED) {
+				SAFE_ADD(einv->total_keep, store->keep, 0, INT_MAX, FALSE);
+			}
 			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
 				einv->keep = store->keep;
@@ -1110,6 +1118,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {
+			// prefix
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
@@ -1117,6 +1126,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*vstr = '\0';
 			}
 			
+			// keep section
 			if (einv->keep == UNLIMITED) {
 				strcpy(keepstr, " (keep)");
 			}
@@ -1127,12 +1137,24 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*keepstr = '\0';
 			}
 			
+			// total?
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, einv->total);
+				if (einv->total_keep == UNLIMITED) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
+				}
+				else if (einv->total_keep > 0) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
+				}
+				else {
+					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
+				}
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr);
+				*totalstr = '\0';
 			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
 			
 			// append if room
 			if (size + lsize < sizeof(output)) {
