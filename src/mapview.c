@@ -40,7 +40,7 @@
 
 // external functions
 ACMD(do_weather);
-vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
+vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_vehicles);
 
 // locals
 ACMD(do_exits);
@@ -1955,7 +1955,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		base_color = crop_icon->color;
 	}
 	
-	show_veh = find_vehicle_to_show(ch, to_room);
+	show_veh = find_vehicle_to_show(ch, to_room, NULL);
 	painted = (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) ? (show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room)) : FALSE;
 
 	// 1: Build basic icon strings: self_icon, mappc_icon, veh_icon, map_icon (any of these may be empty)
@@ -2404,7 +2404,8 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 */
 char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark) {
 	static char output[1024];
-	char plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
+	char plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], multi_str[256], paint_str[256];
+	int total_vehicles = 0;
 	vehicle_data *show_veh;
 	empire_data *emp;
 	char_data *vict;
@@ -2431,7 +2432,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 	}
 	
 	// show ships
-	if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+	if ((show_veh = find_vehicle_to_show(ch, to_room, &total_vehicles))) {
 		if (VEH_PAINT_COLOR(show_veh)) {
 			sprinttype(VEH_PAINT_COLOR(show_veh), paint_names, paint_str, sizeof(paint_str), "painted");
 			*paint_str = LOWER(*paint_str);
@@ -2441,15 +2442,23 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 			*paint_str = '\0';
 		}
 		
-		if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-			get_informative_vehicle_string(ch, show_veh, infobuf);
-			sprintf(output + strlen(output), " <%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
-		}
-		else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
-			sprintf(output + strlen(output), " <%s %s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+		// indicate if more vehicles can be seen
+		if (total_vehicles > 1) {
+			snprintf(multi_str, sizeof(multi_str), ", %+d", total_vehicles - 1);
 		}
 		else {
-			sprintf(output + strlen(output), " <%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+			*multi_str = '\0';
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+			get_informative_vehicle_string(ch, show_veh, infobuf);
+			sprintf(output + strlen(output), " <%s%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf, multi_str);
+		}
+		else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+			sprintf(output + strlen(output), " <%s %s%s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), multi_str);
+		}
+		else {
+			sprintf(output + strlen(output), " <%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), multi_str);
 		}
 	}
 	
