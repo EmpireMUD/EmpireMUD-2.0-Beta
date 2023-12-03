@@ -1035,14 +1035,14 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		return;
 	}
 	
-	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
-		return;
-	}
-	
 	if (!str_cmp(argument, "all") || !strn_cmp(argument, "all ", 4)) {
 		*argument = '\0';
 		all = TRUE;
+	}
+	
+	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !all && !*argument) {
+		msg_to_char(ch, "You don't have anything stored at sea.\r\n");
+		return;
 	}
 	
 	// build list
