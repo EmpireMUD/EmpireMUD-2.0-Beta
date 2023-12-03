@@ -1730,6 +1730,11 @@ void extract_char(char_data *ch) {
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch, NOTHING);
 	
+	// remove dots to avoid one firing mid-extract
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+	
 	// ensure no stored events
 	cancel_all_stored_events(&GET_STORED_EVENTS(ch));
 	
