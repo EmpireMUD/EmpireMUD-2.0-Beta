@@ -2948,8 +2948,10 @@ const char *obj_custom_types[] = {
 	"script3",
 	"script4",
 	"script5",	// 25
-	"action-to-char",
-	"action-to-room",
+	"mine-to-char",
+	"mine-to-room",
+	"chop-to-char",
+	"chop-to-room",
 	"\n"
 };
 

@@ -1547,14 +1547,14 @@ void process_chop(char_data *ch) {
 	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
 
 	// messaging
-	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_ACTION_TO_CHAR))) {
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_CHOP_TO_CHAR))) {
 		act(cust, FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
 	}
 	else {
 		act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
 	}
 	
-	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_ACTION_TO_ROOM))) {
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_CHOP_TO_ROOM))) {
 		act(cust, FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
 	}
 	else {
@@ -1699,8 +1699,7 @@ void process_escaping(char_data *ch) {
 * @param char_data *ch The excavator.
 */
 void process_excavating(char_data *ch) {
-	int count, total, rand;
-	char *cust;
+	int count, total;
 	char_data *iter;
 	obj_data *tool;
 
@@ -1730,27 +1729,14 @@ void process_excavating(char_data *ch) {
 			// count up toward zero
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, 1);
 			
-			rand = number(0, 1);	// for basic messaging
-			
 			// messaging
-			if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_CHAR))) {
-				act(cust, FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
-			}
-			else if (rand) {
-				act("You jab your shovel into the dirt...", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
-			}
-			else {
+			if (!number(0, 1)) {
 				act("You toss a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
-			}
-			
-			if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_ROOM))) {
-				act(cust, FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
-			}
-			else if (rand) {
-				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+				act("$n jabs $s shovel into the dirt...", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			else {
-				act("$n jabs $s shovel into the dirt...", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+				act("You jab your shovel into the dirt...", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 			}
 
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
@@ -2228,14 +2214,14 @@ void process_mining(char_data *ch) {
 		GET_ACTION_TIMER(ch) -= amt;
 		
 		// messaging
-		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_CHAR))) {
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_MINE_TO_CHAR))) {
 			act(cust, FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
 		}
 		else {
 			act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
 		}
 		
-		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_ROOM))) {
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_MINE_TO_ROOM))) {
 			act(cust, FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 		}
 		else {
