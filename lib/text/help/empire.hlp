@@ -1148,15 +1148,15 @@ The territory command will list all your territory. This command groups tiles
 that are near each other so that it shows you fewer lines.
 
 Supported options:
-   -cities - Only tiles in cities.
-   -outskirts - Only tiles on outskirts.
-   -frontier - Only tiles on the frontier.
-   -distance N - Only locations within N tiles of you.
-   -island "name" - Only locations on the given island (use quotes if needed).
-   -no-abandon - Only no-abandon tiles.
-   -no-dismantle - Only no-dismantle tiles.
-   -no-work - Only no-work tiles.
-   -public - Only public tiles.
+   -cities   Only tiles in cities.
+   -outskirts   Only tiles on outskirts.
+   -frontier   Only tiles on the frontier.
+   -distance N   Only locations within N tiles of you.
+   -island "name"   Only locations on the given island (use quotes if needed).
+   -no-abandon   Only no-abandon tiles.
+   -no-dismantle   Only no-dismantle tiles.
+   -no-work   Only no-work tiles.
+   -public   Only public tiles.
 
 You can also add search keywords. Starting a keyword with a dash (-) will
 search for tiles that DON'T have that word. If you need to exclude a word
