@@ -1074,6 +1074,10 @@ while %something%
   ...
 done
 
+Note that "break" can be used to end a "while" loop early, as in many
+languages, but the /f formatter will not recognize it and will not format the
+script correctly.
+
 See also: SWITCH
 #d
 $~
