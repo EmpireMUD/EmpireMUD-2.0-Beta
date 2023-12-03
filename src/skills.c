@@ -2460,6 +2460,10 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 		}
 		
+		if (ABIL_COOLDOWN_SECS(abil) > 0) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		}
+		
 		// data, if parameterized
 		if (ABIL_DATA(abil)) {
 			// techs
