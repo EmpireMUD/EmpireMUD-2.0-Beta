@@ -2813,19 +2813,19 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	
 	if (inspire_data[type].first_apply != APPLY_NONE) {
 		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	if (inspire_data[type].second_apply != APPLY_NONE) {
 		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	
 	if (any) {
