@@ -2608,6 +2608,10 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   wait 8 s
 elseif %move% == 3
   * Summon or Buff Max (no interrupt)
+  if %diff% == 1
+    * skip max
+    halt
+  end
   set max %room.people(16614)%
   if !%max% && %self.var(summoned_max,0)%
     %echo% &&G&&Z~%self% says, 'This is for Max, you monster!'&&0
