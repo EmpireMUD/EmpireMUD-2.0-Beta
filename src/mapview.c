@@ -386,7 +386,7 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
 	}
 	if (mine_view != 0 && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_MINE_STATUS))) {
-		sprintf(buffer + strlen(buffer), "%s%s", *buffer ? ", " :"", mine_view > 0 ? "has ore" : "depleted");
+		sprintf(buffer + strlen(buffer), "%s%s", *buffer ? ", " :"", mine_view > 0 ? "has ore" : "ore depleted");
 	}
 	if (public && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC))) {
 		sprintf(buffer + strlen(buffer), "%spublic", *buffer ? ", " :"");
