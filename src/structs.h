@@ -2004,8 +2004,10 @@ typedef enum {
 #define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
-#define OBJ_CUSTOM_ACTION_TO_CHAR  26	// used during actions like chop or mine
-#define OBJ_CUSTOM_ACTION_TO_ROOM  27	// used during actions like chop or mine
+#define OBJ_CUSTOM_MINE_TO_CHAR  26
+#define OBJ_CUSTOM_MINE_TO_ROOM  27
+#define OBJ_CUSTOM_CHOP_TO_CHAR  28
+#define OBJ_CUSTOM_CHOP_TO_ROOM  29
 
 
 // RES_x: resource requirement types
