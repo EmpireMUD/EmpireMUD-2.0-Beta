@@ -2563,6 +2563,7 @@ ACMD(do_gen_write) {
 	}
 	else {
 		msg_to_char(ch, "You submit %s %s: %s\r\n", AN(name), name, show_color_codes(argument));
+		msg_to_char(ch, "Thanks!\r\n");
 	}
 }
 
