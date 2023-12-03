@@ -1853,6 +1853,7 @@ bool is_multiword_abbrev(const char *arg, const char *phrase);
 int is_number(const char *str);
 char *one_argument(char *argument, char *first_arg);
 char *one_word(char *argument, char *first_arg);
+char *quoted_arg_or_all(char *argument, char *found_arg);
 int reserved_word(char *argument);
 int search_block(char *arg, const char **list, int exact);
 void skip_spaces(char **string);

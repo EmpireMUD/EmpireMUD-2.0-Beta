@@ -2323,6 +2323,40 @@ char *one_word(char *argument, char *first_arg) {
 
 
 /**
+* This is similar to one_word() in that it checks for quotes around the args,
+* but different in that unquoted text will return the whole argument, not just
+* the first word.
+*
+* @param char *argument The incoming argument(s).
+* @param char *found_arg The variable where the detected argument will be stored.
+* @return char* A pointer to whatever remains of argument.
+*/
+char *quoted_arg_or_all(char *argument, char *found_arg) {
+	skip_spaces(&argument);
+	if (*argument == '\"') {
+		// found quote: pull whole thing
+		argument++;
+		while (*argument && *argument != '\"') {
+			*(found_arg++) = *argument;
+			argument++;
+		}
+		*found_arg = '\0';
+	}
+	else {
+		// no quote: pull the entire arg
+		strcpy(found_arg, argument);
+		
+		// and advance argument to the very end
+		while (*argument) {
+			++argument;
+		}
+	}
+	
+	return (argument);
+}
+
+
+/**
 * @param char *argument The argument to test.
 * @return int TRUE if the argument is in the reserved_words[] list.
 */

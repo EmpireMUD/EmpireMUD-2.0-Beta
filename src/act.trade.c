@@ -1957,7 +1957,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
+	char temp_arg[MAX_INPUT_LENGTH], short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR, wrong_cmd = NOTHING;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
 	vehicle_data *veh;
@@ -1987,17 +1987,22 @@ ACMD(do_gen_craft) {
 	// optional leading info request
 	if (!strn_cmp(argument, "info ", 5)) {
 		argument = any_one_arg(argument, arg);
-		show_craft_info(ch, argument, subcmd);
+		quoted_arg_or_all(argument, temp_arg);
+		show_craft_info(ch, temp_arg, subcmd);
 		return;
 	}
 	
 	// optional 'list' arg to search craftables
 	if (!strn_cmp(argument, "list ", 5)) {
 		argument = any_one_arg(argument, arg);
-		skip_spaces(&argument);
 		list_only = TRUE;
 		// keep going
 	}
+	
+	// process what's left of argument to allow "quotes"
+	skip_spaces(&argument);
+	quoted_arg_or_all(argument, temp_arg);
+	argument = temp_arg;
 	
 	// all other functions require standing
 	if (*argument && !list_only && GET_POS(ch) < POS_STANDING) {
