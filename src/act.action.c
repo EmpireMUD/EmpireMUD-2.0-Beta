@@ -1523,6 +1523,7 @@ void process_chipping(char_data *ch) {
 */
 void process_chop(char_data *ch) {
 	bool got_any = FALSE;
+	char *cust;
 	char_data *ch_iter;
 	obj_data *axe;
 	int amt;
@@ -1544,8 +1545,21 @@ void process_chop(char_data *ch) {
 	amt = MAX(min_progress_per_chop, amt);
 
 	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
-	act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
-	act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+
+	// messaging
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_ACTION_TO_CHAR))) {
+		act(cust, FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
+	}
+	else {
+		act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
+	}
+	
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_ACTION_TO_ROOM))) {
+		act(cust, FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+	}
+	else {
+		act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+	}
 	
 	// complete?
 	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
