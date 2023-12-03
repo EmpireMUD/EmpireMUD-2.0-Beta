@@ -2460,6 +2460,10 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 		}
 		
+		if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cost: %d%s %s\r\n", ABIL_COST(abil), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
+		}
+		
 		if (ABIL_COOLDOWN_SECS(abil) > 0) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		}
