@@ -588,7 +588,7 @@ off with the "smessages" command.
 
 See also: STATUS MESSAGES
 #
-DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
+DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" SCRATCH WOUND BATTER WALLOP FEROCIOUSLY SAVAGELY MAUL RAVAGE MASSACRE DECIMATE BRUTALLY VICIOUSLY CRUSH WRECK OBLITERATE ANNIHILATE MUTILATE SLAUGHTER DEMOLISH DEVASTATE ERADICATE LIQUIDATE EXTERMINATE CONQUER
 
 Use the 'hit' command (or any attack ability) to initiate combat and deal
 damage to other creatures. Getting better gear will increase the a mount of
@@ -600,21 +600,43 @@ type of weapon and the amount of damage you dealt.
 
 Damage text:
       0 damage: miss
-      1 damage: tickle
-    2-3 damage: barely
-   4-10 damage: [normal]
-  11-14 damage: hard
-  15-16 damage: very hard
-  17-20 damage: extremely hard
-  21-24 damage: maul
-  25-28 damage: massacre
-  29-32 damage: decimate
-  33-45 damage: OBLITERATE
-  46-60 damage: ANNIHILATE
-  61-75 damage: MUTILATE
- 76-100 damage: SLAUGHTER
-101-125 damage: **ERADICATE**
-   126+ damage: **LIQUIDATE**
+      1 damage: rattle
+      2 damage: jostle
+      3 damage: tickle
+      4 damage: graze
+      5 damage: barely
+      6 damage: bruise
+      7 damage: scratch
+    8-9 damage: gently
+  10-11 damage: wound
+  12-13 damage: injure
+  14-15 damage: [normal]
+  16-18 damage: batter
+  19-22 damage: hard
+  23-26 damage: stagger
+  27-30 damage: very hard
+  31-35 damage: wallop
+  36-40 damage: extremely hard
+  41-45 damage: ferociously
+  46-50 damage: savagely
+  51-54 damage: maul
+  55-60 damage: ravage
+  61-65 damage: massacre
+  66-70 damage: decimate
+  71-80 damage: brutally
+  81-90 damage: viciously
+ 91-100 damage: CRUSH
+101-125 damage: WRECK
+126-150 damage: OBLITERATE
+151-175 damage: ANNIHILATE
+176-200 damage: MUTILATE
+201-225 damage: SLAUGHTER
+226-250 damage: **DEMOLISH**
+251-275 damage: **DEVASTATE**
+276-300 damage: **ERADICATE**
+301-325 damage: **LIQUIDATE**
+326-350 damage: **EXTERMINATE**
+   351+ damage: **CONQUER**
 
 Examples:
   You slash the ship very hard!
