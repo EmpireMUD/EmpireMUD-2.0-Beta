@@ -1732,20 +1732,20 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 	
 		/* now list characters, vehicles, & objects */
-		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
-			send_to_char("&g", ch);
-			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
-		}
-		// show vehicles anyway
-		send_to_char("&w", ch);
+		send_to_char("\tw", ch);
 		list_vehicles_to_char(ROOM_VEHICLES(room), ch, FALSE, IS_SET(options, LRR_LOOK_OUT_INSIDE) ? GET_ROOM_VEHICLE(IN_ROOM(ch)) : NULL);
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
-			send_to_char("&y", ch);
+			send_to_char("\tg", ch);
+			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+		}
+		
+		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+			send_to_char("\ty", ch);
 			list_char_to_char(ROOM_PEOPLE(room), ch);
 		}
 		
-		send_to_char("&0", ch);
+		send_to_char("\t0", ch);
 	}
 
 	/* Exits ? */

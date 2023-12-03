@@ -2707,11 +2707,11 @@ ACMD(do_contents) {
 	
 	// ok: show it
 	if (can_see_anything) {
-		send_to_char("&g", ch);
-		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
-		send_to_char("&w", ch);
+		send_to_char("\tw", ch);
 		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE, NULL);
-		send_to_char("&0", ch);
+		send_to_char("\tg", ch);
+		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("\t0", ch);
 	}
 	else {	// can see nothing
 		msg_to_char(ch, "There are no contents here.\r\n");
