@@ -535,11 +535,17 @@ A thorn pick is stuck into the ground.~
 modified from a woody desert plant into a temperate tool. What will those
 Magiterranean druids come up with next?
 ~
-1 0 an h 0 5
+1 0 an h 0 6
 0 3 8
 2 0
 C
 50 50
+M
+26
+You swing $p hard into the wall, searching for ore.~
+M
+27
+$n swings $p hard into the wall, searching for ore.~
 R
 4 5121 0
 R
@@ -553,11 +559,17 @@ A pick-and-pan is lying on the ground.~
 pickthorn and bladegrass. It can be used for mining metals, or for panning them
 in the stream.
 ~
-1 emo ano hi 0 6
+1 emo ano hi 0 7
 0 1 8
 0 0
 C
 0 125
+M
+26
+You scrape at the walls with $p in search of ore.~
+M
+27
+$n scrapes at the walls with $p in search of ore.~
 S
 #10535
 vines vigilant bundle~

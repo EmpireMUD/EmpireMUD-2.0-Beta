@@ -126,9 +126,15 @@ a pick~
 A simple pick is lying here.~
 The pick is small, but very useful in prying loose ore.
 ~
-1 hmo an h 0 2
+1 hmo an h 0 3
 0 1 8
 13 0
+M
+26
+You pick at the walls, looking for ore.~
+M
+27
+$n picks at the walls, looking for ore.~
 S
 #2111
 robe simple brown mage~
