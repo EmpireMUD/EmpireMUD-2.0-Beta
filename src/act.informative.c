@@ -1176,13 +1176,15 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 
 /**
-* Shows one vehicle as in-the-room.
+* Builds the text for one vehicle as shown in-the-room.
 *
 * @param vehicle_data *veh The vehicle to show.
 * @param char_data *ch The person to send the output to.
+* @param char* The constructed text for the vehicle's listing.
 */
-void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	char buf[MAX_STRING_LENGTH], part[256];
+char *list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	static char buf[MAX_STRING_LENGTH];
+	char part[256];
 	size_t size = 0, pos;
 	
 	// pre-description
@@ -1246,7 +1248,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you can finish a quest here!\r\n");
 	}
 
-	send_to_char(buf, ch);
+	return buf;
 }
 
 
@@ -1259,6 +1261,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 * @param vehicle_data *exclude Optional: Don't show a specific vehicle (usually the one you're in); may be NULL.
 */
 void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh;
 	
 	bitvector_t large_veh_flags = VEH_BUILDING | VEH_NO_BUILDING | VEH_SIEGE_WEAPONS | VEH_ON_FIRE | VEH_VISIBLE_IN_DARK | VEH_OBSCURE_VISION;
@@ -1283,8 +1286,19 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 			continue;	// don't show vehicles someone else is sitting on
 		}
 		
-		list_one_vehicle_to_char(veh, ch);
+		add_string_hash(&str_hash, list_one_vehicle_to_char(veh, ch), 1);
 	}
+	
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		if (str_iter->count == 1) {
+			send_to_char(str_iter->str, ch);
+		}
+		else {
+			msg_to_char(ch, "(%2d) %s", str_iter->count, str_iter->str);
+		}
+	}
+	
+	free_string_hash(&str_hash);
 }
 
 
