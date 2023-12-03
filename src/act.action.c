@@ -1699,12 +1699,14 @@ void process_escaping(char_data *ch) {
 * @param char_data *ch The excavator.
 */
 void process_excavating(char_data *ch) {
-	int count, total;
+	int count, total, rand;
+	char *cust;
 	char_data *iter;
+	obj_data *tool;
 
 	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
-		if (!has_tool(ch, TOOL_SHOVEL)) {
+		if (!(tool = has_tool(ch, TOOL_SHOVEL))) {
 			msg_to_char(ch, "You need a shovel to excavate.\r\n");
 			cancel_action(ch);
 		}
@@ -1728,18 +1730,27 @@ void process_excavating(char_data *ch) {
 			// count up toward zero
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, 1);
 			
+			rand = number(0, 1);	// for basic messaging
+			
 			// messaging
-			if (!number(0, 1)) {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You jab your shovel into the dirt...\r\n");
-				}
-				act("$n jabs $s shovel into the dirt...", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+			if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_CHAR))) {
+				act(cust, FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			else if (rand) {
+				act("You jab your shovel into the dirt...", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			else {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You toss a shovel-full of dirt out of the trench.\r\n");
-				}
-				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+				act("You toss a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			
+			if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_ROOM))) {
+				act(cust, FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			else if (rand) {
+				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			else {
+				act("$n jabs $s shovel into the dirt...", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 			}
 
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {

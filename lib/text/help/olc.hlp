@@ -5685,8 +5685,8 @@ Message types:
  &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
- &caction-to-char&0 - Shown to the character during actions like chop or mine.
- &caction-to-room&0 - Shown to the room during actions like chop or mine.
+ &caction-to-char&0 - Shown to the character during: chop, excavate, mine.
+ &caction-to-room&0 - Shown to the room during: chop, excavate, mine.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
