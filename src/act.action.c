@@ -2160,6 +2160,7 @@ void process_maintenance(char_data *ch) {
 */
 void process_mining(char_data *ch) {	
 	struct global_data *glb;
+	char *cust;
 	int count, total, amt;
 	room_data *in_room;
 	obj_data *tool;
@@ -2200,9 +2201,21 @@ void process_mining(char_data *ch) {
 		amt = MAX(min_progress_per_mine, amt);
 		
 		GET_ACTION_TIMER(ch) -= amt;
-
-		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);
-		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_ROOM | TO_SPAMMY);
+		
+		// messaging
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_CHAR))) {
+			act(cust, FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		else {
+			act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_ACTION_TO_ROOM))) {
+			act(cust, FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+		}
+		else {
+			act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+		}
 
 		// done??
 		if (GET_ACTION_TIMER(ch) <= 0) {
