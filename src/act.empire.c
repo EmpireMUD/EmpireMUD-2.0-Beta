@@ -1139,14 +1139,14 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			
 			// total?
 			if (einv->total > einv->local) {
-				if (einv->total_keep == UNLIMITED) {
+				if (einv->total_keep == 0 || einv->total_keep == einv->keep) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
+				}
+				else if (einv->total_keep == UNLIMITED) {
 					snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
 				}
 				else if (einv->total_keep > 0) {
 					snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
-				}
-				else {
-					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
 				}
 			}
 			else {
