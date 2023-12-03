@@ -971,11 +971,17 @@ a goblin pick~
 A goblin pick is stabbed into the ground.~
 It's a fine pick, if somewhat small.
 ~
-1 mp ano h 0 3
+1 mp ano h 0 4
 0 1 8
 2 0
 C
 0 25
+M
+26
+You claw at the wall with $p in search of ore.~
+M
+27
+$n claws at the wall with $p in search of ore.~
 S
 #10769
 sense victory~

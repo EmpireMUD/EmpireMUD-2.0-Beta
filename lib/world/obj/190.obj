@@ -877,7 +877,7 @@ Furl's nightmare pick~
 Furl's nightmare pick sticks out of the ground.~
 This pick is forged from hellfire, branded with goblin runes.
 ~
-1 eimp an h 0 5
+1 eimp an h 0 6
 0 3 8
 10 0
 A
@@ -888,6 +888,12 @@ A
 5 1 6
 C
 50 150
+M
+26
+You hurl $p into the wall to try to loosen the ore.~
+M
+27
+$n hurls $p into the wall to try to loosen the ore.~
 S
 #19069
 legplates plates goblin pair giant~

@@ -1083,7 +1083,7 @@ someone else's axe~
 An axe is lying here.~
 This axe looks too nice to have been made by the goblin you got it from.
 ~
-1 emp an a 0 6
+1 emp an a 0 8
 0 6 2
 2 0
 A
@@ -1092,6 +1092,12 @@ A
 21 2 0
 C
 1 175
+M
+28
+You swing someone else's axe hard!~
+M
+29
+$n swings someone else's axe hard!~
 T 10460
 S
 #10461
