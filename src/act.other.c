@@ -2557,7 +2557,13 @@ ACMD(do_gen_write) {
 	
 	fprintf(fl, "%-8s (%6.6s)%s %s\n", GET_NAME(ch), (tmp + 4), locpart, argument);
 	fclose(fl);
-	send_to_char("Okay. Thanks!\r\n", ch);
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_to_char("Okay. Thanks!\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "You submit %s %s: %s\r\n", AN(name), name, show_color_codes(argument));
+	}
 }
 
 
