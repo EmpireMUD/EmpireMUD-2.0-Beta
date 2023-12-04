@@ -532,7 +532,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	crop_data *cp;
 	int found;
 	double rating;
-	bool any, library;
+	bool any, library, showed_level = FALSE;
 		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -671,23 +671,25 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	// show level if scalable OR wearable (will show quality on the same line)
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS || (proto && OBJ_FLAGGED(proto, OBJ_SCALABLE)))) {
 		msg_to_char(ch, "Level: %s%d\t0, ", color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		showed_level = TRUE;
 	}
 	
 	// quality (same line as level, if applicable)
 	if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
-		msg_to_char(ch, "Quality: %ssuperior\t0\r\n", obj_color_by_quality(obj, ch));
+		msg_to_char(ch, "Quality: superior\r\n");
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
-		msg_to_char(ch, "Quality: %sboss drop\t0\r\n", obj_color_by_quality(obj, ch));
+		msg_to_char(ch, "Quality: boss drop\r\n");
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
-		msg_to_char(ch, "Quality: %sgroup drop\t0\r\n", obj_color_by_quality(obj, ch));
+		msg_to_char(ch, "Quality: group drop\r\n");
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
-		msg_to_char(ch, "Quality: %shard drop\t0\r\n", obj_color_by_quality(obj, ch));
+		msg_to_char(ch, "Quality: hard drop\r\n");
 	}
-	else {
-		msg_to_char(ch, "Quality: %snormal\t0\r\n", obj_color_by_quality(obj, ch));
+	else if (showed_level) {
+		// skip normal quality unless level also appeared
+		msg_to_char(ch, "Quality: normal\r\n");
 	}
 	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
