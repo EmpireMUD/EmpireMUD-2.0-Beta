@@ -1928,6 +1928,7 @@ void show_resource_list(struct resource_data *list, char *save_buffer);
 sector_data *get_sect_by_name(char *name);
 
 // string functions from utils.c
+bool any_isname(const char *str, const char *namelist);
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
 char *delete_doubledollar(char *string);

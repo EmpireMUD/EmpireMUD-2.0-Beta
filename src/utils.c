@@ -4505,6 +4505,46 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if any word in str is an abbrev for any keyword in namelist,
+* separately -- even if the other words in str are not.
+*
+* @param const char *str The search arguments, e.g. "hug blue"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @return bool TRUE if any word in str is an abbrev for any keyword in namelist, even if the others aren't.
+*/
+bool any_isname(const char *str, const char *namelist) {
+	char *newlist, *curtok, word[MAX_INPUT_LENGTH];
+	const char *ptr;
+	bool found = FALSE;
+	
+	if (!*str || !*namelist) {
+		return FALSE;	// shortcut
+	}
+	if (!str_cmp(str, namelist)) {
+		return TRUE;	// the easy way
+	}
+
+	newlist = strdup(namelist);
+
+	// for each word in newlist
+	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok) {
+			ptr = str;
+			while (*ptr && !found) {
+				ptr = any_one_arg((char*)ptr, word);
+				if (*word && is_abbrev(word, curtok)) {
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
