@@ -7563,25 +7563,37 @@ ACMD(do_territory) {
 			continue;
 		}
 		
-		// compare requested text
+		// search requested text
 		ok = FALSE;
-		if (!*search_str && !*exclude_str) {
+		if (!*search_str) {
 			ok = TRUE;
 		}
-		else if ((!*search_str || multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) && (!*exclude_str || !any_isname(exclude_str, GET_SECT_NAME(SECT(iter))))) {
+		else if (multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) {
 			ok = TRUE;
 		}
-		else if (GET_BUILDING(iter) && (!*search_str || multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) && (!*exclude_str || !any_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter))))) {
+		else if (GET_BUILDING(iter) && multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
 			ok = TRUE;
 		}
-		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && (!*search_str || multi_isname(search_str, GET_CROP_NAME(crop))) && (!*exclude_str || !any_isname(exclude_str, GET_CROP_NAME(crop)))) {
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(search_str, GET_CROP_NAME(crop))) {
 			ok = TRUE;
 		}
-		else if ((!*search_str || multi_isname(search_str, get_room_name(iter, FALSE))) && (!*exclude_str || !any_isname(exclude_str, get_room_name(iter, FALSE)))) {
+		else if (multi_isname(search_str, get_room_name(iter, FALSE))) {
 			ok = TRUE;
 		}
-		else {
-			ok = FALSE;
+		// check exclude text
+		if (ok && *exclude_str) {
+			if (any_isname(exclude_str, GET_SECT_NAME(SECT(iter)))) {
+				ok = FALSE;
+			}
+			else if (GET_BUILDING(iter) && any_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
+				ok = FALSE;
+			}
+			else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && any_isname(exclude_str, GET_CROP_NAME(crop))) {
+				ok = FALSE;
+			}
+			else if (any_isname(exclude_str, get_room_name(iter, FALSE))) {
+				ok = FALSE;
+			}
 		}
 		
 		// final ok: add to the list
@@ -7644,15 +7656,16 @@ ACMD(do_territory) {
 				continue;
 			}
 		
-			// compare requested text
+			// search requested text
 			ok = FALSE;
-			if (!*search_str && !*exclude_str) {
+			if (!*search_str) {
 				ok = TRUE;
 			}
-			else if ((!*search_str || multi_isname(search_str, VEH_SHORT_DESC(veh))) && (!*exclude_str || !any_isname(exclude_str, VEH_SHORT_DESC(veh)))) {
+			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
 				ok = TRUE;
 			}
-			else {
+			// check exclude text
+			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
 				ok = FALSE;
 			}
 		
