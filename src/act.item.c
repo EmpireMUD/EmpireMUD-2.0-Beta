@@ -65,7 +65,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // ONLY flags to show on identify / warehouse inv
 // TODO consider moving this to structs.h near the flag list
-bitvector_t show_obj_flags = OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
+bitvector_t show_obj_flags = OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -668,9 +668,26 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		msg_to_char(ch, "\r\n");
 	}
 	
-	// show level if scalable OR wearable
+	// show level if scalable OR wearable (will show quality on the same line)
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS || (proto && OBJ_FLAGGED(proto, OBJ_SCALABLE)))) {
-		msg_to_char(ch, "Level: %s%d\t0\r\n", color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		msg_to_char(ch, "Level: %s%d\t0, ", color_by_difficulty(ch, GET_OBJ_CURRENT_SCALE_LEVEL(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+	}
+	
+	// quality (same line as level, if applicable)
+	if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
+		msg_to_char(ch, "Quality: %ssuperior\t0\r\n", obj_color_by_quality(obj, ch));
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		msg_to_char(ch, "Quality: %sboss drop\t0\r\n", obj_color_by_quality(obj, ch));
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		msg_to_char(ch, "Quality: %sgroup drop\t0\r\n", obj_color_by_quality(obj, ch));
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+		msg_to_char(ch, "Quality: %shard drop\t0\r\n", obj_color_by_quality(obj, ch));
+	}
+	else {
+		msg_to_char(ch, "Quality: %snormal\t0\r\n", obj_color_by_quality(obj, ch));
 	}
 	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
