@@ -12,6 +12,9 @@ A
 1 -1
 A
 8 -1
+D
+The reindeer is a beautiful slate-gray color, with long, strong antlers.
+~
 S
 #10701
 snowman large~
@@ -21,6 +24,10 @@ cijl 15 9 100 nrG 3
 1 0 -1 10719
 A
 11 -5
+D
+   The frosty snowman stands as three oversized snowballs, stacked up with a
+black top hat, a button nose, and coal for eyes.
+~
 S
 #10702
 elf christmas~
@@ -28,5 +35,8 @@ a Christmas elf~
 A Christmas elf is dancing about.~
 0 15 0 0 0 2
 1 0 -1 10719
+D
+This jolly little elf is somersaulting around with reckless abandon.
+~
 S
 $

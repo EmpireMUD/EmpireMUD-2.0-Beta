@@ -2,7 +2,7 @@
 jaguar spotted~
 a jaguar~
 A spotted jaguar is stalking you!~
-cgj 10 0 175 0
+cgj 10 0 175 0 3
 2 25 215 18516
 A
 6 2
@@ -12,5 +12,9 @@ A
 1 1
 A
 8 -1
+D
+   The jaguar is barely visible as it stalks through heavy leaves, but its
+characteristic spots give away its location.
+~
 S
 $
