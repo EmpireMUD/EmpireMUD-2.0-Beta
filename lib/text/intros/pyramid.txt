@@ -16,4 +16,5 @@
    &y/%%%%%%%%%%|            |====|            \       \     &0http://empiremud.net
  &y/%%%%%khufu%.  "           ||||     '     .   \       \&0
  
-Enter your character name: 
+Enter your character name:
+> 
