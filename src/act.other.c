@@ -551,6 +551,9 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_all_items(old);
 	extract_char(old);
 	
+	// ensure character is gone right away
+	extract_pending_chars();
+	
 	if (config_get_bool("public_logins")) {
 		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
 			mortlog("%s", mort_alt);
@@ -3608,6 +3611,9 @@ ACMD(do_quit) {
 		extract_all_items(ch);
 		extract_char(ch);	// this will disconnect the descriptor
 		pause_affect_total = FALSE;
+		
+		// ensure quit characters are gone right away
+		extract_pending_chars();
 	}
 }
 
