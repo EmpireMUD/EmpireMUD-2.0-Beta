@@ -6704,6 +6704,7 @@ Supported types:
   mobile
   object
   progress
+  quest
   room template
   sector
   trigger
@@ -7287,6 +7288,35 @@ The following quest flags are available:
     separate from non-event dailies.
 
 See also: OLC QUESTS, DAILY QUEST
+#d
+"QEDIT FULLSEARCH" "QUEST FULLSEARCH
+
+Usage:  .q fullsearch -<field> <argument> <...>
+
+This command allows you to search for quests matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the quest's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP QEDIT FLAGS
+  &c-level&0, &clevelover&0, &clevelunder&0 - Search the level range of quests
+  &c-dailycycle&0 - Search for a specific daily cycle id
+  &c-nodailycycle&0 - Search for daily quests with no cycle
+  &c-activedailycycle&0, &c-inactivedailycycle&0 - Dailies that are active or not
+  &c-repeat&0, &crepeatover&0, &crepeatunder&0 - Search for specific repeat times
+  &c-reward&0 - Search for 1 reward type; see HELP QEDIT REWARDS
+  &c-prereq&0 - Search for 1 prerequisite type; see HELP REQUIREMENTS
+  &c-task&0 - Search for 1 task type; see HELP REQUIREMENTS
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .q fullsearch -level 150
+ > .q fullsearch -flagged EMPIRE-ONLY -task OWN-BUILDING
+ > .q fullsearch -repeatover 1 -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find quests that reward a green knitted
+stocking (object 16678), use ".o search 16678".
 #d
 "QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
 

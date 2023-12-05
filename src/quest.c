@@ -3793,6 +3793,203 @@ char *list_one_quest(quest_data *quest, bool detail) {
 
 
 /**
+* Searches properties of quests.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_quest(char_data *ch, char *argument) {
+	bool any;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	struct quest_reward *qreward;
+	struct req_data *req;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	bool no_daily_cycle = FALSE, active_daily_cycle = FALSE, inactive_daily_cycle = FALSE;
+	int vmin = NOTHING, vmax = NOTHING, only_level = NOTHING, level_over = NOTHING, level_under = NOTHING;
+	int only_daily_cycle = NOTHING, only_repeat = NOTHING, repeat_over = NOTHING, repeat_under = NOTHING;
+	int only_reward = NOTHING, only_prereq = NOTHING, only_task = NOTHING;
+	
+	quest_data *quest, *next_quest;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, generic_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("dailycycle", only_daily_cycle, 0, INT_MAX)
+		FULLSEARCH_BOOL("nodailycycle", no_daily_cycle)
+		FULLSEARCH_BOOL("activedailycycle", active_daily_cycle)
+		FULLSEARCH_BOOL("inactivedailycycle", inactive_daily_cycle)
+		FULLSEARCH_INT("repeat", only_repeat, 0, INT_MAX)
+		FULLSEARCH_INT("repeatover", repeat_over, 0, INT_MAX)
+		FULLSEARCH_INT("repeatunder", repeat_under, 0, INT_MAX)
+		FULLSEARCH_LIST("rewards", only_reward, quest_reward_types)
+		FULLSEARCH_LIST("prereqs", only_prereq, requirement_types)
+		FULLSEARCH_LIST("prerequisite", only_prereq, requirement_types)
+		FULLSEARCH_LIST("tasks", only_task, requirement_types)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Quest fullsearch: %s\r\n", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if ((vmin != NOTHING && QUEST_VNUM(quest) < vmin) || (vmax != NOTHING && QUEST_VNUM(quest) > vmax)) {
+			continue;	// vnum range
+		}
+		if (not_flagged != NOBITS && IS_SET(QUEST_FLAGS(quest), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (QUEST_FLAGS(quest) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_level != NOTHING && (QUEST_MIN_LEVEL(quest) > only_level || QUEST_MAX_LEVEL(quest) < only_level)) {
+			continue;
+		}
+		if (level_over != NOTHING && QUEST_MAX_LEVEL(quest) <= level_over && QUEST_MIN_LEVEL(quest) <= level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && QUEST_MAX_LEVEL(quest) >= level_over && QUEST_MIN_LEVEL(quest) >= level_over) {
+			continue;
+		}
+		if (only_daily_cycle != NOTHING && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_CYCLE(quest) != only_daily_cycle)) {
+			continue;
+		}
+		if (no_daily_cycle && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_CYCLE(quest) != NOTHING)) {
+			continue;
+		}
+		if (active_daily_cycle && (!IS_DAILY_QUEST(quest) || !QUEST_DAILY_ACTIVE(quest))) {
+			continue;
+		}
+		if (inactive_daily_cycle && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_ACTIVE(quest))) {
+			continue;
+		}
+		if (only_repeat != NOTHING && QUEST_REPEATABLE_AFTER(quest) != only_repeat) {
+			continue;
+		}
+		if (repeat_over != NOTHING && QUEST_REPEATABLE_AFTER(quest) < only_repeat) {
+			continue;
+		}
+		if (repeat_under != NOTHING && (QUEST_REPEATABLE_AFTER(quest) == 0 || QUEST_REPEATABLE_AFTER(quest) > only_repeat)) {
+			continue;
+		}
+		if (only_reward != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_REWARDS(quest), qreward) {
+				if (qreward->type == only_reward) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// reward type not found
+			}
+		}
+		if (only_prereq != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_PREREQS(quest), req) {
+				if (req->type == only_prereq) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// prereq type not found
+			}
+		}
+		if (only_task != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_TASKS(quest), req) {
+				if (req->type == only_task) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// task type not found
+			}
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (multi_isname(find_keywords, QUEST_NAME(quest))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, QUEST_DESCRIPTION(quest))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, QUEST_COMPLETE_MSG(quest))) {
+				any = TRUE;
+			}
+			
+			// task customs text
+			LL_FOREACH(QUEST_TASKS(quest), req) {
+				if (!any && req->custom && multi_isname(find_keywords, req->custom)) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 16) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d quests)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a quest and displays them.
 *
 * @param char_data *ch The player.
