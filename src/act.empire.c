@@ -5470,7 +5470,7 @@ ACMD(do_esay) {
 		sprintf(output, buf, color, color);
 	}
 	tmp = str_replace("$o", PERS(ch, ch, TRUE), output);
-	add_to_empire_history(e, ch, output, level);
+	add_to_empire_history(e, ch, tmp, level);
 	free(tmp);
 }
 
