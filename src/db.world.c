@@ -3522,7 +3522,9 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3646,7 +3648,9 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3725,7 +3729,9 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		abandon_room(room);
+		if (!bld || !BLD_FLAGGED(bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+			abandon_room(room);
+		}
 		disassociate_building(room);
 	
 		if (ROOM_PEOPLE(room)) {
