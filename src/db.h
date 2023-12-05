@@ -112,6 +112,7 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
 #define BOOK_PREFIX  "books/"	// for books.c
+#define EMPIRE_HISTORY_PREFIX  LIB_EMPIRE"history/"	// for empire history
 #define ELOG_PREFIX  LIB_EMPIRE"logs/"	// for empire logs
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 

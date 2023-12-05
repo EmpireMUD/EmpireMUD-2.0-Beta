@@ -3128,6 +3128,7 @@ typedef enum {
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
+#define MAX_RECENT_CHANNELS		20		// number of messages to remember in each history
 #define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000
@@ -5512,6 +5513,7 @@ struct empire_data {
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
 	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
+	struct channel_history_data *chat_history;
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -5547,6 +5549,7 @@ struct empire_data {
 	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
 	char mapout_token;	// displayed for this empire on the graphical political map
 	
+	bool history_loaded;	// record whether or not chat history has been loaded
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
 	

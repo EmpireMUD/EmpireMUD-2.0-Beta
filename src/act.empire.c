@@ -30,6 +30,7 @@
 /**
 * Contents:
 *   Helpers
+*   Chat History
 *   City Helpers
 *   Diplomacy Helpers
 *   Efind Helpers
@@ -1641,6 +1642,156 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
 	else {	// just sort by coords
 		return b->loc - a->loc;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHAT HISTORY ////////////////////////////////////////////////////////////
+
+/**
+* Filename for empire history.
+*
+* @param empire_data *emp The empire.
+* @return char* The filename for the empire chat history.
+*/
+char *empire_history_filename(empire_data *emp) {
+	static char fname[256];
+	snprintf(fname, sizeof(fname), "%s%d%s", EMPIRE_HISTORY_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	return fname;
+}
+
+
+/**
+* Adds a message to a empire chat history and writes it to the history file.
+*
+* @param empire_data *emp Which empire.
+* @param char_data *speaker Who said it (for invis, etc).
+* @param char *message The message itself.
+* @param int rank Rank required to view the message (optional; may be 0).
+*/
+void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank) {
+	struct channel_history_data *entry;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp) {
+		return;
+	}
+	
+	// in case
+	load_empire_chat_history(emp);
+	
+	// add in-game
+	entry = process_add_to_channel_history(&EMPIRE_CHAT_HISTORY(emp), speaker, message, FALSE, rank, NOTHING);
+	
+	// save to file
+	if (!(fl = fopen(empire_history_filename(emp), "a"))) {
+		log("SYSERR: Unable to open empire history file '%s' for appending", empire_history_filename(emp));
+		return;	// unable to write
+	}
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
+}
+
+
+/**
+* Removes old messages and writes a clean version of the empire chat history
+* file. Then, it also frees up the memory from older messages in memory.
+*
+* @param empire_data *emp The empire.
+*/
+void clean_empire_history(empire_data *emp) {
+	struct channel_history_data *hist, *next_hist;
+	time_t clear_before;
+	int count;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp || !emp->history_loaded) {
+		return;
+	}
+	
+	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
+	
+	// open the file for write (overwrite the old one)
+	if (!(fl = fopen(empire_history_filename(emp), "w"))) {
+		log("SYSERR: Unable to write empire history file '%s'", empire_history_filename(emp));
+		return;
+	}
+	
+	// clean the history and write any remaining history
+	count = 0;
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (hist->timestamp >= clear_before) {
+			write_one_slash_channel_message(fl, hist);
+			++count;
+		}
+		else {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
+	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (count-- > MAX_RECENT_CHANNELS) {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+}
+
+
+/**
+* Loads empire chat history on-request. Only does this once per uptime.
+*
+* @param empire_data *emp Which empire.
+*/
+void load_empire_chat_history(empire_data *emp) {
+	char line[256], error[256];
+	struct channel_history_data *hist;
+	FILE *fl;
+	
+	if (emp->history_loaded) {
+		return;	// already done
+	}
+	
+	// update this first
+	emp->history_loaded = TRUE;
+	
+	if (!(fl = fopen(empire_history_filename(emp), "r"))) {
+		// no history / not an error
+		return;
+	}
+	
+	// file open..
+	snprintf(error, sizeof(error), "empire history file for %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+	
+	for (;;) {
+		if (!get_line(fl, line)) {
+			break;	// done (no terminating code)
+		}
+		
+		switch (*line) {
+			case 'M': {	// message
+				if ((hist = parse_channel_history_message(line, fl, error))) {
+					DL_APPEND(EMPIRE_CHAT_HISTORY(emp), hist);
+				}
+				break;
+			}
+			
+			// default: ignore the line as garbage
+		}
+	}
+		
+	fclose(fl);
+	clean_empire_history(emp);
 }
 
 
@@ -5210,7 +5361,8 @@ ACMD(do_esay) {
 	int level = 0, i;
 	empire_data *e;
 	bool emote = FALSE, extra_color = FALSE;
-	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char *tmp;
 
 	if (IS_NPC(ch))
 		return;
@@ -5282,11 +5434,6 @@ ACMD(do_esay) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		// for channel history
-		if (ch->desc) {
-			clear_last_act_message(ch->desc);
-		}
-
 		sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_ESAY));
 		if (extra_color) {
 			sprintf(output, buf, color, color, color);
@@ -5296,21 +5443,13 @@ ACMD(do_esay) {
 		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
-		
-		// channel history
-		if (ch->desc && ch->desc->last_act_message) {
-			// the message was sent via act(), we can retrieve it from the desc
-			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, ch, lbuf, FALSE, level, NOTHING);
-		}
 	}
 
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch)
+		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch) {
 			continue;
+		}
 		else {
-			clear_last_act_message(d);
-			
 			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(tch, CUSTOM_COLOR_ESAY));
 			if (extra_color) {
 				sprintf(output, buf, color, color, color);
@@ -5319,15 +5458,20 @@ ACMD(do_esay) {
 				sprintf(output, buf, color, color);
 			}
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
-			
-			// channel history
-			if (d->last_act_message) {
-				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, ch, lbuf, FALSE, level, NOTHING);
-			}	
 		}
 	}
+	
+	// and add to chat history
+	sprintf(color, "%s\t0", EXPLICIT_BANNER_TERMINATOR(e));
+	if (extra_color) {
+		sprintf(output, buf, color, color, color);
+	}
+	else {
+		sprintf(output, buf, color, color);
+	}
+	tmp = str_replace("$o", PERS(ch, ch, TRUE), output);
+	add_to_empire_history(e, ch, output, level);
+	free(tmp);
 }
 
 

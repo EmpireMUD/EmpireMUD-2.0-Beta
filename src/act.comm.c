@@ -37,15 +37,10 @@ ACMD(do_slash_channel);
 
 // local prototypes
 FILE *open_slash_channel_file(struct slash_channel *chan);
-struct channel_history_data *parse_channel_history_message(char *line, FILE *fl, char *error);
-struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool disguised, int rank, any_vnum language);
-void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
 void write_slash_channel_index();
 
 // local data
-#define MAX_RECENT_CHANNELS		20		/* Number of pub_comm uses to remember */
-
 #define PUB_COMM_OOC  0
 #define PUB_COMM_GLOBAL  1
 #define PUB_COMM_SHORT_RANGE  2
@@ -1840,40 +1835,56 @@ ACMD(do_history) {
 	struct channel_history_data *chd_iter, *list;
 	player_index_data *plr_index;
 	bool found_crlf;
-	char realname[256];
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], realname[256], *sub_arg;
 	int pos, type = NO_HISTORY, glob_type = NO_HISTORY;
+	empire_data *use_emp = NULL;
 	
 	if (REAL_NPC(ch)) {
 		return;	// nothing to show
 	}
 	
-	skip_spaces(&argument);
+	sub_arg = any_one_word(argument, arg);
 	
 	// determine type
-	if (subcmd == SCMD_GOD_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "godnet") || is_abbrev(argument, "wiznet") || is_abbrev(argument, "immortal")))) {
+	if (subcmd == SCMD_GOD_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(arg, "godnet") || is_abbrev(arg, "wiznet") || is_abbrev(arg, "immortal")))) {
 		glob_type = GLOBAL_HISTORY_GOD;
 	}
-	else if (subcmd == SCMD_TELL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "tells"))) {
+	else if (subcmd == SCMD_TELL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(arg, "tells"))) {
 		type = CHANNEL_HISTORY_TELLS;
 	}
-	else if (subcmd == SCMD_SAY_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "says") || is_abbrev(argument, "group") || is_abbrev(argument, "gsays") || is_abbrev(argument, "emotes") || is_abbrev(argument, "socials")))) {
+	else if (subcmd == SCMD_SAY_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(arg, "says") || is_abbrev(arg, "group") || is_abbrev(arg, "gsays") || is_abbrev(arg, "emotes") || is_abbrev(arg, "socials")))) {
 		type = CHANNEL_HISTORY_SAY;
 	}
-	else if (subcmd == SCMD_EMPIRE_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "empire") || is_abbrev(argument, "esays") || is_abbrev(argument, "etalks")))) {
-		type = CHANNEL_HISTORY_EMPIRE;
+	else if (subcmd == SCMD_EMPIRE_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(arg, "empire") || is_abbrev(arg, "esays") || is_abbrev(arg, "etalks")))) {
+		use_emp = GET_LOYALTY(ch);
+		
+		// allow target for immortals
+		if (imm_access) {
+			if (subcmd == SCMD_HISTORY) {
+				quoted_arg_or_all(sub_arg, arg2);
+			}
+			else {
+				quoted_arg_or_all(argument, arg2);
+			}
+			if (*arg2 && !(use_emp = get_empire_by_name(arg2))) {
+				msg_to_char(ch, "Unknown empire '%s'.\r\n", arg2);
+				return;
+			}
+		}
 	}
-	else if (subcmd == SCMD_ROLL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "rolls"))) {
+	else if (subcmd == SCMD_ROLL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(arg, "rolls"))) {
 		type = CHANNEL_HISTORY_ROLL;
 	}
-	else if (subcmd == SCMD_HISTORY && *argument == '/') {
+	else if (subcmd == SCMD_HISTORY && *arg == '/') {
 		// forward to /history
 		char buf[MAX_INPUT_LENGTH];
-		snprintf(buf, sizeof(buf), "history %s", argument);
+		snprintf(buf, sizeof(buf), "history %s", arg);
 		do_slash_channel(ch, buf, 0, 0);
 		return;
 	}
 	else if (subcmd == SCMD_HISTORY) {
-		if (!*argument) {
+		if (!*arg) {
 			msg_to_char(ch, "Usage: history <say | tell | /<channel> | empire | rolls%s>\r\n", IS_IMMORTAL(ch) ? " | immortal" : (IS_GOD(ch) ? " | god" : ""));
 		}
 		else {
@@ -1890,6 +1901,11 @@ ACMD(do_history) {
 	else if (glob_type != NO_HISTORY) {
 		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, glob_types[glob_type]);
 		list = global_channel_history[glob_type];
+	}
+	else if (use_emp) {
+		msg_to_char(ch, "Last %d empire chats for %s%s\t0:\r\n", MAX_RECENT_CHANNELS, EMPIRE_BANNER(use_emp), EMPIRE_NAME(use_emp));
+		load_empire_chat_history(use_emp);
+		list = EMPIRE_CHAT_HISTORY(use_emp);
 	}
 	else {
 		msg_to_char(ch, "No history to show.\r\n");

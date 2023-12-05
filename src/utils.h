@@ -564,6 +564,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_BASE_TECH(emp, num)  ((emp)->base_tech[(num)])
+#define EMPIRE_CHAT_HISTORY(emp)  ((emp)->chat_history)
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
 #define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
 #define EMPIRE_DROPPED_ITEMS(emp)  ((emp)->dropped_items)
@@ -2046,13 +2047,18 @@ struct slash_channel *find_slash_channel_by_id(int id);
 struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
 bool is_ignoring(char_data *ch, char_data *victim);
 void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...);
+struct channel_history_data *parse_channel_history_message(char *line, FILE *fl, char *error);
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool disguised, int rank, any_vnum language);
+void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 
 // act.empire.c
+void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank);
 bool check_in_city_requirement(room_data *room, bool check_wait);
 void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
 void do_customize_island(char_data *ch, char *argument);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
+void load_empire_chat_history(empire_data *emp);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
