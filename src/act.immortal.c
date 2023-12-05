@@ -8863,7 +8863,7 @@ ACMD(do_echo) {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 	}
 
@@ -8892,7 +8892,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -8934,7 +8934,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 		}
 	}
@@ -8964,7 +8964,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch) {
 				// just in case

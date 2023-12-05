@@ -175,7 +175,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 		
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_OTHERS)), SOC_HIDDEN(soc), ch, FALSE, FALSE, TO_ROOM | TO_NOT_IGNORING);
@@ -189,7 +189,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
@@ -203,7 +203,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 	}
 	else if (vict == ch) {
@@ -216,7 +216,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 		
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
@@ -230,7 +230,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
@@ -279,7 +279,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 				if (c->desc->last_act_message) {
 					// the message was sent via act(), we can retrieve it from the desc
 					sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
-					add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+					add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 				}
 				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					// terminate color just in case
@@ -370,7 +370,7 @@ ACMD(do_point) {
 		sprintf(buf, "\t%cYou point %s.\t0\r\n", color, dirs[get_direction_for_char(ch, dir)]);
 		send_to_char(buf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf, FALSE, 0, NOTHING);
 		}
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), pers, next_pers, next_in_room) {
@@ -385,7 +385,7 @@ ACMD(do_point) {
 				
 				// channel history
 				if (pers->desc && pers->desc->last_act_message) {
-					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message);
+					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 				}
 			}
 		}
@@ -422,7 +422,7 @@ ACMD(do_point) {
 		}
 		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR);
 		if (ch->desc && ch->desc->last_act_message) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, ch->desc->last_act_message);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, ch->desc->last_act_message, FALSE, 0, NOTHING);
 		}
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), pers, next_pers, next_in_room) {
@@ -437,7 +437,7 @@ ACMD(do_point) {
 				
 				// channel history
 				if (pers->desc && pers->desc->last_act_message) {
-					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message);
+					add_to_channel_history(pers, CHANNEL_HISTORY_SAY, ch, pers->desc->last_act_message, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 				}
 			}
 		}
@@ -504,7 +504,7 @@ ACMD(do_roll) {
 		snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
 		send_to_char(buf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf, FALSE, 0, NOTHING);
 		}
 		
 		snprintf(buf, sizeof(buf), "$n rolls a %d-sided die and gets: %d", size, total);
@@ -520,7 +520,7 @@ ACMD(do_roll) {
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
 					
 					if (mem->member->desc && mem->member->desc->last_act_message) {
-						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, ch, mem->member->desc->last_act_message);
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, ch, mem->member->desc->last_act_message, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 					}
 				}
 			}
@@ -530,7 +530,7 @@ ACMD(do_roll) {
 		snprintf(buf, sizeof(buf), "You roll %dd%d and get: %d\r\n", num, size, total);
 		send_to_char(buf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf, FALSE, 0, NOTHING);
 		}
 		
 		snprintf(buf, sizeof(buf), "$n rolls %dd%d and gets: %d", num, size, total);
@@ -546,7 +546,7 @@ ACMD(do_roll) {
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
 					
 					if (mem->member->desc && mem->member->desc->last_act_message) {
-						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, ch, mem->member->desc->last_act_message);
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_ROLL, ch, mem->member->desc->last_act_message, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 					}
 				}
 			}
@@ -556,7 +556,7 @@ ACMD(do_roll) {
 	// save room last-act
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict != ch && vict->desc && vict->desc->last_act_message) {
-			add_to_channel_history(vict, CHANNEL_HISTORY_ROLL, ch, vict->desc->last_act_message);
+			add_to_channel_history(vict, CHANNEL_HISTORY_ROLL, ch, vict->desc->last_act_message, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 		}
 	}
 }

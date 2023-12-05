@@ -2204,14 +2204,19 @@ typedef enum {
 #define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
 
 
-// types of channel histories -- act.comm.c
+// CHANNEL_HISTORY_x: types of channel histories -- act.comm.c
 #define NO_HISTORY  -1	// reserved
-#define CHANNEL_HISTORY_GOD  0
+#define CHANNEL_HISTORY_GOD  0	// no longer used: god channels are now global
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
 #define CHANNEL_HISTORY_EMPIRE  3
 #define CHANNEL_HISTORY_ROLL  4
 #define NUM_CHANNEL_HISTORY_TYPES  5
+
+
+// GLOBAL_HISTORY_x: types of global channel histories -- act.comm.c
+#define GLOBAL_HISTORY_GOD  0		// god channel and wiznet
+#define NUM_GLOBAL_HISTORIES  1		// must be the total number
 
 
 // channels for announcements
@@ -4258,6 +4263,10 @@ struct account_player {
 struct channel_history_data {
 	int idnum;	// id of the author
 	int invis_level;	// if it's an invisible immortal
+	int access_level;	// not shown below this access level at all
+	int rank;	// for empire chats, required rank
+	any_vnum language;	// which language it was in, for some channels
+	bool is_disguised;	// indicates we need to show a real name to immortals
 	char *message;
 	long timestamp;
 	struct channel_history_data *prev, *next;	// doubly-linked list

@@ -8656,6 +8656,15 @@ void free_whole_library(void) {
 		free(slash);
 	}
 	
+	for (iter = 0; iter < NUM_GLOBAL_HISTORIES; ++iter) {
+		DL_FOREACH_SAFE(global_channel_history[iter], chd, next_chd) {
+			if (chd->message) {
+				free(chd->message);
+			}
+			free(chd);
+		}
+	}
+	
 	if (start_locs) {
 		free(start_locs);
 	}
