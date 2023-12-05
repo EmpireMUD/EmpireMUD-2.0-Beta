@@ -725,6 +725,15 @@ A wee wombat is sniffing around.
 D
 The fat brown wombat has short legs and a thick body.
 ~
+M
+0
+$n sniffs around.~
+M
+0
+$n waddles in a little circle around you.~
+M
+0
+$n makes a soft grunting noise.~
 S
 #9933
 fox red kit~
@@ -759,6 +768,15 @@ An alpaca is cuddling up to you.
 D
 The alpaca is so fluffy that you can't help but cuddle!
 ~
+M
+0
+$n lets out a little squeak.~
+M
+0
+$n nuzzles against you with $s soft face.~
+M
+0
+$n trots around in circles.~
 S
 #9935
 seashell shell sparkling~
