@@ -1686,7 +1686,7 @@ ACMD(do_slash_channel) {
 			
 			// iterate backwards
 			count = 0;
-			for (hist = chan->history ? chan->history->prev : NULL; hist && hist != chan->history; hist = hist->prev) {
+			for (hist = chan->history ? chan->history->prev : NULL; hist; hist = (hist == chan->history ? NULL : hist->prev)) {
 				if (is_ignoring_idnum(ch, hist->idnum)) {
 					continue;	// ignore list
 				}
@@ -1940,7 +1940,7 @@ ACMD(do_history) {
 	count = 0;
 	
 	// iterate the history in reverse...
-	for (chd_iter = list ? list->prev : NULL; chd_iter && chd_iter != list; chd_iter = chd_iter->prev) {
+	for (chd_iter = list ? list->prev : NULL; chd_iter; chd_iter = (chd_iter == list ? NULL : chd_iter->prev)) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
