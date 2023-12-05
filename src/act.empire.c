@@ -5364,18 +5364,14 @@ ACMD(do_esay) {
 	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
 	char *tmp;
 
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
 
 	if (!(e = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
-		}
-
-	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
-		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
-		return;
-		}
+	}
 
 	skip_spaces(&argument);
 
@@ -5407,6 +5403,10 @@ ACMD(do_esay) {
 	skip_spaces(&argument);
 
 	level++;	// 1-based, not 0-based
+	if (level > GET_RANK(ch)) {
+		msg_to_char(ch, "You can't chat above your own rank.\r\n");
+		return;
+	}
 
 	if (level > 1) {
 		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
