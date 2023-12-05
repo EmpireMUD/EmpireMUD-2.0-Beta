@@ -3128,7 +3128,8 @@ typedef enum {
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_RECENT_CHANNELS		20		// number of messages to remember in each history
+#define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
+#define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
 #define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000

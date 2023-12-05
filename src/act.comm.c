@@ -427,7 +427,7 @@ struct channel_history_data *process_add_to_channel_history(struct channel_histo
 	
 	// check limit
 	DL_COUNT(*history, iter, count);
-	if (count > MAX_RECENT_CHANNELS) {
+	if (count > KEEP_RECENT_CHANNELS) {
 		// remove the first one
 		old = *history;
 		DL_DELETE(*history, old);
@@ -539,7 +539,7 @@ void clean_global_channel(int which) {
 	
 	// free up memory for any entries that wouldn't be shown on histories
 	DL_FOREACH_SAFE(global_channel_history[which], hist, next_hist) {
-		if (count-- > MAX_RECENT_CHANNELS) {
+		if (count-- > KEEP_RECENT_CHANNELS) {
 			DL_DELETE(global_channel_history[which], hist);
 			if (hist->message) {
 				free(hist->message);
@@ -952,7 +952,7 @@ void clean_slash_channel(struct slash_channel *chan) {
 	
 	// free up memory for any entries that wouldn't be shown on histories
 	DL_FOREACH_SAFE(chan->history, hist, next_hist) {
-		if (count-- > MAX_RECENT_CHANNELS) {
+		if (count-- > KEEP_RECENT_CHANNELS) {
 			DL_DELETE(chan->history, hist);
 			if (hist->message) {
 				free(hist->message);
@@ -1682,11 +1682,11 @@ ACMD(do_slash_channel) {
 			DL_COUNT(chan->history, hist, count);
 			
 			DL_FOREACH(chan->history, hist) {
-				if (count-- > MAX_RECENT_CHANNELS) {
-					continue;	// skip down to the last N
-				}
 				if (is_ignoring_idnum(ch, hist->idnum)) {
 					continue;	// ignore list
+				}
+				if (count-- > MAX_RECENT_CHANNELS) {
+					continue;	// skip down to the last N
 				}
 				
 				if (hist->invis_level > 0 && hist->invis_level <= GET_ACCESS_LEVEL(ch)) {
@@ -1837,7 +1837,7 @@ ACMD(do_history) {
 	bool found_crlf;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], realname[256], *sub_arg;
-	int pos, type = NO_HISTORY, glob_type = NO_HISTORY;
+	int count, pos, type = NO_HISTORY, glob_type = NO_HISTORY;
 	empire_data *use_emp = NULL;
 	
 	if (REAL_NPC(ch)) {
@@ -1911,7 +1911,10 @@ ACMD(do_history) {
 		msg_to_char(ch, "No history to show.\r\n");
 		return;
 	}
-		
+	
+	// how many?
+	DL_COUNT(list, chd_iter, count);
+	
 	DL_FOREACH(list, chd_iter) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
@@ -1921,6 +1924,9 @@ ACMD(do_history) {
 		}
 		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
 			continue;	// ignore list
+		}
+		if (count-- > MAX_RECENT_CHANNELS) {
+			continue;	// skip down to the last N
 		}
 		
 		// verify has newline

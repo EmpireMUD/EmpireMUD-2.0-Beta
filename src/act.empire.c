@@ -1737,7 +1737,7 @@ void clean_empire_history(empire_data *emp) {
 	
 	// free up memory for any entries that wouldn't be shown on histories
 	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
-		if (count-- > MAX_RECENT_CHANNELS) {
+		if (count-- > KEEP_RECENT_CHANNELS) {
 			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
 			if (hist->message) {
 				free(hist->message);
