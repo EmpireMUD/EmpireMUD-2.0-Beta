@@ -10194,7 +10194,7 @@ ACMD(do_reboot) {
 	no_arg = !*arg;
 	while (*arg) {
 		if (is_number(arg)) {
-			if ((time = atoi(arg)) == 0) {
+			if ((time = atoi(arg)) <= 0) {
 				msg_to_char(ch, "Invalid amount of time!\r\n");
 				return;
 			}
