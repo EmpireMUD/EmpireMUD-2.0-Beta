@@ -4,6 +4,10 @@ a heroic demi-griffin~
 A heroic demi-griffin is standing here, half human, half bird, and half lion.~
 b 10 0 0 0 4
 0 0 -1 -1
+D
+   The demi-griffin has the wings and feathers of a bird, the legs and claws of
+a lion, but the sympathetic face of a person.
+~
 S
 #2901
 centaurnicorn unicorn heroic~
@@ -11,6 +15,10 @@ a heroic centaurnicorn~
 A heroic centaurnicorn stands here, half person, half unicorn.~
 b 11 14 0 0 4
 0 0 -1 -1
+D
+   This odd creature has all the legs of a pony, with the torso of a person and
+a single shining horn in the middle of its forehead.
+~
 S
 #2902
 half-naga naga heroic~
@@ -18,6 +26,10 @@ a heroic half-naga~
 A heroic half-naga coils around you.~
 b 9 5 0 0 4
 0 0 -1 -1
+D
+   The creature has the look of an enormous snake with the head and arms of a
+person!
+~
 S
 #2903
 pegacentaur pegasus centaur pegasentaur~
@@ -25,6 +37,10 @@ a heroic pegacentaur~
 A heroic pegacentaur stretches its wings.~
 b 11 14 0 0 4
 0 0 -1 -1
+D
+   The odd thing looks like a winged centaur: It has the legs of a pony, the
+torso of a man, and two wings from each of its two backs.
+~
 S
 #2904
 were-cerberus cerberus heroic~
@@ -32,6 +48,10 @@ a heroic were-cerberus~
 A heroic were-cerberus stalks past you, watching you with six eyes.~
 b 9 0 0 0 4
 0 0 -1 -1
+D
+   Stalking around on its two hind paws, this three-headed werewolf would be
+terrifying if it didn't look so confused.
+~
 S
 #2910
 griffin heroic little~
@@ -39,6 +59,12 @@ a heroic little griffin~
 A heroic little griffin is flapping around.~
 bj 10 2 0 0 1
 0 0 -1 -1
+D
+   A pint-sized marvel, this heroic little griffin exudes a captivating blend
+of elegance and valor. With fur as golden as the sun and feathers that shimmer
+with a kaleidoscope of hues, its compact frame mirrors the strength of its
+mythical counterpart.
+~
 S
 #2911
 unicorn heroic little~
@@ -46,6 +72,12 @@ a heroic little unicorn~
 A heroic little unicorn is prancing about.~
 bj 11 14 0 0 1
 0 0 -1 -1
+D
+   This little unicorn emanates an aura of pure enchantment. A diminutive
+marvel with a lustrous ivory coat, its ethereal mane cascades like a waterfall
+of stardust. A single, spiraled horn graces its noble forehead, glinting in any
+speck of available light.
+~
 S
 #2912
 naga heroic little~
@@ -53,6 +85,12 @@ a heroic little naga~
 A heroic little naga is slithering around you.~
 bj 9 5 0 0 1
 0 0 -1 -1
+D
+   The little naga coils with serpentine allure, embodying the mystique of an
+ancient and magical creature. Scaled in iridescent hues that shift like
+sunlight filtering through crystal-clear waters, its lithe form undulates with
+sheer grace.
+~
 S
 #2913
 pegasus heroic little~
@@ -60,6 +98,12 @@ a heroic little pegasus~
 A heroic little pegasus is flapping around you.~
 bj 11 2 0 0 1
 0 0 -1 -1
+D
+   The little pegasus captures the essence of celestial grace and airborne
+splendor for which its kind are well-renowned. Adorned in a lustrous, silken
+coat of starry white, its wings unfurl with feathery elegance. Its golden mane
+and tail trail behind as it prances, echoing the radiance of the sun itself.
+~
 S
 #2914
 cerberus heroic little~
@@ -67,5 +111,11 @@ a heroic little cerberus~
 A heroic little cerberus is running around trying to bite both your ankles.~
 bj 9 0 0 0 1
 0 0 -1 -1
+D
+   With three tiny heads, each featuring expressive eyes, this mythical little
+guardian of the underworld takes on an endearing, ferocious, charming glow. 
+Its fur, a blend of midnight black and fiery red, creates a captivating
+contrast and hints to its infernal origins.
+~
 S
 $
