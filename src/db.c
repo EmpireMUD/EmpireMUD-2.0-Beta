@@ -87,6 +87,7 @@ void load_binary_map_file();
 void load_daily_quest_file();
 void load_empire_storage();
 void load_fight_messages();
+void load_global_history();
 void load_instances();
 void load_islands();
 void load_running_events_file();
@@ -244,6 +245,7 @@ struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automati
 struct player_quest *global_next_player_quest = NULL;	// for safely iterating
 struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
 struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
+struct channel_history_data *global_channel_history[NUM_GLOBAL_HISTORIES];	// history for channels like wiznet/immortal
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -355,6 +357,14 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 };
 
 
+// GLOBAL_HISTORY_x: types of global channel histories
+const char *global_history_files[] = {
+	// names should start with '_'
+	LIB_CHANNELS "_god",	// GLOBAL_HISTORY_GOD
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STARTUP /////////////////////////////////////////////////////////////////
 
@@ -388,7 +398,8 @@ void boot_db(void) {
 	log("Loading help entries.");
 	index_boot_help();
 	
-	// logs its own message
+	// log their own messages
+	load_global_history();
 	load_slash_channels();
 	
 	log("Loading player accounts.");

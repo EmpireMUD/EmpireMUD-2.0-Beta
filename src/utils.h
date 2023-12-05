@@ -2039,7 +2039,7 @@ void stop_room_action(room_data *room, int action);
 void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 
 // act.comm.c
-void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
+void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message, bool disguised, int rank, any_vnum language);
 struct slash_channel *create_slash_channel(char *name);
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 struct slash_channel *find_slash_channel_by_id(int id);

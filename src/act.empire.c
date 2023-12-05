@@ -5301,7 +5301,7 @@ ACMD(do_esay) {
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, ch, lbuf, FALSE, level, NOTHING);
 		}
 	}
 
@@ -5324,7 +5324,7 @@ ACMD(do_esay) {
 			if (d->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
+				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, ch, lbuf, FALSE, level, NOTHING);
 			}	
 		}
 	}

@@ -696,7 +696,9 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players
 extern struct over_time_effect_type *free_dots_list;
+extern struct channel_history_data *global_channel_history[NUM_GLOBAL_HISTORIES];
 extern struct player_quest *global_next_player_quest, *global_next_player_quest_2;
+extern const char *global_history_files[];
 extern struct group_data *group_list;
 extern struct int_hash *inherent_ptech_hash;
 extern int max_inventory_size;

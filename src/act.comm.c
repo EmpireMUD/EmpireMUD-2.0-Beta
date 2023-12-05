@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Helper Functions
+*   Global Channel Histories
 *   Pub_Comm
 *   Slash Channels
 *   Communication Commands
@@ -36,7 +37,8 @@ ACMD(do_slash_channel);
 
 // local prototypes
 FILE *open_slash_channel_file(struct slash_channel *chan);
-struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
+struct channel_history_data *parse_channel_history_message(char *line, FILE *fl, char *error);
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool disguised, int rank, any_vnum language);
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
 void write_slash_channel_index();
@@ -56,10 +58,11 @@ struct {
 	int min_level;	// absolute minimum
 	bitvector_t ignore_flag;	// PRF_ flag for ignoring this channel
 	int history;
+	int global_history;
 } pub_comm[NUM_CHANNELS] = {
-	{ "shout", "\ty", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY },
-	{ "GOD", "\tr", PUB_COMM_OOC, LVL_GOD, PRF_NOGODNET, CHANNEL_HISTORY_GOD },
-	{ "IMMORTAL", "\tc", PUB_COMM_OOC, LVL_START_IMM, PRF_NOWIZ, CHANNEL_HISTORY_GOD },
+	{ "shout", "\ty", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY, NO_HISTORY },
+	{ "GOD", "\tr", PUB_COMM_OOC, LVL_GOD, PRF_NOGODNET, NO_HISTORY, GLOBAL_HISTORY_GOD },
+	{ "IMMORTAL", "\tc", PUB_COMM_OOC, LVL_START_IMM, PRF_NOWIZ, NO_HISTORY, GLOBAL_HISTORY_GOD },
 };
 
 
@@ -93,10 +96,13 @@ bool add_ignore(char_data *ch, int idnum) {
 * @param int type CHANNEL_HISTORY_x -- structs.h
 * @param char_data *speaker Who said the message
 * @param char *message full string including sender
+* @param bool disguised If TRUE, real name is hidden by a disguise.
+* @param int rank Optional: Empire rank (for empire history). Pass 0 if not used.
+* @param any_vnum language Optional: Language the character was speaking (for in-character channels). Pass NOTHING if not applicable.
 */
-void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message) {
+void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message, bool disguised, int rank, any_vnum language) {
 	if (!REAL_NPC(ch)) {
-		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), NULL, message);
+		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), NULL, message, disguised, rank, language);
 	}
 }
 
@@ -116,7 +122,7 @@ void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker
 		return;
 	}
 	
-	entry = process_add_to_channel_history(&(chan->history), speaker, message);
+	entry = process_add_to_channel_history(&(chan->history), speaker, message, FALSE, 0, NOTHING);
 	if (!(fl = open_slash_channel_file(chan))) {
 		return;	// unable to write
 	}
@@ -363,7 +369,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 	if (vict->desc && vict->desc->last_act_message) {
 		// the message was sent via act(), we can retrieve it from the desc
 		sprintf(lbuf, "\t%c%s", color, vict->desc->last_act_message);
-		add_to_channel_history(vict, CHANNEL_HISTORY_TELLS, ch, lbuf);
+		add_to_channel_history(vict, CHANNEL_HISTORY_TELLS, ch, lbuf, FALSE, 0, NOTHING);
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT))
@@ -381,7 +387,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
-			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch, ch->desc->last_act_message);
+			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch, ch->desc->last_act_message, FALSE, 0, NOTHING);
 		}
 	}
 	
@@ -402,9 +408,12 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 * @param struct channel_history_data **history a pointer to a history storage pointer
 * @param char_data *ch The player speaking on the channel (if applicable)
 * @param char *message the message to store
+* @param bool disguised If TRUE, real name is hidden by a disguise.
+* @param int rank Optional: Empire rank (for empire history). Pass 0 if not used.
+* @param any_vnum language Optional: Language the character was speaking (for in-character channels). Pass NOTHING if not applicable.
 * @return struct channel_history_data* The new history entry.
 */
-struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message) {
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool disguised, int rank, any_vnum language) {
 	struct channel_history_data *new, *old, *iter;
 	int count;
 	
@@ -413,6 +422,9 @@ struct channel_history_data *process_add_to_channel_history(struct channel_histo
 	new->message = strdup(message);
 	new->idnum = (ch ? GET_IDNUM(ch) : 0);
 	new->invis_level = (ch && !IS_NPC(ch)) ? GET_INVIS_LEV(ch) : 0;
+	new->is_disguised = disguised;
+	new->language = language;
+	new->rank = rank;
 	new->timestamp = time(0);
 	
 	// put it at the end
@@ -448,6 +460,143 @@ void remove_ignore(char_data *ch, int idnum) {
 		if (GET_IGNORE_LIST(ch, iter) == idnum) {
 			GET_IGNORE_LIST(ch, iter) = 0;
 		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GLOBAL CHANNEL HISTORIES ////////////////////////////////////////////////
+
+/**
+* Adds a message to a global history and writes it to the history file.
+*
+* @param int which Any GLOBAL_HISTORY_ const.
+* @param char_data *speaker Who said it (for invis, etc).
+* @param char *message The message itself.
+* @param int access_level Required level to view.
+* @param bool disguised If TRUE, real name is hidden by a disguise.
+* @param int rank Optional: Empire rank (for empire history). Pass 0 if not used.
+* @param any_vnum language Optional: Language the character was speaking (for in-character channels). Pass NOTHING if not applicable.
+*/
+void add_to_global_history(int which, char_data *speaker, char *message, int access_level, bool disguised, int rank, any_vnum language) {
+	struct channel_history_data *entry;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || which < 0 || which >= NUM_GLOBAL_HISTORIES) {
+		return;
+	}
+	
+	// add in-game
+	entry = process_add_to_channel_history(&global_channel_history[which], speaker, message, disguised, rank, language);
+	entry->access_level = access_level;
+	
+	// save to file
+	if (!(fl = fopen(global_history_files[which], "a"))) {
+		log("SYSERR: Unable to open global history file '%s' for appending", global_history_files[which]);
+		return;	// unable to write
+	}
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
+}
+
+
+/**
+* Removes old messages and writes a clean version of the global history
+* file. Then, it also frees up the memory from older messages in memory.
+*
+* @param int which Any GLOBAL_HISTORY_ const.
+*/
+void clean_global_channel(int which) {
+	struct channel_history_data *hist, *next_hist;
+	time_t clear_before;
+	int count;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || which < 0 || which >= NUM_GLOBAL_HISTORIES || !*global_history_files[which]) {
+		return;
+	}
+	
+	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
+	
+	// open the file for write (overwrite the old one)
+	if (!(fl = fopen(global_history_files[which], "w"))) {
+		log("SYSERR: Unable to write global history file '%s'", global_history_files[which]);
+		return;
+	}
+	
+	// clean the history and write any remaining history
+	count = 0;
+	DL_FOREACH_SAFE(global_channel_history[which], hist, next_hist) {
+		if (hist->timestamp >= clear_before) {
+			write_one_slash_channel_message(fl, hist);
+			++count;
+		}
+		else {
+			DL_DELETE(global_channel_history[which], hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
+	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories (keeps 4x in case of invisible conversations)
+	DL_FOREACH_SAFE(global_channel_history[which], hist, next_hist) {
+		if (count-- > MAX_RECENT_CHANNELS * 4) {
+			DL_DELETE(global_channel_history[which], hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+}
+
+
+/**
+* Loads the history for global channels.
+*/
+void load_global_history(void) {
+	char line[256], error[256];
+	struct channel_history_data *hist;
+	int iter;
+	FILE *fl;
+	
+	log("Loading global channel histories...");
+	
+	for (iter = 0; iter < NUM_GLOBAL_HISTORIES && *global_history_files[iter]; ++iter) {
+		// init now
+		global_channel_history[iter] = NULL;
+		
+		if (!(fl = fopen(global_history_files[iter], "r"))) {
+			log("- no history file found: %s", global_history_files[iter]);
+			continue;
+		}
+		
+		// file open..
+		snprintf(error, sizeof(error), "global history file %s", global_history_files[iter]);
+			
+		for (;;) {
+			if (!get_line(fl, line)) {
+				break;	// done (no terminating code)
+			}
+			
+			switch (*line) {
+				case 'M': {	// message
+					if ((hist = parse_channel_history_message(line, fl, error))) {
+						DL_APPEND(global_channel_history[iter], hist);
+					}
+					break;
+				}
+				
+				// default: ignore the line as garbage
+			}
+		}
+			
+		fclose(fl);
+		clean_global_channel(iter);
 	}
 }
 
@@ -582,7 +731,7 @@ ACMD(do_pub_comm) {
 			
 			// trap last act() and send to the history
 			if (ch->desc && ch->desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-				add_to_channel_history(ch, pub_comm[subcmd].history, ch, ch->desc->last_act_message);
+				add_to_channel_history(ch, pub_comm[subcmd].history, ch, ch->desc->last_act_message, FALSE, 0, lang ? GEN_VNUM(lang) : NOTHING);
 			}
 		}
 		
@@ -684,8 +833,30 @@ ACMD(do_pub_comm) {
 			
 			// get the message from act() and put it in history
 			if (desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-				add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, desc->last_act_message);
+				add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, desc->last_act_message,  (pub_comm[subcmd].type != PUB_COMM_OOC && (IS_MORPHED(ch) || IS_DISGUISED(ch))), 0, ((lang && pub_comm[subcmd].type != PUB_COMM_OOC) ? GEN_VNUM(lang) : NOTHING));
 			}
+		}
+		
+		// global history
+		if (pub_comm[subcmd].global_history != NO_HISTORY) {
+			switch (pub_comm[subcmd].type) {
+				case PUB_COMM_GLOBAL:
+				case PUB_COMM_SHORT_RANGE: {
+					sprintf(msgbuf, "%s%s %s%s, '%s%s'\tn", pub_comm[subcmd].color, (GET_INVIS_LEV(ch) >= LVL_GOD ? "Someone" : PERS(ch, ch, FALSE)), pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
+					break;
+				}
+				case PUB_COMM_OOC:
+				default: {
+					if (emote) {
+						sprintf(msgbuf, "[%s%s\tn%s] %s %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, PERS(ch, ch, TRUE), argument);
+					}
+					else {
+						sprintf(msgbuf, "[%s%s\tn %s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, PERS(ch, ch, TRUE), level_string, argument);
+					}
+					break;
+				}
+			}
+			add_to_global_history(pub_comm[subcmd].global_history, ch, msgbuf, level, (pub_comm[subcmd].type && (IS_DISGUISED(ch) || IS_MORPHED(ch))), 0, ((lang && pub_comm[subcmd].type) ? GEN_VNUM(lang) : NOTHING));
 		}
 	}
 }
@@ -932,10 +1103,8 @@ void load_slash_channels(void) {
 	char name[256], filename[256], line[256], error[256], str[256];
 	struct channel_history_data *hist, *next_hist;
 	struct slash_channel *chan;
-	char color, *tmp;
-	int idnum, invis;
+	char color;
 	FILE *index, *fl;
-	long timestamp;
 	
 	log("Loading slash-channels...");
 	
@@ -974,23 +1143,10 @@ void load_slash_channels(void) {
 				
 				switch (*line) {
 					case 'M': {	// message
-						if (sscanf(line, "M %ld %d %d", &timestamp, &idnum, &invis) != 3) {
-							// skip this entry
-							tmp = fread_string(fl, error);
-							if (tmp) {
-								free(tmp);
-							}
-							continue;
+						if ((hist = parse_channel_history_message(line, fl, error))) {
+							// put it at the end
+							DL_APPEND(chan->history, hist);
 						}
-						
-						CREATE(hist, struct channel_history_data, 1);
-						hist->idnum = idnum;
-						hist->invis_level = invis;
-						hist->timestamp = timestamp;
-						hist->message = fread_string(fl, error);
-						
-						// put it at the end
-						DL_APPEND(chan->history, hist);
 						break;
 					}
 					case 'N': {	// name/configs
@@ -1100,6 +1256,52 @@ FILE *open_slash_channel_file(struct slash_channel *chan) {
 		log("SYSERR: Unable to open slash-channel file '%s' for appending", fname);
 	}
 	return fl;
+}
+
+
+/**
+* Parse 1 channel history entry from an open file.
+*
+* @param char *line The 'M' line already read in, starting the message.
+* @param FILE *fl The open file, where the next line is the message text.
+* @param char *error The partial error string in case something goes wrong.
+* @return struct channel_history_data* The new entry, if a message was read, or blank if not.
+*/
+struct channel_history_data *parse_channel_history_message(char *line, FILE *fl, char *error) {
+	char *tmp;
+	int idnum, invis, access_level, rank, language, is_disguised;
+	time_t timestamp;
+	struct channel_history_data *hist;
+
+	if (sscanf(line, "M %ld %d %d %d %d %d %d", &timestamp, &idnum, &invis, &access_level, &rank, &language, &is_disguised) != 7) {
+		// backwards-compatible
+		access_level = 0;
+		rank = 0;
+		language = NOTHING;
+		is_disguised = 0;
+		
+		if (sscanf(line, "M %ld %d %d", &timestamp, &idnum, &invis) != 3) {
+			// skip this entry
+			tmp = fread_string(fl, error);
+			if (tmp) {
+				free(tmp);
+			}
+			return NULL;
+		}
+	}
+	
+	// ok
+	CREATE(hist, struct channel_history_data, 1);
+	hist->idnum = idnum;
+	hist->invis_level = invis;
+	hist->access_level = access_level;
+	hist->rank = rank;
+	hist->language = language;
+	hist->is_disguised = is_disguised ? TRUE : FALSE;
+	hist->timestamp = timestamp;
+	hist->message = fread_string(fl, error);
+	
+	return hist;
 }
 
 
@@ -1225,14 +1427,15 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 
 
 /**
-* Writes a single slash-channel entry to a slash-channel log file.
+* Writes a single slash-channel entry to a slash-channel log file. This is
+* ALSO used for global histories.
 *
 * @param FILE *fl The open file to write to.
 * @param struct channel_history_data *entry The message entry to write.
 */
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry) {
 	if (fl && entry) {
-		fprintf(fl, "M %ld %d %d\n%s~\n", entry->timestamp, entry->idnum, entry->invis_level, NULLSAFE(entry->message));
+		fprintf(fl, "M %ld %d %d %d %d %d %d\n%s~\n", entry->timestamp, entry->idnum, entry->invis_level, entry->access_level, entry->rank, entry->language, entry->is_disguised ? 1 : 0, NULLSAFE(entry->message));
 		fflush(fl);
 	}
 }
@@ -1593,7 +1796,7 @@ ACMD(do_gsay) {
 			delete_doubledollar(normal);
 			send_to_char(normal, ch);
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, normal);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, normal, FALSE, 0, NOTHING);
 			}
 		}
 
@@ -1622,7 +1825,7 @@ ACMD(do_gsay) {
 			}
 			
 			act(string, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-			add_to_channel_history(desc->character, CHANNEL_HISTORY_SAY, ch, desc->last_act_message);
+			add_to_channel_history(desc->character, CHANNEL_HISTORY_SAY, ch, desc->last_act_message, FALSE, 0, NOTHING);
 		}
 	}
 }
@@ -1633,9 +1836,10 @@ ACMD(do_gsay) {
 */
 ACMD(do_history) {
 	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats", "rolls" };
-	struct channel_history_data *chd_iter;
+	const char *glob_types[NUM_GLOBAL_HISTORIES] = { "immortal messages" };
+	struct channel_history_data *chd_iter, *list;
 	bool found_crlf;
-	int pos, type = NO_HISTORY;
+	int pos, type = NO_HISTORY, glob_type = NO_HISTORY;
 	
 	if (REAL_NPC(ch)) {
 		return;	// nothing to show
@@ -1645,7 +1849,7 @@ ACMD(do_history) {
 	
 	// determine type
 	if (subcmd == SCMD_GOD_HISTORY || (subcmd == SCMD_HISTORY && (is_abbrev(argument, "godnet") || is_abbrev(argument, "wiznet") || is_abbrev(argument, "immortal")))) {
-		type = CHANNEL_HISTORY_GOD;
+		glob_type = GLOBAL_HISTORY_GOD;
 	}
 	else if (subcmd == SCMD_TELL_HISTORY || (subcmd == SCMD_HISTORY && is_abbrev(argument, "tells"))) {
 		type = CHANNEL_HISTORY_TELLS;
@@ -1676,15 +1880,28 @@ ACMD(do_history) {
 		return;	// fail either way
 	}
 	
-	if (type == NO_HISTORY) {
+	// show:
+	if (type != NO_HISTORY) {
+		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[type]);
+		list = GET_HISTORY(REAL_CHAR(ch), type);
+	}
+	else if (glob_type != NO_HISTORY) {
+		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, glob_types[glob_type]);
+		list = global_channel_history[glob_type];
+	}
+	else {
 		msg_to_char(ch, "No history to show.\r\n");
 		return;
 	}
 	
-	// show a history
-	msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[type]);
-	
-	DL_FOREACH(GET_HISTORY(REAL_CHAR(ch), type), chd_iter) {
+	DL_FOREACH(list, chd_iter) {
+		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
+			continue;	// bad access level
+		}
+		if (chd_iter->rank > 0 && (!GET_LOYALTY(ch) || GET_RANK(ch) < chd_iter->rank)) {
+			continue;	// low rank
+		}
+		
 		// verify has newline
 		pos = strlen(chd_iter->message) - 1;
 		found_crlf = FALSE;
@@ -1989,7 +2206,7 @@ ACMD(do_say) {
 			// channel history
 			if (c->desc && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, c->desc->last_act_message);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, c->desc->last_act_message, (subcmd != SCMD_OOCSAY && (IS_DISGUISED(ch) || IS_MORPHED(ch))), 0, ((lang && subcmd != SCMD_OOCSAY) ? GEN_VNUM(lang) : NOTHING));
 			}
 		}
 		
@@ -2008,7 +2225,7 @@ ACMD(do_say) {
 			send_to_char(buf, ch);
 
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf, FALSE, 0, NOTHING);
 			}
 		}
 		
@@ -2170,7 +2387,7 @@ ACMD(do_spec_comm) {
 		if (vict->desc && vict->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(buf, "\t%c%s", color, vict->desc->last_act_message);
-			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, buf);
+			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, buf, (IS_DISGUISED(ch) || IS_MORPHED(ch)), 0, NOTHING);
 		}
 		
 		// msg to char
@@ -2182,7 +2399,7 @@ ACMD(do_spec_comm) {
 			sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), buf2, color);
 			msg_to_char(ch, "%s\r\n", buf);
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf, FALSE, 0, NOTHING);
 			}
 		}
 
