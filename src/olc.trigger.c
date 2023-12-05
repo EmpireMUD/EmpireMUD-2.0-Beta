@@ -627,7 +627,7 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
 	}
 	else if (count == 0) {

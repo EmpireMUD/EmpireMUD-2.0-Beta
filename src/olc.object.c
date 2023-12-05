@@ -1296,7 +1296,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
 	}
 	else if (count == 0) {

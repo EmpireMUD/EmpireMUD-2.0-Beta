@@ -593,7 +593,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d generics)\r\n", count);
 	}
 	else if (count == 0) {

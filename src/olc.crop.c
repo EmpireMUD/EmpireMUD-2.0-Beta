@@ -397,7 +397,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d crop%s)\r\n", count, PLURAL(count));
 	}
 	else if (count == 0) {

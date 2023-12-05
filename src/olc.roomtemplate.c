@@ -507,8 +507,8 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d room templates)\r\n", count);
+	if (count > 0 && (size + 20) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d templates)\r\n", count);
 	}
 	else if (count == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
