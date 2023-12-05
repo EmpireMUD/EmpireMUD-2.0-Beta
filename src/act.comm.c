@@ -1836,9 +1836,15 @@ ACMD(do_history) {
 	player_index_data *plr_index;
 	bool found_crlf;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
-	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], realname[256], *sub_arg;
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], realname[256], *sub_arg;
 	int count, pos, type = NO_HISTORY, glob_type = NO_HISTORY;
 	empire_data *use_emp = NULL;
+	
+	// for displaying a full 20
+	struct hist_temp_t {
+		char *msg;
+		struct hist_temp_t *next;
+	} *hist_list = NULL, *htt, *next_htt;
 	
 	if (REAL_NPC(ch)) {
 		return;	// nothing to show
@@ -1912,13 +1918,10 @@ ACMD(do_history) {
 		return;
 	}
 	
-	// how many?
-	DL_COUNT(list, chd_iter, count);
+	count = 0;
 	
-	DL_FOREACH(list, chd_iter) {
-		if (count-- > MAX_RECENT_CHANNELS) {
-			continue;	// skip down to the last N
-		}
+	// iterate the history in reverse...
+	for (chd_iter = list ? list->prev : NULL; chd_iter && chd_iter != list; chd_iter = chd_iter->prev) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
@@ -1927,6 +1930,9 @@ ACMD(do_history) {
 		}
 		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
 			continue;	// ignore list
+		}
+		if (count++ > MAX_RECENT_CHANNELS) {
+			break;	// done
 		}
 		
 		// verify has newline
@@ -1954,16 +1960,30 @@ ACMD(do_history) {
 			*realname = '\0';
 		}
 		
-		// send message
+		// build message
 		if (chd_iter->language == NOTHING || speaks_language(ch, chd_iter->language) == LANG_SPEAK) {
-			msg_to_char(ch, "%3s:%s %s\tn%s", simple_time_since(chd_iter->timestamp), realname, chd_iter->message, (found_crlf ? "" : "\r\n"));
+			snprintf(output, sizeof(output), "%3s:%s %s\tn%s", simple_time_since(chd_iter->timestamp), realname, chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 		else if (speaks_language(ch, chd_iter->language) == LANG_RECOGNIZE) {
-			msg_to_char(ch, "%3s:%s Unknown %s speech\r\n", simple_time_since(chd_iter->timestamp), realname, get_generic_name_by_vnum(chd_iter->language));
+			snprintf(output, sizeof(output), "%3s:%s Unknown %s speech\r\n", simple_time_since(chd_iter->timestamp), realname, get_generic_name_by_vnum(chd_iter->language));
 		}
 		else {
-			msg_to_char(ch, "%3s:%s Unknown language\r\n", simple_time_since(chd_iter->timestamp), realname);
+			snprintf(output, sizeof(output), "%3s:%s Unknown language\r\n", simple_time_since(chd_iter->timestamp), realname);
 		}
+		
+		// put in buffer
+		CREATE(htt, struct hist_temp_t, 1);
+		htt->msg = strdup(output);
+		LL_PREPEND(hist_list, htt);
+	}
+	
+	// and show
+	LL_FOREACH_SAFE(hist_list, htt, next_htt) {
+		if (htt->msg) {
+			send_to_char(htt->msg, ch);
+			free(htt->msg);
+		}
+		free(htt);
 	}
 }
 
