@@ -552,13 +552,13 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		}
 		
 		// moons
-		if (only_moon != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) != only_moon)) {
+		if (only_moon != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) != only_moon)) {
 			continue;
 		}
-		if (moon_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) < moon_over)) {
+		if (moon_over != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) < moon_over)) {
 			continue;
 		}
-		if (moon_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) > moon_under)) {
+		if (moon_under != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) > moon_under)) {
 			continue;
 		}
 		
