@@ -6374,7 +6374,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Gray fox pet behavior~
 0 bt 25
 ~
-set list 11893 11946 11947 11977
+set list 11893 11946 11947 11977 534 9141 9933
 set room %self.room%
 set ch %room.people%
 set any 0
