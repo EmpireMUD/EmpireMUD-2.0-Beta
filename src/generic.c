@@ -447,7 +447,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 	
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_liquid_flags = NOBITS;
 	int only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
-	int only_drunk = INT_MIN, drunk_over = INT_MIN, drunk_under = INT_MIN, only_hunger = -2, hunger_over = INT_MIN, hunger_under = INT_MIN, only_thirst = -2, thirst_over = INT_MIN, thirst_under = INT_MIN;
+	int only_drunk = INT_MIN, drunk_over = INT_MIN, drunk_under = INT_MIN, only_hunger = INT_MIN, hunger_over = INT_MIN, hunger_under = INT_MIN, only_thirst = INT_MIN, thirst_over = INT_MIN, thirst_under = INT_MIN;
 	int only_moon = NOTHING, moon_over = NOTHING, moon_under = NOTHING;
 	
 	generic_data *gen, *next_gen;
@@ -504,7 +504,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 	size = snprintf(buf, sizeof(buf), "Generic fullsearch: %s\r\n", show_color_codes(find_keywords));
 	count = 0;
 	
-	// okay now look up genericss
+	// okay now look up generics
 	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if ((vmin != NOTHING && GEN_VNUM(gen) < vmin) || (vmax != NOTHING && GEN_VNUM(gen) > vmax)) {
 			continue;	// vnum range
