@@ -1682,11 +1682,11 @@ ACMD(do_slash_channel) {
 			DL_COUNT(chan->history, hist, count);
 			
 			DL_FOREACH(chan->history, hist) {
-				if (is_ignoring_idnum(ch, hist->idnum)) {
-					continue;	// ignore list
-				}
 				if (count-- > MAX_RECENT_CHANNELS) {
 					continue;	// skip down to the last N
+				}
+				if (is_ignoring_idnum(ch, hist->idnum)) {
+					continue;	// ignore list
 				}
 				
 				if (hist->invis_level > 0 && hist->invis_level <= GET_ACCESS_LEVEL(ch)) {
@@ -1916,6 +1916,9 @@ ACMD(do_history) {
 	DL_COUNT(list, chd_iter, count);
 	
 	DL_FOREACH(list, chd_iter) {
+		if (count-- > MAX_RECENT_CHANNELS) {
+			continue;	// skip down to the last N
+		}
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
@@ -1924,9 +1927,6 @@ ACMD(do_history) {
 		}
 		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
 			continue;	// ignore list
-		}
-		if (count-- > MAX_RECENT_CHANNELS) {
-			continue;	// skip down to the last N
 		}
 		
 		// verify has newline
@@ -1947,7 +1947,7 @@ ACMD(do_history) {
 		}
 		
 		// realname section
-		if (chd_iter->invis_level <= GET_ACCESS_LEVEL(ch) && (chd_iter->invis_level > 0 || chd_iter->is_disguised)) {
+		if ((chd_iter->invis_level <= GET_ACCESS_LEVEL(ch) && chd_iter->invis_level > 0) || (IS_IMMORTAL(ch) && chd_iter->is_disguised && chd_iter->invis_level == 0)) {
 			snprintf(realname, sizeof(realname), " (%s)", (plr_index = find_player_index_by_idnum(chd_iter->idnum)) ? plr_index->fullname : "<unknown>");
 		}
 		else {
