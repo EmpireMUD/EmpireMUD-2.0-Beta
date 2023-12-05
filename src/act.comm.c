@@ -1686,7 +1686,7 @@ ACMD(do_slash_channel) {
 			
 			// iterate backwards
 			count = 0;
-			for (hist = chan->history ? chan->history->prev : NULL; hist && hist != chan->history->prev; hist = hist->prev) {
+			for (hist = chan->history ? chan->history->prev : NULL; hist && hist != chan->history; hist = hist->prev) {
 				if (is_ignoring_idnum(ch, hist->idnum)) {
 					continue;	// ignore list
 				}
