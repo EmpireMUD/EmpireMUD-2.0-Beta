@@ -542,9 +542,9 @@ void clean_global_channel(int which) {
 	
 	fclose(fl);
 	
-	// free up memory for any entries that wouldn't be shown on histories (keeps 4x in case of invisible conversations)
+	// free up memory for any entries that wouldn't be shown on histories
 	DL_FOREACH_SAFE(global_channel_history[which], hist, next_hist) {
-		if (count-- > MAX_RECENT_CHANNELS * 4) {
+		if (count-- > MAX_RECENT_CHANNELS) {
 			DL_DELETE(global_channel_history[which], hist);
 			if (hist->message) {
 				free(hist->message);
@@ -848,10 +848,10 @@ ACMD(do_pub_comm) {
 				case PUB_COMM_OOC:
 				default: {
 					if (emote) {
-						sprintf(msgbuf, "[%s%s\tn%s] %s %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, PERS(ch, ch, TRUE), argument);
+						sprintf(msgbuf, "[%s%s\tn%s] %s %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, level_string, (GET_INVIS_LEV(ch) >= LVL_GOD ? "Someone" : PERS(ch, ch, TRUE)), argument);
 					}
 					else {
-						sprintf(msgbuf, "[%s%s\tn %s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, PERS(ch, ch, TRUE), level_string, argument);
+						sprintf(msgbuf, "[%s%s\tn %s%s]: %s\tn", pub_comm[subcmd].color, pub_comm[subcmd].name, (GET_INVIS_LEV(ch) >= LVL_GOD ? "Someone" : PERS(ch, ch, TRUE)), level_string, argument);
 					}
 					break;
 				}
@@ -1703,7 +1703,7 @@ ACMD(do_slash_channel) {
 				strncpy(message, hist->message, MAX_INPUT_LENGTH-1);
 				message[MAX_INPUT_LENGTH-1] = '\0';
 				delete_doubledollar(message);
-				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
+				msg_to_char(ch, "%3s:%s %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
 			}
 		}
 	}
@@ -1838,7 +1838,9 @@ ACMD(do_history) {
 	const char *types[NUM_CHANNEL_HISTORY_TYPES] = { "god channels", "tells", "says", "empire chats", "rolls" };
 	const char *glob_types[NUM_GLOBAL_HISTORIES] = { "immortal messages" };
 	struct channel_history_data *chd_iter, *list;
+	player_index_data *plr_index;
 	bool found_crlf;
+	char realname[256];
 	int pos, type = NO_HISTORY, glob_type = NO_HISTORY;
 	
 	if (REAL_NPC(ch)) {
@@ -1893,13 +1895,16 @@ ACMD(do_history) {
 		msg_to_char(ch, "No history to show.\r\n");
 		return;
 	}
-	
+		
 	DL_FOREACH(list, chd_iter) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
 		if (chd_iter->rank > 0 && (!GET_LOYALTY(ch) || GET_RANK(ch) < chd_iter->rank)) {
 			continue;	// low rank
+		}
+		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
+			continue;	// ignore list
 		}
 		
 		// verify has newline
@@ -1919,8 +1924,24 @@ ACMD(do_history) {
 			}
 		}
 		
+		// realname section
+		if (chd_iter->invis_level <= GET_ACCESS_LEVEL(ch) && (chd_iter->invis_level > 0 || chd_iter->is_disguised)) {
+			snprintf(realname, sizeof(realname), " (%s)", (plr_index = find_player_index_by_idnum(chd_iter->idnum)) ? plr_index->fullname : "<unknown>");
+		}
+		else {
+			*realname = '\0';
+		}
+		
 		// send message
-		msg_to_char(ch, "%3s: %s\tn%s", simple_time_since(chd_iter->timestamp), chd_iter->message, (found_crlf ? "" : "\r\n"));
+		if (chd_iter->language == NOTHING || speaks_language(ch, chd_iter->language) == LANG_SPEAK) {
+			msg_to_char(ch, "%3s:%s %s\tn%s", simple_time_since(chd_iter->timestamp), realname, chd_iter->message, (found_crlf ? "" : "\r\n"));
+		}
+		else if (speaks_language(ch, chd_iter->language) == LANG_RECOGNIZE) {
+			msg_to_char(ch, "%3s:%s Unknown %s speech\r\n", simple_time_since(chd_iter->timestamp), realname, get_generic_name_by_vnum(chd_iter->language));
+		}
+		else {
+			msg_to_char(ch, "%3s:%s Unknown language\r\n", simple_time_since(chd_iter->timestamp), realname);
+		}
 	}
 }
 
