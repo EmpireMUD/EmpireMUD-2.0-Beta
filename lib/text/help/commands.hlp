@@ -2221,7 +2221,9 @@ SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 Usage:  say <string>
         say #<language> <string>
         oocsay <string>
-        <tell | whisper | ask> <player> <string>
+        tell <player> <string>
+        ask <player> [#<language>] <string>
+        whisper <player> [#<language>] <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
@@ -2237,6 +2239,7 @@ Examples:
   > say Hey, does anyone know how to get to Oz?
   > say #low-goblish Hello!
   > tell catje hi, how are you?
+  > whisper phil #english Do you speak this language?
 
 You can use ' as a shorthand for say, and " for oocsay, as in:
 
