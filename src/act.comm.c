@@ -1944,7 +1944,7 @@ ACMD(do_history) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
-		if (chd_iter->rank > 0 && (!GET_LOYALTY(ch) || GET_RANK(ch) < chd_iter->rank)) {
+		if (chd_iter->rank > 0 && !imm_access && (!GET_LOYALTY(ch) || GET_RANK(ch) < chd_iter->rank)) {
 			continue;	// low rank
 		}
 		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
