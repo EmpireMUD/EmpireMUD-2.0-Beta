@@ -2056,6 +2056,7 @@ void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, 
 bool check_in_city_requirement(room_data *room, bool check_wait);
 void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
 void do_customize_island(char_data *ch, char *argument);
+char *empire_history_filename(empire_data *emp);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void load_empire_chat_history(empire_data *emp);

@@ -2209,7 +2209,7 @@ typedef enum {
 #define CHANNEL_HISTORY_GOD  0	// no longer used: god channels are now global
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
-#define CHANNEL_HISTORY_EMPIRE  3
+#define CHANNEL_HISTORY_EMPIRE  3	// no longer used: empire histories now saved to empire
 #define CHANNEL_HISTORY_ROLL  4
 #define NUM_CHANNEL_HISTORY_TYPES  5
 
