@@ -1486,7 +1486,7 @@ ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash;
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
 	char message[MAX_INPUT_LENGTH];
 	player_index_data *index;
 	descriptor_data *desc;
@@ -1495,6 +1495,12 @@ ACMD(do_slash_channel) {
 	bool ok, found;
 	
 	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "index", "\n" };
+	
+	// for displaying a full 20
+	struct hist_temp_t {
+		char *msg;
+		struct hist_temp_t *next;
+	} *hist_list = NULL, *htt, *next_htt;
 	
 	half_chop(argument, arg, arg2);
 	
@@ -1678,15 +1684,14 @@ ACMD(do_slash_channel) {
 		else {
 			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
 			
-			// count so we can just show the last N
-			DL_COUNT(chan->history, hist, count);
-			
-			DL_FOREACH(chan->history, hist) {
-				if (count-- > MAX_RECENT_CHANNELS) {
-					continue;	// skip down to the last N
-				}
+			// iterate backwards
+			count = 0;
+			for (hist = chan->history ? chan->history->prev : NULL; hist && hist != chan->history->prev; hist = hist->prev) {
 				if (is_ignoring_idnum(ch, hist->idnum)) {
 					continue;	// ignore list
+				}
+				if (++count > MAX_RECENT_CHANNELS) {
+					break;	// skip any over the last N
 				}
 				
 				if (hist->invis_level > 0 && hist->invis_level <= GET_ACCESS_LEVEL(ch)) {
@@ -1698,7 +1703,21 @@ ACMD(do_slash_channel) {
 				strncpy(message, hist->message, MAX_INPUT_LENGTH-1);
 				message[MAX_INPUT_LENGTH-1] = '\0';
 				delete_doubledollar(message);
-				msg_to_char(ch, "%3s:%s %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
+				snprintf(output, sizeof(output), "%3s:%s %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
+				
+				// put in buffer
+				CREATE(htt, struct hist_temp_t, 1);
+				htt->msg = strdup(output);
+				LL_PREPEND(hist_list, htt);
+			}
+			
+			// and show
+			LL_FOREACH_SAFE(hist_list, htt, next_htt) {
+				if (htt->msg) {
+					send_to_char(htt->msg, ch);
+					free(htt->msg);
+				}
+				free(htt);
 			}
 		}
 	}
@@ -1931,7 +1950,7 @@ ACMD(do_history) {
 		if (is_ignoring_idnum(ch, chd_iter->idnum)) {
 			continue;	// ignore list
 		}
-		if (count++ > MAX_RECENT_CHANNELS) {
+		if (++count > MAX_RECENT_CHANNELS) {
 			break;	// done
 		}
 		
