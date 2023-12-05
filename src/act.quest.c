@@ -251,16 +251,22 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 		if (!task->group) {	// ungrouped "or" tasks
 			if (task->current >= task->needed) {
 				// found a complete "or"
-				*complete = *total = task->needed;
+				if (requirement_amt_type[task->type] == REQ_AMT_NUMBER) {
+					*complete = *total = task->needed;
+				}
+				else {
+					// just pass/fail
+					*complete = *total = 1;
+				}
 				done = TRUE;
 				break;
 			}
-			else if (task->current > ungroup_complete) {
+			else if (task->current > ungroup_complete && requirement_amt_type[task->type] == REQ_AMT_NUMBER) {
 				ungroup_complete = task->current;
 				ungroup_total = task->needed;
 			}
 			else if (!ungroup_total) {
-				ungroup_total = task->needed;
+				ungroup_total = (requirement_amt_type[task->type] == REQ_AMT_NUMBER) ? task->needed : 1;
 			}
 		}
 		else {	// grouped tasks

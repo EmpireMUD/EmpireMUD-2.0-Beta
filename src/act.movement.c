@@ -3127,8 +3127,9 @@ ACMD(do_worm) {
 	}
 	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "You can't go that way!\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER))
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || IS_SET(get_climate(to_room), CLIM_FRESH_WATER | CLIM_SALT_WATER | CLIM_FROZEN_WATER | CLIM_OCEAN | CLIM_LAKE)) {
 		msg_to_char(ch, "You can't pass through the water!\r\n");
+	}
 	else if (GET_MOVE(ch) < 1)
 		msg_to_char(ch, "You don't have enough energy left to do that.\r\n");
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_WORM)) {

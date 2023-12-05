@@ -378,7 +378,9 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Magical will generally help you in the Caster or Solo roles.
+
+See also: CASTER, ROLE, SCORE, SOLO
 #
 BONUS-PHYSICAL "BONUS PHYSICAL" "PHYSICAL ATTRIBUTE" "PHYSICAL TRAIT"
 
@@ -391,7 +393,9 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Physical will generally only help you in the Melee or Solo roles.
+
+See also: MELEE, ROLE, SCORE, SOLO
 #
 "BRIEF RESPITE" RESPITE
 
@@ -584,7 +588,7 @@ off with the "smessages" command.
 
 See also: STATUS MESSAGES
 #
-DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
+DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" SCRATCH BATTER WALLOP FEROCIOUSLY SAVAGELY MAUL RAVAGE MASSACRE DECIMATE BRUTALLY VICIOUSLY CRUSH WRECK OBLITERATE ANNIHILATE MUTILATE SLAUGHTER DEMOLISH DEVASTATE ERADICATE LIQUIDATE EXTERMINATE VANQUISH CONQUER
 
 Use the 'hit' command (or any attack ability) to initiate combat and deal
 damage to other creatures. Getting better gear will increase the a mount of
@@ -596,21 +600,45 @@ type of weapon and the amount of damage you dealt.
 
 Damage text:
       0 damage: miss
-      1 damage: tickle
-    2-3 damage: barely
-   4-10 damage: [normal]
-  11-14 damage: hard
-  15-16 damage: very hard
-  17-20 damage: extremely hard
-  21-24 damage: maul
-  25-28 damage: massacre
-  29-32 damage: decimate
-  33-45 damage: OBLITERATE
-  46-60 damage: ANNIHILATE
-  61-75 damage: MUTILATE
- 76-100 damage: SLAUGHTER
-101-125 damage: **ERADICATE**
-   126+ damage: **LIQUIDATE**
+      1 damage: rattle
+      2 damage: jostle
+      3 damage: tickle
+      4 damage: graze
+      5 damage: barely
+      6 damage: bruise
+      7 damage: scratch
+    8-9 damage: gently
+  10-11 damage: wound
+  12-13 damage: injure
+  14-15 damage: [normal]
+  16-18 damage: batter
+  19-22 damage: hard
+  23-26 damage: stagger
+  27-30 damage: very hard
+  31-35 damage: wallop
+  36-40 damage: extremely hard
+  41-45 damage: ferociously
+  46-50 damage: savagely
+  51-54 damage: maul
+  55-60 damage: ravage
+  61-65 damage: massacre
+  66-70 damage: decimate
+  71-80 damage: brutally
+  81-90 damage: viciously
+ 91-100 damage: CRUSH
+101-125 damage: WRECK
+126-150 damage: SHATTER
+151-175 damage: OBLITERATE
+176-200 damage: ANNIHILATE
+201-233 damage: MUTILATE
+234-266 damage: SLAUGHTER
+267-300 damage: **DEMOLISH**
+301-350 damage: **DEVASTATE**
+351-400 damage: **ERADICATE**
+401-450 damage: **LIQUIDATE**
+451-500 damage: **EXTERMINATE**
+501-550 damage: **VANQUISH**
+   551+ damage: **CONQUER**
 
 Examples:
   You slash the ship very hard!
@@ -703,8 +731,10 @@ See also: ATTRIBUTES, MELEE, CASTER, TANK, TO-HIT, DODGE
 "DIMINISHING RETURNS"
 
 Diminishing returns are numbers that increase quickly at low levels, but more
-slowly at higher levels. For example, the first +20 dodge you get is applied
-directly, but the next +20 dodge only brings you up to +30.
+slowly at higher levels. For example, the first +20 you get in a diminishing
+stat is applied directly, but the next +20 only brings you up to +30.
+
+This is currently only used for resistances.
 #
 DISPLAY
 

@@ -227,7 +227,9 @@ bool dismiss_any_minipet(char_data *ch) {
 	char_data *mob;
 	
 	while ((mob = find_minipet(ch))) {	// ensures there aren't more than 1
-		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+		if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+			act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+		}
 		extract_char(mob);
 		any = TRUE;
 	}
@@ -549,6 +551,9 @@ void perform_alternate(char_data *old, char_data *new) {
 	extract_all_items(old);
 	extract_char(old);
 	
+	// ensure character is gone right away
+	extract_pending_chars();
+	
 	if (config_get_bool("public_logins")) {
 		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
 			mortlog("%s", mort_alt);
@@ -807,7 +812,7 @@ static void print_group(char_data *ch) {
 	char_data *k;
 
 	if (GROUP(ch)) {
-		msg_to_char(ch, "Your group consists of:\r\n");
+		msg_to_char(ch, "Your group:\r\n");
 		for (mem = GROUP(ch)->members; mem; mem = mem->next) {
 			k = mem->member;
 			
@@ -821,9 +826,14 @@ static void print_group(char_data *ch) {
 			}
 			
 			// show class section if they have one
-			if (!IS_NPC(k) && GET_CLASS(k)) {
+			if (!IS_NPC(k)) {
 				get_player_skill_string(k, skills, TRUE);
-				snprintf(class, sizeof(class), "/%s/%s", skills, class_role[(int) GET_CLASS_ROLE(k)]);
+				snprintf(class, sizeof(class), "/%s", skills);
+				
+				// screenreader sees role here; otherwise the name is highlighted
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
+				}
 			}
 			else {
 				*class = '\0';
@@ -849,7 +859,7 @@ static void print_group(char_data *ch) {
 			}
 			
 			// name: lvl class (spec) -- location (x, y)
-			msg_to_char(ch, "%s%s [%d%s]%s%s%s\r\n", PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", get_approximate_level(k), class, status, alerts, loc);
+			msg_to_char(ch, "%s%s%s\t0 [%d%s]%s%s%s\r\n", class_role_color[(int)GET_CLASS_ROLE(k)], PERS(k, k, TRUE), (k == GROUP_LEADER(GROUP(ch))) ? " (L)" : "", get_approximate_level(k), class, status, alerts, loc);
 		}
 	}
 	else {
@@ -2550,7 +2560,14 @@ ACMD(do_gen_write) {
 	
 	fprintf(fl, "%-8s (%6.6s)%s %s\n", GET_NAME(ch), (tmp + 4), locpart, argument);
 	fclose(fl);
-	send_to_char("Okay. Thanks!\r\n", ch);
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_to_char("Okay. Thanks!\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "You submit %s %s: %s\r\n", AN(name), name, show_color_codes(argument));
+		msg_to_char(ch, "Thanks!\r\n");
+	}
 }
 
 
@@ -2568,7 +2585,9 @@ ACMD(do_group) {
 
 	// no-arg
 	if (!*buf) {
-		msg_to_char(ch, "Available group options: new, invite, join, kick, leave, leader\r\n");
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "Available group options: new, invite, join, kick, leave, leader, options\r\n");
+		}
 		
 		if (GROUP(ch)) {
 			// should we replace this with the group summary? -pc
@@ -2576,6 +2595,9 @@ ACMD(do_group) {
 		}
 		else if ((vict = is_playing(GET_GROUP_INVITE(ch)))) {
 			msg_to_char(ch, "You have been invited to a group by %s.\r\n", PERS(vict, vict, TRUE));
+		}
+		else {
+			msg_to_char(ch, "You are not in a group.\r\n");
 		}
 		return;
 	}
@@ -3209,7 +3231,7 @@ ACMD(do_morph) {
 	
 	if (!*argument) {
 		count = 1;	// counting 'normal'
-		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-38.38s%s", "normal", PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
+		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-*.*s%s", (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? "\tgnormal (current)\t0" : "normal"), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
@@ -3233,10 +3255,15 @@ ACMD(do_morph) {
 				lsize = snprintf(line, sizeof(line), "%s", skip_filler(MORPH_SHORT_DESC(morph)));
 			}
 			
+			// current?
+			if (GET_MORPH(ch) == morph) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (current)");
+			}
+			
 			// append
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 2) || lsize > 38) {
 				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+					size += snprintf(buf + size, sizeof(buf) - size, " %s%s\t0\r\n", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 				}
 				else {
 					full = TRUE;
@@ -3244,7 +3271,7 @@ ACMD(do_morph) {
 			}
 			else {
 				if (size + 39 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s", line);
+					size += snprintf(buf + size, sizeof(buf) - size, " %s%-38.38s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 				}
 				else {
 					full = TRUE;
@@ -3584,6 +3611,9 @@ ACMD(do_quit) {
 		extract_all_items(ch);
 		extract_char(ch);	// this will disconnect the descriptor
 		pause_affect_total = FALSE;
+		
+		// ensure quit characters are gone right away
+		extract_pending_chars();
 	}
 }
 

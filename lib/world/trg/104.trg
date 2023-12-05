@@ -197,11 +197,12 @@ Hamlet burn-down (cleanup)~
 ~
 * check if instance was scaled at all -- if not, don't bother with ruins
 set guard %instance.mob(10400)%
-if %guard%
-  if !%guard.varexists(scaled)%
-    * never been scaled
-    halt
-  end
+if !%guard%
+  * not even loaded? no players have been inside
+  halt
+elseif !%guard.varexists(scaled)%
+  * never been scaled
+  halt
 end
 * check if any bosses remain
 set boss_mobs 10405 10410 10415

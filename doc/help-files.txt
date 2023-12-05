@@ -94,6 +94,8 @@ clients but will show only plain text on ones that don't support it:
       The 3 digits inside the brackets indicate RGB values from 0-5 where
       0 is darkest and 5 is lightest. In order the digits are Red, Green, Blue.
 
+(Color codes are converted internally from & (ampersand) to \t (tab), which
+enables the full range of codes from protocol.c)
 
 ================
  MAKING CHANGES

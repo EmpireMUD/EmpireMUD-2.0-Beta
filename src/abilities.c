@@ -1865,7 +1865,7 @@ DO_ABIL(do_damage_ability) {
 	dmg = subdata->scale_points * (data->matching_role ? 3 : 2);	// could go higher?
 	
 	// bonus damage if role matches
-	if (data->matching_role) {
+	if (data->matching_role || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
 		switch (ABIL_DAMAGE_TYPE(abil)) {
 			case DAM_PHYSICAL: {
 				dmg += GET_BONUS_PHYSICAL(ch);
@@ -1918,7 +1918,7 @@ DO_ABIL(do_dot_ability) {
 	dmg = points * (data->matching_role ? 2 : 1);
 	
 	// bonus damage if role matches
-	if (data->matching_role) {
+	if (data->matching_role || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
 		switch (ABIL_DAMAGE_TYPE(abil)) {
 			case DAM_PHYSICAL: {
 				dmg += GET_BONUS_PHYSICAL(ch) / MAX(1, dur);

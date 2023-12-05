@@ -62,7 +62,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.163";
+const char *version = "EmpireMUD 2.0 beta 5.164";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -88,9 +88,9 @@ const char *level_names[][2] = {
 // TODO could move to a file
 const int num_of_reboot_strings = 3;
 const char *reboot_strings[] = {
-	"   EmpireMUD is performing a reboot. This process generally takes ten to\r\n"
-	"fifteen seconds and will not disconnect you. Most character actions are\r\n"
-	"not affected, although fighting will stop.\r\n",
+	"   EmpireMUD is performing a reboot. This process generally takes one to\r\n"
+	"two minutes and will not disconnect you. Most character actions are not\r\n"
+	"affected, although fighting will stop.\r\n",
 
 	"Q. What is a reboot?\r\n"
 	"A. A reboot allows the mud to reload code without disconnecting players.\r\n"
@@ -2222,19 +2222,19 @@ const char *relationship_descs[] = {
 
 // REP_x: faction reputation levels
 const struct faction_reputation_type reputation_levels[] = {
-	// { type const, name, points to achieve this level } -> ASCENDING ORDER
+	// { type const, name, by/to, color, points to achieve this level } -> ASCENDING ORDER
 	// note: you achieve the level when you reach the absolute value of its
 	// points (-99 < x < 99 is neutral, +/-100 are the cutoffs for the first rank)
 	
-	{ REP_DESPISED, "Despised", "\tr", -1000 },
-	{ REP_HATED, "Hated", "\tr", -750 },
-	{ REP_LOATHED, "Loathed", "\to", -300 },
-	{ REP_DISLIKED, "Disliked", "\ty", -100 },
-	{ REP_NEUTRAL, "Neutral", "\tt", 0 },
-	{ REP_LIKED, "Liked", "\tc", 100 },
-	{ REP_ESTEEMED, "Esteemed", "\ta", 300 },
-	{ REP_VENERATED, "Venerated", "\tg", 750 },
-	{ REP_REVERED, "Revered", "\tG", 1000 },
+	{ REP_DESPISED, "Despised", "by", "\tr", -1000 },
+	{ REP_HATED, "Hated", "by", "\tr", -750 },
+	{ REP_LOATHED, "Loathed", "by", "\to", -300 },
+	{ REP_DISLIKED, "Disliked", "by", "\ty", -100 },
+	{ REP_NEUTRAL, "Neutral", "to", "\tt", 0 },
+	{ REP_LIKED, "Liked", "by", "\tc", 100 },
+	{ REP_ESTEEMED, "Esteemed", "by", "\ta", 300 },
+	{ REP_VENERATED, "Venerated", "by", "\tg", 750 },
+	{ REP_REVERED, "Revered", "by", "\tG", 1000 },
 	
 	{ -1, "\n", "\t0", 0 },	// last
 };
@@ -2948,6 +2948,10 @@ const char *obj_custom_types[] = {
 	"script3",
 	"script4",
 	"script5",	// 25
+	"mine-to-char",
+	"mine-to-room",
+	"chop-to-char",
+	"chop-to-room",
 	"\n"
 };
 

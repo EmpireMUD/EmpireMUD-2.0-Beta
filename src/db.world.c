@@ -1245,8 +1245,8 @@ void annual_update_map_tile(struct map_data *tile) {
 			// apply damage
 			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
 		
-			// apply maintenance resources (if any, and if it's not being dismantled)
-			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
+			// apply maintenance resources (if any, and if it's not being dismantled, and it's either complete or has had at least 1 resource added)
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room) && (IS_COMPLETE(room) || GET_BUILT_WITH(room))) {
 				old_list = GET_BUILDING_RESOURCES(room);
 				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
 				free_resource_list(old_list);

@@ -1185,7 +1185,11 @@ ACMD(do_ritual) {
 	}
 	
 	// just ending
-	if (GET_ACTION(ch) == ACT_RITUAL || GET_ACTION(ch) == ACT_CHANTING) {
+	if (GET_ACTION(ch) == (subcmd == SCMD_RITUAL ? ACT_RITUAL : ACT_CHANTING)) {
+		if (*arg) {
+			msg_to_char(ch, "You are already in the middle of a %s.\r\n", ritual_scmd[subcmd]);
+			return;
+		}
 		msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
 		sprintf(buf, "$n stops the %s.", ritual_scmd[subcmd]);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);

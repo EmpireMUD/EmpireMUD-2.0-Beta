@@ -2162,7 +2162,7 @@ ACMD(do_dismantle) {
 	
 	// otherwise args are not welcome
 	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		msg_to_char(ch, "You don't see that to dismantle here.\r\n");
 		return;
 	}
 	
@@ -2340,6 +2340,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
+			act("$n renames the room.", FALSE, ch, NULL, NULL, TO_ROOM);
 			command_lag(ch, WAIT_ABILITY);
 		}
 		else if (color_code_length(arg2) > 0) {
@@ -2359,6 +2360,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
+			act("$n renames the room.", FALSE, ch, NULL, NULL, TO_ROOM);
 			command_lag(ch, WAIT_ABILITY);
 		}
 	}

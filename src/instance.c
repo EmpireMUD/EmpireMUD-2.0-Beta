@@ -1066,7 +1066,9 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 				set_mob_flags(mob, MOB_SPAWNED);
 			}
 			else {
-				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				}
 				char_to_room(mob, extraction_room);
 				extract_all_items(mob);
 				extract_char(mob);
@@ -2497,6 +2499,11 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 */
 int lock_instance_level(room_data *room, int level) {
 	struct instance_data *inst;
+	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
 	
 	if (IS_ADVENTURE_ROOM(room) && COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
 		if (INST_LEVEL(inst) <= 0) {

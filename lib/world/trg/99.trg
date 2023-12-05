@@ -150,38 +150,51 @@ end
 Iterative minipet reward~
 1 c 2
 use~
+* list of vnums granted by this box
+set list 9900 9901 9902 9903 9904 9905 9906 9907 9908 9909 9910 9911 9912 9913 9914 9915 9916 9917 9918 9920 9921 9922 9930 9931 9932 9933 9934 9935
+* length is used to shuffle the start point of the list
+set length 28
+*
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
+*
+* shuffle the start point
+eval start %%random.%length%%% - 1
+while %start% > 0
+  eval start %start% - 1
+  set list %list.cdr% %list.car%
+done
+* find the first pet the owner doesn't have
 set pet_found 0
-set vnum 9900
-while !%pet_found%
-  if %vnum% >= 9923
-    %send% %actor% You already have all the minipets @%self% can provide!
-    %send% %actor% Keep it for now, and pester Yvain to add more.
-    halt
-  elseif %vnum% == 9919 || %actor.has_minipet(%vnum%)%
-    eval vnum %vnum%+1
-  else
+while %list% && !%pet_found%
+  * get next vnum in list
+  set vnum %list.car%
+  set list %list.cdr%
+  if !%actor.has_minipet(%vnum%)%
     set pet_found %vnum%
   end
 done
-if %pet_found%
-  %load% mob %pet_found%
-  set mob %self.room.people%
-  if %mob.vnum% != %pet_found%
-    * Uh-oh.
-    %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
-    halt
-  end
-  set mob_string %mob.name%
-  %purge% %mob%
-  %send% %actor% You open @%self% and find a whistle inside!
-  %send% %actor% You gain '%mob_string%' as a minipet. Use the minipets command to summon it.
-  %echoaround% %actor% ~%actor% opens @%self% and takes %mob_string% whistle out.
-  nop %actor.add_minipet(%vnum%)%
-  %purge% %self%
+* Nothing to give
+if !%pet_found%
+  %send% %actor% You already have all the minipets @%self% can provide!
+  halt
 end
+* ok make it so
+%load% mob %pet_found%
+set mob %self.room.people%
+if %mob.vnum% != %pet_found%
+  * Uh-oh.
+  %echo% Something went horribly wrong while granting a minipet. Please bug-report this error.
+  halt
+end
+set mob_string %mob.name%
+%purge% %mob%
+%send% %actor% You open @%self% and find a whistle inside!
+%send% %actor% You gain '%mob_string%' as a minipet. Use the minipets command to summon it.
+%echoaround% %actor% ~%actor% opens @%self% and takes %mob_string% whistle out.
+nop %actor.add_minipet(%vnum%)%
+%purge% %self%
 ~
 $

@@ -1176,13 +1176,15 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 
 /**
-* Shows one vehicle as in-the-room.
+* Builds the text for one vehicle as shown in-the-room.
 *
 * @param vehicle_data *veh The vehicle to show.
 * @param char_data *ch The person to send the output to.
+* @param char* The constructed text for the vehicle's listing.
 */
-void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	char buf[MAX_STRING_LENGTH], part[256];
+char *list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	static char buf[MAX_STRING_LENGTH];
+	char part[256];
 	size_t size = 0, pos;
 	
 	// pre-description
@@ -1246,7 +1248,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...you can finish a quest here!\r\n");
 	}
 
-	send_to_char(buf, ch);
+	return buf;
 }
 
 
@@ -1259,6 +1261,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 * @param vehicle_data *exclude Optional: Don't show a specific vehicle (usually the one you're in); may be NULL.
 */
 void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude) {
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh;
 	
 	bitvector_t large_veh_flags = VEH_BUILDING | VEH_NO_BUILDING | VEH_SIEGE_WEAPONS | VEH_ON_FIRE | VEH_VISIBLE_IN_DARK | VEH_OBSCURE_VISION;
@@ -1283,8 +1286,19 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 			continue;	// don't show vehicles someone else is sitting on
 		}
 		
-		list_one_vehicle_to_char(veh, ch);
+		add_string_hash(&str_hash, list_one_vehicle_to_char(veh, ch), 1);
 	}
+	
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		if (str_iter->count == 1) {
+			send_to_char(str_iter->str, ch);
+		}
+		else {
+			msg_to_char(ch, "(%2d) %s", str_iter->count, str_iter->str);
+		}
+	}
+	
+	free_string_hash(&str_hash);
 }
 
 
@@ -2693,11 +2707,11 @@ ACMD(do_contents) {
 	
 	// ok: show it
 	if (can_see_anything) {
-		send_to_char("&g", ch);
-		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
-		send_to_char("&w", ch);
+		send_to_char("\tw", ch);
 		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE, NULL);
-		send_to_char("&0", ch);
+		send_to_char("\tg", ch);
+		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
+		send_to_char("\t0", ch);
 	}
 	else {	// can see nothing
 		msg_to_char(ch, "There are no contents here.\r\n");
@@ -2716,7 +2730,7 @@ ACMD(do_cooldowns) {
 	for (cool = ch->cooldowns; cool; cool = cool->next) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
-		if (diff > 0) {
+		if (diff >= 0) {
 			if (diff >= SECS_PER_REAL_HOUR) {
 				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
 			}
@@ -4462,7 +4476,7 @@ ACMD(do_whois) {
 	char part[MAX_STRING_LENGTH];
 	char_data *victim = NULL;
 	bool file = FALSE;
-	int level;
+	int level, diff, math;
 
 	skip_spaces(&argument);
 
@@ -4495,6 +4509,29 @@ ACMD(do_whois) {
 	if (GET_LOYALTY(victim)) {
 		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
 		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
+	}
+	
+	// last login info
+	if (!IS_IMMORTAL(victim) && !IN_ROOM(victim)) {
+		diff = time(0) - victim->prev_logon;
+		
+		if (diff > SECS_PER_REAL_YEAR) {
+			math = diff / SECS_PER_REAL_YEAR;
+			msg_to_char(ch, "Last online: over %d year%s ago\r\n", math, PLURAL(math));
+		}
+		else if (diff > (SECS_PER_REAL_DAY * 30.5)) {
+			math = diff / (SECS_PER_REAL_DAY * 30.5);
+			msg_to_char(ch, "Last online: over %d month%s ago\r\n", math, PLURAL(math));
+		}
+		else if (diff > SECS_PER_REAL_WEEK) {
+			msg_to_char(ch, "Last online: more than a week ago\r\n");
+		}
+		else if (diff > SECS_PER_REAL_DAY) {
+			msg_to_char(ch, "Last online: more than a day ago\r\n");
+		}
+		else {
+			msg_to_char(ch, "Last online: today\r\n");
+		}
 	}
 
 	if (GET_LORE(victim)) {

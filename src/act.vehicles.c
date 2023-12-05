@@ -905,6 +905,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			}
 			
 			msg_to_char(ch, "The %s no longer has a custom name.\r\n", VEH_OR_BLD(veh));
+			act("$n renames $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		}
 		else if (color_code_length(argument) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
@@ -932,6 +933,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			}
 			
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
+			act("$n renames $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		}
 	}
 	else if (is_abbrev(type_arg, "longdesc")) {
@@ -957,6 +959,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			set_vehicle_long_desc(veh, argument);
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
+			act("$n renames $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		}
 	}
 	else if (is_abbrev(type_arg, "description")) {

@@ -312,9 +312,8 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		}
 	}
 	
-	// apply maintenance if not dismantling
-	if (!VEH_IS_DISMANTLING(veh)) {
-		// add maintenance (if not dismantling)
+	// apply maintenance if not dismantling -- and is either complete OR has had at least 1 item added
+	if (!VEH_IS_DISMANTLING(veh) && (VEH_IS_COMPLETE(veh) || VEH_BUILT_WITH(veh))) {
 		old_list = VEH_NEEDS_RESOURCES(veh);
 		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
 		free_resource_list(old_list);
@@ -676,12 +675,17 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 *
 * @param char_data *ch The player looking.
 * @param room_data *room The room to check.
+* @param int *total_vehicles Optional: If a variable is provided, it will be set to the total number of vehicles visible in the room from a distance. (May be NULL to skip.)
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
-vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
+vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_vehicles) {
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
 	int found_size = -1, found_height = -1;
+	
+	if (total_vehicles) {
+		*total_vehicles = 0;	// init
+	}
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -706,6 +710,11 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 				found_size = VEH_SIZE(iter);
 				found = iter;
 			}
+		}
+		
+		// and increment the total
+		if (total_vehicles) {
+			++(*total_vehicles);
 		}
 	}
 	
@@ -4006,6 +4015,9 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Interior: [\tc%d\t0 - \ty%s\t0], Rooms: [\tc%d\t0], Designate: \ty%s\t0\r\n", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none", VEH_MAX_ROOMS(veh), part);
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "Interior: [\tc-1\t0 - \tynone\t0], Rooms: [\tc0\t0]\r\n");
 	}
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);

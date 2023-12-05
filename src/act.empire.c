@@ -30,6 +30,7 @@
 /**
 * Contents:
 *   Helpers
+*   Chat History
 *   City Helpers
 *   Diplomacy Helpers
 *   Efind Helpers
@@ -63,8 +64,10 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 struct einv_type {
 	obj_vnum vnum;
 	int local;
-	int total;
 	int keep;
+	
+	int total;
+	int total_keep;
 	UT_hash_handle hh;
 };
 
@@ -1019,7 +1022,7 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256], totalstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_storage_data *store, *next_store;
@@ -1033,14 +1036,14 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		return;
 	}
 	
-	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
-		return;
-	}
-	
 	if (!str_cmp(argument, "all") || !strn_cmp(argument, "all ", 4)) {
 		*argument = '\0';
 		all = TRUE;
+	}
+	
+	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !all && !*argument) {
+		msg_to_char(ch, "You don't have anything stored at sea.\r\n");
+		return;
 	}
 	
 	// build list
@@ -1073,6 +1076,12 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		
 			// add
 			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
+			if (store->keep == UNLIMITED) {
+				einv->total_keep = UNLIMITED;
+			}
+			else if (einv->total_keep != UNLIMITED) {
+				SAFE_ADD(einv->total_keep, store->keep, 0, INT_MAX, FALSE);
+			}
 			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
 				einv->keep = store->keep;
@@ -1110,6 +1119,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {
+			// prefix
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
@@ -1117,6 +1127,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*vstr = '\0';
 			}
 			
+			// keep section
 			if (einv->keep == UNLIMITED) {
 				strcpy(keepstr, " (keep)");
 			}
@@ -1127,12 +1138,24 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*keepstr = '\0';
 			}
 			
+			// total?
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, einv->total);
+				if (einv->total_keep == 0 || einv->total_keep == einv->keep) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
+				}
+				else if (einv->total_keep == UNLIMITED) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
+				}
+				else if (einv->total_keep > 0) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
+				}
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr);
+				*totalstr = '\0';
 			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
 			
 			// append if room
 			if (size + lsize < sizeof(output)) {
@@ -1598,7 +1621,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		}
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
@@ -1619,6 +1642,156 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
 	else {	// just sort by coords
 		return b->loc - a->loc;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHAT HISTORY ////////////////////////////////////////////////////////////
+
+/**
+* Filename for empire history.
+*
+* @param empire_data *emp The empire.
+* @return char* The filename for the empire chat history.
+*/
+char *empire_history_filename(empire_data *emp) {
+	static char fname[256];
+	snprintf(fname, sizeof(fname), "%s%d%s", EMPIRE_HISTORY_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	return fname;
+}
+
+
+/**
+* Adds a message to a empire chat history and writes it to the history file.
+*
+* @param empire_data *emp Which empire.
+* @param char_data *speaker Who said it (for invis, etc).
+* @param char *message The message itself.
+* @param int rank Rank required to view the message (optional; may be 0).
+*/
+void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank) {
+	struct channel_history_data *entry;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp) {
+		return;
+	}
+	
+	// in case
+	load_empire_chat_history(emp);
+	
+	// add in-game
+	entry = process_add_to_channel_history(&EMPIRE_CHAT_HISTORY(emp), speaker, message, FALSE, rank, NOTHING);
+	
+	// save to file
+	if (!(fl = fopen(empire_history_filename(emp), "a"))) {
+		log("SYSERR: Unable to open empire history file '%s' for appending", empire_history_filename(emp));
+		return;	// unable to write
+	}
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
+}
+
+
+/**
+* Removes old messages and writes a clean version of the empire chat history
+* file. Then, it also frees up the memory from older messages in memory.
+*
+* @param empire_data *emp The empire.
+*/
+void clean_empire_history(empire_data *emp) {
+	struct channel_history_data *hist, *next_hist;
+	time_t clear_before;
+	int count;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp || !emp->history_loaded) {
+		return;
+	}
+	
+	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
+	
+	// open the file for write (overwrite the old one)
+	if (!(fl = fopen(empire_history_filename(emp), "w"))) {
+		log("SYSERR: Unable to write empire history file '%s'", empire_history_filename(emp));
+		return;
+	}
+	
+	// clean the history and write any remaining history
+	count = 0;
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (hist->timestamp >= clear_before) {
+			write_one_slash_channel_message(fl, hist);
+			++count;
+		}
+		else {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
+	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (count-- > KEEP_RECENT_CHANNELS) {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+}
+
+
+/**
+* Loads empire chat history on-request. Only does this once per uptime.
+*
+* @param empire_data *emp Which empire.
+*/
+void load_empire_chat_history(empire_data *emp) {
+	char line[256], error[256];
+	struct channel_history_data *hist;
+	FILE *fl;
+	
+	if (emp->history_loaded) {
+		return;	// already done
+	}
+	
+	// update this first
+	emp->history_loaded = TRUE;
+	
+	if (!(fl = fopen(empire_history_filename(emp), "r"))) {
+		// no history / not an error
+		return;
+	}
+	
+	// file open..
+	snprintf(error, sizeof(error), "empire history file for %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+	
+	for (;;) {
+		if (!get_line(fl, line)) {
+			break;	// done (no terminating code)
+		}
+		
+		switch (*line) {
+			case 'M': {	// message
+				if ((hist = parse_channel_history_message(line, fl, error))) {
+					DL_APPEND(EMPIRE_CHAT_HISTORY(emp), hist);
+				}
+				break;
+			}
+			
+			// default: ignore the line as garbage
+		}
+	}
+		
+	fclose(fl);
+	clean_empire_history(emp);
 }
 
 
@@ -2791,19 +2964,19 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	
 	if (inspire_data[type].first_apply != APPLY_NONE) {
 		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	if (inspire_data[type].second_apply != APPLY_NONE) {
 		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	
 	if (any) {
@@ -4530,6 +4703,9 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// 'all' skips buildings
+			}
 			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
 				continue;
 			}
@@ -5185,20 +5361,17 @@ ACMD(do_esay) {
 	int level = 0, i;
 	empire_data *e;
 	bool emote = FALSE, extra_color = FALSE;
-	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char *tmp;
 
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
 
 	if (!(e = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
-		}
-
-	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
-		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
-		return;
-		}
+	}
 
 	skip_spaces(&argument);
 
@@ -5230,6 +5403,10 @@ ACMD(do_esay) {
 	skip_spaces(&argument);
 
 	level++;	// 1-based, not 0-based
+	if (level > GET_RANK(ch)) {
+		msg_to_char(ch, "You can't chat above your own rank.\r\n");
+		return;
+	}
 
 	if (level > 1) {
 		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
@@ -5257,11 +5434,6 @@ ACMD(do_esay) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		// for channel history
-		if (ch->desc) {
-			clear_last_act_message(ch->desc);
-		}
-
 		sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_ESAY));
 		if (extra_color) {
 			sprintf(output, buf, color, color, color);
@@ -5271,21 +5443,13 @@ ACMD(do_esay) {
 		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
-		
-		// channel history
-		if (ch->desc && ch->desc->last_act_message) {
-			// the message was sent via act(), we can retrieve it from the desc
-			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
-		}
 	}
 
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch)
+		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch) {
 			continue;
+		}
 		else {
-			clear_last_act_message(d);
-			
 			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(tch, CUSTOM_COLOR_ESAY));
 			if (extra_color) {
 				sprintf(output, buf, color, color, color);
@@ -5294,15 +5458,20 @@ ACMD(do_esay) {
 				sprintf(output, buf, color, color);
 			}
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
-			
-			// channel history
-			if (d->last_act_message) {
-				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
-			}	
 		}
 	}
+	
+	// and add to chat history
+	sprintf(color, "%s\t0", EXPLICIT_BANNER_TERMINATOR(e));
+	if (extra_color) {
+		sprintf(output, buf, color, color, color);
+	}
+	else {
+		sprintf(output, buf, color, color);
+	}
+	tmp = str_replace("$o", PERS(ch, ch, TRUE), output);
+	add_to_empire_history(e, ch, tmp, level);
+	free(tmp);
 }
 
 
@@ -7360,17 +7529,20 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], line[256], *ptr;
-	struct find_territory_node *node_list = NULL, *node, *next_node;
-	empire_data *emp = GET_LOYALTY(ch);
-	room_data *iter, *next_iter;
-	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk, full;
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], option_buf[1024], line[256], *remain;
+	bool ok, junk, full;
+	bool check_city, check_outskirts, check_frontier, any_type_found;
+	bool no_abandon, no_dismantle, no_work, public_only;
+	int dist_from_me, total, ttype;
 	size_t size, lsize;
-	int total;
 	crop_data *crop = NULL;
-	char *remain;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	struct island_info *find_island;
+	room_data *iter, *next_iter;
+	vehicle_data *veh;
 	
-	// imms can target an empire, otherwise the only arg is optional sector type
+	// imms can target an empire as the FIRST argument
 	remain = any_one_word(argument, arg);
 	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
 		if ((emp = get_empire_by_name(arg))) {
@@ -7382,9 +7554,7 @@ ACMD(do_territory) {
 		}
 	}
 	
-	skip_spaces(&argument);
-	*search_str = *exclude_str = '\0';
-	
+	// preliminaries
 	if (!emp) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
@@ -7394,90 +7564,309 @@ ACMD(do_territory) {
 		return;
 	}
 	
-	// only if no argument (optional)
-	if (*argument && is_abbrev(argument, "outskirts") && strlen(argument) >= 4) {
-		// (allow partial abbrev)
-		outskirts_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else if (*argument && is_abbrev(argument, "frontier") && strlen(argument) >= 5) {
-		// (allow partial abbrev)
-		frontier_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else {
-		outside_only = *argument ? FALSE : TRUE;
+	// prepare options
+	*search_str = *exclude_str = '\0';
+	check_city = check_outskirts = check_frontier = TRUE;
+	any_type_found = FALSE;
+	no_abandon = no_dismantle = no_work = public_only = FALSE;
+	dist_from_me = -1;
+	find_island = NULL;
+	
+	// parse options
+	while (*argument) {
+		skip_spaces(&argument);
+		argument = any_one_word(argument, arg);
 		
-		// process the argument into search_str, exclude_str
-		ptr = argument;
-		while (*ptr) {
-			ptr = any_one_word(ptr, arg);
-			
-			if (*arg == '-') {
-				sprintf(exclude_str + strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
+		if (!str_cmp(arg, "city") || !str_cmp(arg, "cities") || is_abbrev(arg, "-city") || is_abbrev(arg, "-cities")) {
+			check_city = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_outskirts = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (!str_cmp(arg, "outskirts") || is_abbrev(arg, "-outskirts")) {
+			check_outskirts = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (!str_cmp(arg, "frontier") || is_abbrev(arg, "-frontier")) {
+			check_frontier = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_outskirts = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-distance")) {
+			argument = any_one_arg(argument, arg2);
+			if (*arg2 && isdigit(*arg2)) {
+				dist_from_me = atoi(arg2);
 			}
 			else {
-				sprintf(search_str + strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+				msg_to_char(ch, "Territory: The -distance argument requires a number.\r\n");
+				return;
+			}
+		}
+		else if (is_abbrev(arg, "-island")) {
+			argument = any_one_word(argument, arg2);
+			if (!*arg2) {
+				msg_to_char(ch, "You must specify which island with -island \"Island Name\".\r\n");
+				return;
+			}
+			else if (find_island) {
+				msg_to_char(ch, "You can't specify more than one island at a time.\r\n");
+				return;
+			}
+			else if (!(find_island = get_island_by_name(ch, arg2))) {
+				msg_to_char(ch, "Unknown island '%s'.\r\n", arg2);
+				return;
+			}
+			// else: we found an island
+		}
+		else if (!str_cmp(arg, "no-abandon") || !str_cmp(arg, "noabandon") || is_abbrev(arg, "-no-abandon") || is_abbrev(arg, "-noabandon")) {
+			no_abandon = TRUE;
+		}
+		else if (!str_cmp(arg, "no-dismantle") || !str_cmp(arg, "nodismantle") || is_abbrev(arg, "-no-dismantle") || is_abbrev(arg, "-nodismantle")) {
+			no_dismantle = TRUE;
+		}
+		else if (!str_cmp(arg, "no-work") || !str_cmp(arg, "nowork") || is_abbrev(arg, "-no-work") || is_abbrev(arg, "-nowork")) {
+			no_work = TRUE;
+		}
+		else if (!str_cmp(arg, "public") || is_abbrev(arg, "-public")) {
+			public_only = TRUE;
+		}
+		else {
+			// unknown arg: treat as search
+			if (*arg != '-') {
+				// positive search term
+				snprintf(search_str + strlen(search_str), sizeof(search_str) - strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+			}
+			else if (*(arg+1) == '-') {
+				// double dash: negative term
+				if (*arg+2) {
+					snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+2);
+				}
+				// else: empty/ignore
+			}
+			else if (*(arg+1)) {
+				// single dash: also a negative term
+				snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
 			}
 		}
 	}
 	
-	// ready?
+	// ready? check world:
 	HASH_ITER(hh, world_table, iter, next_iter) {	
-		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;	// not on map
+		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+			continue;	// not on map: ignore if no search terms given
 		}
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) == TER_CITY) {
-			continue;	// not outside
-		}
-		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_OUTSKIRTS) {
-			continue;	// not outskirts
-		}
-		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_FRONTIER) {
-			continue;	// not outskirts
+		
+		// territory type flags: only if any where requested
+		if (any_type_found) {
+			ttype = get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL);
+			if (!check_city && ttype == TER_CITY) {
+				continue;
+			}
+			else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+				continue;
+			}
+			else if (!check_frontier && ttype == TER_FRONTIER) {
+				continue;
+			}
 		}
 		
-		// compare request
-		if (!*search_str && !*exclude_str) {
-			ok = TRUE;
+		// manage flags
+		if (no_abandon && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_ABANDON)) {
+			continue;
 		}
-		else if ((!*search_str || multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) && (!*exclude_str || !multi_isname(exclude_str, GET_SECT_NAME(SECT(iter))))) {
-			ok = TRUE;
+		if (no_dismantle && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_DISMANTLE)) {
+			continue;
 		}
-		else if (GET_BUILDING(iter) && (!*search_str || multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) && (!*exclude_str || !multi_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter))))) {
-			ok = TRUE;
+		if (no_work && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_WORK)) {
+			continue;
 		}
-		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && (!*search_str || multi_isname(search_str, GET_CROP_NAME(crop))) && (!*exclude_str || !multi_isname(exclude_str, GET_CROP_NAME(crop)))) {
-			ok = TRUE;
-		}
-		else if ((!*search_str || multi_isname(search_str, get_room_name(iter, FALSE))) && (!*exclude_str || !multi_isname(exclude_str, get_room_name(iter, FALSE)))) {
-			ok = TRUE;
-		}
-		else {
-			ok = FALSE;
+		if (public_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC)) {
+			continue;
 		}
 		
+		// distance?
+		if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), iter) > dist_from_me) {
+			continue;
+		}
+		if (find_island && GET_ISLAND(iter) != find_island) {
+			continue;
+		}
+		
+		// search requested text
+		ok = FALSE;
+		if (!*search_str) {
+			ok = TRUE;
+		}
+		else if (multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) {
+			ok = TRUE;
+		}
+		else if (GET_BUILDING(iter) && multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
+			ok = TRUE;
+		}
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(search_str, GET_CROP_NAME(crop))) {
+			ok = TRUE;
+		}
+		else if (multi_isname(search_str, get_room_name(iter, FALSE))) {
+			ok = TRUE;
+		}
+		// check exclude text
+		if (ok && *exclude_str) {
+			if (any_isname(exclude_str, GET_SECT_NAME(SECT(iter)))) {
+				ok = FALSE;
+			}
+			else if (GET_BUILDING(iter) && any_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
+				ok = FALSE;
+			}
+			else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && any_isname(exclude_str, GET_CROP_NAME(crop))) {
+				ok = FALSE;
+			}
+			else if (any_isname(exclude_str, get_room_name(iter, FALSE))) {
+				ok = FALSE;
+			}
+		}
+		
+		// final ok: add to the list
 		if (ok) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
+			node->is_vehicle = FALSE;
 			DL_PREPEND(node_list, node);
 		}
+	} // end territory
+	
+	// check vehicles (except under certain options):	
+	if (!no_abandon && !public_only) {
+		DL_FOREACH(vehicle_list, veh) {
+			if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// not a building or not owned by emp
+			}
+		
+			// do we already have this location?
+			ok = TRUE;
+			DL_FOREACH(node_list, node) {
+				if (node->loc == IN_ROOM(veh)) {
+					ok = FALSE;
+					break;
+				}
+			}
+			if (!ok) {
+				continue;	// already marked this room
+			}
+		
+			// check options:
+			// territory type flags: only if any where requested
+			if (any_type_found) {
+				ttype = get_territory_type_for_empire(IN_ROOM(veh), emp, FALSE, &junk, NULL);
+				if (!check_city && ttype == TER_CITY) {
+					continue;
+				}
+				else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+					continue;
+				}
+				else if (!check_frontier && ttype == TER_FRONTIER) {
+					continue;
+				}
+			}
+		
+			// manage flags
+			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
+				continue;
+			}
+			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+				continue;
+			}
+		
+			// distance?
+			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
+				continue;
+			}
+			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
+				continue;
+			}
+		
+			// search requested text
+			ok = FALSE;
+			if (!*search_str) {
+				ok = TRUE;
+			}
+			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
+				ok = TRUE;
+			}
+			// check exclude text
+			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
+				ok = FALSE;
+			}
+		
+			// final ok: add to the list
+			if (ok) {
+				CREATE(node, struct find_territory_node, 1);
+				node->loc = IN_ROOM(veh);
+				node->count = 1;
+				node->is_vehicle = TRUE;
+				DL_PREPEND(node_list, node);
+			}
+		}
+	} // end vehicles
+	
+	// build option buf for output
+	*option_buf = '\0';
+	if (find_island) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
+	}
+	if (dist_from_me >= 0) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
+	}
+	if (any_type_found) {
+		if (check_city) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
+		}
+		if (check_outskirts) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
+		}
+		if (check_frontier) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
+		}
+	}
+	if (no_abandon) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
+	}
+	if (no_dismantle) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
+	}
+	if (no_work) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
+	}
+	if (public_only) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+	}
+	if (*search_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
+	}
+	if (*exclude_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
 	}
 	
 	if (node_list) {
 		node_list = reduce_territory_node_list(node_list);
-	
-		if (!*argument) {
-			size = snprintf(buf, sizeof(buf), "%s%s&0 territory outside of cities:\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
-		}
-		else {
-			size = snprintf(buf, sizeof(buf), "'%s' tiles owned by %s%s&0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-			CAP(buf);
-		}
+		
+		// start buf
+		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
 		
 		// display and free the nodes
 		total = 0;
@@ -7487,10 +7876,10 @@ ACMD(do_territory) {
 			
 			if (!full) {
 				if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s%s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				else {
-					lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%s %s%s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				
 				if (size + lsize < sizeof(buf)) {
@@ -7517,7 +7906,13 @@ ACMD(do_territory) {
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
-		msg_to_char(ch, "No matching territory found.\r\n");
+		// none found
+		if (*option_buf) {
+			msg_to_char(ch, "No matching territory found: %s\r\n", option_buf);
+		}
+		else {
+			msg_to_char(ch, "No territory found.\r\n");
+		}
 	}
 }
 
@@ -7775,8 +8170,10 @@ ACMD(do_workforce) {
 		msg_to_char(ch, "Your empire has no workforce.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Usage: workforce [chore] [on | off | <limit>] [island name | all]\r\n");
 		show_workforce_setup_to_char(emp, ch);
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "See 'help workforce' for options.\r\n");
+		}
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");

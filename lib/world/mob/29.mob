@@ -4,7 +4,7 @@ an imperial griffin hatchling~
 A little imperial griffin charges at you from above.
 ~
 1 1 bdoD mn 1
-0 0 2 10
+0 0 2 10 -1
 D
    This young griffin squawks at you through its eagle-like beak while batting
 at you with its paws.
@@ -24,8 +24,6 @@ $n preens $mself.~
 M
 1
 What has four wings in the morning, two wings in the... wait... are riddles us or the sphinges?~
-T 9901
-T 9902
 S
 #2914
 changeling heroic little~
@@ -33,7 +31,7 @@ a heroic little changeling~
 A heroic little changeling is florping around on the ground.
 ~
 1 1 bdoD mn 1
-0 0 21 28
+0 0 21 28 -1
 D
 Every time you think you've figured out what it is, it changes shape again!
 ~
@@ -64,8 +62,6 @@ $n charges at you with $s head down.~
 M
 0
 $n roars loudly!~
-T 9901
-T 9902
 T 2914
 S
 $

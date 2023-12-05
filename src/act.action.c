@@ -846,6 +846,10 @@ INTERACTION_FUNC(finish_chopping) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	
 	return TRUE;
@@ -896,6 +900,10 @@ INTERACTION_FUNC(finish_digging) {
 			// to-room
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			if (IN_ROOM(obj)) {
+				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
 		}
 	}
 	
@@ -991,6 +999,10 @@ INTERACTION_FUNC(finish_foraging) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	else {
 		msg_to_char(ch, "You find nothing.\r\n");
@@ -1033,6 +1045,10 @@ INTERACTION_FUNC(finish_gathering) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 		
 		gain_player_tech_exp(ch, PTECH_GATHER, 10);
 		
@@ -1080,10 +1096,14 @@ INTERACTION_FUNC(finish_harvesting) {
 			else {
 				strcpy(buf, cust ? cust : "You got $p!");
 			}
-			act(buf, FALSE, ch, obj, FALSE, TO_CHAR);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n gets $p!", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			if (IN_ROOM(obj)) {
+				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
 		}
 	}
 	else {
@@ -1096,9 +1116,9 @@ INTERACTION_FUNC(finish_harvesting) {
 
 INTERACTION_FUNC(finish_mining) {
 	bool any = FALSE;
-	obj_data *obj;
+	obj_data *obj = NULL;
 	char *cust;
-	int iter;
+	int iter, obj_ok = 0;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -1112,10 +1132,16 @@ INTERACTION_FUNC(finish_mining) {
 		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		if (load_otrigger(obj)) {
+		if ((obj_ok = load_otrigger(obj))) {
 			get_otrigger(obj, ch, FALSE);
 		}
 		any = TRUE;
+	}
+	
+	if (obj && obj_ok) {
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 	}
 	
 	// mark gained
@@ -1497,6 +1523,7 @@ void process_chipping(char_data *ch) {
 */
 void process_chop(char_data *ch) {
 	bool got_any = FALSE;
+	char *cust;
 	char_data *ch_iter;
 	obj_data *axe;
 	int amt;
@@ -1518,8 +1545,21 @@ void process_chop(char_data *ch) {
 	amt = MAX(min_progress_per_chop, amt);
 
 	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
-	act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
-	act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+
+	// messaging
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_CHOP_TO_CHAR))) {
+		act(cust, FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
+	}
+	else {
+		act("You swing $p hard!", FALSE, ch, axe, NULL, TO_CHAR | TO_SPAMMY);
+	}
+	
+	if ((cust = obj_get_custom_message(axe, OBJ_CUSTOM_CHOP_TO_ROOM))) {
+		act(cust, FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+	}
+	else {
+		act("$n swings $p hard!", FALSE, ch, axe, NULL, TO_ROOM | TO_SPAMMY);
+	}
 	
 	// complete?
 	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
@@ -1661,10 +1701,11 @@ void process_escaping(char_data *ch) {
 void process_excavating(char_data *ch) {
 	int count, total;
 	char_data *iter;
+	obj_data *tool;
 
 	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
-		if (!has_tool(ch, TOOL_SHOVEL)) {
+		if (!(tool = has_tool(ch, TOOL_SHOVEL))) {
 			msg_to_char(ch, "You need a shovel to excavate.\r\n");
 			cancel_action(ch);
 		}
@@ -1690,16 +1731,12 @@ void process_excavating(char_data *ch) {
 			
 			// messaging
 			if (!number(0, 1)) {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You jab your shovel into the dirt...\r\n");
-				}
-				act("$n jabs $s shovel into the dirt...", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+				act("You toss a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n jabs $s shovel into the dirt...", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			else {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You toss a shovel-full of dirt out of the trench.\r\n");
-				}
-				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+				act("You jab your shovel into the dirt...", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n tosses a shovel-full of dirt out of the trench.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
 			}
 
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
@@ -2134,6 +2171,7 @@ void process_maintenance(char_data *ch) {
 */
 void process_mining(char_data *ch) {	
 	struct global_data *glb;
+	char *cust;
 	int count, total, amt;
 	room_data *in_room;
 	obj_data *tool;
@@ -2174,9 +2212,21 @@ void process_mining(char_data *ch) {
 		amt = MAX(min_progress_per_mine, amt);
 		
 		GET_ACTION_TIMER(ch) -= amt;
-
-		act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_CHAR | TO_SPAMMY);
-		act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, 0, TO_ROOM | TO_SPAMMY);
+		
+		// messaging
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_MINE_TO_CHAR))) {
+			act(cust, FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		else {
+			act("You pick at the walls with $p, looking for ore.", FALSE, ch, tool, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		
+		if ((cust = obj_get_custom_message(tool, OBJ_CUSTOM_MINE_TO_ROOM))) {
+			act(cust, FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+		}
+		else {
+			act("$n picks at the walls with $p, looking for ore.", FALSE, ch, tool, NULL, TO_ROOM | TO_SPAMMY);
+		}
 
 		// done??
 		if (GET_ACTION_TIMER(ch) <= 0) {
@@ -4047,6 +4097,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		if (cust || data->msg.finish[1]) {
 			act(cust ? cust : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
+		}
+		
+		if (IN_ROOM(obj)) {
+			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
 	

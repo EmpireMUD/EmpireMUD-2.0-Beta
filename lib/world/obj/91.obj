@@ -125,9 +125,11 @@ pieces, and one large roof. Stacked between the folds are several weathered
 tusks, to be used as uprights. You can set this tent up using 'build cabin
 tent'.
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 7 0
+C
+100 100
 S
 #9175
 rack antlers reindeer~

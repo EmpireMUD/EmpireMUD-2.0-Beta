@@ -266,9 +266,10 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 * @param char *argument The typed-in name.
 * @param int craft_type Any CRAFT_TYPE_ to look up.
 * @param bool hide_dismantle_only If TRUE, skips crafts set dismantle-only.
+* @param int *found_wrong_cmd Optional: If a craft otherwise matched but was for a different command, will set this var to the correct craft command e.g. CRAFT_TYPE_BREW (but the function will still return NULL). A NOTHING on this variable, or a successful return on the function, indicates there was no mismatched type.
 * @return craft_data* The matching craft, if any.
 */
-craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type, bool hide_dismantle_only) {
+craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type, bool hide_dismantle_only, int *found_wrong_cmd) {
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL, *known_abbrev_no_res = NULL;
 	craft_data *unknown_multi = NULL;
@@ -276,12 +277,13 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *craft, *next_craft;
 	bool use_room = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
 	
+	if (found_wrong_cmd) {
+		*found_wrong_cmd = NOTHING;
+	}
+	
 	skip_spaces(&argument);
 	
 	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-		if (GET_CRAFT_TYPE(craft) != craft_type) {
-			continue;
-		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;
 		}
@@ -293,11 +295,26 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			
 			// exact match!
 			return craft;
 		}
 		else if (!known_abbrev && is_abbrev(argument, GET_CRAFT_NAME(craft))) {
-			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
 				// only imms hit this block
 				if (!unknown_abbrev) {
 					unknown_abbrev = craft;
@@ -323,7 +340,14 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 			}
 		}
 		else if (!known_multi && multi_isname(argument, GET_CRAFT_NAME(craft))) {
-			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
 				// only imms hit this block
 				if (!unknown_multi) {
 					unknown_multi = craft;
@@ -775,7 +799,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
-	int craft_level;
+	int craft_level, found_wrong_cmd = NOTHING;
 	
 	// these flags show on craft info
 	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
@@ -784,8 +808,13 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
-	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE))) {
-		msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
+	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE, &found_wrong_cmd))) {
+		if (found_wrong_cmd != NOTHING) {
+			msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[craft_type].command, gen_craft_data[found_wrong_cmd].command);
+		}
+		else {
+			msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
+		}
 		return;
 	}
 	
@@ -904,12 +933,15 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	}
 	
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		sprintf(buf, "%s%s", (has_ability(ch, GET_CRAFT_ABILITY(craft)) ? "" : "\tr"), get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
 		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
+		if (!has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+			sprintf(buf + strlen(buf), " (not learned)\t0");
+		}
 		if (abil && ABIL_MASTERY_ABIL(abil) != NOTHING) {
-			sprintf(buf + strlen(buf), ", Mastery: %s", get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+			sprintf(buf + strlen(buf), ", Mastery: %s%s%s", (has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : "\tr"), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : " (not learned)\t0");
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
 	}
@@ -1016,7 +1048,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
 	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 									// note: build does not use the message strings
-	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
+	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
 	{ "workforce", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
@@ -1026,7 +1058,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
-	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making a %s." } },
+	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making %s." } },
 };
 
 
@@ -1925,8 +1957,8 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
-	int count, timer, num = 1, dir = NO_DIR;
+	char temp_arg[MAX_INPUT_LENGTH], short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
+	int count, timer, num = 1, dir = NO_DIR, wrong_cmd = NOTHING;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
 	vehicle_data *veh;
 	bool is_master, use_room, list_only = FALSE;
@@ -1955,17 +1987,22 @@ ACMD(do_gen_craft) {
 	// optional leading info request
 	if (!strn_cmp(argument, "info ", 5)) {
 		argument = any_one_arg(argument, arg);
-		show_craft_info(ch, argument, subcmd);
+		quoted_arg_or_all(argument, temp_arg);
+		show_craft_info(ch, temp_arg, subcmd);
 		return;
 	}
 	
 	// optional 'list' arg to search craftables
 	if (!strn_cmp(argument, "list ", 5)) {
 		argument = any_one_arg(argument, arg);
-		skip_spaces(&argument);
 		list_only = TRUE;
 		// keep going
 	}
+	
+	// process what's left of argument to allow "quotes"
+	skip_spaces(&argument);
+	quoted_arg_or_all(argument, temp_arg);
+	argument = temp_arg;
 	
 	// all other functions require standing
 	if (*argument && !list_only && GET_POS(ch) < POS_STANDING) {
@@ -2002,9 +2039,6 @@ ACMD(do_gen_craft) {
 		}
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_TYPE(craft) != subcmd) {
-				continue;	// wrong craft type
-			}
 			if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
 				continue;	// never allow these flags
 			}
@@ -2020,7 +2054,11 @@ ACMD(do_gen_craft) {
 			
 			// match so far...
 			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
-				// do this last because it records if they are just missing an ability
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
@@ -2031,7 +2069,11 @@ ACMD(do_gen_craft) {
 				break;
 			}
 			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
-				// do this last because it records if they are just missing an ability
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
@@ -2046,7 +2088,11 @@ ACMD(do_gen_craft) {
 				}
 			}
 			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
-				// do this last because it records if they are just missing an ability
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
@@ -2083,6 +2129,10 @@ ACMD(do_gen_craft) {
 	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && type && CRAFT_IS_BUILDING(type) && GET_BUILDING(IN_ROOM(ch)) && GET_CRAFT_BUILD_TYPE(type) == GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch)))) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
+	}
+	else if (*arg && !list_only && !type && wrong_cmd != NOTHING) {
+		// found no match but there was an almost-match with a different command (forge, sew, etc)
+		msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[subcmd].command, gen_craft_data[wrong_cmd].command);
 	}
 	else if (*arg && !list_only && !type && missing_abil != NO_ABIL) {
 		// found no match but there was an almost-match with an ability requirement
@@ -2329,7 +2379,8 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_CHAR);
+		snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}

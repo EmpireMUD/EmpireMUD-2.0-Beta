@@ -1972,6 +1972,7 @@ void delete_empire(empire_data *emp) {
 	unlink(buf);
 	sprintf(buf, "%s%d%s", STORAGE_PREFIX, vnum, EMPIRE_SUFFIX);
 	unlink(buf);
+	unlink(empire_history_filename(emp));
 	
 	cleanup_all_coins();
 	
@@ -2003,7 +2004,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 		GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
 		
 		if (!EXTRACTED(npc->mob) && !IS_DEAD(npc->mob)) {
-			if (!AFF_FLAGGED(npc->mob, AFF_NO_SEE_IN_ROOM)) {
+			if (!AFF_FLAGGED(npc->mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
 				act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
 			}
 			extract_char(npc->mob);
@@ -2053,6 +2054,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	struct channel_history_data *chd, *next_chd;
 	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_playtime_tracker *ept, *next_ept;
@@ -2084,6 +2086,15 @@ void free_empire(empire_data *emp) {
 			extract_obj(eus->obj);
 		}
 		free(eus);
+	}
+	
+	// free history
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), chd, next_chd) {
+		DL_DELETE(EMPIRE_CHAT_HISTORY(emp), chd);
+		if (chd->message) {
+			free(chd->message);
+		}
+		free(chd);
 	}
 	
 	// free shipping data
@@ -8654,6 +8665,16 @@ void free_whole_library(void) {
 			free(chd);
 		}
 		free(slash);
+	}
+	
+	for (iter = 0; iter < NUM_GLOBAL_HISTORIES; ++iter) {
+		DL_FOREACH_SAFE(global_channel_history[iter], chd, next_chd) {
+			DL_DELETE(global_channel_history[iter], chd);
+			if (chd->message) {
+				free(chd->message);
+			}
+			free(chd);
+		}
 	}
 	
 	if (start_locs) {

@@ -482,7 +482,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: EFIND, SHIPPING, WORKFORCE, EIDENTIFY
+See also: AUTOSTORE, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 
@@ -1142,27 +1142,37 @@ See also: CITIES, EMPIRE TIMEOUT, EXTENDED RADIUS, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
-Usage:  territory [keywords] [-exclude keyword]
-        territory [outskirts | frontier]
-        territory <empire> [type]  -- immortals only
+Usage:  territory [options] [keywords] [-exclude keyword]
 
-The territory command will list all your territory that is outside of your
-cities. This command groups tiles that are near each other so that it shows you
-fewer lines. It does not list territory inside of your cities, but you can find
-a list of your cities on the "city list" command.
+The territory command will list all your territory. This command groups tiles
+that are near each other so that it shows you fewer lines.
 
-You can optionally specify a building or terrain type and see all your tiles of
-that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
-territory to just one of those two categories. You can also type 'territory
-building' to get a list of all your buildings.
+Supported options:
+   -cities   Only tiles in cities.
+   -outskirts   Only tiles on outskirts.
+   -frontier   Only tiles on the frontier.
+   -distance N   Only locations within N tiles of you.
+   -island "name"   Only locations on the given island (use quotes if needed).
+   -no-abandon   Only no-abandon tiles.
+   -no-dismantle   Only no-dismantle tiles.
+   -no-work   Only no-work tiles.
+   -public   Only public tiles.
 
-If you put a dash (-) in front of a keyword, it will exclude results that
-match that keyword. You can specify more than 1 keyword to search or exclude.
+You can also add search keywords. Starting a keyword with a dash (-) will
+search for tiles that DON'T have that word. If you need to exclude a word
+such as "island" which is also a search option, use two dashes (--island).
+You can specify multiple keywords at once.
+
+Interior rooms, such as bedrooms, are only searched if keywords are given.
+Otherwise, this command only searches map tiles.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
-See also: CITIES, NAVIGATION, TERRITORY, MANAGE
+Immortals may provide an empire name as the first argument. Use quotes if it's
+more than 1 word.
+
+See also: CITIES, CITY COMMAND, NAVIGATION, TERRITORY, MANAGE
 #
 THIEVERY "THIEVERY PERMIT" "STEALING PERMIT"
 
@@ -1555,7 +1565,7 @@ Examples:
  > workforce keep 200 spruce lumber
  > workforce keep default 1
 
-See also: WORKFORCE
+See also: WORKFORCE, WORKFORCE LIMIT
 #
 "WORKFORCE LIMIT" "WORKFORCE LIMITS"
 
@@ -1573,7 +1583,7 @@ Using this command without an amount lets you search your current limits.
 You can also set limits for a whole chore when turning a chore on using
 "workforce <chore> <limit> [island name]".
 
-See also: WORKFORCE
+See also: WORKFORCE, WORKFORCE KEEP
 #
 "WORKFORCE NEARBY"
 

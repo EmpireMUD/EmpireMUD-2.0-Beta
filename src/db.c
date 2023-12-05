@@ -87,6 +87,7 @@ void load_binary_map_file();
 void load_daily_quest_file();
 void load_empire_storage();
 void load_fight_messages();
+void load_global_history();
 void load_instances();
 void load_islands();
 void load_running_events_file();
@@ -102,6 +103,7 @@ void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
 void update_instance_world_size();
+void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
@@ -243,6 +245,7 @@ struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automati
 struct player_quest *global_next_player_quest = NULL;	// for safely iterating
 struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
 struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
+struct channel_history_data *global_channel_history[NUM_GLOBAL_HISTORIES];	// history for channels like wiznet/immortal
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -354,6 +357,14 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 };
 
 
+// GLOBAL_HISTORY_x: types of global channel histories
+const char *global_history_files[] = {
+	// names should start with '_'
+	LIB_CHANNELS "_god",	// GLOBAL_HISTORY_GOD
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STARTUP /////////////////////////////////////////////////////////////////
 
@@ -387,7 +398,8 @@ void boot_db(void) {
 	log("Loading help entries.");
 	index_boot_help();
 	
-	// logs its own message
+	// log their own messages
+	load_global_history();
 	load_slash_channels();
 	
 	log("Loading player accounts.");
@@ -641,6 +653,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	perform_force_upgrades();
+	verify_daily_quest_cycles();
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
@@ -1352,7 +1365,7 @@ void load_help(FILE *fl) {
 		
 		// convert ampersand codes like &0 to tab codes like \t0 -- string length won't change
 		for (iter = 0; iter < strlen(entry); ++iter) {
-			if (entry[iter] == '&') {
+			if (entry[iter] == COLOUR_CHAR) {
 				entry[iter] = '\t';
 				// skip next letter as part of the code:
 				++iter;

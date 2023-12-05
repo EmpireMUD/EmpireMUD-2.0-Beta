@@ -1000,7 +1000,8 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 	
 	if (any) {
 		if (from_abil) {
-			snprintf(abil_buf, sizeof(abil_buf), " using %s", ABIL_NAME(from_abil));
+			// reports 1 gain higher than currently-recorded because it's only incremented after the gain is successful
+			snprintf(abil_buf, sizeof(abil_buf), " using %s (%d/%d)", ABIL_NAME(from_abil), levels_gained_from_ability(ch, from_abil) + 1, GAINS_PER_ABILITY);
 		}
 		else {
 			*abil_buf = '\0';
@@ -1012,8 +1013,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 			if (SHOW_STATUS_MESSAGES(ch, SM_SKILL_GAINS)) {
 				msg_to_char(ch, "\tyYou improve your %s skill to %d%s.\t0\r\n", SKILL_NAME(skill), skdata->level, abil_buf);
 				
-				points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
-				if (points > 0) {
+				if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && (points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill))) > 0) {
 					msg_to_char(ch, "\tyYou have %d ability point%s to spend. Type 'skill %s' to see %s.\t0\r\n", points, (points != 1 ? "s" : ""), SKILL_NAME(skill), (points != 1 ? "them" : "it"));
 				}
 			}
@@ -1831,7 +1831,7 @@ ACMD(do_skills) {
 	ability_data *abil;
 	int points, level, iter, count;
 	empire_data *emp;
-	bool found, any, line, has_param_details;
+	bool found, any, same, line, has_param_details;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
 	int min_level = -1, max_level = -1;
 	size_t size, l_size;
@@ -2150,7 +2150,12 @@ ACMD(do_skills) {
 			msg_to_char(ch, "Usage: skill drop <skill> <0/%d/%d>\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
 		}
 		else if (!(skill = find_skill_by_name(arg))) {
-			msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
+			if (find_ability_by_name(arg)) {
+				msg_to_char(ch, "You cannot drop abilities with this command. Use \"skill reset\" instead.\r\n");
+			}
+			else {
+				msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
+			}
 		}
 		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
 			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
@@ -2374,7 +2379,25 @@ ACMD(do_skills) {
 		}
 		
 		if (ABIL_ASSIGNED_SKILL(abil)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0\r\n", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
+			}
+			else {
+				size += snprintf(outbuf + size, sizeof(outbuf) - size, "\r\n");
+			}
+			
+			// check purchased
+			any = same = FALSE;
+			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+				if (has_ability_in_set(ch, ABIL_VNUM(abil), iter)) {
+					any = TRUE;
+					if (iter == GET_CURRENT_SKILL_SET(ch)) {
+						same = TRUE;
+					}
+				}
+			}
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
 			
 			// parent/prerequisite ability (chain?) -- maybe?
 		}
@@ -2435,6 +2458,14 @@ ACMD(do_skills) {
 		if (ABIL_REQUIRES_TOOL(abil)) {
 			prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
+		}
+		
+		if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cost: %d%s %s\r\n", ABIL_COST(abil), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
+		}
+		
+		if (ABIL_COOLDOWN_SECS(abil) > 0) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		}
 		
 		// data, if parameterized

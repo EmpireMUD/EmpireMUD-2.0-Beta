@@ -1499,6 +1499,40 @@ void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward
 
 
 /**
+* Verifies all cycling daily quests (ones with the QST_DAILY flag and a
+* QUEST_DAILY_CYCLE() id). All cycling dailies will have 1 active quest in the
+* cycle after this.
+*/
+void verify_daily_quest_cycles(void) {
+	quest_data *qst, *next_qst, *iter, *next_iter;
+	bool any;
+	
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		if (QUEST_FLAGGED(qst, QST_IN_DEVELOPMENT) || !IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
+			continue;	// not a cycling daily
+		}
+		if (QUEST_DAILY_ACTIVE(qst)) {
+			continue;	// if it's active the cycle has already been set up
+		}
+		
+		// if we have an inactive daily then see if something else on the same cycle is active yet
+		any = FALSE;
+		HASH_ITER(hh, quest_table, iter, next_iter) {
+			if (iter != qst && QUEST_DAILY_ACTIVE(iter) && QUEST_DAILY_CYCLE(iter) == QUEST_DAILY_CYCLE(qst) && !QUEST_FLAGGED(iter, QST_IN_DEVELOPMENT)) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		// did we find any?
+		if (!any) {
+			setup_daily_quest_cycles(QUEST_DAILY_CYCLE(qst));
+		}
+	}
+}
+
+
+/**
 * Counts the words of text in a quest's strings.
 *
 * @param quest_data *quest The quest whose strings to count.

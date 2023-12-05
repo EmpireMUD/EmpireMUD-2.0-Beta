@@ -2192,80 +2192,200 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		"$n tries to #w $N, but misses." },
 
 		{ 1,
+		"You rattle $N with your #x.",
+		"$n rattles you with $s #x.",
+		"$n rattles $N with $s #x." },
+
+		{ 2,
+		"You jostle $N as you #w $M.",
+		"$n jostles you as $e #W you.",
+		"$n jostles $N as $e #W $M." },
+
+		{ 3,
 		"You tickle $N as you #w $M.",
 		"$n tickles you as $e #W you.",
 		"$n tickles $N as $e #W $M." },
 
-		{ 3,
+		{ 4,
+		"You graze $N with your #x.",
+		"$n grazes you with $s #x.",
+		"$n grazes $N with $s #x." },
+
+		{ 5,
 		"You barely #w $N.",
 		"$n barely #W you.",
 		"$n barely #W $N." },
 
-		{ 10,
+		{ 6,
+		"You bruise $N as you #w $M.",
+		"$n bruises you as $e #W you.",
+		"$n bruises $N as $e #W $M." },
+
+		{ 7,
+		"You scratch $N with your #x.",
+		"$n scratches you with $s #x.",
+		"$n scratches $N with $s #x." },
+
+		{ 9,
+		"You gently #w $N.",
+		"$n gently #W you.",
+		"$n gently #W $N." },
+
+		{ 11,
+		"You wound $N with your #x.",
+		"$n wounds you with $s #x.",
+		"$n wounds $N with $s #x." },
+
+		{ 13,
+		"You injure $N as you #w $M.",
+		"$n injures you as $e #W you.",
+		"$n injures $N as $e #W $M." },
+
+		{ 15,
 		"You #w $N.",
 		"$n #W you.",
 		"$n #W $N." },
 
-		{ 14,
+		{ 18,
+		"You batter $N as you #w $M.",
+		"$n batters you as $e #W you.",
+		"$n batters $N as $e #W $M." },
+
+		{ 22,
 		"You #w $N hard.",
 		"$n #W you hard.",
 		"$n #W $N hard." },
 
-		{ 16,
+		{ 26,
+		"You stagger $N as you #w $M.",
+		"$n staggers you as $e #W you.",
+		"$n staggers $N as $e #W $M." },
+
+		{ 30,
 		"You #w $N very hard.",
 		"$n #W you very hard.",
 		"$n #W $N very hard." },
 
-		{ 20,
+		{ 35,
+		"You wallop $N with your #x.",
+		"$n wallops you with $s #x.",
+		"$n wallops $N with $s #x." },
+
+		{ 40,
 		"You #w $N extremely hard.",
 		"$n #W you extremely hard.",
 		"$n #W $N extremely hard." },
 
-		{ 24,
-		"You maul $N with your #x.",
-		"$n mauls you with $s #x.",
-		"$n mauls $N with $s #x." },
-
-		{ 28,
-		"You massacre $N with your #x.",
-		"$n massacres you with $s #x.",
-		"$n massacres $N with $s #x." },
-
-		{ 32,
-		"You decimate $N with your #x.",
-		"$n decimates you with $s #x.",
-		"$n decimates $N with $s #x." },
-
 		{ 45,
-		"You OBLITERATE $N with your deadly #x!!",
-		"$n OBLITERATES you with $s deadly #x!!",
-		"$n OBLITERATES $N with $s deadly #x!!" },
+		"You #w $N ferociously.",
+		"$n #W you ferociously.",
+		"$n #W $N ferociously." },
+
+		{ 50,
+		"You savagely #w $N!",
+		"$n savagely #W you!",
+		"$n savagely #W $N!" },
+
+		{ 55,
+		"You maul $N with your #x!",
+		"$n mauls you with $s #x!",
+		"$n mauls $N with $s #x!" },
 
 		{ 60,
-		"You ANNIHILATE $N with your deadly #x!!",
-		"$n ANNIHILATES you with $s deadly #x!!",
-		"$n ANNIHILATES $N with $s deadly #x!!" },
+		"You ravage $N with your #x!",
+		"$n ravages you with $s #x!",
+		"$n ravages $N with $s #x!" },
 
-		{ 75,
-		"You MUTILATE $N with your deadly #x!!",
-		"$n MUTILATES you with $s deadly #x!!",
-		"$n MUTILATES $N with $s deadly #x!!" },
+		{ 65,
+		"You massacre $N with your #x!",
+		"$n massacres you with $s #x!",
+		"$n massacres $N with $s #x!" },
+
+		{ 70,
+		"You decimate $N with your #x!",
+		"$n decimates you with $s #x!",
+		"$n decimates $N with $s #x!" },
+
+		{ 80,
+		"You brutally #w $N!",
+		"$n brutally #W you!",
+		"$n brutally #W $N!" },
+
+		{ 90,
+		"You viciously #w $N!",
+		"$n viciously #W you!",
+		"$n viciously #W $N!" },
 
 		{ 100,
-		"You SLAUGHTER $N with your deadly #x!!",
-		"$n SLAUGHTERS you with $s deadly #x!!",
-		"$n SLAUGHTERS $N with $s deadly #x!!" },
+		"You CRUSH $N with your #x!",
+		"$n CRUSHES you with $s #x!",
+		"$n CRUSHES $N with $s #x!" },
 
 		{ 125,
+		"You WRECK $N with your #x!",
+		"$n WRECKS you with $s #x!",
+		"$n WRECKS $N with $s #x!" },
+
+		{ 150,
+		"You SHATTER $N with your #x!",
+		"$n SHATTERS you with $s #x!",
+		"$n SHATTERS $N with $s #x!" },
+
+		{ 175,
+		"You OBLITERATE $N with your #x!",
+		"$n OBLITERATES you with $s #x!",
+		"$n OBLITERATES $N with $s #x!" },
+
+		{ 200,
+		"You ANNIHILATE $N with your #x!",
+		"$n ANNIHILATES you with $s #x!",
+		"$n ANNIHILATES $N with $s #x!" },
+
+		{ 233,
+		"You MUTILATE $N with your #x!",
+		"$n MUTILATES you with $s #x!",
+		"$n MUTILATES $N with $s #x!" },
+
+		{ 266,
+		"You SLAUGHTER $N with your #x!",
+		"$n SLAUGHTERS you with $s #x!",
+		"$n SLAUGHTERS $N with $s #x!" },
+
+		{ 300,
+		"You **DEMOLISH** $N with your deadly #x!!",
+		"$n **DEMOLISHES** you with $s deadly #x!!",
+		"$n **DEMOLISHES** $N with $s deadly #x!!" },
+
+		{ 350,
+		"You **DEVASTATE** $N with your deadly #x!!",
+		"$n **DEVASTATES** you with $s deadly #x!!",
+		"$n **DEVASTATES** $N with $s deadly #x!!" },
+
+		{ 400,
 		"You **ERADICATE** $N with your deadly #x!!",
 		"$n **ERADICATES** you with $s deadly #x!!",
 		"$n **ERADICATES** $N with $s deadly #x!!" },
 
-		// use -1 as the final entry (REQUIRED) -- captures any higher damage
-		{ -1,
+		{ 450,
 		"You **LIQUIDATE** $N with your deadly #x!!",
 		"$n **LIQUIDATES** you with $s deadly #x!!",
-		"$n **LIQUIDATES** $N with $s deadly #x!!" }
+		"$n **LIQUIDATES** $N with $s deadly #x!!" },
+		
+		{ 500,
+		"You **EXTERMINATE** $N with your deadly #x!!",
+		"$n **EXTERMINATES** you with $s deadly #x!!",
+		"$n **EXTERMINATES** $N with $s deadly #x!!" },
+		
+		{ 550,
+		"You **VANQUISH** $N with your deadly #x!!",
+		"$n **VANQUISHES** you with $s deadly #x!!",
+		"$n **VANQUISHES** $N with $s deadly #x!!" },
+		
+		// use -1 as the final entry (REQUIRED) -- captures any higher damage
+		{ -1,
+		"You **CONQUER** $N with your deadly #x!!",
+		"$n **CONQUERS** you with $s deadly #x!!",
+		"$n **CONQUERS** $N with $s deadly #x!!" }
 	};
 
 	// find matching message
@@ -2361,7 +2481,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	
 	if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict) {
+			if (ch != vict && msg->msg[MSG_GOD].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
 				}
@@ -2370,23 +2490,27 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 				}
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
-			act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			if (msg->msg[MSG_GOD].room_msg) {
+				act(msg->msg[MSG_GOD].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			}
 		}
 		
 		// victim message
-		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+		if (msg->msg[MSG_GOD].victim_msg) {
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+			}
+			else {	// no damage numbers
+				// normally this would be red, but it's basically a miss against a god
+				snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | miss_flags);
 		}
-		else {	// no damage numbers
-			// normally this would be red, but it's basically a miss against a god
-			snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
-		}
-		act(message, FALSE, ch, weap, vict, TO_VICT | miss_flags);
 	}
 	else if (dam != 0) {
 		if (GET_POS(vict) == POS_DEAD) {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict) {
+				if (ch != vict && msg->msg[MSG_DIE].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
 					}
@@ -2396,21 +2520,25 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
 				
-				act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				if (msg->msg[MSG_DIE].room_msg) {
+					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				}
 			}
 			
 			// victim death message
-			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+			if (msg->msg[MSG_DIE].victim_msg) {
+				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
-			else {	// no damage numbers
-				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
-			}
-			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 		}
 		else {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict) {
+				if (ch != vict && msg->msg[MSG_HIT].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
 					}
@@ -2420,22 +2548,26 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
 				
-				act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				if (msg->msg[MSG_HIT].room_msg) {
+					act(msg->msg[MSG_HIT].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+				}
 			}
 			
 			// victim hit message
-			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+			if (msg->msg[MSG_HIT].victim_msg) {
+				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+				}
+				else {	// no damage numbers
+					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
+				}
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
-			else {	// no damage numbers
-				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
-			}
-			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 		}
 	}
 	else if (ch != vict) {	/* Dam == 0 */
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict) {
+			if (ch != vict && msg->msg[MSG_MISS].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
 				}
@@ -2445,17 +2577,21 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
 			
-			act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			if (msg->msg[MSG_MISS].room_msg) {
+				act(msg->msg[MSG_MISS].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | miss_flags);
+			}
 		}
 		
 		// victim miss message
-		if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+		if (msg->msg[MSG_MISS].victim_msg) {
+			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
+				snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+			}
+			else {	// no damage numbers
+				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
+			}
+			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | miss_flags);
 		}
-		else {	// no damage numbers
-			snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
-		}
-		act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | miss_flags);
 	}
 	
 	// if we got here

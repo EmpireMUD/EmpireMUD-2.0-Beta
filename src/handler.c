@@ -172,13 +172,13 @@ EVENTFUNC(dot_update_event) {
 		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
 			custom_fmessage = create_fight_message(NOTHING);
 			add_fight_message(custom_fmessage, create_fight_message_entry(TRUE,
-				NULL,	// death to-attacker
+				GET_AFFECT_DEATH_TO_ROOM(gen),	// actually death to-attacker
 				GET_AFFECT_DEATH_TO_CHAR(gen),
 				GET_AFFECT_DEATH_TO_ROOM(gen),
 				NULL,	// miss to-attacker
 				NULL,	// miss to_vict
 				NULL,	// miss to-room
-				NULL,	// hit to-attacker
+				GET_AFFECT_DOT_TO_ROOM(gen),	// actually hit to-attacker
 				GET_AFFECT_DOT_TO_CHAR(gen),
 				GET_AFFECT_DOT_TO_ROOM(gen),
 				NULL,	// god to-attacker
@@ -1729,6 +1729,11 @@ void extract_char(char_data *ch) {
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch, NOTHING);
+	
+	// remove dots to avoid one firing mid-extract
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
 	
 	// ensure no stored events
 	cancel_all_stored_events(&GET_STORED_EVENTS(ch));

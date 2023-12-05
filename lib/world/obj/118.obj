@@ -1913,11 +1913,17 @@ together by pitch and leather. Scratch-marks run the length of the handle; but,
 though the head of the pick is slightly worn, there are no signs of cracks.
    Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
 ~
-1 imo an h 0 5
+1 imo an h 0 6
 0 1 8
 1 0
 C
 150 250
+M
+26
+You claw at the wall with $p in search of ore.~
+M
+27
+$n claws at the wall with $p in search of ore.~
 S
 #11876
 stabber obsidian~

@@ -82,7 +82,9 @@ bool despawn_companion(char_data *ch, mob_vnum vnum) {
 	}
 	
 	// seems despawnable
-	act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+	if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+	}
 	extract_char(mob);
 	return TRUE;
 }
@@ -522,7 +524,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || IS_SET(get_climate(IN_ROOM(ch)), CLIM_FRESH_WATER | CLIM_SALT_WATER | CLIM_FROZEN_WATER | CLIM_OCEAN | CLIM_LAKE)) {
 		msg_to_char(ch, "You can't earthmeld without solid ground below you!\r\n");
 		return;
 	}
@@ -1094,7 +1096,7 @@ ACMD(do_skybrand) {
 	
 	// determine damage (which determines cost
 	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
-	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
 		dmg += GET_BONUS_MAGICAL(ch) / dur;
 	}

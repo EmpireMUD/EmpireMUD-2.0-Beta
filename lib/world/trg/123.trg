@@ -927,7 +927,7 @@ end
 wait 1
 * check leash
 set dist %room.distance(%instance.location%)%
-if %instance.location% && (%dist% > 6 && %random.2% == 2)
+if %instance.location% && (%dist% > 4 && %random.2% == 2)
   if !%self.aff_flagged(!SEE)%
     %echo% ~%self% burrows down and vanishes from sight!
   end

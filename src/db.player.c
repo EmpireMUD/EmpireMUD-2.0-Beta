@@ -1204,7 +1204,7 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read, *tmp;
 	int account_id = NOTHING, ignore_pos = 0, junk;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
@@ -1720,11 +1720,27 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + 21);
 				}
 				else if (!strn_cmp(line, "History: ", 9)) {
-					sscanf(line + 9, "%d %ld", &i_in[0], &l_in[1]);
+					if (sscanf(line + 9, "%d %ld %d %d %d %d", &i_in[0], &l_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5]) != 6) {
+						// backwards-compatible
+						i_in[2] = 0;	// access_level
+						i_in[3] = 0;	// rank
+						i_in[4] = NOTHING;	// language
+						i_in[5] = 0;	// is_disguised
+						if (sscanf(line + 9, "%d %ld", &i_in[0], &l_in[1]) != 2) {
+							// discard unknown message
+							tmp = fread_string(fl, error);
+							free(tmp);
+							break;
+						}
+					}
 					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
 						struct channel_history_data *hist;
 						CREATE(hist, struct channel_history_data, 1);
 						hist->timestamp = l_in[1];
+						hist->access_level = i_in[2];
+						hist->rank = i_in[3];
+						hist->language = i_in[4];
+						hist->is_disguised = i_in[5] ? TRUE : FALSE;
 						hist->message = fread_string(fl, error);
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
 					}
@@ -3051,7 +3067,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'H'
 	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
 		DL_FOREACH(GET_HISTORY(ch, iter), hist) {
-			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
+			fprintf(fl, "History: %d %ld %d %d %d %d\n%s~\n", iter, hist->timestamp, hist->access_level, hist->rank, hist->language, hist->is_disguised ? 1 : 0, NULLSAFE(hist->message));
 		}
 	}
 	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
@@ -5491,7 +5507,7 @@ void load_map_memory(char_data *ch) {
 					*name = '\0';
 				}
 				// and add
-				add_player_map_memory(ch, vnum, icon, name, timestamp);
+				add_player_map_memory(ch, vnum, double_map_ampersands(icon), name, timestamp);
 			}
 			else {
 				log("Warning: Unknown map memory line for %s: %s", GET_PC_NAME(ch), line);
@@ -5551,7 +5567,7 @@ void write_map_memory(char_data *ch) {
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
 		if (map_mem->icon) {
-			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, undouble_map_ampersands(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
 		}
 		else {	// no icon
 			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");

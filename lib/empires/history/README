@@ -1,0 +1,2 @@
+Empire channel histories are stored in this directory. They are read only if
+someone from the empire uses the channel or requests them.

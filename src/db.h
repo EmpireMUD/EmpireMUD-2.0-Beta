@@ -112,6 +112,7 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
 #define INTROS_PREFIX  LIB_TEXT"intros/"	// for intro screens
 #define BOOK_PREFIX  "books/"	// for books.c
+#define EMPIRE_HISTORY_PREFIX  LIB_EMPIRE"history/"	// for empire history
 #define ELOG_PREFIX  LIB_EMPIRE"logs/"	// for empire logs
 #define STORAGE_PREFIX  LIB_EMPIRE"storage/"	// for empire storage
 
@@ -696,7 +697,9 @@ void objpack_load_room(room_data *room, bool use_pre_b5_116_dir);
 
 // players
 extern struct over_time_effect_type *free_dots_list;
+extern struct channel_history_data *global_channel_history[NUM_GLOBAL_HISTORIES];
 extern struct player_quest *global_next_player_quest, *global_next_player_quest_2;
+extern const char *global_history_files[];
 extern struct group_data *group_list;
 extern struct int_hash *inherent_ptech_hash;
 extern int max_inventory_size;

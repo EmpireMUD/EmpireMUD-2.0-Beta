@@ -2579,6 +2579,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_companion(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			if (GET_COMPANION(vict) && GET_MOB_VNUM(GET_COMPANION(vict)) == GET_MOB_VNUM(pet)) {
+				if (!AFF_FLAGGED(vict, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, GET_COMPANION(vict), NULL, NULL, TO_ROOM);
+				}
+				extract_char(GET_COMPANION(vict));
+			}
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -6495,6 +6501,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 	}
 	
+	if (k->desc) {
+		// protocol info
+		msg_to_char(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
+		msg_to_char(ch, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+	}
+	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
 		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
@@ -8851,7 +8863,7 @@ ACMD(do_echo) {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 	}
 
@@ -8880,7 +8892,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -8922,7 +8934,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 		}
 	}
@@ -8952,7 +8964,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch) {
 				// just in case

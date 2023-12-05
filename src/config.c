@@ -1982,7 +1982,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "max_map_while_moving", CONFTYPE_INT, "maximum mapsize if the player is moving quickly");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
-	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel file logs");
+	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel and global history log files");
 	init_config(CONFIG_PLAYERS, "temperature_discomfort", CONFTYPE_INT, "temperature after which penalties begin");
 	init_config(CONFIG_PLAYERS, "temperature_extreme", CONFTYPE_INT, "temperature after which players take damage");
 	init_config(CONFIG_PLAYERS, "temperature_from_fire", CONFTYPE_INT, "warmth value from certain lights");

@@ -76,6 +76,7 @@ void update_reboot();
 #define TO_BUFF  BIT(19)	// is a non-violent buff ability for FM_MY_BUFFS_IN_COMBAT, etc -- REQUIRES vict_obj is a char, if provided
 #define TO_AFFECT  BIT(20)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT -- requires vict_obj is a char, if provided
 #define TO_ABILITY  BIT(21)	// indicates it's an ability, for FM_ ability flags
+#define TO_GROUP_ONLY  BIT(22)	// only shows to members of ch's group
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);

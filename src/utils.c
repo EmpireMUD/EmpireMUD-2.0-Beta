@@ -2323,6 +2323,40 @@ char *one_word(char *argument, char *first_arg) {
 
 
 /**
+* This is similar to one_word() in that it checks for quotes around the args,
+* but different in that unquoted text will return the whole argument, not just
+* the first word.
+*
+* @param char *argument The incoming argument(s).
+* @param char *found_arg The variable where the detected argument will be stored.
+* @return char* A pointer to whatever remains of argument.
+*/
+char *quoted_arg_or_all(char *argument, char *found_arg) {
+	skip_spaces(&argument);
+	if (*argument == '\"') {
+		// found quote: pull whole thing
+		argument++;
+		while (*argument && *argument != '\"') {
+			*(found_arg++) = *argument;
+			argument++;
+		}
+		*found_arg = '\0';
+	}
+	else {
+		// no quote: pull the entire arg
+		strcpy(found_arg, argument);
+		
+		// and advance argument to the very end
+		while (*argument) {
+			++argument;
+		}
+	}
+	
+	return (argument);
+}
+
+
+/**
 * @param char *argument The argument to test.
 * @return int TRUE if the argument is in the reserved_words[] list.
 */
@@ -2682,7 +2716,9 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && GET_LEADER(iter) == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
-				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+				if (!AFF_FLAGGED(iter, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+				}
 				extract_char(iter);
 			}
 		}
@@ -4469,6 +4505,46 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if any word in str is an abbrev for any keyword in namelist,
+* separately -- even if the other words in str are not.
+*
+* @param const char *str The search arguments, e.g. "hug blue"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @return bool TRUE if any word in str is an abbrev for any keyword in namelist, even if the others aren't.
+*/
+bool any_isname(const char *str, const char *namelist) {
+	char *newlist, *curtok, word[MAX_INPUT_LENGTH];
+	const char *ptr;
+	bool found = FALSE;
+	
+	if (!*str || !*namelist) {
+		return FALSE;	// shortcut
+	}
+	if (!str_cmp(str, namelist)) {
+		return TRUE;	// the easy way
+	}
+
+	newlist = strdup(namelist);
+
+	// for each word in newlist
+	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok) {
+			ptr = str;
+			while (*ptr && !found) {
+				ptr = any_one_arg((char*)ptr, word);
+				if (*word && is_abbrev(word, curtok)) {
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
@@ -4670,6 +4746,39 @@ int count_icon_codes(char *string) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Doubles the ampersands in a 4-char icon and returns the result. This is
+* mainly for loading stored map memories.
+*
+* @param char *icon The incoming 4-char icon.
+* @return char* The modified icon, or the original if there were no ampersands.
+*/
+char *double_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR) {
+			// double the ampersand
+			output[pos++] = COLOUR_CHAR;
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
 }
 
 
@@ -5530,6 +5639,38 @@ char *trim(char *string) {
 	}
 	
 	return ptr;
+}
+
+
+/**
+* Un-doubles ampersands in 4-char map icons and returns the result. This is
+* used for writing map memory, which does not have room for doubled ampersands.
+*
+* @param char *icon The incoming icon, which may have doubled ampersands.
+* @return char* The modified icon with any doubled ampersands reduced to one, or the original icon if there were no ampersands.
+*/
+char *undouble_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR && icon[iter+1] == COLOUR_CHAR) {
+			++iter;	// skip 1
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
 }
 
 

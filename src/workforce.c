@@ -1901,7 +1901,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 *
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int island = GET_ISLAND_ID(room);
@@ -2204,7 +2204,7 @@ INTERACTION_FUNC(one_dig_chore) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DIGGING].mob);
@@ -2316,7 +2316,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
@@ -2646,7 +2646,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
@@ -2775,7 +2775,7 @@ INTERACTION_FUNC(one_mining_chore) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINING].mob);
@@ -2818,7 +2818,7 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
@@ -2952,7 +2952,7 @@ INTERACTION_FUNC(one_production_chore) {
 *
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 * @param int interact_type INTERACT_PRODUCTION or INTERACT_SKILLED_LABOR
 */
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type) {
@@ -3057,7 +3057,7 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 /**
 * @param empire_data *emp The empire for the chore.
 * @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int shear_growth_time = config_get_int("shear_growth_time");

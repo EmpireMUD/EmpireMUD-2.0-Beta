@@ -132,7 +132,7 @@ ACMD(do_damage_spell) {
 	}
 	
 	// calculate damage in order to calculate cost
-	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 		dmg = get_approximate_level(ch) / 8.0;
 		dmg += GET_BONUS_MAGICAL(ch);
 	}
@@ -146,9 +146,15 @@ ACMD(do_damage_spell) {
 	// calculate DoT damage if any
 	dot_dmg = 0;
 	if (damage_spell[type].dot_type > 0) {
-		dot_dmg = get_ability_level(ch, subcmd) / 24;	// skill level base
 		if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 			dot_dmg = MAX(dot_dmg, (get_approximate_level(ch) / 24));	// total level base
+		}
+		else {
+			dot_dmg = get_ability_level(ch, subcmd) / 24;	// skill level base
+		}
+		
+		// apply bonus-mag (slightly different than previous IF)
+		if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 			dot_dmg += GET_BONUS_MAGICAL(ch) / MAX(1, damage_spell[type].dot_duration);
 		}
 		

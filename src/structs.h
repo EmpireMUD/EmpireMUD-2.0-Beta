@@ -2004,6 +2004,10 @@ typedef enum {
 #define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
+#define OBJ_CUSTOM_MINE_TO_CHAR  26
+#define OBJ_CUSTOM_MINE_TO_ROOM  27
+#define OBJ_CUSTOM_CHOP_TO_CHAR  28
+#define OBJ_CUSTOM_CHOP_TO_ROOM  29
 
 
 // RES_x: resource requirement types
@@ -2200,14 +2204,19 @@ typedef enum {
 #define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
 
 
-// types of channel histories -- act.comm.c
+// CHANNEL_HISTORY_x: types of channel histories -- act.comm.c
 #define NO_HISTORY  -1	// reserved
-#define CHANNEL_HISTORY_GOD  0
+#define CHANNEL_HISTORY_GOD  0	// no longer used: god channels are now global
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
-#define CHANNEL_HISTORY_EMPIRE  3
+#define CHANNEL_HISTORY_EMPIRE  3	// no longer used: empire histories now saved to empire
 #define CHANNEL_HISTORY_ROLL  4
 #define NUM_CHANNEL_HISTORY_TYPES  5
+
+
+// GLOBAL_HISTORY_x: types of global channel histories -- act.comm.c
+#define GLOBAL_HISTORY_GOD  0		// god channel and wiznet
+#define NUM_GLOBAL_HISTORIES  1		// must be the total number
 
 
 // channels for announcements
@@ -3119,6 +3128,8 @@ typedef enum {
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
+#define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
+#define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
 #define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000
@@ -3283,6 +3294,7 @@ struct find_territory_node {
 	room_data *loc;
 	char *details;	// optional string with vehicles, etc
 	int count;
+	bool is_vehicle;	// notes if the marked territory was from a vehicle
 	
 	struct find_territory_node *prev, *next;	// doubly-linked list
 };
@@ -4253,6 +4265,10 @@ struct account_player {
 struct channel_history_data {
 	int idnum;	// id of the author
 	int invis_level;	// if it's an invisible immortal
+	int access_level;	// not shown below this access level at all
+	int rank;	// for empire chats, required rank
+	any_vnum language;	// which language it was in, for some channels
+	bool is_disguised;	// indicates we need to show a real name to immortals
 	char *message;
 	long timestamp;
 	struct channel_history_data *prev, *next;	// doubly-linked list
@@ -5498,6 +5514,7 @@ struct empire_data {
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
 	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
+	struct channel_history_data *chat_history;
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -5533,6 +5550,7 @@ struct empire_data {
 	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
 	char mapout_token;	// displayed for this empire on the graphical political map
 	
+	bool history_loaded;	// record whether or not chat history has been loaded
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
 	
@@ -5728,6 +5746,7 @@ struct faction_relation {
 struct faction_reputation_type {
 	int type;	// REP_ type
 	char *name;
+	char *by_to;	// You are now [Reputation] [by | to] [Faction Name].
 	char *color;	// & or \t color code
 	int value;	// points total a player must be at for this
 };

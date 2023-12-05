@@ -1662,7 +1662,7 @@ de-spawns.
 
 See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
-"ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
+"ADVEDIT LINKING" ""ADVEDIT LINK" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
 
 Usage: linking add <type> <data> [flags]
        linking change <number> <field> <value>
@@ -5685,6 +5685,10 @@ Message types:
  &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
+ &cmine-to-char&0 - Shown to the character when mining.
+ &cmine-to-room&0 - Shown to the room when mining.
+ &cchop-to-char&0 - Shown to the character when chopping.
+ &cchop-to-room&0 - Shown to the room when chopping.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d

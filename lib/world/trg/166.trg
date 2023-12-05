@@ -1726,7 +1726,7 @@ else
     set xmas_pet_announce 1
     remote xmas_pet_announce %pc.id%
     * silently swap for the next pet
-    dg_affect %self% HIDE on 1
+    dg_affect %self% !SEE on 5
     * switch companions
     nop %pc.add_companion(%new_vnum%)%
     nop %pc.remove_companion(%self.vnum%)%
@@ -2608,6 +2608,10 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   wait 8 s
 elseif %move% == 3
   * Summon or Buff Max (no interrupt)
+  if %diff% == 1
+    * skip max
+    halt
+  end
   set max %room.people(16614)%
   if !%max% && %self.var(summoned_max,0)%
     %echo% &&G&&Z~%self% says, 'This is for Max, you monster!'&&0
@@ -2831,7 +2835,7 @@ return 1
 ~
 #16660
 Straw Goat vandalism driver~
-5 ab 50
+5 ab 66
 ~
 * configs
 set quest_vnum 16660
@@ -2845,6 +2849,10 @@ set male_list boy man gentleman farmhand merchant apprentice
 set male_count 6
 set female_list girl woman lady milkmaid merchant apprentice
 set female_count 6
+* check completion
+if !%self.complete%
+  halt
+end
 * ensure a crowd is present or just spawn one
 set found 0
 set room %self.room%

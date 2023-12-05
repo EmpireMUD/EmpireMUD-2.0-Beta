@@ -1413,7 +1413,10 @@ if race /= %cmd% && %actor.is_pc%
   end
   * 2. basic targeting w/arg
   set jar %actor.obj_target_inv(%arg%)%
-  if %self.state% != 1
+  if %self.state% == 3
+    %send% %actor% It looks like they're still setting up after the last race... better wait a moment.
+    halt
+  elseif %self.state% != 1
     %send% %actor% You can't enter any pixies right now.
     halt
   elseif !%jar%
@@ -6371,7 +6374,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Gray fox pet behavior~
 0 bt 25
 ~
-set list 11893 11946 11947 11977
+set list 11893 11946 11947 11977 534 9141 9933
 set room %self.room%
 set ch %room.people%
 set any 0

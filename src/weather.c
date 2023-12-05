@@ -185,6 +185,7 @@ void reset_weather(void) {
 void weather_change(void) {
 	int diff, change, was_state;
 	descriptor_data *desc;
+	bool is_inside;
 	char_data *ch;
 	
 	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))
@@ -301,18 +302,21 @@ void weather_change(void) {
 				continue;	// can't see weather from here
 			}
 			
+			// for messaging
+			is_inside = !IS_OUTDOORS(ch);
+			
 			// SKY_x: ok, we can see weather
 			switch (weather_info.sky) {
 				case SKY_CLOUDY: {
 					if (was_state != SKY_RAINING) {
-						msg_to_char(ch, "\t%cThe sky starts to get cloudy.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						msg_to_char(ch, "\t%cThe sky%s starts to get cloudy.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 					}
 					else {	// was raining
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "\t%cThe snow stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cThe snow stops%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 						else {
-							msg_to_char(ch, "\t%cThe rain stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cThe rain%s stops.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 					}
 					break;
@@ -320,32 +324,32 @@ void weather_change(void) {
 				case SKY_RAINING: {
 					if (was_state != SKY_LIGHTNING) {
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "\t%cIt starts to snow.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cIt starts to snow%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 						else {
-							msg_to_char(ch, "\t%cIt starts to rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cIt starts to rain%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 					}
 					else {	// was lightning
 						if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-							msg_to_char(ch, "\t%cThe blizzard subsides, leaving behind a tranquil scene as snow falls gently from above.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cThe blizzard%s subsides, leaving behind a tranquil scene as snow falls gently from above.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 						else {
-							msg_to_char(ch, "\t%cThe intense lightning storm gives way to a soothing rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+							msg_to_char(ch, "\t%cThe intense lightning storm%s gives way to a soothing rain.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 						}
 					}
 					break;
 				}
 				case SKY_CLOUDLESS: {
-					msg_to_char(ch, "\t%cThe clouds disappear.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+					msg_to_char(ch, "\t%cThe clouds%s disappear.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 					break;
 				}
 				case SKY_LIGHTNING: {
 					if (get_room_temperature(IN_ROOM(ch)) <= -1 * config_get_int("temperature_discomfort")) {
-						msg_to_char(ch, "\t%cThe gentle snowfall becomes a serious blizzard.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						msg_to_char(ch, "\t%cThe gentle snowfall%s becomes a serious blizzard.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 					}
 					else {
-						msg_to_char(ch, "\t%cLightning starts to show in the sky.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER));
+						msg_to_char(ch, "\t%cLightning starts to show in the sky%s.\t0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_WEATHER), (is_inside ? " outside" : ""));
 					}
 					break;
 				}
