@@ -1222,8 +1222,10 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
+				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+					abandon_room(room);
+				}
 				disassociate_building(room);
-				abandon_room(room);
 			
 				if (ROOM_PEOPLE(room)) {
 					act("The ruins finally crumble to dust!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
