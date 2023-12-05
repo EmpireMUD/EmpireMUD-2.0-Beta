@@ -2327,49 +2327,59 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		"$n WRECKS $N with $s #x!" },
 
 		{ 150,
+		"You SHATTER $N with your #x!",
+		"$n SHATTERS you with $s #x!",
+		"$n SHATTERS $N with $s #x!" },
+
+		{ 175,
 		"You OBLITERATE $N with your #x!",
 		"$n OBLITERATES you with $s #x!",
 		"$n OBLITERATES $N with $s #x!" },
 
-		{ 175,
+		{ 200,
 		"You ANNIHILATE $N with your #x!",
 		"$n ANNIHILATES you with $s #x!",
 		"$n ANNIHILATES $N with $s #x!" },
 
-		{ 200,
+		{ 233,
 		"You MUTILATE $N with your #x!",
 		"$n MUTILATES you with $s #x!",
 		"$n MUTILATES $N with $s #x!" },
 
-		{ 225,
+		{ 266,
 		"You SLAUGHTER $N with your #x!",
 		"$n SLAUGHTERS you with $s #x!",
 		"$n SLAUGHTERS $N with $s #x!" },
 
-		{ 250,
+		{ 300,
 		"You **DEMOLISH** $N with your deadly #x!!",
 		"$n **DEMOLISHES** you with $s deadly #x!!",
 		"$n **DEMOLISHES** $N with $s deadly #x!!" },
 
-		{ 275,
+		{ 350,
 		"You **DEVASTATE** $N with your deadly #x!!",
 		"$n **DEVASTATES** you with $s deadly #x!!",
 		"$n **DEVASTATES** $N with $s deadly #x!!" },
 
-		{ 300,
+		{ 400,
 		"You **ERADICATE** $N with your deadly #x!!",
 		"$n **ERADICATES** you with $s deadly #x!!",
 		"$n **ERADICATES** $N with $s deadly #x!!" },
 
-		{ 325,
+		{ 450,
 		"You **LIQUIDATE** $N with your deadly #x!!",
 		"$n **LIQUIDATES** you with $s deadly #x!!",
 		"$n **LIQUIDATES** $N with $s deadly #x!!" },
 		
-		{ 350,
+		{ 500,
 		"You **EXTERMINATE** $N with your deadly #x!!",
 		"$n **EXTERMINATES** you with $s deadly #x!!",
 		"$n **EXTERMINATES** $N with $s deadly #x!!" },
+		
+		{ 550,
+		"You **VANQUISH** $N with your deadly #x!!",
+		"$n **VANQUISHES** you with $s deadly #x!!",
+		"$n **VANQUISHES** $N with $s deadly #x!!" },
 		
 		// use -1 as the final entry (REQUIRED) -- captures any higher damage
 		{ -1,
