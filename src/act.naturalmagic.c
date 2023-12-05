@@ -1096,7 +1096,7 @@ ACMD(do_skybrand) {
 	
 	// determine damage (which determines cost
 	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
-	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
 		dmg += GET_BONUS_MAGICAL(ch) / dur;
 	}
