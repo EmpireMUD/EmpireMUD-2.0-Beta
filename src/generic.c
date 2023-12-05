@@ -435,6 +435,178 @@ char *list_one_generic(generic_data *gen, bool detail) {
 
 
 /**
+* Searches properties of generics.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_generic(char_data *ch, char *argument) {
+	bool any;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, iter;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_liquid_flags = NOBITS;
+	int only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int only_drunk = INT_MIN, drunk_over = INT_MIN, drunk_under = INT_MIN, only_hunger = -2, hunger_over = INT_MIN, hunger_under = INT_MIN, only_thirst = -2, thirst_over = INT_MIN, thirst_under = INT_MIN;
+	int only_moon = NOTHING, moon_over = NOTHING, moon_under = NOTHING;
+	
+	generic_data *gen, *next_gen;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP GENEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, generic_flags)
+		FULLSEARCH_LIST("type", only_type, generic_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		// liquids
+		FULLSEARCH_INT("drunk", only_drunk, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("drunkover", drunk_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("drunkunder", drunk_under, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hunger", only_hunger, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hungerover", hunger_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hungerunder", hunger_under, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirst", only_thirst, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirstover", thirst_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirstunder", thirst_under, INT_MIN, INT_MAX)
+		FULLSEARCH_FLAGS("liquidflags", only_liquid_flags, liquid_flags)
+		FULLSEARCH_FLAGS("liquidflagged", only_liquid_flags, liquid_flags)
+		
+		// moons
+		FULLSEARCH_INT("mooncycle", only_moon, -1, INT_MAX)
+		FULLSEARCH_INT("mooncycleover", moon_over, 0, INT_MAX)
+		FULLSEARCH_INT("mooncycleunder", moon_under, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Generic fullsearch: %s\r\n", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up genericss
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if ((vmin != NOTHING && GEN_VNUM(gen) < vmin) || (vmax != NOTHING && GEN_VNUM(gen) > vmax)) {
+			continue;	// vnum range
+		}
+		if (only_type != NOTHING && GEN_TYPE(gen) != only_type) {
+			continue;
+		}
+		if (not_flagged != NOBITS && IS_SET(GEN_FLAGS(gen), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GEN_FLAGS(gen) & only_flags) != only_flags) {
+			continue;
+		}
+		
+		// liquids
+		if (only_drunk != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) != only_drunk)) {
+			continue;
+		}
+		if (drunk_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) < drunk_over)) {
+			continue;
+		}
+		if (drunk_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) > drunk_under)) {
+			continue;
+		}
+		if (only_hunger != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) != only_hunger)) {
+			continue;
+		}
+		if (hunger_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) < hunger_over)) {
+			continue;
+		}
+		if (hunger_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) > hunger_under)) {
+			continue;
+		}
+		if (only_thirst != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) != only_thirst)) {
+			continue;
+		}
+		if (thirst_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) < thirst_over)) {
+			continue;
+		}
+		if (thirst_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) > thirst_under)) {
+			continue;
+		}
+		if (only_liquid_flags != NOBITS && (GEN_TYPE(gen) != GENERIC_LIQUID || (GEN_VALUE(gen, GVAL_LIQUID_FLAGS) & only_liquid_flags) != only_liquid_flags)) {
+			continue;
+		}
+		
+		// moons
+		if (only_moon != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) != only_moon)) {
+			continue;
+		}
+		if (moon_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) < moon_over)) {
+			continue;
+		}
+		if (moon_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) > moon_under)) {
+			continue;
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (multi_isname(find_keywords, GEN_NAME(gen))) {
+				any = TRUE;
+			}
+			
+			for (iter = 0; iter < NUM_GENERIC_STRINGS && !any; ++iter) {
+				if (GEN_STRING(gen, iter) && multi_isname(find_keywords, GEN_STRING(gen, iter))) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s (%s)\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d generics)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a generic and displays them.
 *
 * @param char_data *ch The player.

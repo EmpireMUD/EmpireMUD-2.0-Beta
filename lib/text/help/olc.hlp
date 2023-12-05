@@ -3865,6 +3865,37 @@ The following flags for generics are available:
 
 See also: OLC GENERICS
 #d
+"GENEDIT FULLSEARCH" "GENERIC FULLSEARCH
+
+Usage:  .gen fullsearch -<field> <argument> <...>
+
+This command allows you to search for generics matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the generic's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP GENEDIT FLAGS
+  &c-type&0 - see HELP GENEDIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Liquid fields (see HELP GENERIC LIQUID):
+  &c-drunk&0, &c-drunkover&0, &c-drunkunder&0 - Search drunk values
+  &c-hunger&0, &c-hungerover&0, &c-hungerunder&0 - Search hunger values
+  &c-thirst&0, &c-thirstover&0, &c-thirstunder&0 - Search thirst values
+  &c-liquidflagged&0 - See GENEDIT LIQUID FLAGS
+
+Moon fields (see HELP GENERIC MOON):
+  &c-mooncycle&0, &c-mooncycleover&0, &c-mooncycleunder&0 - Search moon cycle values
+
+Examples:
+ > .gen fullsearch -type LIQUID brown
+ > .gen fullsearch -flagged BASIC -type COMPONENT
+ > .gen fullsearch -type MOON -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find component generics with obj 6423 ("some
+sticks") as their representative item, use ".o search 6423".
+#d
 "GENEDIT ITEM"
 
 Usage:  .item <vnum>
@@ -5835,8 +5866,8 @@ Examples:
  > .o fullsearch -level 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Minipet Use"
-trigger, use ".t search 9900".
+other OLC types. For example, to find all objects with the "Summon Mob Whistle"
+trigger, use ".t search 9910".
 
 See also: LIGHT ITEM
 #d
@@ -6669,6 +6700,7 @@ Supported types:
   building (search designatable rooms with -flag ROOM)
   craft
   crop
+  generic
   mobile
   object
   progress
