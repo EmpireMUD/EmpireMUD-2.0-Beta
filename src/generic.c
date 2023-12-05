@@ -729,6 +729,15 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
 			any = TRUE;
 		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(obj) == vnum) {
+			any = TRUE;
+		}
 		
 		if (any) {
 			++found;
@@ -1527,6 +1536,18 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found = TRUE;
 			obj->proto_data->component = NOTHING;
 		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POTION_AFFECT, NOTHING);
+		}
+		if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, NOTHING);
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POISON_AFFECT, NOTHING);
+		}
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted generic", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
@@ -1695,6 +1716,21 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 				GET_OLC_OBJECT(desc)->proto_data->component = NOTHING;
 				msg_to_char(desc->character, "The generic component used by the object you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POTION_AFFECT, NOTHING);
+				msg_to_char(desc->character, "The generic affect used by the potion you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POTION_COOLDOWN_TYPE, NOTHING);
+				msg_to_char(desc->character, "The generic cooldown used by the potion you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POISON_AFFECT, NOTHING);
+				msg_to_char(desc->character, "The generic affect used by the poison you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
