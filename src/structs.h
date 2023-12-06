@@ -1663,6 +1663,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 #define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
 #define MOB_NO_UNCONSCIOUS  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
+#define MOB_IMPORTANT  BIT(37)	// L. won't be hit by no-arg "purge"; can be used by scripts
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1972,6 +1973,7 @@ typedef enum {
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
 #define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
+#define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 #define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS)	// flags that are preserved

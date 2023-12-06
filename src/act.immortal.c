@@ -10108,7 +10108,7 @@ ACMD(do_purge) {
 	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
-	obj_data *obj;
+	obj_data *obj, *next_o;
 	int number;
 	char *arg;
 
@@ -10172,12 +10172,15 @@ ACMD(do_purge) {
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
-			if (REAL_NPC(vict))
+			if (REAL_NPC(vict) && !MOB_FLAGGED(vict, MOB_IMPORTANT)) {
 				extract_char(vict);
+			}
 		}
 
-		while (ROOM_CONTENTS(IN_ROOM(ch))) {
-			extract_obj(ROOM_CONTENTS(IN_ROOM(ch)));
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_o, next_content) {
+			if (!OBJ_FLAGGED(obj, OBJ_IMPORTANT)) {
+				extract_obj(obj);
+			}
 		}
 	}
 }

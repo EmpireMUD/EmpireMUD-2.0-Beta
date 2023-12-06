@@ -4772,47 +4772,47 @@ that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
 Never set a flag marked with an * (asterisk).
 
 Available mob flags:
- BRING-A-FRIEND - Assists any non-charmed mob in combat. Without this, mobs
+ &cBRING-A-FRIEND&0 - Assists any non-charmed mob in combat. Without this, mobs
    will still assist other mobs in their same follow-chain if no players are
    in the chain and if neither are charmed.
- SENTINEL - Stays in one room and never wanders.
- AGGR - Aggressive; will attack players.
- ISNPC - Is an NPC (this is always set).
- MOUNTABLE - Can be ridden by players.
- MILKABLE - Can be milked in a stable.
- SCAVENGER - Eats corpses off the ground (not larger than the mob).
- NO-CORPSE - Leaves no corpse when it dies (loot falls on the ground).
- TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
- ANIMAL - Counts as an animal for herding, tying, etc.
- MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
- *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- NO-ATTACK - Mob can be in combat, but will not hit
- SPAWNED - De-spawns after 5 minutes if no players are nearby.
- CHAMPION - Will rescue its leader in combat.
- EMPIRE - Will not be saved through reboots.
- * - Unused (formerly FAMILIAR)
- *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
- CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
- PURSUE - Will pursue players who flee in combat.
- HUMAN - Counts as a human for various commands.
- VAMPIRE - Counts as a vampire for various commands.
- CASTER - Has a mana pool; counts as a caster.
- TANK - Has a larger health pool and better tank attributes.
- DPS - Deals more damage and has better combat attributes.
- HARD - More difficult than other mobs of the same level.
- GROUP - Much more difficult, requires a group.
- *EXTRACTED - Do not set.
- !LOOT - Will not drop any loot.
- !TELEPORT - Cannot teleport to this mob.
- !EXP - Players get no experience from using abilities against this mob.
- !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+ &cSENTINEL&0 - Stays in one room and never wanders.
+ &cAGGR&0 - Aggressive; will attack players.
+ &cISNPC&0 - Is an NPC (this is always set).
+ &cMOUNTABLE&0 - Can be ridden by players.
+ &cMILKABLE&0 - Can be milked in a stable.
+ &cSCAVENGER&0 - Eats corpses off the ground (not larger than the mob).
+ &cNO-CORPSE&0 - Leaves no corpse when it dies (loot falls on the ground).
+ &cTIED&0 - Tied to a hitching post; will not wander unless untied; does not despawn.
+ &cANIMAL&0 - Counts as an animal for herding, tying, etc.
+ &cMOUNTAIN-WALK&0 - Can cross mountain tiles.
+ &cAQUATIC&0 - Can cross water tiles, but won't move on land. (see WATERWALK)
+ &c*PLURAL&0 - Uses the pronouns 'their', 'they', and 'them' in act messages.
+ &cNO-ATTACK&0 - Mob can be in combat, but will not hit
+ &cSPAWNED&0 - De-spawns after 5 minutes if no players are nearby.
+ &cCHAMPION&0 - Will rescue its leader in combat.
+ &cEMPIRE&0 - Will not be saved through reboots.
+ &c*PICKPOCKETED&0 - Has already been pickpocketed; cannot be pickpocketed again.
+ &cCITYGUARD&0 - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
+ &cPURSUE&0 - Will pursue players who flee in combat.
+ &cHUMAN&0 - Counts as a human for various commands.
+ &cVAMPIRE&0 - Counts as a vampire for various commands.
+ &cCASTER&0 - Has a mana pool; counts as a caster.
+ &cTANK&0 - Has a larger health pool and better tank attributes.
+ &cDPS&0 - Deals more damage and has better combat attributes.
+ &cHARD&0 - More difficult than other mobs of the same level.
+ &cGROUP&0 - Much more difficult, requires a group.
+ &c*EXTRACTED&0 - Do not set.
+ &c!LOOT&0 - Will not drop any loot.
+ &c!TELEPORT&0 - Cannot teleport to this mob.
+ &c!EXP&0 - Players get no experience from using abilities against this mob.
+ &c!RESCALE&0 - Mob will not rescale after its initial scaling, e.g. if you set
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
- SILENT - Mob will not display custom strings while this flag is on.
- COINS - Mob will drop coins on death/pickpocket.
- NO-COMMAND - Cannot be commanded/ordered.
- NO-UNCONSCIOUS - Cannot be knocked unconscious (from toggle autokill).
+ &cSILENT&0 - Mob will not display custom strings while this flag is on.
+ &cCOINS&0 - Mob will drop coins on death/pickpocket.
+ &cNO-COMMAND&0 - Cannot be commanded/ordered.
+ &cNO-UNCONSCIOUS&0 - Cannot be knocked unconscious (from toggle autokill).
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
 
 See also: OLC MOBILES
 #d
@@ -5790,31 +5790,32 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- UNIQUE - can only equip 1 at a time
- PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
- LIGHT - lights up the room (prefer LIGHT item type instead of the flag)
- SUPERIOR - crafted by a master craftsman, adds the (superior) tag
- LARGE - takes up 2 inventory slots, adds the (large) tag
- *CREATED - created by a god command
- 1-USE - is destroyed when un-equipped
- SLOW - for weapons, attacks slower
- FAST - for weapons, attacks faster
- ENCHANTED - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
- JUNK - will be cleaned up on the ground, even on claimed land -- worthless
- CREATABLE - can be created using the 'create' command (usually resources)
- SCALABLE - item can be scaled (see HELP ITEM SCALING)
- TWO-HANDED - weapon requires both hand slots
- BOE - item binds to a player when it is equipped (or used)
- BOP - item binds to a player when it is picked up
- STAFF - counts as a staff (even if it doesn't have a staff weapon type)
- UNCOLLECTED-LOOT - will decay on the ground if no player gets it
- *KEEP - player has marked the object with the 'keep' command
- !AUTOSTORE - will not autostore (e.g. furniture)
- HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
- GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
- GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
- !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
- SEEDED - has already been seeded with the 'seed' command
+ &cUNIQUE&0 - can only equip 1 at a time
+ &cPLANTABLE&0 - can be planted as a crop (see OEDIT PLANTS)
+ &cLIGHT&0 - lights up the room (prefer LIGHT item type instead of the flag)
+ &cSUPERIOR&0 - crafted by a master craftsman, adds the (superior) tag
+ &cLARGE&0 - takes up 2 inventory slots, adds the (large) tag
+ &c*CREATED&0 - created by a god command
+ &c1-USE&0 - is destroyed when un-equipped
+ &cSLOW&0 - for weapons, attacks slower
+ &cFAST&0 - for weapons, attacks faster
+ &cENCHANTED&0 - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
+ &cJUNK&0 - will be cleaned up on the ground, even on claimed land -- worthless
+ &cCREATABLE&0 - can be created using the 'create' command (usually resources)
+ &cSCALABLE&0 - item can be scaled (see HELP ITEM SCALING)
+ &cTWO-HANDED&0 - weapon requires both hand slots
+ &cBOE&0 - item binds to a player when it is equipped (or used)
+ &cBOP&0 - item binds to a player when it is picked up
+ &cSTAFF&0 - counts as a staff (even if it doesn't have a staff weapon type)
+ &cUNCOLLECTED-LOOT&0 - will decay on the ground if no player gets it
+ &c*KEEP&0 - player has marked the object with the 'keep' command
+ &c!AUTOSTORE&0 - will not autostore (e.g. furniture)
+ &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
+ &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
+ &cGENERIC-DROP&0 - never receives the HARD-DROP/GROUP-DROP flags
+ &c!STORE&0 - can't be stored (or home/warehouse stored), can be toggled by scripts
+ &cSEEDED&0 - has already been seeded with the 'seed' command
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d

@@ -2340,6 +2340,7 @@ const char *action_bits[] = {
 	"COINS",
 	"NO-COMMAND",	// 35
 	"NO-UNCONSCIOUS",
+	"IMPORTANT",
 	"\n"
 };
 
@@ -2660,6 +2661,7 @@ const char *extra_bits[] = {
 	"GENERIC-DROP",
 	"!STORE",	// 25
 	"SEEDED",
+	"IMPORTANT",
 	"\n"
 };
 
@@ -2693,6 +2695,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// generic-drop
 	"",	// no-store
 	"",	// seeded
+	"",	// important
 	"\n"
 };
 
@@ -2726,6 +2729,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_GENERIC_DROP
 	1.0,	// OBJ_NO_STORE
 	1.0,	// OBJ_SEEDED
+	1.0,	// OBJ_IMPORTANT
 };
 
 
