@@ -3557,7 +3557,7 @@ ACMD(do_nearby) {
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
 	struct instance_data *inst;
-	struct empire_city_data *city;
+	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;
 	int iter, dist, size, max_dist;
 	bool found = FALSE;
@@ -3641,12 +3641,20 @@ ACMD(do_nearby) {
 	
 	// check cities
 	if (cities) {
+		// will always try to show a city we're in
+		if (ROOM_OWNER(IN_ROOM(ch)) && get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, NULL, NULL) == TER_CITY) {
+			in_city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	    }
+	    else {
+	    	in_city = NULL;
+	    }
+		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
-				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
+				if ((dist <= max_dist || city == in_city) && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
 					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
