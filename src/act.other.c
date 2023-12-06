@@ -2148,14 +2148,14 @@ ACMD(do_companions) {
 		else if (!cmod && !multi_isname(argument, GET_PC_NAME(proto))) {
 			continue;	// no custom keywords and doesn't match mob's keywords
 		}
-		if (cd->from_abil && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
+		if ((cd->from_abil && GET_MIN_SCALE_LEVEL(proto) < CLASS_SKILL_CAP) && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
 			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
 				found_low_level = GET_MIN_SCALE_LEVEL(proto);
 				low_in_skill = ABIL_ASSIGNED_SKILL(find_ability_by_vnum(cd->from_abil)) ? TRUE : FALSE;
 			}
 			continue;	// low skill
 		}
-		if (!cd->from_abil && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
+		if ((!cd->from_abil || GET_MIN_SCALE_LEVEL(proto) > CLASS_SKILL_CAP) && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
 			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
 				found_low_level = GET_MIN_SCALE_LEVEL(proto);
 			}
