@@ -2142,8 +2142,9 @@ E
 10 57 5.00 20
 E
 26 268435456 4.00 70
-I 5 107 75.00 1 x  # DIG: bag of sand
-I 5 101 25.00 1 x  # DIG: lump of clay
+I 5 103 8.00 1 x  # DIG: yellow lightning stone
+I 5 107 71.00 1 x  # DIG: bag of sand
+I 5 101 21.00 1 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
