@@ -2067,7 +2067,8 @@ ACMD(do_companions) {
 	struct companion_mod *cmod;
 	ability_data *abil;
 	size_t size, lsize;
-	bool found, full;
+	bool found, full, low_in_skill = FALSE;
+	int found_low_level = 0;
 	
 	skip_spaces(&argument);
 	
@@ -2147,6 +2148,19 @@ ACMD(do_companions) {
 		else if (!cmod && !multi_isname(argument, GET_PC_NAME(proto))) {
 			continue;	// no custom keywords and doesn't match mob's keywords
 		}
+		if (cd->from_abil && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
+			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+				found_low_level = GET_MIN_SCALE_LEVEL(proto);
+				low_in_skill = ABIL_ASSIGNED_SKILL(find_ability_by_vnum(cd->from_abil)) ? TRUE : FALSE;
+			}
+			continue;	// low skill
+		}
+		if (!cd->from_abil && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
+			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+				found_low_level = GET_MIN_SCALE_LEVEL(proto);
+			}
+			continue;	// low skill
+		}
 		
 		// seems to be found!
 		found_cd = cd;
@@ -2161,12 +2175,12 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You already have a companion. Dismiss it first.\r\n");
 		return;
 	}
-	if (!found_cd || !proto) {
-		msg_to_char(ch, "You don't have a companion called '%s'.\r\n", argument);
+	if (!found_cd && found_low_level > 0) {
+		msg_to_char(ch, "You must be level %d%s to summon that companion.\r\n", found_low_level, (low_in_skill ? " in the skill" : ""));
 		return;
 	}
-	if (GET_MIN_SCALE_LEVEL(proto) > GET_COMPUTED_LEVEL(ch)) {
-		msg_to_char(ch, "You must be level %d to summon that companion.\r\n", GET_MIN_SCALE_LEVEL(proto));
+	if (!found_cd || !proto) {
+		msg_to_char(ch, "You don't have a companion called '%s'.\r\n", argument);
 		return;
 	}
 	if (abil && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
@@ -3800,7 +3814,7 @@ ACMD(do_summon) {
 	any_vnum summon_vnum;
 	ability_data *abil;
 	size_t size, lsize;
-	bool found, full;
+	bool found, full, low_in_skill = FALSE;
 	
 	// maximum npcs present when summoning
 	int max_npcs = config_get_int("summon_npc_limit");
@@ -3931,14 +3945,15 @@ ACMD(do_summon) {
 				if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
 					continue;	// no match
 				}
+				if (!multi_isname(argument, GET_PC_NAME(proto))) {
+					continue;	// no string match
+				}
 				if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
 					if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
 						found_low_level = GET_MIN_SCALE_LEVEL(proto);
+						low_in_skill = ABIL_ASSIGNED_SKILL(abil) ? TRUE : FALSE;
 					}
 					continue;
-				}
-				if (!multi_isname(argument, GET_PC_NAME(proto))) {
-					continue;	// no string match
 				}
 				
 				// else: summon it!
@@ -3955,7 +3970,7 @@ ACMD(do_summon) {
 			}
 			
 			if (num == 0 && found_low_level > 0) {
-				msg_to_char(ch, "You must be level %d to summon that.\r\n", found_low_level);
+				msg_to_char(ch, "You must be level %d%s to summon that.\r\n", found_low_level, (low_in_skill ? " in the skill" : ""));
 				return;
 			}
 		}
