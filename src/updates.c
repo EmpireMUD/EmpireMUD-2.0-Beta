@@ -3325,6 +3325,12 @@ PLAYER_UPDATE_FUNC(b5_162_status_messages) {
 }
 
 
+// b5.165: Add some new fmessages to players
+PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
+	GET_FIGHT_MESSAGES(ch) |= FM_MY_HEALS | FM_HEALS_ON_ME | FM_HEALS_ON_ALLIES | FM_HEALS_ON_TARGET | FM_HEALS_ON_OTHER;
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3422,6 +3428,7 @@ const struct {
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
+	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

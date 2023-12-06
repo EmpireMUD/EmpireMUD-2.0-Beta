@@ -77,6 +77,7 @@ void update_reboot();
 #define TO_AFFECT  BIT(20)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT -- requires vict_obj is a char, if provided
 #define TO_ABILITY  BIT(21)	// indicates it's an ability, for FM_ ability flags
 #define TO_GROUP_ONLY  BIT(22)	// only shows to members of ch's group
+#define TO_HEAL  BIT(23)	// is a heal
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);

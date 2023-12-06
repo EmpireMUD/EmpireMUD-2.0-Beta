@@ -657,6 +657,11 @@ const char *combat_message_types[] = {
 	"abilities against allies",
 	"abilities against target",
 	"abilities against tank",
+	"my heals",
+	"heals on me",	// 30
+	"heals on allies",
+	"heals on target",
+	"heals on other",
 	"\n"
 };
 
