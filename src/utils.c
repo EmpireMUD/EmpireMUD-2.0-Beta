@@ -4949,7 +4949,7 @@ bool multi_isname(const char *arg, const char *namelist) {
 		ptr = any_one_arg(ptr, argword);
 	} while (fill_word(argword));
 	
-	ok = TRUE;
+	ok = *argword ? TRUE : FALSE;
 	while (*argword && ok) {
 		if (!isname(argword, namelist)) {
 			ok = FALSE;
