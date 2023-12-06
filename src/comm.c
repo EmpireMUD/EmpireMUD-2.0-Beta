@@ -657,7 +657,7 @@ void perform_reboot(void) {
 			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
-				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
+				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d %llu\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))), GROUP(och)->group_flags);
 			}
 		}
 		
@@ -4191,6 +4191,7 @@ void reboot_recover(void) {
 	int desc, plid, leid;
 	bool fOld;
 	char name[MAX_INPUT_LENGTH];
+	bitvector_t flags;
 
 	log("Reboot is recovering players...");
 	
@@ -4263,7 +4264,7 @@ void reboot_recover(void) {
 		if (*line == '$') {
 			break;
 		}
-		else if (*line == 'G' && sscanf(line, "G %d %d", &plid, &leid) == 2) {
+		else if (*line == 'G' && sscanf(line, "G %d %d %llu", &plid, &leid, &flags) >= 2) {
 			if ((plr = is_playing(plid)) && (ldr = is_playing(leid))) {
 				if (!GROUP(ldr)) {
 					create_group(ldr);
@@ -4271,6 +4272,7 @@ void reboot_recover(void) {
 				if (GROUP(ldr) && !GROUP(plr)) {
 					join_group(plr, GROUP(ldr));
 				}
+				GROUP(ldr)->group_flags = flags;
 			}
 		}
 		else {
