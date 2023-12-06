@@ -73,8 +73,10 @@ one, too.
 ~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 1355 100.00 1  # SKIN: snakeskin
-T 9103
 T 9104
+T 9600
+T 9601
+T 9604
 S
 #9105
 snake green treesnake~
