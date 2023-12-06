@@ -5682,54 +5682,79 @@ SHOW(show_learned) {
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
 	
+	// arg parsing
 	if (!*arg) {
 		msg_to_char(ch, "Usage: show learned <player | empire>\r\n");
+		return;
+	}
+	else if (is_abbrev(arg, "empire") && strlen(arg) >= 3) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what empire?\r\n");
+			return;
+		}
+		else if (!(emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "No such empire '%s'.\r\n", arg);
+			return;
+		}
+	}
+	else if (is_abbrev(arg, "player")) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what player?\r\n");
+			return;
+		}
+		else if (!(plr = find_or_load_player(arg, &file))) {
+			msg_to_char(ch, "No such player '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else if (!(plr = find_or_load_player(arg, &file)) && !(emp = get_empire_by_name(arg))) {
 		send_to_char("There is no such player or empire.\r\n", ch);
+		return;
 	}
-	else {	// plr OR emp is guaranteed
-		if (*argument) {
-			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	
+	// must have plr or emp by now
+	if (*argument) {
+		size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	
+	count = 0;
+	HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum))) {
+			continue;	// no craft?
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			continue;	// searched
+		}
+	
+		// show it
+		snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
 		}
-		
-		count = 0;
-		HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
-			if (!(craft = craft_proto(pcd->vnum))) {
-				continue;	// no craft?
-			}
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
-				continue;	// in-dev
-			}
-			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
-				continue;	// searched
-			}
-		
-			// show it
-			snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
-		}
-	
-		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
-		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+	}
+
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 	
 	if (plr && file) {
