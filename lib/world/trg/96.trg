@@ -1,5 +1,5 @@
 #9600
-SCF Script Fight: Setup dodge, interrupt, struggle~
+SCF Script Fight: Setup dodge, interrupt, struggle (needs 9601, 9604)~
 0 c 0
 scfight~
 * Also requires triggers 9601 and 9604 on the same mob

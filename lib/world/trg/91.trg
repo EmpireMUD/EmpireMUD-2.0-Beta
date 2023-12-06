@@ -1,34 +1,29 @@
 #9103
-Snake Constrict: Struggle~
+Deprecated command trigger~
 0 c 0
 struggle~
-set break_free_at 1
-if !%actor.affect(9104)%
-  return 0
-  halt
+* This was a helper for 9104 Snake: Constrict before b5.165
+* DEPRECATED: replace with new version instead
+if !%self.has_trigger(9104)%
+  attach 9104 %self.id%
 end
-if !%actor.varexists(struggle_counter)%
-  set struggle_counter 0
-  remote struggle_counter %actor.id%
-else
-  set struggle_counter %actor.struggle_counter%
+if !%self.has_trigger(9600)%
+  attach 9600 %self.id%
 end
-eval struggle_counter %struggle_counter% + 1
-if %struggle_counter% >= %break_free_at%
-  %send% %actor% You break free!
-  %echoaround% %actor% ~%actor% breaks free!
-  dg_affect #9104 %actor% off
-  rdelete struggle_counter %actor.id%
-  halt
-else
-  %send% %actor% You struggle, but fail to break free.
-  %echoaround% %actor% ~%actor% struggles to break free!
-  remote struggle_counter %actor.id%
-  halt
+if !%self.has_trigger(9601)%
+  attach 9601 %self.id%
 end
+if !%self.has_trigger(9604)%
+  attach 9604 %self.id%
+end
+* repeat the struggle attempt
+return 1
+%force% %actor% struggle
+* and remove this trigger
+detach 9104 %self.id%
 ~
 #9104
-Snake: Constrict~
+Snake: Constrict (requires 9600, 9601, 9604)~
 0 k 100
 ~
 if %self.cooldown(9103)%
@@ -39,7 +34,7 @@ set target %actor%
 set person %self.room.people%
 set target_found 0
 set no_targets 0
-while %target.affect(9104)% && %person%
+while %target.affect(9602)% && %person%
   if %person.is_pc% && %person.is_enemy(%self%)%
     set target %person%
   end
@@ -53,8 +48,9 @@ if %target.affect(9104)%
   * No valid targets
   halt
 end
-nop %self.cooldown(9103, 20)%
 * Valid target found, start attack
+scfight lockout 9103 20 25
+scfight clear struggle
 %echo% ~%self% starts to wrap around ~%target%...
 set verify_target %target.id%
 wait 3 sec
@@ -65,10 +61,17 @@ end
 if (!%target% || %target.room% != %self.room%)
   halt
 end
-%send% %target% ~%self% squeezes around you, constricting until you cannot move!
-%echoaround% %target% ~%self% constricts around ~%target%!
-%send% %target% Type 'struggle' to break free!
-dg_affect #9104 %target% STUNNED on 20
+%send% %target% &&G**** &&Z~%self% squeezes around you, constricting until you cannot move! ****&&0 (struggle)
+%echoaround% %target% &&G~%self% constricts around ~%target%!&&0
+scfight setup struggle %target%
+set scf_strug_char You struggle, but fail to break free.
+set scf_strug_room ~%%actor%% struggles to break free!
+set scf_free_char You squirm out of the snake's coils!
+set scf_free_room ~%%actor%% squirms out of the snake's coils!
+remote scf_strug_char %target.id%
+remote scf_strug_room %target.id%
+remote scf_free_char %target.id%
+remote scf_free_room %target.id%
 ~
 #9105
 Snake: Venom~
