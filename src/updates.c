@@ -33,7 +33,9 @@
 *   Beta 3 Update Functions
 *   Beta 4 Update Functions
 *   Beta 5 Update Functions -- Write a function to be run once at startup
+*     (Search for ADD HERE)
 *   Update Data -- Add to the end of this array to activate the function
+*     (search for ADD HERE)
 *   Core Functions
 *   Pre-b5.116 World Loading
 */
@@ -3323,6 +3325,9 @@ PLAYER_UPDATE_FUNC(b5_162_status_messages) {
 }
 
 
+// ADD HERE, above: more beta 5 update functions
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -3417,6 +3422,8 @@ const struct {
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
+	
+	// ADD HERE, above: more beta 5 update lines
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };
