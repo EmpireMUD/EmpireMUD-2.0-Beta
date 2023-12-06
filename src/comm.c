@@ -686,7 +686,7 @@ void perform_reboot(void) {
 	}
 
 	if (reboot_control.type == SCMD_REBOOT && fl) {
-		fprintf(fl, "-1 ~ ~\n");
+		fprintf(fl, "-1 ~ ~ ~\n");
 		fprintf(fl, "%s", group_data);
 		fprintf(fl, "$\n");
 		fclose(fl);
