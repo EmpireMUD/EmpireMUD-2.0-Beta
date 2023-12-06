@@ -11672,12 +11672,12 @@ ACMD(do_vnum) {
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
-	else if (is_abbrev(buf, "mob")) {
+	else if (is_abbrev(buf, "mobile")) {
 		if (!vnum_mobile(buf2, ch)) {
 			send_to_char("No mobiles by that name.\r\n", ch);
 		}
 	}
-	else if (is_abbrev(buf, "obj")) {
+	else if (is_abbrev(buf, "object")) {
 		if (!vnum_object(buf2, ch)) {
 			send_to_char("No objects by that name.\r\n", ch);
 		}
