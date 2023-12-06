@@ -691,7 +691,7 @@ void build_player_index(void) {
 	bool has_players;
 	char_data *ch;
 	
-	int top_idnum = data_get_long(DATA_TOP_IDNUM);
+	int top_idnum = data_get_int(DATA_TOP_IDNUM);
 	
 	HASH_ITER(hh, account_table, acct, next_acct) {
 		acct->last_logon = 0;	// reset
@@ -768,7 +768,7 @@ void build_player_index(void) {
 	}
 	
 	// update this
-	data_set_long(DATA_TOP_IDNUM, top_idnum);
+	data_set_int(DATA_TOP_IDNUM, top_idnum);
 }
 
 
@@ -4238,8 +4238,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure the player has an idnum and is in the index
 	if (GET_IDNUM(ch) <= 0) {
-		top_idnum = data_get_long(DATA_TOP_IDNUM) + 1;
-		data_set_long(DATA_TOP_IDNUM, top_idnum);
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
 		GET_IDNUM(ch) = top_idnum;
 		
 		ch->script_id = GET_IDNUM(ch);
@@ -4688,8 +4688,8 @@ void init_player(char_data *ch) {
 	
 	// assign idnum
 	if (GET_IDNUM(ch) <= 0) {
-		top_idnum = data_get_long(DATA_TOP_IDNUM) + 1;
-		data_set_long(DATA_TOP_IDNUM, top_idnum);
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
 		GET_IDNUM(ch) = top_idnum;
 		
 		ch->script_id = GET_IDNUM(ch);
