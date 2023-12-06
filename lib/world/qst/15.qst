@@ -382,4 +382,30 @@ Z
 Z
 1 278
 S
+#1507
+Vampire: Return After Dark~
+   What an unusual box... Return to the back room at night and see if you can
+determine why it's here.
+~
+It seems you've found someone with the box...
+~
+2 0 100 0 -1
+A
+2 10370
+P
+5 1503 0 1 a
+P
+6 1503 0 1 a
+P
+9 7 0 51 a
+P
+44 0 0 1 a
+R
+6 1503 1503
+W+
+45 0 0 1 -
+Return to the back room at night~
+Z
+1 10370
+S
 $
