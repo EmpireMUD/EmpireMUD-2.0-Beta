@@ -4155,7 +4155,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	
 	// ensure missile weapon
-	if (!weapon || !IS_MISSILE_WEAPON(weapon)) {
+	if (!weapon || !IS_MISSILE_WEAPON(weapon) || AFF_FLAGGED(ch, AFF_DISARMED)) {
 		msg_to_char(ch, "You don't have a ranged weapon to shoot with!\r\n");
 		if (FIGHT_MODE(vict) == FMODE_MISSILE) {
 			FIGHT_MODE(ch) = FMODE_WAITING;
