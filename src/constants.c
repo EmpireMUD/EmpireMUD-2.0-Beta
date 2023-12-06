@@ -4765,6 +4765,8 @@ const char *requirement_types[] = {
 	"SPEAK-LANGUAGE",
 	"RECOGNIZE-LANGUAGE",
 	"COMPLETED-QUEST-EVER",
+	"DAYTIME",
+	"NIGHTTIME",
 	"\n",
 };
 
@@ -4813,6 +4815,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_THRESHOLD,	// level over
 	REQ_AMT_NONE,	// speak-language
 	REQ_AMT_NONE,	// recognize-language
+	REQ_AMT_NONE,	// completed-quest-ever
+	REQ_AMT_NONE,	// daytime
+	REQ_AMT_NONE,	// nighttime
 };
 
 
@@ -4860,6 +4865,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// level over
 	FALSE,	// speak-language
 	FALSE,	// recognize-language
+	FALSE,	// daytime
+	FALSE,	// nighttime
 };
 
 

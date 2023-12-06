@@ -1072,6 +1072,13 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				break;
 			}
 			
+			// ones that cannot be detected but are always true for progress goals
+			case REQ_DAYTIME:
+			case REQ_NIGHTTIME: {
+				task->current = task->needed;
+				break;
+			}
+			
 			/* otherwise... do nothing
 			default: {
 				break;

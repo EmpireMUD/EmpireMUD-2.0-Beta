@@ -2501,6 +2501,7 @@ void qt_change_level(char_data *ch, int level);
 void qt_change_production_total(char_data *ch, any_vnum vnum, int amount);
 void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
+void qt_check_day_and_night(char_data *ch);
 void qt_drop_obj(char_data *ch, obj_data *obj);
 void qt_empire_cities(char_data *ch, any_vnum amount);
 void qt_empire_diplomacy(char_data *ch, any_vnum amount);

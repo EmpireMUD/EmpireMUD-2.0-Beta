@@ -1975,9 +1975,12 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			check_instance_is_loaded(inst);
 		}
-
-		// check npc spawns whenever a player is places in a room
+		
 		if (!IS_NPC(ch)) {
+			// day/night can change when moving
+			qt_check_day_and_night(ch);
+			
+			// check npc spawns whenever a player is places in a room
 			spawn_mobs_from_center(room);
 		}
 		
@@ -8788,6 +8791,14 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (level == LANG_RECOGNIZE || level == LANG_SPEAK);
 				break;
 			}
+			case REQ_DAYTIME: {
+				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT);
+				break;
+			}
+			case REQ_NIGHTTIME: {
+				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9042,6 +9053,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_RECOGNIZE_LANGUAGE: {
 			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_DAYTIME: {
+			snprintf(output, sizeof(output), "Daytime");
+			break;
+		}
+		case REQ_NIGHTTIME: {
+			snprintf(output, sizeof(output), "Nighttime");
 			break;
 		}
 		default: {

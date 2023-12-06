@@ -7661,6 +7661,7 @@ Available tasks:
  &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
  &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
  &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
+ &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

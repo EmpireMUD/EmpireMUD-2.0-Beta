@@ -477,6 +477,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_SPEAK_LANGUAGE  41
 #define REQ_RECOGNIZE_LANGUAGE  42
 #define REQ_COMPLETED_QUEST_EVER  43
+#define REQ_DAYTIME  44
+#define REQ_NIGHTTIME  45
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

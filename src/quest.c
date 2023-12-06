@@ -1246,6 +1246,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? task->needed : 0;
 				break;
 			}
+			case REQ_DAYTIME: {
+				task->current = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) ? task->needed : 0;
+				break;
+			}
+			case REQ_NIGHTTIME: {
+				task->current = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT) ? task->needed : 0;
+				break;
+			}
 		}
 	}
 }
@@ -2542,6 +2550,39 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 			}
 			else if (task->type == REQ_CAN_GAIN_SKILL) {
 				task->current = check_can_gain_skill(ch, task->vnum) ? task->needed : 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: Check sun status for player
+*
+* @param char_data *ch The player.
+*/
+void qt_check_day_and_night(char_data *ch) {
+	struct player_quest *pq;
+	struct req_data *task;
+	int status = NOTHING;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DAYTIME) {
+				if (status == NOTHING) {
+					status = get_sun_status(IN_ROOM(ch));
+				}
+				task->current = (status == SUN_LIGHT ? TRUE : FALSE);
+			}
+			else if (task->type == REQ_NIGHTTIME) {
+				if (status == NOTHING) {
+					status = get_sun_status(IN_ROOM(ch));
+				}
+				task->current = (status != SUN_LIGHT ? TRUE : FALSE);
 			}
 		}
 	}
