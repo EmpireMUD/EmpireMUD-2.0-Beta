@@ -4205,6 +4205,10 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	if (best) {
 		set_obj_val(best, VAL_AMMO_QUANTITY, GET_AMMO_QUANTITY(best) - 1);
 		SET_BIT(GET_OBJ_EXTRA(best), OBJ_NO_STORE);	// can no longer be stored
+		if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(best, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(best, ch);
+			reduce_obj_binding(best, ch);
+		}
 		request_obj_save_in_world(best);
 	}
 	
