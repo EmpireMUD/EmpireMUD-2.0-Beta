@@ -1617,20 +1617,20 @@ ACMD(do_regenerate) {
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
 			case REGEN_HEALTH: {
-				msg_to_char(ch, "You focus your blood into regeneration.\r\n");
-				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("You focus your blood into regeneration.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				heal(ch, ch, amount);
 				break;
 			}
 			case REGEN_MANA: {
-				msg_to_char(ch, "You draw out the mystical energy from your blood.\r\n");
-				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
-				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
-				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}

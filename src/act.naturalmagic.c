@@ -110,16 +110,16 @@ void report_healing(char_data *healed, int amount, char_data *report_to) {
 	char buf[MAX_STRING_LENGTH];
 	size_t size;
 	
-	size = snprintf(buf, sizeof(buf), "You healed %s for %d (", (healed == report_to) ? "yourself" : PERS(healed, report_to, FALSE), amount);
+	size = snprintf(buf, sizeof(buf), "You healed %s for %d (", (healed == report_to) ? "yourself" : "$N", amount);
 	
 	if (is_fight_enemy(healed, report_to) || (IS_NPC(healed) && !is_fight_ally(healed, report_to))) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%.1f%% health).\r\n", (GET_HEALTH(healed) * 100.0 / MAX(1, GET_MAX_HEALTH(healed))));
+		size += snprintf(buf + size, sizeof(buf) - size, "%.1f%% health).", (GET_HEALTH(healed) * 100.0 / MAX(1, GET_MAX_HEALTH(healed))));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d/%d health).\r\n", GET_HEALTH(healed), GET_MAX_HEALTH(healed));
+		size += snprintf(buf + size, sizeof(buf) - size, "%d/%d health).", GET_HEALTH(healed), GET_MAX_HEALTH(healed));
 	}
 	
-	msg_to_char(report_to, "%s", buf);
+	act(buf, FALSE, report_to, NULL, healed, TO_CHAR | TO_HEAL);
 }
 
 
@@ -696,11 +696,11 @@ ACMD(do_heal) {
 	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 	
 	if (party) {
-		msg_to_char(ch, "You muster up as much mana as you can and send out a shockwave, healing the entire party!\r\n");
-		act("$n draws up as much mana as $e can and sends it out in a shockwave, healing $s entire party!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("You muster up as much mana as you can and send out a shockwave, healing the entire party!", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+		act("$n draws up as much mana as $e can and sends it out in a shockwave, healing $s entire party!", FALSE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 			if (!IS_DEAD(ch_iter) && in_same_group(ch, ch_iter)) {
-				msg_to_char(ch_iter, "You are healed!\r\n");
+				act("You are healed!", FALSE, ch, NULL, ch_iter, TO_VICT | TO_HEAL);
 				heal(ch, ch_iter, amount * 0.75);
 				
 				if (FIGHTING(ch_iter) && !FIGHTING(ch)) {
@@ -716,13 +716,13 @@ ACMD(do_heal) {
 	else {
 		// not party
 		if (ch == vict) {
-			msg_to_char(ch, "You swirl your mana around your body to heal your wounds.\r\n");
-			act("$n's body swirls with mana and $s wounds seem to heal.", TRUE, ch, NULL, NULL, TO_ROOM);
+			act("You swirl your mana around your body to heal your wounds.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+			act("$n's body swirls with mana and $s wounds seem to heal.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 		}
 		else {
-			act("You let your mana pulse and wave around $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_CHAR);
-			act("$n sends forth a wave of mana, which pulses through your body and heals your wounds.", FALSE, ch, NULL, vict, TO_VICT);
-			act("A wave of mana shoots from $n to $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_NOTVICT);
+			act("You let your mana pulse and wave around $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_CHAR | TO_HEAL);
+			act("$n sends forth a wave of mana, which pulses through your body and heals your wounds.", FALSE, ch, NULL, vict, TO_VICT | TO_HEAL);
+			act("A wave of mana shoots from $n to $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
 		}
 		
 		heal(ch, vict, amount);

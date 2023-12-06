@@ -370,13 +370,13 @@ ACMD(do_firstaid) {
 	charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 	
 	if (ch == vict) {
-		msg_to_char(ch, "You apply first aid to your wounds.\r\n");
-		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM);
+		act("You apply first aid to your wounds.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 	}
 	else {
-		act("You apply first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n applies first aid to your wounds.", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		act("You apply first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_CHAR | TO_HEAL);
+		act("$n applies first aid to your wounds.", FALSE, ch, NULL, vict, TO_VICT | TO_HEAL);
+		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
 	}
 	
 	// remove DoTs
