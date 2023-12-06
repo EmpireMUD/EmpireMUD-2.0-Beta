@@ -3874,10 +3874,10 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		if (only_level != NOTHING && (QUEST_MIN_LEVEL(quest) > only_level || QUEST_MAX_LEVEL(quest) < only_level)) {
 			continue;
 		}
-		if (level_over != NOTHING && QUEST_MAX_LEVEL(quest) <= level_over && QUEST_MIN_LEVEL(quest) <= level_over) {
+		if (level_over != NOTHING && QUEST_MAX_LEVEL(quest) < level_over && QUEST_MIN_LEVEL(quest) < level_over) {
 			continue;
 		}
-		if (level_under != NOTHING && QUEST_MAX_LEVEL(quest) >= level_over && QUEST_MIN_LEVEL(quest) >= level_over) {
+		if (level_under != NOTHING && QUEST_MAX_LEVEL(quest) > level_over && QUEST_MIN_LEVEL(quest) > level_over) {
 			continue;
 		}
 		if (only_daily_cycle != NOTHING && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_CYCLE(quest) != only_daily_cycle)) {

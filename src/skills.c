@@ -3278,19 +3278,19 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		if (only_level != NOTHING && SKILL_MAX_LEVEL(sk) != only_level) {
 			continue;
 		}
-		if (level_over != NOTHING && SKILL_MAX_LEVEL(sk) <= level_over) {
+		if (level_over != NOTHING && SKILL_MAX_LEVEL(sk) < level_over) {
 			continue;
 		}
-		if (level_under != NOTHING && SKILL_MAX_LEVEL(sk) >= level_over) {
+		if (level_under != NOTHING && SKILL_MAX_LEVEL(sk) > level_over) {
 			continue;
 		}
 		if (only_mindrop != NOTHING && SKILL_MIN_DROP_LEVEL(sk) != only_mindrop) {
 			continue;
 		}
-		if (mindrop_over != NOTHING && SKILL_MIN_DROP_LEVEL(sk) <= mindrop_over) {
+		if (mindrop_over != NOTHING && SKILL_MIN_DROP_LEVEL(sk) < mindrop_over) {
 			continue;
 		}
-		if (mindrop_under != NOTHING && SKILL_MIN_DROP_LEVEL(sk) >= mindrop_over) {
+		if (mindrop_under != NOTHING && SKILL_MIN_DROP_LEVEL(sk) > mindrop_over) {
 			continue;
 		}
 		
