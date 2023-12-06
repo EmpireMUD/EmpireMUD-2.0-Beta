@@ -1225,15 +1225,17 @@ char *fread_string(FILE * fl, char *error) {
 			*point = '\0';
 			done = 1;
 		}
-		else if (templength == 512) {
+		else if (templength == 511) {
 			// read all the way to the end of a very long line -- don't add a \r\n
 		}
 		else {
 			*(++point) = '\r';
 			*(++point) = '\n';
 			*(++point) = '\0';
-			templength = point - tmp;
 		}
+		
+		// recalculate
+		templength = point - tmp;
 		
 		if (length + templength >= MAX_STRING_LENGTH) {
 			log("SYSERR: fread_string: string too large (db.c)");
