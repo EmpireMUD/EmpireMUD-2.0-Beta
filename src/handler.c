@@ -6333,7 +6333,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct eq_set_obj *eq_set, *new_set;
 	struct obj_apply *apply_iter, *old_apply, *new_apply;
 	int iter;
-	bool found;
+	bool found, enchant = FALSE;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -6487,12 +6487,15 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		scale_item_to_level(new, scale_level);
 	}
 	
-	// copy enchantment ONLY if level is the same
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
-		SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+	// copy enchantments/hone ONLY if level is the same
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj)) {
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
+			SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+		}
 		
 		LL_FOREACH(GET_OBJ_APPLIES(obj), apply_iter) {
-			if (apply_iter->apply_type == APPLY_TYPE_ENCHANTMENT) {
+			// only copies ones added by the player
+			if (apply_type_from_player[apply_iter->apply_type]) {
 				// ensure it's not on the proto
 				found = FALSE;
 				LL_FOREACH(GET_OBJ_APPLIES(proto), old_apply) {
@@ -6505,7 +6508,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 					continue;	// no need to copy
 				}
 				
-				// copy enchantment
+				// copy apply
 				CREATE(new_apply, struct obj_apply, 1);
 				*new_apply = *apply_iter;
 				new_apply->next = NULL;

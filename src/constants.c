@@ -1595,7 +1595,7 @@ const char *injury_bits[] = {
 };
 
 
-// APPLY_TYPE_x: source of obj apply
+// APPLY_TYPE_x (1/2): source of obj apply
 const char *apply_type_names[] = {
 	"natural",
 	"enchantment",
@@ -1605,6 +1605,18 @@ const char *apply_type_names[] = {
 	"group-drop",
 	"boss-drop",
 	"\n"
+};
+
+
+// APPLY_TYPE_x (2/2): preserve ones set by players through fresh_copy_obj
+const bool apply_type_from_player[] = {
+	FALSE,	// natural
+	TRUE,	// enchantment
+	TRUE,	// honed
+	FALSE,	// superior -- will be applied by the scaler
+	FALSE,	// hard-drop
+	FALSE,	// group-drop
+	FALSE,	// boss-drop
 };
 
 
