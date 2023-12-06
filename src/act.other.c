@@ -3794,7 +3794,7 @@ ACMD(do_skin) {
 ACMD(do_summon) {
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
-	int count, num, fol_count, to_summon, found_low_level = 0;
+	int count, num = 0, fol_count, to_summon, found_low_level = 0;
 	struct ability_data_list *adl;
 	char_data *mob, *proto = NULL;
 	any_vnum summon_vnum;
