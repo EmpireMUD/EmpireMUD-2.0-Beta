@@ -1025,6 +1025,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256], totalstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
+	struct empire_dropped_item *edi, *next_edi;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	struct shipping_data *shipd;
@@ -1098,15 +1099,46 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		if (einv) {	// have this?
 			SAFE_ADD(einv->total, shipd->amount, 0, INT_MAX, FALSE);
 		}
-		else if (all) {	// add an entry
-			CREATE(einv, struct einv_type, 1);
-			einv->vnum = vnum;
-			einv->total = shipd->amount;
-			HASH_ADD_INT(list, vnum, einv);
+		else {
+			if (!all && *argument && vnum != last_vnum) {
+				// prevent constant proto lookups
+				proto = obj_proto(vnum);
+				last_vnum = vnum;
+			}
+			
+			if (all || (proto && *argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto)))) {	// add an entry
+				CREATE(einv, struct einv_type, 1);
+				einv->vnum = vnum;
+				einv->total = shipd->amount;
+				HASH_ADD_INT(list, vnum, einv);
+			}
 		}
 	}
 	
 	// apply dropped items
+	HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next_edi) {
+		vnum = edi->vnum;
+		HASH_FIND_INT(list, &vnum, einv);
+		
+		if (einv) {	// have already
+			SAFE_ADD(einv->total, edi->count, 0, INT_MAX, FALSE);
+		}
+		else {
+			if (!all && *argument && vnum != last_vnum) {
+				// prevent constant proto lookups
+				proto = obj_proto(vnum);
+				last_vnum = vnum;
+			}
+			
+			if (proto && *argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {	// add an entry
+				CREATE(einv, struct einv_type, 1);
+				einv->vnum = vnum;
+				einv->total = edi->count;
+				HASH_ADD_INT(list, vnum, einv);
+			}
+		}
+	}
+
 	HASH_ITER(hh, list, einv, next_einv) {
 		SAFE_ADD(einv->total, count_dropped_items(emp, einv->vnum), 0, INT_MAX, FALSE);
 	}
