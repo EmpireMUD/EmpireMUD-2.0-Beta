@@ -1223,10 +1223,10 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_timer != -2 && GET_OBJ_TIMER(obj) != only_timer) {
 			continue;
 		}
-		if (timer_over != NOTHING && GET_OBJ_TIMER(obj) < only_timer) {
+		if (timer_over != NOTHING && GET_OBJ_TIMER(obj) < timer_over) {
 			continue;
 		}
-		if (timer_under != NOTHING && (GET_OBJ_TIMER(obj) <= 0 || GET_OBJ_TIMER(obj) > only_timer)) {
+		if (timer_under != NOTHING && (GET_OBJ_TIMER(obj) <= 0 || GET_OBJ_TIMER(obj) > timer_under)) {
 			continue;
 		}
 		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
