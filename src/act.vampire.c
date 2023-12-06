@@ -1617,7 +1617,8 @@ ACMD(do_regenerate) {
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
 			case REGEN_HEALTH: {
-				act("You focus your blood into regeneration.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				snprintf(buf, sizeof(buf), "You focus your blood into regeneration.%s", report_healing(ch, amount, ch));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
 				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				heal(ch, ch, amount);
 				break;
