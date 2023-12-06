@@ -236,7 +236,6 @@ obj_data *global_next_obj = NULL;	// used in limits.c
 account_data *account_table = NULL;	// hash table of accounts
 player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
 player_index_data *player_table_by_name = NULL;	// hash table by name
-int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total

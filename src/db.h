@@ -205,7 +205,8 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define DATA_LAST_ISLAND_DESCS  4	// last time island descs regenerated
 #define DATA_LAST_CONSTRUCTION_ID  5	// for vehicle construct/dismantle
 #define DATA_START_PLAYTIME_TRACKING  6	// when we started tracking empire playtime (prevents accidental deletes)
-#define NUM_DATAS  7
+#define DATA_TOP_IDNUM  7	// highest player idnum to prevent re-use
+#define NUM_DATAS  8
 
 
 // DATYPE_x: types of stored data
