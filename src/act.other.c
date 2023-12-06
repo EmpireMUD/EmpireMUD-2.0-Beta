@@ -3794,7 +3794,7 @@ ACMD(do_skin) {
 ACMD(do_summon) {
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
-	int count, num, fol_count, to_summon;
+	int count, num, fol_count, to_summon, found_low_level = 0;
 	struct ability_data_list *adl;
 	char_data *mob, *proto = NULL;
 	any_vnum summon_vnum;
@@ -3931,6 +3931,12 @@ ACMD(do_summon) {
 				if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
 					continue;	// no match
 				}
+				if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
+					if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+						found_low_level = GET_MIN_SCALE_LEVEL(proto);
+					}
+					continue;
+				}
 				if (!multi_isname(argument, GET_PC_NAME(proto))) {
 					continue;	// no string match
 				}
@@ -3946,6 +3952,11 @@ ACMD(do_summon) {
 					}
 				}
 				break;
+			}
+			
+			if (num == 0 && found_low_level > 0) {
+				msg_to_char(ch, "You must be level %d to summon that.\r\n", found_low_level);
+				return;
 			}
 		}
 		else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
