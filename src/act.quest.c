@@ -297,7 +297,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total) {
 				best_complete = cqd->complete;
 				best_total = cqd->total;
 			}
-			else if ((cqd->complete * 100 / cqd->total) > (best_complete * 100 / best_total)) {
+			else if ((cqd->complete * 100 / cqd->total) >= (best_complete * 100 / best_total)) {
 				// found better completion
 				best_complete = cqd->complete;
 				best_total = cqd->total;
