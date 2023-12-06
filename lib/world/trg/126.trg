@@ -226,6 +226,10 @@ Ember: Attack~
 %send% %actor% ~%self% shoots a small bolt of fire at you.
 %echoaround% %actor% ~%self% shoots a small bolt of fire at ~%actor%.
 %damage% %actor% 25
+* attempt to ensure the actor is in combat because this mob does not trigger combat itself
+if %actor.position% == Standing && !%actor.disabled% && !%actor.fighting%
+  %force% %actor% hit ember
+end
 ~
 #12609
 Delayed completion on quest start~
