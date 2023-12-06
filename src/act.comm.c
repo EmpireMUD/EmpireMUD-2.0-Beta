@@ -2313,7 +2313,7 @@ ACMD(do_say) {
 		
 		/* trigger check */
 		if (subcmd != SCMD_OOCSAY) {
-			speech_mtrigger(ch, argument, lang);
+			speech_mtrigger(ch, argument, lang, NULL);
 			speech_wtrigger(ch, argument, lang);
 			speech_vtrigger(ch, argument, lang);
 		}
@@ -2522,6 +2522,9 @@ ACMD(do_spec_comm) {
 		}
 
 		act(action_others, FALSE, ch, NULL, vict, TO_NOTVICT);
+		if (IS_NPC(vict)) {
+			speech_mtrigger(ch, string, lang, vict);
+		}
 	}
 }
 
