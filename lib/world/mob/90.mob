@@ -1123,12 +1123,13 @@ vampire feral starving~
 a feral vampire~
 A starving, feral vampire stalks through the shadows nearby.
 ~
-75 100 cduvwI c 3
-1 0 0 10 -1
+75 100 cdvwI c 3
+1 0 9 10 -1
 D
    The vampire looks emaciated, perhaps near death -- again. It sees you and
 crouches low, preparing to strike.
 ~
+T 9064
 S
 #9066
 bat nerf~

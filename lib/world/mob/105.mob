@@ -4,7 +4,7 @@ the Magiterranean gardener~
 A hooded gardener is poking at the ground.
 ~
 5 80 dvI cno 3
-1 2 0 22
+1 2 0 22 -1
 D
    This old druid prods the ground with his staff, tosses in a glowing seed,
 and buries it with his foot. He hardly seems to notice you.
@@ -29,7 +29,7 @@ the foxglove terrier~
 A foxglove terrier runs circles around you.
 ~
 1 1 bdoD nG 2
-0 0 0 9
+0 0 0 9 -1
 D
    This adorable little purple puppy seems to have fur made from flowers. It
 doesn't seem to mind the bees coming and going from its back. If anything, it
@@ -57,7 +57,7 @@ the verdant retriever~
 A grass-green verdant retriever is holding a stick in its mouth.
 ~
 1 1 bdoD nG 2
-0 0 0 9
+0 0 0 9 -1
 D
    With its luscious green fur, this dog spends most of the day basking in the
 sun. But when there's a spare moment to fetch a stick, all that solar energy
@@ -88,7 +88,7 @@ the petal poodle~
 A pink petal poodle wags her tail.
 ~
 1 1 bdoD nG 2
-2 0 0 9
+2 0 0 9 -1
 D
    This lovely white and pink dog appears to be covered in dainty petals
 instead of fur.
@@ -115,7 +115,7 @@ the sunflower spaniel~
 A sunflower spaniel barks up at the sky.
 ~
 1 1 bdoD nG 2
-0 0 0 9
+0 0 0 9 -1
 D
 This adorable little yellow dog seems to have petals instead of fur.
 ~
@@ -147,7 +147,7 @@ a skeletal guard~
 A skeletal guard marches silently past.
 ~
 100 125 dhqtuD cG 3
-0 0 0 1
+0 0 0 1 -1
 D
 No bones about it, this guard makes you uncomfortable.
 ~
@@ -158,7 +158,7 @@ a skeletal sheep~
 The empty skeleton of a sheep is frolicking around.
 ~
 5 10 djoy G 2
-0 0 0 9
+0 0 0 9 -1
 D
 You aren't sure if these are being raised for their meat or their wool.
 ~
@@ -169,7 +169,7 @@ an undead chicken~
 An undead chicken is pecking mindlessly at the ground.
 ~
 1 3 djo G 1
-2 0 0 10
+2 0 0 10 -1
 D
    It doesn't seem to lay eggs, but it does eat a lot of bugs -- sometimes, the
 same bug over and over.
@@ -181,7 +181,7 @@ a skeletal hound~
 A skeletal hound is lying here as if basking in the sun.
 ~
 20 40 djoz cG 2
-0 0 14 9
+0 0 14 9 -1
 D
 You've seen skinny dogs before, but this one is downright bony.
 ~
@@ -201,7 +201,7 @@ a zombie horse~
 A zombie horse is standing here, skin still falling off it.
 ~
 30 60 dejo G 4
-0 0 14 11
+0 0 14 11 -1
 D
 This horse has seen better days. And knights.
 ~
@@ -213,7 +213,7 @@ a zombie charger~
 An armored zombie charger is decomposing valiantly here.
 ~
 40 80 bdej G 4
-0 0 0 11
+0 0 0 11 -1
 D
    The armor is a good fit, considering this poor horse has no muscle or flesh.
 ~
@@ -228,7 +228,7 @@ a skeletal cat~
 A skeletal cat is cleaning its bones.
 ~
 10 30 djoz cG 1
-0 0 0 10
+0 0 0 10 -1
 D
 This old cat is still trying to clean itself.
 ~
@@ -254,7 +254,7 @@ a skeletal cow~
 The skeleton of a cow is trying to graze here.
 ~
 5 10 djoy G 4
-0 0 0 11
+0 0 0 11 -1
 D
 Presumably they aren't farming it for its milk.
 ~
@@ -265,7 +265,7 @@ a zombie bird~
 A decaying bird flies overhead on tattered wings.
 ~
 5 15 djo mG 1
-0 0 2 10
+0 0 2 10 -1
 D
 This little bird only has a wing and a half, but seems to be making do.
 ~
@@ -276,7 +276,7 @@ a skeletal rabbit~
 A skeletal rabbit hops around.
 ~
 1 3 djo G 1
-0 0 15 9
+0 0 15 9 -1
 D
 It keeps munching on grass, which falls right back out through its neck.
 ~
@@ -287,7 +287,7 @@ a vigilant vegetable~
 A vigilant vegetable stalks the fields.
 ~
 125 150 doqtuA cG 3
-0 0 13 7
+0 0 13 36 -1
 D
 Freed from its roots, this plant seems to be patrolling.
 ~
@@ -298,7 +298,7 @@ a vigilante vegetable~
 A masked vigilante vegetable is lurking in the shadows.
 ~
 50 75 cdo cG 3
-0 0 13 7
+0 0 13 36 -1
 D
 This plant seems to have gone bad.
 ~
@@ -309,7 +309,7 @@ Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
 0 0 bdvxyzABEI cm 3
-1 0 2 20
+1 0 2 20 -1
 D
    Clad in a cosmic robe lined with stark white fur, Baron Aquilo cuts a dash
 as he hovers on the updraft. As you approach him, you feel colder and colder,
@@ -350,7 +350,7 @@ Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
 0 0 bdvxyEI c 3
-0 3 0 20
+0 3 0 20 -1
 D
    The cryomancer seems to be channeling the cold from elsewhere on the
 mountain, bringing it down and infusing it into every living thing. The hair on
@@ -389,7 +389,7 @@ Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
 0 0 bdvxyEI c 3
-0 3 0 20
+0 3 0 20 -1
 D
    As you approach the mage, you notice the frost on your breath swirl around
 you and condense into a thin layer of ice on your clothes. All around you, the
@@ -428,7 +428,7 @@ a rabid caribou~
 A rabid caribou charges at you, spraying frozen foam from its mouth!
 ~
 0 0 bdj 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    This husky deer is foaming at the mouth and has its long antler aimed
 squarely at you.
@@ -443,7 +443,7 @@ a flying orca~
 An enchanted orca surprises you from above!
 ~
 0 0 bdj m 5
-0 0 2 9
+0 0 2 9 -1
 D
    This great beast of the sea is somehow flying through the air, mouth open,
 teeth bared, and coming straight for you!
@@ -458,7 +458,7 @@ a pack of vicious ermines~
 A pack of vicious ermines surprises you from tunnels in the snow!
 ~
 0 0 bdj 0 2
-0 0 0 9
+0 0 0 9 -1
 D
    Though small, these white weasels outnumber you and they keep appearing from
 snow tunnels without any end in sight!
@@ -473,7 +473,7 @@ a snowshoe hare~
 A snowshoe hare darts away from you.
 ~
 1 5 djo 0 1
-0 0 15 9
+0 0 15 9 -1
 D
 The stark white hare hops along, foraging for rare bits of green grass.
 ~
@@ -492,7 +492,7 @@ an arctic wolf~
 A white arctic wolf hunches low and bares its fangs.
 ~
 20 40 djo c 3
-0 0 0 10
+0 0 0 10 -1
 D
    The wolf is all white, barely visible in the snow but with the visage of a
 ghost anywhere else.
@@ -513,7 +513,7 @@ an arctic tern~
 An arctic tern swoops low in the sky.
 ~
 5 15 djoz m 1
-0 0 2 9
+0 0 2 9 -1
 D
    The bird has a white and grey body with a black cap and red feet. Its forked
 tail gives it the elegant look of a fish in the sky.
@@ -526,7 +526,7 @@ the river freezer~
 The river freezer is here.
 ~
 0 0 dh dklmn 3
-0 0 0 15
+0 0 0 15 -1
 D
    Only immortals should see this. This is the mob that changes rivers and
 lakes into frozen rivers and lakes.
@@ -540,7 +540,7 @@ the enchanted ice sword~
 A sword of ice animated by Aquilo's power is flying around.
 ~
 0 0 bdhzDF m 2
-0 0 2 1
+0 0 2 1 -1
 D
    Since it doesn't shatter on impact, it might actually by pykrete instead of
 ice.
@@ -553,7 +553,7 @@ an ice sprite~
 An ice sprite is flitting around here.
 ~
 75 125 bdhoxDF cm 1
-0 0 2 28
+0 0 2 28 -1
 D
    Like an oversized snowflake, the sprite is ephemeral and beautiful, but
 capable of burying an entire village if it comes en masse.
@@ -566,7 +566,7 @@ an ice elemental~
 A summoned ice elemental soars overhead on wings of rime.
 ~
 75 125 bdhoxzDF cm 1
-0 0 2 20
+0 0 2 20 -1
 D
 The elemental is scarcely more than ice, but it is both sharp and deadly.
 ~
@@ -578,7 +578,7 @@ a polar bear~
 A polar bear is resting here.
 ~
 100 125 bdej 0 4
-0 0 26 9
+0 0 26 9 -1
 D
    It's enormous, white, and you have begun to suspect that the last thing you
 see will be the inside of it.
@@ -590,7 +590,7 @@ an emperor penguin~
 An emperor penguin stands placidly before you.
 ~
 100 125 dejl 0 2
-0 0 6 9
+0 0 6 9 -1
 D
    This tall penguin looks downright imperial with its black back, white belly,
 and golden neck. It stands tall, head in the air, watching you pass through its
@@ -603,7 +603,7 @@ a frost wyvern~
 A frost wyvern is perched nearby.
 ~
 100 125 dej m 5
-0 0 2 10
+0 0 2 10 -1
 D
 This gorgeous wyvern has light blue scales and tufts of long white fur.
 ~
@@ -614,7 +614,7 @@ a polar bear cub~
 A polar bear cub is rolling around on the ground.
 ~
 1 1 bdoD n 2
-0 0 0 9
+0 0 0 9 -1
 D
 It's simply the most adorable little white bear cub you've seen in your life.
 ~
@@ -627,7 +627,7 @@ a vested walrus~
 A walrus wearing a vest and tophat has set up a shop on the ice (list).
 ~
 75 125 bdH enD 4
-1 0 0 15
+1 0 0 15 -1
 D
    This poor fellow appears to have suffered a curse that turned him into a
 walrus. At least it hasn't affected his sense of fashion.

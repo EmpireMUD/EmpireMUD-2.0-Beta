@@ -110,6 +110,12 @@ if %instance.start%
   %at% %instance.start% %load% obj 18455
 end
 ~
+#18455
+Dammed River: Delayed adventure complete~
+1 f 0
+~
+%adventurecomplete%
+~
 #18460
 Unstable Portal setup~
 2 n 100
