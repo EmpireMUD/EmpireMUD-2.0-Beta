@@ -3642,7 +3642,7 @@ ACMD(do_nearby) {
 	// check cities
 	if (cities) {
 		// will always try to show a city we're in
-		if (ROOM_OWNER(IN_ROOM(ch)) && get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, NULL, NULL) == TER_CITY) {
+		if (ROOM_OWNER(IN_ROOM(ch)) && get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, NULL, NULL) != TER_FRONTIER) {
 			in_city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 	    }
 	    else {
