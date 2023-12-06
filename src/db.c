@@ -1227,6 +1227,7 @@ char *fread_string(FILE * fl, char *error) {
 		}
 		else if (templength == 511) {
 			// read all the way to the end of a very long line -- don't add a \r\n
+			*(++point) = '\0';
 		}
 		else {
 			*(++point) = '\r';
