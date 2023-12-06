@@ -321,8 +321,9 @@ bool trigger_counterspell(char_data *ch);
 #define TYPE_FIRE_BREATH  33	// non-disarmable fire blast
 #define TYPE_SLING  34	// shoot / sling
 #define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
+#define TYPE_ANIMAL_WHIP  36	// non-disarmable whip variant
 
-#define NUM_ATTACK_TYPES  36	// total
+#define NUM_ATTACK_TYPES  37	// total
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))

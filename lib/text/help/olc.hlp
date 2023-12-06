@@ -4717,6 +4717,14 @@ The following attack types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+30. bow (shoot) - a normal bow
+31. crossbow (shoot) - a crossbow
+32. pistol (shoot) - a small firearm
+33. musket (shoot) - a large firearm
+34. fire breath - dragons
+35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+37. animal whip - animals, non-disarmable whip
 
 See also: OLC MOBILES
 #d
@@ -6382,8 +6390,10 @@ The following weapon types are available:
 31. crossbow (shoot) - a crossbow
 32. pistol (shoot) - a small firearm
 33. musket (shoot) - a large firearm
-34. sling (shoot) - a primitive ranged weapon that shoots sling bullets
-35. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+34. fire breath - dragons
+35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+37. animal whip - animals, non-disarmable whip
 
 See also: OLC OBJECTS
 #d
@@ -6709,8 +6719,12 @@ Supported types:
   quest
   room template
   sector
+  skill
   trigger
   vehicle
+
+Unsupported types: adventure, augment, archetype, book, class, event, faction,
+   global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -8105,6 +8119,29 @@ Available flags:
  &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT FULLSEARCH" "SKILL FULLSEARCH
+
+Usage:  .skill fullsearch -<field> <argument> <...>
+
+This command allows you to search for skills matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the skill's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP SKILLEDIT FLAGS
+  &c-maxlevel&0, &cmaxlevelover&0, &cmaxlevelunder&0 - Search the max-level setting
+  &c-mindrop&0, &cmindropover&0, &cmindropunder&0 - Search the min-drop-level setting
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .skill fullsearch -maxlevel 75
+ > .skill fullsearch -flag BASIC -flag CASTER
+ > .skill fullsearch -flag CASTER -vmin 0 -vmax 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find skills that have "Resurrect" (ability
+219), use ".abil search 219".
 #d
 "SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
 

@@ -1031,6 +1031,36 @@ You hurl a dart at $N but it explodes into flower petals.
 $n hurls a dart at you, but it explodes into flower petals.
 $n hurls a dart at $N, but it explodes into flower petals.
 
+* Animal Whip
+M
+ 36
+You whip $N's head right off of $S body!
+$n whips your head right off of your body!
+$n whips $N's head right off of $S body!
+You whip at $N but whip yourself in the face instead!
+$n whips at you but whips $mself in the face instead!
+$n tries to whip at $N but only whips $mself in the face!
+#
+#
+#
+You'd better stop before $N whips you.
+$n is trying to whip you... how cute!
+$n tries to whip $N - isn't $e cute?
+M
+ 36
+Your dextrous whip messily tears $N's torso right off!
+$n's whip messily tears you right in half!
+With an evil grin, $n messily whips $N in half!
+You try to whip $N but whip the ground instead!
+$n tries to whip you but whips the ground instead!
+$n tries to whip $N but whips the ground instead!
+#
+#
+#
+Don't try to whip $N.
+$n is trying to whip you. Yawn.
+$n tries to whip $N - yawn.
+
 * Suffering
 M
  50
