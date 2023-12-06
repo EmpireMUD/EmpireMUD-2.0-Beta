@@ -2240,6 +2240,9 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 */
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	char_data *i, *found = NULL;
+	int number;
+	
+	number = get_number(&name);
 	
 	DL_FOREACH2(player_character_list, i, next_plr) {
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
@@ -2253,6 +2256,9 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 			continue;
 		}
 		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0))) {
+			continue;
+		}
+		if (--number > 0) {
 			continue;
 		}
 		
