@@ -2418,7 +2418,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
 		return;
 	}
-	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_DRIVING | VEH_SAILING | VEH_FLYING)) {
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
