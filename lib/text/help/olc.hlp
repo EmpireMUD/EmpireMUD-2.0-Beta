@@ -5851,7 +5851,7 @@ Fields:
   &c-apply&0 - see HELP OEDIT APPLY
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
   &c-extradesc&0 - has a specific keyword in its extra descs
-  &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
+  &c-flagged&0, &-cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
@@ -5869,7 +5869,7 @@ Fields:
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
-  &c-wear&0 - see HELP OEDIT WEAR
+  &c-wear&0, &c-nowear&0 - see HELP OEDIT WEAR
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Type-based fields:

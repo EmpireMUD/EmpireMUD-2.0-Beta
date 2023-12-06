@@ -1117,7 +1117,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 void olc_fullsearch_obj(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
-	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
+	bitvector_t only_worn = NOBITS, not_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
@@ -1175,7 +1175,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_BOOL("unstorable", not_storable)
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("noworn", not_worn, wear_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
@@ -1252,6 +1254,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
+			continue;
+		}
+		if (not_worn != NOBITS && !CAN_WEAR(obj, not_worn)) {
 			continue;
 		}
 		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
