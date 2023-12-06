@@ -1203,56 +1203,51 @@ int file_to_string_alloc(const char *name, char **buf) {
 
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE * fl, char *error) {
-	char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH], *rslt;
+	char buf[MAX_STRING_LENGTH], tmp[513];
+	char *point;
 	int done = 0, length = 0, templength;
-	register int pos;
-
+	
 	*buf = '\0';
-
+	
 	do {
 		if (!fgets(tmp, 512, fl)) {
 			log("SYSERR: fread_string: format error at or near %s", error);
 			exit(1);
 		}
-				
-		// upgrade to allow ~ when not at the end
-		pos = strlen(tmp);
+		/* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
+		/* now only removes trailing ~'s -- Welcor */
+		point = strchr(tmp, '\0');
+		templength = point - tmp;
 		
-		// backtrack past any \r\n or trailing space or tab
-		for (--pos; pos > 0 && (tmp[pos] == '\r' || tmp[pos] == '\n' || tmp[pos] == ' ' || tmp[pos] == '\t'); --pos);
+		for (point-- ; (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
 		
-		// look for a trailing ~
-		if (tmp[pos] == '~') {
-			tmp[pos] = '\0';
+		if (*point == '~') {
+			*point = '\0';
 			done = 1;
 		}
-		else {
-			strcpy(tmp + pos + (pos > 0 ? 1 : 0), "\r\n");
+		else if (templength == 512) {
+			// read all the way to the end of a very long line -- don't add a \r\n
 		}
-
-		templength = strlen(tmp);
-
+		else {
+			*(++point) = '\r';
+			*(++point) = '\n';
+			*(++point) = '\0';
+			templength = point - tmp;
+		}
+		
 		if (length + templength >= MAX_STRING_LENGTH) {
 			log("SYSERR: fread_string: string too large (db.c)");
 			log("%s", error);
 			exit(1);
 		}
 		else {
-			strcat(buf + length, tmp);
+			strcat(buf + length, tmp);	/* strcat: OK (size checked above) */
 			length += templength;
 		}
 	} while (!done);
-
+	
 	/* allocate space for the new string and copy it */
-	if (strlen(buf) > 0) {
-		CREATE(rslt, char, length + 1);
-		strcpy(rslt, buf);
-	}
-	else {
-		rslt = NULL;
-	}
-
-	return (rslt);
+	return (strlen(buf) ? strdup(buf) : NULL);
 }
 
 
