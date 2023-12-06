@@ -308,7 +308,7 @@ Aquilo polar baron~
 Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
-0 0 bdvxyzABEI cm 3
+0 0 bdvxyzABEIL cm 3
 1 0 2 20 -1
 D
    Clad in a cosmic robe lined with stark white fur, Baron Aquilo cuts a dash
@@ -349,7 +349,7 @@ S
 Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
-0 0 bdvxyEI c 3
+0 0 bdvxyEIL c 3
 0 3 0 20 -1
 D
    The cryomancer seems to be channeling the cold from elsewhere on the
@@ -388,7 +388,7 @@ mage rime #n apprentice~
 Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
-0 0 bdvxyEI c 3
+0 0 bdvxyEIL c 3
 0 3 0 20 -1
 D
    As you approach the mage, you notice the frost on your breath swirl around
@@ -525,7 +525,7 @@ freezer river~
 the river freezer~
 The river freezer is here.
 ~
-0 0 dh dklmn 3
+0 0 dhL dklmn 3
 0 0 0 15 -1
 D
    Only immortals should see this. This is the mob that changes rivers and
@@ -626,7 +626,7 @@ walrus vested~
 a vested walrus~
 A walrus wearing a vest and tophat has set up a shop on the ice (list).
 ~
-75 125 bdH enD 4
+75 125 bdHL enD 4
 1 0 0 15 -1
 D
    This poor fellow appears to have suffered a curse that turned him into a

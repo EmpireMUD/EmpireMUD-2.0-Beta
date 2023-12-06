@@ -385,7 +385,7 @@ A slow stream of dust falls from the ceiling.~
    The old mining tunnel isn't terribly stable. Dust falls slowly (but
 constantly) near the entrance, punctuated by the occasional pebble or rock.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 1 96
 T 11124
@@ -399,7 +399,7 @@ an old tunnel below. You can see signs of previous visitors, but this shaft
 hasn't been used for mining in a long time.
 Type 'enter shaft' to head in and check it out.
 ~
-8 0 0 0 0 8
+8 B 0 0 0 9
 -1 0 0
 1 0
 S
@@ -409,7 +409,7 @@ the entrance shaft~
 The entrance shaft leads out of here.~
 This shaft leads back out of the canyons to the mountain above.
 ~
-8 0 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 S
@@ -421,7 +421,7 @@ Some debris is blocking the tunnel. (difficulty)~
 it (by selecting a difficulty).
 Usage: difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 1 0
 C
@@ -477,7 +477,7 @@ mosses cascading from the ceiling, but they part easily when pulled away from
 the lid to reveal a stained marble surface beneath. The sides depict friezes of
 what the estate must have looked like in its livelier days.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 1 0
 C
@@ -621,7 +621,7 @@ grain. There is a small rune in the middle of the upturned face, and a
 different image branded into each of the four other visible sides: a mill, a
 garden, a stable, and an estate.
 ~
-3 j 0 0 0 2
+3 jB 0 0 0 3
 0 0 0
 0 0
 C
@@ -649,7 +649,7 @@ There is an open hex box in the sarcophagus.~
 burns away from the center in a bright, violet embering. Inside, cradled in a
 bunting of brocade green silk, an intricately jeweled chalice gleams brightly.
 ~
-4 j 0 0 0 3
+4 jB 0 0 0 4
 1 0 0
 0 48
 C
@@ -800,7 +800,7 @@ The path is blocked by overgrown vegetation. (difficulty)~
 You'll have to cut your way through (by selecting a difficulty).
 Usage: difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 0
 C

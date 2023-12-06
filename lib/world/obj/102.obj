@@ -372,7 +372,7 @@ a hole, hidden behind the plants~
 It looks like there's a hole hidden behind the plants. (adventure)~
 It looks like there's more to the garden! Enter the hole to check it out.
 ~
-8 j 0 0 0 3
+8 jB 0 0 0 4
 10225 0 0
 0 0
 S
@@ -657,7 +657,7 @@ a raging red portal~
 A raging, red portal in the middle of the chamber seems to be unstable.~
 Through the portal, you see some tents and a very large jungle.
 ~
-8 0 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S
@@ -667,7 +667,7 @@ the portal home~
 This side of the portal home looks like it's barely staying open!~
 This portal looks like it leads back to the tower.
 ~
-8 0 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S

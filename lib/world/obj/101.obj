@@ -4,7 +4,7 @@ the hag's pestle~
 A large stone pestle is lying on the ground.~
 This looks like it could be used to grind bone!
 ~
-1 ehmp an 0 1
+1 ehmp an 0 0 1
 0 2 5
 1 0
 A
@@ -16,7 +16,7 @@ the hag's stench~
 A foul stench lingers in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 1
+3 mp ak 0 0 1
 0 0 0
 10 0
 A
@@ -30,7 +30,7 @@ the hag's stench~
 A foul stench lingers in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 1
+3 mp ak 0 0 1
 0 0 0
 10 0
 A
@@ -44,7 +44,7 @@ the hag's stench~
 A foul stench lingers in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 1
+3 mp ak 0 0 1
 0 0 0
 10 0
 A
@@ -58,7 +58,7 @@ a fistful of firebird feathers~
 Some firebird feathers are glowing on the ground.~
 The feathers come from the mythical firebird, and glow even when plucked.
 ~
-29 0 a 0 3
+29 0 a 0 0 3
 400 1 0
 10 0
 O+ 1 6442
@@ -69,7 +69,7 @@ black leather armor~
 A set of black leather armor is lying here.~
 This sleek set of armor is designed to make the wearer stealthier.
 ~
-27 emo aq 0 1
+27 emo aq 0 0 1
 1 0 0
 7 0
 A
@@ -85,7 +85,7 @@ a spiked aklys~
 A spiked aklys is lying on the ground.~
 This spiked club is attached to a string, allowing it to be used at short range.
 ~
-1 ehmo an 0 1
+1 ehmo an 0 0 1
 0 1 5
 0 0
 A
@@ -97,7 +97,7 @@ a pack of dry rations~
 A pack of dry rations is sitting open.~
 This food looks like it could last a while.
 ~
-6 eo a 0 1
+6 eo a 0 0 1
 500 0 0
 0 700
 S
@@ -107,7 +107,7 @@ an armored neck guard~
 A neck guard is lying on the ground.~
 This looks like it's meant to protect the neck from sharp weapons.
 ~
-27 mo ac 0 1
+27 mo ac 0 0 1
 2 0 0
 0 0
 A
@@ -119,7 +119,7 @@ the bloodletter's ring~
 A red ring is lying on the ground.~
 This ring has razors on the outside!
 ~
-2 mo ab 0 1
+2 mo ab 0 0 1
 -1 -1 -1
 13 0
 A
@@ -133,7 +133,7 @@ the egg~
 An unusual egg is sitting by the fire.~
 The egg is leathery, and very large.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 1 0
 T 10110
@@ -144,7 +144,7 @@ a charming necklace~
 A charming necklace has been discarded on the ground.~
 It's a rather handsome bauble.
 ~
-2 mo ac 0 3
+2 mo ac 0 0 3
 -1 -1 -1
 4 0
 A
@@ -158,7 +158,7 @@ some wooden beads~
 Some wooden beads are strung together on the ground.~
 It seems like a simple beaded necklace.
 ~
-2 mo ac 0 3
+2 mo ac 0 0 3
 -1 -1 -1
 0 0
 A
@@ -172,7 +172,7 @@ a shifter's chain~
 A strange chain is lying here.~
 The necklace seems to shift around as your eyes fail to follow it.
 ~
-2 mo ac 0 3
+2 mo ac 0 0 3
 -1 -1 -1
 13 0
 A
@@ -187,7 +187,7 @@ A glowing shiv is lying on the ground.~
    This shiv is inscribed with arcane symbols like none you've ever seen
 before. Some powerful shadow sorcerer must have used it as a talisman.
 ~
-1 imo ano f 5
+1 imo ano f 0 5
 0 3 4
 0 0
 A
@@ -199,7 +199,7 @@ the thieves spawner~
 The thieves spawner isn't working properly.~
 This item spawns 1-3 thieves then purges itself.
 ~
-3 0 0 0 5
+3 0 0 0 0 5
 0 0 0
 0 0
 T 10115
@@ -210,7 +210,7 @@ the bandits spawner~
 The bandits spawner isn't working properly.~
 This item spawns 1-3 bandits then purges itself.
 ~
-3 0 0 0 4
+3 0 0 0 0 4
 0 0 0
 0 0
 T 10116
@@ -221,7 +221,7 @@ a spidersilk choker~
 A silk choker is lying on the ground.~
 For something sewn of spidersilk, it's surprisingly strong.
 ~
-2 mo ac 0 2
+2 mo ac 0 0 2
 0 0 0
 7 0
 A
@@ -236,7 +236,7 @@ A makeshift wand was dropped here.~
    On closer inspection, this is actually a twig with a lightningstone taped to
 it. How quaint.
 ~
-1 mo an 0 2
+1 mo an 0 0 2
 0 3 22
 0 0
 A
@@ -248,7 +248,7 @@ an old morning star~
 An old morning star is propped up here.~
 It's a bit rusted at the edges, but that might just be dry blood.
 ~
-1 imo ano 0 3
+1 imo ano 0 0 3
 0 3 5
 2 0
 A
@@ -260,7 +260,7 @@ roguish pants~
 Some roguish pants are lying here.~
 These pants would look handsome on you, you rogue.
 ~
-2 mo af 0 2
+2 mo af 0 0 2
 0 0 0
 7 0
 A
@@ -275,7 +275,7 @@ Some darkfiber pants have been left behind.~
    The pants are hard to see, although you could see yourself in them if you
 were tanking. Or clubbing.
 ~
-2 mo af 0 2
+2 mo af 0 0 2
 0 0 0
 7 0
 A
@@ -289,7 +289,7 @@ shadowcraft pants~
 Some shadowcraft pants are lying here.~
 These pants might be crafted from pure shadow by a powerful mage.
 ~
-2 mo af 0 2
+2 mo af 0 0 2
 0 0 0
 7 0
 A
@@ -304,7 +304,7 @@ A brawler's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
 feel uplifted.
 ~
-2 mo aj 0 4
+2 mo aj 0 0 4
 0 0 0
 2 0
 A
@@ -319,7 +319,7 @@ A freethinker's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
 feel uplifted.
 ~
-2 mo aj 0 5
+2 mo aj 0 0 5
 0 0 0
 2 0
 A
@@ -334,7 +334,7 @@ An adulterer's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
 feel uplifted.
 ~
-2 mo aj 0 6
+2 mo aj 0 0 6
 0 0 0
 2 0
 A
@@ -348,7 +348,7 @@ a tenebrous aura~
 A tenebrous aura hangs heavy in the air.~
 The aura is dark, shadowy, and certainly mysterious.
 ~
-2 o ak 0 1
+2 o ak 0 0 1
 0 0 0
 10 0
 A
@@ -362,7 +362,7 @@ Monsoon rains blow through a strange rift in the world! (adventure)~
 it hard to approach. It's difficult to see what's on the other side. Type
 '&center rift&0' to find out!
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 10 0
 S
@@ -374,7 +374,7 @@ There's a giant rift torn in the fabric of reality.~
 to create a razor-thin portal between this hypercolor desert and the desert
 outside in what you consider the real world. Type '&center rift&0' to get back out.
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 10 0
 S
@@ -386,7 +386,7 @@ Some notes on the monsoon rift are lying here.~
 the mana that holds it open. Hopefully you can find the right spell to seal the
 rift, but you'll have to find a Tower of Sorcery to look for it.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 Q 10144
@@ -401,7 +401,7 @@ dark brown color of the wood seems to suck up all the light that touches it,
 like a storm cloud. To use the totem, find a desert location and type 'chant
 monsoon' to call on the storms.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 10147
@@ -416,7 +416,7 @@ Still, it seems to be dumping an entire lake over the thirsty desert. Below the
 cloud, every plant seems to have come to life, bulging to store enough water to
 survive the rest of the year.
 ~
-3 0 0 0 6
+3 0 0 0 0 6
 10800 0 0
 10 144
 T 10144
@@ -429,7 +429,7 @@ a mesquite fire~
 A fragrant mesquite fire is burning here!~
 The mesquite fire has a strong desert scent, perfect for cooking meat.
 ~
-29 0 0 0 3
+29 0 0 0 0 3
 48 1 13
 0 0
 S
@@ -440,7 +440,7 @@ Bright red saguaro fruits are strewn around on the ground.~
    These red fruits are spiny, and have already started to split open. A ripe
 fruit aroma wafts up from the basket, so they won't keep long before rotting.
 ~
-6 bg a 0 9
+6 bg a 0 0 9
 12 10146 0
 7 168
 O+ 1 6134
@@ -453,7 +453,7 @@ a spiny red fruit~
 A spiny red fruit is lying on the ground.~
 This strange, spiny fruit has a sweet, earthy flavor.
 ~
-6 g a 0 7
+6 g a 0 0 7
 1 0 0
 7 48
 O+ 1 6124
@@ -465,7 +465,7 @@ A pile of saguaro ribs is stacked here.~
    These long, sturdy wooden ribs once held up a gigantic saguaro cactus. When
 dried, they are both strong and flexible, and well-suited to building.
 ~
-3 e a 0 5
+3 e a 0 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -493,7 +493,7 @@ A fallen saguaro cactus is lying here.~
 has already started to rot, but it looks like the inside is intact and you
 could saw out the ribs.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 0 0
 I 17 10148 100.00 1  # SAW: pile of saguaro ribs
@@ -506,7 +506,7 @@ some mesquite lumber~
 Some mesquite lumber is stacked here.~
 The mesquite lumber is small, but plentiful.
 ~
-3 e a 0 7
+3 e a 0 0 7
 0 0 0
 0 0
 I 11 10145 100.00 1  # LIGHT: mesquite fire
@@ -533,7 +533,7 @@ A scraggly mesquite tree is lying on the ground.~
    This rough, twisted wood has long spines on its branches. The wood has a
 fresh desert scent, and would be good for cooking meat.
 ~
-3 e a 0 10
+3 e a 0 0 10
 0 0 0
 0 0
 I 11 10145 100.00 1  # LIGHT: mesquite fire
@@ -554,7 +554,7 @@ A handful of mesquite pods is scattered on the ground.~
    The mesquite pods are long, and filled with rock-hard beans. The pods have a
 sweet taste, but aren't very filling.
 ~
-3 b a 0 4
+3 b a 0 0 4
 0 10150 0
 0 0
 O+ 1 6180
@@ -569,7 +569,7 @@ A basket of alligator pears is sitting here.~
 dark, bumpy, rigid skin. The inside of the fruit is bright green, with a giant
 seed. They aren't sweet, but have a creamy texture.
 ~
-6 bg a 0 9
+6 bg a 0 0 9
 12 10153 0
 7 168
 I 15 10154 100.00 4 x  # SEPARATE: ripe alligator pear
@@ -584,7 +584,7 @@ An alligator pear is lying on the ground.~
    The alligator pear has a bumpy, black skin. But the inside is bright green
 and creamy.
 ~
-6 g a 0 7
+6 g a 0 0 7
 2 0 0
 7 48
 I 14 10153 100.00 4 x  # COMBINE: basket of alligator pears
@@ -596,7 +596,7 @@ a basket of limes~
 Someone has dropped a basket of limes on the ground.~
 The limes are small, but bright green. You can eat limes, or plant them.
 ~
-6 bg a 0 9
+6 bg a 0 0 9
 12 10155 0
 7 168
 I 15 10156 100.00 4 e  # SEPARATE: single ripe lime
@@ -616,7 +616,7 @@ a single ripe lime~
 A single ripe lime has been forgotten.~
 This is just a single ripe lime that might provide a little substance.
 ~
-6 g a 0 7
+6 g a 0 0 7
 1 0 0
 7 48
 I 14 10155 100.00 4 e  # COMBINE: basket of limes
@@ -635,7 +635,7 @@ A maroon firemelon is rolling around on the ground.~
    This firemelon has a deep maroon hue, striped by brighter red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 begm a 0 13
+6 begm a 0 0 13
 12 10157 0
 7 336
 A
@@ -656,7 +656,7 @@ A crimson firemelon is rolling around on the ground.~
    This firemelon has a bright crimson hue, striped by darker red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 begm a 0 14
+6 begm a 0 0 14
 12 10157 0
 7 336
 A
@@ -680,7 +680,7 @@ entire cactus looks fluffy like a bear, and they're known to leave you with a
 bleed-over-time effect. Type 'use branch' to summon your teddybear cactus
 noncombat pet.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10159 0 0
 2 0
 S
@@ -692,7 +692,7 @@ A giant armadillo totem was dropped here.~
 giant armadillo. The totem itself is quite small. Type 'use totem' to summon
 this mount.
 ~
-3 ep a 0 9
+3 ep a 0 0 9
 10160 0 0
 2 0
 T 9910
@@ -704,7 +704,7 @@ A bat totem is lying on the ground.~
    This ironwood totem is carved in the shape of a bat. Strange glyphs are
 carved into the totem, apparently depicting the sun, moon, fangs, and blood.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 10156
@@ -717,7 +717,7 @@ A giant sphinx moth totem was dropped here.~
    This totem is carved from dark, heavy ironwood, although it's small enough
 to fit in your pocket. Type 'use totem' to summon this flying mount.
 ~
-3 ep a 0 13
+3 ep a 0 0 13
 10162 0 0
 2 0
 T 9910
@@ -732,7 +732,7 @@ hands as you touch it. In a dark enough place, you can see green sparks of mana
 falling from the totem's edges. You can type 'morph saguaro' to use the totem
 to become a cactus, in the desert only.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 S
@@ -743,7 +743,7 @@ A sack of mesquite flour is sitting here.~
    Mesquite flour is slightly sweet. It is made from the ground up bean pods of
 the mesquite tree, which grows in the driest deserts.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 7 168
 O+ 1 6300
@@ -763,7 +763,7 @@ and materials over rough terrain.
 
 Craft (Exquisite Woodworking): clockwork mule
 ~
-3 j a 0 3
+3 j a 0 0 3
 0 0 0
 0 0
 M
@@ -781,7 +781,7 @@ An ironwood signet ring has been dropped here.~
 heavy. The top of the ring is carved with a raptor clutching a snake in its
 talons.
 ~
-2 ep ab 0 1
+2 ep ab 0 0 1
 0 0 0
 0 0
 A
@@ -797,7 +797,7 @@ A spiny ring is sticking up from the ground.~
 been woven together such that they almost never poke you or get stuck in your
 skin.
 ~
-2 mp ab 0 3
+2 mp ab 0 0 3
 0 0 0
 0 0
 A
@@ -813,7 +813,7 @@ Monsoon winds are blowing you around.~
 As you look closer, you find they contain an ironwood totem. As a result, you
 can take the monsoon winds and use them to your own benefit.
 ~
-2 mp ak 0 3
+2 mp ak 0 0 3
 0 0 0
 10 0
 A
@@ -833,7 +833,7 @@ an ironwood giftbox~
 An ironwood giftbox is sitting on the ground.~
 This giftbox contains a reward from the Magiterranean.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 C
@@ -849,7 +849,7 @@ cactus in life. Unlike most plants, dead cacti appear to have skeletons because
 their succulent, fleshy green skin is thick and often has a different shape
 than the underlying structure.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -866,7 +866,7 @@ monsoon rains. Three massive arms make it almost look like a person -- no
 wonder local natives believe these cacti are their ancestors. At the top of the
 saguaro, you can see both white flowers and bright red fruits.
 ~
-3 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 0 0
 S
@@ -878,7 +878,7 @@ A wandering merchant spawner is here.~
 preventing a second merchant from spawning. This is done because of how the
 merchant leaves the adventure.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 0 0
 T 10172
@@ -891,7 +891,7 @@ A bat totem is lying on the ground.~
 eerie red glow since you infused it at the oasis. Glyphs depicting the sun,
 moon, fangs, and blood are carved into the totem, and stained red with blood.
 ~
-3 j a 0 5
+3 j a 0 0 5
 0 0 0
 0 0
 Q 10157
@@ -907,7 +907,7 @@ need to let it age for several minutes before bringing it back to the merchant.
 You need 3 vials of herbicide in total. Use 'brew info herbicide' to see the
 exact requirements.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 10153
@@ -920,7 +920,7 @@ A scroll with the rift ritual is lying here.~
 of a Magiterranean rift. You can cast the ritual using the command 'ritual
 rift'.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 10145
@@ -934,7 +934,7 @@ Some un-aged herbicide has been left here.~
 won't be ready until it turns a bright red. Hold onto the herbicide for a few
 minutes while it ages.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 4
 Q 10153
@@ -948,7 +948,7 @@ A vial of pungent red herbicide is lying here.~
 described in the recipe. The smell is too noxious for you to stand, so the vial
 is securely corked.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 Q 10153
@@ -962,7 +962,7 @@ belongs to the High Order of Sorcery -- city wizards! They're no allies of the
 druids, and if the head druid is actually an imperial sorcerer in disguise,
 this is valuable information indeed.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 11 0
 Q 10150
@@ -972,7 +972,7 @@ volcanoportal volcano portal~
 a volcano portal~
 A volcano portal is here.~
 ~
-8 0 0 0 1
+8 0 0 0 0 1
 -1 0 0
 1 0
 S
@@ -984,7 +984,7 @@ The hot air waves above the bright red lava flow.~
 starting to crust over. It burns you even to stand this close, and your skin is
 starting to blister.
 ~
-29 0 0 0 7
+29 0 0 0 0 7
 -1 1 0
 1 48
 C
@@ -1002,7 +1002,7 @@ The veins of lava have begun to cool and harden.~
 warm to the touch. It looks like the whole mountain has taken on a fresh, black
 coat of volcanic rock.
 ~
-3 0 0 0 4
+3 0 0 0 0 4
 7200 0 0
 1 96
 C

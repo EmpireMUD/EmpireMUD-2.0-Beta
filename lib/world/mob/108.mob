@@ -4,7 +4,7 @@ the pageboy~
 The adviser's pageboy is standing here.
 ~
 0 25 dvI nD 3
-1 0 0 15
+1 0 0 15 -1
 D
 He's running around and announcing the Royal Planning Office.
 ~
@@ -17,7 +17,7 @@ Ranger Clara~
 Clara, the Forest Ranger, is adjusting her boot.
 ~
 0 0 bdvI nD 3
-2 0 0 15
+2 0 0 15 -1
 D
 Clara is here to ensure the forests are safe and well-kept.
 ~
@@ -29,7 +29,7 @@ Rosemary the City Planner~
 Rosemary, the City Planner, is reviewing a scroll.
 ~
 0 0 bdvI nD 3
-2 0 0 15
+2 0 0 15 -1
 D
 Rosemary has been tasked with setting up a fledgling city.
 ~
@@ -41,7 +41,7 @@ Royal Adviser Hugo~
 Hugo, the Royal Adviser, sits behind his desk.
 ~
 0 0 bdvI nD 3
-1 0 0 15
+1 0 0 15 -1
 D
 Hugo is just keeping track of things and report back to the king.
 ~
@@ -52,8 +52,8 @@ crier museum~
 the museum crier~
 The museum crier is standing here.
 ~
-0 25 dvI nD 3
-1 0 0 15
+0 25 dvIL nD 3
+1 0 0 15 -1
 D
    Beyond his tear-stained face, you can see the crier has had a rough life.
 This is probably his first paying job in a long time.
@@ -66,8 +66,8 @@ Horation curator~
 Curator Horation~
 The curator is dusting the shelves.
 ~
-0 0 bdvI nD 3
-1 0 0 15
+0 0 bdvIL nD 3
+1 0 0 15 -1
 D
    Horation is an aging man on a mission to bring history to the people. He
 just needs a few 'authentic' artifacts to get started.
@@ -91,8 +91,8 @@ Horation curator~
 Curator Horation~
 Curator Horation stands proudly next to the exhibit.
 ~
-0 0 bdvI nD 3
-1 0 0 15
+0 0 bdvIL nD 3
+1 0 0 15 -1
 D
 Horation is absolutely beaming at his little museum.
 ~
@@ -115,8 +115,8 @@ spirit order~
 the Spirit of Order~
 The Spirit of Order picks and knits at the clouds.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This ethereal spirit is a pale blue color, and has the shape of a sorcerer.
 This spirit offers the High Sorcery tutorial.
@@ -132,8 +132,8 @@ spirit wild~
 the Spirit of the Wild~
 The Spirit of the Wild comes screaming through the veil of clouds.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This feral spirit is brown in color and almost appears to have fur. It
 offers the Survival tutorial.
@@ -149,8 +149,8 @@ spirit hunt~
 the Spirit of the Hunt~
 The Spirit of the Hunt is perched high above you.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This pale red spirit holds a spear as it peers through the veil between the
 worlds. It offers the Battle tutorial.
@@ -166,8 +166,8 @@ spirit mana~
 the Spirit of Mana~
 The Spirit of Mana takes the form of the clouds themselves.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This strange spirit is pale blue in color but it shifts from one shape to
 another as it moves, like water spilling over rocks. This spirit offers the
@@ -185,8 +185,8 @@ spirit darkness~
 the Spirit of Darkness~
 The Spirit of Darkness looms beyond the clouds.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This spirit is so dark you can barely see it, but you can feel its eyes on
 you at all times. It offers the Stealth tutorial.
@@ -204,8 +204,8 @@ spirit progress~
 the Spirit of Progress~
 The Spirit of Progress marches through the stream.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
 This spirit used to teach the Empire skill.
    Use 'quest start' to see if a quest is available. Try 'start all' to start
@@ -220,8 +220,8 @@ spirit blood~
 the Spirit of Blood~
 The Spirit of Blood pools beneath you.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This spirit is bright red, and moves almost like a fluid as it hovers in the
 soulstream. It offers the Vampire tutorial.
@@ -237,8 +237,8 @@ spirit innovation~
 the Spirit of Innovation~
 The Spirit of Innovation flows forth from the Soulstream.
 ~
-0 0 bdF n 0
-0 0 27 15
+0 0 bdFL n 0
+0 0 27 15 -1
 D
    This spirit seems to be made from flint, then wood, then marble, then glass.
 It offers the Trade tutorial.
@@ -255,7 +255,7 @@ a companion spirit~
 A friendly spirit is floating nearby.
 ~
 1 1 bdoD n 0
-0 0 27 9
+0 0 27 9 -1
 D
 It fades in and out of view, but you feel warm whenever it appears.
 ~

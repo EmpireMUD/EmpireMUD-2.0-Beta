@@ -46,7 +46,7 @@ deckhand hand human~
 the deckhand~
 A human deckhand is chained to the side of the ship.
 ~
-0 0 bdvI 0 3
+0 0 bdvIL 0 3
 1 0 0 15 -1
 D
    Though he towers over the pirates, the pink-skinned deckhand seems to have
@@ -82,7 +82,7 @@ Smeegle goblin quartermaster master~
 Quartermaster Smeegle~
 Smeegle, the goblin quartermaster, is walking around with a list.
 ~
-0 0 bd c 2
+0 0 bdL c 2
 1 0 0 4 -1
 D
    Smeegle is a tubby little goblin with dark green skin akin to a pine forest.
@@ -138,7 +138,7 @@ Hornswaggle first mate~
 First Mate Hornswaggle~
 Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 ~
-0 0 bdy c 2
+0 0 bdyL c 2
 1 0 0 7 -1
 D
    Hornswaggle looks slightly ridiculous in his striped vest and wide hat. The
@@ -188,7 +188,7 @@ Greenbeard captain~
 Captain Greenbeard~
 Captain Greenbeard stands on the aftercastle, sword held high!
 ~
-0 0 bdyz c 2
+0 0 bdyzL c 2
 1 0 0 1 -1
 D
    Greenbeard is no taller than any other goblin here, but he's certainly
@@ -239,7 +239,7 @@ Fathma goblin sorceress~
 Fathma~
 Fathma, goblin sorceress of the deep, holds her wand high!
 ~
-0 0 bdxyz c 2
+0 0 bdxyzL c 2
 2 0 0 21 -1
 D
    The old sorceress holds her glowing wand aloft, holding back the wall of
@@ -299,7 +299,7 @@ S
 deckhand #n~
 #n has been freed from his shackles (list).
 ~
-0 0 bdvI 0 3
+0 0 bdvIL 0 3
 1 0 0 15 -1
 D
    The rail-thin deckhand massages his ankle, which is badly bruised from too
@@ -569,7 +569,7 @@ hydra serpent massive nine-headed~
 the Hydra~
 A massive nine-headed serpent slithers out of the pool.
 ~
-0 0 bdjyA c 5
+0 0 bdjyAL c 5
 0 0 6 9 -1
 D
    You can scarcely see the serpent's body as all nine of its heads snap at you
@@ -630,7 +630,7 @@ scylla silla sylla~
 Scylla~
 Scylla floats in the center of the chamber as water swirls around her!
 ~
-0 0 bdzA c 4
+0 0 bdzAL c 4
 2 0 6 7 -1
 D
    Scylla is half alluring topless woman and half... Something else. She sings

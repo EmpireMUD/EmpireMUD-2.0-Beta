@@ -176,7 +176,7 @@ druid #n~
 the druid #n~
 #n is tending the gardens.
 ~
-50 50 bdvI nD 3
+50 50 bdvIL nD 3
 0 2 0 15 -1
 D
    The druid is wearing a cool white robe, stained from the waist down from
@@ -191,7 +191,7 @@ S
 the gardener~
 #n is tending the gardens.
 ~
-50 50 bdvI nD 3
+50 50 bdvIL nD 3
 0 0 0 15 -1
 D
 You can tell they take pride in these gardens.
@@ -214,7 +214,7 @@ chronomancer #n~
 Chronomancer #n~
 A chronomancer is holding the portal open.
 ~
-0 0 bdvI cnD 3
+0 0 bdvIL cnD 3
 0 2 0 16 -1
 D
    The chronomancer is well-dressed with stunning violet fur robes and perhaps
@@ -231,7 +231,7 @@ salesman~
 the salesman~
 A salesman is running a booth that says 'list'.
 ~
-0 0 bdvI cnD 3
+0 0 bdvIL cnD 3
 1 0 0 15 -1
 D
    From his clothes, he obviously works with the sorcerers. But the salesman
@@ -672,7 +672,7 @@ spirit time~
 a time spirit~
 A time spirit is floating in the air.
 ~
-0 0 bdh kln 3
+0 0 bdhL kln 3
 0 0 0 15 -1
 D
 This invisible mob helps delay-despawn the adventure.

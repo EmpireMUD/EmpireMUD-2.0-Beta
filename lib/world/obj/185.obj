@@ -32,7 +32,7 @@ A sign has been hastily erected here.~
 Society. Please come back later when we're done disarming the traps and putting
 torches up.'
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 8064
 S
@@ -56,7 +56,7 @@ A huge emerald-green orb is half-embedded in the door. (difficulty)~
 weapon. But how hard should you hit it?
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 9
+3 B 0 0 0 10
 0 0 0
 10 0
 T 18514
@@ -68,7 +68,7 @@ An eerie green light fills the temple.~
    It looks like it's very slowly fading away. You should probably finish
 exploring this place before it does...
 ~
-3 0 0 0 0 10
+3 B 0 0 0 11
 0 0 0
 10 72
 T 18515
@@ -93,7 +93,7 @@ a secret passageway~
 A secret passageway has opened up nearby!~
 It looks like a shortcut to somewhere else in the area.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 18504 0 0
 0 0
 S

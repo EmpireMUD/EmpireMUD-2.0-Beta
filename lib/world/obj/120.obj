@@ -7,7 +7,7 @@ foe of the ancient world. Anat killed men and gods alike as she walked the
 world, drenched in blood. Unfortunately, these chains are broken and it seems
 she walks the Earth again. Seek out Anat -- hopefully she hasn't gotten far.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 2 1152
 S
@@ -30,7 +30,7 @@ the mournful wails of Anat~
 The mournful wails of Anat fill the air!~
 It seems Anat has been defeated.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 10 16
 T 12005
@@ -395,7 +395,7 @@ Ba'al Hadad brought good fortune and ill, as his storms fed crops but destroyed
 empires. Now these chains are broken, and it seems the stormlord walks the
 Earth once again. Seek him out -- he can't have gone far.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 2 1152
 S
@@ -405,7 +405,7 @@ the last echoes of Ba'al Hadad~
 The last echoes of Ba'al Hadad fill the air!~
 It would appear someone has defeated Ba'al Hadad.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 16
 T 12005

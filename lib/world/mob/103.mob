@@ -3,7 +3,7 @@ dragon flame~
 the flame dragon~
 A flame dragon is reducing the countryside to ash!
 ~
-100 150 dgxA c 6
+100 150 dgxAL c 6
 0 0 5 33 -1
 D
    The size of a large house, this red-orange dragon seems to have a bone to
@@ -135,7 +135,7 @@ wyvern wandering~
 a wandering wyvern~
 A wyvern is flying lazily above you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    Though it isn't the largest dragon on the landscape, this wyvern still cases
@@ -169,7 +169,7 @@ dragon bull~
 a bull dragon~
 A bull dragon is stomping around.
 ~
-125 175 dgkxyA c 6
+125 175 dgkxyAL c 6
 1 0 9 27 -1
 D
    Though it has wings, the bull dragon seems to spend more of its time on the
@@ -203,7 +203,7 @@ dragon guardian~
 a dragon guardian~
 A dragon guardian stands proudly before you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    Unlike most dragons, the guardian stands on its hind legs with its front
@@ -237,7 +237,7 @@ dragon emerald~
 an emerald dragon~
 An emerald dragon is flying above you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    This shimmering green dragon's translucent scales have all the luster of
@@ -327,7 +327,7 @@ S
 #n~
 #n looks startled to see you.
 ~
-0 0 bdwAI c 3
+0 0 bdwAIL c 3
 0 0 0 13 -1
 D
    It almost seems as if you walked in on something, the way this pale, shifty

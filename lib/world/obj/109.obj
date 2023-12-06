@@ -552,7 +552,7 @@ the sense of victory~
 A sense of victory hangs in the air.~
 It seems that this adventure has been completed.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 10 144
 T 10930
@@ -801,7 +801,7 @@ A mountainous pile of molted dragon skin rests in the muck.~
 only belong to a dragon which, like all serpents, sheds its outer skin en
 masse. Perhaps the dragon hasn't gone far.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 7 1152
 C
@@ -932,7 +932,7 @@ A mountainous pile of molted dragon skin rests in the muck.~
 only belong to a dragon which, like all serpents, sheds its outer skin en
 masse. Perhaps the dragon hasn't gone far.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 7 48
 C
@@ -960,7 +960,7 @@ The ruins of a giant hovel are strewn about the area.~
 roof lies on the ground, upturned. The doorway, already crude, is distended and
 destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 1152
 T 10965
@@ -973,7 +973,7 @@ The ruins of a giant hovel are strewn about the area.~
 roof lies on the ground, upturned. The doorway, already crude, is distended and
 destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 24
 T 10965
@@ -1103,7 +1103,7 @@ the tombstone~
 There is a tombstone here.~
 It looks like someone must have died here.
 ~
-3 0 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 1 48
 T 10982

@@ -6,7 +6,7 @@ The colossus's ankle is unencumbered.~
 down... Perhaps if you 'manufacture colossal ankle brace', you can put a stop
 to its movement.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 M
@@ -22,7 +22,7 @@ the crippled right arm~
 The right arm dangles here, barely able to move.~
 The right arm is crippled and appears to only have a limited range of movement.
 ~
-3 e 0 0 0 2
+3 eB 0 0 0 3
 0 0 0
 2 0
 S
@@ -32,7 +32,7 @@ the destroyed left arm~
 The left arm dangles here, badly damaged.~
 The left arm is damaged beyond repair and will be no good in combat.
 ~
-3 e 0 0 0 1
+3 eB 0 0 0 2
 0 0 0
 2 0
 S
@@ -42,7 +42,7 @@ a sabotage counter~
 A sabotage counter is marked here.~
 This indicates the colossus has been sabotaged.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 48
 T 12523
@@ -858,7 +858,7 @@ the panel~
 There is a closed panel above the belt.~
 It looks like you could pry it open. You wonder what's inside? ('open panel')
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 T 12552
@@ -873,7 +873,7 @@ red wire is labeled with a hand shooting fire from its fingers. The green wire
 depicts the silhouette of a small puppy. The blue wire shows an hourglass.
 Use 'cut <red, green, or blue>' to choose one.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 T 12553
@@ -888,7 +888,7 @@ red wire is labeled with a large spider. The green wire depicts a boot crushing
 a house. The blue wire has an image of the sun. Use 'cut <red, green, or blue>'
 to choose one.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -903,7 +903,7 @@ red wire is labeled with a large dragonfly. The green wire depicts a person
 running. The blue wire shows what appears to be a clockwork brain. Use 'cut
 <red, green, or blue>' to choose one.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 T 12553
@@ -918,7 +918,7 @@ red wire is labeled with a skull and crossbones. The green wire depicts a person
 petting a kitten. The blue wire has an image of a tortoise. Use 'cut <red,
 green, or blue>' to choose one.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -933,7 +933,7 @@ red wire is labeled with a gear. The green wire depicts an eye shooting lasers.
 The blue wire has an image of a belt. Use 'cut <red, green, or blue>' to choose
 one.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -948,7 +948,7 @@ red wire is labeled with a bird. The green wire depicts an torch. The blue wire
 has an image of a giant fist holding a helpless maiden. Use 'cut <red, green,
 or blue>' to choose one.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -962,7 +962,7 @@ them, and black smoke from the core of the colossus vents out through the
 panels. The stench of burning coal permeates the air and your eyes begin to
 water.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 S
@@ -991,7 +991,7 @@ the words~
 Someone has scrawled some words onto the side of the alcove.~
 Someone has scrawled some words onto the side of the alcove.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 T 12556

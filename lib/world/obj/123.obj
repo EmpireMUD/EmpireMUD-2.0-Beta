@@ -6,7 +6,7 @@ There is a rather large hole in the ground. (adventure)~
 however, is its size. Whatever dug it is larger than a warhorse. Type
 'adventure' to see more information or 'enter hole' to go in.
 ~
-8 0 0 0 0 2
+8 B 0 0 0 4
 -1 0 0
 1 0
 S
@@ -16,7 +16,7 @@ the hole~
 The hole leads back to the surface. (enter hole)~
 It's a small climb, but you should be able to get out (enter hole).
 ~
-8 0 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 S
@@ -29,7 +29,7 @@ about the floor to the individual strands that seem to have adhered themselves
 to every single thing. It looks as if a large fight happened in the lair of a
 very furry creature.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 7 48
 T 12302
@@ -912,7 +912,7 @@ the hoarfrost~
 Hoarfrost has formed on the walls of the pit.~
 A fine layer of feathery frost has covered the walls of the pit.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 12 72
 M
@@ -1288,8 +1288,8 @@ S
 corpse enormous absolutely hoarfrost frost serragon~
 the absolutely enormous corpse of the hoarfrost serragon~
 An absolutely enormous serragon corpse is draped across the landscape.~
-   The corpse is too large to move. You'll have to skin and butcher it here. 
-The serragon is blanketed in delicate hoarfrost and ice cold to the touch. 
+   The corpse is too large to move. You'll have to skin and butcher it here.
+The serragon is blanketed in delicate hoarfrost and ice cold to the touch.
 It's large, overlapping scales are toothed on the margins and dangerous even in
 death. Around the serragon's body, the desert has already started to thaw out,
 and things have begun to return to normal.

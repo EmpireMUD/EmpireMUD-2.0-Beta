@@ -172,7 +172,7 @@ The sewer grate is propped open. (adventure)~
    The sewer grate is propped open and you can hear sounds coming from beneath.
 Enter the grate to check it out.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 2 0
 S
@@ -183,7 +183,7 @@ A ladder leads up to the sewer's exit. (climb)~
    The scent of fresh air wafts down from the sewer's exit. You can 'enter
 exit' to leave the sewer.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 2 0
 T 10450

@@ -5,7 +5,7 @@ The North Portal is blowing snow all over the place!~
    The portal howls with wind as snow blows through it. There's a blizzard on
 the other side, but through the noise you think you hear caroling.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 0 0 0
 10 0
 S
@@ -16,7 +16,7 @@ The North Portal leads back out of the winter wonderland.~
    The fierce wind blows snow out through the portal but the weather otherwise
 seems to be better on the other side.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 0 0 0
 10 0
 S
@@ -989,7 +989,7 @@ a sense of victory~
 There is a sense of victory as the spiders are defeated.~
 It seems you have completed the adventure.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 10 8
 T 10769
