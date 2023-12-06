@@ -1256,7 +1256,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
 			continue;
 		}
-		if (not_worn != NOBITS && !CAN_WEAR(obj, not_worn)) {
+		if (not_worn != NOBITS && CAN_WEAR(obj, not_worn)) {
 			continue;
 		}
 		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
