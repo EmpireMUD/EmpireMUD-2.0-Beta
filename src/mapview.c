@@ -1568,7 +1568,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// commands: only show if the first entry is not a \0, which terminates the list
-	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE) && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 		if (GET_BUILDING(room)) {
 			if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
 				msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
@@ -1598,7 +1598,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
 			}
 		}
-	}
+	}	// end tutorials-only commands section
 	
 	// used from here on
 	emp = ROOM_OWNER(HOME_ROOM(room));
