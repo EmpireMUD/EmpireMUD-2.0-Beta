@@ -63,7 +63,7 @@ if (!%target% || %target.room% != %self.room%)
 end
 %send% %target% &&G**** &&Z~%self% squeezes around you, constricting until you cannot move! ****&&0 (struggle)
 %echoaround% %target% &&G~%self% constricts around ~%target%!&&0
-scfight setup struggle %target%
+scfight setup struggle %target% 15
 set scf_strug_char You struggle, but fail to break free.
 set scf_strug_room ~%%actor%% struggles to break free!
 set scf_free_char You squirm out of the snake's coils!
