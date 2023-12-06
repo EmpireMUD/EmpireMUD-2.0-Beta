@@ -3211,6 +3211,134 @@ char *list_one_skill(skill_data *skill, bool detail) {
 
 
 /**
+* Searches properties of skills.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_skill(char_data *ch, char *argument) {
+	bool any;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING, only_level = NOTHING, level_over = NOTHING, level_under = NOTHING;
+	int only_mindrop = NOTHING, mindrop_over = NOTHING, mindrop_under = NOTHING;
+	skill_data *sk, *next_sk;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, skill_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, skill_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, skill_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		FULLSEARCH_INT("maxlevel", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("maxlevelover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("maxlevelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("mindrop", only_mindrop, 0, INT_MAX)
+		FULLSEARCH_INT("mindropover", mindrop_over, 0, INT_MAX)
+		FULLSEARCH_INT("mindropunder", mindrop_under, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Skill fullsearch: %s\r\n", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up skills
+	HASH_ITER(hh, skill_table, sk, next_sk) {
+		if ((vmin != NOTHING && SKILL_VNUM(sk) < vmin) || (vmax != NOTHING && SKILL_VNUM(sk) > vmax)) {
+			continue;	// vnum range
+		}
+		if (not_flagged != NOBITS && IS_SET(SKILL_FLAGS(sk), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (SKILL_FLAGS(sk) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_level != NOTHING && SKILL_MAX_LEVEL(sk) != only_level) {
+			continue;
+		}
+		if (level_over != NOTHING && SKILL_MAX_LEVEL(sk) <= level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && SKILL_MAX_LEVEL(sk) >= level_over) {
+			continue;
+		}
+		if (only_mindrop != NOTHING && SKILL_MIN_DROP_LEVEL(sk) != only_mindrop) {
+			continue;
+		}
+		if (mindrop_over != NOTHING && SKILL_MIN_DROP_LEVEL(sk) <= mindrop_over) {
+			continue;
+		}
+		if (mindrop_under != NOTHING && SKILL_MIN_DROP_LEVEL(sk) >= mindrop_over) {
+			continue;
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (multi_isname(find_keywords, SKILL_NAME(sk))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, SKILL_DESC(sk))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, SKILL_ABBREV(sk))) {
+				any = TRUE;
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", SKILL_VNUM(sk), SKILL_NAME(sk));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 18) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d skills)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a skill and displays them.
 *
 * @param char_data *ch The player.
@@ -4445,7 +4573,7 @@ int vnum_skill(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, skill_table, iter, next_iter) {
-		if (multi_isname(searchname, SKILL_NAME(iter)) || is_abbrev(searchname, SKILL_ABBREV(iter)) || multi_isname(searchname, SKILL_DESC(iter))) {
+		if (multi_isname(searchname, SKILL_NAME(iter)) || is_abbrev(searchname, SKILL_ABBREV(iter))) {
 			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, SKILL_VNUM(iter), SKILL_NAME(iter));
 		}
 	}
