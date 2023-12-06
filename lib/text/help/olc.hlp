@@ -5861,6 +5861,7 @@ Fields:
   &c-material&0 - see OEDIT MATERIAL
   &c-requirestools&0 - see HELP OEDIT TOOLS
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
+  &c-timer&0, &c-timerover&0, &c-timerunder&0 - Search timer values.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE

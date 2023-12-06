@@ -1121,7 +1121,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
@@ -1165,6 +1165,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
 		FULLSEARCH_FLAGS("requirestools", only_requires_tool, tool_flags)
 		FULLSEARCH_BOOL("storable", only_storable)
+		FULLSEARCH_INT("timer", only_timer, -1, INT_MAX)
+		FULLSEARCH_INT("timerover", timer_over, 0, INT_MAX)
+		FULLSEARCH_INT("timerunder", timer_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
@@ -1215,6 +1218,15 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_timer != -2 && GET_OBJ_TIMER(obj) != only_timer) {
+			continue;
+		}
+		if (timer_over != NOTHING && GET_OBJ_TIMER(obj) < only_timer) {
+			continue;
+		}
+		if (timer_under != NOTHING && (GET_OBJ_TIMER(obj) <= 0 || GET_OBJ_TIMER(obj) > only_timer)) {
 			continue;
 		}
 		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
