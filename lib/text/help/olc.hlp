@@ -2399,6 +2399,7 @@ Fields:
   &c-commands&0 - match the text of the commands line, if any
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
   &c-functions&0 - see HELP BEDIT FUNCTIONS
@@ -3210,6 +3211,7 @@ dash (-) are matched to the crop's name, title, and icons.
 
 Fields:
   &c-climate&0 - see HELP CROPEDIT CLIMATE
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP CROPEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP CROPEDIT INTERACTION
   &c-mapout&0 - color name, see HELP CROPEDIT MAPOUT
@@ -5847,6 +5849,7 @@ Fields:
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP OEDIT APPLY
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
@@ -7503,6 +7506,7 @@ with a dash (-) are matched to the template's title and other text.
 
 Fields:
   &c-affects&0 - see HELP REDIT AFFECTS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged -unflagged&0 - see HELP REDIT FLAGS
   &c-functions&0 - see HELP REDIT FUNCTIONS
   &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
@@ -7844,6 +7848,7 @@ Fields:
   &c-buildflagged&0 - see HELP SECTEDIT BUILDFLAGS
   &c-climate&0 - see HELP SECTEDIT CLIMATE
   &c-evolution&0 - has a certain evolution, see SECTEDIT EVOLUTIONS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP SECTEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
   &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
@@ -9096,6 +9101,7 @@ Fields:
   &c-capacity -capacityover -capacityunder&0 - specific capacity
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS

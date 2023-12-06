@@ -3495,7 +3495,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_vehicle(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -3544,6 +3544,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
 		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
 		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
@@ -3644,6 +3645,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (hitpoints_under != NOTHING && VEH_MAX_HEALTH(veh) > hitpoints_under) {
+			continue;
+		}
+		if (*extra_search && !find_exdesc(extra_search, VEH_EX_DESCS(veh), NULL)) {
 			continue;
 		}
 		if (*only_icon && !VEH_ICON(veh)) {

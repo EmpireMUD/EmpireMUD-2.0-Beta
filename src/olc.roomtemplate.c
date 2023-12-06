@@ -418,7 +418,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_room_template(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
@@ -445,6 +445,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, room_template_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, room_template_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, room_template_flags)
@@ -479,6 +480,9 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_functions != NOBITS && (GET_RMT_FUNCTIONS(rmt) & only_functions) != only_functions) {
+			continue;
+		}
+		if (*extra_search && !find_exdesc(extra_search, GET_RMT_EX_DESCS(rmt), NULL)) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions

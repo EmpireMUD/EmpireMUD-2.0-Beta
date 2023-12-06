@@ -2079,6 +2079,7 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 void diag_char_to_char(char_data *i, char_data *ch);
 void display_attributes(char_data *ch, char_data *to);
 void display_tip_to_char(char_data *ch);
+char *find_exdesc(char *word, struct extra_descr_data *list, int *number);
 char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **found_obj, vehicle_data **found_veh, room_data **found_room);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);

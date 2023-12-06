@@ -655,7 +655,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -701,6 +701,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_STRING("commands", only_commands)
 		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
 		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
@@ -790,6 +791,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;
 		}
 		if (hitpoints_under != NOTHING && GET_BLD_MAX_DAMAGE(bld) > hitpoints_under) {
+			continue;
+		}
+		if (*extra_search && !find_exdesc(extra_search, GET_BLD_EX_DESCS(bld), NULL)) {
 			continue;
 		}
 		if (*only_icon && !GET_BLD_ICON(bld)) {
