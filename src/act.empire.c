@@ -1138,10 +1138,6 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 		}
 	}
-
-	HASH_ITER(hh, list, einv, next_einv) {
-		SAFE_ADD(einv->total, count_dropped_items(emp, einv->vnum), 0, INT_MAX, FALSE);
-	}
 	
 	HASH_SORT(list, sort_einv_list);
 	
