@@ -57,7 +57,7 @@ elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%restore% %mob%
+nop %mob.unscale_and_reset%
 ~
 #12002
 Old God death generic (unused)~
