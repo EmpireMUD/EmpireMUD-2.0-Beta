@@ -6333,7 +6333,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct eq_set_obj *eq_set, *new_set;
 	struct obj_apply *apply_iter, *old_apply, *new_apply;
 	int iter;
-	bool found, enchant = FALSE;
+	bool found;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
