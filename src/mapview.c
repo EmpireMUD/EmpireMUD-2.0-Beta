@@ -1276,7 +1276,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
-		if (MAGIC_DARKNESS(room) && !can_see_in_dark_room(ch, room, TRUE)) {
+		if (MAGIC_DARKNESS(room) && !!CAN_SEE_IN_MAGIC_DARKNESS(ch) && !can_see_in_dark_room(ch, room, TRUE)) {
 			// no title
 			send_to_char("It is pitch black...\r\n", ch);
 		}
