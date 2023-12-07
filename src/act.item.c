@@ -7127,9 +7127,9 @@ ACMD(do_pour) {
 ACMD(do_put) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
-	vehicle_data *find_veh;
+	vehicle_data *find_veh = NULL;
 	char_data *tmp_char;
-	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
+	int obj_dotmode, cont_dotmode, found = 0, howmany = 1, number;
 	char *theobj, *thecont;
 	bool multi = FALSE;
 
@@ -7158,7 +7158,14 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+		number = get_number(&thecont);
+		if ((cont = get_obj_for_char_prefer_container(ch, thecont, &number))) {
+			// found preferred container
+		}
+		else {
+			// try another way
+			generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+		}
 		
 		if (find_veh) {
 			// override for put obj in vehicle

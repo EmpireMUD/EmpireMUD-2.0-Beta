@@ -2102,6 +2102,7 @@ bool can_take_obj(char_data *ch, obj_data *obj);
 int count_objs_in_room(room_data *room);
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
 bool douse_light(obj_data *obj);
+obj_data *get_obj_for_char_prefer_container(char_data *ch, char *name, int *number);
 room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
