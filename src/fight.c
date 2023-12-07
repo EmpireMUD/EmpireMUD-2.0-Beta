@@ -1824,7 +1824,7 @@ obj_data *player_death(char_data *ch) {
 	if (GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty") || (is_at_war(GET_LOYALTY(ch)) && GET_RECENT_DEATH_COUNT(ch) >= config_get_int("deaths_before_penalty_war"))) {
 		int duration = config_get_int("seconds_per_death") * (GET_RECENT_DEATH_COUNT(ch) + 1 - config_get_int("deaths_before_penalty"));
 		struct affected_type *af = create_flag_aff(ATYPE_DEATH_PENALTY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
-		affect_join(ch, af, ADD_DURATION);
+		affect_join(ch, af, NOBITS);
 	}
 	
 	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
