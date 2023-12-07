@@ -1231,6 +1231,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
 #define GET_LANGUAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->languages))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
+#define GET_LAST_AFF_WEAR_OFF_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_id))
 #define GET_LAST_AFF_WEAR_OFF_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_vnum))
 #define GET_LAST_AFF_WEAR_OFF_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_aff_wear_off_time))
 #define GET_LAST_COLD_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_cold_time))

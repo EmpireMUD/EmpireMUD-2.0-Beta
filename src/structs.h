@@ -4782,6 +4782,7 @@ struct player_special_data {
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_id;	// helps prevent duplicate wear-off messages
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
 	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
