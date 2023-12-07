@@ -3870,9 +3870,9 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
-		FULLSEARCH_FLAGS("flags", only_flags, generic_flags)
-		FULLSEARCH_FLAGS("flagged", only_flags, generic_flags)
-		FULLSEARCH_FLAGS("unflagged", not_flagged, generic_flags)
+		FULLSEARCH_FLAGS("flags", only_flags, quest_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, quest_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, quest_flags)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
