@@ -2999,7 +2999,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("name") {
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
-		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
+		if (_parse_name(buf, newname, ch->desc, TRUE)) {
+			// sends own message
+			return 0;
+		}
+		if (!Valid_Name(newname)) {
 			msg_to_char(ch, "Invalid name.\r\n");
 			return 0;
 		}

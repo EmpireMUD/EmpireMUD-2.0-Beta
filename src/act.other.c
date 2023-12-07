@@ -2927,8 +2927,11 @@ ACMD(do_lastname) {
 			msg_to_char(ch, "You no longer have a personal lastname.\r\n");
 			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: none", GET_NAME(ch));
 		}
-		else if ((_parse_name(arg2, new_name)) || !Valid_Name(new_name) || strlen(new_name) < 2 || strlen(new_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, new_name)) || reserved_word(buf)) {
-			msg_to_char(ch, "Invalid lastname.\r\n");
+		else if (_parse_name(arg2, new_name, ch->desc, FALSE)) {
+			// sends own error message if it return 1
+		}
+		else if (!Valid_Name(new_name)) {
+			msg_to_char(ch, "You cannot be called '%s'.\r\n", new_name);
 		}
 		else {
 			// ok!
