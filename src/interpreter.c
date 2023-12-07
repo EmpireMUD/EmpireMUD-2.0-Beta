@@ -2446,6 +2446,7 @@ void nanny(descriptor_data *d, char *arg) {
 	}
 
 	skip_spaces(&arg);
+	d->idle_tics = 0;
 
 	switch (STATE(d)) {
 		case CON_GET_NAME: {	/* wait for input of name */
@@ -2489,7 +2490,6 @@ void nanny(descriptor_data *d, char *arg) {
 					
 					msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 					ProtocolNoEcho(d, true);
-					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
 				}
 				else {

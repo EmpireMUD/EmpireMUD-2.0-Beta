@@ -69,7 +69,7 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_idle_passwords();
+void check_idle_menu_users();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
@@ -848,7 +848,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 
 	if (HEARTBEAT(15)) {
-		check_idle_passwords();
+		check_idle_menu_users();
 		HEARTBEAT_LOG("6")
 		
 		run_mob_echoes();

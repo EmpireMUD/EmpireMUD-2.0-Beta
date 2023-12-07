@@ -4401,7 +4401,7 @@ struct descriptor_data {
 
 	char *host;	// hostname
 	byte bad_pws;	// number of bad pw attemps this login
-	byte idle_tics;	// tics idle at password prompt
+	byte idle_tics;	// tics idle at game menus prompt
 	int connected;	// STATE()
 	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc

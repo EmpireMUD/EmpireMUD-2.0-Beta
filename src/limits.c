@@ -160,20 +160,28 @@ void check_daily_cycle_reset(char_data *ch) {
 
 
 /**
-* Times out players who are sitting at the password or name prompt.
+* Times out players who are sitting at various menus. This is  called every 15
+* seconds, so each of d->idle_tics are 15 seconds.
+*
+* Characters at the login or password prompt get 30 seconds; all other menus
+* get 5 minutes.
 */
-void check_idle_passwords(void) {
+void check_idle_menu_users(void) {
 	descriptor_data *d, *next_d;
-
-	for (d = descriptor_list; d; d = next_d) {
-		next_d = d->next;
-		if (STATE(d) != CON_PASSWORD && STATE(d) != CON_GET_NAME)
-			continue;
-			
-		if (d->idle_tics < 2) {
-			++d->idle_tics;
+	int allowed;
+	
+	LL_FOREACH_SAFE(descriptor_list, d, next_d) {
+		if (STATE(d) == CON_PLAYING) {
+			continue;	// ignore in-game
 		}
-		else {
+		
+		// add 1 (15 seconds of time)
+		++d->idle_tics;
+		
+		// determine how long they can stay
+		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 2 : 20;
+		
+		if (d->idle_tics > allowed) {
 			if (STATE(d) == CON_PASSWORD) {
 				ProtocolNoEcho(d, false);
 			}
