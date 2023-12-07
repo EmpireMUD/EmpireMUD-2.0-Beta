@@ -3423,6 +3423,13 @@ void perform_abandon_room(room_data *room) {
 	int ter_type;
 	bool junk;
 	
+	// update any building-flagged vehicles
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
+			perform_abandon_vehicle(veh);
+		}
+	}
+	
 	// updates based on owner
 	if (emp) {
 		deactivate_workforce_room(emp, room);
@@ -3474,13 +3481,6 @@ void perform_abandon_room(room_data *room) {
 	}
 	else {	// other building types
 		check_tavern_setup(room);
-	}
-	
-	// update any building-flagged vehicles
-	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
-			perform_abandon_vehicle(veh);
-		}
 	}
 	
 	affect_total_room(room);
