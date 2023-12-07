@@ -211,14 +211,18 @@ See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
-Usage:  dg_affect [#affect vnum] <target> <property> <value | off [silent]> <duration>
+Usage:  dg_affect [#affect vnum] [@caster] <target> <property> <value | off [silent]> <duration>
         dg_affect <#affect vnum> <target> off [silent]
 
 Puts an affection or apply on the target. Durations must be non-zero. You can
 use -1 for infinite duration ONLY if the target is an NPC.
 
-The affect vnum arg is optional, and requires a # if you're going to use it.
-For example, #3001 uses the "fly" generic affect.
+The first two arguments are optional:
+  #affect - Uses a specific "affect" generic, by vnum (e.g. #3001 for "fly").
+  @caster - Specify who this affect is from. This must be a character variable
+     (e.g. @%self%) if you provide it. The caster can affect abilities such as
+     "cleanse", which won't remove penalties whose "caster" is the victim
+     themselves. For mob triggers, the mob is the default caster.
 
 Using "off" with no property results in removing all affects of a given type.
 If you add "silent" after "off", no wear-off message is shown.
@@ -229,20 +233,24 @@ Examples:
   dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects.
   dg_affect #3024 %actor% off  -- Removes all affects of vnum 134.
   dg_affect %actor% HASTE off silent  -- Quietly removes anything with HASTE.
+  dg_affect #9602 @%actor% %actor% DODGE -50 15  -- Non-cleansable penalty.
 
 See also: APPLIES, AFFECT FLAGS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
-Usage:  dg_affect_room [#affect vnum] <room> <affect> <on|off> <duration>
+Usage:  dg_affect_room [#affect vnum] [@caster] <room> <affect> <on|off> <duration>
         dg_affect_room [#affect vnum] <room> off
 
 Puts a room affect onto the target room. Durations must be non-zero, and you
 can use -1 for infinite duration if you're not on the map. Infinite affects
 can't be added to map locations.
 
-The affect vnum arg is optional, and requires a # if you're going to use it.
-For example, #3001 uses the "fly" generic affect.
+The first two arguments are optional:
+  #affect - Uses a specific "affect" generic, by vnum (e.g. #3001 for "fly").
+  @caster - Specify who this affect is from. This must be a character variable
+     (e.g. @%self%) if you provide it. For mob triggers, the mob is the default
+     caster.
 
 Using "off" with no property results in removing all affects of a given type.
 
