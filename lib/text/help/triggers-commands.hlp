@@ -808,12 +808,24 @@ Switch evaluates an expression and looks for a match amongst the case
 statements that follow. If none of the following case statements are a match,
 and a default statement exists, the default statement is considered a match.
 If a match is found, the commands that follow it, up until a break or done
-command, are executed. 
+command, are executed.
 
 &cbreak&0 - Used to terminate cases in a switch.
 &ccase&0 - Used to begin a new conditional group in a switch block.
 &cdefault&0 - Similar to case but matches any condition not met.
 &cdone&0 - Used to terminate a switch (or while) block.
+
+You can also chain cases like:
+  switch %var%
+    case 1
+    case 2
+      ...
+    break
+    case 3
+    default
+      ...
+    break
+  done
 #d
 %SUBECHO% MSUBECHO OSUBECHO WSUBECHO
 
@@ -1075,8 +1087,7 @@ while %something%
 done
 
 Note that "break" can be used to end a "while" loop early, as in many
-languages, but the /f formatter will not recognize it and will not format the
-script correctly.
+languages.
 
 See also: SWITCH
 #d

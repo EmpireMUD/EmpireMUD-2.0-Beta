@@ -1273,12 +1273,12 @@ int format_script(struct descriptor_data *d) {
 		}
 		else if (!strncasecmp(t, "break", 5)) {
 			if (indent && stack->type == FORMAT_IN_CASE) {
-				// breaks only cancel indent when not in a while
+				// breaks only cancel indent when directly in a case
 				--indent;
 				pop_script_format_stack(&stack);	// remove the case
 			}
-			else if (find_script_format_stack(stack, FORMAT_IN_WHILE)) {
-				// does not cancel indent in a while
+			else if (find_script_format_stack(stack, FORMAT_IN_WHILE) || find_script_format_stack(stack, FORMAT_IN_CASE)) {
+				// does not cancel indent in a while or something nested in a case
 			}
 			else {
 				msg_to_desc(d, "Break not in case (line %d)!\r\n", line_num);
