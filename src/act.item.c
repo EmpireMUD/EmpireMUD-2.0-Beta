@@ -207,14 +207,93 @@ bool douse_light(obj_data *obj) {
 
 
 /**
-* Finds an object for a characcter using hte 'light' command. This will prefer
+* Attempts to find a container with the name given. Prefers inventory over
+* room; will also check gear; will return a non-container if no container
+* exists. Corpses count as containers for the purpose of this function, which
+* is normally used for a "look in" or "get from".
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (get all 4.corpse; may be NULL)
+* @return obj_data *The item found, or NULL. May or may not be a container/corpse.
+*/
+obj_data *get_obj_for_char_prefer_container(char_data *ch, char *name, int *number) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *obj, *backup = NULL, *list[2];
+	int iter, num;
+	bool gave_num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	gave_num = (*number > 1);
+	
+	// looking in two places first:
+	list[0] = ch->carrying;
+	list[1] = ROOM_CONTENTS(IN_ROOM(ch));
+	
+	for (iter = 0; iter < 2; ++iter) {
+		DL_FOREACH2(list[iter], obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj) && MATCH_ITEM_NAME(tmp, obj)) {
+				if (gave_num) {
+					if (--(*number) == 0) {
+						return obj;
+					}
+				}
+				else {	// did not give a number
+					if (IS_CONTAINER(obj) || IS_CORPSE(obj)) {
+						return obj;	// is a match
+					}
+					else if (!backup) {
+						backup = obj;	// missing type but otherwise a match
+					}
+				}
+			}
+		}
+	}
+	
+	// then look in character equipment if we got here:
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && CAN_SEE_OBJ(ch, GET_EQ(ch, iter)) && MATCH_ITEM_NAME(tmp, GET_EQ(ch, iter))) {
+			if (gave_num) {
+				if (--(*number) == 0) {
+					return GET_EQ(ch, iter);
+				}
+			}
+			else {	// did not give a number
+				if (IS_CONTAINER(GET_EQ(ch, iter)) || IS_CORPSE(GET_EQ(ch, iter))) {
+					return GET_EQ(ch, iter);	// is a match
+				}
+				else if (!backup) {
+					backup = GET_EQ(ch, iter);	// missing type but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
+* Finds an object for a character using hte 'light' command. This will prefer
 * an object they CAN light.
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
 * @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *list The list to search.
-* @return obj_data *The item found, or NULL. May or may be lightable.
+* @return obj_data *The item found, or NULL. May or may not be lightable.
 */
 obj_data *get_obj_in_list_vis_prefer_lightable(char_data *ch, char *name, int *number, obj_data *list) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
@@ -6027,8 +6106,9 @@ ACMD(do_exchange) {
 
 ACMD(do_get) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	int cont_dotmode, found = 0, mode;
-	vehicle_data *find_veh, *veh;
+	char *argptr;
+	int cont_dotmode, found = 0, iter, mode, number;
+	vehicle_data *find_veh = NULL, *veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -6053,14 +6133,23 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+			argptr = arg2;
+			number = get_number(&argptr);
+			if ((cont = get_obj_for_char_prefer_container(ch, argptr, &number))) {
+				// found preferred container
+				mode = (cont->carried_by ? FIND_OBJ_INV : (cont->worn_by ? FIND_OBJ_EQUIP : FIND_OBJ_ROOM));
+			}
+			else {
+				// try another way
+				mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+			}
 			
 			if (find_veh) {
 				// pass off to vehicle handler
 				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
 			}
 			else if (!cont) {
-				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
+				sprintf(buf, "You don't have %s %s.\r\n", AN(argptr), argptr);
 				send_to_char(buf, ch);
 			}
 			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && !IS_CORPSE(cont))
@@ -6100,6 +6189,18 @@ ACMD(do_get) {
 					}
 					else if (cont_dotmode == FIND_ALLDOT) {
 						act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
+						found = 1;
+					}
+				}
+			}
+			for (iter = 0; iter < NUM_WEARS; ++iter) {
+				if ((cont = GET_EQ(ch, iter)) && CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
+						get_from_container(ch, cont, arg1, FIND_OBJ_EQUIP, amount);
+						found = 1;
+					}
+					else if (cont_dotmode == FIND_ALLDOT) {
+						act("$p is not a container.", FALSE, ch, cont, NULL, TO_CHAR);
 						found = 1;
 					}
 				}
