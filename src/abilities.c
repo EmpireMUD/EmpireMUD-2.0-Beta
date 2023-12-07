@@ -3400,6 +3400,7 @@ void save_olc_ability(descriptor_data *desc) {
 				remove_player_tech(chiter, ABIL_VNUM(abil));
 				apply_ability_techs_to_player(chiter, abil);
 				remove_passive_buff_by_ability(chiter, vnum);
+				add_ability_gain_hook(chiter, abil);
 			}
 		}
 	}
