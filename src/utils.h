@@ -2001,7 +2001,7 @@ bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
 void lock_icon_map(struct map_data *loc, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
-bool room_is_light(room_data *room, bool count_adjacent_light);
+bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
 sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
 
@@ -2358,7 +2358,7 @@ void schedule_obj_timer_update(obj_data *obj, bool override);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
-bool adjacent_room_is_light(room_data *room);
+bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness);
 int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
 int get_map_radius(char_data *ch);

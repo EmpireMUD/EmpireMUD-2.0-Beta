@@ -79,9 +79,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 /**
 * @param room_data *room The room to check.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
 * @return bool TRUE if any adjacent room is light; otherwise FALSE.
 */
-bool adjacent_room_is_light(room_data *room) {
+bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness) {
 	room_data *to_room;
 	int dir;
 	
@@ -91,7 +92,7 @@ bool adjacent_room_is_light(room_data *room) {
 	}
 
 	for (dir = 0; dir < NUM_SIMPLE_DIRS; ++dir) {
-		if ((to_room = dir_to_room(room, dir, TRUE)) && room_is_light(to_room, FALSE)) {
+		if ((to_room = dir_to_room(room, dir, TRUE)) && room_is_light(to_room, FALSE, ignore_magic_darkness)) {
 			return TRUE;
 		}
 	}
@@ -117,7 +118,7 @@ int distance_can_see_in_dark(char_data *ch) {
 	if (HAS_BONUS_TRAIT(ch, BONUS_LIGHT_RADIUS)) {
 		++dist;
 	}
-	if (room_is_light(IN_ROOM(ch), TRUE)) {
+	if (room_is_light(IN_ROOM(ch), TRUE, CAN_SEE_IN_MAGIC_DARKNESS(ch))) {
 		++dist;
 	}
 
@@ -1450,7 +1451,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 								show_map_to_char(ch, mappc, to_room, options);
 							}
 						}
-						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
+						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room, CAN_SEE_IN_MAGIC_DARKNESS(ch))) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
@@ -2328,7 +2329,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 				// political and informative don't show the 'dim' section
 				strcpy(roombuf, "Dark");
 			}
-			else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
+			else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room, CAN_SEE_IN_MAGIC_DARKNESS(ch))) && !PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
 				// see-distance to see-distance+2: show as dim tile (if political/informative are off)
 				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, TRUE));
 			}

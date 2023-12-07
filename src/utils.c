@@ -3062,7 +3062,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 	}
 	
 	// check if the room is actually light
-	if (room_is_light(room, count_adjacent_light)) {
+	if (room_is_light(room, count_adjacent_light, CAN_SEE_IN_MAGIC_DARKNESS(ch))) {
 		return TRUE;
 	}
 	
@@ -6731,10 +6731,11 @@ void relocate_players(room_data *room, room_data *to_room) {
 *
 * @param room_data *room The room to check (which may be light).
 * @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
 * @return bool TRUE if the room is light, FALSE if not.
 */
-bool room_is_light(room_data *room, bool count_adjacent_light) {
-	if (MAGIC_DARKNESS(room)) {
+bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
+	if (!ignore_magic_darkness && MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
@@ -6751,7 +6752,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
-	if (count_adjacent_light && adjacent_room_is_light(room)) {
+	if (count_adjacent_light && adjacent_room_is_light(room, ignore_magic_darkness)) {
 		return TRUE;	// not dark: adjacent room is light
 	}
 	
