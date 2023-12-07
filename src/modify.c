@@ -1248,7 +1248,7 @@ int format_script(struct descriptor_data *d) {
 				free_script_format_stack(&stack);
 				return FALSE;
 			}
-			indent--;
+			--indent;
 			indent_next = TRUE;
 			// no need to modify stack: we're going from IF to IF (ish)
 		}
@@ -1265,7 +1265,7 @@ int format_script(struct descriptor_data *d) {
 		else if (!strncasecmp(t, "break", 5)) {
 			if (indent && stack->type == FORMAT_IN_CASE) {
 				// breaks only cancel indent when not in a while
-				indent--;
+				--indent;
 				pop_script_format_stack(&stack);	// remove the case
 			}
 			else if (find_script_format_stack(stack, FORMAT_IN_WHILE)) {
