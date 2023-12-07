@@ -5809,7 +5809,7 @@ ACMD(do_eat) {
 		return;
 	}
 	if ((GET_OBJ_TYPE(food) != ITEM_FOOD)) {
-		send_to_char("You can't eat THAT!\r\n", ch);
+		act("$p: You can't eat THAT!", FALSE, ch, food, NULL, TO_CHAR);
 		return;
 	}
 	if (!bind_ok(food, ch)) {
