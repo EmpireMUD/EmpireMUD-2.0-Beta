@@ -1253,14 +1253,23 @@ int format_script(struct descriptor_data *d) {
 			// no need to modify stack: we're going from IF to IF (ish)
 		}
 		else if (!strncasecmp(t, "case", 4) || !strncasecmp(t, "default", 7)) {
-			if (!indent || stack->type != FORMAT_IN_SWITCH) {
+			if (indent && stack->type == FORMAT_IN_SWITCH) {
+				// case in a switch (normal)
+				indent_next = TRUE;
+				add_script_format_stack(&stack, FORMAT_IN_CASE);
+			}
+			else if (indent && stack->type == FORMAT_IN_CASE) {
+				// chained cases
+				--indent;
+				indent_next = TRUE;
+				// don't modify stack because it's going CASE to CASE
+			}
+			else {
 				msg_to_desc(d, "Case/default outside switch (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
 				return FALSE;
 			}
-			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_CASE);
 		}
 		else if (!strncasecmp(t, "break", 5)) {
 			if (indent && stack->type == FORMAT_IN_CASE) {
