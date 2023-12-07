@@ -140,7 +140,7 @@ int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island)
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (!(obj = store->proto)) {
+			if (store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -191,7 +191,7 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->vnum == vnum) {
+			if (store->amount > 0 && store->vnum == vnum) {
 				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
 			}
 		}

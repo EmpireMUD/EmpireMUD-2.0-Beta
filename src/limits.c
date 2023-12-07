@@ -1210,7 +1210,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (needs->needed < 1) {
 				break;	// done early
 			}
-			if (store->keep == UNLIMITED || store->amount <= store->keep || store->amount < 1 || !(obj = store->proto)) {
+			if (store->amount < 1 || store->keep == UNLIMITED || store->amount <= store->keep || store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			

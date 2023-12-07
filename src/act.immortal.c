@@ -9799,7 +9799,7 @@ ACMD(do_load) {
 ACMD(do_moveeinv) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	struct empire_unique_storage *unique;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_island *eisle;
 	int island_from, island_to, count;
 	empire_data *emp;
@@ -9826,8 +9826,24 @@ ACMD(do_moveeinv) {
 		count = 0;
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			count += store->amount;
-			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			if (store->amount > 0) {
+				count += store->amount;
+				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			}
+			else {
+				new_store = find_stored_resource(emp, island_to, store->vnum);
+			}
+			
+			// translate keep?
+			if (new_store && new_store->keep != UNLIMITED) {
+				if (store->keep == UNLIMITED) {
+					new_store->keep = UNLIMITED;
+				}
+				else {
+					SAFE_ADD(new_store->keep, store->keep, 0, INT_MAX, FALSE);
+				}
+			}
+			
 			HASH_DEL(eisle->store, store);
 			free(store);
 		}

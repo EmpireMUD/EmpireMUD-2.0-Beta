@@ -567,6 +567,9 @@ void summon_materials(char_data *ch, char *argument) {
 		if (found) {
 			break;
 		}
+		if (store->amount < 1) {
+			continue;	// none of this
+		}
 		
 		proto = store->proto;
 		if (proto && multi_isname(objname, GET_OBJ_KEYWORDS(proto)) && (++pos == number)) {

@@ -363,7 +363,7 @@ void b3_6_einv_fix(void) {
 		total = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			HASH_ITER(hh, isle->store, store, next_store) {
-				if (store->vnum == vnum) {
+				if (store->amount > 0 && store->vnum == vnum) {
 					amt = store->amount;
 					total += amt;
 					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
@@ -1524,7 +1524,9 @@ void b5_58_gather_totals(void) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			// storage
 			HASH_ITER(hh, isle->store, store, next_store) {
-				add_production_total(emp, store->vnum, store->amount);
+				if (store->amount > 0) {
+					add_production_total(emp, store->vnum, store->amount);
+				}
 			}
 		}
 		

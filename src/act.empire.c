@@ -467,6 +467,7 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 */
 bool is_affiliated_island(empire_data *emp, int island_id) {
 	struct empire_island *isle;
+	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	
 	//Grab the empire_isle information.
@@ -477,9 +478,11 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 		return TRUE;
 	}
 	
-	//Check if the empire has at least an item in there.
-	if (isle->store) {
-		return TRUE;
+	// Check if the empire has at least one item in there.
+	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->amount > 0) {
+			return TRUE;
+		}
 	}
 	
 	//Check unique storage too
@@ -527,6 +530,8 @@ void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit) 
 */
 void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	bool any;
 	
 	// sanity
 	if (!emp || chore < 0 || chore >= NUM_CHORES) {
@@ -538,8 +543,20 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 			continue;	// skip if non-island
 		}
 		if (limit != 0 && isle->workforce_limit[chore] == 0) {	// things we only skip if it's not "off" or there's already data
-			if (!isle->store && !isle->population && isle->territory[TER_TOTAL] < 1) {
+			if (!isle->population && isle->territory[TER_TOTAL] < 1) {
 				continue;	// appears to be a non-island
+			}
+			
+			// check storage for at least one
+			any = FALSE;
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->amount > 0) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// no storage
 			}
 		}
 		
@@ -949,6 +966,10 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;	// must have at least 1 stored
+			}
+			
 			//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
 			if ( !proto ) {
 				if (!multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
@@ -1050,6 +1071,10 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	// build list
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;	// none in storage here
+			}
+			
 			// prototype lookup
 			if (store->vnum != last_vnum) {
 				proto = store->proto;
@@ -5248,11 +5273,13 @@ ACMD(do_enroll) {
 				
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
-					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
+					if (store->amount > 0) {
+						add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
 					
-					// counts as imported items
-					add_production_total(e, store->vnum, store->amount);
-					mark_production_trade(e, store->vnum, store->amount, 0);
+						// counts as imported items
+						add_production_total(e, store->vnum, store->amount);
+						mark_production_trade(e, store->vnum, store->amount, 0);
+					}
 				}
 				
 				// needs
@@ -6013,7 +6040,9 @@ ACMD(do_islands) {
 		
 		// mark storage
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			do_islands_add_einv(&list, eisle->island, store->amount);
+			if (store->amount > 0) {
+				do_islands_add_einv(&list, eisle->island, store->amount);
+			}
 		}
 	}
 	

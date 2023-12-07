@@ -1863,7 +1863,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 		found_one = FALSE;
 		eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
+			if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
 				if (!found_one) {
 					snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
 					CAP(buf);

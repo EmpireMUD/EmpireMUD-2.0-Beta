@@ -9852,8 +9852,9 @@ struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, 
 	}
 	
 	SAFE_ADD(store->amount, amount, 0, MAX_STORAGE, FALSE);
+	store->amount = MAX(store->amount, 0);
 	
-	if (store->amount <= 0) {
+	if (store->amount == 0 && !store->keep) {
 		HASH_DEL(isle->store, store);
 		free(store);
 		store = NULL;
@@ -9903,6 +9904,9 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;
+			}
 			if ((store->keep == UNLIMITED || store->amount <= store->keep) && !use_kept) {
 				continue;
 			}
@@ -9971,7 +9975,7 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 		}
 		
 		HASH_FIND_INT(isle->store, &vnum, store);
-		if (!store) {
+		if (!store || store->amount < 1) {
 			continue;	// none here
 		}
 		
@@ -10036,6 +10040,9 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 	}
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->amount < 1) {
+			continue;	// got none
+		}
 		if ((store->keep == UNLIMITED || store->amount <= store->keep) && !include_kept) {
 			continue;
 		}
@@ -10062,7 +10069,8 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 
 
 /**
-* Finds empire storage on a given island by item keyword.
+* Finds empire storage on a given island by item keyword. Note this can find
+* one with an amount of 0 (because keep amounts are saved).
 * 
 * @param empire_data *emp The empire whose storage to search.
 * @param int island_id Which island to look on.
@@ -10092,7 +10100,8 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 
 /**
 * This finds the empire_storage_data object for a given vnum in an empire,
-* IF there is any of that vnum stored to the empire.
+* IF there is any of that vnum stored to the empire. Note that the resource
+* MAY have an amount of 0 (empty entries are retained for 'keep' info).
 *
 * @param empire_data *emp The empire.
 * @param int island Which island to search.
@@ -10131,7 +10140,7 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_FIND_INT(isle->store, &vnum, sto);
-		if (sto) {
+		if (sto && sto->amount > 0) {
 			SAFE_ADD(count, sto->amount, 0, INT_MAX, FALSE);
 		}
 	}
@@ -10233,7 +10242,7 @@ void read_vault(empire_data *emp) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((proto = store->proto)) {
+			if (store->amount > 0 && (proto = store->proto)) {
 				if (IS_WEALTH_ITEM(proto)) {
 					SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * store->amount), 0, INT_MAX, FALSE);
 				}

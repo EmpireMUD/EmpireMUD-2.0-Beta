@@ -1553,7 +1553,7 @@ void remove_empire_from_table(empire_data *emp) {
 * icon-locking is done.
 */
 void check_for_new_map(void) {
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade, *next_trade;
 	struct empire_city_data *city, *next_city;
@@ -1648,7 +1648,23 @@ void check_for_new_map(void) {
 			
 			// move all inventories to nowhere
 			HASH_ITER(hh, isle->store, store, next_store) {
-				add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
+				if (store->amount > 0) {
+					new_store = add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
+				}
+				else {
+					new_store = find_stored_resource(emp, NO_ISLAND, store->vnum);
+				}
+				
+				// copy keep
+				if (new_store && new_store->keep != UNLIMITED) {
+					if (store->keep == UNLIMITED) {
+						new_store->keep = UNLIMITED;
+					}
+					else {
+						SAFE_ADD(new_store->keep, store->keep, 0, INT_MAX, FALSE);
+					}
+				}
+				
 				HASH_DEL(isle->store, store);
 				free(store);
 			}
@@ -1700,7 +1716,7 @@ void check_for_new_map(void) {
 * @param int new_island The ID of the island to move to.
 */
 void check_nowhere_einv(empire_data *emp, int new_island) {
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_unique_storage *eus;
 	struct empire_island *no_isle;
 	bool any = FALSE;
@@ -1712,7 +1728,23 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 	// move basic storage
 	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
 		HASH_ITER(hh, no_isle->store, store, next_store) {
-			add_to_empire_storage(emp, new_island, store->vnum, store->amount);
+			if (store->amount > 0) {
+				new_store = add_to_empire_storage(emp, new_island, store->vnum, store->amount);
+			}
+			else {
+				new_store = find_stored_resource(emp, new_island, store->vnum);
+			}
+			
+			// copy keep
+			if (new_store && new_store->keep != UNLIMITED) {
+				if (store->keep == UNLIMITED) {
+					new_store->keep = UNLIMITED;
+				}
+				else {
+					SAFE_ADD(new_store->keep, store->keep, 0, INT_MAX, FALSE);
+				}
+			}
+			
 			HASH_DEL(no_isle->store, store);
 			free(store);
 			any = TRUE;
@@ -2412,11 +2444,24 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && GET_OBJ_STORAGE(proto)) {
-					store = add_to_empire_storage(emp, t[2], t[0], t[1]);
+					if (!(store = find_stored_resource(emp, t[2], t[0]))) {
+						CREATE(store, struct empire_storage_data, 1);
+						store->vnum = t[0];
+						store->proto = proto;
+						HASH_ADD_INT(get_empire_island(emp, t[2])->store, vnum, store);
+					}
 					
-					// set keep
-					if (store) {
-						store->keep = t[3];
+					// add amount as if there's an existing entry
+					SAFE_ADD(store->amount, t[1], 0, INT_MAX, FALSE);
+					
+					// compute keep as if there could be an existing entry, which is unlikely
+					if (store->keep != UNLIMITED) {
+						if (t[3] == UNLIMITED) {
+							store->keep = t[3];
+						}
+						else {
+							SAFE_ADD(store->keep, t[3], 0, INT_MAX, FALSE);
+						}
 					}
 				}
 				else if (proto && !GET_OBJ_STORAGE(proto)) {

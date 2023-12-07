@@ -674,7 +674,9 @@ void score_empires(void) {
 		num = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			HASH_ITER(hh, isle->store, store, next_store) {
-				SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				if (store->amount > 0) {
+					SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				}
 			}
 		}
 		num /= 1000;	// for sanity of number size
