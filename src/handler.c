@@ -3423,15 +3423,15 @@ void perform_abandon_room(room_data *room) {
 	int ter_type;
 	bool junk;
 	
-	// update any building-flagged vehicles
-	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
-			perform_abandon_vehicle(veh);
-		}
-	}
-	
 	// updates based on owner
 	if (emp) {
+		// update any building-flagged vehicles
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
+				perform_abandon_vehicle(veh);
+			}
+		}
+		
 		deactivate_workforce_room(emp, room);
 		adjust_building_tech(emp, room, FALSE);
 		
@@ -3500,7 +3500,6 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		empire_data *emp = VEH_OWNER(veh);
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
 		
-		VEH_OWNER(veh) = NULL;
 		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
 	
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
@@ -3508,6 +3507,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		}
 		
 		adjust_vehicle_tech(veh, FALSE);
+		VEH_OWNER(veh) = NULL;
+		
 		if (VEH_IS_COMPLETE(veh) && emp) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
