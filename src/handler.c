@@ -1508,20 +1508,20 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 		return;	// no work need doing
 	}
 	
-	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_WEAR_OFF_ID(ch) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
+	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_ID(ch) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
 		msg_to_char(ch, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
 		if (!IS_NPC(ch)) {
-			GET_LAST_WEAR_OFF_ID(ch) = CAST_BY_ID(ch);
+			GET_LAST_AFF_WEAR_OFF_ID(ch) = CAST_BY_ID(ch);
 			GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
 			GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
 		}
 	}
 	if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (vict->desc && (IS_NPC(vict) || GET_LAST_WEAR_OFF_ID(vict) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
+			if (vict->desc && (IS_NPC(vict) || GET_LAST_AFF_WEAR_OFF_ID(vict) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
 				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, vict, TO_VICT);
 				if (!IS_NPC(vict)) {
-					GET_LAST_WEAR_OFF_ID(vict) = CAST_BY_ID(ch);
+					GET_LAST_AFF_WEAR_OFF_ID(vict) = CAST_BY_ID(ch);
 					GET_LAST_AFF_WEAR_OFF_VNUM(vict) = atype;
 					GET_LAST_AFF_WEAR_OFF_TIME(vict) = time(0);
 				}
