@@ -1942,6 +1942,7 @@ char *double_map_ampersands(char *icon);;
 const char *double_percents(const char *string);
 bool has_keyword(char *string, const char *list[], bool exact);
 bool isname(const char *str, const char *namelist);
+bool isname_check_exact(const char *str, const char *namelist, bool *was_exact);
 char *level_range_string(int min, int max, int current);
 bool multi_isname(const char *arg, const char *namelist);
 char *CAP(char *txt);

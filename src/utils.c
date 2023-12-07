@@ -4889,6 +4889,49 @@ bool isname(const char *str, const char *namelist) {
 
 
 /**
+* Variant of isname that also deterines if it used an abbreviation.
+*
+* @param const char *str The search argument, e.g. "be"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @param bool *was_exact Optional: Will be set to TRUE if an exact keyword was typed instead of an abbrev. (Pass NULL to skip this.)
+* @return bool TRUE if str is an abbrev for any keyword in namelist
+*/
+bool isname_check_exact(const char *str, const char *namelist, bool *was_exact) {
+	char *newlist, *curtok;
+	bool found = FALSE;
+	
+	if (was_exact) {
+		// initialize
+		*was_exact = FALSE;
+	}
+	
+	if (!*str || !*namelist) {
+		return FALSE;	// shortcut
+	}
+
+	/* the easy way */
+	if (!str_cmp(str, namelist)) {
+		return TRUE;
+	}
+
+	newlist = strdup(namelist);
+
+	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok && was_exact && !str_cmp(str, curtok)) {
+			*was_exact = TRUE;
+			found = TRUE;
+		}
+		else if (curtok && is_abbrev(str, curtok)) {
+			found = TRUE;
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
 * Makes a level range look more elegant. You can omit current.
 *
 * @param int min The low end of the range (0 for none).

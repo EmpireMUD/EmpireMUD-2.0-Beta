@@ -1859,16 +1859,16 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	recognize = IS_SET(flags, MATCH_GLOBAL) || (ch ? CAN_RECOGNIZE(ch, target) : TRUE);
 	
 	// name-matching part
-	if (recognize && isname(name, GET_PC_NAME(target))) {
+	if (recognize && isname_check_exact(name, GET_PC_NAME(target), was_exact)) {
 		return TRUE;	// name/kw match
 	}
-	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname(name, GET_CURRENT_LASTNAME(target))) {
+	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname_check_exact(name, GET_CURRENT_LASTNAME(target), was_exact)) {
 		return TRUE;	// lastname match
 	}
-	else if (IS_MORPHED(target) && isname(name, MORPH_KEYWORDS(GET_MORPH(target)))) {
+	else if (IS_MORPHED(target) && isname_check_exact(name, MORPH_KEYWORDS(GET_MORPH(target)), was_exact)) {
 		return TRUE;	// morph kw match
 	}
-	else if (IS_DISGUISED(target) && isname(name, GET_DISGUISED_NAME(target))) {
+	else if (IS_DISGUISED(target) && isname_check_exact(name, GET_DISGUISED_NAME(target), was_exact)) {
 		return TRUE;	// disguise name match
 	}
 	else {
