@@ -131,7 +131,7 @@ act.highsorcery.o: act.highsorcery.c conf.h sysdep.h structs.h uthash.h \
 	$(CC) -c $(CFLAGS) act.highsorcery.c
 act.immortal.o: act.immortal.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h vnums.h interpreter.h handler.h db.h skills.h olc.h dg_scripts.h \
-  constants.h
+  dg_event.h constants.h
 	$(CC) -c $(CFLAGS) act.immortal.c
 act.informative.o: act.informative.c conf.h sysdep.h structs.h uthash.h \
   utils.h comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h \

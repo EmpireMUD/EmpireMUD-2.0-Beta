@@ -23,6 +23,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "constants.h"
 
 /**
@@ -10000,6 +10001,7 @@ ACMD(do_oset) {
 ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
+	trig_data *trig;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		// stop fighting
@@ -10017,8 +10019,18 @@ ACMD(do_peace) {
 		}
 		
 		// clear DOTs (could restart a fight)
-		while (ch->over_time_effects) {
-			dot_remove(ch, ch->over_time_effects);
+		while (iter->over_time_effects) {
+			dot_remove(iter, iter->over_time_effects);
+		}
+		
+		// cancel combat scripts (could keep players in combat)
+		if (IS_NPC(iter) && SCRIPT(iter)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(iter)), trig) {
+				if (GET_TRIG_WAIT(trig) && GET_TRIG_DEPTH(trig) && IS_SET(GET_TRIG_TYPE(trig), MTRIG_FIGHT)) {
+					dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+					GET_TRIG_WAIT(trig) = NULL;
+				}
+			}
 		}
 	}
 	

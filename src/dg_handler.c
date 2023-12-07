@@ -23,9 +23,6 @@
 #include "handler.h"
 #include "dg_event.h"
 
-// external funcs
-EVENT_CANCEL_FUNC(cancel_wait_event);
-
 // locals
 void actually_free_trigger(trig_data *trig);
 

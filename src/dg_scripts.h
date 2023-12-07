@@ -568,3 +568,6 @@ int char_script_id(char_data *ch);
 int obj_script_id(obj_data *obj);
 int veh_script_id(vehicle_data *veh);
 #define room_script_id(room)  (GET_ROOM_VNUM(room) + ROOM_ID_BASE)
+
+// wait helpers
+EVENT_CANCEL_FUNC(cancel_wait_event);
