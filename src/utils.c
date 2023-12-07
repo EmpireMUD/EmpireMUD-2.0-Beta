@@ -4866,7 +4866,7 @@ bool isname(const char *str, const char *namelist) {
 	char *newlist, *curtok;
 	bool found = FALSE;
 	
-	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*str+1))) {
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
 		return FALSE;	// shortcut
 	}
 
@@ -4905,7 +4905,7 @@ bool isname_check_exact(const char *str, const char *namelist, bool *was_exact) 
 		*was_exact = FALSE;
 	}
 	
-	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*str+1))) {
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
 		return FALSE;	// shortcut
 	}
 

@@ -1843,7 +1843,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	}
 	
 	// shortcut with no name or when UID character requested
-	if (!name || !*name || (*name == UID_CHAR && isdigit(*name+1))) {
+	if (!name || !*name || (*name == UID_CHAR && isdigit(*(name+1)))) {
 		return FALSE;
 	}
 	
