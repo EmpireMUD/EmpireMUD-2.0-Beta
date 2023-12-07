@@ -1547,10 +1547,10 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, GET_LOYALTY(ch)) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
 		act("There is already too much on the other side of $p to drag $V there.", FALSE, ch, portal, veh, TO_CHAR);
 	}
-	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room) >= config_get_int("vehicle_max_per_tile")) {
+	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		act("You cannot drag $V through $p because the other side is too full already.", FALSE, ch, portal, veh, TO_CHAR);
 	}
 	else {
@@ -1643,10 +1643,10 @@ ACMD(do_drag) {
 	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, GET_LOYALTY(ch)) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
 		act("There is already too much there to drag $V there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room) >= config_get_int("vehicle_max_per_tile")) {
+	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		act("You cannot drag $V there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else {

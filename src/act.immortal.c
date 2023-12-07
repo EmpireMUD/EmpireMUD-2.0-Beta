@@ -85,6 +85,41 @@ void decustomize_island(int island_id) {
 
 
 /**
+* Approves a character.
+*
+* @param char_data *ch The character to approve.
+*/
+void perform_approve(char_data *ch) {
+	if (config_get_bool("approve_per_character")) {
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	else {	// per-account (default)
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
+	}
+	
+	SAVE_CHAR(ch);
+}
+
+
+/**
+* Rescinds approval for a character.
+*
+* @param char_data *ch The character to unapprove.
+*/
+void perform_unapprove(char_data *ch) {
+	REMOVE_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+	SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	SAVE_CHAR(ch);
+}
+
+
+/**
 * Autostores one item. Contents are also stored.
 *
 * @param obj_dtaa *obj The item to autostore.
@@ -2356,6 +2391,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) < LVL_START_IMM && value >= LVL_START_IMM) {
+			perform_approve(vict);
 			SET_BIT(PRF_FLAGS(vict), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 			// turn on all syslogs
@@ -8249,6 +8285,7 @@ ACMD(do_advance) {
 		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s has promoted %s to level %d (from %d)", GET_NAME(ch), GET_NAME(victim), newlevel, oldlevel);
 
 	if (oldlevel < LVL_START_IMM && newlevel >= LVL_START_IMM) {
+		perform_approve(victim);
 		SET_BIT(PRF_FLAGS(victim), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -8287,22 +8324,10 @@ ACMD(do_approve) {
 	}
 	else {
 		if (subcmd == SCMD_APPROVE) {
-			if (config_get_bool("approve_per_character")) {
-				SET_BIT(PLR_FLAGS(vict), PLR_APPROVED);
-			}
-			else {	// per-account (default)
-				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-				SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			}
-			
-			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
-				GET_ACCESS_LEVEL(vict) = LVL_MORTAL;
-			}
+			perform_approve(vict);
 		}
 		else {
-			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-			SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+			perform_unapprove(vict);
 		}
 		
 		if (!file) {
