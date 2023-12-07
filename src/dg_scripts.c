@@ -3945,7 +3945,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", char_script_id(c));
 					}
 					else if (!str_cmp(field, "is_name")) {
-						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
+						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS, NULL)) {
 							snprintf(str, slen, "1");
 						}
 						else {

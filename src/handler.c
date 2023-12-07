@@ -1831,13 +1831,19 @@ void extract_pending_chars(void) {
 * @param char_data *target The potential match.
 * @param char *name The string ch typed when looking for target.
 * @param bitvector_t flags MATCH_GLOBAL, MATCH_IN_ROOM
+* @param bool *was_exact Optional; If provided will set to TRUE if the name was an exact match not an abbreviation. (Pass NULL to skip this.)
 * @return bool TRUE if "name" is valid for "target" according to "ch", FALSE if not
 */
-bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags) {
+bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags, bool *was_exact) {
 	bool recognize, old_ignore_dark = Global_ignore_dark;
 	
 	if (IS_SET(flags, MATCH_GLOBAL)) {
 		Global_ignore_dark = TRUE;
+	}
+	
+	if (was_exact) {
+		// initialize
+		*was_exact = FALSE;
 	}
 	
 	// visibility (shortcuts)
@@ -2046,7 +2052,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		if (!CAN_SEE(ch, vict) || !can_see_in_dark_room(ch, IN_ROOM(vict), FALSE)) {
 			continue;
 		}
-		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM)) {
+		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM, NULL)) {
 			continue;
 		}
 		
@@ -2123,7 +2129,7 @@ char_data *get_char_room(char *name, room_data *room) {
 		if (j > number) {
 			break;
 		}
-		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
+		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (++j == number) {
 				found = i;
 				break;
@@ -2165,7 +2171,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (--(*number) == 0) {
 				return i;
 			}
@@ -2218,7 +2224,7 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
 				continue;
 			}
-			if (!match_char_name(ch, i, tmp, (IS_SET(where, FIND_NO_DARK) ? MATCH_GLOBAL : 0))) {
+			if (!match_char_name(ch, i, tmp, (IS_SET(where, FIND_NO_DARK) ? MATCH_GLOBAL : 0), NULL)) {
 				continue;
 			}
 			
@@ -2242,9 +2248,11 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 * @return char_data *The found player, or NULL.
 */
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
-	char_data *i, *found = NULL;
+	bool was_exact = FALSE, had_number;
+	char_data *i, *abbrev = NULL, *found = NULL;
 	int number;
 	
+	had_number = (isdigit(*name) ? TRUE : FALSE);
 	number = get_number(&name);
 	
 	DL_FOREACH2(player_character_list, i, next_plr) {
@@ -2258,18 +2266,25 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 		if (!(IS_SET(flags, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i)) && !CAN_SEE(ch, i)) {
 			continue;
 		}
-		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0))) {
+		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0), &was_exact)) {
 			continue;
 		}
-		if (--number > 0) {
+		if (had_number && --number > 0) {
 			continue;
 		}
 		
-		found = i;
-		break;	// done
+		if (had_number || was_exact) {
+			// perfect match
+			found = i;
+			break;	// done
+		}
+		else if (!abbrev) {
+			// save for later
+			abbrev = i;
+		}
 	}
 
-	return found;
+	return found ? found : abbrev;	// may be NULL
 }
 
 
@@ -2299,7 +2314,7 @@ char_data *get_char_world(char *name, int *number) {
 	}
 	
 	DL_FOREACH(character_list, ch) {
-		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL, NULL)) {
 			if (--(*number) == 0) {
 				return ch;	// done
 			}
@@ -2320,31 +2335,39 @@ char_data *get_char_world(char *name, int *number) {
 */
 char_data *get_player_world(char *name, int *number) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool ignore = FALSE;
-	char_data *ch;
+	bool had_number, was_exact = FALSE;
+	char_data *ch, *abbrev = NULL;
 	int num;
 	
 	if (!number) {
+		had_number = (isdigit(*name) ? TRUE : FALSE);
 		strcpy(tmp, name);
 		number = &num;
 		num = get_number(&tmp);
 	}
 	else {
+		had_number = (*number != 1);	// a guess that they provided a number
 		tmp = name;
-	}
-	if (*number == 0) {
-		ignore = TRUE;
 	}
 	
 	DL_FOREACH2(player_character_list, ch, next_plr) {
-		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
-			if (--(*number) == 0 || ignore) {
-				return ch;	// done
-			}
+		if (!match_char_name(NULL, ch, tmp, MATCH_GLOBAL, &was_exact)) {
+			continue;
+		}
+		if (had_number && --(*number) > 0) {
+			continue;
+		}
+		
+		// match!
+		if (had_number || was_exact) {
+			return ch;	// done
+		}
+		else if (!abbrev) {
+			abbrev = ch;	// for later
 		}
 	}
 
-	return NULL;
+	return abbrev;	// if any
 }
 
 
