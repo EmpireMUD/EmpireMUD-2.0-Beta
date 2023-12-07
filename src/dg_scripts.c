@@ -2308,22 +2308,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case MOB_TRIGGER:
 					ch = (char_data*) go;
 
-					if ((o = get_object_in_equip(ch, name))) {
+					if (*name != UID_CHAR && (o = get_object_in_equip(ch, name))) {
 						// just setting
 					}
-					else if ((o = get_obj_in_list(name, ch->carrying))) {
+					else if (*name != UID_CHAR && (o = get_obj_in_list(name, ch->carrying))) {
 						// just setting
 					}
-					else if ((c = get_char_room(name, IN_ROOM(ch)))) {
+					else if (*name != UID_CHAR && (c = get_char_room(name, IN_ROOM(ch)))) {
 						// just setting
 					}
-					else if ((v = get_vehicle_room(IN_ROOM(ch), name, NULL))) {
+					else if (*name != UID_CHAR && (v = get_vehicle_room(IN_ROOM(ch), name, NULL))) {
 						// just setting
 					}
-					else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+					else if (*name != UID_CHAR && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 						v = GET_ROOM_VEHICLE(IN_ROOM(ch));
 					}
-					else if ((o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+					else if (*name != UID_CHAR && (o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
 						// just setting
 					}
 					else if ((c = get_char(name))) {
