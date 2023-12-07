@@ -646,6 +646,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_MOVING  BIT(12)	// gain when moving
 #define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
 #define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
+#define AGH_NOT_WHILE_ASLEEP  BIT(15)	// prevent gains while sleeping (or dying)
 
 
 // RUN_ABIL_x: modes for activating abilities
