@@ -3804,9 +3804,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
 			// cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
-				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR);
-				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT);
-				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT);
+				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR | TO_ABILITY);
+				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
+				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT | TO_ABILITY);
 				
 				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
 
@@ -3820,9 +3820,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
 				affect_join(victim, af, 0);
 				
-				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR);
-				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT);
-				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT);
+				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR | TO_ABILITY);
+				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
+				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT | TO_ABILITY);
 
 				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);
