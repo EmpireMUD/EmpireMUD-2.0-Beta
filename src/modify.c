@@ -22,10 +22,18 @@
 #include "boards.h"
 #include "olc.h"
 
+/**
+* Contents:
+*   Helpers
+*   Paginator
+*   Editor
+*   Script Formatter
+*   Text Formatter
+*   String Replacer
+*   Commands
+*/
 
-/*
- * Action modes for parse_action().
- */
+// PARSE_x: Action modes for parse_action().
 #define PARSE_FORMAT		0
 #define PARSE_REPLACE		1
 #define PARSE_HELP			2
@@ -36,9 +44,7 @@
 #define PARSE_EDIT			7
 #define PARSE_LIST_COLOR	8
 
-/*
- * Defines for the action variable.
- */
+// STRINGADD_x: Defines for the action variable.
 #define STRINGADD_OK		0	/* Just keep adding text.				*/
 #define STRINGADD_SAVE		1	/* Save current text.					*/
 #define STRINGADD_ABORT		2	/* Abort edit, restore old text.		*/
@@ -51,6 +57,9 @@ int improved_editor_execute(descriptor_data *d, char *str);
 void parse_action(int command, char *string, descriptor_data *d);
 int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /* ************************************************************************
 *  modification of malloc'ed strings                                      *
@@ -396,6 +405,9 @@ void string_add(descriptor_data *d, char *str) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// PAGINATOR ///////////////////////////////////////////////////////////////
+
 /*********************************************************************
 * New Pagination Code
 * Michael Buselli submitted the following code for an enhanced pager
@@ -611,6 +623,9 @@ void show_string(descriptor_data *d, char *input) {
 
 /* End of code by Michael Buselli */
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EDITOR //////////////////////////////////////////////////////////////////
 
 /************************************************************************
 * The following modify code was shipped with OasisOLC.  Here are the    *
@@ -1089,16 +1104,104 @@ void parse_action(int command, char *string, descriptor_data *d) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// SCRIPT FORMATTER ////////////////////////////////////////////////////////
+
+// FORMAT_IN_x: Used for formatting scripts
+#define FORMAT_IN_IF  0
+#define FORMAT_IN_SWITCH  1
+#define FORMAT_IN_WHILE  2
+#define FORMAT_IN_CASE  3
+
+// formatting helper: handles nested structures
+struct script_format_stack {
+	int type;
+	struct script_format_stack *next;
+};
+
+
+/**
+* Helper for format_script.
+*
+* @param struct script_format_stack **stack A pointer to the linked list to free.
+*/
+void free_script_format_stack(struct script_format_stack **stack) {
+	struct script_format_stack *entry;
+	
+	if (stack) {
+		while ((entry = *stack)) {
+			*stack = entry->next;
+			free(entry);
+		}
+	}
+}
+
+
+/**
+* Helper for format_script.
+*
+* @param struct script_format_stack **stack A pointer to the linked list.
+* @param int type The type to put on the top of the stack.
+*/
+void add_script_format_stack(struct script_format_stack **stack, int type) {
+	struct script_format_stack *entry;
+	
+	if (stack) {
+		CREATE(entry, struct script_format_stack, 1);
+		entry->type = type;
+		LL_PREPEND(*stack, entry);
+	}
+}
+
+
+/**
+* Helper for format_script.
+*
+* @param struct script_format_stack **stack A pointer to the linked list. The first element will be removed and freed.
+*/
+void pop_script_format_stack(struct script_format_stack **stack) {
+	struct script_format_stack *entry;
+	
+	if (stack && (entry = *stack)) {
+		*stack = entry->next;
+		free(entry);
+	}
+}
+
+
+/**
+* Helper for format_script.
+*
+* @param struct script_format_stack *stack The linked list.
+* @param int type The type look for in the list.
+* @return int Depth 'type' was found at (first entry is 1), or 0 if not found.
+*/
+int find_script_format_stack(struct script_format_stack *stack, int type) {
+	struct script_format_stack *entry;
+	int count = 0;
+	
+	LL_FOREACH(stack, entry) {
+		++count;
+		if (entry->type == type) {
+			return count;
+		}
+	}
+	
+	return 0;	// not found
+}
+
+
 int format_script(struct descriptor_data *d) {
 	char nsc[MAX_CMD_LENGTH], *t, line[READ_SIZE];
 	char *sc;
 	size_t len = 0, nlen = 0, llen = 0;
-	int indent = 0, indent_next = FALSE, found_case = FALSE, i, line_num = 0;
-	bool is_while = FALSE;
-
-	if (!d->str || !*d->str)
+	int indent = 0, indent_next = FALSE, iter, line_num = 0;
+	struct script_format_stack *stack = NULL;
+	
+	if (!d->str || !*d->str) {
 		return FALSE;
-
+	}
+	
 	sc = strdup(*d->str); /* we work on a copy, because of strtok() */
 	t = strtok(sc, "\n\r");
 	*nsc = '\0';
@@ -1108,65 +1211,84 @@ int format_script(struct descriptor_data *d) {
 		skip_spaces(&t);
 		if (!strncasecmp(t, "if ", 3)) {
 			indent_next = TRUE;
+			add_script_format_stack(&stack, FORMAT_IN_IF);
 		}
 		else if (!strncasecmp(t, "switch ", 7)) {
 			indent_next = TRUE;
-			is_while = FALSE;
+			add_script_format_stack(&stack, FORMAT_IN_SWITCH);
 		}
 		else if (!strncasecmp(t, "while ", 6)) {
-			found_case = TRUE;  /* so you can 'break' a loop without complains */
-			is_while = TRUE;	// prevents a break from dropping indent
 			indent_next = TRUE;
+			add_script_format_stack(&stack, FORMAT_IN_WHILE);
 		}
-		else if (!strncasecmp(t, "end", 3) || !strncasecmp(t, "done", 4)) {
-			if (!indent) {
-				msg_to_desc(d, "Unmatched 'end' or 'done' (line %d)!\r\n", line_num);
+		else if (!strncasecmp(t, "done", 4)) {
+			if (!indent || (stack->type != FORMAT_IN_SWITCH && stack->type != FORMAT_IN_WHILE)) {
+				msg_to_desc(d, "Unmatched 'done' (line %d)!\r\n", line_num);
 				free(sc);
+				free_script_format_stack(&stack);
 				return FALSE;
 			}
-			indent--;
-			indent_next = FALSE;
+			--indent;
+			pop_script_format_stack(&stack);	// remove switch or while
+		}
+		else if (!strncasecmp(t, "end", 3)) {
+			if (!indent || stack->type != FORMAT_IN_IF) {
+				msg_to_desc(d, "Unmatched 'end' (line %d)!\r\n", line_num);
+				free(sc);
+				free_script_format_stack(&stack);
+				return FALSE;
+			}
+			--indent;
+			pop_script_format_stack(&stack);	// remove if
 		}
 		else if (!strncasecmp(t, "else", 4)) {
-			if (!indent) {
+			if (!indent || stack->type != FORMAT_IN_IF) {
 				msg_to_desc(d, "Unmatched 'else' (line %d)!\r\n", line_num);
 				free(sc);
+				free_script_format_stack(&stack);
 				return FALSE;
 			}
 			indent--;
 			indent_next = TRUE;
+			// no need to modify stack: we're going from IF to IF (ish)
 		}
 		else if (!strncasecmp(t, "case", 4) || !strncasecmp(t, "default", 7)) {
-			if (!indent) {
+			if (!indent || stack->type != FORMAT_IN_SWITCH) {
 				msg_to_desc(d, "Case/default outside switch (line %d)!\r\n", line_num);
 				free(sc);
+				free_script_format_stack(&stack);
 				return FALSE;
 			}
 			indent_next = TRUE;
-			found_case = TRUE;
+			add_script_format_stack(&stack, FORMAT_IN_CASE);
 		}
 		else if (!strncasecmp(t, "break", 5)) {
-			if (!found_case || !indent ) {
+			if (indent && stack->type == FORMAT_IN_CASE) {
+				// breaks only cancel indent when not in a while
+				indent--;
+				pop_script_format_stack(&stack);	// remove the case
+			}
+			else if (find_script_format_stack(stack, FORMAT_IN_WHILE)) {
+				// does not cancel indent in a while
+			}
+			else {
 				msg_to_desc(d, "Break not in case (line %d)!\r\n", line_num);
 				free(sc);
+				free_script_format_stack(&stack);
 				return FALSE;
-			}
-			if (!is_while) {
-				// breaks only cancel indent when not in a while
-				found_case = FALSE;
-				indent--;
 			}
 		}
 
 		*line = '\0';
-		for (nlen = 0, i = 0;i<indent;i++) {
-			strncat(line, "  ", sizeof(line)-1);
+		for (nlen = 0, iter = 0; iter < indent; ++iter) {
+			strncat(line, "  ", sizeof(line) - 1);
 			nlen += 2;
 		}
 		llen = snprintf(line + nlen, sizeof(line) - nlen, "%s\r\n", t);
 		if (llen + nlen + len > d->max_str - 1 ) {
 			msg_to_desc(d, "String too long, formatting aborted\r\n");
 			free(sc);
+			free_script_format_stack(&stack);
 			return FALSE;
 		}
 		len = len + nlen + llen;
@@ -1186,9 +1308,13 @@ int format_script(struct descriptor_data *d) {
 	*d->str = strdup(nsc);
 	free(sc);
 
+	free_script_format_stack(&stack);
 	return TRUE;
 }
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// TEXT FORMATTER //////////////////////////////////////////////////////////
 
 // "d" is unused and appears to be optional, so I'm treating it as optional -paul
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
@@ -1285,6 +1411,9 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// STRING REPLACER /////////////////////////////////////////////////////////
+
 int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size) {
 	char *replace_buffer = NULL;
 	char *flow, *jetsam, temp;
@@ -1337,6 +1466,9 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all, un
 	return i;
 }
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_string_editor) {
 	if (IS_NPC(ch) || !ch->desc) {
