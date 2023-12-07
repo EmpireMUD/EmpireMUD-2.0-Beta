@@ -4916,7 +4916,7 @@ bool isname_check_exact(const char *str, const char *namelist, bool *was_exact) 
 
 	newlist = strdup(namelist);
 
-	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
+	for (curtok = strtok(newlist, WHITESPACE); curtok && (!found || (was_exact && !*was_exact)); curtok = strtok(NULL, WHITESPACE)) {
 		if (curtok && was_exact && !str_cmp(str, curtok)) {
 			*was_exact = TRUE;
 			found = TRUE;
