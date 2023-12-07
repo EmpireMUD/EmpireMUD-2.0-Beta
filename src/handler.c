@@ -1837,13 +1837,18 @@ void extract_pending_chars(void) {
 bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags, bool *was_exact) {
 	bool recognize, old_ignore_dark = Global_ignore_dark;
 	
-	if (IS_SET(flags, MATCH_GLOBAL)) {
-		Global_ignore_dark = TRUE;
-	}
-	
 	if (was_exact) {
 		// initialize
 		*was_exact = FALSE;
+	}
+	
+	// shortcut with no name or when UID character requested
+	if (!name || !*name || (*name == UID_CHAR && isdigit(*name+1))) {
+		return FALSE;
+	}
+	
+	if (IS_SET(flags, MATCH_GLOBAL)) {
+		Global_ignore_dark = TRUE;
 	}
 	
 	// visibility (shortcuts)
