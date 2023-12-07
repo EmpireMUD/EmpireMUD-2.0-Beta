@@ -9352,6 +9352,15 @@ ACMD(do_forgive) {
 			any = TRUE;
 		}
 		
+		if (affected_by_spell(vict, ATYPE_HOSTILE_DELAY)) {
+			affect_from_char(vict, ATYPE_HOSTILE_DELAY, FALSE);
+			msg_to_char(ch, "Hostile delay forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your hostile delay.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
+			}
+			any = TRUE;
+		}
+		
 		if (get_cooldown_time(vict, COOLDOWN_ROGUE_FLAG) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
 			msg_to_char(ch, "Rogue flag forgiven.\r\n");
