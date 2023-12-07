@@ -1094,6 +1094,7 @@ int format_script(struct descriptor_data *d) {
 	char *sc;
 	size_t len = 0, nlen = 0, llen = 0;
 	int indent = 0, indent_next = FALSE, found_case = FALSE, i, line_num = 0;
+	bool is_while = FALSE;
 
 	if (!d->str || !*d->str)
 		return FALSE;
@@ -1105,11 +1106,16 @@ int format_script(struct descriptor_data *d) {
 	while (t) {
 		line_num++;
 		skip_spaces(&t);
-		if (!strncasecmp(t, "if ", 3) || !strncasecmp(t, "switch ", 7)) {
+		if (!strncasecmp(t, "if ", 3)) {
 			indent_next = TRUE;
+		}
+		else if (!strncasecmp(t, "switch ", 7)) {
+			indent_next = TRUE;
+			is_while = FALSE;
 		}
 		else if (!strncasecmp(t, "while ", 6)) {
 			found_case = TRUE;  /* so you can 'break' a loop without complains */
+			is_while = TRUE;	// prevents a break from dropping indent
 			indent_next = TRUE;
 		}
 		else if (!strncasecmp(t, "end", 3) || !strncasecmp(t, "done", 4)) {
@@ -1145,8 +1151,11 @@ int format_script(struct descriptor_data *d) {
 				free(sc);
 				return FALSE;
 			}
-			found_case = FALSE;
-			indent--;
+			if (!is_while) {
+				// breaks only cancel indent when not in a while
+				found_case = FALSE;
+				indent--;
+			}
 		}
 
 		*line = '\0';
