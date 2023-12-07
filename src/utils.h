@@ -886,6 +886,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_FLAGGED(ch, flag)  (IS_NPC(ch) && IS_SET(MOB_FLAGS(ch), (flag)))
 #define MOB_SAVES_TO_ROOM(mob)  (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED((mob), MOB_EMPIRE) && !GET_COMPANION(mob))
 
+// minipets
+#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & DEFAULT_MINIPET_FLAGS) == DEFAULT_MINIPET_FLAGS && (AFF_FLAGS(mob) & DEFAULT_MINIPET_AFFS) == DEFAULT_MINIPET_AFFS)
+#define DEFAULT_MINIPET_FLAGS  (MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE)
+#define DEFAULT_MINIPET_AFFS  (AFF_NO_ATTACK | AFF_CHARM)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// MORPH UTILS /////////////////////////////////////////////////////////////

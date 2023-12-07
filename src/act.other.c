@@ -43,12 +43,6 @@ ACMD(do_slash_channel);
 // local prototypes
 char_data *find_minipet(char_data *ch);
 
-// configs for minipets
-// TODO this seemsl ike it should move to structs.h / utils.h
-#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
-bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
-bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -3203,8 +3197,8 @@ ACMD(do_minipets) {
 			dismiss_any_minipet(ch);	// out with the old...
 			
 			mob = read_mobile(GET_MOB_VNUM(to_summon), TRUE);
-			set_mob_flags(mob, default_minipet_flags);
-			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
+			set_mob_flags(mob, DEFAULT_MINIPET_FLAGS);
+			SET_BIT(AFF_FLAGS(mob), DEFAULT_MINIPET_AFFS);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
 			scale_mob_as_companion(mob, ch, 0);

@@ -1064,7 +1064,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	struct quest_lookup *ql;
 	struct shop_lookup *sl;
 	UT_hash_handle hh;
-	bool changed;
+	bool changed, is_mini;
 	
 	// have a place to save it?
 	if (!(proto = mob_proto(vnum))) {
@@ -1079,6 +1079,8 @@ void save_olc_mobile(descriptor_data *desc) {
 	// update the strings and pointers on live mobs
 	DL_FOREACH(character_list, mob_iter) {
 		if (IS_NPC(mob_iter) && GET_MOB_VNUM(mob_iter) == vnum) {
+			is_mini = (GET_LEADER(mob_iter) && IS_MINIPET_OF(mob_iter, GET_LEADER(mob_iter)));
+			
 			// update strings
 			if (GET_PC_NAME(mob_iter) == GET_PC_NAME(proto)) {
 				GET_PC_NAME(mob_iter) = GET_PC_NAME(mob);
@@ -1128,6 +1130,12 @@ void save_olc_mobile(descriptor_data *desc) {
 			mob_iter->proto_script = copy_trig_protos(mob->proto_script);
 			assign_triggers(mob_iter, MOB_TRIGGER);
 			request_char_save_in_world(mob_iter);
+			
+			// extract if it was a minipet -- AFTER matching it to the proto
+			if (is_mini) {
+				act("$n vanishes.", TRUE, mob_iter, NULL, NULL, TO_ROOM);
+				extract_char(mob_iter);
+			}
 		}
 	}
 	

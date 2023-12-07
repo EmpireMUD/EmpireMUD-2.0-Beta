@@ -31,9 +31,6 @@
 *   Edit Modules
 */
 
-// external vars
-extern bitvector_t default_minipet_flags, default_minipet_affs;
-
 // locals
 const char *default_obj_keywords = "object new";
 const char *default_obj_short = "a new object";
@@ -3112,12 +3109,12 @@ OLC_MODULE(oedit_minipet) {
 			send_config_msg(ch, "ok_string");
 		}
 		
-		if (!MOB_FLAGGED(mob, default_minipet_flags)) {
-			sprintbit(default_minipet_flags, action_bits, buf, TRUE);
+		if (!MOB_FLAGGED(mob, DEFAULT_MINIPET_FLAGS)) {
+			sprintbit(DEFAULT_MINIPET_FLAGS, action_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these flags: buf\r\n");
 		}
-		if (!AFF_FLAGGED(mob, default_minipet_affs)) {
-			sprintbit(default_minipet_affs, affected_bits, buf, TRUE);
+		if (!AFF_FLAGGED(mob, DEFAULT_MINIPET_AFFS)) {
+			sprintbit(DEFAULT_MINIPET_AFFS, affected_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these affects: buf\r\n");
 		}
 	}
