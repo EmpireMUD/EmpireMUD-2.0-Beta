@@ -5657,7 +5657,7 @@ if %old_name% != %self.name%
       %echo ~%self% arrives.
     break
   done
-break
+end
 ~
 #11982
 Elver the Worthy combat: Hammer Dance, Ring Your Bell, Prayer of Thunder, Hammer Throw~
