@@ -2034,10 +2034,10 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			else {
 				msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
-				ProtocolNoEcho(d, true);
 			}
 		}
 		else {	// password ok
+			ProtocolNoEcho(d, false);
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
@@ -2777,7 +2777,6 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;
