@@ -165,6 +165,62 @@ archetype_data *find_archetype_by_name(int type, char *name) {
 
 
 /**
+* Look up an active archetype by name, preferring exact matches, and accounting
+* for unlocks.
+*
+* @param descriptor_data *desc The person at the archetype menu, who typed the name.
+* @param int type Which ARCHT_ to search.
+* @param char *name The archetype name to look up.
+* @param any_vnum *found_locked Optional: If provided, will set this vnum to an archetype that was a match but locked. Will be NOTHING if not found. (Null to skip.)
+*/
+archetype_data *find_archetype_in_menu(descriptor_data *desc, int type, char *name, any_vnum *found_locked) {
+	archetype_data *arch, *next_arch, *partial = NULL;
+	
+	// initialize locked
+	if (found_locked) {
+		*found_locked = NOTHING;
+	}
+	
+	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (type != GET_ARCH_TYPE(arch) || ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			continue;
+		}
+		
+		// matches:
+		if (!str_cmp(name, GET_ARCH_NAME(arch))) {
+			// perfect match
+			if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
+				if (found_locked) {
+					// save even if already found
+					*found_locked = GET_ARCH_VNUM(arch);
+				}
+			}
+			else {
+				// looks ok
+				return arch;
+			}
+		}
+		if (!partial && is_multiword_abbrev(name, GET_ARCH_NAME(arch))) {
+			// probable match
+			if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
+				if (found_locked && *found_locked == NOTHING) {
+					// save only if not found yet
+					*found_locked = GET_ARCH_VNUM(arch);
+				}
+			}
+			else {
+				// save for later
+				partial = arch;
+			}
+		}
+	}
+	
+	// no exact match...
+	return partial;
+}
+
+
+/**
 * Find a matching gear slot, preferring exact matches.
 *
 * @param char *name The name to look up.
@@ -1296,6 +1352,7 @@ void display_archetype_menu(descriptor_data *desc, int type_pos) {
 void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	char arg1[MAX_INPUT_LENGTH], *arg2;
 	archetype_data *arch;
+	any_vnum found_locked = NOTHING;
 	int pos;	// which submenu
 	
 	// setup/safety: which ARCHT_ we're on
@@ -1336,11 +1393,13 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 		display_archetype_list(desc, archetype_menu[pos].type, arg2);
 	}
 	else {	// picking one
-		if (!(arch = find_archetype_by_name(archetype_menu[pos].type, argument))) {
-			msg_to_desc(desc, "Unknown %s '%s'. Try 'list' for more options.\r\n", archetype_menu[pos].name, argument);
-		}
-		else if (ARCHETYPE_FLAGGED(arch, ARCH_LOCKED) && !has_unlocked_archetype_during_creation(desc->character, GET_ARCH_VNUM(arch))) {
-			msg_to_desc(desc, "%s: You have not unlocked this archetype.\r\n", GET_ARCH_NAME(arch));
+		if (!(arch = find_archetype_in_menu(desc, archetype_menu[pos].type, argument, &found_locked))) {
+			if (found_locked != NOTHING && (arch = archetype_proto(found_locked))) {
+				msg_to_desc(desc, "%s: You have not unlocked this archetype.\r\n", GET_ARCH_NAME(arch));
+			}
+			else {
+				msg_to_desc(desc, "Unknown %s '%s'. Try 'list' for more options.\r\n", archetype_menu[pos].name, argument);
+			}
 		}
 		else {
 			// success!
