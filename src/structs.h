@@ -1122,7 +1122,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
 #define CRAFT_SKIP_CONSUMES_TO  BIT(3)  // won't run the consumes-to interaction on components (e.g. keep the jar from paint when mixing it into a new paint)
-	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
+#define CRAFT_DARK_OK  BIT(4)  // light not necessary
 	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
@@ -1138,6 +1138,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
+
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -1259,6 +1260,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_SHIPPING  8	// shipments via do_ship
 #define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
 #define ELOG_PROGRESS  10	// empire progression goals
+#define ELOG_ALERT  11	// important messages
 
 
 // ENEED_x: empire need types

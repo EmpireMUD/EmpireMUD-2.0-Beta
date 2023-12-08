@@ -1266,8 +1266,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// ENEED_x: logging the problem
 			switch (needs->type) {
 				case ENEED_WORKFORCE: {
-					// this logs to TRADE because otherwise members won't see it
-					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
+					// this logs to ALERT because if it's on WORKFORCE, members won't see it
+					log_to_empire(emp, ELOG_ALERT, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
 					deactivate_workforce_island(emp, eisle->island);
 					break;
 				}

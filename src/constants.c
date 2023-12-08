@@ -1848,7 +1848,7 @@ const char *craft_flags[] = {
 	"BUILDING",
 	"SKILLED-LABOR",
 	"SKIP-CONSUMES-TO",
-	"*",	// formerly carpenter (now uses a function)
+	"DARK-OK",
 	"*",	// 5: formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
 	"FIRE",
@@ -1874,7 +1874,7 @@ const char *craft_flag_for_info[] = {
 	"",	// building
 	"",	// skilled labor
 	"",	// skip-consumes-to
-	"",
+	"can be made in the dark",
 	"",	// 5
 	"",
 	"requires fire",
@@ -1978,6 +1978,7 @@ const char *empire_log_types[] = {
 	"Shipping",
 	"Workforce",
 	"Progress",
+	"Alert",
 	"\n"
 };
 
@@ -1995,6 +1996,7 @@ const bool show_empire_log_type[] = {
 	FALSE,	// shipments
 	FALSE,	// workforce
 	TRUE,	// progress
+	TRUE,	// alert
 };
 
 
@@ -2011,6 +2013,7 @@ const bool empire_log_request_only[] = {
 	FALSE,	// shipments
 	TRUE,	// workforce
 	FALSE,	// progress
+	FALSE,	// alert
 };
 
 
