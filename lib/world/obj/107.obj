@@ -761,9 +761,11 @@ heard goblins sometimes use them to brew potions, so you might be able to sell
 them if you can find the right buyer.
 (Type 'sell parts' when you find Miner Nynar.)
 ~
-3 k a 0 0 3
+3 k a 0 0 4
 0 0 0
 7 0
+C
+1 1
 T 10750
 S
 #10751
@@ -774,9 +776,11 @@ Some spider meat is globbed on the ground.~
 or you could probably just sell it to the goblins.
 (Type 'sell meat' when you find Miner Meena.)
 ~
-6 0 a 0 0 3
+6 0 a 0 0 4
 4 0 0
 7 24
+C
+1 1
 T 10751
 S
 #10752
@@ -786,9 +790,11 @@ Some spider meat is lying on the ground.~
    Spider meat actually improves significantly after you cook it. Now it just
 tastes like rancid chicken.
 ~
-6 0 a 0 0 3
+6 0 a 0 0 4
 12 0 0
 7 24
+C
+1 1
 T 10751
 S
 #10753
@@ -797,9 +803,11 @@ a spider egg~
 A spider egg is lying here.~
 This egg will summon a spiderling minipet if you use it.
 ~
-19 p a 0 0 6
+19 p a 0 0 7
 10753 0 0
 7 0
+C
+1 1
 S
 #10754
 potion bug~
@@ -823,9 +831,11 @@ crusty goblin bread~
 Some crusty goblin bread is lying on the ground.~
 This bread is a bit tough to eat, but it doesn't taste too bad.
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 24 0 0
 7 336
+C
+1 1
 S
 #10756
 ring rusty goblin~
@@ -833,11 +843,13 @@ a rusty goblin ring~
 A rusty goblin ring is lying on the ground.~
 This iron ring pokes at your finger, and leaves your skin stained.
 ~
-2 mp ab 0 0 1
+2 mp ab 0 0 2
 0 0 0
 2 0
 A
 17 1 0
+C
+0 25
 S
 #10757
 idol goblin rusty~
@@ -846,11 +858,13 @@ A rusty goblin idol is planted in the ground.~
    This old idol looks like it was once shaped like an animal, but you can't
 tell whether it was a warg or a cow.
 ~
-2 mp ao 0 0 2
+2 mp ao 0 0 3
 0 0 0
 2 0
 A
 8 1 0
+C
+0 25
 S
 #10758
 helmet goblin rusty~
@@ -858,11 +872,13 @@ a rusty goblin helmet~
 A rusty goblin helmet is lying in the dust.~
 This old helmet probably helped a goblin out in battle once or twice.
 ~
-2 mp ae 0 0 3
+2 mp ae 0 0 4
 0 0 0
 2 0
 A
 1 1 0
+C
+0 25
 S
 #10759
 flask rusty~
@@ -870,9 +886,11 @@ a rusty flask~
 A rusty flask is lying here.~
 This old flask certainly doesn't taste as good as it looks.
 ~
-5 0 a 0 0 1
+5 0 a 0 0 2
 24 24 4
 2 0
+C
+1 1
 S
 #10760
 gown silk spidersilk~
@@ -893,9 +911,11 @@ a spidersilk pouch~
 A silk pouch is lying here.~
 This pouch is actually just a hatched cocoon!
 ~
-24 mp ar 0 0 1
+24 mp ar 0 0 2
 1 0 0
 11 0
+C
+0 25
 S
 #10762
 whip silk spidersilk~
@@ -903,11 +923,13 @@ a spidersilk whip~
 A silk whip is coiled here.~
 This whip is actually just a thick strand of spiderweb.
 ~
-1 hmp an 0 0 2
+1 hmp an 0 0 3
 0 1 7
 11 0
 A
 2 1 0
+C
+0 25
 S
 #10763
 lantern silk spidersilk~
@@ -916,9 +938,11 @@ A spidersilk lantern is lying on the ground.~
    The lantern is made from spidersilk! You can 'light' or 'douse' it to make
 it last longer.
 ~
-29 0 ao 0 0 3
+29 0 ao 0 0 4
 168 0 6
 11 0
+C
+1 1
 S
 #10764
 lantern spidersilk silk~
@@ -927,9 +951,11 @@ A spidersilk lantern is lying on the ground.~
    The lantern is made from spidersilk! You can 'light' or 'douse' it to make
 it last longer.
 ~
-29 0 ao 0 0 4
+29 0 ao 0 0 5
 168 1 6
 11 0
+C
+1 1
 S
 #10765
 slippers silk pair spidersilk~
@@ -937,11 +963,13 @@ spidersilk slippers~
 A pair of silk slippers sits here.~
 These slippers are comfortable, but sort of stick when you walk.
 ~
-2 mp ag 0 0 6
+2 mp ag 0 0 7
 0 0 0
 11 0
 A
 6 1 0
+C
+0 25
 S
 #10766
 mask silk spidersilk~
@@ -949,11 +977,13 @@ a spidersilk mask~
 A silk mask has fallen here.~
 This mask makes you look like some kind of superhero.
 ~
-2 mp ae 0 0 5
+2 mp ae 0 0 6
 0 0 0
 11 0
 A
 4 1 0
+C
+0 25
 S
 #10767
 coins goblin pile~
@@ -961,9 +991,11 @@ some goblin coins~
 A pile of goblin coins are lying here.~
 The coins appear to be made of rusted iron.
 ~
-11 mp a 0 0 6
+11 mp a 0 0 7
 1 -1 0
 2 0
+C
+0 25
 S
 #10768
 pick goblin~
@@ -1001,9 +1033,11 @@ A goblin coffin is lying here.~
    You can use this to 'build coffin', and then set it as your tomb in order to
 have a nearby respawn point when you die.
 ~
-3 g a 0 0 5
+3 g a 0 0 6
 0 0 0
 0 0
+C
+1 1
 T 10770
 S
 #10771
@@ -1026,9 +1060,11 @@ A goblin raft replacer has bugged out.~
 'drag' the raft to the edge of the water, then 'sit' on it and type 'sail
 <direction>'.
 ~
-3 0 0 0 0 3
+3 0 0 0 0 4
 0 0 0
 0 1
+C
+1 1
 T 10773
 S
 #10777

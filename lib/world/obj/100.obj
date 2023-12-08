@@ -485,7 +485,7 @@ a skycleaver belt~
 A skycleaver belt is lying in the dust.~
 This belt is sewn from fine silk.
 ~
-2 jmo al 0 0 5
+2 mo al 0 0 6
 -1 -1 -1
 11 0
 A
@@ -499,7 +499,7 @@ skycleaver gloves~
 A pair of skycleaver gloves is lying here.~
 The gloves are sewn from fine silk, and are as blue as the sky.
 ~
-2 jmo ah 0 0 2
+2 mo ah 0 0 4
 -1 -1 -1
 11 0
 A
@@ -513,7 +513,7 @@ skycleaver armor~
 A set of skycleaver armor has been left here.~
 The armor appears to have been woven from silk, but offers surprising protection.
 ~
-27 jmo aq 0 0 2
+27 mo aq 0 0 3
 2 0 0
 11 0
 A
@@ -1035,7 +1035,7 @@ experimental handwraps~
 Some handwraps are lying on the ground.~
 You're not really sure what these are, but you found them on somebody's hands.
 ~
-2 jmo ah 0 0 2
+2 mo ah 0 0 3
 -1 -1 -1
 10 0
 A
@@ -1047,7 +1047,7 @@ an experimental aura~
 There's... sort of an aura hovering here.~
 It glows with... something.
 ~
-2 ejmo ak 0 0 2
+2 emo ak 0 0 3
 -1 -1 -1
 10 0
 A
