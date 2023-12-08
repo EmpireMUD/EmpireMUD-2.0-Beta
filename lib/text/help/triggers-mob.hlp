@@ -438,7 +438,8 @@ When using field  - The variable returns:
 &ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
 &cchar_target(name)&0 - Finds a visible target character in the room, by name.
-&ccharge_coins(amt)&0 - Charges the actor a number of coins.
+&ccharge_coins(amt)&0 - Charges the actor a number of coins. This will return
+   the exact coins spent as a string.
 &ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
 &ccoins(empire)&0 - How many coins a player has from a certain empire. Use 0

@@ -32,6 +32,17 @@ straight and sturdy. It would make a good walking stick.
 A
 6 1 0
 S
+#18455
+leak dam~
+a leak in the dam~
+There's a leak in the dam.~
+This is the delayed completer for the adventure.
+~
+3 B 0 0 0 3
+0 0 0
+0 96
+T 18455
+S
 #18460
 portal barmy blue~
 a barmy blue portal~
@@ -40,7 +51,7 @@ A barmy, blue portal has opened in the middle of the tower.~
 room. You can barely make out what's on the other side, but you get the feeling
 this portal must span a great distance in space... And, perhaps, in time.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 10 0
 S
@@ -51,7 +62,7 @@ A barmy, blue portal leads back out to the tower.~
    It's lucky this portal is still open. Without it, you might be stuck here
 forever.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 10 0
 S
@@ -324,7 +335,7 @@ A small tombstone rests by the side of the trail.~
 
 A blue plaque is attached to the back of the tombstone.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 0
 S

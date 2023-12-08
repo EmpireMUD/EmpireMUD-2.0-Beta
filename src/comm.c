@@ -69,7 +69,7 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_idle_passwords();
+void check_idle_menu_users();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
@@ -657,7 +657,7 @@ void perform_reboot(void) {
 			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
-				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
+				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d %llu\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))), GROUP(och)->group_flags);
 			}
 		}
 		
@@ -686,7 +686,7 @@ void perform_reboot(void) {
 	}
 
 	if (reboot_control.type == SCMD_REBOOT && fl) {
-		fprintf(fl, "-1 ~ ~\n");
+		fprintf(fl, "-1 ~ ~ ~\n");
 		fprintf(fl, "%s", group_data);
 		fprintf(fl, "$\n");
 		fclose(fl);
@@ -848,7 +848,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 
 	if (HEARTBEAT(15)) {
-		check_idle_passwords();
+		check_idle_menu_users();
 		HEARTBEAT_LOG("6")
 		
 		run_mob_echoes();
@@ -1304,6 +1304,37 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		
 		// no?
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && IS_SET(act_flags, TO_HEAL)) {
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HEALS);
+		}
+		if (!show && to == ch && !vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ME);
+		}
+		if (!show && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ME);
+		}
+		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ALLIES);
+		}
+		if (!show && vict_obj && to != vict_obj && FIGHTING(to) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_TARGET);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_OTHER);
+		}
+		
+		// are we supposed to show it?
 		if (!show) {
 			return;
 		}
@@ -4191,6 +4222,7 @@ void reboot_recover(void) {
 	int desc, plid, leid;
 	bool fOld;
 	char name[MAX_INPUT_LENGTH];
+	bitvector_t flags;
 
 	log("Reboot is recovering players...");
 	
@@ -4263,7 +4295,7 @@ void reboot_recover(void) {
 		if (*line == '$') {
 			break;
 		}
-		else if (*line == 'G' && sscanf(line, "G %d %d", &plid, &leid) == 2) {
+		else if (*line == 'G' && sscanf(line, "G %d %d %llu", &plid, &leid, &flags) >= 2) {
 			if ((plr = is_playing(plid)) && (ldr = is_playing(leid))) {
 				if (!GROUP(ldr)) {
 					create_group(ldr);
@@ -4271,6 +4303,7 @@ void reboot_recover(void) {
 				if (GROUP(ldr) && !GROUP(plr)) {
 					join_group(plr, GROUP(ldr));
 				}
+				GROUP(ldr)->group_flags = flags;
 			}
 		}
 		else {

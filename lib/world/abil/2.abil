@@ -1,16 +1,16 @@
 #202
 Fine Pottery~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #203
 Master Craftsman~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #204
 Master Farmer~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 18 0
 D 1 26 0
 D 1 46 0
@@ -18,12 +18,12 @@ T e 1
 S
 #205
 Master Survivalist~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #207
 Arcane Power~
-ij -1 1.00 0 h
+ij -1 1.00 0 h 0
 A
 16 1
 T f 1
@@ -32,85 +32,85 @@ X f
 S
 #209
 Outrage~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #210
 Unnatural Thirst~
-0 -1 1.00 0 hl
+0 -1 1.00 0 hl 0
 D 1 30 0
 D 1 28 0
 T e 1
 S
 #211
 Dread Blood Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #212
 Savage Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #213
 Towering Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #214
 Sage Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #215
 Animal Forms~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #216
 Refashion~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #218
 Dual-Wield~
-0 -1 1.00 0 b
+0 -1 1.00 0 b 0
 D 1 12 0
 T e 1
 S
 #219
 Resurrect~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #220
 Moonrise~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #221
 Iron Blades~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #222
 Sturdy Armors~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #223
 Rawhide Stitching~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #224
 Magic Attire~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #225
 Predator Vision~
-0 -1 1.00 0 gi
+0 -1 1.00 0 gip 0
 A
 27 1
 D 1 43 0
@@ -121,7 +121,7 @@ X f
 S
 #226
 Sanguine Restoration~
-o -1 1.00 0 0
+o -1 1.00 0 0 0
 A
 20 75
 T f 1
@@ -130,115 +130,115 @@ X f
 S
 #227
 Ward Against Magic~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 7 0
 T e 1
 S
 #228
 Noble Bearing~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #229
 Bloodsweat~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #230
 Improved Reflexes~
-0 -1 1.00 0 d
+0 -1 1.00 0 d 0
 D 1 52 0
 T e 1
 S
 #231
 Shadow Kick~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #232
 Stagger Jab~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #233
 Shadowcage~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #234
 Howl~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #235
 Crucial Jab~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #236
 Diversion~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #237
 Shadow Jab~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #238
 Fastcasting~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 14 0
 T e 1
 S
 #239
 Ancestral Healing~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #240
 Confer~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #241
 Steelsmith Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #243
 Artificer Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #244
 Alchemist Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #245
 Smuggler Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #246
 Tinker Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #247
 Antiquarian Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #248
 Exarch Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #250
 Griffin Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 503 0
@@ -252,7 +252,7 @@ T h 0
 S
 #251
 Dire Wolf Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 504 0
@@ -266,7 +266,7 @@ T h 0
 S
 #252
 Moon Rabbit Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 505 0
@@ -280,7 +280,7 @@ T h 0
 S
 #253
 Spirit Wolf Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 507 0
@@ -294,7 +294,7 @@ T h 0
 S
 #254
 Manticore Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 508 0
@@ -308,7 +308,7 @@ T h 0
 S
 #255
 Phoenix Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 509 0
@@ -322,7 +322,7 @@ T h 0
 S
 #256
 Scorpion Shadow Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 510 0
@@ -336,7 +336,7 @@ T h 0
 S
 #257
 Owl Shadow Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 511 0
@@ -350,7 +350,7 @@ T h 0
 S
 #258
 Basilisk Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 512 0
@@ -364,7 +364,7 @@ T h 0
 S
 #259
 Salamander Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 513 0
@@ -378,7 +378,7 @@ T h 0
 S
 #260
 Skeletal Hulk Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 514 0
@@ -392,7 +392,7 @@ T h 0
 S
 #261
 Banshee Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 515 0
@@ -406,58 +406,58 @@ T h 0
 S
 #262
 Hone~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T l 1
 S
 #263
 Healing Boost~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 19 0
 T e 1
 S
 #264
 Exquisite Woodworking~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #265
 Chant of Illusions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #267
 Astral Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #268
 Whisperstride~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #269
 Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #270
 Family Recipes~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #271
 Gourmet Chef~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #272
 Stablemaster~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #273
 Ablate~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 A
 12 -1
 C
@@ -471,7 +471,7 @@ X c
 S
 #274
 Acidblast~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 A
 24 -1
 C
@@ -485,7 +485,7 @@ X c
 S
 #275
 Arclight~
-abi -1 1.40 o 0
+abi -1 1.40 o 0 0
 C
 arclight 7 bf 2 10 3 2057 9 8 3 0
 T c 1
@@ -494,7 +494,7 @@ X c
 S
 #276
 Astralclaw~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
 astralclaw 7 bf 2 10 3 2058 9 8 3 0
 T c 4
@@ -506,7 +506,7 @@ X d
 S
 #277
 Chronoblast~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
 chronoblast 7 bf 2 11 4 2059 6 8 3 0
 T b 1
@@ -518,7 +518,7 @@ X c
 S
 #278
 Deathtouch~
-abi -1 1.20 o 0
+abi -1 1.20 o 0 0
 C
 deathtouch 7 bf 2 10 3 2060 6 8 3 0
 T c 1
@@ -527,7 +527,7 @@ X c
 S
 #279
 Dispirit~
-abio -1 1.00 o 0
+abio -1 1.00 o 0 0
 A
 9 -4
 C
@@ -541,11 +541,11 @@ X c
 S
 #282
 Shadowlash~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 S
 #283
 Soulchain~
-abio -1 1.00 o 0
+abio -1 1.00 o 0 0
 A
 8 -4
 C
@@ -559,7 +559,7 @@ X c
 S
 #284
 Starstrike~
-abi -1 1.50 o 0
+abi -1 1.50 o 0 0
 C
 starstrike 7 bf 2 10 3 2066 9 8 3 0
 T c 1
@@ -568,7 +568,7 @@ X c
 S
 #285
 Thornlash~
-abi -1 1.00 h 0
+abi -1 1.00 h 0 0
 C
 thornlash 7 bf 2 10 3 2067 9 8 3 0
 T c 4
@@ -580,17 +580,17 @@ X d
 S
 #286
 Evasion~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #287
 Weapon Proficiency~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #288
 Primitive Crafts~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 D 1 81 0
 D 1 80 0
 D 1 82 0
@@ -599,12 +599,12 @@ T e 0
 S
 #289
 Build~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #291
 Scavenging~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 70 0
 D 1 71 0
 D 1 72 0
@@ -615,44 +615,44 @@ T e 1
 S
 #292
 Bite~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #293
 Cook~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 79 0
 T a 0
 T e 0
 S
 #294
 Kite~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #295
 Bowmaster~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #296
 Trick Shots~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #297
 Charge~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #298
 Fletching~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #299
 Animal Husbandry~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 54 0
 D 1 55 0
 D 1 56 0

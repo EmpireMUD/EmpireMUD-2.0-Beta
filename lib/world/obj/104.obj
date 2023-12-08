@@ -4,7 +4,7 @@ the town portal~
 A portal back to the entrance to town has opened here.~
 It looks like the portal leads back to the entrance.
 ~
-8 0 0 0 0 2
+8 B 0 0 0 3
 10400 0 0
 10 8
 T 10415
@@ -889,7 +889,7 @@ an open sewer grate~
 The sewer grate is propped open. (adventure)~
 The sewer grate is propped open and you can hear sounds coming from beneath.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 2 0
 S
@@ -899,7 +899,7 @@ the exit~
 A ladder leads up to the sewer's exit. (climb)~
 The scent of fresh air wafts down from the sewer's exit.
 ~
-8 0 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 2 0
 T 10450

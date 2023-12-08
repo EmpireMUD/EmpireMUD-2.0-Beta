@@ -674,7 +674,9 @@ void score_empires(void) {
 		num = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			HASH_ITER(hh, isle->store, store, next_store) {
-				SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				if (store->amount > 0) {
+					SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				}
 			}
 		}
 		num /= 1000;	// for sanity of number size
@@ -3060,7 +3062,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 	}
 	
 	// check if the room is actually light
-	if (room_is_light(room, count_adjacent_light)) {
+	if (room_is_light(room, count_adjacent_light, CAN_SEE_IN_MAGIC_DARKNESS(ch))) {
 		return TRUE;
 	}
 	
@@ -3569,17 +3571,20 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_COINS: {
 			empire_data *coin_emp = real_empire(res->vnum);
+			char buf2[MAX_STRING_LENGTH];
+			*buf2 = '\0';
+			
+			charge_coins(ch, coin_emp, res->amount, build_used_list, msg_type == APPLY_RES_SILENT ? NULL : buf2);
 			
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "You spend %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "$n spends %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			
-			charge_coins(ch, coin_emp, res->amount, build_used_list);
 			res->amount = 0;	// cost paid in full
 			break;
 		}
@@ -3797,7 +3802,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					break;
 				}
 				case RES_COINS: {
-					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list, NULL);
 					res->amount = 0;	// got full amount
 					break;
 				}
@@ -4864,7 +4869,7 @@ bool isname(const char *str, const char *namelist) {
 	char *newlist, *curtok;
 	bool found = FALSE;
 	
-	if (!*str || !*namelist) {
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
 		return FALSE;	// shortcut
 	}
 
@@ -4877,6 +4882,52 @@ bool isname(const char *str, const char *namelist) {
 
 	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
 		if (curtok && is_abbrev(str, curtok)) {
+			found = TRUE;
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
+* Variant of isname that also deterines if it used an abbreviation.
+*
+* @param const char *str The search argument, e.g. "be"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @param bool *was_exact Optional: Will be set to TRUE if an exact keyword was typed instead of an abbrev. (Pass NULL to skip this.)
+* @return bool TRUE if str is an abbrev for any keyword in namelist
+*/
+bool isname_check_exact(const char *str, const char *namelist, bool *was_exact) {
+	char *newlist, *curtok;
+	bool found = FALSE;
+	
+	if (was_exact) {
+		// initialize
+		*was_exact = FALSE;
+	}
+	
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
+		return FALSE;	// shortcut
+	}
+
+	/* the easy way */
+	if (!str_cmp(str, namelist)) {
+		if (was_exact) {
+			*was_exact = TRUE;
+		}
+		return TRUE;
+	}
+
+	newlist = strdup(namelist);
+
+	for (curtok = strtok(newlist, WHITESPACE); curtok && (!found || (was_exact && !*was_exact)); curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok && was_exact && !str_cmp(str, curtok)) {
+			*was_exact = TRUE;
+			found = TRUE;
+		}
+		else if (curtok && is_abbrev(str, curtok)) {
 			found = TRUE;
 		}
 	}
@@ -4949,7 +5000,7 @@ bool multi_isname(const char *arg, const char *namelist) {
 		ptr = any_one_arg(ptr, argword);
 	} while (fill_word(argword));
 	
-	ok = TRUE;
+	ok = *argword ? TRUE : FALSE;
 	while (*argword && ok) {
 		if (!isname(argword, namelist)) {
 			ok = FALSE;
@@ -6107,7 +6158,7 @@ room_data *find_load_room(char_data *ch) {
 	}
 	
 	// still here?
-	return find_starting_location();
+	return find_starting_location(real_room(GET_LAST_ROOM(ch)));
 }
 
 
@@ -6225,16 +6276,36 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 
 
 /**
-* find a random starting location
+* Find a starting location near a given room, or a random starting location.
 *
+* @param room_data *near_room Optional: Gets the start loc closest to here if provided, or a random one if NULL.
 * @return room_data* A random starting location.
 */
-room_data *find_starting_location() {
+room_data *find_starting_location(room_data *near_room) {
+	int iter, dist, best, best_dist;
+	
 	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
-
-	return (real_room(start_locs[number(0, highest_start_loc_index)]));
+	
+	if (near_room) {
+		// find nearest
+		best = 0;
+		best_dist = -1;
+		for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+			dist = compute_distance(near_room, real_room(start_locs[iter]));
+			if (best_dist == -1 || dist < best_dist) {
+				best = iter;
+				best_dist = dist;
+			}
+		}
+		
+		return real_room(start_locs[best]);
+	}
+	else {
+		// random
+		return real_room(start_locs[number(0, highest_start_loc_index)]);
+	}
 }
 
 
@@ -6683,10 +6754,11 @@ void relocate_players(room_data *room, room_data *to_room) {
 *
 * @param room_data *room The room to check (which may be light).
 * @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
 * @return bool TRUE if the room is light, FALSE if not.
 */
-bool room_is_light(room_data *room, bool count_adjacent_light) {
-	if (MAGIC_DARKNESS(room)) {
+bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
+	if (!ignore_magic_darkness && MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
@@ -6703,7 +6775,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
-	if (count_adjacent_light && adjacent_room_is_light(room)) {
+	if (count_adjacent_light && adjacent_room_is_light(room, ignore_magic_darkness)) {
 		return TRUE;	// not dark: adjacent room is light
 	}
 	

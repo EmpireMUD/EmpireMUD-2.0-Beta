@@ -1067,7 +1067,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2633,6 +2633,11 @@ OLC_MODULE(olc_fullsearch) {
 			olc_fullsearch_crop(ch, argument);
 			break;
 		}
+		case OLC_GENERIC: {
+			void olc_fullsearch_generic(char_data *ch, char *argument);
+			olc_fullsearch_generic(ch, argument);
+			break;
+		}
 		case OLC_MOBILE: {
 			void olc_fullsearch_mob(char_data *ch, char *argument);
 			olc_fullsearch_mob(ch, argument);
@@ -2648,6 +2653,11 @@ OLC_MODULE(olc_fullsearch) {
 			olc_fullsearch_progress(ch, argument);
 			break;
 		}
+		case OLC_QUEST: {
+			void olc_fullsearch_quest(char_data *ch, char *argument);
+			olc_fullsearch_quest(ch, argument);
+			break;
+		}
 		case OLC_ROOM_TEMPLATE: {
 			void olc_fullsearch_room_template(char_data *ch, char *argument);
 			olc_fullsearch_room_template(ch, argument);
@@ -2656,6 +2666,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_SECTOR: {
 			void olc_fullsearch_sector(char_data *ch, char *argument);
 			olc_fullsearch_sector(ch, argument);
+			break;
+		}
+		case OLC_SKILL: {
+			void olc_fullsearch_skill(char_data *ch, char *argument);
+			olc_fullsearch_skill(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -5710,7 +5725,9 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		case REQ_EMPIRE_FAME:
 		case REQ_EMPIRE_MILITARY:
 		case REQ_EMPIRE_GREATNESS:
-		case REQ_GET_COINS: {
+		case REQ_GET_COINS:
+		case REQ_DAYTIME:
+		case REQ_NIGHTTIME: {
 			// need nothing?
 			break;
 		}

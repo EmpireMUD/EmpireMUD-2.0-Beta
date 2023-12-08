@@ -420,7 +420,7 @@ Players in the room you leave will not notice your departure, but players at
 your destination will notice your arrival.
 
 You cannot shadowstep to NPCs that belong to other empires, or that are on land
-that belongs to other empires.
+that belongs to other empires. You also can't shadowstep while distracted.
 
 Gains experience when you use Shadowstep.
 

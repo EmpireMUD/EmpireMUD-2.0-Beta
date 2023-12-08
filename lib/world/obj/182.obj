@@ -9,7 +9,7 @@ creature by a great leather strap, made from an animal so massive that the
 strap reaches unbroken around the tortoise's shell. The tavern is loud enough
 that you can nearly make out their song from here.
 ~
-8 0 0 0 0 3
+8 B 0 0 0 4
 18202 0 0
 0 0
 S
@@ -22,7 +22,7 @@ the outside. Its hinges are sturdy, perhaps imperium, although they don't match
 the rest of the hardware of the rest of the building, so they must have been
 replacements.
 ~
-8 0 0 0 0 2
+8 B 0 0 0 3
 18201 0 0
 0 0
 T 18206
@@ -35,7 +35,7 @@ A fountain of pitch-black water hovers in the air.~
 touch of water. It spins and cycles in the air, free of any container, as if
 gravity hasn't noticed it in this dark corner.
 ~
-5 0 0 0 0 1
+5 B 0 0 0 2
 2000 2000 0
 10 0
 S
@@ -48,7 +48,7 @@ and all manner of other foods. Each time you take a piece, a little more food
 falls out of the cornucopia. But if you move too far from it, the food crumbles
 and is gone.
 ~
-6 m 0 0 0 2
+6 mB 0 0 0 3
 500 0 0
 10 0
 A
@@ -272,7 +272,7 @@ An atlasian egg sits in a makeshift nest.~
    The egg is huge, and still growing! It has a soft, leathery texture that is,
 nevertheless, durable enough to protect the growing embryo inside.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 7 8064
 T 18220
@@ -284,7 +284,7 @@ A shimmering violet fire burns at the base of the hatching egg!~
    A sparkling magewood fire has been built around the base of the egg. The egg
 has grown considerably, and looks as if it is about to hatch.
 ~
-29 0 0 0 0 6
+29 B 0 0 0 7
 -1 1 9
 7 144
 T 18225

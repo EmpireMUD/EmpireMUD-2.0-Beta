@@ -1297,13 +1297,13 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// check size limits
-	if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+	if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, GET_LOYALTY(ch)) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
 		if (ch) {
 			act("There is already too much there for $V to go there.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		return FALSE;
 	}
-	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room) >= config_get_int("vehicle_max_per_tile")) {
+	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		if (ch) {
 			act("$V cannot go there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
@@ -1362,7 +1362,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
-	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING)) {
+	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
 		if (ch) {
 			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
 		}

@@ -3,7 +3,7 @@ dragon fur enormous~
 the fur dragon~
 An enormous fur dragon is stalking low to the ground.
 ~
-225 325 dghk choCD 6
+225 325 dghkL choCD 6
 0 0 9 10 -1
 D
    This tremendous brown creature is undoubtedly a dragon, but its scales are
@@ -130,7 +130,7 @@ serragon hoarfrost frost enormous~
 the hoarfrost serragon~
 An enormous serragon coils around the frozen landscape, baring its teeth.
 ~
-100 200 dhxyAJK cEGL 6
+100 200 dhxyAJKL cEGL 6
 0 0 51 25 -1
 D
    The serragon is so big it could be mistaken for a mountain of ice! Its long,
@@ -327,7 +327,7 @@ spreader hoarfrost frost~
 the hoarfrost spreader~
 A hoarfrost spreader is here.
 ~
-100 200 dhxyAJK cklnEGL 0
+100 200 dhxyAJKL cklnEGL 0
 0 0 51 25 -1
 D
 This invisible mob helps spread hoarfrost.
@@ -496,7 +496,7 @@ serragon wall craw hoarfrost frost~
 the wall of the craw~
 The serragon convulses and contracts around you as it thrashes.
 ~
-100 200 bdhnG 0 6
+100 200 bdhnGL 0 6
 0 0 0 15 -1
 D
 From here, all you can see of the serragon is the wall of its dark blue stomach.
@@ -512,7 +512,7 @@ completion sense teleporter~
 a sense of completion~
 A sense of completion hangs in the air (toggle hassle off to prevent being teleported).
 ~
-100 200 bd ln 3
+100 200 bdL ln 3
 0 0 0 15 -1
 D
 This mob teleports people out of the hoarfrost serragon after the fight is complete.

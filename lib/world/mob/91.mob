@@ -73,8 +73,10 @@ one, too.
 ~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 1355 100.00 1  # SKIN: snakeskin
-T 9103
 T 9104
+T 9600
+T 9601
+T 9604
 S
 #9105
 snake green treesnake~
@@ -1058,16 +1060,10 @@ Its skin is inky black, almost invisible against the water, but it's covered in
 uncountable white spots, arranged like stars.
 ~
 I 0 9019 100.00 2  # BUTCHER: slab of shark meat
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
+I 1 1354 5.00 10 k  # SKIN: shark skin
+I 1 1354 15.00 8 k  # SKIN: shark skin
+I 1 1354 30.00 6 k  # SKIN: shark skin
+I 1 1354 50.00 4 k  # SKIN: shark skin
 S
 #9169
 shark basking~
@@ -1083,16 +1079,10 @@ eating anything trapped inside.
 ~
 I 0 9019 50.00 1 s  # BUTCHER: slab of shark meat
 I 0 9019 50.00 2 s  # BUTCHER: slab of shark meat
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
-I 1 1354 50.00 1  # SKIN: shark skin
+I 1 1354 5.00 10 k  # SKIN: shark skin
+I 1 1354 15.00 8 k  # SKIN: shark skin
+I 1 1354 30.00 6 k  # SKIN: shark skin
+I 1 1354 50.00 4 k  # SKIN: shark skin
 S
 #9170
 gannet bird~

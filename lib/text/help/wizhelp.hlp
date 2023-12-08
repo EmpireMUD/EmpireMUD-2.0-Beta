@@ -311,6 +311,7 @@ Usage:  forgive <player>
 
 This command forgives the following conditions:
  - hostile flag
+ - hostile delay
  - rogue flag
  - empire defect timer
  - pvp flag cooldown
@@ -1333,6 +1334,8 @@ See also: SET LASTNAME
 "SHOW LEARNED"
 
 Usage:  show learned <player | empire> [search phrase]
+        show learned empire <name> [search phrase]
+        show learned player <name> [search phrase]
 
 Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".

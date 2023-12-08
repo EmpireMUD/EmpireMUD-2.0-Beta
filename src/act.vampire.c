@@ -48,14 +48,15 @@ EVENTFUNC(vampire_feeding_event);
 * Cancels vampire feeding, if happening.
 *
 * @param char_data *ch The vampire who's biting someone.
+* @param bool preventable If TRUE, may be prevented. If FALSE, it will definitely stop.
 * @return bool TRUE if biting was canceled; FALSE if nobody was biting.
 */
-bool cancel_biting(char_data *ch) {
+bool cancel_biting(char_data *ch, bool preventable) {
 	char_data *vict;
 	
 	if (ch && (vict = GET_FEEDING_FROM(ch))) {
-		if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
-			msg_to_char(ch, "You can't seem to stop!\r\n");
+		if (preventable && (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_BLOOD_STARVED(ch))) {
+			msg_to_char(ch, "You can't seem to stop%s!\r\n", (IS_BLOOD_STARVED(ch) ? " yourself" : ""));
 			return TRUE;
 		}
 		
@@ -152,7 +153,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 * @param char_data *ch The acting player
 */
 void cancel_siring(char_data *ch) {
-	cancel_biting(ch);
+	cancel_biting(ch, FALSE);
 }
 
 
@@ -409,10 +410,10 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
-		cancel_biting(ch);
+		cancel_biting(ch, FALSE);
 	}
 	if (GET_FED_ON_BY(victim)) {
-		cancel_biting(GET_FED_ON_BY(victim));
+		cancel_biting(GET_FED_ON_BY(victim), FALSE);
 	}
 	
 	GET_FEEDING_FROM(ch) = victim;
@@ -717,8 +718,10 @@ void update_biting_char(char_data *ch) {
 			// give back a little blood
 			set_blood(victim, 1);
 			set_blood(ch, GET_BLOOD(ch) - 1);
-			cancel_biting(ch);
-			return;
+			cancel_biting(ch, TRUE);
+			if (GET_FEEDING_FROM(ch) != victim) {
+				return;
+			}
 		}
 
 		act("You pull the last of $N's blood from $S veins, and $E falls limply to the ground!", FALSE, ch, 0, victim, TO_CHAR);
@@ -932,7 +935,7 @@ ACMD(do_bite) {
 
 	one_argument(argument, arg);
 
-	if (!*argument && cancel_biting(ch)) {
+	if (!*argument && cancel_biting(ch, TRUE)) {
 		// skip this if they typed an arg; cancels if possible; sends own message if so
 	}
 	else if (GET_FEEDING_FROM(ch)) {
@@ -1617,20 +1620,21 @@ ACMD(do_regenerate) {
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
 			case REGEN_HEALTH: {
-				msg_to_char(ch, "You focus your blood into regeneration.\r\n");
-				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM);
+				snprintf(buf, sizeof(buf), "You focus your blood into regeneration.%s", report_healing(ch, amount, ch));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				heal(ch, ch, amount);
 				break;
 			}
 			case REGEN_MANA: {
-				msg_to_char(ch, "You draw out the mystical energy from your blood.\r\n");
-				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
-				msg_to_char(ch, "You focus your blood into your sore muscles.\r\n");
-				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM);
+				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}

@@ -617,7 +617,7 @@ A frosty portal spews flurries of snow from beneath an arch of ice!~
 portal. Snow blasts through the portal and, as the snow lands on your skin, you
 feel the electric mana of the Magiterranean -- the realm of nature mages.
 ~
-8 0 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 10 0
 S
@@ -673,7 +673,7 @@ must come and defeat the Polar Baron, should he use his glacial powers to
 spread frost across the world. There is a small plaque beneath the runes.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 E
@@ -689,7 +689,7 @@ The glacier has split and is beginning to melt.~
    Massive crevices have formed in the glacier, and a steady stream of
 meltwater is pouring from them.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 9 48
 T 10555

@@ -55,7 +55,7 @@ A rope hangs down from the bottom of the hut. (difficulty)~
 ticket into the hut. You can select your difficulty here.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 0
 T 19005
@@ -724,7 +724,7 @@ A huge, crude bell is hanging nearby. (difficulty)~
 You can use this to set the adventure's difficulty.
 Usage: difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 13 0
 T 19060

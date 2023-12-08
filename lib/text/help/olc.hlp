@@ -886,6 +886,7 @@ This tells the ability when to trigger skill gain:
  &cMOVING&0 - Gains when the player moves.
  &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
  &cONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
+ &cNOT-WHILE-ASLEEP&0 - Will not trigger skill gain while sleeping.
 
 See also: OLC ABILITIES
 #d
@@ -2367,6 +2368,8 @@ Available flags:
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
  NO-CUSTOMIZE - cannot be customized by players
+ NO-AUTO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
+    normally used on buildings that are part of adventures like the Hamlet.
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
@@ -2397,6 +2400,7 @@ Fields:
   &c-commands&0 - match the text of the commands line, if any
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
   &c-functions&0 - see HELP BEDIT FUNCTIONS
@@ -2440,7 +2444,6 @@ Available functions:
  FORGE - can use the forge and reforge commands here
  GLASSBLOWER - required for some crafts
  GUARD-TOWER - hostile toward enemy players, at range
- HENGE - allows Chant of Druids
  &rLIBRARY*&0 - can write and store books here
  MAIL - players can send mail here
  MILL - can use the mill command here
@@ -3208,6 +3211,7 @@ dash (-) are matched to the crop's name, title, and icons.
 
 Fields:
   &c-climate&0 - see HELP CROPEDIT CLIMATE
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP CROPEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP CROPEDIT INTERACTION
   &c-mapout&0 - color name, see HELP CROPEDIT MAPOUT
@@ -3864,6 +3868,37 @@ The following flags for generics are available:
     to MOON generics.
 
 See also: OLC GENERICS
+#d
+"GENEDIT FULLSEARCH" "GENERIC FULLSEARCH
+
+Usage:  .gen fullsearch -<field> <argument> <...>
+
+This command allows you to search for generics matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the generic's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP GENEDIT FLAGS
+  &c-type&0 - see HELP GENEDIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Liquid fields (see HELP GENERIC LIQUID):
+  &c-drunk&0, &c-drunkover&0, &c-drunkunder&0 - Search drunk values
+  &c-hunger&0, &c-hungerover&0, &c-hungerunder&0 - Search hunger values
+  &c-thirst&0, &c-thirstover&0, &c-thirstunder&0 - Search thirst values
+  &c-liquidflagged&0 - See GENEDIT LIQUID FLAGS
+
+Moon fields (see HELP GENERIC MOON):
+  &c-mooncycle&0, &c-mooncycleover&0, &c-mooncycleunder&0 - Search moon cycle values
+
+Examples:
+ > .gen fullsearch -type LIQUID brown
+ > .gen fullsearch -flagged BASIC -type COMPONENT
+ > .gen fullsearch -type MOON -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find component generics with obj 6423 ("some
+sticks") as their representative item, use ".o search 6423".
 #d
 "GENEDIT ITEM"
 
@@ -4684,6 +4719,14 @@ The following attack types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+30. bow (shoot) - a normal bow
+31. crossbow (shoot) - a crossbow
+32. pistol (shoot) - a small firearm
+33. musket (shoot) - a large firearm
+34. fire breath - dragons
+35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+37. animal whip - animals, non-disarmable whip
 
 See also: OLC MOBILES
 #d
@@ -4729,47 +4772,47 @@ that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
 Never set a flag marked with an * (asterisk).
 
 Available mob flags:
- BRING-A-FRIEND - Assists any non-charmed mob in combat. Without this, mobs
+ &cBRING-A-FRIEND&0 - Assists any non-charmed mob in combat. Without this, mobs
    will still assist other mobs in their same follow-chain if no players are
    in the chain and if neither are charmed.
- SENTINEL - Stays in one room and never wanders.
- AGGR - Aggressive; will attack players.
- ISNPC - Is an NPC (this is always set).
- MOUNTABLE - Can be ridden by players.
- MILKABLE - Can be milked in a stable.
- SCAVENGER - Eats corpses off the ground (not larger than the mob).
- NO-CORPSE - Leaves no corpse when it dies (loot falls on the ground).
- TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
- ANIMAL - Counts as an animal for herding, tying, etc.
- MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
- *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- NO-ATTACK - Mob can be in combat, but will not hit
- SPAWNED - De-spawns after 5 minutes if no players are nearby.
- CHAMPION - Will rescue its leader in combat.
- EMPIRE - Will not be saved through reboots.
- * - Unused (formerly FAMILIAR)
- *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
- CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
- PURSUE - Will pursue players who flee in combat.
- HUMAN - Counts as a human for various commands.
- VAMPIRE - Counts as a vampire for various commands.
- CASTER - Has a mana pool; counts as a caster.
- TANK - Has a larger health pool and better tank attributes.
- DPS - Deals more damage and has better combat attributes.
- HARD - More difficult than other mobs of the same level.
- GROUP - Much more difficult, requires a group.
- *EXTRACTED - Do not set.
- !LOOT - Will not drop any loot.
- !TELEPORT - Cannot teleport to this mob.
- !EXP - Players get no experience from using abilities against this mob.
- !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+ &cSENTINEL&0 - Stays in one room and never wanders.
+ &cAGGR&0 - Aggressive; will attack players.
+ &cISNPC&0 - Is an NPC (this is always set).
+ &cMOUNTABLE&0 - Can be ridden by players.
+ &cMILKABLE&0 - Can be milked in a stable.
+ &cSCAVENGER&0 - Eats corpses off the ground (not larger than the mob).
+ &cNO-CORPSE&0 - Leaves no corpse when it dies (loot falls on the ground).
+ &cTIED&0 - Tied to a hitching post; will not wander unless untied; does not despawn.
+ &cANIMAL&0 - Counts as an animal for herding, tying, etc.
+ &cMOUNTAIN-WALK&0 - Can cross mountain tiles.
+ &cAQUATIC&0 - Can cross water tiles, but won't move on land. (see WATERWALK)
+ &c*PLURAL&0 - Uses the pronouns 'their', 'they', and 'them' in act messages.
+ &cNO-ATTACK&0 - Mob can be in combat, but will not hit
+ &cSPAWNED&0 - De-spawns after 5 minutes if no players are nearby.
+ &cCHAMPION&0 - Will rescue its leader in combat.
+ &cEMPIRE&0 - Will not be saved through reboots.
+ &c*PICKPOCKETED&0 - Has already been pickpocketed; cannot be pickpocketed again.
+ &cCITYGUARD&0 - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
+ &cPURSUE&0 - Will pursue players who flee in combat.
+ &cHUMAN&0 - Counts as a human for various commands.
+ &cVAMPIRE&0 - Counts as a vampire for various commands.
+ &cCASTER&0 - Has a mana pool; counts as a caster.
+ &cTANK&0 - Has a larger health pool and better tank attributes.
+ &cDPS&0 - Deals more damage and has better combat attributes.
+ &cHARD&0 - More difficult than other mobs of the same level.
+ &cGROUP&0 - Much more difficult, requires a group.
+ &c*EXTRACTED&0 - Do not set.
+ &c!LOOT&0 - Will not drop any loot.
+ &c!TELEPORT&0 - Cannot teleport to this mob.
+ &c!EXP&0 - Players get no experience from using abilities against this mob.
+ &c!RESCALE&0 - Mob will not rescale after its initial scaling, e.g. if you set
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
- SILENT - Mob will not display custom strings while this flag is on.
- COINS - Mob will drop coins on death/pickpocket.
- NO-COMMAND - Cannot be commanded/ordered.
- NO-UNCONSCIOUS - Cannot be knocked unconscious (from toggle autokill).
+ &cSILENT&0 - Mob will not display custom strings while this flag is on.
+ &cCOINS&0 - Mob will drop coins on death/pickpocket.
+ &cNO-COMMAND&0 - Cannot be commanded/ordered.
+ &cNO-UNCONSCIOUS&0 - Cannot be knocked unconscious (from toggle autokill).
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
 
 See also: OLC MOBILES
 #d
@@ -5747,31 +5790,32 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- UNIQUE - can only equip 1 at a time
- PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
- LIGHT - lights up the room (prefer LIGHT item type instead of the flag)
- SUPERIOR - crafted by a master craftsman, adds the (superior) tag
- LARGE - takes up 2 inventory slots, adds the (large) tag
- *CREATED - created by a god command
- 1-USE - is destroyed when un-equipped
- SLOW - for weapons, attacks slower
- FAST - for weapons, attacks faster
- ENCHANTED - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
- JUNK - will be cleaned up on the ground, even on claimed land -- worthless
- CREATABLE - can be created using the 'create' command (usually resources)
- SCALABLE - item can be scaled (see HELP ITEM SCALING)
- TWO-HANDED - weapon requires both hand slots
- BOE - item binds to a player when it is equipped (or used)
- BOP - item binds to a player when it is picked up
- STAFF - counts as a staff (even if it doesn't have a staff weapon type)
- UNCOLLECTED-LOOT - will decay on the ground if no player gets it
- *KEEP - player has marked the object with the 'keep' command
- !AUTOSTORE - will not autostore (e.g. furniture)
- HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
- GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
- GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
- !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
- SEEDED - has already been seeded with the 'seed' command
+ &cUNIQUE&0 - can only equip 1 at a time
+ &cPLANTABLE&0 - can be planted as a crop (see OEDIT PLANTS)
+ &cLIGHT&0 - lights up the room (prefer LIGHT item type instead of the flag)
+ &cSUPERIOR&0 - crafted by a master craftsman, adds the (superior) tag
+ &cLARGE&0 - takes up 2 inventory slots, adds the (large) tag
+ &c*CREATED&0 - created by a god command
+ &c1-USE&0 - is destroyed when un-equipped
+ &cSLOW&0 - for weapons, attacks slower
+ &cFAST&0 - for weapons, attacks faster
+ &cENCHANTED&0 - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
+ &cJUNK&0 - will be cleaned up on the ground, even on claimed land -- worthless
+ &cCREATABLE&0 - can be created using the 'create' command (usually resources)
+ &cSCALABLE&0 - item can be scaled (see HELP ITEM SCALING)
+ &cTWO-HANDED&0 - weapon requires both hand slots
+ &cBOE&0 - item binds to a player when it is equipped (or used)
+ &cBOP&0 - item binds to a player when it is picked up
+ &cSTAFF&0 - counts as a staff (even if it doesn't have a staff weapon type)
+ &cUNCOLLECTED-LOOT&0 - will decay on the ground if no player gets it
+ &c*KEEP&0 - player has marked the object with the 'keep' command
+ &c!AUTOSTORE&0 - will not autostore (e.g. furniture)
+ &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
+ &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
+ &cGENERIC-DROP&0 - never receives the HARD-DROP/GROUP-DROP flags
+ &c!STORE&0 - can't be stored (or home/warehouse stored), can be toggled by scripts
+ &cSEEDED&0 - has already been seeded with the 'seed' command
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d
@@ -5806,7 +5850,8 @@ Fields:
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP OEDIT APPLY
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
+  &c-flagged&0, &-cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
@@ -5820,10 +5865,11 @@ Fields:
   &c-material&0 - see OEDIT MATERIAL
   &c-requirestools&0 - see HELP OEDIT TOOLS
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
+  &c-timer&0, &c-timerover&0, &c-timerunder&0 - Search timer values.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
-  &c-wear&0 - see HELP OEDIT WEAR
+  &c-wear&0, &c-nowear&0 - see HELP OEDIT WEAR
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Type-based fields:
@@ -5835,8 +5881,8 @@ Examples:
  > .o fullsearch -level 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Minipet Use"
-trigger, use ".t search 9900".
+other OLC types. For example, to find all objects with the "Summon Mob Whistle"
+trigger, use ".t search 9910".
 
 See also: LIGHT ITEM
 #d
@@ -6349,8 +6395,10 @@ The following weapon types are available:
 31. crossbow (shoot) - a crossbow
 32. pistol (shoot) - a small firearm
 33. musket (shoot) - a large firearm
-34. sling (shoot) - a primitive ranged weapon that shoots sling bullets
-35. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+34. fire breath - dragons
+35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+37. animal whip - animals, non-disarmable whip
 
 See also: OLC OBJECTS
 #d
@@ -6669,13 +6717,19 @@ Supported types:
   building (search designatable rooms with -flag ROOM)
   craft
   crop
+  generic
   mobile
   object
   progress
+  quest
   room template
   sector
+  skill
   trigger
   vehicle
+
+Unsupported types: adventure, augment, archetype, book, class, event, faction,
+   global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -7256,6 +7310,35 @@ The following quest flags are available:
 
 See also: OLC QUESTS, DAILY QUEST
 #d
+"QEDIT FULLSEARCH" "QUEST FULLSEARCH
+
+Usage:  .q fullsearch -<field> <argument> <...>
+
+This command allows you to search for quests matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the quest's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP QEDIT FLAGS
+  &c-level&0, &clevelover&0, &clevelunder&0 - Search the level range of quests
+  &c-dailycycle&0 - Search for a specific daily cycle id
+  &c-nodailycycle&0 - Search for daily quests with no cycle
+  &c-activedailycycle&0, &c-inactivedailycycle&0 - Dailies that are active or not
+  &c-repeat&0, &crepeatover&0, &crepeatunder&0 - Search for specific repeat times
+  &c-reward&0 - Search for 1 reward type; see HELP QEDIT REWARDS
+  &c-prereq&0 - Search for 1 prerequisite type; see HELP REQUIREMENTS
+  &c-task&0 - Search for 1 task type; see HELP REQUIREMENTS
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .q fullsearch -level 150
+ > .q fullsearch -flagged EMPIRE-ONLY -task OWN-BUILDING
+ > .q fullsearch -repeatover 1 -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find quests that reward a green knitted
+stocking (object 16678), use ".o search 16678".
+#d
 "QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
 
 Usage:  .maxlevel <level>
@@ -7424,6 +7507,7 @@ with a dash (-) are matched to the template's title and other text.
 
 Fields:
   &c-affects&0 - see HELP REDIT AFFECTS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged -unflagged&0 - see HELP REDIT FLAGS
   &c-functions&0 - see HELP REDIT FUNCTIONS
   &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
@@ -7577,6 +7661,7 @@ Available tasks:
  &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
  &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
  &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
+ &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -7765,6 +7850,7 @@ Fields:
   &c-buildflagged&0 - see HELP SECTEDIT BUILDFLAGS
   &c-climate&0 - see HELP SECTEDIT CLIMATE
   &c-evolution&0 - has a certain evolution, see SECTEDIT EVOLUTIONS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP SECTEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
   &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
@@ -8041,6 +8127,29 @@ Available flags:
  &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT FULLSEARCH" "SKILL FULLSEARCH
+
+Usage:  .skill fullsearch -<field> <argument> <...>
+
+This command allows you to search for skills matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the skill's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP SKILLEDIT FLAGS
+  &c-maxlevel&0, &cmaxlevelover&0, &cmaxlevelunder&0 - Search the max-level setting
+  &c-mindrop&0, &cmindropover&0, &cmindropunder&0 - Search the min-drop-level setting
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .skill fullsearch -maxlevel 75
+ > .skill fullsearch -flag BASIC -flag CASTER
+ > .skill fullsearch -flag CASTER -vmin 0 -vmax 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find skills that have "Resurrect" (ability
+219), use ".abil search 219".
 #d
 "SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
 
@@ -8994,6 +9103,7 @@ Fields:
   &c-capacity -capacityover -capacityunder&0 - specific capacity
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS

@@ -3,7 +3,7 @@ spirit faded~
 the faded spirit~
 A faded spirit lingers in the air.
 ~
-150 250 bdJ nG 3
+150 250 bdJL nG 3
 0 0 0 15 -1
 D
    The spirit fades in and out as moves around the room, visible against the
@@ -71,7 +71,7 @@ bucket wooden~
 a bucket~
 A wooden bucket is sitting here, filled with water.
 ~
-50 50 dhJ nG 2
+50 50 dhJL nG 2
 0 0 15 5 -1
 D
    The sudsy little wooden bucket hops along, sloshing water on the floor as
@@ -120,7 +120,7 @@ sponge~
 a sponge~
 A sponge is scrubbing the floor.
 ~
-50 50 bdhJ nG 1
+50 50 bdhJL nG 1
 0 0 24 21 -1
 D
    The sponge zigs and zags across the floors as it chases the hopping bucket
@@ -143,7 +143,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-150 250 dvxHJ n 3
+150 250 dvxHJL n 3
 1 0 68 15 -1
 D
    Corwin is a young man of perhaps 16 years. He keeps his hair cropped short
@@ -170,7 +170,7 @@ Mageina barista~
 Mageina~
 The barista seems to be daydreaming behind the bar. (list)
 ~
-150 250 bdvxIJ n 3
+150 250 bdvxIJL n 3
 2 0 0 16 -1
 D
    Mageina hardly spares you a glance as she leans behind the bar, idly
@@ -236,7 +236,7 @@ Huberus instructor~
 Instructor Huberus~
 Instructor Huberus is seated atop her desk.
 ~
-150 250 bdvxIJ n 3
+150 250 bdvxIJL n 3
 2 0 0 16 -1
 D
    Instructor Huberus is a gruff sort of woman, well-dressed in overflowing
@@ -264,7 +264,7 @@ S
 #n the shopkeep~
 #n is behind the counter, wearing an apron. (list)
 ~
-150 250 bdvAIJ n 3
+150 250 bdvAIJL n 3
 1 0 0 15 -1
 D
    He's dressed in black slacks, a gray shirt, and a purple vest with the Hazel
@@ -308,7 +308,7 @@ Elamm man young eager~
 Elamm~
 An eager young man is seated at a desk.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 16 -1
 D
    Elamm is dressed in well-pressed black slacks and a crisp white shirt. He
@@ -351,7 +351,7 @@ Akeldama student pale~
 Akeldama~
 A pale student is seated in the back.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 16 -1
 D
    Akeldama has chosen a seat in the corner, barely touched by the flickering
@@ -391,7 +391,7 @@ Annaca watcher~
 Watcher Annaca~
 Annaca is watching over the apprentices.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Annaca looks bedraggled in her loose midnight blue robes. The toll that
@@ -455,7 +455,7 @@ apprentice kayla~
 Apprentice Kayla~
 Apprentice Kayla is on her bed, writing something.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Kayla is dressed in simple white apprentice robes. She wears her hair in
@@ -477,7 +477,7 @@ cosimo apprentice~
 Apprentice Cosimo~
 Apprentice Cosimo reads from a book as he wanders around.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 102 15 -1
 D
    Cosimo is clad in white apprentice robes with fiery red trim. On his face he
@@ -496,7 +496,7 @@ tyrone apprentice~
 Apprentice Tyrone~
 Apprentice Tyrone is standing here.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 0 15 -1
 D
    Tyrone is tall, with soft features and black eyes. His face bears no creases
@@ -536,7 +536,7 @@ Wright wrangler~
 Wrangler Wright~
 The goblin wrangler is cleaning up the mess. (list)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Though he's old and more than a little scarred, Wrangler Wright seems to be
@@ -585,7 +585,7 @@ goblin caged cages~
 the caged goblin~
 A goblin sits with its arms and legs dangling out of its cage.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    The cages aren't large enough to stand in, so this poor goblin is dangling
@@ -652,7 +652,7 @@ goblin caged cages~
 a caged goblin~
 A goblin is laying on the dirty floor of her cage.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    The cages have not been cleaned in some time, but one hapless goblin has
@@ -683,7 +683,7 @@ goblin caged cages~
 a caged goblin~
 One of the goblins is trying to climb the bars of its cage.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    One of the goblins has become restless and is trying to climb the bars of
@@ -714,7 +714,7 @@ Chicanders warden ~
 the warden~
 The warden, Chicanders, is overseeing the track. (race)
 ~
-150 250 bdvIJ n 3
+150 250 bdvIJL n 3
 1 0 0 15 -1
 D
    With his hair receding and his gut protruding, Warden Chicanders has settled
@@ -741,7 +741,7 @@ Annelise enchanter~
 Enchanter Annelise~
 Enchanter Annelise is leaning on a table.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Annelise is strikingly young for a woman wearing the many purple robes of a
@@ -799,7 +799,7 @@ sorceress grand high~
 the Grand High Sorceress~
 The Grand High Sorceress sits on her desk, legs crossed. (difficulty)
 ~
-150 250 bdhxyzJK coDEG 3
+150 250 bdhxyzJKL coDEG 3
 2 0 0 22 -1
 D
    The sorceress sits on top of her desk, legs crossed in front of her,
@@ -855,7 +855,7 @@ broom~
 a broom~
 A broom is sweeping up the remaining debris.
 ~
-50 50 dhJ nG 2
+50 50 dhJL nG 2
 0 0 36 5 -1
 D
    With its short heather pole and twiggy end, this old besom broom would be
@@ -899,7 +899,7 @@ duster feather~
 a feather duster~
 A feather duster swishes as it flies across every surface.
 ~
-50 50 dhJ nG 2
+50 50 dhJL nG 2
 0 0 103 21 -1
 D
    This elegant little plume of fluffy red feathers is bound by a strap of
@@ -966,7 +966,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Apprentice Ravinder is here.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 0 15 -1
 D
    Ravinder Singh is not a tall man, but he stands tall in his violet dastar,
@@ -1008,7 +1008,7 @@ sponge giant~
 the sponge~
 A giant sponge tries in futility to clean the empty cages.
 ~
-50 50 bdhJ nG 2
+50 50 bdhJL nG 2
 0 0 24 15 -1
 D
    The oversized sponge looks old and worn, discolored from years spent in
@@ -1064,7 +1064,7 @@ water first embodiment living~
 the First Water~
 You are surrounded by the living embodiment of the First Water! (difficulty)
 ~
-150 250 bdhyzDJK chDEG 5
+150 250 bdhyzDJKL chDEG 5
 0 0 0 14 -1
 D
    The water on all sides of you is alive! You have found yourself trapped in
@@ -1091,7 +1091,7 @@ Paige page~
 Paige~
 A page is bustling past you.
 ~
-150 250 dvxHJ n 3
+150 250 dvxHJL n 3
 2 0 50 15 -1
 D
    Paige is a young woman with her brown and blonde hair in a jaw-length bob.
@@ -1112,7 +1112,7 @@ caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is supervising the residents.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 0 15 -1
 D
    Where the other sorcerers would wear a robe, Caius is draped in a white
@@ -1171,7 +1171,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is pacing. (list)
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Niamh's black hair shows fiery red roots as she stoops to pick up a book.
@@ -1222,7 +1222,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is standing here.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 83 15 -1
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -1239,7 +1239,7 @@ mop bucket~
 a mop~
 A mop carries a bucket past you.
 ~
-50 50 dhJ nG 2
+50 50 dhJL nG 2
 0 0 35 5 -1
 D
    The mop has a pale handle, perhaps made from poplar, with the yarn of the
@@ -1281,7 +1281,7 @@ otherworlder tall blue person~
 the otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor.
 ~
-150 250 bdvxJ nG 3
+150 250 bdvxJL nG 3
 0 0 0 15 -1
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1308,7 +1308,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the otherworlder.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1371,7 +1371,7 @@ scaldorran lich~
 the Lich Scaldorran~
 Scaldorran the Lich twists and curls in the air.
 ~
-150 250 bdvxJ nG 3
+150 250 bdvxJL nG 3
 1 0 0 15 -1
 D
    Scaldorran is a mass of tattered gray linen wraps, slithering and writhing
@@ -1570,7 +1570,7 @@ skeleton~
 the skeleton~
 A skeleton is picking bits of flesh off its bones.
 ~
-150 250 bdJ nG 3
+150 250 bdJL nG 3
 0 0 0 15 -1
 D
    The skeleton is seated on top of a work bench, perplexed by several spare
@@ -1615,7 +1615,7 @@ Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is channeling a spell. (list)
 ~
-150 250 bdJ nG 3
+150 250 bdJL nG 3
 1 0 0 15 -1
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -1671,7 +1671,7 @@ Annelise enchanter~
 Enchanter Annelise~
 Enchanter Annelise is working on something.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Annelise is strikingly young for a woman wearing the many purple robes of
@@ -1735,7 +1735,7 @@ Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here. (list)
 ~
-150 250 bdvxIJ n 3
+150 250 bdvxIJL n 3
 1 0 0 15 -1
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -1787,7 +1787,7 @@ goef oreonic rock creature pitch black~
 Goef the Oreonic~
 A pitch black rock creature stands in the center of the room. (attune)
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 0 0 0 5 -1
 D
    It stands in the center of the room, sometimes so still that it looks like a
@@ -1815,7 +1815,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 Apprentice Sanjiv is using an arcane contraption on the walls.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Sanjiv is dressed in a white kurta with a violet hem along the bottom. He's
@@ -1878,7 +1878,7 @@ Amets page~
 Page Amets~
 A page is bustling around.
 ~
-150 250 dvxHJ n 3
+150 250 dvxHJL n 3
 1 0 64 15 -1
 D
    Amets is a portly man with a bright red sash over his plain jute robe. He's
@@ -1903,7 +1903,7 @@ fox gray grey~
 a gray fox~
 There is a gray fox sniffing around.
 ~
-150 250 djJ n 3
+150 250 djJL n 3
 0 0 102 15 -1
 D
    The curious fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -1948,7 +1948,7 @@ fox gray grey~
 the gray fox~
 A gray fox is sitting by the gate.
 ~
-150 250 bdjJ n 3
+150 250 bdjJL n 3
 0 0 14 15 -1
 D
    The loyal fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -1963,7 +1963,7 @@ Loern goblin~
 Loern~
 Beneath the stone, Loern kneels on a reed mat.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    Except for the rare bow where he touches his head to the ground, you can
@@ -1988,7 +1988,7 @@ Raek goblin~
 Raek~
 Raek is looking at everything.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 0 15 -1
 D
    Raek's gray-green skin is lighter than most of the goblins here, and his
@@ -2027,7 +2027,7 @@ Ortimer goblin~
 Ortimer~
 Ortimer is laying on the higher bed.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    Dressed in a green robe that nearly matches his moss-green skin, you suppose
@@ -2201,7 +2201,7 @@ Meyina goblin~
 Meyina~
 Meyina sits by the fire.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    Meyina stokes the fire with a piece of wood, then brushes ashes from her
@@ -2233,7 +2233,7 @@ Orkhan goblin boy~
 Orkhan~
 There's a boy sitting on one of the taller houses.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 86 15 -1
 D
    Orkhan, a slight boy with verdant jade skin, is sitting on the edge of one
@@ -2251,7 +2251,7 @@ Khoab goblin~
 Khoab~
 Khoab is snacking as he walks.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 0 15 -1
 D
    Khoab has a sack of boiled clams tucked under his arm and every so often,
@@ -2287,7 +2287,7 @@ Zelen goblin~
 Zelen~
 Zelen is standing here.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 0 15 -1
 D
    Zelen's bright green skin is all the brighter as he sweats in the sun. He
@@ -2325,7 +2325,7 @@ Pimmi goblin~
 Pimmi~
 Pimmi is organizing the store room.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    Pimmi's bright hazel eyes are undimmed by their place on her deeply creased,
@@ -2428,7 +2428,7 @@ Elver worthy goblin~
 Elver the Worthy~
 Elver the Worthy stands in the center of the arena. (difficulty)
 ~
-150 250 bdhDJK csEG 3
+150 250 bdhDJKL csEG 3
 1 0 0 5 -1
 D
    Elver is on the small side, even for a goblin, nearly outsized by his own
@@ -2469,7 +2469,7 @@ Nailbokh axe goblin~
 Nailbokh the Axe~
 Nailbokh the Axe stands in the center of the arena.
 ~
-150 250 bdhzDJK cG 3
+150 250 bdhzDJKL cG 3
 2 0 0 2 -1
 D
    Nailbokh drags her giant stone axe across the arena sand, drawing a line
@@ -2510,7 +2510,7 @@ Biksi champion orka goblin~
 Biksi, Champion of Orka~
 Biksi, Champion of Orka, stands in the center of the arena.
 ~
-150 250 bdhyzDJK cEG 3
+150 250 bdhyzDJKL cEG 3
 2 0 0 7 -1
 D
    The Champion of Orka stands in the center of the arena, readying a pair of
@@ -2553,7 +2553,7 @@ sheila page~
 Page Sheila~
 Sheila is bustling about, getting things in order.
 ~
-150 250 dvxHJ n 3
+150 250 dvxHJL n 3
 2 0 99 15 -1
 D
    Sheila is dressed in a plain jute robe, like all the pages in the tower. She
@@ -2573,7 +2573,7 @@ cabinet filing~
 a filing cabinet~
 A filing cabinet is standing here.
 ~
-50 50 dhJ nG 2
+50 50 dhJL nG 2
 0 0 93 5 -1
 D
    The wooden cabinet is mahogany, stained with a slight violet tinge, with
@@ -2617,7 +2617,7 @@ bookshelf shelf ebony~
 a bookshelf~
 An ebony bookshelf is standing here.
 ~
-50 50 dhJ nG 3
+50 50 dhJL nG 3
 0 0 61 5 -1
 D
    The bookshelf is made from dark ebony wood with striped calamander accents
@@ -2658,7 +2658,7 @@ thorley apprentice~
 Apprentice Thorley~
 Apprentice Thorley is leaning against the wall.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 0 15 -1
 D
    Thorley is a young apprentice, not more than fourteen by the look of him.
@@ -2709,7 +2709,7 @@ celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is rushing from task to task.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Celiya strikes an elegant figure in robes of violet, lavender, lilac, and
@@ -2824,7 +2824,7 @@ trolley cleaning~
 the cleaning trolley~
 A cleaning trolley is parked in the middle of the office.
 ~
-150 250 bdJ nG 3
+150 250 bdJL nG 3
 0 0 0 15 -1
 D
    The little trolley is equipped with a bucket and mob, some sponges, a large
@@ -2880,7 +2880,7 @@ Grace sorcerer assistant~
 Grace~
 The sorcerer's assistant, Grace, is sorting papers. (list)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Grace, with her white hair up in a high beehive and her blue witchglass
@@ -2965,7 +2965,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh sits with his head in his hands.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Barrosh has shed his violet high sorcerer robes in the corner and now sits
@@ -3056,7 +3056,7 @@ knezz grand high sorcerer~
 Grand High Sorcerer Knezz~
 Grand High Sorcerer Knezz is standing here. (list)
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 49 15 -1
 D
    Knezz has the characteristic long, unkempt salt-and-pepper hair and beard
@@ -3153,7 +3153,7 @@ celiya grand high sorcerer~
 Grand High Sorcerer Celiya~
 Grand High Sorcerer Celiya is here.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Grand High Sorcerer Celiya strikes an elegant figure in robes of gold,
@@ -3273,7 +3273,7 @@ Niamh acting high sorcerer~
 Acting High Sorcerer Niamh~
 Acting High Sorcerer Niamh is standing here. (list)
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Niamh stands tall in her freshly-pressed purple and black robes. In the
@@ -3405,7 +3405,7 @@ Gron goblin~
 Gron~
 Gron is passing through the plaza.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    Gron's olive green skin nearly matches the shade of his oversized robe,
@@ -3775,7 +3775,7 @@ crowd~
 the crowd~
 A crowd has gathered on the adjoining rooftops.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 0 0 0 15 -1
 D
    A crowd of eager goblins has gathered on the rooftops that overlook the
@@ -3789,7 +3789,7 @@ Broker captain guard goblin~
 Captain Broker~
 Captain Broker is doing the rounds.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    Broker is clad in a purple quilted cloth doublet that gives him an almost
@@ -3829,7 +3829,7 @@ Celles voice goblin~
 Celles~
 Celles, Voice of Orka, stands before the stone.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    With long, straight, translucent white hair that flows over her deep purple
@@ -3901,7 +3901,7 @@ Filliks goblin~
 Filliks~
 On the lower bed, Filliks is mending some socks.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    Though she's small even for a goblin, Filliks has an old woman's fine white
@@ -3939,7 +3939,7 @@ Pim goblin~
 Pim~
 Pim is tidying up.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    Pim wears a pleated purple skirt and a gray blouse. Two large white shell
@@ -3971,7 +3971,7 @@ fox gray grey fermin~
 the gray fox~
 A gray fox is sitting by the oven.
 ~
-150 250 bdjJ n 3
+150 250 bdjJL n 3
 0 0 14 15 -1
 D
    The curious fox isn't much larger than a cat, with an ashen-silver coat, a
@@ -4016,7 +4016,7 @@ moth~
 the moth~
 There is a moth on the wall.
 ~
-1 1 bdj mnG 3
+1 1 bdjL mnG 3
 0 0 2 15 -1
 D
    The small moth sits motionless on the wall, its silvery wings folded down in
@@ -4029,7 +4029,7 @@ pilgrim altar~
 an altar pilgrim~
 A pilgrim is here.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 0 0 0 15 -1
 D
    This NPC is loaded and renamed dynamically as part of the scenery for the
@@ -4045,7 +4045,7 @@ Ryken elder goblin~
 Ryken the Elder~
 Ryken the Elder is on his knees in front of one of the bodies.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    You can hear Ryken's bones creaking as he moves. He's an old man, surely not
@@ -4079,7 +4079,7 @@ crowd~
 the crowd~
 There is a large crowd of people around the plaza.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 0 0 0 15 -1
 D
    The plaza is a sea of green, with dozens of goblins, many of whom are
@@ -4135,7 +4135,7 @@ Ryke goblin~
 Ryke~
 Ryke is out for a walk.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 86 15 -1
 D
    Ryke strolls along at a leisurely pace, looking at everyone he passes, and
@@ -4153,7 +4153,7 @@ Yena goblin~
 Yena~
 Yena is standing here.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 2 0 0 15 -1
 D
    Yena is young, with fair chartreuse skin and long, straight, brown hair tied
@@ -4188,7 +4188,7 @@ Ballen goblin~
 Ballen~
 Ballen is out for a stroll.
 ~
-150 250 dJ n 3
+150 250 dJL n 3
 1 0 0 15 -1
 D
    Though he just seems to be out for a walk, Ballen seems to be sight-seeing
@@ -4221,7 +4221,7 @@ Orkonna goblin~
 Orkonna~
 Orkonna is stirring one of the cauldrons.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 2 0 0 15 -1
 D
    Orkonna is big, for a goblin, both in height and in weight. Her head is
@@ -4263,7 +4263,7 @@ Orlin goblin repairman~
 Orlin~
 A repairman is working on the damage.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 1 0 0 15 -1
 D
    Orlan's jade skin glistens in the sun as he works, shirtless, on repairing
@@ -4324,7 +4324,7 @@ guards pair alivva rink~
 the guards~
 A pair of guards stand at attention inside the gate.
 ~
-150 250 bdJ n 3
+150 250 bdJL n 3
 0 0 0 15 -1
 D
    Both of the little green guards are wearing quilted armor in deep purple and

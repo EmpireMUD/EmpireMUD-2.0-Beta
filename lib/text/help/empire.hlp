@@ -428,6 +428,7 @@ Log types are:
  Trade - Logs related to empire trades.
  Workforce - Shows logs of production and consumption (shown only on request).
  Progress - Recently completed goals and purchased rewards.
+ Alert - Important messages.
  
 See also: PRIVILEGE
 #

@@ -2034,10 +2034,10 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			else {
 				msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
-				ProtocolNoEcho(d, true);
 			}
 		}
 		else {	// password ok
+			ProtocolNoEcho(d, false);
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
@@ -2392,39 +2392,92 @@ int perform_dupe_check(descriptor_data *d) {
 }
 
 
-// basic name validation and processing
-int _parse_name(char *arg, char *name) {
-	int i, iter, caps;
-	int max_caps = config_get_int("max_capitals_in_name");
-
-	/* skip whitespaces */
-	for (; isspace(*arg); arg++);
+/**
+* basic name validation and processing
+*
+* @param char *arg The name from the user.
+* @param char *name A buffer to store the modified name to.
+* @param descriptor_data *desc Optional: The person who will receive the error message if this fails. (May be NULL,)
+* @param bool reduced_restrictions For "set" or other immortal commands: checks fewer things if TRUE.
+* @return int 1 if the name was invalid (and sent a message); 0 if it was valid (no message sent).
+*/
+int _parse_name(char *arg, char *name, descriptor_data *desc, bool reduced_restrictions) {
+	int iter, caps;
+	descriptor_data *desc_iter;
 	
-	if (max_caps > 0) {
-		caps = 0;
-		for (iter = 0; iter < strlen(arg); ++iter) {
-			if (isupper(arg[iter])) {
-				++caps;
+	const char *allowed_chars = "'-";
+
+	// skip whitespace
+	skip_spaces(&arg);
+	
+	// validate parts of the string
+	caps = 0;
+	for (iter = 0; iter < strlen(arg); ++iter) {
+		if (!isalpha(arg[iter]) && !strchr(allowed_chars, arg[iter])) {
+			if (desc) {
+				msg_to_desc(desc, "Names cannot contain '%c'.\r\n", arg[iter]);
 			}
-		}
-		if (caps > max_caps) {
 			return 1;
 		}
+		else if (isupper(arg[iter])) {
+			++caps;
+		}
 	}
-	
-	// don't allow leading apostrophe or dash
-	if (*arg == '\'' || *arg == '-') {
+	if (!reduced_restrictions && config_get_int("max_capitals_in_name") > 0 && caps > config_get_int("max_capitals_in_name")) {
+		if (desc) {
+			msg_to_desc(desc, "Names may not contain more than %d capital letters.\r\n", config_get_int("max_capitals_in_name"));
+		}
 		return 1;
 	}
-
-	// check for anything that's not an apostrophe or dash
-	for (i = 0; (*name = *arg); arg++, i++, name++)
-		if (!isalpha(*arg) && *arg != '\'' && *arg != '-')
-			return 1;
-
-	if (!i)
-		return (1);
-
+	if (!reduced_restrictions && (strlen(arg) < 2 || strlen(arg) > MAX_NAME_LENGTH)) {
+		if (desc) {
+			msg_to_desc(desc, "Name must be between 2 and %d letters in length.\r\n", MAX_NAME_LENGTH);
+		}
+		return 1;
+	}
+	if (reduced_restrictions && strlen(arg) > MAX_NAME_LENGTH * 2) {
+		if (desc) {
+			msg_to_desc(desc, "Name too long.\r\n");
+		}
+		return 1;
+	}
+	if (!isalpha(*arg)) {
+		if (desc) {
+			msg_to_desc(desc, "Name must begin with a letter.\r\n");
+		}
+		return 1;
+	}
+	if (!isalpha(arg[strlen(arg) - 1])) {
+		if (desc) {
+			msg_to_desc(desc, "Name must end with a letter.\r\n");
+		}
+		return 1;
+	}
+	if (fill_word(arg) || reserved_word(arg)) {
+		if (desc) {
+			msg_to_desc(desc, "'&&Z%s' is an invalid name.\r\n", arg);
+		}
+		return 1;
+	}
+	
+	// check other descriptors for the same name
+	LL_FOREACH(descriptor_list, desc_iter) {
+		if (desc_iter->character && GET_NAME(desc_iter->character) && !str_cmp(GET_NAME(desc_iter->character), arg)) {
+			if (STATE(desc_iter) == CON_PLAYING || STATE(desc_iter) == CON_RMOTD) {
+				// playing state: name is valid (maybe just reconnecting)
+				continue;
+			}
+			else {
+				if (desc) {
+					msg_to_desc(desc, "Someone is already using that name.\r\n");
+				}
+				return 1;
+			}
+		}
+	}
+	
+	// seems good
+	strcpy(name, arg);
 	return (0);
 }
 
@@ -2433,7 +2486,7 @@ int _parse_name(char *arg, char *name) {
 * Main "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
-	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
+	char tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;
 	bitvector_t bit;
 	bool show_start = FALSE;
@@ -2446,6 +2499,7 @@ void nanny(descriptor_data *d, char *arg) {
 	}
 
 	skip_spaces(&arg);
+	d->idle_tics = 0;
 
 	switch (STATE(d)) {
 		case CON_GET_NAME: {	/* wait for input of name */
@@ -2471,8 +2525,8 @@ void nanny(descriptor_data *d, char *arg) {
 				return;
 			}
 			else {
-				if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name) || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-					msg_to_desc(d, "Invalid name, please try another.\r\nName: %s", telnet_go_ahead(d));
+				if (_parse_name(arg, tmp_name, d, FALSE)) {
+					msg_to_desc(d, "Please try another name: %s", telnet_go_ahead(d));
 					return;
 				}
 				if ((temp_char = load_player(tmp_name, TRUE))) {
@@ -2489,14 +2543,13 @@ void nanny(descriptor_data *d, char *arg) {
 					
 					msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 					ProtocolNoEcho(d, true);
-					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
 				}
 				else {
 					/* player unknown -- make new character */
 					const char *rules = config_get_string("name_rules");
 
-					/* Check for multiple creations of a character. */
+					// Check bans and multiple creations of a character.
 					if (!Valid_Name(tmp_name)) {
 						msg_to_desc(d, "Invalid name, please try another.\r\nName: %s", telnet_go_ahead(d));
 						return;
@@ -2724,7 +2777,6 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;
@@ -2735,9 +2787,8 @@ void nanny(descriptor_data *d, char *arg) {
 				msg_to_desc(d, "\r\nEnter a last name: %s", telnet_go_ahead(d));
 				return;
 			}
-			else if ((_parse_name(arg, tmp_name)) || !Valid_Name(tmp_name) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-				msg_to_desc(d, "\r\nInvalid last name, please try another.\r\n"
-						  "Enter a last name: %s", telnet_go_ahead(d));
+			else if (_parse_name(arg, tmp_name, d, FALSE) || !Valid_Name(tmp_name)) {
+				msg_to_desc(d, "\r\nPlease try a different last name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else {

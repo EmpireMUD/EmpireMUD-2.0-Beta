@@ -3,7 +3,7 @@ apprentice sorcerer's sorcerers~
 the sorcerer's apprentice~
 A sorcerer's apprentice stands in front of the rift (adventure).
 ~
-0 25 bdvI cn 3
+0 25 bdvIL cn 3
 1 0 0 15 -1
 D
    The apprentice looks rather comical in his oversized blue robe, hat, and
@@ -44,7 +44,7 @@ elemental rocky earth~
 a rocky elemental~
 A rocky earth elemental rises from the soil.
 ~
-0 25 dhK cG 2
+0 25 dhKL cG 2
 0 0 21 14 -1
 D
 This ball of rocks rolls and roils as if it's alive!
@@ -73,7 +73,7 @@ elemental fire burning~
 a burning elemental~
 A fire elemental burns brightly!
 ~
-0 25 dhK cG 2
+0 25 dhKL cG 2
 0 0 18 33 -1
 D
 Like a flame without a wick, this elemental burns brightly but all-too-briefly.
@@ -101,7 +101,7 @@ elemental wind tornado~
 a wind elemental~
 A wind elemental rips across the land like a tornado!
 ~
-0 25 dhK cG 2
+0 25 dhKL cG 2
 0 0 27 21 -1
 D
 It looks like a little cone of dirt and debris.
@@ -126,7 +126,7 @@ elemental water~
 a water elemental~
 A water elemental splashes about.
 ~
-0 25 dhK cG 2
+0 25 dhKL cG 2
 0 0 10 20 -1
 D
    When it rests, it just looks like a puddle. But when it's playing, it's
@@ -324,7 +324,7 @@ druid badger creature huge man~
 the badger druid~
 A huge creature - half man, half badger - looms over you!
 ~
-5 0 bdx c 3
+5 0 bdxL c 3
 1 0 0 10 -1
 D
    The druid's brown robe is in tatters, barely clinging to the shoulders of
@@ -353,7 +353,7 @@ druid archdruid #n~
 Archdruid #n~
 Archdruid #n seems to glow with the energy of the Grove!
 ~
-5 0 bdvxI c 3
+5 0 bdvxIL c 3
 2 3 0 5 -1
 D
    The archdruid's brown robe is woven with strands of glimmering gold and
@@ -382,7 +382,7 @@ druid tall crow~
 the crow druid~
 A tall druid in a black feathered cloak is perched above you.
 ~
-5 0 bdvxI c 3
+5 0 bdvxIL c 3
 2 0 0 10 -1
 D
    This druid must belong to a different cult than the others, because instead
@@ -413,7 +413,7 @@ druid rotund turtle~
 the turtle druid~
 A rotund druid wallows peacefully in the water.
 ~
-5 0 bdx c 3
+5 0 bdxL c 3
 1 0 0 9 -1
 D
    The druid is fat -- very fat, compared to the thin, gaunt figures that walk
@@ -619,7 +619,7 @@ tree gnarled old grandmother poplar's poplars goods~
 Grandmother Poplar's Poplar Goods~
 A gnarled old tree with the face of a woman is selling some goods. (list)
 ~
-0 0 bdAB cn 5
+0 0 bdABL cn 5
 2 0 0 15 -1
 D
    The strange old tree is carved with the face of an aged woman. She gives a
@@ -643,7 +643,7 @@ fox orange talking~
 the talking fox~
 An orange talking fox stands here, wary.
 ~
-0 0 bd cn 2
+0 0 bdL cn 2
 0 0 0 15 -1
 D
    This little orange fox is standing on its hind legs, as if it thinks it's
@@ -667,7 +667,7 @@ spirit strange grove~
 the Spirit of the Grove~
 A strange spirit lingers in the air.
 ~
-0 0 bd cn 0
+0 0 bdL cn 0
 0 0 0 15 -1
 D
 The spirit is vaguely fox-like.

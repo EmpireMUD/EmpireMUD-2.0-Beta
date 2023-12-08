@@ -140,7 +140,7 @@ int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island)
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (!(obj = store->proto)) {
+			if (store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -191,7 +191,7 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->vnum == vnum) {
+			if (store->amount > 0 && store->vnum == vnum) {
 				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
@@ -1069,6 +1069,13 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_EVENT_NOT_RUNNING: {
 				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+				break;
+			}
+			
+			// ones that cannot be detected but are always true for progress goals
+			case REQ_DAYTIME:
+			case REQ_NIGHTTIME: {
+				task->current = task->needed;
 				break;
 			}
 			
@@ -2538,7 +2545,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 25) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d progress goals)\r\n", count);
 	}
 	else if (count == 0) {

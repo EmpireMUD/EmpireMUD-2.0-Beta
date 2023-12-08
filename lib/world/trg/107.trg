@@ -1033,7 +1033,7 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 if !%is_veh%
   %load% obj %vnum% %actor% inv 25
 else
@@ -1044,7 +1044,7 @@ else
     %own% %veh% %emp%
   end
 end
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10753
@@ -1068,9 +1068,9 @@ if !%actor.can_afford(30)%
   %send% %actor% ~%self% tells you, 'Big human needs 30 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(30)%
+set coinstr %actor.charge_coins(30)%
 %load% obj %vnum% %actor% inv 25
-%send% %actor% You buy %named% for 30 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10754
@@ -1167,9 +1167,9 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv 25
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10759
@@ -1193,14 +1193,14 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% veh %vnum% 25
 set emp %actor.empire%
 set veh %self.room.vehicles%
 if %emp%
   %own% %veh% %emp%
 end
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10760

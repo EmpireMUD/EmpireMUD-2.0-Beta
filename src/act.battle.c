@@ -322,7 +322,7 @@ ACMD(do_firstaid) {
 	struct over_time_effect_type *dot, *next_dot;
 	bool has_dot = FALSE;
 	char_data *vict;
-	int cost = 20;
+	int amount, cost = 20;
 	int levels[] = { 10, 20, 50 };
 	
 	if (!can_use_ability(ch, ABIL_FIRSTAID, MOVE, cost, NOTHING)) {
@@ -368,15 +368,22 @@ ACMD(do_firstaid) {
 	}
 	
 	charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
+	amount = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch);
 	
 	if (ch == vict) {
-		msg_to_char(ch, "You apply first aid to your wounds.\r\n");
-		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM);
+		snprintf(buf, sizeof(buf), "You apply first aid to your wounds.%s", report_healing(ch, amount, ch));
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+		
+		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
 	}
 	else {
-		act("You apply first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n applies first aid to your wounds.", FALSE, ch, NULL, vict, TO_VICT);
-		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT);
+		snprintf(buf, sizeof(buf), "You apply first aid to $N's wounds.%s", report_healing(vict, amount, ch));
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_HEAL);
+		
+		snprintf(buf, sizeof(buf), "$n applies first aid to your wounds.%s", report_healing(vict, amount, vict));
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_HEAL);
+		
+		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
 	}
 	
 	// remove DoTs
@@ -388,7 +395,7 @@ ACMD(do_firstaid) {
 		}
 	}
 	
-	heal(ch, vict, CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch));
+	heal(ch, vict, amount);
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_FIRSTAID, 15);
 		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);

@@ -718,8 +718,9 @@ See also: SKILL, SKILL CAPS
 
 Command:  transport [destination]
 
-When you start, or die, you appear at a starting location. These are safe
-locations which will give you a moment to prepare to go out into the world.
+When you start the game, you appear at a starting location. When you die, if
+you don't have a tomb, you end up at the nearest starting locadtion. These are
+safe places which will give you a moment to prepare to go out into the world.
 No player can be attacked at a starting location.
 
 You can travel randomly between starting locations using the transport command.
@@ -728,6 +729,8 @@ of a person who is at one) to transport directly there.
 
 On EmpireMUD, starting locations are called Towers of Souls. Nobody may claim
 the area immediately around a Tower of Souls (&y*/\*&0).
+
+See also: TOMB, TRANSPORT
 #
 SUMMON
 

@@ -1166,7 +1166,7 @@ See also: DISPLAY, IGNORE, GROUP, TELL, SAY
 #
 HELP
 
-Usage:  help [command]
+Usage:  help [topic]
 
 Help searches for a partial match of the entered word, including any
 spaces that may follow the word. Help alone will give a list of the
@@ -1176,6 +1176,8 @@ Examples:
 
   > help hide
     will find the help text for the hide ability.
+
+Immortals may view mortal help files with: help -m <topic>
 
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #
@@ -2221,7 +2223,9 @@ SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 Usage:  say <string>
         say #<language> <string>
         oocsay <string>
-        <tell | whisper | ask> <player> <string>
+        tell <player> <string>
+        ask <player> [#<language>] <string>
+        whisper <player> [#<language>] <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
@@ -2237,6 +2241,7 @@ Examples:
   > say Hey, does anyone know how to get to Oz?
   > say #low-goblish Hello!
   > tell catje hi, how are you?
+  > whisper phil #english Do you speak this language?
 
 You can use ' as a shorthand for say, and " for oocsay, as in:
 
@@ -2423,6 +2428,9 @@ If the 'workforce no-work' option is set on a docks, it won't be used by the
 shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
+
+Privileged immortals may check the status of other empires' shipments by
+typing: ship "empire name" status
 
 See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
 #

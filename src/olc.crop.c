@@ -277,7 +277,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_crop(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
@@ -294,6 +294,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -303,6 +304,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, crop_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, crop_flags)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
@@ -360,6 +362,9 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		if (only_mapout != NOTHING && GET_CROP_MAPOUT(crop) != only_mapout) {
 			continue;
 		}
+		if (*extra_search && !find_exdesc(extra_search, GET_CROP_EX_DESCS(crop), NULL)) {
+			continue;
+		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
 			LL_FOREACH(GET_CROP_INTERACTIONS(crop), inter) {
@@ -397,7 +402,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d crop%s)\r\n", count, PLURAL(count));
 	}
 	else if (count == 0) {

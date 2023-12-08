@@ -79,9 +79,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 /**
 * @param room_data *room The room to check.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
 * @return bool TRUE if any adjacent room is light; otherwise FALSE.
 */
-bool adjacent_room_is_light(room_data *room) {
+bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness) {
 	room_data *to_room;
 	int dir;
 	
@@ -91,7 +92,7 @@ bool adjacent_room_is_light(room_data *room) {
 	}
 
 	for (dir = 0; dir < NUM_SIMPLE_DIRS; ++dir) {
-		if ((to_room = dir_to_room(room, dir, TRUE)) && room_is_light(to_room, FALSE)) {
+		if ((to_room = dir_to_room(room, dir, TRUE)) && room_is_light(to_room, FALSE, ignore_magic_darkness)) {
 			return TRUE;
 		}
 	}
@@ -117,7 +118,7 @@ int distance_can_see_in_dark(char_data *ch) {
 	if (HAS_BONUS_TRAIT(ch, BONUS_LIGHT_RADIUS)) {
 		++dist;
 	}
-	if (room_is_light(IN_ROOM(ch), TRUE)) {
+	if (room_is_light(IN_ROOM(ch), TRUE, CAN_SEE_IN_MAGIC_DARKNESS(ch))) {
 		++dist;
 	}
 
@@ -1276,7 +1277,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
-		if (MAGIC_DARKNESS(room) && !can_see_in_dark_room(ch, room, TRUE)) {
+		if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_MAGIC_DARKNESS(ch) && !can_see_in_dark_room(ch, room, TRUE)) {
 			// no title
 			send_to_char("It is pitch black...\r\n", ch);
 		}
@@ -1450,7 +1451,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 								show_map_to_char(ch, mappc, to_room, options);
 							}
 						}
-						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
+						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room, CAN_SEE_IN_MAGIC_DARKNESS(ch))) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) && !show_blocked) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
@@ -1568,7 +1569,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// commands: only show if the first entry is not a \0, which terminates the list
-	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+	if (!IS_SET(options, LRR_LOOK_OUT_INSIDE) && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 		if (GET_BUILDING(room)) {
 			if (GET_BLD_COMMANDS(GET_BUILDING(room)) && *GET_BLD_COMMANDS(GET_BUILDING(room))) {
 				msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
@@ -1598,7 +1599,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
 			}
 		}
-	}
+	}	// end tutorials-only commands section
 	
 	// used from here on
 	emp = ROOM_OWNER(HOME_ROOM(room));
@@ -2328,7 +2329,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 				// political and informative don't show the 'dim' section
 				strcpy(roombuf, "Dark");
 			}
-			else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
+			else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room, CAN_SEE_IN_MAGIC_DARKNESS(ch))) && !PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
 				// see-distance to see-distance+2: show as dim tile (if political/informative are off)
 				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, TRUE));
 			}
@@ -2621,7 +2622,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance) {
 				continue;
 			}
-			if (!match_char_name(ch, i, arg, NOBITS)) {
+			if (!match_char_name(ch, i, arg, NOBITS, NULL)) {
 				continue;
 			}
 			
@@ -2729,7 +2730,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	}
 	else {
 		DL_FOREACH(character_list, i) {
-			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL))) {
+			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL, NULL))) {
 				found = 1;
 				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}

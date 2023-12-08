@@ -43,12 +43,6 @@ ACMD(do_slash_channel);
 // local prototypes
 char_data *find_minipet(char_data *ch);
 
-// configs for minipets
-// TODO this seemsl ike it should move to structs.h / utils.h
-#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && GET_LEADER(mob) == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
-bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
-bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -2067,7 +2061,8 @@ ACMD(do_companions) {
 	struct companion_mod *cmod;
 	ability_data *abil;
 	size_t size, lsize;
-	bool found, full;
+	bool found, full, low_in_skill = FALSE;
+	int found_low_level = 0;
 	
 	skip_spaces(&argument);
 	
@@ -2147,6 +2142,19 @@ ACMD(do_companions) {
 		else if (!cmod && !multi_isname(argument, GET_PC_NAME(proto))) {
 			continue;	// no custom keywords and doesn't match mob's keywords
 		}
+		if ((cd->from_abil && GET_MIN_SCALE_LEVEL(proto) < CLASS_SKILL_CAP) && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
+			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+				found_low_level = GET_MIN_SCALE_LEVEL(proto);
+				low_in_skill = ABIL_ASSIGNED_SKILL(find_ability_by_vnum(cd->from_abil)) ? TRUE : FALSE;
+			}
+			continue;	// low skill
+		}
+		if ((!cd->from_abil || GET_MIN_SCALE_LEVEL(proto) > CLASS_SKILL_CAP) && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
+			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+				found_low_level = GET_MIN_SCALE_LEVEL(proto);
+			}
+			continue;	// low skill
+		}
 		
 		// seems to be found!
 		found_cd = cd;
@@ -2161,12 +2169,12 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You already have a companion. Dismiss it first.\r\n");
 		return;
 	}
-	if (!found_cd || !proto) {
-		msg_to_char(ch, "You don't have a companion called '%s'.\r\n", argument);
+	if (!found_cd && found_low_level > 0) {
+		msg_to_char(ch, "You must be level %d%s to summon that companion.\r\n", found_low_level, (low_in_skill ? " in the skill" : ""));
 		return;
 	}
-	if (GET_MIN_SCALE_LEVEL(proto) > GET_COMPUTED_LEVEL(ch)) {
-		msg_to_char(ch, "You must be level %d to summon that companion.\r\n", GET_MIN_SCALE_LEVEL(proto));
+	if (!found_cd || !proto) {
+		msg_to_char(ch, "You don't have a companion called '%s'.\r\n", argument);
 		return;
 	}
 	if (abil && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
@@ -2919,8 +2927,11 @@ ACMD(do_lastname) {
 			msg_to_char(ch, "You no longer have a personal lastname.\r\n");
 			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: none", GET_NAME(ch));
 		}
-		else if ((_parse_name(arg2, new_name)) || !Valid_Name(new_name) || strlen(new_name) < 2 || strlen(new_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, new_name)) || reserved_word(buf)) {
-			msg_to_char(ch, "Invalid lastname.\r\n");
+		else if (_parse_name(arg2, new_name, ch->desc, FALSE)) {
+			// sends own error message if it return 1
+		}
+		else if (!Valid_Name(new_name)) {
+			msg_to_char(ch, "You cannot be called '%s'.\r\n", new_name);
 		}
 		else {
 			// ok!
@@ -3189,8 +3200,8 @@ ACMD(do_minipets) {
 			dismiss_any_minipet(ch);	// out with the old...
 			
 			mob = read_mobile(GET_MOB_VNUM(to_summon), TRUE);
-			set_mob_flags(mob, default_minipet_flags);
-			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
+			set_mob_flags(mob, DEFAULT_MINIPET_FLAGS);
+			SET_BIT(AFF_FLAGS(mob), DEFAULT_MINIPET_AFFS);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
 			scale_mob_as_companion(mob, ch, 0);
@@ -3794,13 +3805,13 @@ ACMD(do_skin) {
 ACMD(do_summon) {
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
-	int count, num, fol_count, to_summon;
+	int count, num = 0, fol_count, to_summon, found_low_level = 0;
 	struct ability_data_list *adl;
 	char_data *mob, *proto = NULL;
 	any_vnum summon_vnum;
 	ability_data *abil;
 	size_t size, lsize;
-	bool found, full;
+	bool found, full, low_in_skill = FALSE;
 	
 	// maximum npcs present when summoning
 	int max_npcs = config_get_int("summon_npc_limit");
@@ -3934,6 +3945,13 @@ ACMD(do_summon) {
 				if (!multi_isname(argument, GET_PC_NAME(proto))) {
 					continue;	// no string match
 				}
+				if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
+					if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
+						found_low_level = GET_MIN_SCALE_LEVEL(proto);
+						low_in_skill = ABIL_ASSIGNED_SKILL(abil) ? TRUE : FALSE;
+					}
+					continue;
+				}
 				
 				// else: summon it!
 				to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
@@ -3946,6 +3964,11 @@ ACMD(do_summon) {
 					}
 				}
 				break;
+			}
+			
+			if (num == 0 && found_low_level > 0) {
+				msg_to_char(ch, "You must be level %d%s to summon that.\r\n", found_low_level, (low_in_skill ? " in the skill" : ""));
+				return;
 			}
 		}
 		else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {

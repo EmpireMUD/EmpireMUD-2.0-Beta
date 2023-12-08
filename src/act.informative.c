@@ -570,14 +570,15 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	char buf[MAX_STRING_LENGTH];
 	const char *gstr;
 	char_data *dummy = NULL;
-	int amt, bits = 0;
+	int amt, number;
+	
+	number = get_number(&arg);
 
 	if (!obj && !veh && (!arg || !*arg)) {
 		send_to_char("Look in what?\r\n", ch);
 	}
-	else if (!obj && !veh && !(bits = generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
-		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
-		send_to_char(buf, ch);
+	else if (!obj && !veh && !(obj = get_obj_for_char_prefer_container(ch, arg, &number)) && !generic_find(arg, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh)) {
+		msg_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (veh) {
 		// vehicle section
@@ -1863,7 +1864,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 		found_one = FALSE;
 		eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
+			if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
 				if (!found_one) {
 					snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
 					CAP(buf);
@@ -2909,12 +2910,21 @@ ACMD(do_gen_text_string) {
 
 ACMD(do_help) {
 	struct help_index_element *found;
+	int level = GET_ACCESS_LEVEL(ch);
 
 	if (!ch->desc)
 		return;
 
 	skip_spaces(&argument);
-
+	
+	// optional -m arg
+	if (!strn_cmp(argument, "-m ", 3)) {
+		level = LVL_MORTAL;
+		argument += 3;
+		skip_spaces(&argument);
+	}
+	
+	// no-arg: basic help screen
 	if (!*argument) {
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			send_to_char(text_file_strings[TEXT_FILE_HELP_SCREEN_SCREENREADER], ch);
@@ -2924,8 +2934,10 @@ ACMD(do_help) {
 		}
 		return;
 	}
+	
+	// with arg: look up by keyword
 	if (help_table) {
-		found = find_help_entry(GET_ACCESS_LEVEL(ch), argument);
+		found = find_help_entry(level, argument);
 		
 		if (found) {
 			page_string(ch->desc, found->entry, FALSE);
@@ -3557,7 +3569,7 @@ ACMD(do_nearby) {
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
 	struct instance_data *inst;
-	struct empire_city_data *city;
+	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;
 	int iter, dist, size, max_dist;
 	bool found = FALSE;
@@ -3641,12 +3653,20 @@ ACMD(do_nearby) {
 	
 	// check cities
 	if (cities) {
+		// will always try to show a city we're in
+		if (ROOM_OWNER(IN_ROOM(ch)) && get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, NULL, NULL) != TER_FRONTIER) {
+			in_city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	    }
+	    else {
+	    	in_city = NULL;
+	    }
+		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
-				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
+				if ((dist <= max_dist || city == in_city) && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
 					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));

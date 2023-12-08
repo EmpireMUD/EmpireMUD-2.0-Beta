@@ -5,7 +5,7 @@ A logging axe is lying here.~
    This crude iron axe appears to be goblin manufacture. You have no idea how a
 little goblin could wield this massive axe. It's a bit awkward even for you.
 ~
-1 hmp an a 8
+1 hmp an a 0 8
 0 1 2
 2 0
 A
@@ -20,7 +20,7 @@ A vial of goblin lumberjack brew is sitting here.~
    Finally, the explanation for goblins being able to use human sized weapons
 comes to light: as with everything else, they cheat.
 ~
-25 m a 0 7
+25 m a 0 0 7
 -1 0 3030
 8 0
 A
@@ -28,7 +28,7 @@ A
 C
 50 50
 R
-5130 0
+4 5130 0
 S
 #18102
 sandals goblin pair~
@@ -37,7 +37,7 @@ A pair of goblin sandals is falling apart here.~
    The only thing more pathetically flimsy than goblin shoes, this pair of
 goblin sandals seems to be falling apart before your eyes.
 ~
-2 mp ag 0 5
+2 mp ag 0 0 5
 0 0 0
 7 0
 A
@@ -50,7 +50,7 @@ A crude wooden cap is lying here.~
    Goblin lumberjacks tend to abandon precision in favor of enthusiasm.
 Natural selection eventually developed these thick wooden caps.
 ~
-2 mp ae 0 2
+2 mp ae 0 0 2
 0 0 0
 0 0
 A
@@ -62,7 +62,7 @@ goblin lumberjack pauldrons~
 A pair of goblin lumberjack pauldrons is lying here.~
 These wooden shoulder plates will deflect up to at least 50% of falling trees!
 ~
-2 mp ai 0 1
+2 mp ai 0 0 1
 0 0 0
 0 0
 A
@@ -75,7 +75,7 @@ A pair of goblin lumberjack leggings is lying here.~
    These smelly but surprisingly durable leggings are made from the raw hide of
 a warg. Or maybe a rat. It's hard to tell.
 ~
-2 mp af 0 1
+2 mp af 0 0 1
 0 0 0
 7 0
 A
@@ -87,7 +87,7 @@ the retreating goblins~
 The goblins are retreating!~
 This item tracks the time left before the camp disappears.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 0 6
 T 18106

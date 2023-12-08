@@ -29,15 +29,656 @@
 
 /**
 * Contents:
-*   Update Functions -- Write a function to be run once at startup
+*   Beta 2 Update Functions
+*   Beta 3 Update Functions
+*   Beta 4 Update Functions
+*   Beta 5 Update Functions -- Write a function to be run once at startup
+*     (Search for ADD HERE)
 *   Update Data -- Add to the end of this array to activate the function
+*     (search for ADD HERE)
 *   Core Functions
 *   Pre-b5.116 World Loading
 */
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// UPDATE FUNCTIONS ////////////////////////////////////////////////////////
+//// BETA 2 UPDATE FUNCTIONS /////////////////////////////////////////////////
+
+void b2_5_workforce_update(void) {
+	empire_data *emp, *next_emp;
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// auto-balance was removed and the same id was used for dismantle-mines
+		set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
+// 2.8 removes the color preference
+PLAYER_UPDATE_FUNC(b2_8_update_players) {
+	REMOVE_BIT(PRF_FLAGS(ch), BIT(9));	// was PRF_COLOR
+}
+
+
+void b2_9_crop_update(void) {
+	// this is actually a bug that occurred on EmpireMUDs that patched
+	// b2.8 on a live copy; this will look for tiles that are in an
+	// error state -- crops that were in the 'seeded' state during the
+	// b2.8 reboot would have gotten bad original-sect data
+	room_data *room, *next_room;
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
+			// normal case: crop with a 'Seeded' original sect
+			// the fix is just to set the original sect to the current
+			// sect so it will detect a new sect on-harvest instead of
+			// setting it back to seeded
+			change_base_sector(room, SECT(room));
+		}
+		/* as of b5.84, this is no longer active because climate_default_sector is gone
+		else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == BASE_SECT(room)) {
+			// second error case: a Seeded crop with itself as its
+			// original sect: detect a new original sect
+			const sector_vnum climate_default_sector[NUM_CLIMATES];
+			sector_data *sect;
+			crop_data *cp;
+			if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+				change_base_sector(room, sect);
+			}
+		}
+		*/
+	}
+}
+
+
+void b2_11_update(void) {
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+	char_data *mob, *mobpr;
+	obj_data *obj, *objpr;
+
+	log(" - assigning mob triggers...");
+	DL_FOREACH(character_list, mob) {
+		if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
+			mob->proto_script = copy_trig_protos(mobpr->proto_script);
+			assign_triggers(mob, MOB_TRIGGER);
+		}
+	}
+
+	log(" - assigning triggers to object list...");
+	DL_FOREACH(object_list, obj) {
+		if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+
+	log(" - assigning triggers to warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
+				eus->obj->proto_script = copy_trig_protos(objpr->proto_script);
+				assign_triggers(eus->obj, OBJ_TRIGGER);
+			}
+		}
+	}
+
+	log(" - assigning triggers to trading post objects...");
+	DL_FOREACH(trading_list, tpd) {
+		if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
+			tpd->obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(tpd->obj, OBJ_TRIGGER);
+		}
+	}
+
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+}
+
+
+// 2.11 loads inventories and attaches triggers
+PLAYER_UPDATE_FUNC(b2_11_update_players) {
+	obj_data *obj, *proto;
+	int iter;
+
+	// no work if in-game (covered by other parts of the update)
+	if (!is_file) {
+		return;
+	}
+
+	check_delayed_load(ch);
+
+	// inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+			obj->proto_script = copy_trig_protos(proto->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+
+	// eq
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && (proto = obj_proto(GET_OBJ_VNUM(GET_EQ(ch, iter))))) {
+			GET_EQ(ch, iter)->proto_script = copy_trig_protos(proto->proto_script);
+			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
+		}
+	}
+}
+
+
+// this is a repeat of the b2.9 update, but should fix additional rooms
+void b3_0_crop_update(void) {
+	room_data *room, *next_room;
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
+			// normal case: crop with a 'Seeded' original sect
+			// the fix is just to set the original sect to the current
+			// sect so it will detect a new sect on-harvest instead of
+			// setting it back to seeded
+			change_base_sector(room, SECT(room));
+		}
+		/* as of b5.84, this is no longer active because climate_default_sector is gone
+		else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
+			// second error case: a Seeded crop with a Seeded crop as
+			// its original sect: detect a new original sect
+			const sector_vnum climate_default_sector[NUM_CLIMATES];
+			sector_data *sect;
+			crop_data *cp;
+			if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+				change_base_sector(room, sect);
+			}
+		}
+		*/
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BETA 3 UPDATE FUNCTIONS /////////////////////////////////////////////////
+
+// updater for existing mines
+void b3_1_mine_update(void) {
+	room_data *room, *next_room;
+	int type;
+
+	HASH_ITER(hh, world_table, room, next_room) {
+		if ((type = get_room_extra_data(room, 0)) <= 0) {	// 0 was ROOM_EXTRA_MINE_TYPE
+			continue;
+		}
+
+		switch (type) {
+			case 10: {	// iron
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 199);
+				break;
+			}
+			case 11: {	// silver
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 161);
+				break;
+			}
+			case 12: {	// gold
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 162);
+				break;
+			}
+			case 13: {	// nocturnium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 163);
+				break;
+			}
+			case 14: {	// imperium
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 164);
+				break;
+			}
+			case 15: {	// copper
+				set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, 160);
+				break;
+			}
+		}
+
+		remove_room_extra_data(room, 0);	// ROOM_EXTRA_MINE_TYPE prior to b3.1
+	}
+}
+
+
+PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
+	obj_data *obj, *next_obj, *new;
+	int iter;
+
+	check_delayed_load(ch);
+
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
+
+
+// removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
+void b3_2_map_and_gear(void) {
+	obj_data *obj, *next_obj, *new, *proto;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+
+	log("Applying b3.2 update...");
+
+	/* as of b5.84, this is no longer active because climate_default_sector is gone
+	log(" - updating the map...");
+	const sector_vnum climate_default_sector[NUM_CLIMATES];
+	room_data *room, *next_room;
+	crop_vnum type;
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
+	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
+	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
+	HASH_ITER(hh, world_table, room, next_room) {
+		// player-made
+		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
+			// remove the bits
+			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+			affect_total_room(room);
+		
+			// update the natural sector
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
+			}
+		}
+		
+		// crops
+		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
+			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, FALSE));
+			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
+		}
+	}
+	*/
+
+	log(" - disenchanting the object list...");
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+
+	log(" - disenchanting warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				eus->obj = new;
+				extract_obj(obj);
+			}
+		}
+	}
+
+	log(" - disenchanting trading post objects...");
+	DL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+
+	log(" - disenchanting player inventories...");
+	update_all_players(NULL, b3_2_player_gear_disenchant);
+
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+}
+
+
+// fixes some guild-patterend cloth that was accidentally auto-weaved in a previous patch
+// NOTE: the cloth is not storable, so any empire with it in normal storage must have had the bug
+void b3_6_einv_fix(void) {
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *isle, *next_isle;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	int total, amt;
+
+	obj_vnum vnum = 2344;	// guild-patterned cloth
+	obj_vnum cloth = 1359;
+	obj_vnum silver = 161;
+
+	proto = obj_proto(vnum);
+	if (!proto || GET_OBJ_STORAGE(proto) || !obj_proto(cloth) || !obj_proto(silver)) {
+		return;	// no work to do on this EmpireMUD
+	}
+
+	log("Fixing incorrectly auto-weaved guild-patterned cloth (2344)");
+
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		total = 0;
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->amount > 0 && store->vnum == vnum) {
+					amt = store->amount;
+					total += amt;
+					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
+					add_to_empire_storage(emp, isle->island, silver, 2 * amt);
+					HASH_DEL(isle->store, store);
+					free(store);
+				}
+			}
+		}
+
+		if (total > 0) {
+			log(" - [%d] %s: %d un-woven", EMPIRE_VNUM(emp), EMPIRE_NAME(emp), total);
+		}
+	}
+
+	save_all_empires();
+}
+
+
+// removes shipping ids that got stuck and are not in the holding pen
+void b3_11_ship_fix(void) {
+	vehicle_data *veh;
+
+	DL_FOREACH(vehicle_list, veh) {
+		if (IN_ROOM(veh) && VEH_SHIPPING_ID(veh) != -1 && (!GET_BUILDING(IN_ROOM(veh)) || GET_BLD_VNUM(GET_BUILDING(IN_ROOM(veh))) != RTYPE_SHIP_HOLDING_PEN)) {
+			VEH_SHIPPING_ID(veh) = -1;
+		}
+	}
+}
+
+
+// removes AFF_SENSE_HIDE
+PLAYER_UPDATE_FUNC(b3_12_update_players) {
+	// only care if they have a permanent sense-hide
+	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDE)) {
+		return;
+	}
+
+	check_delayed_load(ch);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+	affect_total(ch);	// in case they are getting it from a real affect
+}
+
+
+// respawns wild crops and converts 5% of jungle to crops
+void b3_15_crop_update(void) {
+	struct map_data *map;
+	crop_data *new_crop;
+	room_data *room;
+	
+	/*
+	const int SECT_JUNGLE = 28;	// convert jungles at random
+	const int JUNGLE_PERCENT = 5;	// change to change jungle to crop
+	const int SECT_JUNGLE_FIELD = 16;	// sect to use for crop
+	*/
+
+	LL_FOREACH(land_map, map) {
+		room = NULL;
+
+		if ((room = map->room)) {
+			if (ROOM_OWNER(room)) {
+				continue;	// skip owned tiles
+			}
+		}
+
+		if (map->crop_type) {
+			// update crop
+			if (room || (room = real_room(map->vnum))) {
+				new_crop = get_potential_crop_for_location(room, FALSE);
+				set_crop_type(room, new_crop ? new_crop : crop_table);
+			}
+		}
+		/* removed in b5.165 because wild rops aren't needed
+		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {
+			// transform jungle
+			if (room || (room = real_room(map->vnum))) {
+				change_terrain(room, SECT_JUNGLE_FIELD, NOTHING);	// picks own crop
+			}
+		}*/
+	}
+}
+
+
+// adds built-with resources to roads
+void b3_17_road_update(void) {
+	struct map_data *map;
+	room_data *room;
+
+	obj_vnum rock_obj = 100;
+
+	LL_FOREACH(land_map, map) {
+		if (!SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD)) {
+			continue;
+		}
+		if (!(room = real_room(map->vnum))) {
+			continue;
+		}
+
+		// ensure complex data
+		if (!COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room) = init_complex_data();
+		}
+
+		// add build cost in rocks if necessary
+		if (!GET_BUILT_WITH(room)) {
+			add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, rock_obj, 20, 0);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BETA 4 UPDATE FUNCTIONS /////////////////////////////////////////////////
+
+// adds approval
+PLAYER_UPDATE_FUNC(b4_1_approve_players) {
+	player_index_data *index;
+
+	// fix some level glitches caused by this patch
+	if (GET_IMMORTAL_LEVEL(ch) == -1) {
+		GET_ACCESS_LEVEL(ch) = MIN(LVL_MORTAL, GET_ACCESS_LEVEL(ch));
+	}
+	else {
+		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	if (GET_ACCESS_LEVEL(ch) == LVL_GOD) {
+		GET_ACCESS_LEVEL(ch) = LVL_START_IMM;
+	}
+
+	// if we should approve them (approve all imms now)
+	if (IS_IMMORTAL(ch) || (GET_ACCESS_LEVEL(ch) >= LVL_MORTAL && config_get_bool("auto_approve"))) {
+		if (config_get_bool("approve_per_character")) {
+			SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+		}
+		else {	// per-account (default)
+			SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+			SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		}
+	}
+
+	// update the index in case any of this changed
+	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+		update_player_index(index, ch);
+	}
+}
+
+
+// adds current mount to mounts list
+PLAYER_UPDATE_FUNC(b4_2_mount_update) {
+	check_delayed_load(ch);
+
+	if (GET_MOUNT_VNUM(ch)) {
+		add_mount(ch, GET_MOUNT_VNUM(ch), GET_MOUNT_FLAGS(ch) & ~MOUNT_RIDING);
+	}
+}
+
+
+// sets default fight message flags
+PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
+	SET_BIT(GET_FIGHT_MESSAGES(ch), DEFAULT_FIGHT_MESSAGES);
+}
+
+
+// convert data on unfinished buildings and disrepair
+void b4_15_building_update(void) {
+	struct resource_data *res, *disrepair_res;
+	room_data *room, *next_room;
+
+	HASH_ITER(hh, world_table, room, next_room) {
+		// add INCOMPLETE aff
+		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			affect_total_room(room);
+		}
+
+		// convert maintenance
+		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
+			// add maintenance
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+				// basic stuff
+				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+
+				// multiply by years of disrepair
+				LL_FOREACH(disrepair_res, res) {
+					res->amount *= COMPLEX_DATA(room)->disrepair;
+				}
+
+				// combine into existing resources
+				if (BUILDING_RESOURCES(room)) {
+					res = BUILDING_RESOURCES(room);
+					GET_BUILDING_RESOURCES(room) = combine_resources(res, disrepair_res);
+					free_resource_list(res);
+				}
+				else {
+					GET_BUILDING_RESOURCES(room) = disrepair_res;
+				}
+			}
+
+			// add damage (10% per year of disrepair)
+			COMPLEX_DATA(room)->damage += COMPLEX_DATA(room)->disrepair * GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / 10;
+		}
+
+		// clear this
+		if (COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room)->disrepair = 0;
+		}
+	}
+}
+
+
+// 4.19 removes the vampire flag
+PLAYER_UPDATE_FUNC(b4_19_update_players) {
+	bitvector_t PLR_VAMPIRE = BIT(14);
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
+}
+
+
+// 4.32 moves 2 rmt flags to fnc flags
+void b4_32_convert_rmts(void) {
+	bitvector_t RMT_PIGEON_POST = BIT(9);	// j. can use mail here
+	bitvector_t RMT_COOKING_FIRE = BIT(10);	// k. can cook here
+
+	room_template *rmt, *next_rmt;
+
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_MAIL);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: PIGEON-POST", GET_RMT_VNUM(rmt));
+		}
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_COOKING_FIRE);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: COOKING-FIRE", GET_RMT_VNUM(rmt));
+		}
+	}
+}
+
+
+// 4.36 needs triggers attached to studies
+void b4_36_study_triggers(void) {
+	const any_vnum bld_study = 5608, attach_trigger = 5609;
+	struct trig_proto_list *tpl;
+	room_data *room;
+
+	DL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_study) {
+			continue;
+		}
+
+		CREATE(tpl, struct trig_proto_list, 1);
+		tpl->vnum = attach_trigger;
+		LL_CONCAT(room->proto_script, tpl);
+
+		assign_triggers(room, WLD_TRIGGER);
+	}
+}
+
+
+// 4.38 needs triggers attached to towers
+void b4_38_tower_triggers(void) {
+	const any_vnum bld_tower = 5511, attach_trigger = 5511;
+	struct trig_proto_list *tpl;
+	room_data *room;
+
+	DL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_tower) {
+			continue;
+		}
+
+		CREATE(tpl, struct trig_proto_list, 1);
+		tpl->vnum = attach_trigger;
+		LL_CONCAT(room->proto_script, tpl);
+
+		assign_triggers(room, WLD_TRIGGER);
+	}
+}
+
+
+// b4.39 convert stored data from old files
+void b4_39_data_conversion(void) {
+	const char *EXP_FILE = LIB_ETC"exp_cycle";	// used prior to this patch
+	const char *TIME_FILE = LIB_ETC"time";
+
+	long l_in;
+	int i_in;
+	FILE *fl;
+
+	// exp cycle file
+	if ((fl = fopen(EXP_FILE, "r"))) {
+		fscanf(fl, "%d\n", &i_in);
+		data_set_long(DATA_DAILY_CYCLE, i_in);
+		log(" - imported daily cycle %ld", data_get_long(DATA_DAILY_CYCLE));
+		fclose(fl);
+		unlink(EXP_FILE);
+	}
+
+	// time file
+	if ((fl = fopen(TIME_FILE, "r"))) {
+		fscanf(fl, "%ld\n", &l_in);
+		data_set_long(DATA_WORLD_START, l_in);
+		log(" - imported start time %ld", data_get_long(DATA_WORLD_START));
+		fclose(fl);
+		unlink(TIME_FILE);
+
+		reset_time();
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BETA 5 UPDATE FUNCTIONS /////////////////////////////////////////////////
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
@@ -883,7 +1524,9 @@ void b5_58_gather_totals(void) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			// storage
 			HASH_ITER(hh, isle->store, store, next_store) {
-				add_production_total(emp, store->vnum, store->amount);
+				if (store->amount > 0) {
+					add_production_total(emp, store->vnum, store->amount);
+				}
 			}
 		}
 		
@@ -2684,6 +3327,15 @@ PLAYER_UPDATE_FUNC(b5_162_status_messages) {
 }
 
 
+// b5.165: Add some new fmessages to players
+PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
+	GET_FIGHT_MESSAGES(ch) |= FM_MY_HEALS | FM_HEALS_ON_ME | FM_HEALS_ON_ALLIES | FM_HEALS_ON_TARGET | FM_HEALS_ON_OTHER;
+}
+
+
+// ADD HERE, above: more beta 5 update functions
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UPDATE DATA /////////////////////////////////////////////////////////////
 
@@ -2697,6 +3349,36 @@ const struct {
 	// 2. do not insert in the middle, only at the end
 	// 3. never remove the last entry that was applied to the mud (you'd risk it re-running updaters or losing its place)
 	
+	// beta 2
+	{ "b2.5", b2_5_workforce_update, NULL, "Update to empires" },
+	{ "b2.7", NULL, NULL, "No update" },
+	{ "b2.8", NULL, b2_8_update_players, "Update to players" },
+	{ "b2.9", b2_9_crop_update, NULL, "Update to crops" },
+	{ "b2.11", b2_11_update, b2_11_update_players, "Trigger updates" },
+	
+	// beta 3
+	{ "b3.0", b3_0_crop_update, NULL, "Update to crops" },
+	{ "b3.1", b3_1_mine_update, NULL, "Update to mines" },
+	{ "b3.2", b3_2_map_and_gear, NULL, "Fixing map and gear" },
+	{ "b3.6", b3_6_einv_fix, NULL, "Fixing einventory" },
+	{ "b3.8", NULL, NULL, "Update to vehicles - canceled in b5.110" },
+	{ "b3.11", b3_11_ship_fix, NULL, "Fix to ships" },
+	{ "b3.12", NULL, b3_12_update_players, "Removal of stray affect flag" },
+	{ "b3.15", b3_15_crop_update, NULL, "Spawning crops" },
+	{ "b3.17", b3_17_road_update, NULL, "Adding road data" },
+	
+	// beta 4
+	{ "b4.1", NULL, b4_1_approve_players, "Adding approval data" },
+	{ "b4.2", NULL, b4_2_mount_update, "Adding mount data" },
+	{ "b4.4", NULL, b4_4_fight_messages, "Adding fight messages" },
+	{ "b4.15", b4_15_building_update, NULL, "Converting building data" },
+	{ "b4.19", NULL, b4_19_update_players, "Update to players" },
+	{ "b4.32", b4_32_convert_rmts, NULL, "Update to rmts" },
+	{ "b4.36", b4_36_study_triggers, NULL, "Update to studies" },
+	{ "b4.38", b4_38_tower_triggers, NULL, "Update to towers" },
+	{ "b4.39", b4_39_data_conversion, NULL, "Converting data to new format" },
+	
+	// beta 5
 	{ "b5.1", b5_1_global_update, b5_1_update_players, NULL },
 	{ "b5.3", b5_3_missile_update, NULL, NULL },
 	{ "b5.14", b5_14_superior_items, b5_14_player_superiors, NULL },
@@ -2748,6 +3430,9 @@ const struct {
 	{ "b5.152", b5_152_world_update, b5_152_player_update, "Updating lights and expire times on player, mob, and world affects" },
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
+	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
+	
+	// ADD HERE, above: more beta 5 update lines
 	
 	{ "\n", NULL, NULL, "\n" }	// must be last
 };

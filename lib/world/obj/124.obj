@@ -4,7 +4,7 @@ the cave~
 A large cave opens beneath a hill on the seaside (adventure).~
 The cave is hard to see until you're almost right on top of it.
 ~
-8 0 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 S
@@ -14,7 +14,7 @@ the cave exit~
 The mouth of the cave opens back out to the seashore (exit).~
 You can see the ocean.
 ~
-8 0 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 T 12401
@@ -25,7 +25,7 @@ a swirling portal~
 A swirling portal has opened in the floor, and the water is draining through it.~
 Despite how much water is flowing through the portal, the outside looks dry.
 ~
-8 0 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S
@@ -63,7 +63,7 @@ there's an easy way around it. You just have to set the difficulty for the
 adventure to get by...
 Usage:  difficulty <normal | hard>
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 1 0
 T 12405
@@ -74,7 +74,7 @@ the magical bubble~
 A magical bubble barely holds back the sea water!~
 The bubble cast by the sea witch looks like it won't hold for long.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 10 0
 S
@@ -924,7 +924,7 @@ A large, suspicious rock stands beside the path.~
    This rock is not blocking your path. Why are you staring at it? Adventure
 awaits!
 ~
-3 0 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 1 72
 T 12404

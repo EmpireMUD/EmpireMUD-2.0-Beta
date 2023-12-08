@@ -153,7 +153,7 @@ miraculously, there's no sign of any water splashing outside the stone rim.
 It looks like some people have tossed coins into the water, perhaps for luck.
 Around the fountain, a long round bench provides ample seating.
 ~
-5 j 0 0 0 9
+5 jB 0 0 0 10
 1000000 1000000 0
 1 0
 C
@@ -178,7 +178,7 @@ dusty rolls of clothing beneath a tarnished metal claw.
 was merely a Sorcerie Faire exhibit, but when it rapidly outpaced expectations,
 it gained a permanent berth in the gift shop.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 0
 C
@@ -199,7 +199,7 @@ ceiling, threatening to reach down and grab any one of them.
 was merely a sorcery faire exhibit, but when it rapidly outpaced expectations,
 it gained a permanent berth in the gift shop.
 ~
-3 0 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 0 0
 C
@@ -364,7 +364,7 @@ something brownish-green, and you try not to think too hard about what it might
 be. Chicken bones and scraps of food line the corners of some of the cages, and
 the whole room reeks of desperation.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 C
@@ -507,7 +507,7 @@ who live in these quarters. The dispenser is made of fine porcelain, shaped
 like a tall kettle, and always cool to the touch despite the piping hot tea
 that pours out. Unfortunately the only cups around here appear to be dirty.
 ~
-5 0 0 0 0 13
+5 B 0 0 0 14
 1000 1000 11921
 6 0
 C
@@ -527,7 +527,7 @@ A long lever sticks out of the wall.~
    This rusted old lever is undoubtedly what opens the secret passage from the
 inside. It looks like you can pull it.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -545,7 +545,7 @@ stray droplets of paint have ruined the wall or floor.
 Grand High Sorcerer Celiya's likeness into view, the brush pauses only to dunk
 itself in one of the pots of paint that sit on the floor.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 0
 C
@@ -690,7 +690,7 @@ dressed in simple wool clothing but wrapped in a soft purple robe. His lips are
 bright blue, as are the corners of his eyes. It looks like he might have been
 poisoned!
 ~
-10 0 0 0 0 3
+10 B 0 0 0 4
 11927 3 0
 7 0
 C
@@ -1289,7 +1289,7 @@ you can see the goblin cages. The next, it's Scaldorran's lab. There's no time
 to look at details before the next image appears, so you're not sure how useful
 a mirror like this would be.
 ~
-8 j 0 0 0 3
+8 jB 0 0 0 4
 11800 0 0
 3 0
 C
@@ -1304,7 +1304,7 @@ A strange mirror occupies much of the wall.~
 mirror doesn't show you standing here in the Grand High Sorcerer's quarters,
 but instead reflects you standing in the great hall on the first floor!
 ~
-8 j 0 0 0 2
+8 jB 0 0 0 3
 11800 0 0
 3 0
 C
@@ -1359,7 +1359,7 @@ the black tower's ebony, there is no woodgrain, no knots, not even the
 slightest imperfection on the surface. It is well and truly black, almost as if
 it was carved from a shadow instead of a tree.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 0
 C
@@ -1374,7 +1374,7 @@ occupant stand and, indeed, there is no chair. As if that weren't imposing
 enough, the desk stands on a raised dais. No name adorns the desk, which is
 covered in loose papers that nearly cover an old ink stain.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 0
 C
@@ -1405,7 +1405,7 @@ or tower. The nameplate on the desk, also made from ivory, displays the full
 name and title of Grand High Sorcerer Jozef Robert Knezz, Fifteenth Master of
 the Tower Skycleave.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 0
 C
@@ -1428,7 +1428,7 @@ outside depicting an academy of scholars apparently studying the higher magical
 arts. The placard on the desk indicates that it belongs to Celiya, one of the
 Tower Skycleave's longest-serving High Sorcerers.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -1457,7 +1457,7 @@ water. Every once in a while, one or more of the animal shapes will leap into
 the air and escape the confines of the fountain for a time, before returning to
 splash into the water and disappear.
 ~
-5 j 0 0 0 7
+5 jB 0 0 0 8
 1000000 1000000 0
 1 0
 C
@@ -1483,7 +1483,7 @@ magic. Now, the heartwood is burned.
 again and fall into a pile, before raising themselves up and burning themselves
 down again, and again, and again.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 12 0
 C
@@ -1495,7 +1495,7 @@ the blood in the arena~
 Blood stains the shining sand of the arena.~
 Spatters of blood crisscross the center of the arena.
 ~
-3 0 0 0 0 3
+3 0 0 0 0 5
 0 0 0
 7 2
 C
@@ -1508,7 +1508,7 @@ the blood in the arena~
 Blood stains the shining sand of the arena.~
 Spatters of blood crisscross the center of the arena.
 ~
-3 0 0 0 0 5
+3 0 0 0 0 7
 0 0 0
 7 2
 C
@@ -1643,7 +1643,7 @@ Piles of clams, oysters, and scallops are stacked around the cauldrons.~
 here. Though you can see oysters, scallops, and even mussels, by far the most
 numerous piles here are clams.
 ~
-6 0 0 0 0 8
+6 B 0 0 0 9
 500 0 0
 7 0
 C
@@ -1662,7 +1662,7 @@ There is a barrel of water with a ladle.~
    The oak barrel is bound with wooden hoops and sealed with pitch. The top is
 open, with a wooden ladle hanging from the rim.
 ~
-5 0 0 0 0 9
+5 B 0 0 0 10
 1000 1000 0
 0 0
 C

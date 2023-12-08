@@ -1474,10 +1474,14 @@ if race /= %cmd% && %actor.is_pc%
 elseif watch /= %cmd% && %actor.is_pc%
   * usage 2: watch [pixy name]
   if !%arg%
-    %send% %actor% Watch which pixy?
+    %send% %actor% Watch which pixy (or none)?
     halt
   end
-  if %self.count% >= 1 && %self.name1% /= %arg%
+  if %arg% == none
+    rdelete watching_%actor.id% %selfid%
+    %send% %actor% You stop watching the race.
+    halt
+  elseif %self.count% >= 1 && %self.name1% /= %arg%
     set found 1
   elseif %self.count% >= 2 && %self.name2% /= %arg%
     set found 2
@@ -3206,10 +3210,11 @@ Rot and Ruin: Re-spawn boss when new player arrives~
 if %actor.is_npc%
   halt
 end
+wait 1
 set mob %instance.mob(11888)%
 if !%mob%
   %load% mob 11888
-  %echoaround% %actor% The giant emerges once again from the still water.
+  %echo% The giant emerges once again from the still water.
 end
 ~
 #11943
@@ -5653,7 +5658,7 @@ if %old_name% != %self.name%
       %echo ~%self% arrives.
     break
   done
-break
+end
 ~
 #11982
 Elver the Worthy combat: Hammer Dance, Ring Your Bell, Prayer of Thunder, Hammer Throw~

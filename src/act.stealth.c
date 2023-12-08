@@ -1492,6 +1492,9 @@ ACMD(do_shadowstep) {
 	else if (!can_use_ability(ch, ABIL_SHADOWSTEP, MOVE, cost, COOLDOWN_SHADOWSTEP)) {
 		// sends own messages
 	}
+	else if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
+		msg_to_char(ch, "You can't do that while distracted.\r\n");
+	}
 	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't shadowstep while riding.\r\n");
 	}
@@ -1706,7 +1709,7 @@ ACMD(do_steal) {
 			
 			proto = store->proto;
 			
-			if (proto && obj_can_be_retrieved(proto, IN_ROOM(ch), NULL) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
+			if (store->amount > 0 && proto && obj_can_be_retrieved(proto, IN_ROOM(ch), NULL) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
 				if (stored_item_requires_withdraw(proto) && !has_player_tech(ch, PTECH_STEAL_UPGRADE)) {

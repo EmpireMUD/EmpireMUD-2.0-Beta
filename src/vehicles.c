@@ -1250,16 +1250,23 @@ void start_vehicle_burning(vehicle_data *veh) {
 * Determines the total number of vehicles in the room that don't have a size.
 *
 * @param room_data *room The room to check.
+* @param empire_data *exclude_hostile_to_empire Optional: Ignore people who are hostile to this empire because they're not allowed to block them in. (Pass NULL to ignore.)
 * @return int The total number of size-zero vehicles there.
 */
-int total_small_vehicles_in_room(room_data *room) {
+int total_small_vehicles_in_room(room_data *room, empire_data *exclude_hostile_to_empire) {
 	vehicle_data *veh;
 	int count = 0;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_SIZE(veh) == 0) {
-			++count;
+		if (VEH_SIZE(veh) > 0) {
+			continue;	// skip large ones
 		}
+		if (exclude_hostile_to_empire && VEH_OWNER(veh) && VEH_OWNER(veh) != exclude_hostile_to_empire && has_relationship(exclude_hostile_to_empire, VEH_OWNER(veh), DIPL_WAR | DIPL_DISTRUST)) {
+			continue;	// skip hostiles
+		}
+		
+		// otherwise go ahead and count it
+		++count;
 	}
 	
 	return count;
@@ -1270,13 +1277,21 @@ int total_small_vehicles_in_room(room_data *room) {
 * Determines the total size of all vehicles in the room.
 *
 * @param room_data *room The room to check.
+* @param empire_data *exclude_hostile_to_empire Optional: Ignore people who are hostile to this empire because they're not allowed to block them in. (Pass NULL to ignore.)
 * @return int The total size of vehicles there.
 */
-int total_vehicle_size_in_room(room_data *room) {
+int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire) {
 	vehicle_data *veh;
 	int size = 0;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_SIZE(veh) == 0) {
+			continue;	// skip small ones
+		}
+		if (exclude_hostile_to_empire && VEH_OWNER(veh) && VEH_OWNER(veh) != exclude_hostile_to_empire && has_relationship(exclude_hostile_to_empire, VEH_OWNER(veh), DIPL_WAR | DIPL_DISTRUST)) {
+			continue;	// skip hostiles
+		}
+		
 		size += VEH_SIZE(veh);
 	}
 	
@@ -3495,7 +3510,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_vehicle(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -3526,6 +3541,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -3544,6 +3560,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
 		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
 		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
@@ -3646,6 +3663,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (hitpoints_under != NOTHING && VEH_MAX_HEALTH(veh) > hitpoints_under) {
 			continue;
 		}
+		if (*extra_search && !find_exdesc(extra_search, VEH_EX_DESCS(veh), NULL)) {
+			continue;
+		}
 		if (*only_icon && !VEH_ICON(veh)) {
 			continue;
 		}
@@ -3739,7 +3759,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d vehicles)\r\n", count);
 	}
 	else if (count == 0) {

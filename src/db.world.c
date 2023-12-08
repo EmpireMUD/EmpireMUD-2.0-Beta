@@ -1222,8 +1222,10 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
+				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+					abandon_room(room);
+				}
 				disassociate_building(room);
-				abandon_room(room);
 			
 				if (ROOM_PEOPLE(room)) {
 					act("The ruins finally crumble to dust!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -2416,7 +2418,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
 		return;
 	}
-	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_DRIVING | VEH_SAILING | VEH_FLYING)) {
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
@@ -3522,7 +3524,9 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3646,7 +3650,9 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3725,7 +3731,9 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		abandon_room(room);
+		if (!bld || !BLD_FLAGGED(bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+			abandon_room(room);
+		}
 		disassociate_building(room);
 	
 		if (ROOM_PEOPLE(room)) {

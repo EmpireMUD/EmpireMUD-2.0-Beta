@@ -50,7 +50,6 @@
 extern const char *anonymous_public_hosts[];
 extern const char *default_channels[];
 extern int top_account_id;
-extern int top_idnum;
 
 // external funcs
 ACMD(do_slash_channel);
@@ -682,7 +681,7 @@ bool add_player_to_table(player_index_data *plr) {
 * be run after accounts are loaded, but before the mud boots up.
 *
 * This also determines:
-*   top_idnum
+*   top_idnum / DATA_TOP_IDNUM
 *   top_account_id
 */
 void build_player_index(void) {
@@ -691,6 +690,8 @@ void build_player_index(void) {
 	player_index_data *index;
 	bool has_players;
 	char_data *ch;
+	
+	int top_idnum = data_get_int(DATA_TOP_IDNUM);
 	
 	HASH_ITER(hh, account_table, acct, next_acct) {
 		acct->last_logon = 0;	// reset
@@ -765,6 +766,9 @@ void build_player_index(void) {
 			free_account(acct);
 		}
 	}
+	
+	// update this
+	data_set_int(DATA_TOP_IDNUM, top_idnum);
 }
 
 
@@ -4210,7 +4214,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	player_index_data *index;
 	vehicle_data *veh;
 	empire_data *emp;
-	int iter, duration;
+	int iter, duration, top_idnum;
 	
 	pause_affect_total = TRUE;	// prevent unnecessary totaling
 
@@ -4234,7 +4238,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure the player has an idnum and is in the index
 	if (GET_IDNUM(ch) <= 0) {
-		GET_IDNUM(ch) = ++top_idnum;
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
+		GET_IDNUM(ch) = top_idnum;
+		
 		ch->script_id = GET_IDNUM(ch);
 	}
 	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
@@ -4270,7 +4277,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
-				stop_action = TRUE;
+				try_home = TRUE;
 			}
 		}
 	}
@@ -4518,12 +4525,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		// ensure player has penalty if at war
 		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
-			affect_join(ch, af, ADD_DURATION);
+			affect_join(ch, af, NOBITS);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
 		}
 		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
 			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
-			affect_join(ch, af, ADD_DURATION);
+			affect_join(ch, af, NOBITS);
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
 		}
 	}
@@ -4617,7 +4624,7 @@ void init_player(char_data *ch) {
 	int account_id = NOTHING;
 	account_data *acct;
 	bool first = FALSE;
-	int i, iter;
+	int i, iter, top_idnum;
 
 	// create a player_special structure, if needed
 	if (ch->player_specials == NULL) {
@@ -4681,7 +4688,10 @@ void init_player(char_data *ch) {
 	
 	// assign idnum
 	if (GET_IDNUM(ch) <= 0) {
-		GET_IDNUM(ch) = ++top_idnum;
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
+		GET_IDNUM(ch) = top_idnum;
+		
 		ch->script_id = GET_IDNUM(ch);
 	}
 	// ensure in index

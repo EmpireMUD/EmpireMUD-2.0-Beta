@@ -447,7 +447,7 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 		// scan for data
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 			HASH_FIND_INT(eisle->store, &vnum, store);
-			if (store) {
+			if (store && store->amount > 0) {
 				SAFE_ADD(tt->total_amount, store->amount, 0, INT_MAX, FALSE);
 				isle = ewt_find_island(tt, eisle->island);
 				SAFE_ADD(isle->amount, store->amount, 0, INT_MAX, FALSE);
@@ -1804,7 +1804,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {
 			continue;	// don't allow crafts with TAKE-REQUIRED-OBJ
 		}
-		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !find_stored_resource(emp, islid, GET_CRAFT_REQUIRES_OBJ(craft))) {
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && (!(store = find_stored_resource(emp, islid, GET_CRAFT_REQUIRES_OBJ(craft))) || store->amount < 1)) {
 			continue;	// missing required-obj
 		}
 		// pass through validator function
@@ -1825,7 +1825,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 				// can ONLY do crafts that use objects/components
 				has_res = FALSE;
 			}
-			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->keep == UNLIMITED || store->amount <= store->keep || (store->amount - store->keep) < res->amount)) {
+			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->amount < 1 || store->keep == UNLIMITED || store->amount <= store->keep || (store->amount - store->keep) < res->amount)) {
 				has_res = FALSE;
 			}
 			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->amount, FALSE, TRUE)) {
@@ -1964,7 +1964,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
 		// RES_x: can only process some types in this way
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0 && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, 1, FALSE, TRUE)) {
@@ -3181,7 +3181,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
 		// RES_x: can ONLY do it if it requires an object, component, or action
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0 && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, 1, FALSE, TRUE)) {

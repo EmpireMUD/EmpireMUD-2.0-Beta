@@ -383,8 +383,8 @@ switch %random.3%
     while %person%
       if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
-        if %heroic_mode%
-          dg_affect #10552 %person% HARD-STUNNED on 5
+        if %heroic_mode% && !%person.aff_flagged(!STUN)%
+          dg_affect #10552 %person% STUNNED on 5
         else
           %echo% The ice shatters, but leaves a lingering chill...
         end
@@ -420,7 +420,9 @@ switch %random.3%
         %send% %actor% &&rThe comet crashes into you, smashing you to the ground, and explodes!
         %echoaround% %actor% The comet crashes into ~%actor%, smashing *%actor% to the ground, and explodes!
         %damage% %actor% 400 physical
-        dg_affect #10553 %actor% HARD-STUNNED on 10
+        if !%actor.aff_flagged(!STUN)%
+          dg_affect #10553 %actor% STUNNED on 10
+        end
         %echo% &&rFragments fly in all directions!
         %aoe% 100 physical
       end
@@ -509,11 +511,15 @@ switch %random.3%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
       dg_affect #10555 %actor% BLIND on 20
-      dg_affect #10555 %actor% HARD-STUNNED on 20
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10555 %actor% STUNNED on 20
+      end
     else
       %send% %actor% You scramble to pull yourself out of the pile of snow.
       dg_affect #10555 %actor% BLIND on 5
-      dg_affect #10555 %actor% HARD-STUNNED on 5
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10555 %actor% STUNNED on 5
+      end
     end
   break
   case 3
@@ -553,7 +559,9 @@ switch %random.3%
     %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and hoar frost suddenly encases *%actor%!
     dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
-      dg_affect #10556 %actor% HARD-STUNNED on 5
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10556 %actor% STUNNED on 5
+      end
       %dot% #10557 %actor% 100 20 magical
     else
       %dot% #10557 %actor% 75 20 magical

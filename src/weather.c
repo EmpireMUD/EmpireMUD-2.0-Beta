@@ -680,6 +680,7 @@ void send_hourly_sun_messages(void) {
 		// check for sun changes
 		sun = get_sun_status(IN_ROOM(desc->character));
 		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
+			qt_check_day_and_night(desc->character);
 			GET_LAST_LOOK_SUN(desc->character) = sun;
 			
 			switch (sun) {

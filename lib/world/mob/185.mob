@@ -4,30 +4,30 @@ the Sun King~
 An ancient god-king arises from his deathly slumber!
 ~
 0 0 bdxyzAB 0 3
-1 0 0 18
+1 0 0 18 -1
 D
    The mummified husk of this ancient ruler offers little clue to his
 appearance in life. His jewelled golden raiment, however, attests to the great
 wealth he must once have possessed, and the emerald flames burning in his empty
 eyesockets hints at his great magical strength.
 ~
-I 4 18544 100.00 1  # LOOT: a chance of boss loot
-I 4 18545 20.00 1  # LOOT: the solar raiment
+I 4 18544 100.00 1  # LOOT: chance of boss loot
+I 4 18545 20.00 1  # LOOT: solar raiment
 I 4 18532 10.00 1 e  # LOOT: plated jaguar gauntlets
 I 4 18533 10.00 1 e  # LOOT: coyote claw gauntlets
 I 4 18534 10.00 1 e  # LOOT: sparkling feathered gloves
 I 4 18535 10.00 1 e  # LOOT: eagle talon gloves
 I 4 18536 10.00 1 e  # LOOT: shifting chameleon gauntlets
-I 4 18537 10.00 1 e  # LOOT: the roar of the jaguar
-I 4 18538 10.00 1 e  # LOOT: the howl of the coyote
-I 4 18539 10.00 1 e  # LOOT: the wind of the feathered serpent
-I 4 18540 10.00 1 e  # LOOT: the call of the eagle
-I 4 18541 10.00 1 e  # LOOT: the shadow of the chameleon
-I 4 18527 20.00 1 r  # LOOT: a jaguar claw ring
-I 4 18528 20.00 1 r  # LOOT: an obsidian coyote ring
-I 4 18529 20.00 1 r  # LOOT: a serpent fang ring
-I 4 18530 20.00 1 r  # LOOT: an eagle talon ring
-I 4 18531 20.00 1 r  # LOOT: a chameleon tail ring
+I 4 18537 10.00 1 e  # LOOT: roar of the jaguar
+I 4 18538 10.00 1 e  # LOOT: howl of the coyote
+I 4 18539 10.00 1 e  # LOOT: wind of the feathered serpent
+I 4 18540 10.00 1 e  # LOOT: call of the eagle
+I 4 18541 10.00 1 e  # LOOT: shadow of the chameleon
+I 4 18527 20.00 1 r  # LOOT: jaguar claw ring
+I 4 18528 20.00 1 r  # LOOT: obsidian coyote ring
+I 4 18529 20.00 1 r  # LOOT: serpent fang ring
+I 4 18530 20.00 1 r  # LOOT: eagle talon ring
+I 4 18531 20.00 1 r  # LOOT: chameleon tail ring
 M
 1
 All that I beheld was once mine, and shall be again...~
@@ -47,7 +47,7 @@ Manasa the serpent lord~
 A serpent lord stands here, wielding a sword with each of her four arms!
 ~
 0 0 bdxzAB 0 4
-2 2 5 1
+2 2 5 1 -1
 D
    This serpent lord has the lower body of a giant serpent, melding into the
 upper body of a four-armed human woman. All four of her arms grip exotic,
@@ -55,22 +55,22 @@ curved swords in the stance of a trained warrior. She stands head-and-shoulders
 above even the tallest human, and her forked tongue flicks out to taste the air
 as she examines you...
 ~
-I 4 18544 100.00 1  # LOOT: a chance of boss loot
-I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
-I 4 18528 6.66 1 e  # LOOT: an obsidian coyote ring
-I 4 18529 6.66 1 e  # LOOT: a serpent fang ring
-I 4 18530 6.66 1 e  # LOOT: an eagle talon ring
-I 4 18531 6.66 1 e  # LOOT: a chameleon tail ring
+I 4 18544 100.00 1  # LOOT: chance of boss loot
+I 4 18527 6.66 1 e  # LOOT: jaguar claw ring
+I 4 18528 6.66 1 e  # LOOT: obsidian coyote ring
+I 4 18529 6.66 1 e  # LOOT: serpent fang ring
+I 4 18530 6.66 1 e  # LOOT: eagle talon ring
+I 4 18531 6.66 1 e  # LOOT: chameleon tail ring
 I 4 18532 6.66 1 e  # LOOT: plated jaguar gauntlets
 I 4 18533 6.66 1 e  # LOOT: coyote claw gauntlets
 I 4 18534 6.66 1 e  # LOOT: sparkling feathered gloves
 I 4 18535 6.66 1 e  # LOOT: eagle talon gloves
 I 4 18536 6.66 1 e  # LOOT: shifting chameleon gauntlets
-I 4 18537 6.66 1 e  # LOOT: the roar of the jaguar
-I 4 18538 6.66 1 e  # LOOT: the howl of the coyote
-I 4 18539 6.66 1 e  # LOOT: the wind of the feathered serpent
-I 4 18540 6.66 1 e  # LOOT: the call of the eagle
-I 4 18541 6.67 1 e  # LOOT: the shadow of the chameleon
+I 4 18537 6.66 1 e  # LOOT: roar of the jaguar
+I 4 18538 6.66 1 e  # LOOT: howl of the coyote
+I 4 18539 6.66 1 e  # LOOT: wind of the feathered serpent
+I 4 18540 6.66 1 e  # LOOT: call of the eagle
+I 4 18541 6.67 1 e  # LOOT: shadow of the chameleon
 M
 1
 I have come from landsss far away... to ssserve the Sssun King...~
@@ -92,7 +92,7 @@ the feathered serpent Quetzalcoatl~
 The feathered serpent Quetzalcoatl hovers here, defending its domain!
 ~
 0 0 bdxy m 5
-0 0 2 22
+0 0 2 22 -1
 D
    This elephant-sized serpent has massive feathered wings with beautiful,
 many-colored plumage that shines softly in the dim light of the hidden valley.
@@ -100,22 +100,22 @@ It floats effortlessly in the air in complete defiance of its massive weight,
 and a gentle breeze swirls in a circle around it, lightly ruffling its colorful
 feathers.
 ~
-I 4 18544 100.00 1  # LOOT: a chance of boss loot
-I 4 18527 6.66 1 e  # LOOT: a jaguar claw ring
-I 4 18528 6.66 1 e  # LOOT: an obsidian coyote ring
-I 4 18529 6.66 1 e  # LOOT: a serpent fang ring
-I 4 18530 6.66 1 e  # LOOT: an eagle talon ring
-I 4 18531 6.66 1 e  # LOOT: a chameleon tail ring
+I 4 18544 100.00 1  # LOOT: chance of boss loot
+I 4 18527 6.66 1 e  # LOOT: jaguar claw ring
+I 4 18528 6.66 1 e  # LOOT: obsidian coyote ring
+I 4 18529 6.66 1 e  # LOOT: serpent fang ring
+I 4 18530 6.66 1 e  # LOOT: eagle talon ring
+I 4 18531 6.66 1 e  # LOOT: chameleon tail ring
 I 4 18532 6.66 1 e  # LOOT: plated jaguar gauntlets
 I 4 18533 6.66 1 e  # LOOT: coyote claw gauntlets
 I 4 18534 6.66 1 e  # LOOT: sparkling feathered gloves
 I 4 18535 6.66 1 e  # LOOT: eagle talon gloves
 I 4 18536 6.66 1 e  # LOOT: shifting chameleon gauntlets
-I 4 18537 6.66 1 e  # LOOT: the roar of the jaguar
-I 4 18538 6.66 1 e  # LOOT: the howl of the coyote
-I 4 18539 6.66 1 e  # LOOT: the wind of the feathered serpent
-I 4 18540 6.66 1 e  # LOOT: the call of the eagle
-I 4 18541 6.67 1 e  # LOOT: the shadow of the chameleon
+I 4 18537 6.66 1 e  # LOOT: roar of the jaguar
+I 4 18538 6.66 1 e  # LOOT: howl of the coyote
+I 4 18539 6.66 1 e  # LOOT: wind of the feathered serpent
+I 4 18540 6.66 1 e  # LOOT: call of the eagle
+I 4 18541 6.67 1 e  # LOOT: shadow of the chameleon
 M
 0
 $n spreads $s beautiful rainbow-colored plumage, which emits a faint light.~
@@ -135,7 +135,7 @@ a giant gorilla~
 A gorilla the size of a carthorse looms menacingly over you!
 ~
 0 0 bdy c 4
-0 0 0 15
+0 0 0 15 -1
 D
    A faint emerald light shines in the eyes of this huge ape, suggesting its
 size and aggression may be unnatural...
@@ -149,13 +149,13 @@ a feral jaguar~
 A feral jaguar snarls at you and bares its fangs!
 ~
 0 0 bdjz c 3
-0 0 0 10
+0 0 0 10 -1
 D
    As this large, fearsome feline prepares to defend its territory, you notice
 a faint flicker of green light in its eyes...
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1353 100.00 1  # SKIN: a big cat pelt
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1353 100.00 1  # SKIN: big cat pelt
 T 18513
 T 18503
 S
@@ -165,13 +165,13 @@ a king cobra~
 A king cobra rears up and flares its hood, hissing loudly!
 ~
 0 0 bdjz c 3
-0 0 5 9
+0 0 5 9 -1
 D
    Are the slitted green eyes of this unusually large and fierce serpent
 glowing, or is it just your imagination...?
 ~
-I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 2  # SKIN: some snakeskin
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 2  # SKIN: snakeskin
 T 18513
 T 18503
 S
@@ -181,7 +181,7 @@ a grass snake~
 A large grass snake is slithering away.
 ~
 0 0 bdho 0 2
-0 0 5 9
+0 0 5 9 -1
 D
    It appears as though Quetzalcoatl has command over normal snakes. It will
 probably leave soon if you don't kill it. Or if you kill Quetzalcoatl.
@@ -194,7 +194,7 @@ a serpent lord mirage~
 A mirage of the serpent lord is fading away.
 ~
 0 0 bdhox 0 4
-2 2 5 1
+2 2 5 1 -1
 D
    These illusory doubles of the serpent lord look and feel real, but their
 strikes don't quite hurt as much... The mirage will probably fade away
@@ -208,16 +208,16 @@ an armored battle-jaguar~
 An armored battle-jaguar is stalking around here.
 ~
 125 175 bdej 0 4
-0 0 11 10
+0 0 11 10 -1
 D
 Someone has given this already fearsome feline a suit of chain armor!
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1353 100.00 1  # SKIN: a big cat pelt
-I 4 175 100.00 4  # LOOT: an iron ingot
-I 4 175 75.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
-I 4 175 50.00 2  # LOOT: an iron ingot
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1353 100.00 1  # SKIN: big cat pelt
+I 4 175 100.00 4  # LOOT: iron ingot
+I 4 175 75.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
+I 4 175 50.00 2  # LOOT: iron ingot
 S
 #18512
 jaguar riding~
@@ -225,13 +225,13 @@ a riding jaguar~
 A riding jaguar is saddled up and prowling around.
 ~
 75 100 bdej 0 4
-0 0 11 10
+0 0 11 10 -1
 D
 A glint of intelligence flickers in the fearsome feline's emerald green eyes...
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1353 100.00 1  # SKIN: a big cat pelt
-I 3 18511 100.00 1  # BARDE: an armored battle-jaguar
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1353 100.00 1  # SKIN: big cat pelt
+I 3 18511 100.00 1  # BARDE: armored battle-jaguar
 S
 #18513
 serpent sea huge~
@@ -239,13 +239,13 @@ a sea serpent~
 A huge sea serpent is swimming around here.
 ~
 125 175 bdejl 0 5
-0 0 6 9
+0 0 6 9 -1
 D
    Someone has very thoughtfully put a bridle on it. It would be pretty hard to
 hold onto it otherwise.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 1  # SKIN: some snakeskin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 1  # SKIN: snakeskin
 S
 #18514
 serpent feathered~
@@ -253,13 +253,13 @@ a feathered serpent~
 A feathered serpent is riding the winds nearby.
 ~
 125 175 bdej m 5
-0 0 2 9
+0 0 2 9 -1
 D
    This feathered serpent, while not as large or majestic as its progenitor,
 Quetzalcoatl, is still easily strong enough to carry someone on its back.
 ~
-I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-I 1 1355 100.00 1  # SKIN: some snakeskin
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1355 100.00 1  # SKIN: snakeskin
 S
 #18515
 jaguar cub tiny~
@@ -267,7 +267,7 @@ a tiny jaguar cub~
 A tiny jaguar cub runs around your ankles.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
 It's the size of a housecat!
 ~
@@ -292,7 +292,7 @@ a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
 0 0 cdhoz c 4
-0 0 5 9
+0 0 5 9 -1
 D
 The snakes are all around you! They're coming out of the walls!
 ~
@@ -303,8 +303,8 @@ S
 Professor #n~
 The renowned archaeologist, Professor #n, is setting up shop here...
 ~
-0 0 bd cn 3
-0 1 0 15
+0 0 bdL cn 3
+0 1 0 15 -1
 D
    Professor of Archaeology, expert on the occult, and how does one say it...
 Obtainer of rare antiquities.

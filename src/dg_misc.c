@@ -72,7 +72,7 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 #define APPLY_TYPE	1
 #define AFFECT_TYPE	2
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
-	char_data *ch = NULL;
+	char_data *ch = NULL, *caster = NULL;
 	int value = 0, duration = 0;
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
 	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
@@ -85,14 +85,28 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, charname, cmd);
-	// sometimes charname is an affect vnum
-	if (*charname == '#') {
-		atype = atoi(charname+1);
-		half_chop(cmd, charname, temp);
-		strcpy(cmd, temp);
-		if (!find_generic(atype, GENERIC_AFFECT)) {
-			script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
-			atype = ATYPE_DG_AFFECT;
+	
+	// sometimes charname is an affect vnum or caster instead
+	while (*charname == '#' || *charname == '@') {
+		if (*charname == '#') {	// vnum
+			atype = atoi(charname+1);
+			if (!find_generic(atype, GENERIC_AFFECT)) {
+				script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
+				atype = ATYPE_DG_AFFECT;
+			}
+			// shift remaining args
+			half_chop(cmd, charname, temp);
+			strcpy(cmd, temp);
+		}
+		else if (*charname == '@') {	// caster
+			caster = get_char(charname+1);
+			if (!caster) {
+				script_log("Trigger: %s, VNum %d. dg_affect: Missing requested caster %s", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), charname);
+				caster = NULL;
+			}
+			// shift remaining args
+			half_chop(cmd, charname, temp);
+			strcpy(cmd, temp);
 		}
 	}
 	
@@ -189,7 +203,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = atype;
-	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.cast_by = caster ? CAST_BY_ID(caster) : (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = value;
 
@@ -220,18 +234,35 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	room_data *room = NULL;
 	bool all_off = FALSE;
 	int duration = 0;
+	char_data *caster = NULL;
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, roomname, cmd);
-	// sometimes roomname is an affect vnum
-	if (*roomname == '#') {
-		atype = atoi(roomname+1);
-		half_chop(cmd, roomname, temp);
-		strcpy(cmd, temp);
-		if (!find_generic(atype, GENERIC_AFFECT)) {
-			atype = ATYPE_DG_AFFECT;
+	
+	// sometimes roomname is an affect vnum or caster instead
+	while (*roomname == '#' || *roomname == '@') {
+		if (*roomname == '#') {	// vnum
+			atype = atoi(roomname+1);
+			if (!find_generic(atype, GENERIC_AFFECT)) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
+				atype = ATYPE_DG_AFFECT;
+			}
+			// shift remaining args
+			half_chop(cmd, roomname, temp);
+			strcpy(cmd, temp);
+		}
+		else if (*roomname == '@') {	// caster
+			caster = get_char(roomname+1);
+			if (!caster) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room: Missing requested caster %s", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), roomname);
+				caster = NULL;
+			}
+			// shift remaining args
+			half_chop(cmd, roomname, temp);
+			strcpy(cmd, temp);
 		}
 	}
+	
 	half_chop(cmd, property, temp);
 	half_chop(temp, value_p, duration_p);
 
@@ -296,7 +327,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 
 	/* add the affect */
 	af.type = atype;
-	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.cast_by = caster ? CAST_BY_ID(caster) : (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = 0;
 	af.location = APPLY_NONE;

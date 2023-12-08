@@ -477,6 +477,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_SPEAK_LANGUAGE  41
 #define REQ_RECOGNIZE_LANGUAGE  42
 #define REQ_COMPLETED_QUEST_EVER  43
+#define REQ_DAYTIME  44
+#define REQ_NIGHTTIME  45
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -644,6 +646,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_MOVING  BIT(12)	// gain when moving
 #define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
 #define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
+#define AGH_NOT_WHILE_ASLEEP  BIT(15)	// prevent gains while sleeping (or dying)
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -800,7 +803,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
 #define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
-// #define BLD_UNUSED10  BIT(22)
+#define BLD_NO_AUTO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)
 // #define BLD_UNUSED13  BIT(25)
@@ -905,7 +908,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
 #define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
-#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+	#define FNC_UNUSED  BIT(10)	// formerly "HENGE" which now uses a script
 #define FNC_LIBRARY  BIT(11)	// can write and store books here
 #define FNC_MAIL  BIT(12)	// players can send mail here
 #define FNC_MILL  BIT(13)	// can use the mill command here
@@ -1119,7 +1122,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
 #define CRAFT_SKIP_CONSUMES_TO  BIT(3)  // won't run the consumes-to interaction on components (e.g. keep the jar from paint when mixing it into a new paint)
-	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
+#define CRAFT_DARK_OK  BIT(4)  // light not necessary
 	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
@@ -1135,6 +1138,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
+
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -1256,6 +1260,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_SHIPPING  8	// shipments via do_ship
 #define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
 #define ELOG_PROGRESS  10	// empire progression goals
+#define ELOG_ALERT  11	// important messages
 
 
 // ENEED_x: empire need types
@@ -1663,6 +1668,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 #define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
 #define MOB_NO_UNCONSCIOUS  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
+#define MOB_IMPORTANT  BIT(37)	// L. won't be hit by no-arg "purge"; can be used by scripts
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1972,9 +1978,10 @@ typedef enum {
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
 #define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
+#define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -2316,9 +2323,14 @@ typedef enum {
 #define FM_ABILITIES_AGAINST_ALLIES  BIT(26)	// abilities targeting allies
 #define FM_ABILITIES_AGAINST_TARGET  BIT(27)	// abilities targeting my target
 #define FM_ABILITIES_AGAINST_TANK  BIT(28)	// abilities targeting the tank
+#define FM_MY_HEALS  BIT(29)	// heals I caused
+#define FM_HEALS_ON_ME  BIT(30)	// heal effects that hit me
+#define FM_HEALS_ON_ALLIES  BIT(31)	// heal effects that hit allies
+#define FM_HEALS_ON_TARGET  BIT(32)	// heal effects that hit my target
+#define FM_HEALS_ON_OTHER  BIT(33)	// heal effects that hit others
 
 // flags set at character creation
-#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE | FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK)
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE | FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK | FM_MY_HEALS | FM_HEALS_ON_ME | FM_HEALS_ON_ALLIES | FM_HEALS_ON_TARGET | FM_HEALS_ON_OTHER)
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -3130,7 +3142,7 @@ typedef enum {
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
 #define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
 #define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
-#define MAX_REFERRED_BY_LENGTH  80
+#define MAX_REFERRED_BY_LENGTH  160
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
@@ -4391,7 +4403,7 @@ struct descriptor_data {
 
 	char *host;	// hostname
 	byte bad_pws;	// number of bad pw attemps this login
-	byte idle_tics;	// tics idle at password prompt
+	byte idle_tics;	// tics idle at game menus prompt
 	int connected;	// STATE()
 	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc
@@ -4772,6 +4784,7 @@ struct player_special_data {
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_id;	// helps prevent duplicate wear-off messages
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
 	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty

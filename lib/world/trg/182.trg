@@ -6,6 +6,7 @@ if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
+set from_room %self.room%
 set room i18201
 if !%instance.start%
   %echo% ~%self% disappears! Or... was it ever there in the first place?
@@ -17,6 +18,18 @@ end
 %echoaround% %actor% ~%actor% boards ~%self%.
 %send% %actor% You board ~%self%.
 %force% %actor% look
+* companions
+set ch %from_room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
+    %echoaround% %ch% ~%ch% boards ~%self%.
+    %teleport% %ch% %room%
+    %echoaround% %ch% ~%ch% boards ~%self%.
+    %send% %ch% You board ~%self%.
+  end
+  set ch %next_ch%
+done
 ~
 #18201
 City turtle greet~
@@ -83,6 +96,19 @@ end
 %teleport% %actor% %target%
 %force% %actor% look
 %echoaround% %actor% ~%actor% disembarks from the turtle.
+* companions
+set ch %self.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
+    %send% %ch% You disembark from the turtle.
+    %echoaround% %ch% ~%ch% disembarks from the turtle.
+    %teleport% %ch% %target%
+    %echoaround% %ch% ~%ch% disembarks from the turtle.
+  end
+  set ch %next_ch%
+done
+
 ~
 #18205
 City turtle look out~
@@ -714,6 +740,13 @@ if borrow /= %cmd%
     %mod% %self% append-lookdesc-noformat it behind you, listening to the guttural squeaks of poor Rodentmort.
     %mod% %self% append-lookdesc-noformat Use: release Rodentmort
   end
+  halt
+end
+* check other things with a release trigger
+set otar %actor.obj_target(%arg%)%
+if %otar% && %otar.vnum% == 11836
+  * has its own release
+  return 0
   halt
 end
 * RELEASE SECOND
@@ -1624,9 +1657,9 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #18261

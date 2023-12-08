@@ -202,13 +202,13 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 		}
 		return FALSE;
 	}
-	if (make_veh && VEH_SIZE(make_veh) > 0 && total_vehicle_size_in_room(room) + VEH_SIZE(make_veh) > config_get_int("vehicle_size_per_tile")) {
+	if (make_veh && VEH_SIZE(make_veh) > 0 && total_vehicle_size_in_room(room, NULL) + VEH_SIZE(make_veh) > config_get_int("vehicle_size_per_tile")) {
 		if (ch) {
 			msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		}
 		return FALSE;
 	}
-	if (make_veh && VEH_SIZE(make_veh) == 0 && total_small_vehicles_in_room(room) >= config_get_int("vehicle_max_per_tile")) {
+	if (make_veh && VEH_SIZE(make_veh) == 0 && total_small_vehicles_in_room(room, NULL) >= config_get_int("vehicle_max_per_tile")) {
 		if (ch) {
 			msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		}
@@ -2482,8 +2482,10 @@ ACMD(do_dedicate) {
 		
 		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
 
-		// grant them hide-real-name for this
-		SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
+		// grant them hide-real-name for this ONLY if it's not already renamed
+		if (!ROOM_CUSTOM_NAME(ded_room)) {
+			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
+		}
 		set_room_custom_name(ded_room, buf);
 		affect_total_room(ded_room);
 	}

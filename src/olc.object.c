@@ -31,9 +31,6 @@
 *   Edit Modules
 */
 
-// external vars
-extern bitvector_t default_minipet_flags, default_minipet_affs;
-
 // locals
 const char *default_obj_keywords = "object new";
 const char *default_obj_short = "a new object";
@@ -1115,13 +1112,13 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
-	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
+	bitvector_t only_worn = NOBITS, not_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
@@ -1140,6 +1137,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -1152,6 +1150,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
 		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
 		FULLSEARCH_FLAGS("custom", find_custom, obj_custom_types)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
@@ -1165,13 +1164,18 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
 		FULLSEARCH_FLAGS("requirestools", only_requires_tool, tool_flags)
 		FULLSEARCH_BOOL("storable", only_storable)
+		FULLSEARCH_INT("timer", only_timer, -1, INT_MAX)
+		FULLSEARCH_INT("timerover", timer_over, 0, INT_MAX)
+		FULLSEARCH_INT("timerunder", timer_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
 		FULLSEARCH_BOOL("unstorable", not_storable)
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("noworn", not_worn, wear_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
@@ -1217,6 +1221,15 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
 			continue;
 		}
+		if (only_timer != -2 && GET_OBJ_TIMER(obj) != only_timer) {
+			continue;
+		}
+		if (timer_over != NOTHING && GET_OBJ_TIMER(obj) < timer_over) {
+			continue;
+		}
+		if (timer_under != NOTHING && (GET_OBJ_TIMER(obj) <= 0 || GET_OBJ_TIMER(obj) > timer_under)) {
+			continue;
+		}
 		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
 			continue;
 		}
@@ -1241,6 +1254,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
 			continue;
 		}
+		if (not_worn != NOBITS && CAN_WEAR(obj, not_worn)) {
+			continue;
+		}
 		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
 			continue;
 		}
@@ -1251,6 +1267,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_weapontype != NOTHING && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != only_weapontype)) {
+			continue;
+		}
+		if (*extra_search && !find_exdesc(extra_search, GET_OBJ_EX_DESCS(obj), NULL)) {
 			continue;
 		}
 		if (find_applies) {	// look up its applies
@@ -1296,7 +1315,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
 	}
 	else if (count == 0) {
@@ -3091,12 +3110,12 @@ OLC_MODULE(oedit_minipet) {
 			send_config_msg(ch, "ok_string");
 		}
 		
-		if (!MOB_FLAGGED(mob, default_minipet_flags)) {
-			sprintbit(default_minipet_flags, action_bits, buf, TRUE);
+		if (!MOB_FLAGGED(mob, DEFAULT_MINIPET_FLAGS)) {
+			sprintbit(DEFAULT_MINIPET_FLAGS, action_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these flags: buf\r\n");
 		}
-		if (!AFF_FLAGGED(mob, default_minipet_affs)) {
-			sprintbit(default_minipet_affs, affected_bits, buf, TRUE);
+		if (!AFF_FLAGGED(mob, DEFAULT_MINIPET_AFFS)) {
+			sprintbit(DEFAULT_MINIPET_AFFS, affected_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these affects: buf\r\n");
 		}
 	}

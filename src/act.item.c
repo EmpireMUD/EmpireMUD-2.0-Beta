@@ -207,14 +207,93 @@ bool douse_light(obj_data *obj) {
 
 
 /**
-* Finds an object for a characcter using hte 'light' command. This will prefer
+* Attempts to find a container with the name given. Prefers inventory over
+* room; will also check gear; will return a non-container if no container
+* exists. Corpses count as containers for the purpose of this function, which
+* is normally used for a "look in" or "get from".
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (get all 4.corpse; may be NULL)
+* @return obj_data *The item found, or NULL. May or may not be a container/corpse.
+*/
+obj_data *get_obj_for_char_prefer_container(char_data *ch, char *name, int *number) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *obj, *backup = NULL, *list[2];
+	int iter, num;
+	bool gave_num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	gave_num = (*number > 1);
+	
+	// looking in two places first:
+	list[0] = ch->carrying;
+	list[1] = ROOM_CONTENTS(IN_ROOM(ch));
+	
+	for (iter = 0; iter < 2; ++iter) {
+		DL_FOREACH2(list[iter], obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj) && MATCH_ITEM_NAME(tmp, obj)) {
+				if (gave_num) {
+					if (--(*number) == 0) {
+						return obj;
+					}
+				}
+				else {	// did not give a number
+					if (IS_CONTAINER(obj) || IS_CORPSE(obj)) {
+						return obj;	// is a match
+					}
+					else if (!backup) {
+						backup = obj;	// missing type but otherwise a match
+					}
+				}
+			}
+		}
+	}
+	
+	// then look in character equipment if we got here:
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && CAN_SEE_OBJ(ch, GET_EQ(ch, iter)) && MATCH_ITEM_NAME(tmp, GET_EQ(ch, iter))) {
+			if (gave_num) {
+				if (--(*number) == 0) {
+					return GET_EQ(ch, iter);
+				}
+			}
+			else {	// did not give a number
+				if (IS_CONTAINER(GET_EQ(ch, iter)) || IS_CORPSE(GET_EQ(ch, iter))) {
+					return GET_EQ(ch, iter);	// is a match
+				}
+				else if (!backup) {
+					backup = GET_EQ(ch, iter);	// missing type but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
+* Finds an object for a character using hte 'light' command. This will prefer
 * an object they CAN light.
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
 * @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *list The list to search.
-* @return obj_data *The item found, or NULL. May or may be lightable.
+* @return obj_data *The item found, or NULL. May or may not be lightable.
 */
 obj_data *get_obj_in_list_vis_prefer_lightable(char_data *ch, char *name, int *number, obj_data *list) {
 	char copy[MAX_INPUT_LENGTH], *tmp = copy;
@@ -4012,7 +4091,7 @@ void trade_list(char_data *ch, char *argument) {
 void trade_buy(char_data *ch, char *argument) {
 	struct trading_post_data *tpd, *next_tpd;
 	empire_data *coin_emp = NULL;
-	char buf[MAX_STRING_LENGTH], *ptr1, *ptr2;
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *ptr1, *ptr2;
 	char_data *seller;
 	int num = 1;
 	
@@ -4063,7 +4142,7 @@ void trade_buy(char_data *ch, char *argument) {
 		}
 		
 		// pay up
-		charge_coins(ch, coin_emp, tpd->buy_cost, NULL);
+		charge_coins(ch, coin_emp, tpd->buy_cost, NULL, buf2);
 		REMOVE_BIT(tpd->state, TPD_FOR_SALE);
 		SET_BIT(tpd->state, TPD_BOUGHT | TPD_COINS_PENDING);
 		
@@ -4071,7 +4150,7 @@ void trade_buy(char_data *ch, char *argument) {
 		if ((seller = is_playing(tpd->player))) {
 			msg_to_char(seller, "Your trading post item '%s' has sold for %s.\r\n", GET_OBJ_SHORT_DESC(tpd->obj), money_amount(coin_emp, tpd->buy_cost));
 		}
-		sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, tpd->buy_cost));
+		sprintf(buf, "You buy $p for %s.", buf2);
 		act(buf, FALSE, ch, tpd->obj, NULL, TO_CHAR);
 		act("$n buys $p.", FALSE, ch, tpd->obj, NULL, TO_ROOM | TO_SPAMMY);
 			
@@ -4346,7 +4425,7 @@ void trade_post(char_data *ch, char *argument) {
 		snprintf(buf, sizeof(buf), "$n posts $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
 		act(buf, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		
-		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
+		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL, NULL);
 		
 		// SEV_x: events that must be canceled or changed when an item is posted
 		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
@@ -4935,7 +5014,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_buy) {
-	char buf[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	empire_data *coin_emp = NULL;
 	struct shop_item *item;
@@ -5019,8 +5098,8 @@ ACMD(do_buy) {
 			
 			// finish the purchase
 			if (item->currency == NOTHING) {
-				charge_coins(ch, coin_emp, item->cost, NULL);
-				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
+				charge_coins(ch, coin_emp, item->cost, NULL, buf2);
+				sprintf(buf, "You buy $p for %s.", buf2);
 			}
 			else {
 				add_currency(ch, item->currency, -(item->cost));
@@ -5730,7 +5809,7 @@ ACMD(do_eat) {
 		return;
 	}
 	if ((GET_OBJ_TYPE(food) != ITEM_FOOD)) {
-		send_to_char("You can't eat THAT!\r\n", ch);
+		act("$p: You can't eat THAT!", FALSE, ch, food, NULL, TO_CHAR);
 		return;
 	}
 	if (!bind_ok(food, ch)) {
@@ -6027,8 +6106,9 @@ ACMD(do_exchange) {
 
 ACMD(do_get) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	int cont_dotmode, found = 0, mode;
-	vehicle_data *find_veh, *veh;
+	char *argptr;
+	int cont_dotmode, found = 0, iter, mode, number;
+	vehicle_data *find_veh = NULL, *veh;
 	obj_data *cont;
 	char_data *tmp_char;
 
@@ -6053,14 +6133,23 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+			argptr = arg2;
+			number = get_number(&argptr);
+			if ((cont = get_obj_for_char_prefer_container(ch, argptr, &number))) {
+				// found preferred container
+				mode = (cont->carried_by ? FIND_OBJ_INV : (cont->worn_by ? FIND_OBJ_EQUIP : FIND_OBJ_ROOM));
+			}
+			else {
+				// try another way
+				mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+			}
 			
 			if (find_veh) {
 				// pass off to vehicle handler
 				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
 			}
 			else if (!cont) {
-				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
+				sprintf(buf, "You don't have %s %s.\r\n", AN(argptr), argptr);
 				send_to_char(buf, ch);
 			}
 			else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && !IS_CORPSE(cont))
@@ -6100,6 +6189,18 @@ ACMD(do_get) {
 					}
 					else if (cont_dotmode == FIND_ALLDOT) {
 						act("$p is not a container.", FALSE, ch, cont, 0, TO_CHAR);
+						found = 1;
+					}
+				}
+			}
+			for (iter = 0; iter < NUM_WEARS; ++iter) {
+				if ((cont = GET_EQ(ch, iter)) && CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
+					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
+						get_from_container(ch, cont, arg1, FIND_OBJ_EQUIP, amount);
+						found = 1;
+					}
+					else if (cont_dotmode == FIND_ALLDOT) {
+						act("$p is not a container.", FALSE, ch, cont, NULL, TO_CHAR);
 						found = 1;
 					}
 				}
@@ -6399,6 +6500,7 @@ ACMD(do_keep) {
 	obj_data *obj, *next_obj;
 	int dotmode, mode = SCMD_KEEP;
 	const char *sname;
+	bool any;
 
 	// validate mode
 	switch (subcmd) {
@@ -6432,6 +6534,10 @@ ACMD(do_keep) {
 		else {
 			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (mode == SCMD_KEEP) {
+					if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+						continue;	// skip quest items
+					}
+					
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 					qt_keep_obj(ch, obj, TRUE);
 				}
@@ -6451,10 +6557,16 @@ ACMD(do_keep) {
 		}
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+			return;
 		}
+		any = FALSE;
 		while (obj) {
 			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			if (mode == SCMD_KEEP) {
+				if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+					obj = next_obj;
+					continue;	// skip quest items
+				}
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 				qt_keep_obj(ch, obj, TRUE);
 			}
@@ -6465,11 +6577,20 @@ ACMD(do_keep) {
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE | TO_SLEEP);
 			obj = next_obj;
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "You didn't have any you could keep.\r\n");
+			return;
 		}
 	}
 	else {
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
+		else if (mode == SCMD_KEEP && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			msg_to_char(ch, "You cannot use 'keep' on quest items (but you also can't drop them).\r\n");
 		}
 		else {
 			if (mode == SCMD_KEEP) {
@@ -7026,9 +7147,9 @@ ACMD(do_pour) {
 ACMD(do_put) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
-	vehicle_data *find_veh;
+	vehicle_data *find_veh = NULL;
 	char_data *tmp_char;
-	int obj_dotmode, cont_dotmode, found = 0, howmany = 1;
+	int obj_dotmode, cont_dotmode, found = 0, howmany = 1, number;
 	char *theobj, *thecont;
 	bool multi = FALSE;
 
@@ -7057,7 +7178,14 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+		number = get_number(&thecont);
+		if ((cont = get_obj_for_char_prefer_container(ch, thecont, &number))) {
+			// found preferred container
+		}
+		else {
+			// try another way
+			generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
+		}
 		
 		if (find_veh) {
 			// override for put obj in vehicle
@@ -7280,7 +7408,7 @@ ACMD(do_retrieve) {
 	/* they hit "ret all" */
 	if (!str_cmp(objname, "all")) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
+			if (store->amount > 0 && (objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
@@ -7304,7 +7432,7 @@ ACMD(do_retrieve) {
 				break;
 			}
 			
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
+			if (store->amount > 0 && (objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (multi_isname(objname, GET_OBJ_KEYWORDS(objn)) && (++pos == number)) {
 					found = 1;
 					
@@ -7561,10 +7689,13 @@ ACMD(do_sheathe) {
 
 ACMD(do_ship) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
+	char *strptr;
 	struct island_info *from_isle, *to_isle;
+	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_storage_data *store;
 	struct shipping_data *sd;
 	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	room_data *to_room, *docks;
 	vehicle_data *veh;
 	obj_data *proto;
@@ -7573,6 +7704,19 @@ ACMD(do_ship) {
 	
 	// SHIPPING_x
 	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
+	
+	// optional empire arg
+	if (imm_access) {
+		strptr = any_one_word(argument, arg1);
+		if ((emp = get_empire_by_name(arg1))) {
+			// was an empire arg
+			argument = strptr;
+		}
+		else {
+			// not an empire arg (keep original argument)
+			emp = GET_LOYALTY(ch);
+		}
+	}
 	
 	argument = any_one_word(argument, arg1);	// command
 	argument = any_one_word(argument, arg2);	// number/all or keywords
@@ -7595,10 +7739,10 @@ ACMD(do_ship) {
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (IS_NPC(ch) || !GET_LOYALTY(ch) || !ch->desc) {
+	else if (IS_NPC(ch) || !emp || !ch->desc) {
 		msg_to_char(ch, "You can't use the shipping system unless you're in an empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_SHIPPING)) {
 		msg_to_char(ch, "You don't have permission to ship anything.\r\n");
 	}
 	else if (!*arg1) {
@@ -7607,13 +7751,13 @@ ACMD(do_ship) {
 		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
-		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
+		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(emp));
 		
 		done = FALSE;
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 			if (sd->vnum == NOTHING) {
 				// just a ship, not a shipment
-				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(GET_LOYALTY(ch), sd->shipping_id))) {
+				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(emp, sd->shipping_id))) {
 					continue;
 				}
 				if (*keywords && !multi_isname(keywords, VEH_KEYWORDS(veh))) {
@@ -7658,6 +7802,9 @@ ACMD(do_ship) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (emp != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You may only check the status of other empires' shipments.\r\n");
+	}
 	else if (GET_POS(ch) < POS_RESTING) {
 		send_low_pos_msg(ch);
 	}
@@ -7672,7 +7819,7 @@ ACMD(do_ship) {
 		
 		// find a matching entry
 		done = wrong_isle = FALSE;
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
@@ -7692,11 +7839,11 @@ ACMD(do_ship) {
 			
 			// found!
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
+			add_to_empire_storage(emp, sd->from_island, sd->vnum, sd->amount);
 			
-			DL_DELETE(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), sd);
 			free(sd);
-			EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			done = TRUE;
 			break;	// only allow 1st match
@@ -7710,7 +7857,7 @@ ACMD(do_ship) {
 		if (number < 1 || !*keywords) {
 			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
 		}
-		else if (!(docks = find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+		else if (!(docks = find_docks(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
 		else if (!(to_room = get_shipping_target(ch, arg1, &targeted_island))) {
@@ -7722,14 +7869,14 @@ ACMD(do_ship) {
 		else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(ch))) {
 			msg_to_char(ch, "You are already on that island.\r\n");
 		}
-		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
+		else if (!(store = find_island_storage_by_keywords(emp, GET_ISLAND_ID(IN_ROOM(ch)), keywords)) || store->amount < 1) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
 		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
+			add_shipping_queue(ch, emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
 		}
 	}
 }

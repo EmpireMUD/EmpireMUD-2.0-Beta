@@ -431,7 +431,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
@@ -451,6 +451,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -462,6 +463,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("buildflags", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("buildflagged", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, sector_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, sector_flags)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
@@ -526,6 +528,9 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// string search
+		if (*extra_search && !find_exdesc(extra_search, GET_SECT_EX_DESCS(sect), NULL)) {
+			continue;
+		}
 		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect))) {
 			// check icons too
 			match = FALSE;
@@ -552,7 +557,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d sector%s)\r\n", count, PLURAL(count));
 	}
 	else if (count == 0) {

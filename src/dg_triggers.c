@@ -554,7 +554,13 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
-void speech_mtrigger(char_data *actor, char *str, generic_data *language) {
+/**
+* @param char_data *actor Person speaking.
+* @param char *str String spoken.
+* @param generic_data *language Language spoken in.
+* @param char_data *only_mob Optional: Only this mob heard the speech (NULL for all mobs in room). Mob MUST be in the same room.
+*/
+void speech_mtrigger(char_data *actor, char *str, generic_data *language, char_data *only_mob) {
 	char_data *ch, *ch_next;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -562,6 +568,10 @@ void speech_mtrigger(char_data *actor, char *str, generic_data *language) {
 	bool multi;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
+		if (only_mob && ch != only_mob) {
+			continue;
+		}
+		
 		// multi is per-char
 		multi = FALSE;
 		
@@ -593,7 +603,7 @@ void speech_mtrigger(char_data *actor, char *str, generic_data *language) {
 				if (*GET_TRIG_ARG(t) == '*' || ((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) || (!GET_TRIG_NARG(t) && is_substring(GET_TRIG_ARG(t), str)))) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+					add_var(&GET_TRIG_VARS(t), "speech", strip_color(str), 0);
 					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
 					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
@@ -2117,7 +2127,7 @@ void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+			add_var(&GET_TRIG_VARS(t), "speech", strip_color(str), 0);
 			add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 			sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
 			add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);
@@ -2792,7 +2802,7 @@ void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 				if (*GET_TRIG_ARG(t) == '*' || ((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) || (!GET_TRIG_NARG(t) && is_substring(GET_TRIG_ARG(t), str)))) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-					add_var(&GET_TRIG_VARS(t), "speech", str, 0);
+					add_var(&GET_TRIG_VARS(t), "speech", strip_color(str), 0);
 					add_var(&GET_TRIG_VARS(t), "lang", language ? GEN_NAME(language) : "", 0);
 					sprintf(buf, "%d", language ? GEN_VNUM(language) : NOTHING);
 					add_var(&GET_TRIG_VARS(t), "lang_vnum", buf, 0);

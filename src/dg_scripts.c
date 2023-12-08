@@ -2286,7 +2286,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "startloc")) {
-				room_data *sloc = find_starting_location();
+				room_data *sloc = find_starting_location(NULL);
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(sloc) + ROOM_ID_BASE);
 				return;
 			}
@@ -2308,22 +2308,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case MOB_TRIGGER:
 					ch = (char_data*) go;
 
-					if ((o = get_object_in_equip(ch, name))) {
+					if (*name != UID_CHAR && (o = get_object_in_equip(ch, name))) {
 						// just setting
 					}
-					else if ((o = get_obj_in_list(name, ch->carrying))) {
+					else if (*name != UID_CHAR && (o = get_obj_in_list(name, ch->carrying))) {
 						// just setting
 					}
-					else if ((c = get_char_room(name, IN_ROOM(ch)))) {
+					else if (*name != UID_CHAR && (c = get_char_room(name, IN_ROOM(ch)))) {
 						// just setting
 					}
-					else if ((v = get_vehicle_room(IN_ROOM(ch), name, NULL))) {
+					else if (*name != UID_CHAR && (v = get_vehicle_room(IN_ROOM(ch), name, NULL))) {
 						// just setting
 					}
-					else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+					else if (*name != UID_CHAR && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 						v = GET_ROOM_VEHICLE(IN_ROOM(ch));
 					}
-					else if ((o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+					else if (*name != UID_CHAR && (o = get_obj_in_list(name, ROOM_CONTENTS(IN_ROOM(ch))))) {
 						// just setting
 					}
 					else if ((c = get_char(name))) {
@@ -3255,8 +3255,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "charge_coins")) {
 						if (subfield && isdigit(*subfield)) {
-							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield), NULL);
-							*str = '\0';
+							// will report output to str
+							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield), NULL, str);
 						}
 					}
 					else if (!str_cmp(field, "charge_component")) {
@@ -3945,7 +3945,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", char_script_id(c));
 					}
 					else if (!str_cmp(field, "is_name")) {
-						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
+						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS, NULL)) {
 							snprintf(str, slen, "1");
 						}
 						else {

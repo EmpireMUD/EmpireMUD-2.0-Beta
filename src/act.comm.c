@@ -1686,7 +1686,7 @@ ACMD(do_slash_channel) {
 			
 			// iterate backwards
 			count = 0;
-			for (hist = chan->history ? chan->history->prev : NULL; hist && hist != chan->history; hist = hist->prev) {
+			for (hist = chan->history ? chan->history->prev : NULL; hist; hist = (hist == chan->history ? NULL : hist->prev)) {
 				if (is_ignoring_idnum(ch, hist->idnum)) {
 					continue;	// ignore list
 				}
@@ -1940,7 +1940,7 @@ ACMD(do_history) {
 	count = 0;
 	
 	// iterate the history in reverse...
-	for (chd_iter = list ? list->prev : NULL; chd_iter && chd_iter != list; chd_iter = chd_iter->prev) {
+	for (chd_iter = list ? list->prev : NULL; chd_iter; chd_iter = (chd_iter == list ? NULL : chd_iter->prev)) {
 		if (GET_ACCESS_LEVEL(ch) < chd_iter->access_level) {
 			continue;	// bad access level
 		}
@@ -2313,7 +2313,7 @@ ACMD(do_say) {
 		
 		/* trigger check */
 		if (subcmd != SCMD_OOCSAY) {
-			speech_mtrigger(ch, argument, lang);
+			speech_mtrigger(ch, argument, lang, NULL);
 			speech_wtrigger(ch, argument, lang);
 			speech_vtrigger(ch, argument, lang);
 		}
@@ -2411,10 +2411,13 @@ ACMD(do_speak) {
 
 
 ACMD(do_spec_comm) {
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	char_data *vict;
+	bool res;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *string;
 	const char *action_sing, *action_plur, *action_others;
 	char color;
+	int mode;
+	char_data *vict;
+	generic_data *lang = NULL;
 
 	switch (subcmd) {
 		case SCMD_WHISPER: {
@@ -2436,18 +2439,26 @@ ACMD(do_spec_comm) {
 			break;
 		}
 	}
+	
+	half_chop(argument, arg1, arg2);
+	string = arg2;
 
-	half_chop(argument, buf, buf2);
+	// determine language?
+	res = determine_language_from_string(ch, &string, &lang);
+	if (!res) {
+		// if we got here it sent an error
+		return;
+	}
 
 	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!*buf || !*buf2) {
+	else if (!*arg1 || !*string) {
 		msg_to_char(ch, "Whom do you want to %s... and what??\r\n", action_sing);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
-	else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		msg_to_char(ch, "You can't get your mouth close enough to your ear...\r\n");
@@ -2460,7 +2471,25 @@ ACMD(do_spec_comm) {
 			clear_last_act_message(vict->desc);
 		}
 		color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SAY)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SAY) : '0';
-		sprintf(buf, "$n %s you, '%s\t%c'\t0", action_plur, buf2, color);
+		mode = lang ? speaks_language(vict, GEN_VNUM(lang)) : LANG_SPEAK;
+		
+		if (mode == LANG_SPEAK && (IS_NPC(vict) || !lang || GET_SPEAKING(vict) == GEN_VNUM(lang))) {
+			// same language
+			sprintf(buf, "$n %s you, '%s\t%c'\t0", action_plur, string, color);
+		}
+		else if (mode == LANG_SPEAK) {
+			// different language
+			sprintf(buf, "$n %s you, in %s, '%s\t%c'\t0", action_plur, (lang ? GEN_NAME(lang) : "another language"), string, color);
+		}
+		else if (mode == LANG_RECOGNIZE) {
+			// different language, can't understand
+			sprintf(buf, "$n %s you in %s but you don't understand it.\t0", action_plur, (lang ? GEN_NAME(lang) : "another language"));
+		}
+		else {
+			// don't recognize
+			sprintf(buf, "$n %s you but you don't understand $m.\t0", action_plur);
+		}
+		
 		if (color != '0') {
 			msg_to_char(vict, "\t%c", color);
 		}
@@ -2478,7 +2507,14 @@ ACMD(do_spec_comm) {
 		}
 		else {
 			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SAY)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SAY) : '0';
-			sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), buf2, color);
+			
+			if (!lang || IS_NPC(ch) || GEN_VNUM(lang) == GET_SPEAKING(ch)) {
+				sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), string, color);
+			}
+			else {
+				sprintf(buf, "\t%cYou %s %s, in %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), (lang ? GEN_NAME(lang) : "another language"), string, color);
+			}
+			
 			msg_to_char(ch, "%s\r\n", buf);
 			if (ch->desc) {
 				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf, FALSE, 0, NOTHING);
@@ -2486,6 +2522,9 @@ ACMD(do_spec_comm) {
 		}
 
 		act(action_others, FALSE, ch, NULL, vict, TO_NOTVICT);
+		if (IS_NPC(vict)) {
+			speech_mtrigger(ch, string, lang, vict);
+		}
 	}
 }
 

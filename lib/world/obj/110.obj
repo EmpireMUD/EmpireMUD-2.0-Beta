@@ -6,7 +6,7 @@ A gigantic nest made from whole trees blocks the landscape! (adventure)~
 you've never even been to the land they were collected from. It looks like you
 can 'enter the nest' and see what's in there.
 ~
-8 0 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 0 0
 T 11000
@@ -19,7 +19,7 @@ A gigantic egg sits in the center of the nest.~
 seems to shake. It must be about to hatch. You should decide which quest to
 start, before the mother gets home.
 ~
-3 0 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 14 0
 S
@@ -263,7 +263,7 @@ a sense of loss~
 A sense of loss looms where an egg should be.~
 There should be something here, but it's gone...
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 96
 T 11021

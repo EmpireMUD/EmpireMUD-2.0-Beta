@@ -1528,7 +1528,7 @@ void process_chop(char_data *ch) {
 	obj_data *axe;
 	int amt;
 	
-	const int min_progress_per_chop = 3;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
+	const int min_progress_per_chop = 4;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);
@@ -1541,7 +1541,7 @@ void process_chop(char_data *ch) {
 		return;
 	}
 
-	amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(axe) / 10.0) * (OBJ_FLAGGED(axe, OBJ_SUPERIOR) ? 2 : 1);
+	amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(axe) / 8.3333 * (OBJ_FLAGGED(axe, OBJ_SUPERIOR) ? 1.25 : 1));
 	amt = MAX(min_progress_per_chop, amt);
 
 	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * amt);
@@ -2208,7 +2208,7 @@ void process_mining(char_data *ch) {
 			break;
 		}
 		
-		amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 6.66) * (OBJ_FLAGGED(tool, OBJ_SUPERIOR) ? 2 : 1);
+		amt = round(GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 6.66) * (OBJ_FLAGGED(tool, OBJ_SUPERIOR) ? 1.5 : 1);
 		amt = MAX(min_progress_per_mine, amt);
 		
 		GET_ACTION_TIMER(ch) -= amt;
@@ -3823,7 +3823,7 @@ ACMD(do_stop) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No, you stop.\r\n");
 	}
-	else if (cancel_biting(ch)) {
+	else if (cancel_biting(ch, TRUE)) {
 		// sends its own message if the player was biting someone
 	}
 	else if (GET_ACTION(ch) == ACT_NONE) {

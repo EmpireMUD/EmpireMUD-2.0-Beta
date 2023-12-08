@@ -1508,17 +1508,23 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 		return;	// no work need doing
 	}
 	
-	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
+	if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc && (IS_NPC(ch) || GET_LAST_AFF_WEAR_OFF_ID(ch) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(ch) != atype || GET_LAST_AFF_WEAR_OFF_TIME(ch) != time(0))) {
 		msg_to_char(ch, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_STATUS), GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
-		GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
-		GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
+		if (!IS_NPC(ch)) {
+			GET_LAST_AFF_WEAR_OFF_ID(ch) = CAST_BY_ID(ch);
+			GET_LAST_AFF_WEAR_OFF_VNUM(ch) = atype;
+			GET_LAST_AFF_WEAR_OFF_TIME(ch) = time(0);
+		}
 	}
 	if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (vict->desc && (IS_NPC(vict) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
+			if (vict->desc && (IS_NPC(vict) || GET_LAST_AFF_WEAR_OFF_ID(vict) != CAST_BY_ID(ch) || GET_LAST_AFF_WEAR_OFF_VNUM(vict) != atype || GET_LAST_AFF_WEAR_OFF_TIME(vict) != time(0))) {
 				act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, vict, TO_VICT);
-				GET_LAST_AFF_WEAR_OFF_VNUM(vict) = atype;
-				GET_LAST_AFF_WEAR_OFF_TIME(vict) = time(0);
+				if (!IS_NPC(vict)) {
+					GET_LAST_AFF_WEAR_OFF_ID(vict) = CAST_BY_ID(ch);
+					GET_LAST_AFF_WEAR_OFF_VNUM(vict) = atype;
+					GET_LAST_AFF_WEAR_OFF_TIME(vict) = time(0);
+				}
 			}
 		}
 	}
@@ -1831,10 +1837,21 @@ void extract_pending_chars(void) {
 * @param char_data *target The potential match.
 * @param char *name The string ch typed when looking for target.
 * @param bitvector_t flags MATCH_GLOBAL, MATCH_IN_ROOM
+* @param bool *was_exact Optional; If provided will set to TRUE if the name was an exact match not an abbreviation. (Pass NULL to skip this.)
 * @return bool TRUE if "name" is valid for "target" according to "ch", FALSE if not
 */
-bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags) {
+bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags, bool *was_exact) {
 	bool recognize, old_ignore_dark = Global_ignore_dark;
+	
+	if (was_exact) {
+		// initialize
+		*was_exact = FALSE;
+	}
+	
+	// shortcut with no name or when UID character requested
+	if (!name || !*name || (*name == UID_CHAR && isdigit(*(name+1)))) {
+		return FALSE;
+	}
 	
 	if (IS_SET(flags, MATCH_GLOBAL)) {
 		Global_ignore_dark = TRUE;
@@ -1853,16 +1870,16 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	recognize = IS_SET(flags, MATCH_GLOBAL) || (ch ? CAN_RECOGNIZE(ch, target) : TRUE);
 	
 	// name-matching part
-	if (recognize && isname(name, GET_PC_NAME(target))) {
+	if (recognize && isname_check_exact(name, GET_PC_NAME(target), was_exact)) {
 		return TRUE;	// name/kw match
 	}
-	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname(name, GET_CURRENT_LASTNAME(target))) {
+	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname_check_exact(name, GET_CURRENT_LASTNAME(target), was_exact)) {
 		return TRUE;	// lastname match
 	}
-	else if (IS_MORPHED(target) && isname(name, MORPH_KEYWORDS(GET_MORPH(target)))) {
+	else if (IS_MORPHED(target) && isname_check_exact(name, MORPH_KEYWORDS(GET_MORPH(target)), was_exact)) {
 		return TRUE;	// morph kw match
 	}
-	else if (IS_DISGUISED(target) && isname(name, GET_DISGUISED_NAME(target))) {
+	else if (IS_DISGUISED(target) && isname_check_exact(name, GET_DISGUISED_NAME(target), was_exact)) {
 		return TRUE;	// disguise name match
 	}
 	else {
@@ -1911,6 +1928,7 @@ bool perform_idle_out(char_data *ch) {
 	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	dismiss_any_minipet(ch);
+	despawn_companion(ch, NOTHING);
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle) at %s", GET_NAME(ch), IN_ROOM(ch) ? room_log_identifier(IN_ROOM(ch)) : "an unknown location");
 	
@@ -1975,9 +1993,12 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			check_instance_is_loaded(inst);
 		}
-
-		// check npc spawns whenever a player is places in a room
+		
 		if (!IS_NPC(ch)) {
+			// day/night can change when moving
+			qt_check_day_and_night(ch);
+			
+			// check npc spawns whenever a player is places in a room
 			spawn_mobs_from_center(room);
 		}
 		
@@ -2043,7 +2064,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		if (!CAN_SEE(ch, vict) || !can_see_in_dark_room(ch, IN_ROOM(vict), FALSE)) {
 			continue;
 		}
-		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM)) {
+		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM, NULL)) {
 			continue;
 		}
 		
@@ -2120,7 +2141,7 @@ char_data *get_char_room(char *name, room_data *room) {
 		if (j > number) {
 			break;
 		}
-		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
+		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (++j == number) {
 				found = i;
 				break;
@@ -2162,7 +2183,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (--(*number) == 0) {
 				return i;
 			}
@@ -2215,7 +2236,7 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
 				continue;
 			}
-			if (!match_char_name(ch, i, tmp, (IS_SET(where, FIND_NO_DARK) ? MATCH_GLOBAL : 0))) {
+			if (!match_char_name(ch, i, tmp, (IS_SET(where, FIND_NO_DARK) ? MATCH_GLOBAL : 0), NULL)) {
 				continue;
 			}
 			
@@ -2239,7 +2260,12 @@ char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t wher
 * @return char_data *The found player, or NULL.
 */
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
-	char_data *i, *found = NULL;
+	bool was_exact = FALSE, had_number;
+	char_data *i, *abbrev = NULL, *found = NULL;
+	int number;
+	
+	had_number = (isdigit(*name) ? TRUE : FALSE);
+	number = get_number(&name);
 	
 	DL_FOREACH2(player_character_list, i, next_plr) {
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
@@ -2252,15 +2278,25 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 		if (!(IS_SET(flags, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i)) && !CAN_SEE(ch, i)) {
 			continue;
 		}
-		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0))) {
+		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0), &was_exact)) {
+			continue;
+		}
+		if (had_number && --number > 0) {
 			continue;
 		}
 		
-		found = i;
-		break;	// done
+		if (had_number || was_exact) {
+			// perfect match
+			found = i;
+			break;	// done
+		}
+		else if (!abbrev) {
+			// save for later
+			abbrev = i;
+		}
 	}
 
-	return found;
+	return found ? found : abbrev;	// may be NULL
 }
 
 
@@ -2290,7 +2326,7 @@ char_data *get_char_world(char *name, int *number) {
 	}
 	
 	DL_FOREACH(character_list, ch) {
-		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
+		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL, NULL)) {
 			if (--(*number) == 0) {
 				return ch;	// done
 			}
@@ -2311,31 +2347,39 @@ char_data *get_char_world(char *name, int *number) {
 */
 char_data *get_player_world(char *name, int *number) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool ignore = FALSE;
-	char_data *ch;
+	bool had_number, was_exact = FALSE;
+	char_data *ch, *abbrev = NULL;
 	int num;
 	
 	if (!number) {
+		had_number = (isdigit(*name) ? TRUE : FALSE);
 		strcpy(tmp, name);
 		number = &num;
 		num = get_number(&tmp);
 	}
 	else {
+		had_number = (*number != 1);	// a guess that they provided a number
 		tmp = name;
-	}
-	if (*number == 0) {
-		ignore = TRUE;
 	}
 	
 	DL_FOREACH2(player_character_list, ch, next_plr) {
-		if (match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
-			if (--(*number) == 0 || ignore) {
-				return ch;	// done
-			}
+		if (!match_char_name(NULL, ch, tmp, MATCH_GLOBAL, &was_exact)) {
+			continue;
+		}
+		if (had_number && --(*number) > 0) {
+			continue;
+		}
+		
+		// match!
+		if (had_number || was_exact) {
+			return ch;	// done
+		}
+		else if (!abbrev) {
+			abbrev = ch;	// for later
 		}
 	}
 
-	return NULL;
+	return abbrev;	// if any
 }
 
 
@@ -2391,12 +2435,20 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param empire_data *type Empire who is charging the player (or OTHER_COIN for any coin type).
 * @param int amount How much to charge the player -- must be positive.
 * @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc coin types charged.
+* @param char *build_string Optional: if not NULL, will build a string of exactly what was charged, e.g. "450 crown coins and 100 miscellaneous coins". This string should ideally be MAX_STRING_LENGTH, but in practice will be way shorter.
 */
-void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list) {
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list, char *build_string) {
 	struct coin_data *coin;
+	char temp[1024];
+	char *ptr;
 	int this, this_amount;
 	double rate, inv;
 	empire_data *emp;
+	
+	if (build_string) {
+		// initialize
+		*build_string = '\0';
+	}
 	
 	if (IS_NPC(ch) || amount <= 0) {
 		return;
@@ -2410,6 +2462,9 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		
 		if (build_used_list) {
 			add_to_resource_list(build_used_list, RES_COINS, type ? EMPIRE_VNUM(type) : OTHER_COIN, this, 0);
+		}
+		if (build_string) {
+			sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(type, this));
 		}
 	}
 		
@@ -2425,6 +2480,9 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		
 		if (build_used_list) {
 			add_to_resource_list(build_used_list, RES_COINS, OTHER_COIN, this, 0);
+		}
+		if (build_string) {
+			sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(REAL_OTHER_COIN, this));
 		}
 	}
 	
@@ -2442,10 +2500,20 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 			if (build_used_list) {
 				add_to_resource_list(build_used_list, RES_COINS, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, this, 0);
 			}
+			if (build_string) {
+				sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(real_empire(coin->empire_id), this));
+			}
 		}
 	}
 
 	// coins were cleaned up with each increase
+	// lastly, look for the last comma
+	if (build_string && (ptr = strrchr(build_string, ','))) {
+		// and replace comma with and
+		strcpy(temp, ptr+1);
+		strcpy(ptr, " and");
+		strcat(ptr, temp);
+	}
 }
 
 
@@ -3416,6 +3484,13 @@ void perform_abandon_room(room_data *room) {
 	
 	// updates based on owner
 	if (emp) {
+		// update any building-flagged vehicles
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
+				perform_abandon_vehicle(veh);
+			}
+		}
+		
 		deactivate_workforce_room(emp, room);
 		adjust_building_tech(emp, room, FALSE);
 		
@@ -3467,13 +3542,6 @@ void perform_abandon_room(room_data *room) {
 		check_tavern_setup(room);
 	}
 	
-	// update any building-flagged vehicles
-	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
-			perform_abandon_vehicle(veh);
-		}
-	}
-	
 	affect_total_room(room);
 	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 	request_mapout_update(GET_ROOM_VNUM(room));
@@ -3491,7 +3559,6 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		empire_data *emp = VEH_OWNER(veh);
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
 		
-		VEH_OWNER(veh) = NULL;
 		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
 	
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
@@ -3499,6 +3566,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		}
 		
 		adjust_vehicle_tech(veh, FALSE);
+		VEH_OWNER(veh) = NULL;
+		
 		if (VEH_IS_COMPLETE(veh) && emp) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
@@ -6481,12 +6550,15 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		scale_item_to_level(new, scale_level);
 	}
 	
-	// copy enchantment ONLY if level is the same
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
-		SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+	// copy enchantments/hone ONLY if level is the same
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj)) {
+		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
+			SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
+		}
 		
 		LL_FOREACH(GET_OBJ_APPLIES(obj), apply_iter) {
-			if (apply_iter->apply_type == APPLY_TYPE_ENCHANTMENT) {
+			// only copies ones added by the player
+			if (apply_type_from_player[apply_iter->apply_type]) {
 				// ensure it's not on the proto
 				found = FALSE;
 				LL_FOREACH(GET_OBJ_APPLIES(proto), old_apply) {
@@ -6499,7 +6571,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 					continue;	// no need to copy
 				}
 				
-				// copy enchantment
+				// copy apply
 				CREATE(new_apply, struct obj_apply, 1);
 				*new_apply = *apply_iter;
 				new_apply->next = NULL;
@@ -8419,7 +8491,7 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				break;
 			}
 			case REQ_GET_COINS: {
-				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL);
+				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL, NULL);
 				break;
 			}
 			case REQ_CROP_VARIETY: {
@@ -8779,6 +8851,14 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (level == LANG_RECOGNIZE || level == LANG_SPEAK);
 				break;
 			}
+			case REQ_DAYTIME: {
+				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT);
+				break;
+			}
+			case REQ_NIGHTTIME: {
+				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9033,6 +9113,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_RECOGNIZE_LANGUAGE: {
 			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_DAYTIME: {
+			snprintf(output, sizeof(output), "Daytime");
+			break;
+		}
+		case REQ_NIGHTTIME: {
+			snprintf(output, sizeof(output), "Nighttime");
 			break;
 		}
 		default: {
@@ -9824,8 +9912,9 @@ struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, 
 	}
 	
 	SAFE_ADD(store->amount, amount, 0, MAX_STORAGE, FALSE);
+	store->amount = MAX(store->amount, 0);
 	
-	if (store->amount <= 0) {
+	if (store->amount == 0 && !store->keep) {
 		HASH_DEL(isle->store, store);
 		free(store);
 		store = NULL;
@@ -9875,6 +9964,9 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;
+			}
 			if ((store->keep == UNLIMITED || store->amount <= store->keep) && !use_kept) {
 				continue;
 			}
@@ -9943,7 +10035,7 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 		}
 		
 		HASH_FIND_INT(isle->store, &vnum, store);
-		if (!store) {
+		if (!store || store->amount < 1) {
 			continue;	// none here
 		}
 		
@@ -10008,6 +10100,9 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 	}
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->amount < 1) {
+			continue;	// got none
+		}
 		if ((store->keep == UNLIMITED || store->amount <= store->keep) && !include_kept) {
 			continue;
 		}
@@ -10034,7 +10129,8 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 
 
 /**
-* Finds empire storage on a given island by item keyword.
+* Finds empire storage on a given island by item keyword. Note this can find
+* one with an amount of 0 (because keep amounts are saved).
 * 
 * @param empire_data *emp The empire whose storage to search.
 * @param int island_id Which island to look on.
@@ -10064,7 +10160,8 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 
 /**
 * This finds the empire_storage_data object for a given vnum in an empire,
-* IF there is any of that vnum stored to the empire.
+* IF there is any of that vnum stored to the empire. Note that the resource
+* MAY have an amount of 0 (empty entries are retained for 'keep' info).
 *
 * @param empire_data *emp The empire.
 * @param int island Which island to search.
@@ -10103,7 +10200,7 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_FIND_INT(isle->store, &vnum, sto);
-		if (sto) {
+		if (sto && sto->amount > 0) {
 			SAFE_ADD(count, sto->amount, 0, INT_MAX, FALSE);
 		}
 	}
@@ -10205,7 +10302,7 @@ void read_vault(empire_data *emp) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((proto = store->proto)) {
+			if (store->amount > 0 && (proto = store->proto)) {
 				if (IS_WEALTH_ITEM(proto)) {
 					SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * store->amount), 0, INT_MAX, FALSE);
 				}

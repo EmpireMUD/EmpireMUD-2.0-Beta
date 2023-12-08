@@ -601,7 +601,7 @@ A long box takes up most of the floor space.~
 as long as you are tall, and a little over two feet wide. It's the only thing
 in here that isn't covered in dust.
 ~
-3 p 0 0 0 6
+3 pB 0 0 0 7
 0 0 0
 0 24
 C
@@ -617,7 +617,7 @@ There is a pile of boards in the middle of the room.~
 attached to each other by cross-boards but if this was a box, it wasn't a very
 good one.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 0
 C

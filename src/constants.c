@@ -62,7 +62,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.164";
+const char *version = "EmpireMUD 2.0 beta 5.165";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -296,6 +296,7 @@ const char *ability_gain_hooks[] = {
 	"MOVING",
 	"ONLY-USING-READY-WEAPON",
 	"ONLY-USING-COMPANIONS",
+	"NOT-WHILE-ASLEEP",	// 15
 	"\n"
 };
 
@@ -657,6 +658,11 @@ const char *combat_message_types[] = {
 	"abilities against allies",
 	"abilities against target",
 	"abilities against tank",
+	"my heals",
+	"heals on me",	// 30
+	"heals on allies",
+	"heals on target",
+	"heals on other",
 	"\n"
 };
 
@@ -1595,7 +1601,7 @@ const char *injury_bits[] = {
 };
 
 
-// APPLY_TYPE_x: source of obj apply
+// APPLY_TYPE_x (1/2): source of obj apply
 const char *apply_type_names[] = {
 	"natural",
 	"enchantment",
@@ -1605,6 +1611,18 @@ const char *apply_type_names[] = {
 	"group-drop",
 	"boss-drop",
 	"\n"
+};
+
+
+// APPLY_TYPE_x (2/2): preserve ones set by players through fresh_copy_obj
+const bool apply_type_from_player[] = {
+	FALSE,	// natural
+	TRUE,	// enchantment
+	TRUE,	// honed
+	FALSE,	// superior -- will be applied by the scaler
+	FALSE,	// hard-drop
+	FALSE,	// group-drop
+	FALSE,	// boss-drop
 };
 
 
@@ -1830,7 +1848,7 @@ const char *craft_flags[] = {
 	"BUILDING",
 	"SKILLED-LABOR",
 	"SKIP-CONSUMES-TO",
-	"*",	// formerly carpenter (now uses a function)
+	"DARK-OK",
 	"*",	// 5: formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
 	"FIRE",
@@ -1856,7 +1874,7 @@ const char *craft_flag_for_info[] = {
 	"",	// building
 	"",	// skilled labor
 	"",	// skip-consumes-to
-	"",
+	"can be made in the dark",
 	"",	// 5
 	"",
 	"requires fire",
@@ -1960,6 +1978,7 @@ const char *empire_log_types[] = {
 	"Shipping",
 	"Workforce",
 	"Progress",
+	"Alert",
 	"\n"
 };
 
@@ -1977,6 +1996,7 @@ const bool show_empire_log_type[] = {
 	FALSE,	// shipments
 	FALSE,	// workforce
 	TRUE,	// progress
+	TRUE,	// alert
 };
 
 
@@ -1993,6 +2013,7 @@ const bool empire_log_request_only[] = {
 	FALSE,	// shipments
 	TRUE,	// workforce
 	FALSE,	// progress
+	FALSE,	// alert
 };
 
 
@@ -2340,6 +2361,7 @@ const char *action_bits[] = {
 	"COINS",
 	"NO-COMMAND",	// 35
 	"NO-UNCONSCIOUS",
+	"IMPORTANT",
 	"\n"
 };
 
@@ -2660,6 +2682,7 @@ const char *extra_bits[] = {
 	"GENERIC-DROP",
 	"!STORE",	// 25
 	"SEEDED",
+	"IMPORTANT",
 	"\n"
 };
 
@@ -2693,6 +2716,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// generic-drop
 	"",	// no-store
 	"",	// seeded
+	"",	// important
 	"\n"
 };
 
@@ -2708,7 +2732,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_SINGLE_USE
 	1.0,	// OBJ_SLOW (weapon attack speed)
 	1.0,	// OBJ_FAST (weapon attack speed)
-	1.3333,	// OBJ_ENCHANTED
+	1.0,	// OBJ_ENCHANTED
 	0.5,	// OBJ_JUNK
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
@@ -2726,6 +2750,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_GENERIC_DROP
 	1.0,	// OBJ_NO_STORE
 	1.0,	// OBJ_SEEDED
+	1.0,	// OBJ_IMPORTANT
 };
 
 
@@ -2989,13 +3014,14 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "peck", "peck", "pecks", "peck", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "gore", "gore", "gores", "gore", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "mana blast", "blast", "blasts", "blast", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
-	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
 	{ "fire breath", "breathe fire at", "breathes fire at", "fire breath", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
-	{ "sling", "shoot", "shoots", "shot", { 3.0, 3.5, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "spear-thrower", "shoot", "shoots", "shot", { 3.5, 4.0, 4.5 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "sling", "shoot", "shoots", "shot", { 3.0, 3.5, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "spear-thrower", "shoot", "shoots", "shot", { 3.5, 4.0, 4.5 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "animal whip", "whip", "whips", "whip", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 };
 
 
@@ -3263,7 +3289,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
 	"NO-CUSTOMIZE",
-	"*",
+	"NO-AUTO-ABANDON-WHEN-RUINED",
 	"*",
 	"*",
 	"*",	// 25
@@ -3598,7 +3624,7 @@ const char *function_flags[] = {
 	"FORGE",
 	"GLASSBLOWER",
 	"GUARD-TOWER",
-	"HENGE",	// 10
+	"*",	// 10
 	"LIBRARY",
 	"MAIL",
 	"MILL",
@@ -3643,7 +3669,7 @@ const char *function_flags_long[] = {
 	"at a forge",
 	"at a glassblower",
 	"at a guard tower",
-	"at a henge",	// 10
+	"",	// 10
 	"in a library",
 	"at a post box",
 	"at a mill",
@@ -4743,6 +4769,8 @@ const char *requirement_types[] = {
 	"SPEAK-LANGUAGE",
 	"RECOGNIZE-LANGUAGE",
 	"COMPLETED-QUEST-EVER",
+	"DAYTIME",
+	"NIGHTTIME",
 	"\n",
 };
 
@@ -4791,6 +4819,9 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_THRESHOLD,	// level over
 	REQ_AMT_NONE,	// speak-language
 	REQ_AMT_NONE,	// recognize-language
+	REQ_AMT_NONE,	// completed-quest-ever
+	REQ_AMT_NONE,	// daytime
+	REQ_AMT_NONE,	// nighttime
 };
 
 
@@ -4838,6 +4869,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// level over
 	FALSE,	// speak-language
 	FALSE,	// recognize-language
+	FALSE,	// daytime
+	FALSE,	// nighttime
 };
 
 

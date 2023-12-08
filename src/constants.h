@@ -100,6 +100,7 @@ extern const char *position_commands[];
 extern const int regen_by_pos[];
 extern const char *injury_bits[];
 extern const char *apply_type_names[];
+extern const bool apply_type_from_player[];
 extern const char *apply_types[];
 extern const double apply_values[];
 extern const int apply_attribute[];

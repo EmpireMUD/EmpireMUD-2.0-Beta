@@ -3,7 +3,7 @@
 #n~
 #n is standing here.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 2 0 0 15 -1
 D
    She's dressed in traveling pants and wears a hat that clearly identifies her
@@ -17,7 +17,7 @@ Dylane trense~
 Dylane of Trense~
 Dylane of Trense is here, looking around.
 ~
-150 250 bdvHJ nK 3
+150 250 bdvHJL nK 3
 1 0 86 15 -1
 D
    Dressed unmistakably in the finery of a nobleman and making no efforts to
@@ -58,7 +58,7 @@ S
 #n~
 #n is looking up at everything.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 1 0 0 15 -1
 D
    He seems to have a keen interest in architecture as he walks around looking
@@ -93,7 +93,7 @@ S
 #n~
 #n talks with his hands as he walks.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 1 0 0 15 -1
 D
    He seems to be very knowledgeable about the tower as he's giving a lot of
@@ -108,7 +108,7 @@ corwin page~
 Page Corwin~
 Corwin is bustling about.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 1 0 68 15 -1
 D
    Corwin is sweating under his heavy jute page robe. He's bustling around
@@ -158,7 +158,7 @@ Mageina barista~
 Mageina~
 Mageina is managing several pots of soup.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 16 -1
 D
    Mageina moves back and forth between pots of soup, which she heats with a
@@ -207,7 +207,7 @@ Huberus master sorcerer instructor~
 Master Sorcerer Huberus~
 Master Sorcerer Huberus is making one of the beds.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 16 -1
 D
    Huberus is a gruff sort, barely casting a glance from underneath the gnarly
@@ -245,7 +245,7 @@ S
 #n~
 #n is organizing the supplies.
 ~
-150 250 bdvIJ n 3
+150 250 bdvIJL n 3
 1 0 0 16 -1
 D
    Though he looks like he's new here, he has set right to work sorting and
@@ -286,7 +286,7 @@ S
 #n~
 A young lady is standing here.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 2 0 102 15 -1
 D
    She's young, not past her second decade, and it looks as if she's been
@@ -333,7 +333,7 @@ S
 #n~
 #n walks around with a huge grin on his face.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 1 0 0 15 -1
 D
    The young man is dressed in white shirt and dark wool trousers with
@@ -348,7 +348,7 @@ Annaca watcher~
 Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -391,7 +391,7 @@ apprentice kayla~
 Kayla~
 Apprentice Kayla is standing here.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 15 -1
 D
    Kayla's white robes have turned gray below the shins and the back side isn't
@@ -440,7 +440,7 @@ cosimo apprentice~
 Cosimo~
 Apprentice Cosimo is lurking in the passage.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Cosimo is clad in dingy white apprentice robes with red trim. His hair is
@@ -462,7 +462,7 @@ tyrone~
 Tyrone~
 Tyrone is relaxing on one of the bunks.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Tyrone looks almost at ease compared to the rest of the tower. His white
@@ -480,7 +480,7 @@ wright old~
 Old Wright~
 Old Wright is reading on his bunk.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Even in the dim light of the bunk room, Wright's advanced years are such
@@ -622,7 +622,7 @@ Venjer fox goblin~
 Venjer the Fox~
 Venjer the Fox is prodding at the vines with a staff.
 ~
-150 250 abdxEJ c 2
+150 250 abdxEJL c 2
 2 0 0 17 -1
 D
    Venjer is a small woman, though she stands tall and proud, light on her feet
@@ -682,7 +682,7 @@ pixy queen majestic~
 the pixy queen~
 A majestic pixy queen dazzles you with blinding sparkles!
 ~
-150 250 abdxEJK cG 3
+150 250 abdxEJKL cG 3
 2 0 0 28 -1
 D
    The pixy queen is, at first, scarcely more than a colorful sparkle of light.
@@ -772,7 +772,7 @@ Hugh Mann~
 Hugh~
 Hugh Mann stands here in a low hat and full-length coat.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 1 0 88 15 -1
 D
    It's hard to get a good look at his face since his hat is pulled low. You're
@@ -815,7 +815,7 @@ S
 #n~
 #n seems to be studying the tower.
 ~
-150 250 dvJ n 3
+150 250 dvJL n 3
 2 0 0 15 -1
 D
    She walks slowly, with her hands behind her back, watching everyone and
@@ -832,7 +832,7 @@ S
 #n~
 #n is walking around.
 ~
-150 250 dvIJ n 3
+150 250 dvIJL n 3
 1 0 0 15 -1
 D
    He's middle-aged, perhaps past his prime as he stands with a hunch. He's
@@ -870,7 +870,7 @@ S
 #n~
 #n is looking around.
 ~
-150 250 dvHIJ n 3
+150 250 dvHIJL n 3
 2 0 0 15 -1
 D
    She's dressed like any young village woman; her clothes aren't in fashion
@@ -931,7 +931,7 @@ ravinder apprentice~
 Apprentice Ravinder~
 Ravinder is reclining on a bunk.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Ravinder looks positively exhausted. His apprentice robes are dirty from
@@ -1137,7 +1137,7 @@ S
 #n~
 #n is standing here.
 ~
-150 250 dvHIJ n 3
+150 250 dvHIJL n 3
 2 0 0 15 -1
 D
    She's a young woman sporting a gold wedding ring, perhaps just married. She
@@ -1185,7 +1185,7 @@ Marina apprentice~
 Marina~
 Marina is sitting with Djon.
 ~
-150 250 bdvJ n 3
+150 250 bdvJL n 3
 2 0 0 15 -1
 D
    Marina is dressed in white apprentice robes with a bright blue margin. Her
@@ -1205,7 +1205,7 @@ Djon apprentice~
 Djon~
 Djon is seated at a table in the corner.
 ~
-150 250 bdvJ n 3
+150 250 bdvJL n 3
 1 0 0 15 -1
 D
    Djon leans back, with one arm propped up on an empty chair. His legs are
@@ -1224,7 +1224,7 @@ otherworlder~
 an otherworlder~
 An escaped otherworlder is barreling through!
 ~
-150 250 bdzJ G 3
+150 250 bdzJL G 3
 0 0 37 15 -1
 D
    The otherworlder hunches as it runs to avoid hitting its head. It's taller
@@ -1245,7 +1245,7 @@ Caius sirensbane high master~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase!
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -1287,7 +1287,7 @@ Niamh resident~
 Resident Niamh~
 Resident Niamh is guarding the entrance.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    The slump of Niamh's posture, the bags under her eyes, and the red roots
@@ -1306,7 +1306,7 @@ mohammed resident~
 Resident Mohammed~
 Resident Mohammed is helping out.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Mohammed stands like a beanpole, tall and thin, wearing a long, slim, gray
@@ -1357,7 +1357,7 @@ shimmer slight goef~
 the shimmer~
 There's a slight shimmer in the air.
 ~
-150 250 dxJ dnG 3
+150 250 dxJL dnG 3
 0 0 27 5 -1
 D
    You first catch the shimmer out of the corner of your eye and almost dismiss
@@ -1379,7 +1379,7 @@ otherworlder person tall blue~
 an otherworlder~
 A tall, blue person is pulling at the chains that hold it to the floor!
 ~
-150 250 bdJ nG 3
+150 250 bdJL nG 3
 0 0 0 15 -1
 D
    The otherworlder is taller than a human, with periwinkle skin dappled with
@@ -1415,7 +1415,7 @@ Sanjiv apprentice~
 Apprentice Sanjiv~
 An apprentice is poorly camouflaged against the wall.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    A young apprentice is magically camouflaged against the wall. From most
@@ -1434,7 +1434,7 @@ scaldorran lich~
 the Lich Scaldorran~
 The Lich Scaldorran howls as he twists and writhes in the air!
 ~
-150 250 bdvxJ nG 3
+150 250 bdvxJL nG 3
 1 0 0 15 -1
 D
    A bone-chilling howl trickles from your ears, down your spine, into your
@@ -1473,8 +1473,8 @@ rags swarm~
 the swarm of rags~
 A swarm of rags is cleaning the walkway.
 ~
-50 50 bdhJ nG 2
-0 0 2 7 -1
+50 50 bdhJL nG 2
+0 0 2 36 -1
 D
    The cloud of flying rags is in a cleaning frenzy, wiping, scrubbing, and
 polishing everything from the floor and handrails to the paneled walls, to the
@@ -1513,7 +1513,7 @@ Weyonomon spirit apprentice~
 the spirit of Weyonomon~
 The spirit of Apprentice Weyonomon is wandering, listless.
 ~
-150 250 dJ nG 3
+150 250 dJL nG 3
 1 0 27 15 -1
 D
    Weyonomon is -- or rather, was -- a promising young apprentice. He still
@@ -1533,7 +1533,7 @@ Annelise~
 Annelise~
 Annelise is seated at one of the tables.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Annelise, the youngest sorcerer you've met in the tower, is seated at a
@@ -1757,7 +1757,7 @@ Waltur walter magineer~
 Magineer Waltur~
 Magineer Waltur is here.
 ~
-150 250 bdvxEJ n 3
+150 250 bdvxEJL n 3
 1 0 0 15 -1
 D
    Waltur is a young man, not over the age of 25, and apparently so busy he has
@@ -2005,7 +2005,7 @@ Kara Virduke~
 Kara Virduke~
 Kara Virduke is digging through cabinets.
 ~
-150 250 bdvxEIJ coE 3
+150 250 bdvxEIJL coE 3
 2 0 0 17 -1
 D
    Kara Virduke is nearly seven feet tall, such that she must stoop to work in
@@ -2098,7 +2098,7 @@ Rojjer bleak~
 Bleak Rojjer~
 Bleak Rojjer is searching for something on the left side of the room.
 ~
-150 250 bdvzEIJ cCE 3
+150 250 bdvzEIJL cCE 3
 1 0 0 4 -1
 D
    Bleak Rojjer's back is to you as you enter. He must think you're one of his
@@ -2155,7 +2155,7 @@ Trixton Vye~
 Trixton Vye~
 Trixton Vye is searching for something.
 ~
-150 250 bdvyEIJ chEG 3
+150 250 bdvyEIJL chEG 3
 1 0 0 5 -1
 D
    When you enter the room, you do not initially notice Trixton Vye. It's not
@@ -2244,7 +2244,7 @@ Paige page~
 the page~
 A page hovers motionlessly in the air, her head down.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    You walk in a circle around the young page as she hovers there, perfectly
@@ -2398,7 +2398,7 @@ sheila~
 Sheila~
 Sheila is sitting behind the bed's canopy.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Sheila has taken refuge behind the canopy of the bed, where she can't be
@@ -2415,7 +2415,7 @@ Grace woman old helpless~
 Grace~
 A helpless old woman floats upside-down near the wardrobe.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    The old woman appears to be Grace, assistant to High Sorcerer Barrosh. Her
@@ -2432,7 +2432,7 @@ barrosh high sorcerer~
 Barrosh~
 High Sorcerer Barrosh is kneeling on the floor.
 ~
-150 250 bdvxEJK nG 3
+150 250 bdvxEJKL nG 3
 1 0 0 15 -1
 D
    Barrosh looks disheveled, kneeling on the floor in his violet high sorcerer
@@ -2450,7 +2450,7 @@ thorley apprentice~
 Apprentice Thorley~
 Thorley is hiding behind a chair.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Young Thorley is tucked behind a chair, peeking out at every sound. Already
@@ -2469,7 +2469,7 @@ shadow ascendant mezvienne shade~
 the Shadow Ascendant~
 The Shadow Ascendant looms over the chamber as it draws more and more power!
 ~
-150 250 bdhxyJK choEG 3
+150 250 bdhxyJKL choEG 3
 0 0 0 20 -1
 D
    The shade, once merely a projection of the powerful enchantress Mezvienne,
@@ -2517,7 +2517,7 @@ Celiya high sorcerer~
 High Sorcerer Celiya~
 High Sorcerer Celiya is coordinating the defense of the tower.
 ~
-150 250 dvxJ n 3
+150 250 dvxJL n 3
 2 0 0 17 -1
 D
    Celiya looks downright exhausted as she hurries about in high sorcerer robes
@@ -2572,7 +2572,7 @@ vortex enormous~
 the vortex~
 An enormous vortex has engulfed the top of the tower!
 ~
-150 250 bd nG 3
+150 250 bdL nG 3
 0 0 0 15 -1
 D
 You can't see into the vortex... it's too strong!
@@ -2584,7 +2584,7 @@ Mezvienne enchantress~
 Mezvienne~
 Mezvienne the Enchantress clasps her head and doubles over in pain.
 ~
-150 250 bdvxEJK nG 3
+150 250 bdvxEJKL nG 3
 2 0 0 15 -1
 D
    Mezvienne screams as she clasps her head, her body twirling almost aimlessly
@@ -2603,7 +2603,7 @@ barrosh high sorcerer~
 High Sorcerer Barrosh~
 High Sorcerer Barrosh stands with his staff raised high and an anguished look.
 ~
-150 250 bdhvxyzJK cDEG 3
+150 250 bdhvxyzJKL cDEG 3
 1 0 0 19 -1
 D
    Barrosh takes a menacing position as you enter and seems to be muttering
@@ -2636,7 +2636,7 @@ knezz master~
 Knezz~
 Master Knezz is in his chair, with his head back, and his eyes and mouth wide open.
 ~
-150 250 bdvxEJ n 3
+150 250 bdvxEJL n 3
 1 0 0 15 -1
 D
    Grand High Sorcerer Knezz doesn't seem to be conscious, splayed out such as
@@ -2657,8 +2657,8 @@ Mezvienne shade shadow~
 the Shade of Mezvienne~
 The Shade of Mezvienne surrounds Knezz like a phantom.
 ~
-150 250 bdhJK cCDEG 3
-0 0 0 7 -1
+150 250 bdhJKL cCDEG 3
+0 0 0 36 -1
 D
    The Shade is lithe, feminine, even graceful as it swirls back and forth
 around Grand High Sorcerer Knezz. At times, it almost has a face, but it
@@ -2706,7 +2706,7 @@ knezz grand high sorcerer~
 Knezz~
 Grand High Sorcerer Knezz is sitting in the chair.
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 49 15 -1
 D
    The old sorcerer looks exhausted, even drained, as he sits in his chair,
@@ -2749,7 +2749,7 @@ Mezvienne enchantress~
 Mezvienne the Enchantress~
 Mezvienne the Enchantress hovers above the tower as she channels the heartwood.
 ~
-150 250 bdhvxyDJK cDEG 3
+150 250 bdhvxyDJKL cDEG 3
 2 0 0 21 -1
 D
    The enchantress's long gossamer gown blows madly in the wind as she floats
@@ -2850,7 +2850,7 @@ lion time skithe ler-wyn lerwyn~
 the Lion of Time~
 Skithe Ler-Wyn, the Lion of Time, has erupted from Mezvienne's limp body!
 ~
-150 250 bdhyzEJK cEG 3
+150 250 bdhyzEJKL cEG 3
 2 0 0 10 -1
 D
    Mezvienne the Enchantress floats limp and bloody in the time stream, her
@@ -2885,7 +2885,7 @@ Moneryl astrologer royal~
 the astrologer~
 The royal astrologer is kneeling before the throne.
 ~
-150 250 bdoxJ nG 3
+150 250 bdoxJL nG 3
 1 0 0 15 -1
 D
    Though the drape of his face shows that days have come and gone since he
@@ -2904,7 +2904,7 @@ envoy~
 the envoy~
 An envoy from Smol Sul-Pik stands before the queen.
 ~
-150 250 bdoxJ nG 3
+150 250 bdoxJL nG 3
 2 0 0 15 -1
 D
    The envoy is a short, stout woman, clad in rugged green tree-bast traveling
@@ -2922,7 +2922,7 @@ Nayyul messenger young~
 the young messenger~
 A young messenger stands at attention before the queen.
 ~
-150 250 bdoxJ nG 3
+150 250 bdoxJL nG 3
 1 0 0 15 -1
 D
    Even in his wood and glimstone armor, Nayyul looks young, with sharp, smooth
@@ -2942,7 +2942,7 @@ Pelet urborist royal~
 the urborist~
 The royal urborist stands before the queen.
 ~
-150 250 bdoxJ nG 3
+150 250 bdoxJL nG 3
 1 0 0 15 -1
 D
    Pelet stands with the hunch of a wizened sage and his voice has a raspy,
@@ -2960,7 +2960,7 @@ Joiago~
 Joiago~
 Joiago is standing here.
 ~
-150 250 dxJ nG 3
+150 250 dxJL nG 3
 1 0 86 15 -1
 D
    Joiago stands a full head taller than you, with blue-black hair and hazel
@@ -2983,7 +2983,7 @@ Bastain keeper~
 Keeper Bastain~
 Keeper Bastain is patrolling.
 ~
-150 250 dxJ nG 3
+150 250 dxJL nG 3
 1 0 0 15 -1
 D
    Bastain is tall but hunched as he bears a heavy wooden shield over the cape
@@ -3003,7 +3003,7 @@ Veloryan royal guard~
 Veloryan of the Royal Guard~
 Veloryan stands firm in glistering gemstone armor.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 1 0 0 15 -1
 D
    Veloryan stands tall at the left hand of the obsidian throne, unflinching,
@@ -3023,7 +3023,7 @@ Lotte~
 Lotte~
 Lotte is standing here, admiring the city.
 ~
-150 250 dxJ nG 3
+150 250 dxJL nG 3
 2 0 0 15 -1
 D
    Lotte is rather short, though she wears stark white hair in a tall beehive
@@ -3048,7 +3048,7 @@ Kym~
 Kym~
 Kym is standing here.
 ~
-150 250 dxJ nG 3
+150 250 dxJL nG 3
 2 0 0 15 -1
 D
    Kym is tall and lean, even in the slightly-oversized teal blouse and slacks
@@ -3068,7 +3068,7 @@ tresydion high~
 the High Tresydion~
 The High Tresydion stands with his hands folded.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 1 0 0 15 -1
 D
    The tresydion strikes a large and imposing figure in his leaf-like green
@@ -3088,7 +3088,7 @@ Meket black~
 Black Meket~
 Black Meket is kneeling next to the pool.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 1 0 0 15 -1
 D
    Black Meket rocks back and forth slightly as he leans over the shimmering
@@ -3170,7 +3170,7 @@ Queen image queen's Vehl somber~
 the Queen's image~
 The somber image of Queen Vehl sits atop the throne.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 2 0 0 15 -1
 D
    Though she is blessed with the delicate features of a young maiden, Queen
@@ -3195,7 +3195,7 @@ Tyewa~
 Tyewa~
 Tyewa is kneeling by one of the pools.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 2 0 0 15 -1
 D
    Though she's as tall as anyone you've met here, Tyewa has the soft, young
@@ -3244,7 +3244,7 @@ Torru~
 Torru~
 Torru stands with her arms up and her hands touching the rotted ceiling.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 2 0 0 15 -1
 D
    Torru's face is contorted into a sort of crooked grimace as blood drips from
@@ -3267,7 +3267,7 @@ Nayyur~
 Nayyur~
 Nayyur is kneeling with his head bent low.
 ~
-150 250 bdxJ nG 3
+150 250 bdxJL nG 3
 1 0 0 15 -1
 D
    Blood trickles from vicious wounds across Nayyur's back as he slowly rocks
@@ -3286,7 +3286,7 @@ Iskip giant~
 Iskip of Rot and Ruin~
 The giant stands knee-deep in the water, turned away from you. (difficulty)
 ~
-150 250 bdhvxyzDJK chDEG 6
+150 250 bdhvxyzDJKL chDEG 6
 1 0 0 19 -1
 D
    The giant Iskip is truly huge -- you'd scarcely reach his ankles if he were
@@ -3328,7 +3328,7 @@ Wright wrangler~
 Wrangler Wright~
 The goblin wrangler is cleaning up the mess. (list)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    Though he's old and more than a little scarred, Wrangler Wright seems to be
@@ -3369,7 +3369,7 @@ Celiya high sorcerer difficulty~
 High Sorcerer Celiya~
 High Sorcerer Celiya is shielding the staircase with a powerful spell! (difficulty)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 17 -1
 D
    The high sorcerer looks bedraggled, almost exhausted, in her layered purple
@@ -3416,7 +3416,7 @@ Annaca watcher difficulty~
 Watcher Annaca~
 Watcher Annaca is struggling to hold a mana shield over the staircase. (difficulty)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 2 0 0 15 -1
 D
    Though Annaca's face is strained and contorted as she struggles to hold the
@@ -3459,7 +3459,7 @@ Caius sirensbane high master difficulty~
 Caius Sirensbane~
 High Master Caius Sirensbane is warding the staircase! (difficulty)
 ~
-150 250 bdvxJ n 3
+150 250 bdvxJL n 3
 1 0 0 15 -1
 D
    High Master Caius strains against the shining red ward he has placed over
@@ -3541,7 +3541,7 @@ progress sense phase changer~
 a sense of progress~
 A sense of progress hangs in the air (toggle hassle off to prevent being teleported).
 ~
-250 250 bd ln 3
+250 250 bdL ln 3
 0 0 0 15 -1
 D
 This mob teleports people from phase A to phase B, for this room only, in Skycleave.
@@ -3553,7 +3553,7 @@ progress sense phase changer~
 a sense of progress~
 A sense of progress hangs in the air.
 ~
-250 250 bdo ln 3
+250 250 bdoL ln 3
 0 0 0 15 -1
 D
 This mob triggers all the phase changes for floor 1 of Skycleave.
@@ -3566,7 +3566,7 @@ progress sense phase changer~
 a sense of progress~
 A sense of progress hangs in the air.
 ~
-250 250 bdo ln 3
+250 250 bdoL ln 3
 0 0 0 15 -1
 D
 This mob triggers all the phase changes for floor 2 of Skycleave.
@@ -3579,7 +3579,7 @@ progress sense phase changer~
 a sense of progress~
 A sense of progress hangs in the air.
 ~
-250 250 bdo ln 3
+250 250 bdoL ln 3
 0 0 0 15 -1
 D
 This mob triggers all the phase changes for floor 3 of Skycleave.
@@ -3592,7 +3592,7 @@ progress sense phase changer~
 a sense of progress~
 A sense of progress hangs in the air.
 ~
-250 250 bdo ln 3
+250 250 bdoL ln 3
 0 0 0 15 -1
 D
 This mob triggers all the phase changes for floor 4 of Skycleave.
@@ -3605,7 +3605,7 @@ regression sense relocator~
 a sense of regression~
 A sense of regression hangs in the air.
 ~
-250 250 bd ln 3
+250 250 bdL ln 3
 0 0 0 15 -1
 D
 This mob prevents players getting stuck in areas like the time stream.

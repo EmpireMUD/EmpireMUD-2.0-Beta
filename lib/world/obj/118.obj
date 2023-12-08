@@ -7,7 +7,7 @@ foul), crisps, crackers, carrots, cuts of fish and game, brightly colored
 birds, and pots set into the table that hold soup. It has an inviting aroma
 that feels like it's exactly what you need right now.
 ~
-6 0 0 0 0 4
+6 B 0 0 0 5
 1000 0 0
 7 0
 C
@@ -234,7 +234,7 @@ the directory~
 There is a directory engraved on a stone slab.~
 This look description is updated by trigger 11811.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 1 0
 C
@@ -864,7 +864,7 @@ keeping whatever is up there at bay.
    Use the 'difficulty' command to set the difficulty for the next floor before
 proceeding.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 C
@@ -880,7 +880,7 @@ labeled as precious relics, dangerous artifacts, and irreplaceable books. All
 of the crates are nailed shut. The floor around and under the crates looks
 scorched.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -903,7 +903,7 @@ to have a thick brow ridge above where the eyes would be.
    The sculpture is warded by a shimmering wall of light that surrounds the
 dais and prevents you from getting too close.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 2 0
 C
@@ -918,7 +918,7 @@ unceremoniously onto its side and one of the legs is cracked. Still, this
 hefty mahogany table provides a safe spot to fling spells -- or arrows -- at
 any threat.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 0
 C
@@ -935,7 +935,7 @@ against intruders or rescuers, you cannot tell. The makeshift barricade has
 collapsed as it burns. Luckily, it doesn't seem to catch any of the tower's
 rare and expensive ebony paneling on fire.
 ~
-29 0 0 0 0 5
+29 B 0 0 0 6
 -1 1 9
 0 12
 C
@@ -955,7 +955,7 @@ the death of a sorcerer. But when a sorcerer commands vast power and abundant
 cleverness, it is possible to prepare a repository to anchor their magic to the
 mortal plane after their body has rotted and their soul has moved on.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 4 0
 C
@@ -997,7 +997,7 @@ standing on legs. The tower and legs are both made of stone, though the tower
 is a bit crooked and doesn't form a perfect cylinder. In all regards except for
 the legs, it resembles a little sorcery tower.
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 1 0
 C
@@ -1671,7 +1671,7 @@ touch it, but it's solid. You can't force your arm through and it seems to be
 impervious to magic. This powerful shadow magic must be coming from somewhere
 nearby.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 0
 C
@@ -1810,7 +1810,7 @@ A swirling vortex atop the tower keeps you from climbing the stairs.~
 can't even climb the stairs. It sounds like somebody is locked in mortal combat
 above you and you won't be able to climb the stairs until someone has died.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 C
@@ -1830,7 +1830,7 @@ in an endless cycle. Surely this is what is responsible for the sorry state of
 the Tower Skycleave. Your only recourse now is to burn the heartwood in hopes
 of ending the cycle and rescuing the sorcerers from this odious time loop.
 ~
-3 j 0 0 0 6
+3 jB 0 0 0 7
 0 0 0
 12 0
 C
@@ -2194,7 +2194,7 @@ you take care not to trip into it as there's no railing or step protecting it.
 The viridescent light from the glowing shell shimmers off of the water and
 dances around on the ceiling.
 ~
-5 0 0 0 0 7
+5 B 0 0 0 8
 1000000 1000000 11885
 12 0
 C
@@ -2266,7 +2266,7 @@ avoid falling in. Each one is almost as wide as your armspan, and round in
 shape, but none of them is very deep. The pools closer to the stairs are
 well-lit, while the ones in the back of the grotto are difficult to see.
 ~
-5 0 0 0 0 5
+5 B 0 0 0 6
 1000000 1000000 11885
 12 0
 C
@@ -2291,7 +2291,7 @@ nevertheless a great work of art.
    Destroying the sculpture is the furthest thing from your mind. Or, it was,
 until just now. Vanity and narcissism are common pitfalls of great sorcerers.
 ~
-3 0 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 8 0
 C
@@ -2308,7 +2308,7 @@ reach through it. As you try, you see visions of the pixy queen in your mind.
 A crooked grin breaks on her face as she laughs -- cackles, even -- at your
 attempt to pass her impenetrable shield.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 0
 C
@@ -2327,7 +2327,7 @@ revolting urge to taste it.
    In Smol Nes-Pik, wasting the tree's sap is a great crime, as every last
 pint of it is precious.
 ~
-3 0 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -2345,7 +2345,7 @@ Thousands of tiny splinters hover in the air!~
 drawing more and more wood from the sides of the hollow, until the air is so
 full of them you can hardly breathe!
 ~
-3 0 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 0
 C
@@ -2378,7 +2378,7 @@ Sap is flowing from the tree.~
    The sap has totally encased you! You can do little else but watch the Great
 Tree fall into rot and ruin.
 ~
-3 0 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 10
 C

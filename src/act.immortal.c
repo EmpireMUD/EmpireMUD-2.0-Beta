@@ -23,6 +23,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "constants.h"
 
 /**
@@ -81,6 +82,41 @@ void decustomize_island(int island_id) {
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 	}
+}
+
+
+/**
+* Approves a character.
+*
+* @param char_data *ch The character to approve.
+*/
+void perform_approve(char_data *ch) {
+	if (config_get_bool("approve_per_character")) {
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	else {	// per-account (default)
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
+	}
+	
+	SAVE_CHAR(ch);
+}
+
+
+/**
+* Rescinds approval for a character.
+*
+* @param char_data *ch The character to unapprove.
+*/
+void perform_unapprove(char_data *ch) {
+	REMOVE_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+	SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	SAVE_CHAR(ch);
 }
 
 
@@ -2356,6 +2392,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) < LVL_START_IMM && value >= LVL_START_IMM) {
+			perform_approve(vict);
 			SET_BIT(PRF_FLAGS(vict), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 			// turn on all syslogs
@@ -2962,7 +2999,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("name") {
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
-		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
+		if (_parse_name(buf, newname, ch->desc, TRUE)) {
+			// sends own message
+			return 0;
+		}
+		if (!Valid_Name(newname)) {
 			msg_to_char(ch, "Invalid name.\r\n");
 			return 0;
 		}
@@ -5682,54 +5723,79 @@ SHOW(show_learned) {
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
 	
+	// arg parsing
 	if (!*arg) {
 		msg_to_char(ch, "Usage: show learned <player | empire>\r\n");
+		return;
+	}
+	else if (is_abbrev(arg, "empire") && strlen(arg) >= 3) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what empire?\r\n");
+			return;
+		}
+		else if (!(emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "No such empire '%s'.\r\n", arg);
+			return;
+		}
+	}
+	else if (is_abbrev(arg, "player")) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what player?\r\n");
+			return;
+		}
+		else if (!(plr = find_or_load_player(arg, &file))) {
+			msg_to_char(ch, "No such player '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else if (!(plr = find_or_load_player(arg, &file)) && !(emp = get_empire_by_name(arg))) {
 		send_to_char("There is no such player or empire.\r\n", ch);
+		return;
 	}
-	else {	// plr OR emp is guaranteed
-		if (*argument) {
-			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	
+	// must have plr or emp by now
+	if (*argument) {
+		size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	
+	count = 0;
+	HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum))) {
+			continue;	// no craft?
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			continue;	// searched
+		}
+	
+		// show it
+		snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
 		}
-		
-		count = 0;
-		HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
-			if (!(craft = craft_proto(pcd->vnum))) {
-				continue;	// no craft?
-			}
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
-				continue;	// in-dev
-			}
-			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
-				continue;	// searched
-			}
-		
-			// show it
-			snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
-		}
-	
-		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
-		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+	}
+
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 	
 	if (plr && file) {
@@ -8224,6 +8290,7 @@ ACMD(do_advance) {
 		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s has promoted %s to level %d (from %d)", GET_NAME(ch), GET_NAME(victim), newlevel, oldlevel);
 
 	if (oldlevel < LVL_START_IMM && newlevel >= LVL_START_IMM) {
+		perform_approve(victim);
 		SET_BIT(PRF_FLAGS(victim), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -8262,22 +8329,10 @@ ACMD(do_approve) {
 	}
 	else {
 		if (subcmd == SCMD_APPROVE) {
-			if (config_get_bool("approve_per_character")) {
-				SET_BIT(PLR_FLAGS(vict), PLR_APPROVED);
-			}
-			else {	// per-account (default)
-				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-				SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			}
-			
-			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
-				GET_ACCESS_LEVEL(vict) = LVL_MORTAL;
-			}
+			perform_approve(vict);
 		}
 		else {
-			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-			SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+			perform_unapprove(vict);
 		}
 		
 		if (!file) {
@@ -9302,6 +9357,15 @@ ACMD(do_forgive) {
 			any = TRUE;
 		}
 		
+		if (affected_by_spell(vict, ATYPE_HOSTILE_DELAY)) {
+			affect_from_char(vict, ATYPE_HOSTILE_DELAY, FALSE);
+			msg_to_char(ch, "Hostile delay forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your hostile delay.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
+			}
+			any = TRUE;
+		}
+		
 		if (get_cooldown_time(vict, COOLDOWN_ROGUE_FLAG) > 0) {
 			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
 			msg_to_char(ch, "Rogue flag forgiven.\r\n");
@@ -9774,7 +9838,7 @@ ACMD(do_load) {
 ACMD(do_moveeinv) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	struct empire_unique_storage *unique;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_island *eisle;
 	int island_from, island_to, count;
 	empire_data *emp;
@@ -9801,8 +9865,24 @@ ACMD(do_moveeinv) {
 		count = 0;
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			count += store->amount;
-			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			if (store->amount > 0) {
+				count += store->amount;
+				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			}
+			else {
+				new_store = find_stored_resource(emp, island_to, store->vnum);
+			}
+			
+			// translate keep?
+			if (new_store && new_store->keep != UNLIMITED) {
+				if (store->keep == UNLIMITED) {
+					new_store->keep = UNLIMITED;
+				}
+				else {
+					SAFE_ADD(new_store->keep, store->keep, 0, INT_MAX, FALSE);
+				}
+			}
+			
 			HASH_DEL(eisle->store, store);
 			free(store);
 		}
@@ -9925,6 +10005,7 @@ ACMD(do_oset) {
 ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
+	trig_data *trig;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		// stop fighting
@@ -9942,8 +10023,18 @@ ACMD(do_peace) {
 		}
 		
 		// clear DOTs (could restart a fight)
-		while (ch->over_time_effects) {
-			dot_remove(ch, ch->over_time_effects);
+		while (iter->over_time_effects) {
+			dot_remove(iter, iter->over_time_effects);
+		}
+		
+		// cancel combat scripts (could keep players in combat)
+		if (IS_NPC(iter) && SCRIPT(iter)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(iter)), trig) {
+				if (GET_TRIG_WAIT(trig) && GET_TRIG_DEPTH(trig) && IS_SET(GET_TRIG_TYPE(trig), MTRIG_FIGHT)) {
+					dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+					GET_TRIG_WAIT(trig) = NULL;
+				}
+			}
 		}
 	}
 	
@@ -10083,7 +10174,7 @@ ACMD(do_purge) {
 	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
-	obj_data *obj;
+	obj_data *obj, *next_o;
 	int number;
 	char *arg;
 
@@ -10147,12 +10238,15 @@ ACMD(do_purge) {
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
-			if (REAL_NPC(vict))
+			if (REAL_NPC(vict) && !MOB_FLAGGED(vict, MOB_IMPORTANT)) {
 				extract_char(vict);
+			}
 		}
 
-		while (ROOM_CONTENTS(IN_ROOM(ch))) {
-			extract_obj(ROOM_CONTENTS(IN_ROOM(ch)));
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_o, next_content) {
+			if (!OBJ_FLAGGED(obj, OBJ_IMPORTANT)) {
+				extract_obj(obj);
+			}
 		}
 	}
 }
@@ -10194,7 +10288,7 @@ ACMD(do_reboot) {
 	no_arg = !*arg;
 	while (*arg) {
 		if (is_number(arg)) {
-			if ((time = atoi(arg)) == 0) {
+			if ((time = atoi(arg)) <= 0) {
 				msg_to_char(ch, "Invalid amount of time!\r\n");
 				return;
 			}
@@ -11644,12 +11738,12 @@ ACMD(do_vnum) {
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
-	else if (is_abbrev(buf, "mob")) {
+	else if (is_abbrev(buf, "mobile")) {
 		if (!vnum_mobile(buf2, ch)) {
 			send_to_char("No mobiles by that name.\r\n", ch);
 		}
 	}
-	else if (is_abbrev(buf, "obj")) {
+	else if (is_abbrev(buf, "object")) {
 		if (!vnum_object(buf2, ch)) {
 			send_to_char("No objects by that name.\r\n", ch);
 		}

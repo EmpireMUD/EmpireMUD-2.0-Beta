@@ -5,7 +5,7 @@ A royal ring is sitting on the ground.~
    This ring has been in your family for, well, just the one generation. But
 this is only the beginning of your epic and storied family line.
 ~
-2 p ab 0 1
+2 p ab 0 0 1
 0 0 0
 4 0
 A
@@ -26,7 +26,7 @@ An imperial ring is lying on the ground.~
    This oversized gold ring has been forged, carved, and polished by a skilled
 artisan. It is set with a precious gem in the empire's color.
 ~
-2 am ab 0 7
+2 am ab 0 0 7
 0 0 0
 4 0
 A
@@ -50,7 +50,7 @@ an imperium chisel~
 An imperium chisel pokes out of the ground.~
 This imperium chisel surely belongs to a master craftsman.
 ~
-2 p ao 0 2
+2 p ao 0 0 2
 0 0 0
 2 0
 A
@@ -72,7 +72,7 @@ Horation's design for a mechanical clock is lying here.~
 really sure what that's useful for.
 Usage: craft mechanical clock
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 0 0
 Q 10837
@@ -87,7 +87,7 @@ has an intricately-carved wooden case, and the clock face is inlaid with
 precious metal. Unfortunately, you don't know how to read the clock face and
 cannot use it to determine the time.
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 0 0
 Q 10837
@@ -100,7 +100,7 @@ A vibrantly colored portal draws light down from the sky!~
 rainbow. If you're new here, try using 'quest start' to begin the tutorial
 quests. You can enter the portal by typing 'enter soulstream'.
 ~
-8 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 10 0
 S
@@ -111,7 +111,7 @@ A bright portal leads back out into the world! (enter portal)~
    The portal whips and churns as it spills light in every color of the
 rainbow. Type 'enter portal' to leave the Soulstream and return to the world.
 ~
-8 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 10 0
 S
@@ -126,7 +126,7 @@ try using a trinket of conveyance.
    This item has been upgraded to a type of currency, so it won't take up
 an inventory slot anymore. Drop or get this token to convert it!
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 14 0
 T 10859
@@ -139,7 +139,7 @@ A stone skinning knife is lying on the ground.~
 it to skin the corpses of animals. First wield or hold the knife, then type
 'skin corpse'. You can even use it from your sheath.
 ~
-1 0 ano f 2
+1 0 ano f 0 2
 0 1 1
 1 0
 C
@@ -152,7 +152,7 @@ a spirit bell~
 A spirit bell is lying here.~
 Type 'use bell' to summon a companion spirit!
 ~
-19 p a 0 5
+19 p a 0 0 5
 10859 0 0
 2 0
 S
@@ -162,7 +162,7 @@ a good omen~
 A good omen lingers in the air.~
 This item buffs the receiver.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 T 10865
