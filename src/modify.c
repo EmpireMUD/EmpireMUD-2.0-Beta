@@ -287,6 +287,13 @@ void string_add(descriptor_data *d, char *str) {
 			if (emp) {
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 				
+				if (d->str == &EMPIRE_MOTD(emp)) {
+					log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire MOTD", PERS(d->character, d->character, TRUE));
+				}
+				else if (d->str == &EMPIRE_DESCRIPTION(emp)) {
+					log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire description", PERS(d->character, d->character, TRUE));
+				}
+				
 				if (emp != GET_LOYALTY(d->character)) {
 					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "ABUSE: %s has edited text for %s", GET_NAME(d->character), EMPIRE_NAME(emp));
 				}
