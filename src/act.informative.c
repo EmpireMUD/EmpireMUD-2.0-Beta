@@ -2910,12 +2910,21 @@ ACMD(do_gen_text_string) {
 
 ACMD(do_help) {
 	struct help_index_element *found;
+	int level = GET_ACCESS_LEVEL(ch);
 
 	if (!ch->desc)
 		return;
 
 	skip_spaces(&argument);
-
+	
+	// optional -m arg
+	if (!strn_cmp(argument, "-m ", 3)) {
+		level = LVL_MORTAL;
+		argument += 3;
+		skip_spaces(&argument);
+	}
+	
+	// no-arg: basic help screen
 	if (!*argument) {
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			send_to_char(text_file_strings[TEXT_FILE_HELP_SCREEN_SCREENREADER], ch);
@@ -2925,8 +2934,10 @@ ACMD(do_help) {
 		}
 		return;
 	}
+	
+	// with arg: look up by keyword
 	if (help_table) {
-		found = find_help_entry(GET_ACCESS_LEVEL(ch), argument);
+		found = find_help_entry(level, argument);
 		
 		if (found) {
 			page_string(ch->desc, found->entry, FALSE);
