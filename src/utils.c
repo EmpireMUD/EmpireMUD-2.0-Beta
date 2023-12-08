@@ -6290,7 +6290,7 @@ room_data *find_starting_location(room_data *near_room) {
 		best = 0;
 		best_dist = -1;
 		for (iter = 0; iter <= highest_start_loc_index; ++iter) {
-			dist = compute_distance(near_rom, real_room(start_locs[iter]));
+			dist = compute_distance(near_room, real_room(start_locs[iter]));
 			if (best_dist == -1 || dist < best_dist) {
 				best = iter;
 				best_dist = dist;
