@@ -4091,7 +4091,7 @@ void trade_list(char_data *ch, char *argument) {
 void trade_buy(char_data *ch, char *argument) {
 	struct trading_post_data *tpd, *next_tpd;
 	empire_data *coin_emp = NULL;
-	char buf[MAX_STRING_LENGTH], *ptr1, *ptr2;
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *ptr1, *ptr2;
 	char_data *seller;
 	int num = 1;
 	
@@ -4142,7 +4142,7 @@ void trade_buy(char_data *ch, char *argument) {
 		}
 		
 		// pay up
-		charge_coins(ch, coin_emp, tpd->buy_cost, NULL);
+		charge_coins(ch, coin_emp, tpd->buy_cost, NULL, buf2);
 		REMOVE_BIT(tpd->state, TPD_FOR_SALE);
 		SET_BIT(tpd->state, TPD_BOUGHT | TPD_COINS_PENDING);
 		
@@ -4150,7 +4150,7 @@ void trade_buy(char_data *ch, char *argument) {
 		if ((seller = is_playing(tpd->player))) {
 			msg_to_char(seller, "Your trading post item '%s' has sold for %s.\r\n", GET_OBJ_SHORT_DESC(tpd->obj), money_amount(coin_emp, tpd->buy_cost));
 		}
-		sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, tpd->buy_cost));
+		sprintf(buf, "You buy $p for %s.", buf2);
 		act(buf, FALSE, ch, tpd->obj, NULL, TO_CHAR);
 		act("$n buys $p.", FALSE, ch, tpd->obj, NULL, TO_ROOM | TO_SPAMMY);
 			
@@ -4425,7 +4425,7 @@ void trade_post(char_data *ch, char *argument) {
 		snprintf(buf, sizeof(buf), "$n posts $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
 		act(buf, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		
-		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
+		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL, NULL);
 		
 		// SEV_x: events that must be canceled or changed when an item is posted
 		cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
@@ -5014,7 +5014,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_buy) {
-	char buf[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	empire_data *coin_emp = NULL;
 	struct shop_item *item;
@@ -5098,8 +5098,8 @@ ACMD(do_buy) {
 			
 			// finish the purchase
 			if (item->currency == NOTHING) {
-				charge_coins(ch, coin_emp, item->cost, NULL);
-				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
+				charge_coins(ch, coin_emp, item->cost, NULL, buf2);
+				sprintf(buf, "You buy $p for %s.", buf2);
 			}
 			else {
 				add_currency(ch, item->currency, -(item->cost));

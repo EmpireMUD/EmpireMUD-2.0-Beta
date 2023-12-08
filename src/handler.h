@@ -128,7 +128,7 @@ char_data *get_player_world(char *name, int *number);
 
 // coin handlers
 bool can_afford_coins(char_data *ch, empire_data *type, int amount);
-void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list);
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list, char *build_string);
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);

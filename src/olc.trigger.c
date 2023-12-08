@@ -1022,7 +1022,7 @@ void olc_show_trigger(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%sstring\t0> %s\r\n", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		sprintf(buf + strlen(buf), "<%scosts\t0> %d other coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		sprintf(buf + strlen(buf), "<%scosts\t0> %d misc coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
 	sprintf(buf + strlen(buf), "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));

@@ -3571,17 +3571,20 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_COINS: {
 			empire_data *coin_emp = real_empire(res->vnum);
+			char buf2[MAX_STRING_LENGTH];
+			*buf2 = '\0';
+			
+			charge_coins(ch, coin_emp, res->amount, build_used_list, msg_type == APPLY_RES_SILENT ? NULL : buf2);
 			
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "You spend %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "$n spends %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			
-			charge_coins(ch, coin_emp, res->amount, build_used_list);
 			res->amount = 0;	// cost paid in full
 			break;
 		}
@@ -3799,7 +3802,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					break;
 				}
 				case RES_COINS: {
-					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list, NULL);
 					res->amount = 0;	// got full amount
 					break;
 				}

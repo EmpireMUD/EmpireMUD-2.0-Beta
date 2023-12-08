@@ -3255,8 +3255,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "charge_coins")) {
 						if (subfield && isdigit(*subfield)) {
-							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield), NULL);
-							*str = '\0';
+							// will report output to str
+							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield), NULL, str);
 						}
 					}
 					else if (!str_cmp(field, "charge_component")) {

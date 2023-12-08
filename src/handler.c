@@ -2435,12 +2435,20 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param empire_data *type Empire who is charging the player (or OTHER_COIN for any coin type).
 * @param int amount How much to charge the player -- must be positive.
 * @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc coin types charged.
+* @param char *build_string Optional: if not NULL, will build a string of exactly what was charged, e.g. "450 crown coins and 100 miscellaneous coins". This string should ideally be MAX_STRING_LENGTH, but in practice will be way shorter.
 */
-void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list) {
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list, char *build_string) {
 	struct coin_data *coin;
+	char temp[1024];
+	char *ptr;
 	int this, this_amount;
 	double rate, inv;
 	empire_data *emp;
+	
+	if (build_string) {
+		// initialize
+		*build_string = '\0';
+	}
 	
 	if (IS_NPC(ch) || amount <= 0) {
 		return;
@@ -2454,6 +2462,9 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		
 		if (build_used_list) {
 			add_to_resource_list(build_used_list, RES_COINS, type ? EMPIRE_VNUM(type) : OTHER_COIN, this, 0);
+		}
+		if (build_string) {
+			sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(type, this));
 		}
 	}
 		
@@ -2469,6 +2480,9 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		
 		if (build_used_list) {
 			add_to_resource_list(build_used_list, RES_COINS, OTHER_COIN, this, 0);
+		}
+		if (build_string) {
+			sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(REAL_OTHER_COIN, this));
 		}
 	}
 	
@@ -2486,10 +2500,20 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 			if (build_used_list) {
 				add_to_resource_list(build_used_list, RES_COINS, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, this, 0);
 			}
+			if (build_string) {
+				sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(real_empire(coin->empire_id), this));
+			}
 		}
 	}
 
 	// coins were cleaned up with each increase
+	// lastly, look for the last comma
+	if (build_string && (ptr = strrchr(build_string, ','))) {
+		// and replace comma with and
+		strcpy(temp, ptr+1);
+		strcpy(ptr, " and");
+		strcat(ptr, temp);
+	}
 }
 
 
@@ -8467,7 +8491,7 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				break;
 			}
 			case REQ_GET_COINS: {
-				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL);
+				charge_coins(ch, REAL_OTHER_COIN, req->needed, NULL, NULL);
 				break;
 			}
 			case REQ_CROP_VARIETY: {
