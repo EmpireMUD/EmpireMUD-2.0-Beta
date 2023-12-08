@@ -1102,8 +1102,7 @@ bool try_mobile_movement(char_data *ch) {
 		return FALSE;
 	}
 	
-	// 40% random chance to attempt a move indoors or 20% outdoors
-	if (number(1, 100) > 20 * (COMPLEX_DATA(IN_ROOM(ch)) ? 2 : 1)) {
+	if (number(1, 100) > 20) {
 		return FALSE;
 	}
 	
