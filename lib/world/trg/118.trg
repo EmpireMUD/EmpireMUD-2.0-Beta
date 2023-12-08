@@ -3197,7 +3197,7 @@ elseif !%arg%
   halt
 elseif %actor.char_target(%arg%)% != %self%
   set rodent_cage %actor.obj_target(%arg%)%
-  if %rodent_cage% && %rodent_cage.vnum% == 18224
+  if (%rodent_cage% && %rodent_cage.vnum% == 18224) || (%actor.inventory(18224)% && Rodentmort /= %arg%)
     * has its own release trig
     return 0
   else
