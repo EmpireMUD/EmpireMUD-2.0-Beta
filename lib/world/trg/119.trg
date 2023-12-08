@@ -3210,10 +3210,11 @@ Rot and Ruin: Re-spawn boss when new player arrives~
 if %actor.is_npc%
   halt
 end
+wait 1
 set mob %instance.mob(11888)%
 if !%mob%
   %load% mob 11888
-  %echoaround% %actor% The giant emerges once again from the still water.
+  %echo% The giant emerges once again from the still water.
 end
 ~
 #11943
