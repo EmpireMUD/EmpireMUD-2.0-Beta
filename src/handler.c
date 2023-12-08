@@ -1928,6 +1928,7 @@ bool perform_idle_out(char_data *ch) {
 	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	dismiss_any_minipet(ch);
+	despawn_companion(ch, NOTHING);
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle) at %s", GET_NAME(ch), IN_ROOM(ch) ? room_log_identifier(IN_ROOM(ch)) : "an unknown location");
 	
