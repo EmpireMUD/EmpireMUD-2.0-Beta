@@ -2346,7 +2346,7 @@ ACMD(do_conjure) {
 		}
 		
 		// run it? only if it matches
-		if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID || ABILT_CONJURE_OBJECT)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
 			if (GET_POS(ch) < POS_RESTING || GET_POS(ch) < ABIL_MIN_POS(abil)) {
 				send_low_pos_msg(ch);	// not high enough pos for this conjure
 				return;
