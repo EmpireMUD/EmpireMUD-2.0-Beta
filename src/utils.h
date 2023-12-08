@@ -1910,7 +1910,7 @@ void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
-room_data *find_starting_location();
+room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);

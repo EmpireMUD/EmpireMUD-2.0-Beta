@@ -2286,7 +2286,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "startloc")) {
-				room_data *sloc = find_starting_location();
+				room_data *sloc = find_starting_location(NULL);
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(sloc) + ROOM_ID_BASE);
 				return;
 			}

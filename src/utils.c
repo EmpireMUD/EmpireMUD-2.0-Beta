@@ -6155,7 +6155,7 @@ room_data *find_load_room(char_data *ch) {
 	}
 	
 	// still here?
-	return find_starting_location();
+	return find_starting_location(real_room(GET_LAST_ROOM(ch)));
 }
 
 
@@ -6273,16 +6273,36 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 
 
 /**
-* find a random starting location
+* Find a starting location near a given room, or a random starting location.
 *
+* @param room_data *near_room Optional: Gets the start loc closest to here if provided, or a random one if NULL.
 * @return room_data* A random starting location.
 */
-room_data *find_starting_location() {
+room_data *find_starting_location(room_data *near_room) {
+	int iter, dist, best, best_dist;
+	
 	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
-
-	return (real_room(start_locs[number(0, highest_start_loc_index)]));
+	
+	if (near_room) {
+		// find nearest
+		best = 0;
+		best_dist = -1;
+		for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+			dist = compute_distance(near_rom, real_room(start_locs[iter]));
+			if (best_dist == -1 || dist < best_dist) {
+				best = iter;
+				best_dist = dist;
+			}
+		}
+		
+		return real_room(start_locs[best]);
+	}
+	else {
+		// random
+		return real_room(start_locs[number(0, highest_start_loc_index)]);
+	}
 }
 
 
