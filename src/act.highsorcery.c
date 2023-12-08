@@ -1697,10 +1697,11 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
-	room_data *to_room, *rand_room, *map;
+	room_data *to_room, *rand_room, *map, *was_in;
 	int tries, rand_x, rand_y;
 	bool random;
 	
+	was_in = IN_ROOM(ch);
 	to_room = real_room(GET_ACTION_VNUM(ch, 1));
 	random = to_room ? FALSE : TRUE;
 	
@@ -1733,7 +1734,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		char_to_room(ch, to_room);
 		qt_visit_room(ch, IN_ROOM(ch));
 		look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
-		act("$n appears with a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("$n appears with a brilliant flash of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
@@ -1743,7 +1744,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 			cancel_adventure_summon(ch);
 		}
 
-		// trigger block	
+		// trigger block
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR, "ability");
@@ -1761,6 +1762,18 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		}
 		else if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) == GET_IDNUM(ch)) {
 			add_cooldown(ch, COOLDOWN_TELEPORT_HOME, 15 * SECS_PER_REAL_MIN);
+		}
+		
+		// teleport companion, too
+		if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
+			act("$n vanishes in a flash!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
+			char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
+			act("$n appears in a flash!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
+			enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
+			entry_memory_mtrigger(GET_COMPANION(ch));
+			greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+			greet_memory_mtrigger(GET_COMPANION(ch));
+			greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
 		}
 	}
 }
