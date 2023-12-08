@@ -1492,6 +1492,9 @@ ACMD(do_shadowstep) {
 	else if (!can_use_ability(ch, ABIL_SHADOWSTEP, MOVE, cost, COOLDOWN_SHADOWSTEP)) {
 		// sends own messages
 	}
+	else if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
+		msg_to_char(ch, "You can't do that while distracted.\r\n");
+	}
 	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't shadowstep while riding.\r\n");
 	}
