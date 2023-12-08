@@ -1382,8 +1382,13 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 		if (!*arg2) {
 			msg_to_desc(desc, "Usage: info <archetype name>\r\n");
 		}
-		else if (!(arch = find_archetype_by_name(archetype_menu[pos].type, arg2))) {
-			msg_to_desc(desc, "Unknown %s '%s'.\r\n", archetype_menu[pos].name, argument);
+		else if (!(arch = find_archetype_in_menu(desc, archetype_menu[pos].type, arg2, &found_locked))) {
+			if (found_locked != NOTHING && (arch = archetype_proto(found_locked))) {
+				msg_to_desc(desc, "%s: You have not unlocked this archetype.\r\n", GET_ARCH_NAME(arch));
+			}
+			else {
+				msg_to_desc(desc, "Unknown %s '%s'.\r\n", archetype_menu[pos].name, argument);
+			}
 		}
 		else {
 			display_archetype_info(desc, arch);
