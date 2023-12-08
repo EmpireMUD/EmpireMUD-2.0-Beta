@@ -1657,9 +1657,9 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #18261
