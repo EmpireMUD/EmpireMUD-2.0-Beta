@@ -129,7 +129,8 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
-	"LIMIT-CROWD-CONTROL",
+	"LIMIT-CROWD-CONTROL",	// 15
+	"NOT-IN-COMBAT",
 	"\n"
 };
 
@@ -152,6 +153,7 @@ const char *ability_flag_notes[] = {
 	"unaffected by sun",
 	"",	// UNSCALED-BUFF
 	"limited crowd control",
+	"",	// NOT-IN-COMBAT
 	"\n"
 };
 

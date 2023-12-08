@@ -2323,7 +2323,7 @@ ACMD(do_conjure) {
 		}
 		
 		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
+			strcat(buf, " nothing\r\n");	// always room for this if !found
 		}
 		if (full) {
 			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");

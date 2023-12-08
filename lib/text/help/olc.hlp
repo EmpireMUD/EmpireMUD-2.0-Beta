@@ -860,6 +860,7 @@ The following ability flags are available:
  &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
  &cUNSCALED-BUFF&0 - Uses exact apply values rather than scaling them.
  &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
+ &cNOT-IN-COMBAT&0 - Ability cannot be used in combat even if min-position is low.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

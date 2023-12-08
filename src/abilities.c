@@ -1479,6 +1479,10 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return TRUE;	// sent its own error message
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
+		send_to_char("No way! You're fighting for your life!\r\n", ch);
+		return TRUE;
+	}
 	
 	perform_ability_command(ch, abil, arg1);
 	return TRUE;
@@ -1788,6 +1792,11 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 	
 	if (GET_POS(ch) < ABIL_MIN_POS(abil)) {
 		send_low_pos_msg(ch);
+		data->stop = TRUE;
+		return;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
+		send_to_char("No way! You're fighting for your life!\r\n", ch);
 		data->stop = TRUE;
 		return;
 	}
@@ -2342,15 +2351,26 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 	}
 	
+	// conjure liquid
+	if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID)) {
+		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_CONJURE_LIQUID)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No CONJURE-LIQUID interactions set");
+			problem = TRUE;
+		}
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Must target object");
+			problem = TRUE;
+		}
+	}
 	
 	// dots
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited short duration not supported on DOTs", ABIL_VNUM(iter));
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited short duration not supported on DOTs");
 			problem = TRUE;
 		}
 		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs", ABIL_VNUM(iter));
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs");
 			problem = TRUE;
 		}
 	}

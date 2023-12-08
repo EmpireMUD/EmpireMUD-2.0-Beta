@@ -555,6 +555,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
 #define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
 #define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
+#define ABILF_NOT_IN_COMBAT  BIT(16)	// q. prevents use in combat despite min-position
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

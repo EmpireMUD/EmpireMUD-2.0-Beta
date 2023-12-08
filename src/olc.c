@@ -4887,7 +4887,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		}
 		
 		// store quantity for later except chores that are often high
-		if (!interact_one_at_a_time[iter->type]) {
+		if (!interact_one_at_a_time[iter->type] && iter->type != INTERACT_CONJURE_LIQUID) {
 			max_quantity = MAX(max_quantity, iter->quantity);
 		}
 		else if (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) {
