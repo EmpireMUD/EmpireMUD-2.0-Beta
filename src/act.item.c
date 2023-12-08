@@ -6500,6 +6500,7 @@ ACMD(do_keep) {
 	obj_data *obj, *next_obj;
 	int dotmode, mode = SCMD_KEEP;
 	const char *sname;
+	bool any;
 
 	// validate mode
 	switch (subcmd) {
@@ -6533,6 +6534,10 @@ ACMD(do_keep) {
 		else {
 			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (mode == SCMD_KEEP) {
+					if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+						continue;	// skip quest items
+					}
+					
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 					qt_keep_obj(ch, obj, TRUE);
 				}
@@ -6552,10 +6557,16 @@ ACMD(do_keep) {
 		}
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+			return;
 		}
+		any = FALSE;
 		while (obj) {
 			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			if (mode == SCMD_KEEP) {
+				if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+					obj = next_obj;
+					continue;	// skip quest items
+				}
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 				qt_keep_obj(ch, obj, TRUE);
 			}
@@ -6566,11 +6577,20 @@ ACMD(do_keep) {
 			sprintf(buf, "You %s $p.", sname);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE | TO_SLEEP);
 			obj = next_obj;
+			any = TRUE;
+		}
+		
+		if (!any) {
+			msg_to_char(ch, "You didn't have any you could keep.\r\n");
+			return;
 		}
 	}
 	else {
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
+		else if (mode == SCMD_KEEP && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			msg_to_char(ch, "You cannot use 'keep' on quest items (but you also can't drop them).\r\n");
 		}
 		else {
 			if (mode == SCMD_KEEP) {
