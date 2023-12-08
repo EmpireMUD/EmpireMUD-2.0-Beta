@@ -657,6 +657,9 @@ Conjure-liquid abilities have the following properties:
     least 1 CONJURE-LIQUID interaction, and only 1 should succeed.
  <&ytargets&0> Must target an object.
 
+This type of ability uses the "targ" custom messages with the $p token for the
+targeted object.
+
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
 "ABILEDIT CONJURE OBJECT ABILITY" "ABILEDIT CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITY" "CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITIES" "CONJURE-OBJECT ABILITIES"

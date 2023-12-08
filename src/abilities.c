@@ -139,9 +139,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 *
 * @param char_data *ch The player using the ability.
 * @param char_data *vict The targeted player, if any (or NULL).
+* @param obj_data *ovict The targeted object, if any (or NULL).
 * @param ability_data *abil The ability.
 */
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
+void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil) {
 	bool invis;
 	bitvector_t act_flags = TO_ABILITY;
 	
@@ -161,51 +162,70 @@ void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
-	if (ch == vict || !vict) {	// message: targeting self
+	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_ROOM | act_flags);
+			act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 	}
-	else {	// message: ch != vict
+	else if (vict) {	// message: ch != vict
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 	
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_VICT | act_flags);
+			act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+			act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+		}
+	}
+	else if (ovict) {	// message: obj targeted without vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+		
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
 }
@@ -1010,9 +1030,10 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 *
 * @param char_data *ch The player using the ability.
 * @param char_data *vict The targeted player, if any (or NULL).
+* @param obj_data *ovict The targeted object, if any (or NULL).
 * @param ability_data *abil The ability.
 */
-void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
+void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil) {
 	bool invis;
 	bitvector_t act_flags = TO_ABILITY;
 	
@@ -1032,31 +1053,42 @@ void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	
-	if (ch == vict || !vict) {	// message: targeting self
+	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 	}
-	else {	// message: ch != vict
+	else if (vict) {	// message: ch != vict
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 		}
 	
 		// to vict
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+		}
+	}
+	else if (ovict) {	// message: ovict without vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
 }
@@ -1563,7 +1595,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// pre-messages if any
-	pre_ability_message(ch, cvict, abil);
+	pre_ability_message(ch, cvict, ovict, abil);
 	
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch);
@@ -1604,7 +1636,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check for FAILURE:
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		ability_fail_message(ch, cvict, abil);
+		ability_fail_message(ch, cvict, ovict, abil);
 		
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
@@ -1613,57 +1645,78 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// messaging
 	if (cvict && !data->no_msg) {	// messaging with char target
-		if (ch == cvict) {	// message: targeting self
+		if (ch == cvict || (!cvict && !ovict)) {	// message: targeting self
 			// to-char
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
+				act(buf, FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
 			}
 		
 			// to room
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM | act_flags);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, ovict, cvict, TO_ROOM | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_ROOM | act_flags);
+				act(buf, invis, ch, ovict, cvict, TO_ROOM | act_flags);
 			}
 		}
 		else {	// message: ch != cvict
 			// to-char
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR | act_flags);
+				act(buf, FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
 			}
 		
 			// to cvict
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT | act_flags);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, ovict, cvict, TO_VICT | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_VICT | act_flags);
+				act(buf, invis, ch, ovict, cvict, TO_VICT | act_flags);
 			}
 		
 			// to room
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT | act_flags);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, cvict, TO_NOTVICT | act_flags);
 			}
 			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_NOTVICT | act_flags);
+				act(buf, invis, ch, ovict, cvict, TO_NOTVICT | act_flags);
 			}
+		}
+	}
+	else if (ovict && !data->no_msg) {	// messaging with obj target
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
 	
@@ -4315,7 +4368,7 @@ OLC_MODULE(abiledit_maxstacks) {
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION | ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {

@@ -2015,7 +2015,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 
 // abilities.c
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
+void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
@@ -2027,7 +2027,7 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
-void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
+void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil);
 void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);

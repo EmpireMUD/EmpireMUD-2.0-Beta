@@ -747,13 +747,13 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	// proceed:
 	if (checks) {
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-		pre_ability_message(ch, NULL, abil);
+		pre_ability_message(ch, NULL, NULL, abil);
 	}
 	
 	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		if (checks) {
-			ability_fail_message(ch, NULL, abil);
+			ability_fail_message(ch, NULL, NULL, abil);
 			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 		}
 		return FALSE;
@@ -2199,12 +2199,12 @@ ACMD(do_companions) {
 	}
 	
 	// pre-message, if any
-	pre_ability_message(ch, NULL, abil);
+	pre_ability_message(ch, NULL, NULL, abil);
 	
 	// proceed:
 	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, abil ? ABIL_WAIT_TYPE(abil) : WAIT_OTHER);
 	if (abil && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		ability_fail_message(ch, NULL, abil);
+		ability_fail_message(ch, NULL, NULL, abil);
 		return;
 	}
 	
