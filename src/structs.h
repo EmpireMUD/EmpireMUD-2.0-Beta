@@ -908,7 +908,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
 #define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
-#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+	#define FNC_UNUSED  BIT(10)	// formerly "HENGE" which now uses a script
 #define FNC_LIBRARY  BIT(11)	// can write and store books here
 #define FNC_MAIL  BIT(12)	// players can send mail here
 #define FNC_MILL  BIT(13)	// can use the mill command here
