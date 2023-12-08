@@ -2261,6 +2261,109 @@ ACMD(do_confirm) {
 }
 
 
+ACMD(do_conjure) {
+	bool found, full;
+	char *ptr;
+	size_t size;
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	
+	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), ABILT_CONJURE_OBJECT | ABILT_CONJURE_LIQUID) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil)))
+	
+	argument = one_argument(argument, arg);	// first arg: conjure type
+	skip_spaces(&argument);	// remaining arg
+	
+	
+	// no-arg: show conjurable list
+	if (!*arg) {
+		size = snprintf(buf, sizeof(buf), "You can conjure the following things:\r\n");
+		
+		found = full = FALSE;
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			abil = plab->ptr;
+			if (!VALID_CONJURE_ABIL(ch, plab)) {
+				continue;	// not a conjure ability
+			}
+			
+			// show it
+			if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID)) {
+				// strip part of ability name
+				if (!strn_cmp(ABIL_NAME(abil), "conjure ", 8)) {
+					ptr = ABIL_NAME(abil) + 8;
+				}
+				else if (!strn_cmp(ABIL_NAME(abil), "create ", 7)) {
+					ptr = ABIL_NAME(abil) + 7;
+				}
+				else if (!strn_cmp(ABIL_NAME(abil), "summon ", 7)) {
+					ptr = ABIL_NAME(abil) + 7;
+				}
+				else {
+					ptr = ABIL_NAME(abil);
+				}
+				
+				// append
+				if (size + strlen(ptr) + 3 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", ptr);
+				}
+				else {
+					full = TRUE;
+					break;
+				}
+			}
+			else {
+				continue;
+			}
+			
+			// found 1
+			found = TRUE;
+			
+			if (full) {
+				break;
+			}
+		}
+		
+		if (!found) {
+			strcat(buf, " none\r\n");	// always room for this if !found
+		}
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}	// end no-arg
+	
+	// with arg: determine what they typed
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		if (!VALID_CONJURE_ABIL(ch, plab)) {
+			continue;	// not a conjure ability
+		}
+		if (!isname(arg, ABIL_NAME(abil))) {
+			continue;	// wrong name
+		}
+		
+		// run it? only if it matches
+		if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID || ABILT_CONJURE_OBJECT)) {
+			if (GET_POS(ch) < POS_RESTING || GET_POS(ch) < ABIL_MIN_POS(abil)) {
+				send_low_pos_msg(ch);	// not high enough pos for this conjure
+				return;
+			}
+			
+			perform_ability_command(ch, abil, argument);
+			found = TRUE;
+			break;
+		}
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "You don't know how to conjure that.\r\n");
+	}
+}
+
+
 ACMD(do_customize) {
 	char arg2[MAX_INPUT_LENGTH];
 	

@@ -69,6 +69,7 @@ OLC_MODULE(abiledit_difficulty);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_gainhooks);
 OLC_MODULE(abiledit_immunities);
+OLC_MODULE(abiledit_interaction);
 OLC_MODULE(abiledit_linkedtrait);
 OLC_MODULE(abiledit_longduration);
 OLC_MODULE(abiledit_masteryability);
@@ -580,6 +581,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "gainhooks", abiledit_gainhooks, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "interaction", abiledit_interaction, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "longduration", abiledit_longduration, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
@@ -4619,6 +4621,12 @@ const char *get_interaction_target(int type, any_vnum vnum) {
 		case TYPE_VEH: {
 			return skip_filler(get_vehicle_name_by_proto(vnum));
 		}
+		case TYPE_ABIL: {
+			return skip_filler(get_ability_name_by_vnum(vnum));
+		}
+		case TYPE_LIQUID: {
+			return skip_filler(get_generic_name_by_vnum(vnum));
+		}
 		default: {
 			return "unknown";
 		}
@@ -7388,6 +7396,14 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			
 			// OLC_x: copyable interactions
 			switch (findtype) {
+				case OLC_ABILITY: {
+					ability_data *abil = ability_proto(vnum);
+					if (abil) {
+						copyfrom = ABIL_INTERACTIONS(abil);
+						none = copyfrom ? FALSE : TRUE;
+					}
+					break;
+				}
 				case OLC_BUILDING: {
 					bld_data *bld = building_proto(vnum);
 					if (bld) {
@@ -7579,6 +7595,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
 			msg_to_char(ch, "Invalid type.\r\n");
 		}
+		// TYPE_x:
 		else if (interact_vnum_types[loc] == TYPE_MOB && !mob_proto(vnum)) {
 			msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
 		}
@@ -7590,6 +7607,12 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		}
 		else if (interact_vnum_types[loc] == TYPE_VEH && !vehicle_proto(vnum)) {
 			msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+		}
+		else if (interact_vnum_types[loc] == TYPE_ABIL && !ability_proto(vnum)) {
+			msg_to_char(ch, "Invalid ability vnum %d.\r\n", vnum);
+		}
+		else if (interact_vnum_types[loc] == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
+			msg_to_char(ch, "Invalid generic liquid vnum %d.\r\n", vnum);
 		}
 		else if (num < 1 || num >= 1000) {
 			msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
@@ -7669,6 +7692,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			if (!*arg4) {
 				msg_to_char(ch, "Change it to which vnum?\r\n");
 			}
+			// TYPE_x:
 			else if (interact_vnum_types[change->type] == TYPE_MOB && !mob_proto(vnum)) {
 				msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
 			}
@@ -7680,6 +7704,12 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 			else if (interact_vnum_types[change->type] == TYPE_VEH && !vehicle_proto(vnum)) {
 				msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_ABIL && !ability_proto(vnum)) {
+				msg_to_char(ch, "Invalid ability vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
+				msg_to_char(ch, "Invalid generic liquid vnum %d.\r\n", vnum);
 			}
 			else {
 				change->vnum = vnum;

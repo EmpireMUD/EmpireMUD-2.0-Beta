@@ -43,13 +43,18 @@ const char *default_ability_name = "Unnamed Ability";
 
 // local protos
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
-void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 
 
 // ability function prototypes
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
+
+DO_ABIL(do_conjure_liquid_ability);
+PREP_ABIL(prep_conjure_liquid_ability);
+
+DO_ABIL(do_conjure_object_ability);
+PREP_ABIL(prep_conjure_object_ability);
 
 DO_ABIL(do_damage_ability);
 PREP_ABIL(prep_damage_ability);
@@ -79,6 +84,8 @@ struct {
 	{ ABILT_MORPH, NULL, NULL },
 	{ ABILT_AUGMENT, NULL, NULL },
 	{ ABILT_CUSTOM, NULL, NULL },
+	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -1520,7 +1527,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			(do_ability_data[iter].prep_func)(ch, abil, level, cvict, data);
+			(do_ability_data[iter].prep_func)(ch, abil, level, cvict, ovict, data);
 			
 			// adjust cost
 			if (ABIL_COST_PER_SCALE_POINT(abil)) {
@@ -1663,7 +1670,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			(do_ability_data[iter].do_func)(ch, abil, level, cvict, data);
+			(do_ability_data[iter].do_func)(ch, abil, level, cvict, ovict, data);
 		}
 	}
 	
@@ -1768,7 +1775,7 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 * All buff-type abilities come through here. This handles scaling and buff
 * maintenance/replacement.
 *
-* DO_ABIL provides: ch, abil, level, vict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, data
 */
 DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
@@ -1856,10 +1863,54 @@ DO_ABIL(do_buff_ability) {
 }
 
 
+INTERACTION_FUNC(conjure_liquid_interaction) {
+	int amount;
+	
+	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
+		return FALSE;
+	}
+	
+	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
+	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
+	
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
+	
+	return TRUE;
+}
+
+
+/**
+* Handler for conjure-liquid abilities.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+DO_ABIL(do_conjure_liquid_ability) {
+	if (!ovict) {
+		// can do nothing
+		return;
+	}
+	
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_CONJURE_LIQUID, IN_ROOM(ch), NULL, ovict, NULL, conjure_liquid_interaction);
+}
+
+
+/**
+* Handler for conjure-object abilities.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+DO_ABIL(do_conjure_object_ability) {
+	// data->stop = TRUE;
+	
+	data->success = TRUE;
+}
+
+
 /**
 * All damage abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict_data
 */
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
@@ -1895,7 +1946,7 @@ DO_ABIL(do_damage_ability) {
 * All damage-over-time abilities come through here. This handles scaling and
 * stacking.
 *
-* DO_ABIL provides: ch, abil, level, vict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict_data
 */
 DO_ABIL(do_dot_ability) {
 	any_vnum affect_vnum;
@@ -2049,14 +2100,14 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		if (!has) {
-			snprintf(buf, sizeof(buf), "%s %s?\r\n", SAFE_ABIL_COMMAND(abil), IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			snprintf(buf, sizeof(buf), "%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
 			msg_to_char(ch, "%s", CAP(buf));
 			return;
 		}
 	}
 
 	if (has && (targ == ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", SAFE_ABIL_COMMAND(abil));
+		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
 		return;
 	}
 	if (!has) {
@@ -2096,7 +2147,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
@@ -2118,7 +2169,72 @@ PREP_ABIL(prep_buff_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, data
+* Determines if ovict is a valid target for creating the liquid.
+* 
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+PREP_ABIL(prep_conjure_liquid_ability) {
+	char buf[256];
+	struct interaction_item *interact;
+	generic_data *existing, *gen;
+	
+	get_ability_type_data(data, ABILT_CONJURE_LIQUID)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_LIQUID, data);
+	
+	if (!ovict) {
+		// should this error? or just do nothing
+		// data->stop = TRUE;
+		return;
+	}
+	if (!IS_DRINK_CONTAINER(ovict)) {
+		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR);
+		data->stop = TRUE;
+		return;
+	}
+	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
+		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR);
+		data->stop = TRUE;
+		return;
+	}
+	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
+		// check compatible contents
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_CONJURE_LIQUID) {
+				continue;	// not a liquid
+			}
+			if (!(gen = find_generic(interact->vnum, GENERIC_LIQUID))) {
+				continue;	// invalid liquid
+			}
+			if (GEN_VNUM(gen) == GEN_VNUM(existing)) {
+				continue;	// ok: same liquid
+			}
+			
+			// ok, both are different liquids... is it a problem?
+			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
+				// 1 is not water, or existing is not basic water
+				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
+				act(buf, FALSE, ch, ovict, NULL, TO_CHAR);
+				data->stop = TRUE;
+				return;
+			}
+		}
+	}
+	
+	// otherwise it seems ok
+}
+
+
+/**
+* Determines if player can conjure objects.
+* 
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+PREP_ABIL(prep_conjure_object_ability) {	
+	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
 PREP_ABIL(prep_damage_ability) {
 	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
@@ -2126,7 +2242,7 @@ PREP_ABIL(prep_damage_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
 PREP_ABIL(prep_dot_ability) {
 	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
@@ -2161,6 +2277,9 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 			problem = TRUE;
 		}
 	}
+	
+	// interactions
+	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
 	
 	// other abils
 	HASH_ITER(hh, ability_table, iter, next_iter) {
@@ -2490,6 +2609,9 @@ void free_ability(ability_data *abil) {
 			free(atl);
 		}
 	}
+	if (ABIL_INTERACTIONS(abil) && (!proto || ABIL_INTERACTIONS(abil) != ABIL_INTERACTIONS(proto))) {
+		free_interactions(&ABIL_INTERACTIONS(abil));
+	}
 	
 	free(abil);
 }
@@ -2616,6 +2738,10 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				LL_APPEND(ABIL_DATA(abil), adl);
 				break;
 			}
+			case 'I': {	// interaction item
+				parse_interaction(line, &ABIL_INTERACTIONS(abil), error);
+				break;
+			}
 			
 			case 'M': {	// custom messages
 				parse_custom_message(fl, &ABIL_CUSTOM_MSGS(abil), error);
@@ -2633,6 +2759,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			
 			case 'X': {	// extended data (type-based)
 				type = asciiflag_conv(line+2);
+				// ABILT_x: parsing ability data
 				switch (type) {
 					case ABILT_BUFF: {
 						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
@@ -2821,7 +2948,10 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		fprintf(fl, "D %d %d %d\n", adl->type, adl->vnum, adl->misc);
 	}
 	
-	// M: custom message
+	// 'I' interactions
+	write_interactions_to_file(fl, ABIL_INTERACTIONS(abil));
+	
+	// 'M' custom message
 	write_custom_messages_to_file(fl, 'M', ABIL_CUSTOM_MSGS(abil));
 	
 	// 'T' types
@@ -2829,7 +2959,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
 	}
 	
-	// 'X' type data
+	// 'X' ABILT_x: type-based data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
 		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
@@ -3129,6 +3259,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS;
+	bitvector_t find_interacts = NOBITS, found_interacts;
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
@@ -3137,6 +3268,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	ability_data *abil, *next_abil;
 	struct custom_message *cust;
 	struct apply_data *app;
+	struct interaction_item *inter;
 	size_t size;
 	bool found;
 	
@@ -3170,6 +3302,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("immunities", only_immunities, affected_bits)
 		FULLSEARCH_FLAGS("immunity", only_immunities, affected_bits)
 		FULLSEARCH_FLAGS("immune", only_immunities, affected_bits)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_LIST("linkedtrait", only_linked, apply_types)
 		FULLSEARCH_INT("maxcooldowntime", max_cd, 0, INT_MAX)
 		FULLSEARCH_INT("mincooldowntime", min_cd, 0, INT_MAX)
@@ -3336,6 +3469,15 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 				continue;
 			}
 		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
 		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
 			continue;
 		}
@@ -3481,6 +3623,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
+		ABIL_INTERACTIONS(new) = copy_interaction_list(ABIL_INTERACTIONS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -3502,7 +3645,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 * @param ability_data *abil The ability to display.
 */
 void do_stat_ability(char_data *ch, ability_data *abil) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH*4], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct custom_message *custm;
 	struct apply_data *app;
@@ -3531,11 +3674,11 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
 	
 	// command-related portion
+	sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 	if (!ABIL_COMMAND(abil)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0], Targets: \tg%s\t0\r\n", part);
 	}
 	else {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
@@ -3546,7 +3689,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	
-	// type-specific data
+	// ABILT_x: type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 			strcpy(part, "unlimited");
@@ -3595,6 +3738,11 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
 			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
 		}
+	}
+	
+	if (ABIL_INTERACTIONS(abil)) {
+		get_interaction_display(ABIL_INTERACTIONS(abil), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Interactions:\r\n%s", part);
 	}
 	
 	// data
@@ -3649,11 +3797,11 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sgainhooks\t0> %s\r\n", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
 	// command-related portion
+	sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
 	if (!ABIL_COMMAND(abil)) {
-		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)\r\n", OLC_LABEL_UNCHANGED);
+		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command), <%stargets\t0> %s\r\n", OLC_LABEL_UNCHANGED, OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	else {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
 		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%stargets\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
@@ -3709,6 +3857,13 @@ void olc_show_ability(char_data *ch) {
 	count = 0;
 	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
+	}
+	
+	// interactions
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
+	if (ABIL_INTERACTIONS(abil)) {
+		get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
+		strcat(buf, lbuf);
 	}
 	
 	// data
@@ -3825,10 +3980,6 @@ OLC_MODULE(abiledit_command) {
 			free(ABIL_COMMAND(abil));
 		}
 		ABIL_COMMAND(abil) = NULL;
-		
-		// clear other data
-		ABIL_TARGETS(abil) = NOBITS;
-		
 		msg_to_char(ch, "It no longer has a command.\r\n");
 	}
 	else if (strchr(argument, ' ')) {
@@ -4079,6 +4230,12 @@ OLC_MODULE(abiledit_immunities) {
 }
 
 
+OLC_MODULE(abiledit_interaction) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	olc_process_interactions(ch, argument, &ABIL_INTERACTIONS(abil), TYPE_ABIL);
+}
+
+
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
@@ -4207,13 +4364,7 @@ OLC_MODULE(abiledit_shortduration) {
 
 OLC_MODULE(abiledit_targets) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
-	}
+	ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
 }
 
 

@@ -291,6 +291,7 @@ ability_data *find_ability(char *argument);
 ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev);
 #define find_ability_by_name(name)  find_ability_by_name_exact(name, TRUE)
 ability_data *find_ability_by_vnum(any_vnum vnum);
+#define ability_proto  find_ability_by_vnum	// why don't all the types have "type_proto()" functions?
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
 void remove_ability_from_table(ability_data *abil);

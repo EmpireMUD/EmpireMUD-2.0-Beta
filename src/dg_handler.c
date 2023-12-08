@@ -545,6 +545,7 @@ void add_to_lookup_table(int uid, void *ptr, int type) {
 		find->type = type;
 		HASH_ADD_INT(master_uid_lookup_table, uid, find);
 		
+		// TYPE_x: script lookup tables
 		switch (type) {
 			case TYPE_MOB: {
 				find->data.ch = ptr;

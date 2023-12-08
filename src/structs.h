@@ -216,13 +216,15 @@
 #define MAGIC_NUMBER  (0x06)	// Arbitrary number that won't be in a string
 
 
-// for things that hold more than one type of thing:
+// TYPE_x: for things that hold more than one type of thing:
 #define TYPE_OBJ  0
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
 #define TYPE_MINE_DATA  3
 #define TYPE_BLD  4
 #define TYPE_VEH  5
+#define TYPE_ABIL  6
+#define TYPE_LIQUID  7
 
 
 // basic types
@@ -413,7 +415,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RUINS_TO_VEH  30
 #define INTERACT_PRODUCTION  31
 #define INTERACT_SKILLED_LABOR  32
-#define NUM_INTERACTS  33
+#define INTERACT_CONJURE_LIQUID  33
+#define INTERACT_CONJURE_OBJECT  34
+#define NUM_INTERACTS  35
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -568,6 +572,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_MORPH  BIT(10)	// ability has morphs that require it
 #define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
 #define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
+#define ABILT_CONJURE_OBJECT  BIT(13)	// creates 1 or more items
+#define ABILT_CONJURE_LIQUID  BIT(14)	// puts liquid in a drink container
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -3762,13 +3768,14 @@ struct ability_data {
 	int damage_type;	// damage
 	int max_stacks;	// dot
 	struct ability_data_list *data;	// LL of additional data
+	struct interaction_item *interactions;	// LL of regular interactions
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
 	bool is_class;	// assignment comes from a class
-	bool is_synergy;	// assignemtn comes from a synergy
+	bool is_synergy;	// assignemnt comes from a synergy
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle

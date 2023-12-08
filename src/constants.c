@@ -168,9 +168,11 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
-	"MORPH",
+	"MORPH",	// 10
 	"AUGMENT",
 	"CUSTOM",
+	"CONJURE-OBJECT",
+	"CONJURE-LIQUID",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -199,9 +201,11 @@ const char *ability_type_notes[] = {
 	"companion",
 	"summon",
 	"summon",
-	"morphing",
+	"morphing",	// 10
 	"augment",
 	"custom",
+	"conjure object",
+	"conjure liquid",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -4569,6 +4573,8 @@ const char *interact_types[] = {
 	"RUINS-TO-VEH",	// 30
 	"PRODUCTION",
 	"SKILLED-LABOR",
+	"CONJURE-LIQUID",
+	"CONJURE-OBJECT",
 	"\n"
 };
 
@@ -4608,6 +4614,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// RUINS-TO-VEH
 	TYPE_ROOM,	// PRODUCTION
 	TYPE_ROOM,	// SKILLED-LABOR
+	TYPE_ABIL,	// CONJURE-LIQUID
+	TYPE_ABIL,	// CONJURE-OBJECT
 };
 
 
@@ -4646,6 +4654,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_VEH,	// RUINS-TO-VEH
 	TYPE_OBJ,	// PRODUCTION
 	TYPE_OBJ,	// SKILLED-LABOR
+	TYPE_LIQUID,	// CONJURE-LIQUID
+	TYPE_OBJ,	// CONJURE-OBJECTS
 };
 
 
@@ -4686,6 +4696,8 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
 	TRUE,	// PRODUCTION
 	TRUE,	// SKILLED_LABOR
+	FALSE,	// CONJURE_LIQUID
+	FALSE,	// CONJURE_OBJECTS
 };
 
 

@@ -114,6 +114,7 @@
 #define ABIL_FLAGS(abil)  ((abil)->flags)
 #define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
+#define ABIL_INTERACTIONS(abil)  ((abil)->interactions)
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
 #define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
@@ -2025,6 +2026,7 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer, bool
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
+void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
 void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
