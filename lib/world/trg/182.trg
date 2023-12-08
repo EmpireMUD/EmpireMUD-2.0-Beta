@@ -742,6 +742,13 @@ if borrow /= %cmd%
   end
   halt
 end
+* check other things with a release trigger
+set otar %actor.obj_target(%arg%)%
+if %otar% && %otar.vnum% == 11836
+  * has its own release
+  return 0
+  halt
+end
 * RELEASE SECOND
 set needed 3
 if !%self.val0%
