@@ -7669,10 +7669,13 @@ ACMD(do_sheathe) {
 
 ACMD(do_ship) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
+	char *strptr;
 	struct island_info *from_isle, *to_isle;
+	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_storage_data *store;
 	struct shipping_data *sd;
 	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	room_data *to_room, *docks;
 	vehicle_data *veh;
 	obj_data *proto;
@@ -7681,6 +7684,19 @@ ACMD(do_ship) {
 	
 	// SHIPPING_x
 	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
+	
+	// optional empire arg
+	if (imm_access) {
+		strptr = any_one_word(argument, arg1);
+		if ((emp = get_empire_by_name(arg1))) {
+			// was an empire arg
+			argument = strptr;
+		}
+		else {
+			// not an empire arg (keep original argument)
+			emp = GET_LOYALTY(ch);
+		}
+	}
 	
 	argument = any_one_word(argument, arg1);	// command
 	argument = any_one_word(argument, arg2);	// number/all or keywords
@@ -7703,10 +7719,10 @@ ACMD(do_ship) {
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (IS_NPC(ch) || !GET_LOYALTY(ch) || !ch->desc) {
+	else if (IS_NPC(ch) || !emp || !ch->desc) {
 		msg_to_char(ch, "You can't use the shipping system unless you're in an empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_SHIPPING)) {
 		msg_to_char(ch, "You don't have permission to ship anything.\r\n");
 	}
 	else if (!*arg1) {
@@ -7715,13 +7731,13 @@ ACMD(do_ship) {
 		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
-		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
+		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(emp));
 		
 		done = FALSE;
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 			if (sd->vnum == NOTHING) {
 				// just a ship, not a shipment
-				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(GET_LOYALTY(ch), sd->shipping_id))) {
+				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(emp, sd->shipping_id))) {
 					continue;
 				}
 				if (*keywords && !multi_isname(keywords, VEH_KEYWORDS(veh))) {
@@ -7766,6 +7782,9 @@ ACMD(do_ship) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
+	else if (emp != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You may only check the status of other empires' shipments.\r\n");
+	}
 	else if (GET_POS(ch) < POS_RESTING) {
 		send_low_pos_msg(ch);
 	}
@@ -7780,7 +7799,7 @@ ACMD(do_ship) {
 		
 		// find a matching entry
 		done = wrong_isle = FALSE;
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
@@ -7800,11 +7819,11 @@ ACMD(do_ship) {
 			
 			// found!
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
+			add_to_empire_storage(emp, sd->from_island, sd->vnum, sd->amount);
 			
-			DL_DELETE(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), sd);
 			free(sd);
-			EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			done = TRUE;
 			break;	// only allow 1st match
@@ -7818,7 +7837,7 @@ ACMD(do_ship) {
 		if (number < 1 || !*keywords) {
 			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
 		}
-		else if (!(docks = find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+		else if (!(docks = find_docks(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
 		else if (!(to_room = get_shipping_target(ch, arg1, &targeted_island))) {
@@ -7830,14 +7849,14 @@ ACMD(do_ship) {
 		else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(ch))) {
 			msg_to_char(ch, "You are already on that island.\r\n");
 		}
-		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords)) || store->amount < 1) {
+		else if (!(store = find_island_storage_by_keywords(emp, GET_ISLAND_ID(IN_ROOM(ch)), keywords)) || store->amount < 1) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
 		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
+			add_shipping_queue(ch, emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
 		}
 	}
 }

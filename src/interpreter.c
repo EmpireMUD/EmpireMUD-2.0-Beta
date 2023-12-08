@@ -2455,7 +2455,7 @@ int _parse_name(char *arg, char *name, descriptor_data *desc, bool reduced_restr
 	}
 	if (fill_word(arg) || reserved_word(arg)) {
 		if (desc) {
-			msg_to_desc(desc, "'%s' is an invalid name.\r\n", arg);
+			msg_to_desc(desc, "'&&Z%s' is an invalid name.\r\n", arg);
 		}
 		return 1;
 	}

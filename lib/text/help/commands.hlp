@@ -2427,6 +2427,9 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
+Privileged immortals may check the status of other empires' shipments by
+typing: ship "empire name" status
+
 See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
