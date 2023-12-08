@@ -3823,7 +3823,7 @@ ACMD(do_stop) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No, you stop.\r\n");
 	}
-	else if (cancel_biting(ch)) {
+	else if (cancel_biting(ch, TRUE)) {
 		// sends its own message if the player was biting someone
 	}
 	else if (GET_ACTION(ch) == ACT_NONE) {
