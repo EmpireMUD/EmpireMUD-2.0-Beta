@@ -563,6 +563,15 @@ When a reboot has been set to a specific time, players are allowed to speed it
 up. If everyone types 'confirm,' it will reboot early. This should only be
 done when you're ready for the reboot, because you can't take it back.
 #
+CONJURE CONJURATION
+
+Usage:  conjure [object]
+        conjure [liquid] [container]
+
+Some abilities allow to you to conjure items, or even fill drink containers
+with liquids. Typing this command without any arguments will tell you what you
+know how to conjure.
+#
 CONSIDER
 
 Usage:  consider <target>
