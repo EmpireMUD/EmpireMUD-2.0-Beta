@@ -4277,7 +4277,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
-				stop_action = TRUE;
+				try_home = TRUE;
 			}
 		}
 	}
