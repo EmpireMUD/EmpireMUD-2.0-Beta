@@ -2729,7 +2729,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_SINGLE_USE
 	1.0,	// OBJ_SLOW (weapon attack speed)
 	1.0,	// OBJ_FAST (weapon attack speed)
-	1.3333,	// OBJ_ENCHANTED
+	1.0,	// OBJ_ENCHANTED
 	0.5,	// OBJ_JUNK
 	1.0,	// OBJ_CREATABLE
 	1.0,	// OBJ_SCALABLE
@@ -3621,7 +3621,7 @@ const char *function_flags[] = {
 	"FORGE",
 	"GLASSBLOWER",
 	"GUARD-TOWER",
-	"HENGE",	// 10
+	"*",	// 10
 	"LIBRARY",
 	"MAIL",
 	"MILL",
@@ -3666,7 +3666,7 @@ const char *function_flags_long[] = {
 	"at a forge",
 	"at a glassblower",
 	"at a guard tower",
-	"at a henge",	// 10
+	"",	// 10
 	"in a library",
 	"at a post box",
 	"at a mill",
