@@ -3078,10 +3078,12 @@ char *make_prompt(descriptor_data *d) {
 		// no prompt to people in the EXTRACTED state
 		*prompt = '\0';
 	}
-	else if (d->showstr_count)
-		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
-	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
-		strcpy(prompt, "] ");
+	else if (d->showstr_count) {
+		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ] %s", d->showstr_page, d->showstr_count, telnet_go_ahead(d));
+	}
+	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor)) {
+		sprintf(prompt, "] %s", telnet_go_ahead(d));
+	}
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
 		
