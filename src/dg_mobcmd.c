@@ -143,26 +143,31 @@ ACMD(do_maggro) {
 	if (*arg) {
 		if (*arg == UID_CHAR) {
 			if (!(victim = get_char(arg))) {
-				mob_log(ch, "maggro: victim (%s) not found", arg);
-				return;
+				// no victim: ok, just fall through to broad aggro
+				// mob_log(ch, "maggro: victim (%s) not found", arg);
+				// return;
 			}
 		}
 		else if (!(victim = get_char_room_vis(ch, arg, NULL))) {
-			mob_log(ch, "maggro: victim (%s) not found",arg);
-			return;
+			// no victim: ok, just fall through to broad aggro
+			// mob_log(ch, "maggro: victim (%s) not found",arg);
+			// return;
 		}
-	
-		if (victim == ch) {
-			mob_log(ch, "maggro: victim is self");
-			return;
-		}
-		if (IN_ROOM(victim) != IN_ROOM(ch)) {
-			mob_log(ch, "maggro: victim is in wrong room");
-			return;
-		}
-		if (!valid_dg_target(victim, DG_ALLOW_GODS)) {
-			mob_log(ch, "maggro: target is invalid");
-			return;
+		
+		// if we got a victim (optional), check them:
+		if (victim) {
+			if (victim == ch) {
+				mob_log(ch, "maggro: victim is self");
+				return;
+			}
+			if (IN_ROOM(victim) != IN_ROOM(ch)) {
+				mob_log(ch, "maggro: victim is in wrong room");
+				return;
+			}
+			if (!valid_dg_target(victim, DG_ALLOW_GODS)) {
+				mob_log(ch, "maggro: target is invalid");
+				return;
+			}
 		}
 	}
 	
