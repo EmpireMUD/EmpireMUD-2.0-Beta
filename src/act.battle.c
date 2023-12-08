@@ -369,6 +369,7 @@ ACMD(do_firstaid) {
 	
 	charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 	amount = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_FIRSTAID) + total_bonus_healing(ch);
+	heal(ch, vict, amount);
 	
 	if (ch == vict) {
 		snprintf(buf, sizeof(buf), "You apply first aid to your wounds.%s", report_healing(ch, amount, ch));
@@ -395,7 +396,6 @@ ACMD(do_firstaid) {
 		}
 	}
 	
-	heal(ch, vict, amount);
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_FIRSTAID, 15);
 		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);

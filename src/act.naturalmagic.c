@@ -105,7 +105,7 @@ int total_bonus_healing(char_data *ch) {
 * @param char_data *healed Person who was healed.
 * @param int amount The amount healed.
 * @param char_data *report_to The person to send the message to (the healer).
-* @param 
+* @return char* The healing string to show, like (+5, 25%).
 */
 char *report_healing(char_data *healed, int amount, char_data *report_to) {
 	static char output[80];
@@ -708,13 +708,13 @@ ACMD(do_heal) {
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 			if (!IS_DEAD(ch_iter) && in_same_group(ch, ch_iter)) {
+				heal(ch, ch_iter, amount);
+				
 				snprintf(buf, sizeof(buf), "You heal $N!%s", report_healing(ch_iter, amount, ch));
 				act(buf, FALSE, ch, NULL, ch_iter, TO_CHAR | TO_HEAL);
 				
 				snprintf(buf, sizeof(buf), "You are healed!%s", report_healing(ch_iter, amount, ch_iter));
 				act(buf, FALSE, ch, NULL, ch_iter, TO_VICT | TO_HEAL);
-				
-				heal(ch, ch_iter, amount);
 				
 				if (FIGHTING(ch_iter) && !FIGHTING(ch)) {
 					engage_combat(ch, FIGHTING(ch_iter), FALSE);
@@ -726,6 +726,8 @@ ACMD(do_heal) {
 	}
 	else {
 		// not party
+		heal(ch, vict, amount);
+		
 		if (ch == vict) {
 			snprintf(buf, sizeof(buf), "You swirl your mana around your body to heal your wounds.%s", report_healing(vict, amount, ch));
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
@@ -741,8 +743,6 @@ ACMD(do_heal) {
 			
 			act("A wave of mana shoots from $n to $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
 		}
-		
-		heal(ch, vict, amount);
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);

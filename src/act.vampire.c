@@ -1620,22 +1620,22 @@ ACMD(do_regenerate) {
 	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
 		switch (mode) {
 			case REGEN_HEALTH: {
+				heal(ch, ch, amount);
 				snprintf(buf, sizeof(buf), "You focus your blood into regeneration.%s", report_healing(ch, amount, ch));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
 				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				heal(ch, ch, amount);
 				break;
 			}
 			case REGEN_MANA: {
+				set_mana(ch, GET_MANA(ch) + amount);
 				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
 				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				set_mana(ch, GET_MANA(ch) + amount);
 				break;
 			}
 			case REGEN_MOVE: {
+				set_move(ch, GET_MOVE(ch) + amount);
 				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
 				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				set_move(ch, GET_MOVE(ch) + amount);
 				break;
 			}
 		}

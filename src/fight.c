@@ -3557,7 +3557,10 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	
 	// check recovery
 	if (GET_POS(vict) < POS_SLEEPING && GET_HEALTH(vict) > 0) {
-		msg_to_char(vict, "You recover and wake up.\r\n");
+		if (vict->desc) {
+			// causes a short delay so heal messaging happens first
+			stack_msg_to_desc(vict->desc, "You recover and wake up.\r\n");
+		}
 		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
 		end_pursuit(vict, ch);	// good samaritan
 	}
