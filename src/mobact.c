@@ -1102,7 +1102,7 @@ bool try_mobile_movement(char_data *ch) {
 		return FALSE;
 	}
 	
-	if (number(1, 100) > 20) {
+	if (number(1, 100) > 20 * (ROOM_IS_CLOSED(IN_ROOM(ch)) ? 1.5 : 1)) {
 		return FALSE;
 	}
 	
