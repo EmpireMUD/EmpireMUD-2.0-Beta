@@ -192,21 +192,21 @@ if %loc% && %self.room% != %loc%
 ~
 #12306
 Fur Dragon: attack info before difficulty selection~
-0 c 0
-kill hit kick bash lightningbolt backstab skybrand entangle shoot sunshock enervate slow siphon disarm job blind sap prick~
+0 B 0
+~
 if %self.aff_flagged(!ATTACK)%
   if %actor.char_target(%arg%)% != %self%
-    return 0
+    return 1
     halt
   end
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
-  return 1
+  return 0
 else
   * no need for this script anymore
   detach 12306 %self.id%
-  return 0
+  return 1
 end
 ~
 #12307

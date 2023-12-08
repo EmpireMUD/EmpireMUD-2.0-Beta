@@ -640,21 +640,21 @@ end
 ~
 #10458
 Goblin Outpost attack info~
-0 c 0
-kill hit kick bash lightningbolt backstab skybrand entangle shoot sunshock enervate slow siphon disarm job blind sap prick~
+0 B 0
+~
 if %self.aff_flagged(!ATTACK)%
   if %actor.char_target(%arg%)% != %self%
-    return 0
+    return 1
     halt
   end
   %send% %actor% You need to choose a difficulty before you can challenge ~%self%.
   %send% %actor% Usage: difficulty <normal \| hard \| group>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
-  return 1
+  return 0
 else
   * no need for this script anymore
   detach 10458 %self.id%
-  return 0
+  return 1
 end
 ~
 #10459
