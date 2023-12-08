@@ -399,6 +399,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				found = TRUE;
 			}
 		}
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_MOB, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related mob", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -546,9 +547,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 					found = TRUE;
 				}
 			}
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_MOB, vnum);
 		
 			if (found) {
-				msg_to_desc(desc, "A mob listed in the data for the ability you're editing has been removed.\r\n");
+				msg_to_desc(desc, "A mob listed in the data or interactions for the ability you're editing has been removed.\r\n");
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
@@ -844,12 +846,23 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
+		any = FALSE;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+				any = TRUE;
 				break;
 			}
+		}
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	

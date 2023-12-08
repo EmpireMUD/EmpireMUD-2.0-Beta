@@ -618,6 +618,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	event_data *event, *next_event;
+	struct interaction_item *inter;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
@@ -643,6 +644,14 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		any = FALSE;
 		any |= (ABIL_AFFECT_VNUM(abil) == vnum);
 		any |= (ABIL_COOLDOWN(abil) == vnum);
+		
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_LIQUID && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -1459,6 +1468,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found = TRUE;
 		}
 		
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_LIQUID, vnum);
+		
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
@@ -1653,6 +1664,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				ABIL_COOLDOWN(GET_OLC_ABILITY(desc)) = NOTHING;
 				found = TRUE;
 			}
+			
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_LIQUID, vnum);
 			
 			if (found) {
 				msg_to_char(desc->character, "A generic used by the ability you're editing was deleted.\r\n");
