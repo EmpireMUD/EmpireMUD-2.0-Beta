@@ -1091,9 +1091,10 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 * @return bool TRUE if the mobile moved successfully
 */
 bool try_mobile_movement(char_data *ch) {
-	int dir, count;
+	bool try_vehicle = FALSE;
+	int dir = -1, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
-	struct room_direction_data *ex;
+	struct room_direction_data *ex_iter, *use_exit = NULL;
 	vehicle_data *veh;
 	
 	// animals don't move indoors
@@ -1107,18 +1108,33 @@ bool try_mobile_movement(char_data *ch) {
 	}
 	
 	// pick a random direction
-	if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	if (IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		dir = number(-1, NUM_2D_DIRS-1);
+		try_vehicle = (dir == -1);
+	}
+	else if (COMPLEX_DATA(IN_ROOM(ch))) {
+		if (number(1, 100) <= 10) {
+			try_vehicle = TRUE;
+		}
+		else {
+			count = 0;
+			LL_FOREACH(COMPLEX_DATA(IN_ROOM(ch))->exits, ex_iter) {
+				if (!number(0, count++)) {
+					use_exit = ex_iter;
+				}
+			}
+		}
 	}
 	else {
-		dir = number(-1, NUM_NATURAL_DIRS-1);
+		// nowhere to go, nothing to do
+		return FALSE;
 	}
 	
-	// -1 will attempt to enter/exit a vehicle instead
-	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
+	// vehicle?
+	if (try_vehicle && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
 		do_exit(ch, "", 0, 0);
 	}
-	else if (dir == -1) {	// look for a vehicle to enter
+	else if (try_vehicle) {	// look for a vehicle to enter
 		to_room = NULL;
 		count = 0;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
@@ -1146,7 +1162,7 @@ bool try_mobile_movement(char_data *ch) {
 			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 		}
 	}	// end attempt enter/exit
-	else if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	else if (dir != -1 && IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		// map movement:
 		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 		
@@ -1160,12 +1176,12 @@ bool try_mobile_movement(char_data *ch) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir)) && CAN_GO(ch, ex)) {
+	else if (use_exit && CAN_GO(ch, use_exit)) {
 		// indoor movement
-		to_room = ex->room_ptr;
+		to_room = use_exit->room_ptr;
 		
-		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, dir, to_room)) {
-			perform_move(ch, dir, to_room, MOVE_WANDER);
+		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room)) {
+			perform_move(ch, use_exit->dir, to_room, MOVE_WANDER);
 		}
 	}
 
