@@ -3196,7 +3196,13 @@ elseif !%arg%
   %send% %actor% Free whom?
   halt
 elseif %actor.char_target(%arg%)% != %self%
-  %send% %actor% You can't free that.
+  set rodent_cage %actor.obj_target(%arg%)%
+  if %rodent_cage% && %rodent_cage.vnum% == 18224
+    * has its own release trig
+    return 0
+  else
+    %send% %actor% You can't free that.
+  end
   halt
 end
 * more checks that apply to both modes
