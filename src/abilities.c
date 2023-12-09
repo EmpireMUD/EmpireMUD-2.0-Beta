@@ -2359,53 +2359,70 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 * PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
 PREP_ABIL(prep_conjure_object_ability) {
-	bool any;
-	int iter;
+	bool has_any, one_ata, any_inv, any_room;
+	int any_size, iter;
 	struct interaction_item *interact;
 	obj_data *proto;
 	
 	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
 	
-	// check dupes?
-	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
-		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-			if (interact->type != INTERACT_CONJURE_OBJECT) {
-				continue;	// not an object
-			}
-			if (!(proto = obj_proto(interact->vnum))) {
-				continue;	// no proto
-			}
-			
-			// check if one is present
-			any = FALSE;
-			
-			if (CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
-				for (iter = 0; iter < NUM_WEARS && !any; ++iter) {
-					if (GET_EQ(ch, iter) && count_objs_by_vnum(interact->vnum, GET_EQ(ch, iter))) {
-						any = TRUE;
-					}
-				}
-				if (!any && count_objs_by_vnum(interact->vnum, ch->carrying)) {
-					any = TRUE;
-				}
-				
-				// oops
-				if (any) {
-					act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR);
+	one_ata = ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) ? TRUE : FALSE;
+	
+	// check interactions
+	any_size = 0;
+	any_inv = any_room = FALSE;
+	
+	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+		if (interact->type != INTERACT_CONJURE_OBJECT) {
+			continue;	// not an object
+		}
+		if (!(proto = obj_proto(interact->vnum))) {
+			continue;	// no proto
+		}
+		
+		// data to find
+		any_size = MAX(any_size, obj_carry_size(proto));
+		has_any = FALSE;
+		
+		if (CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+			any_inv = TRUE;
+			for (iter = 0; iter < NUM_WEARS && !has_any; ++iter) {
+				if (one_ata && GET_EQ(ch, iter) && count_objs_by_vnum(interact->vnum, GET_EQ(ch, iter))) {
+					has_any = TRUE;
 				}
 			}
-			else {	// no-take
-				if (count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
-					act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR);
-					any = TRUE;
-				}
+			if (one_ata && !has_any && count_objs_by_vnum(interact->vnum, ch->carrying)) {
+				has_any = TRUE;
 			}
 			
-			if (any) {
-				data->stop = TRUE;
-				return;
+			// oops
+			if (one_ata && has_any) {
+				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			}
 		}
+		else {	// no-take
+			any_room = TRUE;
+			if (one_ata && count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
+				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR);
+				has_any = TRUE;
+			}
+		}
+		
+		if (one_ata && has_any) {
+			data->stop = TRUE;
+			return;
+		}
+	}
+	
+	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
+		data->stop = TRUE;
+		return;
+	}
+	if (any_room && any_size > 0 && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && (any_size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
+		msg_to_char(ch, "You can't use that ability because the room is full.\r\n");
+		data->stop = TRUE;
+		return;
 	}
 }
 
