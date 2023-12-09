@@ -2262,8 +2262,8 @@ ACMD(do_confirm) {
 
 
 ACMD(do_conjure) {
-	bool found, full;
-	char *ptr;
+	bool found, full, needs_target;
+	char *ptr, *arg2;
 	size_t size;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
@@ -2272,8 +2272,9 @@ ACMD(do_conjure) {
 	
 	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "conjure")))
 	
-	argument = one_argument(argument, arg);	// first arg: conjure type
-	skip_spaces(&argument);	// remaining arg
+	skip_spaces(&argument);	// keep whole arg too (may be the whole conjure type)
+	arg2 = one_argument(argument, arg);	// first arg: conjure type
+	skip_spaces(&arg2);	// remaining arg
 	
 	
 	// no-arg: show conjurable list
@@ -2340,11 +2341,15 @@ ACMD(do_conjure) {
 	found = FALSE;
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 		abil = plab->ptr;
+		needs_target = (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID) ? TRUE : FALSE);
 		if (!VALID_CONJURE_ABIL(ch, plab)) {
 			continue;	// not a conjure ability
 		}
-		if (!isname(arg, ABIL_NAME(abil))) {
-			continue;	// wrong name
+		if (needs_target && !isname(arg, ABIL_NAME(abil))) {
+			continue;	// wrong name: targeted
+		}
+		if (!needs_target && !multi_isname(argument, ABIL_NAME(abil))) {
+			continue;	// wrong name: not-targeted
 		}
 		
 		// run it? only if it matches
@@ -2354,7 +2359,7 @@ ACMD(do_conjure) {
 				return;
 			}
 			
-			perform_ability_command(ch, abil, argument);
+			perform_ability_command(ch, abil, needs_target ? arg2 : argument);
 			found = TRUE;
 			break;
 		}
