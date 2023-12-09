@@ -1957,15 +1957,43 @@ DO_ABIL(do_conjure_liquid_ability) {
 }
 
 
+INTERACTION_FUNC(conjure_object_interaction) {	
+	int num, obj_ok = 0;
+	obj_data *obj = NULL;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
+		
+		obj_ok = load_otrigger(obj);
+		if (obj_ok && obj->carried_by == ch) {
+			get_otrigger(obj, ch, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	return TRUE;
+}
+
+
 /**
 * Handler for conjure-object abilities.
 *
 * DO_ABIL provides: ch, abil, level, vict, ovict, data
 */
 DO_ABIL(do_conjure_object_ability) {
-	// data->stop = TRUE;
-	
-	data->success = TRUE;
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_CONJURE_OBJECT, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
 }
 
 
@@ -2290,8 +2318,55 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 * 
 * PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
-PREP_ABIL(prep_conjure_object_ability) {	
+PREP_ABIL(prep_conjure_object_ability) {
+	bool any;
+	int iter;
+	struct interaction_item *interact;
+	obj_data *proto;
+	
 	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
+	
+	// check dupes?
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_CONJURE_OBJECT) {
+				continue;	// not an object
+			}
+			if (!(proto = obj_proto(interact->vnum))) {
+				continue;	// no proto
+			}
+			
+			// check if one is present
+			any = FALSE;
+			
+			if (CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+				for (iter = 0; iter < NUM_WEARS && !any; ++iter) {
+					if (GET_EQ(ch, iter) && count_objs_by_vnum(interact->vnum, GET_EQ(ch, iter))) {
+						any = TRUE;
+					}
+				}
+				if (!any && count_objs_by_vnum(interact->vnum, ch->carrying)) {
+					any = TRUE;
+				}
+				
+				// oops
+				if (any) {
+					act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR);
+				}
+			}
+			else {	// no-take
+				if (count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
+					act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR);
+					any = TRUE;
+				}
+			}
+			
+			if (any) {
+				data->stop = TRUE;
+				return;
+			}
+		}
+	}
 }
 
 

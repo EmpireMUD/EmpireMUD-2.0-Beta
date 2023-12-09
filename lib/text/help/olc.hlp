@@ -662,7 +662,7 @@ targeted object.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
-"ABILEDIT CONJURE OBJECT ABILITY" "ABILEDIT CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITY" "CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITIES" "CONJURE-OBJECT ABILITIES"
+"ABILEDIT CONJURE OBJECT ABILITY" "ABILEDIT CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITY" "CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITIES" "CONJURE-OBJECT ABILITIES" CONJURE-OBJECT
 
 The CONJURE-OBJECT ability type means that the ability will create one or more
 items.
@@ -670,14 +670,19 @@ items.
 Objects will go to the player's inventory, even if full, unless they do not
 have the TAKE wear bit.
 
-This ability supports both the 'conjure' command and its own command.
+This ability supports both the 'conjure' command and its own command. It does
+not require or use a target.
 
 Conjure-object abilities have the following properties:
- <&ycommand&0> Optional command to create the object(s).
- <&yinteractions&0> Uses ??? interactions to determine which items will be
-    conjured.
+ <&ycommand&0> Optional command to create the object(s). If you do not set a
+    command, it will automatically be added to the "conjure" command instead.
+ <&yinteractions&0> Determine which object(s) will be conjured. You must set at
+    least 1 CONJURE-OBJECT interaction.
 
-See also: OLC ABILITIES, ABILEDIT TYPES
+This type of ability uses the "targ" custom messages with the $p token for the
+created object.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
 
@@ -861,6 +866,7 @@ The following ability flags are available:
  &cUNSCALED-BUFF&0 - Uses exact apply values rather than scaling them.
  &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
  &cNOT-IN-COMBAT&0 - Ability cannot be used in combat even if min-position is low.
+ &cONE-AT-A-TIME&0 - For some ability types, prevents use when already active.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

@@ -131,6 +131,7 @@ const char *ability_flags[] = {
 	"UNSCALED-BUFF",
 	"LIMIT-CROWD-CONTROL",	// 15
 	"NOT-IN-COMBAT",
+	"ONE-AT-A-TIME",
 	"\n"
 };
 
@@ -154,6 +155,7 @@ const char *ability_flag_notes[] = {
 	"",	// UNSCALED-BUFF
 	"limited crowd control",
 	"",	// NOT-IN-COMBAT
+	"",	// ONE-AT-A-TIME
 	"\n"
 };
 
