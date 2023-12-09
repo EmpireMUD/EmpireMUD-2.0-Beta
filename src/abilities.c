@@ -40,6 +40,7 @@
 
 // local data
 const char *default_ability_name = "Unnamed Ability";
+const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 
 // local protos
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
@@ -4387,7 +4388,7 @@ OLC_MODULE(abiledit_cooldown) {
 OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | conjure_types)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -4399,7 +4400,7 @@ OLC_MODULE(abiledit_cost) {
 OLC_MODULE(abiledit_costperscalepoint) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), conjure_types)) {
 		msg_to_char(ch, "Only command abilities have this property.\r\n");
 	}
 	else {
@@ -4411,7 +4412,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | conjure_types)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -4684,7 +4685,7 @@ OLC_MODULE(abiledit_maxstacks) {
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION | ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION | conjure_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
