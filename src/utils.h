@@ -2035,6 +2035,7 @@ void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
 void setup_ability_companions(char_data *ch);
+const char *skip_conjure_words(const char *string);
 
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);

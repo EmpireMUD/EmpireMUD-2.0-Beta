@@ -2263,7 +2263,8 @@ ACMD(do_confirm) {
 
 ACMD(do_conjure) {
 	bool found, full, needs_target;
-	char *ptr, *arg2;
+	char *arg2;
+	const char *ptr;
 	size_t size;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
@@ -2290,19 +2291,7 @@ ACMD(do_conjure) {
 			
 			// show it
 			if (IS_SET(ABIL_TYPES(abil), my_types)) {
-				// strip part of ability name
-				if (!strn_cmp(ABIL_NAME(abil), "conjure ", 8)) {
-					ptr = ABIL_NAME(abil) + 8;
-				}
-				else if (!strn_cmp(ABIL_NAME(abil), "create ", 7)) {
-					ptr = ABIL_NAME(abil) + 7;
-				}
-				else if (!strn_cmp(ABIL_NAME(abil), "summon ", 7)) {
-					ptr = ABIL_NAME(abil) + 7;
-				}
-				else {
-					ptr = ABIL_NAME(abil);
-				}
+				ptr = skip_conjure_words(ABIL_NAME(abil));
 				
 				// append
 				if (size + strlen(ptr) + 3 < sizeof(buf)) {
@@ -2345,10 +2334,10 @@ ACMD(do_conjure) {
 		if (!VALID_CONJURE_ABIL(ch, plab)) {
 			continue;	// not a conjure ability
 		}
-		if (needs_target && !isname(arg, ABIL_NAME(abil))) {
+		if (needs_target && !isname(arg, skip_conjure_words(ABIL_NAME(abil)))) {
 			continue;	// wrong name: targeted
 		}
-		if (!needs_target && !multi_isname(argument, ABIL_NAME(abil))) {
+		if (!needs_target && !multi_isname(argument, skip_conjure_words(ABIL_NAME(abil)))) {
 			continue;	// wrong name: not-targeted
 		}
 		

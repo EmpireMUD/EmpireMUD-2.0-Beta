@@ -313,6 +313,15 @@ const char *ability_gain_hooks[] = {
 };
 
 
+// used to filter words out of conjure/summon names
+const char *conjure_words[] = {
+	"conjure",
+	"create",
+	"summon",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE CONSTANTS /////////////////////////////////////////////////////
 
