@@ -2189,7 +2189,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			targ = ch;
 			has = TRUE;
 		}
-		if (!has) {
+		if (!has && ABIL_TARGETS(abil)) {
 			snprintf(buf, sizeof(buf), "%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
 			msg_to_char(ch, "%s", CAP(buf));
 			return;
