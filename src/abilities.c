@@ -2043,6 +2043,7 @@ DO_ABIL(do_conjure_object_ability) {
 
 
 INTERACTION_FUNC(conjure_vehicle_interaction) {
+	bool junk;
 	char buf[256], multi[24];
 	int level, num;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
@@ -2055,6 +2056,30 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 		veh = read_vehicle(interaction->vnum, TRUE);
 		scale_vehicle_to_level(veh, level);
 		vehicle_to_room(veh, IN_ROOM(ch));
+		
+		// this is borrowed from act.trade.c
+		if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+			if (VEH_CLAIMS_WITH_ROOM(veh)) {
+				// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
+				if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
+					empire_data *emp = get_or_create_empire(ch);
+					if (emp) {
+						int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
+						if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+							claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
+						}
+					}
+				}
+			
+				// and set the owner to the room owner
+				perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			}
+			else {
+				perform_claim_vehicle(veh, GET_LOYALTY(ch));
+			}
+		}
+		
+		special_vehicle_setup(ch, veh);
 		load_vtrigger(veh);
 	}
 	
