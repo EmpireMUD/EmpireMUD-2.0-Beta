@@ -2204,7 +2204,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
-		else {
+		else if (ABIL_TARGETS(abil)) {
 			msg_to_char(ch, "There's nothing like that here.\r\n");
 		}
 		return;
