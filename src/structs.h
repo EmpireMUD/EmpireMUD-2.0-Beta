@@ -415,10 +415,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RUINS_TO_VEH  30
 #define INTERACT_PRODUCTION  31
 #define INTERACT_SKILLED_LABOR  32
-#define INTERACT_LIQUID_CONJURE  33
-#define INTERACT_OBJECT_CONJURE  34
-#define INTERACT_VEHICLE_CONJURE  35
-#define NUM_INTERACTS  36
+#define INTERACT_CONJURE_LIQUID  33
+#define INTERACT_CONJURE_OBJECT  34
+#define NUM_INTERACTS  35
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -577,7 +576,6 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
 #define ABILT_CONJURE_OBJECT  BIT(13)	// creates 1 or more items
 #define ABILT_CONJURE_LIQUID  BIT(14)	// puts liquid in a drink container
-#define ABILT_CONJURE_VEHICLE  BIT(15)	// creates a vehicle in the room
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -627,8 +625,6 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
 #define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
 #define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
-#define ABIL_CUSTOM_VEH_TO_CHAR  18
-#define ABIL_CUSTOM_VEH_TO_ROOM  19
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used

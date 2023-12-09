@@ -177,7 +177,6 @@ const char *ability_type_flags[] = {
 	"CUSTOM",
 	"CONJURE-OBJECT",
 	"CONJURE-LIQUID",
-	"CONJURE-VEHICLE",	// 15
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -211,7 +210,6 @@ const char *ability_type_notes[] = {
 	"custom",
 	"conjure object",
 	"conjure liquid",
-	"conjure vehicle",	// 15
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -268,8 +266,6 @@ const char *ability_custom_types[] = {
 	"pre-targ-to-char",	// 15
 	"pre-targ-to-vict",
 	"pre-targ-to-room",
-	"veh-to-char",
-	"veh-to-room",
 	"\n"
 };
 
@@ -4581,9 +4577,8 @@ const char *interact_types[] = {
 	"RUINS-TO-VEH",	// 30
 	"PRODUCTION",
 	"SKILLED-LABOR",
-	"LIQUID-CONJURE",
-	"OBJECT-CONJURE",
-	"VEHICLE-CONJURE",	// 35
+	"CONJURE-LIQUID",
+	"CONJURE-OBJECT",
 	"\n"
 };
 
@@ -4623,9 +4618,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// RUINS-TO-VEH
 	TYPE_ROOM,	// PRODUCTION
 	TYPE_ROOM,	// SKILLED-LABOR
-	TYPE_ABIL,	// LIQUID-CONJURE
-	TYPE_ABIL,	// OBJECT-CONJURE
-	TYPE_ABIL,	// VEHICLE-CONJURE
+	TYPE_ABIL,	// CONJURE-LIQUID
+	TYPE_ABIL,	// CONJURE-OBJECT
 };
 
 
@@ -4664,9 +4658,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_VEH,	// RUINS-TO-VEH
 	TYPE_OBJ,	// PRODUCTION
 	TYPE_OBJ,	// SKILLED-LABOR
-	TYPE_LIQUID,	// LIQUID-CONJURE
-	TYPE_OBJ,	// OBJECT-CONJURE
-	TYPE_VEH,	// VEHICLE-CONJURE
+	TYPE_LIQUID,	// CONJURE-LIQUID
+	TYPE_OBJ,	// CONJURE-OBJECTS
 };
 
 
@@ -4707,9 +4700,8 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
 	TRUE,	// PRODUCTION
 	TRUE,	// SKILLED_LABOR
-	FALSE,	// LIQUID_CONJURE
-	FALSE,	// OBJECT_CONJURE
-	FALSE,	// VEHICLE_CONJURE
+	FALSE,	// CONJURE_LIQUID
+	FALSE,	// CONJURE_OBJECTS
 };
 
 
