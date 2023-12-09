@@ -1992,7 +1992,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	
 	// messaging?
 	if (obj_ok && obj) {
-		if (interaction->quantity > 0) {
+		if (interaction->quantity > 1) {
 			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
 		}
 		else {
