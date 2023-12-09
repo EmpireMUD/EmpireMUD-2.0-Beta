@@ -570,10 +570,12 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	char buf[MAX_STRING_LENGTH];
 	const char *gstr;
 	char_data *dummy = NULL;
-	int amt, number;
+	int amt, number = 1;
 	
-	number = get_number(&arg);
-
+	if (arg && *arg) {
+		number = get_number(&arg);
+	}
+	
 	if (!obj && !veh && (!arg || !*arg)) {
 		send_to_char("Look in what?\r\n", ch);
 	}
