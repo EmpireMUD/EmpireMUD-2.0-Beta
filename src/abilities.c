@@ -2200,11 +2200,11 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
 		return;
 	}
-	if (!has) {
+	if (!has && ABIL_TARGETS(abil)) {
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
-		else if (ABIL_TARGETS(abil)) {
+		else {
 			msg_to_char(ch, "There's nothing like that here.\r\n");
 		}
 		return;
