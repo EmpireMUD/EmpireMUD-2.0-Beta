@@ -654,11 +654,11 @@ Conjure-liquid abilities have the following properties:
  <&ycommand&0> Optional command to create the liquid. If you do not set a
     command, it will automatically be added to the "conjure" command instead.
  <&yinteractions&0> Determine which liquid will be conjured. You must set at
-    least 1 CONJURE-LIQUID interaction, and only 1 should succeed.
+    least 1 LIQUID-CONJURE interaction, and only 1 should succeed.
  <&ytargets&0> Must target an object.
 
-This type of ability uses the "targ" custom messages with the $p token for the
-targeted object.
+This type of ability uses the &ctarg-to-*&0 custom messages with the &y$p&0 token for
+the targeted object.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
@@ -677,10 +677,31 @@ Conjure-object abilities have the following properties:
  <&ycommand&0> Optional command to create the object(s). If you do not set a
     command, it will automatically be added to the "conjure" command instead.
  <&yinteractions&0> Determine which object(s) will be conjured. You must set at
-    least 1 CONJURE-OBJECT interaction.
+    least 1 OBJECT-CONJURE interaction.
 
-This type of ability uses the "targ" custom messages with the $p token for the
-created object.
+This type of ability uses the &ctarg-to-*&0 custom messages on success, with the &y$p&0
+token for the object name. On failure, it instead uses &cfail-self-to-*&0 messages
+as there is no item.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
+#d
+"ABILEDIT CONJURE VEHICLE ABILITY" "ABILEDIT CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITY" "CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITIES" "CONJURE-VEHICLE ABILITIES" CONJURE-VEHICLE
+
+The CONJURE-VEHICLE ability type means that the ability will create one or more
+vehicles in the room.
+
+This ability supports both the 'conjure' command and its own command. It does
+not require or use a target.
+
+Conjure-object abilities have the following properties:
+ <&ycommand&0> Optional command to create the vehicle. If you do not set a
+    command, it will automatically be added to the "conjure" command instead.
+ <&yinteractions&0> Determine which vehicle(s) will be conjured. You must set at
+    least 1 VEHICLE-CONJURE interaction.
+
+This type of ability uses the &cveh-to-*&0 custom messages on success, with the &y$V&0
+token for the object name. On failure, it instead uses &cfail-self-to-*&0 messages
+as there is no vehicle.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
@@ -762,9 +783,10 @@ Message types:
  &cself-to-char&0 - Shown to the actor when the ability targets himself (or
    targets nobody).
  &cself-to-room&0 - Shown to the room when the ability targets self/nobody.
- &ctarg-to-char&0 - Shown to the actor when the ability targets a character.
- &ctarg-to-vict&0 - Shown to the victim when the ability targets a character.
- &ctarg-to-room&0 - Shown to the rest of the room when targeting a character.
+ &ctarg-to-char&0 - Shown to the actor when the ability targets a character
+   or object.
+ &ctarg-to-vict&0 - Shown to the victim when the ability targets a char/obj.
+ &ctarg-to-room&0 - Shown to the rest of the room when targeting a char/obj.
  &ccounterspell-to-char&0 - Shown to the actor when a counterspell cancels the
    ability.
  &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
@@ -780,6 +802,8 @@ Message types:
  &cpre-targ-to-char&0 - To the actor before an ability executes, when targeted.
  &cpre-targ-to-vict&0 - To the victim before an ability executes, when targeted.
  &cpre-targ-to-room&0 - To the room before an ability executes, when targeted.
+ &cveh-to-char&0 - To the actor when targeting an vehicle with $V for the vehicle.
+ &cveh-to-room&0 - To the room when targeting a vehicle.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -1276,6 +1300,7 @@ The following types are available (each has its own help file):
  &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cCONJURE-OBJECT&0 - Creates one or more items.
  &cCONJURE-LIQUID&0 - Creates liquid in a drink container.
+ &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
@@ -4963,8 +4988,9 @@ Room/vehicle interaction types:
    Production is 1 at a time; quantity is used as the depletion limit.
 
 Ability interaction types:
- &cCONJURE-LIQUID&0 - See ABILEDIT CONJURE LIQUID
- &cCONJURE-OBJECT&0 - See ABILEDIT CONJURE OBJECT
+ &cLIQUID-CONJURE&0 - See ABILEDIT CONJURE LIQUID
+ &cOBJECT-CONJURE&0 - See ABILEDIT CONJURE OBJECT
+ &cVEHICLE-CONJURE&0 - See ABILEDIT CONJURE VEHICLE
 
 * Room interactions marked with an asterisk are 'one-at-a-time' interactions,
   where the 'quantity' field is used as the maximum depletion, and players (or
