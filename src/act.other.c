@@ -2286,7 +2286,7 @@ ACMD(do_conjure) {
 			}
 			
 			// show it
-			if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID)) {
+			if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
 				// strip part of ability name
 				if (!strn_cmp(ABIL_NAME(abil), "conjure ", 8)) {
 					ptr = ABIL_NAME(abil) + 8;
