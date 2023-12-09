@@ -4146,10 +4146,10 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		sprintf(part, "Contents:\tg");
 		HASH_ITER(hh, str_hash, str_iter, next_str) {
 			if (str_iter->count == 1) {
-				sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+				sprintf(part + strlen(part), "%s %s", found++ ? "," : "", skip_filler(str_iter->str));
 			}
 			else {
-				sprintf(part + strlen(part), "%s %s (x%d)", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), str_iter->count);
+				sprintf(part + strlen(part), "%s %s (x%d)", found++ ? "," : "", skip_filler(str_iter->str), str_iter->count);
 			}
 			
 			if (strlen(part) >= 62) {
