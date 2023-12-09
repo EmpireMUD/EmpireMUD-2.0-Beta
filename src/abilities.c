@@ -2015,7 +2015,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You conjure $p%s%s!%s", ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "", multi);
 		}
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_ABILITY);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
@@ -2025,7 +2025,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n conjures $p%s%s!",  ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "");
 		}
-		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, obj, NULL, TO_ROOM | TO_ABILITY);
+		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -2100,7 +2100,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You conjure $V%s%s!%s", ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "", multi);
 		}
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_ABILITY);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_VEH_TO_ROOM)) {
@@ -2110,7 +2110,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n conjures $V%s%s!",  ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "");
 		}
-		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, NULL, veh, TO_ROOM | TO_ABILITY);
+		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, NULL, veh, TO_ROOM);
 	}
 	
 	return TRUE;
