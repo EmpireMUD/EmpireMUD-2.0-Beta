@@ -313,7 +313,7 @@ const char *ability_gain_hooks[] = {
 };
 
 
-// used to filter words out of conjure/summon names
+// used to filter words out of conjure/summon names, e.g. "Conjure Food" lists as "Food" in do_conjure.
 const char *conjure_words[] = {
 	"conjure",
 	"create",
