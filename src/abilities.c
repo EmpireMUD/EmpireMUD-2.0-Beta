@@ -2438,6 +2438,14 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 	}
 	
+	// conjure object
+	if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_OBJECT)) {
+		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_CONJURE_OBJECT)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No CONJURE-OBJECT interactions set");
+			problem = TRUE;
+		}
+	}
+	
 	// dots
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
