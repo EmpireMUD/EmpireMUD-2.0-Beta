@@ -4826,7 +4826,11 @@ if %self.vnum% == 11890
   halt
 end
 * otherwise: Time-traveler's diary:
-if !%actor%
+if %actor%
+  set ch %actor%
+elseif %self.carried_by%
+  set ch %self.carried_by%
+else
   halt
 end
 * gives the pages in order if not owned, or at random if owned
@@ -4840,7 +4844,7 @@ set list %diary_list%
 while %list%
   set vnum %list.car%
   set list %list.cdr%
-  if !%actor.inventory(%vnum%)% && !%actor.on_quest(%vnum%)% && !%actor.completed_quest(%vnum%)%
+  if !%ch.inventory(%vnum%)% && !%ch.on_quest(%vnum%)% && !%ch.completed_quest(%vnum%)%
     if %ch%
       %load% obj %vnum% %ch% inv
       set obj %ch.inventory(%vnum%)%
