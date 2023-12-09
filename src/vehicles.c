@@ -4042,6 +4042,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	size_t size;
 	bool comma;
 	int found;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!veh) {
 		return;
@@ -4137,12 +4138,22 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (VEH_CONTAINS(veh)) {
-		sprintf(part, "Contents:\tg");
-		found = 0;
 		DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
-			sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+			add_string_hash(&str_hash, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), 1);
+		}
+		
+		found = 0;
+		sprintf(part, "Contents:\tg");
+		HASH_ITER(hh, str_hash, str_iter, next_str) {
+			if (str_iter->count == 1) {
+				sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+			}
+			else {
+				sprintf(part + strlen(part), "%s %s (x%d)", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), str_iter->count);
+			}
+			
 			if (strlen(part) >= 62) {
-				if (obj->next_content) {
+				if (next_str) {
 					strcat(part, ",");
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", part);
@@ -4156,6 +4167,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		else {
 			size += snprintf(buf + size, sizeof(buf) - size, "\t0");
 		}
+		
+		free_string_hash(&str_hash);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
