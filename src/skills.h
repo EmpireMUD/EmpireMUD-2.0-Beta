@@ -433,6 +433,7 @@ struct attack_hit_type {
 
 // passes data throughout an ability call
 struct ability_exec {
+	ability_data *abil;	// which ability (pointer)
 	bool stop;	// indicates no further types should process
 	bool success;	// indicates the player should be charged
 	bool no_msg;	// indicates you shouldn't send messages

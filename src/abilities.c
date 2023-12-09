@@ -396,8 +396,10 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
 	
 	CREATE(data, struct ability_exec, 1);
+	data->abil = abil;
 	data->matching_role = has_matching_role(ch, abil, FALSE);
 	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
+	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// things only needed for scaled buffs
 	if (!unscaled) {
@@ -408,6 +410,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 		total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
 		
 		if (total_points < 0) {	// no work
+			GET_RUNNING_ABILITY_DATA(ch) = NULL;
 			free(data);
 			return;
 		}
@@ -459,6 +462,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 		}
 	}
 	
+	GET_RUNNING_ABILITY_DATA(ch) = NULL;
 	free(data);
 }
 
@@ -1958,7 +1962,10 @@ DO_ABIL(do_conjure_liquid_ability) {
 
 
 INTERACTION_FUNC(conjure_object_interaction) {	
+	char buf[256], multi[24];
 	int num, obj_ok = 0;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
 	obj_data *obj = NULL;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -1981,6 +1988,36 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	// mark gained
 	if (GET_LOYALTY(ch)) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	// messaging?
+	if (obj_ok && obj) {
+		if (interaction->quantity > 0) {
+			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
+		}
+		else {
+			*multi = '\0';
+		}
+		
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), multi);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "You conjure $p%s%s!%s", ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "", multi);
+		}
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_ABILITY);
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), multi);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "$n conjures $p%s%s!",  ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "");
+		}
+		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, obj, NULL, TO_ROOM | TO_ABILITY);
 	}
 	
 	return TRUE;
@@ -2212,8 +2249,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// exec data to pass through
 	CREATE(data, struct ability_exec, 1);
+	data->abil = abil;
 	data->cost = ABIL_COST(abil);	// base cost, may be modified
 	data->matching_role = has_matching_role(ch, abil, TRUE);
+	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// run the ability
 	do_ability(ch, abil, argument, targ, obj, veh, data);
@@ -2230,6 +2269,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	LL_FOREACH_SAFE(data->types, aet, next_aet) {
 		free(aet);
 	}
+	GET_RUNNING_ABILITY_DATA(ch) = NULL;
 	free(data);
 }
 

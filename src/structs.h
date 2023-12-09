@@ -4911,6 +4911,7 @@ struct char_special_data {
 	
 	int carry_items;	// Number of items carried
 	
+	struct ability_exec *running_ability_data;	// while running an ability, its data is here for reference anywhere
 	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
