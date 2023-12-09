@@ -56,6 +56,9 @@ PREP_ABIL(prep_conjure_liquid_ability);
 DO_ABIL(do_conjure_object_ability);
 PREP_ABIL(prep_conjure_object_ability);
 
+DO_ABIL(do_conjure_vehicle_ability);
+PREP_ABIL(prep_conjure_vehicle_ability);
+
 DO_ABIL(do_damage_ability);
 PREP_ABIL(prep_damage_ability);
 
@@ -86,6 +89,7 @@ struct {
 	{ ABILT_CUSTOM, NULL, NULL },
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability },
 	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
+	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -1958,20 +1962,22 @@ DO_ABIL(do_conjure_liquid_ability) {
 		return;
 	}
 	
-	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_CONJURE_LIQUID, IN_ROOM(ch), NULL, ovict, NULL, conjure_liquid_interaction);
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_LIQUID_CONJURE, IN_ROOM(ch), NULL, ovict, NULL, conjure_liquid_interaction);
 }
 
 
-INTERACTION_FUNC(conjure_object_interaction) {	
+INTERACTION_FUNC(conjure_object_interaction) {
 	char buf[256], multi[24];
-	int num, obj_ok = 0;
+	int level, num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
 	obj_data *obj = NULL;
 	
+	level = get_ability_level(ch, ABIL_VNUM(abil));
+	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
+		scale_item_to_level(obj, level);
 		
 		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			obj_to_char(obj, ch);
@@ -2031,7 +2037,67 @@ INTERACTION_FUNC(conjure_object_interaction) {
 * DO_ABIL provides: ch, abil, level, vict, ovict, data
 */
 DO_ABIL(do_conjure_object_ability) {
-	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_CONJURE_OBJECT, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
+}
+
+
+INTERACTION_FUNC(conjure_vehicle_interaction) {
+	char buf[256], multi[24];
+	int level, num;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	vehicle_data *veh = NULL;
+	
+	level = get_ability_level(ch, ABIL_VNUM(abil));
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		veh = read_vehicle(interaction->vnum, TRUE);
+		scale_vehicle_to_level(veh, level);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		load_vtrigger(veh);
+	}
+	
+	// messaging?
+	if (veh) {
+		if (interaction->quantity > 1) {
+			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
+		}
+		else {
+			*multi = '\0';
+		}
+		
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_VEH_TO_CHAR)) {
+			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_VEH_TO_CHAR), multi);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "You conjure $V%s%s!%s", ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "", multi);
+		}
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_ABILITY);
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_VEH_TO_ROOM)) {
+			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_VEH_TO_ROOM), multi);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "$n conjures $V%s%s!",  ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "");
+		}
+		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, NULL, veh, TO_ROOM | TO_ABILITY);
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Handler for conjure-vehicle abilities.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+DO_ABIL(do_conjure_vehicle_ability) {
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
 }
 
 
@@ -2329,7 +2395,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
 		// check compatible contents
 		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-			if (interact->type != INTERACT_CONJURE_LIQUID) {
+			if (interact->type != INTERACT_LIQUID_CONJURE) {
 				continue;	// not a liquid
 			}
 			if (!(gen = find_generic(interact->vnum, GENERIC_LIQUID))) {
@@ -2374,7 +2440,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 	any_inv = any_room = FALSE;
 	
 	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-		if (interact->type != INTERACT_CONJURE_OBJECT) {
+		if (interact->type != INTERACT_OBJECT_CONJURE) {
 			continue;	// not an object
 		}
 		if (!(proto = obj_proto(interact->vnum))) {
@@ -2429,6 +2495,62 @@ PREP_ABIL(prep_conjure_object_ability) {
 
 
 /**
+* Determines if player can conjure vehicles.
+* 
+* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+*/
+PREP_ABIL(prep_conjure_vehicle_ability) {
+	struct interaction_item *interact;
+	vehicle_data *proto, *viter;
+	
+	get_ability_type_data(data, ABILT_CONJURE_VEHICLE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_VEHICLE, data);
+	
+	// check interactions
+	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+		if (interact->type != INTERACT_VEHICLE_CONJURE) {
+			continue;	// not an object
+		}
+		if (!(proto = vehicle_proto(interact->vnum))) {
+			continue;	// no proto
+		}
+		
+		// check room for any if one-at-a-time
+		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
+				if (VEH_VNUM(viter) == interact->vnum) {
+					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR);
+					data->stop = TRUE;
+					return;
+				}
+			}
+		}
+		
+		// check vehicle flagging
+		if (VEH_FLAGGED(proto, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)))) {
+			msg_to_char(ch, "You can't do that inside a building.\r\n");
+			data->stop = TRUE;
+			return;
+		}
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(proto, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
+			msg_to_char(ch, "You can't do that inside a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
+			data->stop = TRUE;
+			return;
+		}
+		if (VEH_SIZE(proto) > 0 && total_vehicle_size_in_room(IN_ROOM(ch), NULL) + VEH_SIZE(proto) > config_get_int("vehicle_size_per_tile")) {
+			msg_to_char(ch, "This area is already too full to do that.\r\n");
+			data->stop = TRUE;
+			return;
+		}
+		if (VEH_SIZE(proto) == 0 && total_small_vehicles_in_room(IN_ROOM(ch), NULL) >= config_get_int("vehicle_max_per_tile")) {
+			msg_to_char(ch, "This area is already too full to do that.\r\n");
+			data->stop = TRUE;
+			return;
+		}
+	}
+}
+
+
+/**
 * PREP_ABIL provides: ch, abil, level, vict, ovict, data
 */
 PREP_ABIL(prep_damage_ability) {
@@ -2456,6 +2578,7 @@ PREP_ABIL(prep_dot_ability) {
 */
 bool audit_ability(ability_data *abil, char_data *ch) {
 	ability_data *iter, *next_iter;
+	struct interaction_item *interact;
 	bool problem = FALSE;
 	
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil) || !str_cmp(ABIL_NAME(abil), default_ability_name)) {
@@ -2486,21 +2609,53 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	
 	// conjure liquid
 	if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID)) {
-		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_CONJURE_LIQUID)) {
-			olc_audit_msg(ch, ABIL_VNUM(abil), "No CONJURE-LIQUID interactions set");
+		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_LIQUID_CONJURE)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No LIQUID-CONJURE interactions set");
 			problem = TRUE;
 		}
 		if (!IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Must target object");
 			problem = TRUE;
 		}
+		
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_LIQUID_CONJURE) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Has non-LIQUID-CONJURE interaction.");
+				problem = TRUE;
+				break;
+			}
+		}
 	}
 	
 	// conjure object
 	if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_OBJECT)) {
-		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_CONJURE_OBJECT)) {
-			olc_audit_msg(ch, ABIL_VNUM(abil), "No CONJURE-OBJECT interactions set");
+		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No OBJECT-CONJURE interactions set");
 			problem = TRUE;
+		}
+		
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_OBJECT_CONJURE) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Has non-OBJECT-CONJURE interaction.");
+				problem = TRUE;
+				break;
+			}
+		}
+	}
+	
+	// conjure vehicle
+	if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_VEHICLE)) {
+		if (!has_interaction(ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No VEHICLE-CONJURE interactions set");
+			problem = TRUE;
+		}
+		
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_VEHICLE_CONJURE) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Has non-VEHICLE-CONJURE interaction.");
+				problem = TRUE;
+				break;
+			}
 		}
 	}
 	

@@ -2268,7 +2268,9 @@ ACMD(do_conjure) {
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
 	
-	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), ABILT_CONJURE_OBJECT | ABILT_CONJURE_LIQUID) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil)))
+	bitvector_t my_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
+	
+	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil)))
 	
 	argument = one_argument(argument, arg);	// first arg: conjure type
 	skip_spaces(&argument);	// remaining arg
@@ -2286,7 +2288,7 @@ ACMD(do_conjure) {
 			}
 			
 			// show it
-			if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+			if (IS_SET(ABIL_TYPES(abil), my_types)) {
 				// strip part of ability name
 				if (!strn_cmp(ABIL_NAME(abil), "conjure ", 8)) {
 					ptr = ABIL_NAME(abil) + 8;
@@ -2346,7 +2348,7 @@ ACMD(do_conjure) {
 		}
 		
 		// run it? only if it matches
-		if (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT)) {
+		if (IS_SET(ABIL_TYPES(abil), my_types)) {
 			if (GET_POS(ch) < POS_RESTING || GET_POS(ch) < ABIL_MIN_POS(abil)) {
 				send_low_pos_msg(ch);	// not high enough pos for this conjure
 				return;

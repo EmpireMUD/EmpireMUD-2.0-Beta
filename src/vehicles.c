@@ -998,6 +998,11 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 		level = MIN(level, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
+	
 	// set the level
 	VEH_SCALE_LEVEL(veh) = level;
 	request_vehicle_save_in_world(veh);
@@ -1857,6 +1862,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh_iter, *next_veh_iter;
 	struct obj_storage_type *store;
 	struct interaction_item *inter;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -1877,6 +1883,22 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		any = FALSE;
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+	}
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
@@ -3260,6 +3282,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3300,6 +3323,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// save index and vehicle file now
 	save_index(DB_BOOT_VEH);
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
+	
+	// update abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		found = FALSE;
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_VEH, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related vehicle", ABIL_VNUM(abil), ABIL_NAME(abil));
+			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
+		}
+	}
 	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
@@ -3412,6 +3446,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_VEH, vnum);
+		
+			if (found) {
+				msg_to_desc(desc, "An vehicle listed in the interactions for the ability you're editing has been removed.\r\n");
+			}
+		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
