@@ -1764,7 +1764,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		}
 	}
 	else if (!data->no_msg) {
-		msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
+		// msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
+		ability_fail_message(ch, cvict, ovict, abil);
 	}
 }
 
