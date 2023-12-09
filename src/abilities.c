@@ -2543,7 +2543,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		// check room for any if one-at-a-time
 		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
-				if (VEH_VNUM(viter) == interact->vnum) {
+				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
 					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR);
 					data->stop = TRUE;
 					return;
