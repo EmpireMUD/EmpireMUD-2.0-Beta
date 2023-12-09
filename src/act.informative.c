@@ -572,7 +572,7 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	char_data *dummy = NULL;
 	int amt, number = 1;
 	
-	if (*arg) {
+	if (arg && *arg) {
 		number = get_number(&arg);
 	}
 	
