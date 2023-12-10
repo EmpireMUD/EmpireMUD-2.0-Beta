@@ -272,6 +272,18 @@ before it expires.
 You can confer: block, dodge, health, health-regen, mana, mana-regen,
   move, move-regen, resist-magical, resist-physical, to-hit
 #
+"CONJURE FRUIT"
+
+Conjure Fruit (Natural Magic ability)
+
+Usage:  conjure fruit
+Cooldown:  30 seconds
+Cost:  25 mana
+
+Turn mana into food with this simple spell.
+
+See alos: CONJURE
+#
 COUNTERSPELL "COUNTER SPELL"
 
 Counterspell (Natural Magic ability)
