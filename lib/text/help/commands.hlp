@@ -568,9 +568,11 @@ CONJURE CONJURATION
 Usage:  conjure [object]
         conjure [liquid] [container]
 
-Some abilities allow to you to conjure items, or even fill drink containers
-with liquids. Typing this command without any arguments will tell you what you
-know how to conjure.
+Some abilities allow you to conjure items, or even fill drink containers with
+liquids. Typing this command without any arguments will tell you what you know
+how to conjure.
+
+Try "helpsearch conjure" to look for abilities like this.
 #
 CONSIDER
 
@@ -2808,7 +2810,7 @@ This setting causes you to automatically 'look' after each time you move when
 running or when driving, piloting, or sailing a vehicle. With this message off,
 you only see a short message indicating you moved.
 
-See alos: STATUS MESSAGES
+See also: STATUS MESSAGES
 #
 TUNNEL "TUNNEL COMMAND"
 
