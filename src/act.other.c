@@ -2277,6 +2277,10 @@ ACMD(do_conjure) {
 	arg2 = one_argument(argument, arg);	// first arg: conjure type
 	skip_spaces(&arg2);	// remaining arg
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot conjure.\r\n");
+		return;
+	}
 	
 	// no-arg: show conjurable list
 	if (!*arg) {
