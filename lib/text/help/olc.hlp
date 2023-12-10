@@ -699,7 +699,7 @@ vehicles in the room.
 This ability supports both the 'conjure' command and its own command. It does
 not require or use a target.
 
-Conjure-object abilities have the following properties:
+Conjure-vehicle abilities have the following properties:
  <&ycommand&0> Optional command to create the vehicle. If you do not set a
     command, it will automatically be added to the "conjure" command instead.
  <&yinteractions&0> Determine which vehicle(s) will be conjured. You must set at
