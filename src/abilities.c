@@ -109,7 +109,7 @@ struct {
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
 void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
-	bool invis;
+	bool any, invis;
 	char buf[MAX_STRING_LENGTH];
 	
 	bitvector_t act_flags = TO_ABILITY;
@@ -121,20 +121,17 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 		return;
 	}
 	
+	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
 	
-	// mark this now
-	if (data) {
-		data->sent_any_msg = TRUE;
-	}
-	
 	if (vict) {	// messaging with char target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 			// to-char
+			any = TRUE;
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
@@ -156,6 +153,7 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else {	// message: ch != vict
 			// to-char
+			any = TRUE;
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
 				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
@@ -186,8 +184,9 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 			}
 		}
 	}
-	else if (ovict && !data->no_msg) {	// messaging with obj target
+	else if (ovict) {	// messaging with obj target
 		// to-char
+		any = TRUE;
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
 			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
 		}
@@ -206,6 +205,11 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
+	}
+	
+	// mark this now
+	if (data && any) {
+		data->sent_any_msg = TRUE;
 	}
 }
 
@@ -228,7 +232,7 @@ void ability_counterspell_message(char_data *ch, char_data *vict, ability_data *
 	
 	// mark this now
 	if (data) {
-		data->sent_any_msg = TRUE;
+		data->sent_any_msg = TRUE;	// guaranteed
 	}
 	
 	// to-char
@@ -328,7 +332,7 @@ void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, abili
 	
 	// mark this now
 	if (data) {
-		data->sent_any_msg = TRUE;
+		data->sent_any_msg = TRUE;	// guaranteed
 	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
@@ -429,11 +433,6 @@ void ability_per_item_message(char_data *ch, obj_data *ovict, int quantity, abil
 		act_flags |= TO_BUFF;
 	}
 	
-	// mark this now
-	if (data) {
-		data->sent_any_msg = TRUE;
-	}
-	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
@@ -445,14 +444,17 @@ void ability_per_item_message(char_data *ch, obj_data *ovict, int quantity, abil
 	if (abil_has_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) {
 		snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR), multi);
 		act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
-		data->sent_any_msg = TRUE;
+	
+		// mark this now
+		if (data) {
+			data->sent_any_msg = TRUE;
+		}
 	}
 	
 	// to room ONLY if there's a custom message
 	if (abil_has_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM)) {
 		snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM), multi);
 		act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
-		data->sent_any_msg = TRUE;
 	}
 }
 
@@ -1265,7 +1267,7 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
 void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
-	bool invis;
+	bool any, invis;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
@@ -1275,21 +1277,18 @@ void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, abilit
 		return;
 	}
 	
+	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
 	
-	// mark this now
-	if (data) {
-		data->sent_any_msg = TRUE;
-	}
-	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) {
 			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			any = TRUE;
 		}
 	
 		// to room
@@ -1301,6 +1300,7 @@ void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, abilit
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
 			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			any = TRUE;
 		}
 	
 		// to vict
@@ -1317,12 +1317,18 @@ void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, abilit
 		// to-char
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
 			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+			any = TRUE;
 		}
 	
 		// to room
 		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
 			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
+	}
+	
+	// mark this now
+	if (data && any) {
+		data->sent_any_msg = TRUE;
 	}
 }
 
@@ -2480,7 +2486,7 @@ PREP_ABIL(prep_buff_ability) {
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
-		data->sent_any_msg = TRUE;
+		data->sent_any_msg = TRUE;	// ok_string is still a message
 		data->success = TRUE;	// I think this is a success?
 		
 		command_lag(ch, ABIL_WAIT_TYPE(abil));
