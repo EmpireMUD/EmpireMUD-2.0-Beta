@@ -667,11 +667,13 @@ See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 The CONJURE-OBJECT ability type means that the ability will create one or more
 items.
 
-Objects will go to the player's inventory, even if full, unless they do not
-have the TAKE wear bit.
+Objects will go to the player's inventory unless they do not have the TAKE wear
+bit. This will only work if there's at least 1 slot in the player's inventory
+(2 for a large item). Multiple items may over-fill the inventory if only 1
+space was available.
 
 This ability supports both the 'conjure' command and its own command. It does
-not require or use a target.
+not have a target -- you must set the &gIGNORE&0 target.
 
 Conjure-object abilities have the following properties:
  <&ycommand&0> Optional command to create the object(s). If you do not set a
@@ -680,14 +682,11 @@ Conjure-object abilities have the following properties:
     least 1 OBJECT-CONJURE interaction.
 
 Messages:
- &cpre-self-to-char&0
- &cpre-self-to-room&0
- &cself-to-char&0
- &cself-to-room&0
- &cfail-self-to-char&0
- &cfail-self-to-room&0
- &cper-item-to-char&0 - Shows when each item appears, only if set (no default).
- &cper-item-to-room&0 - Use &y$p&0 for the item conjured.
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent when each item appears: &cper-item-to-char&0 and &cper-item-to-room&0
+   Using &y$p&0 for the item. These messages are also optional.
+ Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
+   &cfail-self-to-room&0
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
