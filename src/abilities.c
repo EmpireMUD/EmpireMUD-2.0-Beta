@@ -1820,6 +1820,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check costs and cooldowns now
 	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	
