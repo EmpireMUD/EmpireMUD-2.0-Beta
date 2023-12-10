@@ -145,8 +145,8 @@ ACMD(do_bash) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9, WAIT_COMBAT_ABILITY);
 	
 	// start meters now, to track direct damage()
-	check_combat_start(ch);
-	check_combat_start(vict);
+	check_start_combat_meters(ch);
+	check_start_combat_meters(vict);
 
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
@@ -507,8 +507,8 @@ ACMD(do_kick) {
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6, WAIT_COMBAT_ABILITY);
 	
 	// start meters now, to track direct damage()
-	check_combat_start(ch);
-	check_combat_start(vict);
+	check_start_combat_meters(ch);
+	check_start_combat_meters(vict);
 	
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);

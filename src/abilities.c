@@ -100,6 +100,167 @@ struct {
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Sends the main messages for using an ability.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param obj_data *ovict The targeted object, if any (or NULL).
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
+	bool invis;
+	char buf[MAX_STRING_LENGTH];
+	
+	bitvector_t act_flags = TO_ABILITY;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
+	
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;
+	}
+	
+	if (vict) {	// messaging with char target
+		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			}
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
+				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, ovict, vict, TO_ROOM | act_flags);
+			}
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
+				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
+			}
+		}
+		else {	// message: ch != vict
+			// to-char
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			}
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
+				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
+				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			}
+		
+			// to vict
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, ovict, vict, TO_VICT | act_flags);
+			}
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
+				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
+			}
+		
+			// to room
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+			}
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+				// don't message if it's damage + there's an attack type
+				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+			}
+		}
+	}
+	else if (ovict && !data->no_msg) {	// messaging with obj target
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+	}
+}
+
+
+/**
+* Sends the message for a counterspell when using an ability.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, who had the counterspell.
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void ability_counterspell_message(char_data *ch, char_data *vict, ability_data *abil, struct ability_exec *data) {
+	if (!ch || !abil) {
+		return;	// no work?
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;
+	}
+	
+	// to-char
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+	}
+	
+	// to vict
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+	}
+	
+	// to room
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		act(buf, FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+	}
+}
+
+
+/**
 * String display for one ADL item.
 *
 * @param struct ability_data_list *adl The data item to show.
@@ -146,26 +307,29 @@ char *ability_data_display(struct ability_data_list *adl) {
 * @param char_data *vict The targeted player, if any (or NULL).
 * @param obj_data *ovict The targeted object, if any (or NULL).
 * @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
-void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil) {
+void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool invis;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
 	}
-	
-	/* not currently sending abilities as a miss
-	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
-		act_flags |= TO_COMBAT_MISS;
+	if (data && data->no_msg) {
+		return;
 	}
-	*/
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
 	
-	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;
+	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
@@ -1041,26 +1205,29 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 * @param char_data *vict The targeted player, if any (or NULL).
 * @param obj_data *ovict The targeted object, if any (or NULL).
 * @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
-void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil) {
+void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool invis;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
 	}
-	
-	/* not currently showing abilities as a hit
-	if (ABILITY_FLAGGED(abil, ABILF_VIOLENT) && vict) {
-		act_flags |= TO_COMBAT_HIT;
+	if (data && data->no_msg) {
+		return;
 	}
-	*/
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
 	
-	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;
+	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
@@ -1478,7 +1645,9 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 
 
 /**
-* This checks if "string" is an ability's command, and performs it if so.
+* This checks if "string" is an ability's command, and performs it if so. This
+* is called by the command interpreter. To call an ability directly in code,
+* use perform_ability_command().
 *
 * @param char_data *ch The actor.
 * @param char *string The command they typed.
@@ -1531,15 +1700,6 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 		return TRUE;
 	}
 	
-	// ok check if we can perform it
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
-		return TRUE;	// sent its own error message
-	}
-	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
-		send_to_char("No way! You're fighting for your life!\r\n", ch);
-		return TRUE;
-	}
-	
 	perform_ability_command(ch, abil, arg1);
 	return TRUE;
 }
@@ -1558,68 +1718,30 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 *
 * @param char_data *ch The person performing the ability.
 * @param ability_data *abil The ability being used.
-* @param char_data *cvict The character target, if any (may be NULL).
+* @param char_data *vict The character target, if any (may be NULL).
 * @param obj_data *ovict The object target, if any (may be NULL).
 * @param vehicle_data *vvict The vehicle target, if any (may be NULL).
 * @param int level The level to use the ability at.
 * @param int casttype SPELL_CAST, etc.
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *cvict, obj_data *ovict, vehicle_data *vvict, int level, int casttype, struct ability_exec *data) {
-	char buf[MAX_STRING_LENGTH];
-	bool violent, invis;
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int casttype, struct ability_exec *data) {
 	int iter;
-	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil) {
 		return;
 	}
 	
-	violent = (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT));
-	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	
-	/* not currenly showing abilities as a hit
-	if (violent && cvict) {
-		act_flags |= TO_COMBAT_HIT;
-	}
-	*/
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= TO_BUFF;
-	}
-	
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && violent) {
-		msg_to_char(ch, "You can't %s here.\r\n", SAFE_ABIL_COMMAND(abil));
+	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
 		data->stop = TRUE;
-		return;
-	}
-	
-	if (cvict && cvict != ch && violent) {
-		if (!can_fight(ch, cvict)) {
-			act("You can't attack $N!", FALSE, ch, NULL, cvict, TO_CHAR);
-			data->stop = TRUE;
-			return;
-		}
-		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, cvict)) {
-			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-			data->stop = TRUE;
-			return;
-		}
-		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, cvict) && FIGHTING(ch)) {
-			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
-			data->stop = TRUE;
-			return;
-		}
-	}
-	if (ABILITY_TRIGGERS(ch, cvict, ovict, ABIL_VNUM(abil))) {
-		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			(do_ability_data[iter].prep_func)(ch, abil, level, cvict, ovict, data);
+			(do_ability_data[iter].prep_func)(ch, abil, level, vict, ovict, data);
 			
 			// adjust cost
 			if (ABIL_COST_PER_SCALE_POINT(abil)) {
@@ -1634,259 +1756,87 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check costs and cooldowns now
-	if (ABIL_COST_TYPE(abil) == BLOOD && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
-		return;	// sun fail
-	}
 	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
 		return;
 	}
 	
 	// ready to start the ability:
-	if (violent) {
+	if (ABIL_IS_VIOLENT(abil)) {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
 	
 		// start meters now, to track direct damage()
-		check_combat_start(ch);
-		if (cvict) {
-			check_combat_start(cvict);
+		check_start_combat_meters(ch);
+		if (vict) {
+			check_start_combat_meters(vict);
 		}
 	}
 	
 	// pre-messages if any
-	pre_ability_message(ch, cvict, ovict, abil);
+	pre_ability_message(ch, vict, ovict, abil, data);
 	
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch);
 	
 	// counterspell?
-	if (ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && violent && cvict && cvict != ch && trigger_counterspell(cvict)) {
-		// to-char
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR | TO_ABILITY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_CHAR | TO_ABILITY);
-		}
-		
-		// to vict
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT), FALSE, ch, NULL, cvict, TO_VICT | TO_ABILITY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_VICT | TO_ABILITY);
-		}
-		
-		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM), FALSE, ch, NULL, cvict, TO_NOTVICT | TO_ABILITY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, cvict, TO_NOTVICT | TO_ABILITY);
-		}
-		
+	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict)) {
+		ability_counterspell_message(ch, vict, abil, data);
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use
 		data->no_msg = TRUE;	// don't show more messages
 	}
 	
 	// check for FAILURE:
-	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		ability_fail_message(ch, cvict, ovict, abil);
+	if (!data->stop && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		ability_fail_message(ch, vict, ovict, abil, data);
 		
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
 		data->no_msg = TRUE;	// prevents success message
 	}
 	
-	// messaging
-	if (cvict && !data->no_msg) {	// messaging with char target
-		if (ch == cvict || (!cvict && !ovict)) {	// message: targeting self
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
-			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-				// don't message if it's damage + there's an attack type
-				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, ovict, cvict, TO_ROOM | act_flags);
-			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-				// don't message if it's damage + there's an attack type
-				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, ovict, cvict, TO_ROOM | act_flags);
-			}
-		}
-		else {	// message: ch != cvict
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
-			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-				// don't message if it's damage + there's an attack type
-				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, ovict, cvict, TO_CHAR | act_flags);
-			}
-		
-			// to cvict
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, ovict, cvict, TO_VICT | act_flags);
-			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-				// don't message if it's damage + there's an attack type
-				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, ovict, cvict, TO_VICT | act_flags);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, cvict, TO_NOTVICT | act_flags);
-			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-				// don't message if it's damage + there's an attack type
-				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, ovict, cvict, TO_NOTVICT | act_flags);
-			}
-		}
-	}
-	else if (ovict && !data->no_msg) {	// messaging with obj target
-		// to-char
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
-		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-			// don't message if it's damage + there's an attack type
-			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
-		}
-	
-		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
-		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-			// don't message if it's damage + there's an attack type
-			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
-		}
-	}
+	// main messaging
+	ability_activation_message(ch, vict, ovict, abil, data);
 	
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			(do_ability_data[iter].do_func)(ch, abil, level, cvict, ovict, data);
+			(do_ability_data[iter].do_func)(ch, abil, level, vict, ovict, data);
 		}
 	}
 	
-	/* special handling for damage... integrate this into the for() loop above -- don't forget about exp tho
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) && !data->stop) {
-		if (mag_damage(level, ch, cvict, abil) == -1) {
-			data->stop = TRUE;
-			return;	// Successful and target died, don't cast again.
-		}
+	// exp gain unless we hit something that prevented costs
+	if (data->should_charge_cost && (!vict || can_gain_exp_from(ch, vict))) {
+		// TODO some way to modify this amount?
+		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 	}
-	*/
 	
-	if (data->success) {
-		// experience
-		if (!cvict || can_gain_exp_from(ch, cvict)) {
-			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-		}
-		
-		// check if should be in combat
-		if (cvict && cvict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(cvict) && !IS_DEAD(cvict)) {
+	// check if should be in combat
+	if (!data->stop && data->should_charge_cost) {
+		if (vict && vict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
 			// auto-assist if we used an ability on someone who is fighting
-			if (!violent && FIGHTING(cvict) && !FIGHTING(ch)) {
-				engage_combat(ch, FIGHTING(cvict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+			if (!ABIL_IS_VIOLENT(abil) && FIGHTING(vict) && !FIGHTING(ch)) {
+				engage_combat(ch, FIGHTING(vict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 			
 			// auto-attack if used on an enemy
-			if (violent && AWAKE(cvict) && !FIGHTING(cvict)) {
-				engage_combat(cvict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+			if (ABIL_IS_VIOLENT(abil) && AWAKE(vict) && !FIGHTING(vict)) {
+				engage_combat(vict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
 			}
 		}
 	}
-	else if (!data->no_msg) {
-		// msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
-		ability_fail_message(ch, cvict, ovict, abil);
-	}
-}
-
-
-/**
-* do_ability is used generically to perform any ability, assuming we already
-* have the target char/obj/veh and most things have been validated. This checks
-* further restrictions.
-*
-* If an NPC uses an ability directly in the code, this is the correct entry
-* point for it.
-*
-* @param char_data *ch The person performing the ability.
-* @param ability_data *abil The ability being used.
-* @param char *argument Any remaining argument.
-* @param char_data *targ The char target, if any (may be NULL).
-* @param obj_data *obj The obj target, if any (may be NULL).
-* @param vehicle_data *veh The vehicle target, if any (may be NULL).
-* @param struct ability_exec *data The execution data to pass back and forth.
-*/
-void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *targ, obj_data *obj, vehicle_data *veh, struct ability_exec *data) {
-	int level, cap;
 	
-	if (!ch || !abil) {
-		log("SYSERR: do_ability called without %s.", ch ? "ability" : "character");
-		data->stop = TRUE;
-		return;
+	// check for a no-effect/fail message
+	if (!data->success && !data->no_msg) {
+		if (data->sent_any_msg) {
+			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
+		}
+		else {
+			// send a full fail
+			ability_fail_message(ch, vict, ovict, abil, data);
+		}
 	}
-	
-	if (GET_POS(ch) < ABIL_MIN_POS(abil)) {
-		send_low_pos_msg(ch);
-		data->stop = TRUE;
-		return;
-	}
-	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
-		send_to_char("No way! You're fighting for your life!\r\n", ch);
-		data->stop = TRUE;
-		return;
-	}
-	if (targ && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == targ)) {
-		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
-		data->stop = TRUE;
-		return;
-	}
-	if ((targ != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
-		msg_to_char(ch, "You can only use that on yourself!\r\n");
-		data->stop = TRUE;
-		return;
-	}
-	if ((targ == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
-		msg_to_char(ch, "You cannot use that on yourself!\r\n");
-		data->stop = TRUE;
-		return;
-	}
-	/* TODO: if group abilities are added
-	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
-		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
-		data->stop = TRUE;
-		return;
-	}
-	*/
-	
-	// determine correct level (sometimes limited by skill level)
-	level = get_approximate_level(ch);
-	if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
-		level = MIN(level, cap);	// constrain by skill level
-	}
-	
-	call_ability(ch, abil, argument, targ, obj, veh, level, RUN_ABIL_NORMAL, data);
 }
 
 
@@ -1973,7 +1923,7 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	// check if it kills them
-	if (GET_POS(vict) == POS_INCAP && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+	if (GET_POS(vict) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
 		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
 		data->stop = TRUE;
 	}
@@ -2047,6 +1997,8 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	
 	// messaging?
 	if (obj_ok && obj) {
+		data->sent_any_msg = TRUE;
+		
 		if (interaction->quantity > 1) {
 			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
 		}
@@ -2132,6 +2084,8 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 	
 	// messaging?
 	if (veh) {
+		data->sent_any_msg = TRUE;
+		
 		if (interaction->quantity > 1) {
 			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
 		}
@@ -2267,23 +2221,44 @@ DO_ABIL(do_dot_ability) {
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *argptr = arg;
+	char arg[MAX_INPUT_LENGTH], *argptr = arg;
 	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
 	vehicle_data *veh = NULL;
-	char_data *targ = NULL;
-	obj_data *obj = NULL;
+	char_data *vict = NULL;
+	obj_data *ovict = NULL;
 	bool has = FALSE;
-	int iter, number;
+	int cap, iter, level, number;
 	
-	skip_spaces(&argument);
-	
-	// pre-validates JUST the ability -- individual types must validate cost/cooldown
-	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
+	if (!ch || !abil) {
+		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
 		return;
 	}
-		
-	// Find the target
+	
+	// 1. pre-targeting checks
+	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
+		// pre-validates JUST the ability -- individual types must validate cost/cooldown
+		// sent its own error message
+		return;
+	}
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
+		// sent its own error message
+		return;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
+		send_to_char("No way! You're fighting for your life!\r\n", ch);
+		return;
+	}
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && ABIL_IS_VIOLENT(abil)) {
+		msg_to_char(ch, "You can't %s%s here.\r\n", ABIL_COMMAND(abil) ? "use " : "", SAFE_ABIL_COMMAND(abil));
+		return;
+	}
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
+		return;	// sun fail
+	}
+	
+	// 2. find the target
+	skip_spaces(&argument);
 	if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
 		has = TRUE;
 	}
@@ -2296,42 +2271,42 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		
 		// char targets
 		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY))) {
-			if ((targ = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM)) != NULL) {
+			if ((vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM)) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST)) {
-			if ((targ = find_closest_char(ch, argptr, FALSE)) != NULL) {
+			if ((vict = find_closest_char(ch, argptr, FALSE)) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD)) {
-			if ((targ = get_char_vis(ch, argptr, &number, FIND_CHAR_WORLD)) != NULL) {
+			if ((vict = get_char_vis(ch, argptr, &number, FIND_CHAR_WORLD)) != NULL) {
 				has = TRUE;
 			}
 		}
 		
 		// obj targets
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV)) {
-			if ((obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) != NULL) {
+			if ((ovict = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && number > 0) {
 			for (iter = 0; !has && iter < NUM_WEARS; ++iter) {
 				if (GET_EQ(ch, iter) && isname(argptr, GET_EQ(ch, iter)->name) && --number == 0) {
-					obj = GET_EQ(ch, iter);
+					ovict = GET_EQ(ch, iter);
 					has = TRUE;
 				}
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM)) {
-			if ((obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+			if ((ovict = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD)) {
-			if ((obj = get_obj_vis(ch, argptr, &number)) != NULL) {
+			if ((ovict = get_obj_vis(ch, argptr, &number)) != NULL) {
 				has = TRUE;
 			}
 		}
@@ -2348,36 +2323,32 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 	}
-	else {	// no arg
+	else {	// no arg and no tar-ignore
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
 			if (FIGHTING(ch) != NULL) {
-				targ = ch;
+				vict = ch;
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT)) {
 			if (FIGHTING(ch) != NULL) {
-				targ = FIGHTING(ch);
+				vict = FIGHTING(ch);
 				has = TRUE;
 			}
 		}
 		// if no target specified, and the spell isn't violent, default to self
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-			targ = ch;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !ABIL_IS_VIOLENT(abil)) {
+			vict = ch;
 			has = TRUE;
 		}
-		if (!has && ABIL_TARGETS(abil)) {
-			snprintf(buf, sizeof(buf), "%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
-			msg_to_char(ch, "%s", CAP(buf));
+		if (!has) {
+			msg_to_char(ch, "&&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
 			return;
 		}
 	}
-
-	if (has && (targ == ch) && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
-		return;
-	}
-	if (!has && ABIL_TARGETS(abil)) {
+	
+	// 3. target validation
+	if (!has) {
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
@@ -2386,26 +2357,76 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
+	if ((vict == ch) && ABIL_IS_VIOLENT(abil)) {
+		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
+		return;
+	}
+	if ((vict == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+		msg_to_char(ch, "You cannot use that on yourself!\r\n");
+		return;
+	}
+	if (vict && (vict != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+		msg_to_char(ch, "You can only use that on yourself!\r\n");
+		return;
+	}
+	if (vict && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
+		// TODO should this only be for violent spells?
+		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
+		return;
+	}
+	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
+		if (!can_fight(ch, vict)) {
+			act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+			return;
+		}
+		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, vict)) {
+			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			return;
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, vict) && FIGHTING(ch)) {
+			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
+			return;
+		}
+	}
+	/* TODO: if group abilities are added
+	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
+		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
+		return;
+	}
+	*/
 	
-	// exec data to pass through
+	// end target validation
+	
+	// 4. determine correct level (sometimes limited by skill level)
+	level = get_approximate_level(ch);
+	if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
+		level = MIN(level, cap);	// constrain by skill level
+	}
+	
+	// 5. exec data to pass through
 	CREATE(data, struct ability_exec, 1);
 	data->abil = abil;
 	data->cost = ABIL_COST(abil);	// base cost, may be modified
+	data->should_charge_cost = TRUE;	// may be turned off any time
 	data->matching_role = has_matching_role(ch, abil, TRUE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
-	// run the ability
-	do_ability(ch, abil, argument, targ, obj, veh, data);
+	// 6. ** run the ability **
+	call_ability(ch, abil, argument, vict, ovict, veh, level, RUN_ABIL_NORMAL, data);
 	
-	if (data->success) {
+	// 7. costs and consequences
+	if (data->should_charge_cost) {
+		// charge costs and cooldown unless the ability stopped itself -- regardless of success
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-		
+	}
+	if (data->success) {
+		// only if successful
 		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
-			limit_crowd_control(targ, ABIL_AFFECT_VNUM(abil));
+			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 		}
 	}
 	
-	// clean up data
+	// 9. clean up data
 	LL_FOREACH_SAFE(data->types, aet, next_aet) {
 		free(aet);
 	}
@@ -2429,9 +2450,12 @@ PREP_ABIL(prep_buff_ability) {
 		send_config_msg(ch, "ok_string");
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
 		data->stop = TRUE;
+		data->should_charge_cost = FALSE;	// free cancel
+		data->sent_any_msg = TRUE;
+		data->success = TRUE;	// I think this is a success?
 		
 		command_lag(ch, ABIL_WAIT_TYPE(abil));
-		return;	// prevent charging for the ability or adding a cooldown by not setting success
+		return;
 	}
 	
 	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
@@ -2458,11 +2482,13 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	if (!IS_DRINK_CONTAINER(ovict)) {
 		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR);
 		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
 		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR);
 		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
@@ -2484,6 +2510,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
 				act(buf, FALSE, ch, ovict, NULL, TO_CHAR);
 				data->stop = TRUE;
+				data->should_charge_cost = FALSE;
 				return;
 			}
 		}
@@ -2550,6 +2577,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 		
 		if (one_ata && has_any) {
 			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
 	}
@@ -2557,11 +2585,13 @@ PREP_ABIL(prep_conjure_object_ability) {
 	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
 		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	if (any_room && any_size > 0 && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && (any_size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 		msg_to_char(ch, "You can't use that ability because the room is full.\r\n");
 		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 }
@@ -2593,6 +2623,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
 					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR);
 					data->stop = TRUE;
+					data->should_charge_cost = FALSE;
 					return;
 				}
 			}
@@ -2602,21 +2633,25 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		if (VEH_FLAGGED(proto, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)))) {
 			msg_to_char(ch, "You can't do that inside a building.\r\n");
 			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(proto, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
 			msg_to_char(ch, "You can't do that inside a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
 			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
 		if (VEH_SIZE(proto) > 0 && total_vehicle_size_in_room(IN_ROOM(ch), NULL) + VEH_SIZE(proto) > config_get_int("vehicle_size_per_tile")) {
 			msg_to_char(ch, "This area is already too full to do that.\r\n");
 			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
 		if (VEH_SIZE(proto) == 0 && total_small_vehicles_in_room(IN_ROOM(ch), NULL) >= config_get_int("vehicle_max_per_tile")) {
 			msg_to_char(ch, "This area is already too full to do that.\r\n");
 			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
 	}

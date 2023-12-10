@@ -140,6 +140,7 @@
 #define ABIL_IS_CLASS(abil)  ((abil)->is_class)
 #define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
 #define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
+#define ABIL_IS_VIOLENT(abil)  (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT))
 #define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "the ability")
 
 
@@ -2016,7 +2017,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 
 // abilities.c
-void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil);
+void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
@@ -2028,7 +2029,7 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
-void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil);
+void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
@@ -2286,7 +2287,7 @@ void update_reputations(char_data *ch);
 void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
 void check_combat_end(char_data *ch);
-void check_combat_start(char_data *ch);
+void check_start_combat_meters(char_data *ch);
 bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 void death_log(char_data *ch, char_data *killer, int type);
 void death_restore(char_data *ch);

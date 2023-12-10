@@ -619,8 +619,8 @@ ACMD(do_backstab) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
 	
 		// start meters now, to track direct damage()
-		check_combat_start(ch);
-		check_combat_start(vict);
+		check_start_combat_meters(ch);
+		check_start_combat_meters(vict);
 
 		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 

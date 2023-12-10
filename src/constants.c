@@ -209,9 +209,9 @@ const char *ability_type_notes[] = {
 	"morphing",	// 10
 	"augment",
 	"custom",
-	"conjure object",
+	"conjure",	// actually conjure object
 	"conjure liquid",
-	"conjure vehicle",	// 15
+	"conjure",	// 15, actually conjure vehicle (shown to players as conjure as it can conjure furniture and buildings too)
 /*
 	"UNAFFECTS",
 	"POINTS",

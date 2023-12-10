@@ -210,8 +210,8 @@ ACMD(do_damage_spell) {
 	}
 	
 	// start meters now, to track direct damage()
-	check_combat_start(ch);
-	check_combat_start(vict);
+	check_start_combat_meters(ch);
+	check_start_combat_meters(vict);
 	
 	// check counterspell and then damage
 	if (!trigger_counterspell(vict)) {
@@ -397,10 +397,10 @@ ACMD(do_ready) {
 	}
 	
 	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-	pre_ability_message(ch, NULL, NULL, found_abil);
+	pre_ability_message(ch, NULL, NULL, found_abil, NULL);
 	
 	if (!skill_check(ch, ABIL_VNUM(found_abil), ABIL_DIFFICULTY(found_abil))) {
-		ability_fail_message(ch, NULL, NULL, found_abil);
+		ability_fail_message(ch, NULL, NULL, found_abil, NULL);
 		return;
 	}
 	

@@ -936,7 +936,7 @@ void check_combat_end(char_data *ch) {
 *
 * @param char_data *ch The player.
 */
-void check_combat_start(char_data *ch) {
+void check_start_combat_meters(char_data *ch) {
 	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == TRUE) {
 		if (PRF_FLAGGED(ch, PRF_CLEARMETERS)) {
 			reset_combat_meters(ch);
@@ -3595,8 +3595,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	}
 	
 	// ensure meters started
-	check_combat_start(ch);
-	check_combat_start(victim);
+	check_start_combat_meters(ch);
+	check_start_combat_meters(victim);
 	
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
@@ -4010,7 +4010,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
 	
 	// mark start
-	check_combat_start(ch);
+	check_start_combat_meters(ch);
 }
 
 

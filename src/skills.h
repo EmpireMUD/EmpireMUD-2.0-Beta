@@ -436,9 +436,11 @@ struct ability_exec {
 	ability_data *abil;	// which ability (pointer)
 	bool stop;	// indicates no further types should process
 	bool success;	// indicates the player should be charged
+	bool sent_any_msg;	// if TRUE, it sent at least one message
 	bool no_msg;	// indicates you shouldn't send messages
 	bool matching_role;	// if FALSE, no bonuses from matching role
 	int cost;	// for types that raise the cost later
+	bool should_charge_cost;	// if TRUE, will charge regardless of success
 	
 	struct ability_exec_type *types;	// LL of type data
 };
