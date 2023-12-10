@@ -366,7 +366,7 @@ I 34 10519 0.10 1 x  # OBJECT-CONJURE: basket of pudding figs
 I 34 1123 22.50 1 x  # OBJECT-CONJURE: twinkling starberry
 I 34 1124 22.50 1 x  # OBJECT-CONJURE: orange sunapple
 I 34 1125 22.50 1 x  # OBJECT-CONJURE: dewy rainbotan
-I 34 1126 22.50 1 x  # OBJECT-CONJURE: gleaming mysticurrant
+I 34 1126 100.00 1 x  # OBJECT-CONJURE: gleaming mysticurrant
 M
 13
 You form a delicate ball of blue mana in your hands...~
@@ -379,6 +379,12 @@ It shimmers and becomes $p!~
 M
 21
 It shimmers and becomes $p in $s hands!~
+M
+20
+You shape it into $p!~
+M
+20
+It twists itself into $p!~
 T n 1
 S
 $
