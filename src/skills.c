@@ -2466,10 +2466,10 @@ ACMD(do_skills) {
 		
 		// Cooldown?
 		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d:%02d hour%s\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60), (ABIL_COOLDOWN_SECS(abil) == 60 * 60) ? "" : "s");
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
 		}
 		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d minute%s\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60), (ABIL_COOLDOWN_SECS(abil) == 60) ? "" : "s");
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
 		}
 		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
