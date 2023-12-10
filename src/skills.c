@@ -2464,7 +2464,14 @@ ACMD(do_skills) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cost: %d%s %s\r\n", ABIL_COST(abil), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
 		}
 		
-		if (ABIL_COOLDOWN_SECS(abil) > 0) {
+		// Cooldown?
+		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d:%02d hour%s\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60), (ABIL_COOLDOWN_SECS(abil) == 60 * 60) ? "" : "s");
+		}
+		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d:%02d minute%s\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60), (ABIL_COOLDOWN_SECS(abil) == 60) ? "" : "s");
+		}
+		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		}
 		
