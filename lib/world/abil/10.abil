@@ -326,7 +326,7 @@ S
 Shimmering Anvil~
 r -1 1.00 0 0 0
 C
-conjure 8 0 2 100 0 2063 3600 0 5 0
+conjure 8 a 2 100 0 2063 3600 0 5 0
 I 35 1100 100.00 1  # VEHICLE-CONJURE: shimmering anvil
 M
 18
@@ -341,5 +341,44 @@ M
 9
 $n speaks some words, but nothing seems to happen.~
 T p 1
+S
+#1019
+Conjure Fruit~
+dq -1 1.00 0 0 0
+C
+conjure 5 a 2 25 0 2089 30 0 5 1
+I 34 3001 1.03 1 x  # OBJECT-CONJURE: green apple
+I 34 3006 1.03 1 x  # OBJECT-CONJURE: plump peach
+I 34 3042 1.03 1 x  # OBJECT-CONJURE: single ripe mango
+I 34 3009 1.03 1 x  # OBJECT-CONJURE: orange
+I 34 3038 1.03 1 x  # OBJECT-CONJURE: ripe plum
+I 34 3029 1.03 1 x  # OBJECT-CONJURE: ripe yellow banana
+I 34 3067 1.03 1 x  # OBJECT-CONJURE: small watermelon
+I 34 3077 1.03 1 x  # OBJECT-CONJURE: single ripe lemon
+I 34 3017 1.03 1 x  # OBJECT-CONJURE: plump fig
+I 34 10523 0.11 1 x  # OBJECT-CONJURE: handful of magic beans
+I 34 10531 0.11 1 x  # OBJECT-CONJURE: red pickthorn fruit
+I 34 10501 0.11 1 x  # OBJECT-CONJURE: handful of glowkra pods
+I 34 10506 0.10 1 x  # OBJECT-CONJURE: handful of spadebrush seeds
+I 34 10514 0.10 1 x  # OBJECT-CONJURE: basket of sparkling gemfruits
+I 34 10516 0.10 1 x  # OBJECT-CONJURE: basket of magic mushrooms
+I 34 10519 0.10 1 x  # OBJECT-CONJURE: basket of pudding figs
+I 34 1123 22.50 1 x  # OBJECT-CONJURE: twinkling starberry
+I 34 1124 22.50 1 x  # OBJECT-CONJURE: orange sunapple
+I 34 1125 22.50 1 x  # OBJECT-CONJURE: dewy rainbotan
+I 34 1126 22.50 1 x  # OBJECT-CONJURE: gleaming mysticurrant
+M
+13
+You form a delicate ball of blue mana in your hands...~
+M
+14
+$n forms a delicate ball of blue mana in $s hands...~
+M
+20
+It shimmers and becomes $p!~
+M
+21
+It shimmers and becomes $p in $s hands!~
+T n 1
 S
 $

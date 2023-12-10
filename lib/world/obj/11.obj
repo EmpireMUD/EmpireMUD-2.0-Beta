@@ -280,4 +280,110 @@ use it for mining -- or murder.
 A
 1 1 0
 S
+#1123
+starberry berry twinkling~
+a twinkling starberry~
+A starberry twinkles on the ground.~
+   The petite little berry twinkles with the brilliance of the distant stars.
+Beneath its deep, celestial blue skin, the fruit's sweet flavor is as
+enchanting as a cloudless night.
+~
+6 g a 0 0 7
+6 0 0
+7 5
+C
+1 1
+M
+4
+You bite into the starberry and your vision goes dark, only for a second, followed by dazzling stars.~
+M
+5
+$n bites into $p and looks far away for a moment.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+S
+#1124
+sunapple apple orange~
+an orange sunapple~
+An orange sunapple glows softly on the ground.~
+   The radiant sunapple has a golden-orange hue and a soft, comforting glow. 
+Its skin is smooth and slightly mottled, like a fresh apple.
+~
+6 g a 0 0 8
+6 0 0
+7 5
+C
+1 1
+M
+4
+You bite into the sunapple and, for an instant, your vision is blinded by a light as bright as the sun!~
+M
+5
+$n bites into $p and then blinks a few times as $e waves $s hand in front of $s face.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+S
+#1125
+rainbotan rainbow dewy~
+a dewy rainbotan~
+A rainbotan sits on the ground, covered in dew.~
+   The rainbotan resembles a tropical blossom with a kaleidoscope of colors,
+but when you open the skin, the inside is a delicate fruit that glistens as it
+shifts from hue to hue.
+~
+6 g a 0 0 8
+6 0 0
+7 5
+C
+1 1
+M
+4
+As you eat the delicate rainbotan, you can almost feel the fresh burst of a tropical rain shower.~
+M
+5
+$n bites into $p and looks far away for a moment.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+S
+#1126
+mysticurrant currant gleaming~
+a gleaming mysticurrant~
+A mysticurrant gleams on the ground.~
+   It's a small, odd fruit with an otherworldly aura. Its skin is iridescent,
+shifting from color to color as it catches the light.
+~
+6 g a 0 0 8
+6 0 0
+7 5
+C
+1 1
+M
+4
+You eat the mysticurrant, which leaves you with the subtle taste of wonder and enchantment.~
+M
+5
+$n eats $p and a look of wonder crosses $s face.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+S
 $
