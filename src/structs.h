@@ -629,6 +629,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
 #define ABIL_CUSTOM_VEH_TO_CHAR  18
 #define ABIL_CUSTOM_VEH_TO_ROOM  19
+#define ABIL_CUSTOM_PER_ITEM_TO_CHAR  20
+#define ABIL_CUSTOM_PER_ITEM_TO_ROOM  21
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used

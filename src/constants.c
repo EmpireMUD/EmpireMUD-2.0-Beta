@@ -270,6 +270,8 @@ const char *ability_custom_types[] = {
 	"pre-targ-to-room",
 	"veh-to-char",
 	"veh-to-room",
+	"per-item-to-char",	// 20
+	"per-item-to-room",
 	"\n"
 };
 

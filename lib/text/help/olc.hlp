@@ -679,9 +679,15 @@ Conjure-object abilities have the following properties:
  <&yinteractions&0> Determine which object(s) will be conjured. You must set at
     least 1 OBJECT-CONJURE interaction.
 
-This type of ability uses the &ctarg-to-*&0 custom messages on success, with the &y$p&0
-token for the object name. On failure, it instead uses &cfail-self-to-*&0 messages
-as there is no item.
+Messages:
+ &cpre-self-to-char&0
+ &cpre-self-to-room&0
+ &cself-to-char&0
+ &cself-to-room&0
+ &cfail-self-to-char&0
+ &cfail-self-to-room&0
+ &cper-item-to-char&0 - Shows when each item appears, only if set (no default).
+ &cper-item-to-room&0 - Use &y$p&0 for the item conjured.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
@@ -804,6 +810,8 @@ Message types:
  &cpre-targ-to-room&0 - To the room before an ability executes, when targeted.
  &cveh-to-char&0 - To the actor when targeting an vehicle with $V for the vehicle.
  &cveh-to-room&0 - To the room when targeting a vehicle.
+ &cper-item-to-char&0 - To the actor on types like conjur object, when conjured.
+ &cper-item-to-room&0 - To the room on types like conjur object, when conjured.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d

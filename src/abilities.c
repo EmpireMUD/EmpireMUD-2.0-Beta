@@ -401,6 +401,63 @@ void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, abili
 
 
 /**
+* Sends the message for using an ability with a per-item message set. These
+* messages have no default and will be omitted if the ability doesn't have
+* them.
+*
+* @param char_data *ch The player using the ability.
+* @param obj_data *ovict The item, if any (or NULL; but won't show messages if NULL).
+* @param int quantity How many items (for the x2 display when > 1).
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void ability_per_item_message(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data) {
+	bool invis;
+	char buf[256], multi[24];
+	bitvector_t act_flags = TO_ABILITY;
+	
+	if (!ch || !abil || !ovict) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
+	
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;
+	}
+	
+	if (quantity > 1) {
+		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+	}
+	else {
+		*multi = '\0';
+	}
+	
+	// to-char ONLY if there's a custom message
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) {
+		snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR), multi);
+		act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		data->sent_any_msg = TRUE;
+	}
+	
+	// to room ONLY if there's a custom message
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM)) {
+		snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM), multi);
+		act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		data->sent_any_msg = TRUE;
+	}
+}
+
+
+/**
 * Adds a gain hook for an ability.
 *
 * @param char_data *ch The player to add a hook to.
@@ -1965,7 +2022,6 @@ DO_ABIL(do_conjure_liquid_ability) {
 
 
 INTERACTION_FUNC(conjure_object_interaction) {
-	char buf[256], multi[24];
 	int level, num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
@@ -1997,34 +2053,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	
 	// messaging?
 	if (obj_ok && obj) {
-		data->sent_any_msg = TRUE;
-		
-		if (interaction->quantity > 1) {
-			snprintf(multi, sizeof(multi), " (x%d)", interaction->quantity);
-		}
-		else {
-			*multi = '\0';
-		}
-		
-		// to-char
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), multi);
-		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-			// don't message if it's damage + there's an attack type
-			snprintf(buf, sizeof(buf), "You conjure $p%s%s!%s", ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "", multi);
-		}
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-	
-		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-			snprintf(buf, sizeof(buf), "%s%s", abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), multi);
-		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
-			// don't message if it's damage + there's an attack type
-			snprintf(buf, sizeof(buf), "$n conjures $p%s%s!",  ABIL_COMMAND(abil) ? " with " : "", ABIL_COMMAND(abil) ? SAFE_ABIL_COMMAND(abil) : "");
-		}
-		act(buf, (ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE), ch, obj, NULL, TO_ROOM);
+		ability_per_item_message(ch, obj, interaction->quantity, abil, data);
 	}
 	
 	return TRUE;
