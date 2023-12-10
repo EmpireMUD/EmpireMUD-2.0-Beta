@@ -1273,7 +1273,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && IS_SET(act_flags, TO_ABILITY)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_ABILITY)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
