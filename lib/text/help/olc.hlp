@@ -1306,7 +1306,7 @@ The following types are available (each has its own help file):
  &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
- &cMORPH&0 - Ability has morphs that require ir.
+ &cMORPH&0 - Ability has morphs that require it.
  &cAUGMENT&0 - Used for augments/enchanting.
  &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cCONJURE-OBJECT&0 - Creates one or more items.
