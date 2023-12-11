@@ -2598,7 +2598,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// was it a vehicle, not an object?
 			if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
-				act("$V: you can't get that.", FALSE, ch, NULL, veh, TO_CHAR);
+				act("$V: you can't take that!", FALSE, ch, NULL, veh, TO_CHAR);
 			}
 			else {
 				msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
@@ -2634,7 +2634,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 			}
 			else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 				// tried to get a vehicle
-				act("$V: you can't get that.", FALSE, ch, NULL, veh, TO_CHAR);
+				act("$V: you can't take that!", FALSE, ch, NULL, veh, TO_CHAR);
 			}
 			else {
 				sprintf(buf, "You don't see any %ss here.\r\n", arg);
