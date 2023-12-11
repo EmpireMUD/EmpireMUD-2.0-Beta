@@ -1483,7 +1483,7 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	// ATAR_x: attempt to validate
 	if (abil) {
 		// char targets
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) && (!vict || !*vict)) {
+		if (IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) && (!vict || !*vict)) {
 			return FALSE;	// no char
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) && IN_ROOM(*vict) != IN_ROOM(ch)) {
@@ -1496,22 +1496,24 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 		}
 		
 		// obj location
-		any = (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD) ? TRUE : FALSE);
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV) && (*ovict)->carried_by == ch) {
-			any = TRUE;
-		}
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && (*ovict)->worn_by == ch) {
-			any = TRUE;
-		}
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM) && IN_ROOM(*ovict) == IN_ROOM(ch)) {
-			any = TRUE;
-		}
-		if (!any) {
-			return FALSE;	// bad location
+		if (IS_SET(ABIL_TARGETS(abil), OBJ_ATARS)) {
+			any = (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD) ? TRUE : FALSE);
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV) && (*ovict)->carried_by == ch) {
+				any = TRUE;
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && (*ovict)->worn_by == ch) {
+				any = TRUE;
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM) && IN_ROOM(*ovict) == IN_ROOM(ch)) {
+				any = TRUE;
+			}
+			if (!any) {
+				return FALSE;	// bad location
+			}
 		}
 		
 		// vehicle targets
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM | ATAR_VEH_WORLD) && (!vvict || !*vvict)) {
+		if (IS_SET(ABIL_TARGETS(abil), VEH_ATARS) && (!vvict || !*vvict)) {
 			return FALSE;	// no vehicle
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD) && IN_ROOM(*vvict) != IN_ROOM(ch)) {
