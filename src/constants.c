@@ -2404,7 +2404,7 @@ const char *action_bits[] = {
 };
 
 
-// MOB_CUSTOM_x
+// MOB_CUSTOM_x (1/2): type names
 const char *mob_custom_types[] = {
 	"echo",
 	"say",
@@ -2421,6 +2421,16 @@ const char *mob_custom_types[] = {
 	"scavenge-corpse",
 	"\n"
 };
+
+
+// MOB_CUSTOM_x (2/2): how they're shown in olc
+const char *mob_custom_type_help =
+"Types of messages:\r\n"
+"&w Echo messages: echo echo-day echo-night&0\r\n"
+" Speak text: say say-day say-night\r\n"
+"&w Varying lond descriptions: long-desc&0\r\n"
+" Shown when a scavenger mob eats a corpse: scavenge-corpse\r\n"
+"&w Available for scripts: script1 script2 script3 script4 script5&0\r\n";
 
 
 // MOB_MOVE_x: mob/vehicle move types
@@ -2983,7 +2993,7 @@ const char *tool_flags[] = {
 };
 
 
-// OBJ_CUSTOM_x
+// OBJ_CUSTOM_x (1/2): message types
 const char *obj_custom_types[] = {
 	"build-to-char",	// 0
 	"build-to-room",
@@ -3017,6 +3027,25 @@ const char *obj_custom_types[] = {
 	"chop-to-room",
 	"\n"
 };
+
+
+// OBJ_CUSTOM_x (2/2): how they're shown in olc
+const char *obj_custom_type_help =
+"Types of messages:\r\n"
+"&w Changes the player's long description: longdesc longdesc-female longdesc-male&0\r\n"
+" Shown when you wear it as equipment: wear-to-char wear-to-room\r\n"
+"&w Shown when you remove it from equipment: remove-to-char remove-to-room&0\r\n"
+" Shown when using it to build a building: build-to-char build-to-room\r\n"
+"&w Shown when using it to build a vehicle: craft-to-char craft-to-room&0\r\n"
+" Shown when you eat/drink/quaff/light it: consume-to-char consume-to-room\r\n"
+"&w Shown when it decays in your inventory: decays-on-char&0\r\n"
+" Shown when it decays on the ground: decays-in-room\r\n"
+"&w Shown when gained as a resource (chopped): resource-to-char resource-to-room&0\r\n"
+" Shown when using the item to fish: fish-to-char fish-to-room\r\n"
+"&w Shown when you use it to mine ore: mine-to-char mine-to-room&0\r\n"
+" Shown when you use it to chop trees: chop-to-char chop-to-room\r\n"
+"&w Shown in order when playing it: instrument-to-char instrument-to-room&0\r\n"
+" Available for scripts: script1 script2 script3 script4 script5\r\n";
 
 
 // Weapon attack texts -- TYPE_x

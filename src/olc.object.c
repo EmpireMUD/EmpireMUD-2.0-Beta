@@ -2914,7 +2914,7 @@ OLC_MODULE(oedit_currency) {
 
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types, NULL);
+	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types, obj_custom_type_help);
 }
 
 

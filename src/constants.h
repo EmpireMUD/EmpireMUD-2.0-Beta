@@ -162,6 +162,7 @@ extern const char *liquid_flags[];
 // mob constants
 extern const char *action_bits[];
 extern const char *mob_custom_types[];
+extern const char *mob_custom_type_help;
 extern const char *mob_move_types[];
 extern const char *name_sets[];
 
@@ -195,6 +196,7 @@ extern const char *resource_types[];
 extern const char *storage_bits[];
 extern const char *tool_flags[];
 extern const char *obj_custom_types[];
+extern const char *obj_custom_type_help;
 extern const double basic_speed;
 
 // olc constants

@@ -1375,7 +1375,7 @@ OLC_MODULE(medit_attack) {
 
 OLC_MODULE(medit_custom) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types, NULL);
+	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types, mob_custom_type_help);
 }
 
 
