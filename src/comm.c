@@ -3541,7 +3541,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						craft_data *ctype = craft_proto(GET_ACTION_VNUM(ch, 0));
 						strcpy(i, gen_craft_data[GET_CRAFT_TYPE(ctype)].verb);
 					}
-					else if (IS_NPC(ch) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+					else if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
 						strcpy(i, get_ability_name_by_vnum(GET_ACTION_VNUM(ch, 0)));
 					}
 					else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
