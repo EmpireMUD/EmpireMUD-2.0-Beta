@@ -3468,36 +3468,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 						if (subfield && *subfield && IS_NPC(c)) {
 							char arg1[256], arg2[256];
-							int ctype, count = 0, pos = -1;
-							struct custom_message *mcm, *found_mcm = NULL;
+							char *msg;
+							int ctype, pos = -1;
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && (ctype = search_block(arg1, mob_custom_types, FALSE)) != NOTHING) {
 								if (*arg2) {	// optional message pos
 									pos = atoi(arg2);
+									msg = get_custom_message_pos(MOB_CUSTOM_MSGS(c), ctype, pos);
 								}
-								
-								// valid type
-								LL_FOREACH(MOB_CUSTOM_MSGS(c), mcm) {
-									if (mcm->type != ctype) {
-										continue;
-									}
-									
-									// seems valid
-									if (pos != -1 && pos-- <= 0) {
-										// only looking for 1
-										found_mcm = mcm;
-										break;
-									}
-									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
-										// picking at random
-										found_mcm = mcm;
-									}
+								else {
+									msg = get_custom_message(MOB_CUSTOM_MSGS(c), ctype);
 								}
 								
 								// did we find one
-								if (found_mcm) {
-									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								if (msg) {
+									snprintf(str, slen, "%s", NULLSAFE(msg));
 								}
 							}
 						}
@@ -4898,36 +4884,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 						if (subfield && *subfield) {
 							char arg1[256], arg2[256];
-							int ctype, count = 0, pos = -1;
-							struct custom_message *mcm, *found_mcm = NULL;
+							char *msg;
+							int ctype, pos = -1;
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && (ctype = search_block(arg1, obj_custom_types, FALSE)) != NOTHING) {
 								if (*arg2) {	// optional message pos
 									pos = atoi(arg2);
+									msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(o), ctype, pos);
 								}
-								
-								// valid type
-								LL_FOREACH(GET_OBJ_CUSTOM_MSGS(o), mcm) {
-									if (mcm->type != ctype) {
-										continue;
-									}
-									
-									// seems valid
-									if (pos != -1 && pos-- <= 0) {
-										// only looking for 1
-										found_mcm = mcm;
-										break;
-									}
-									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
-										// picking at random
-										found_mcm = mcm;
-									}
+								else {
+									msg = get_custom_message(GET_OBJ_CUSTOM_MSGS(o), ctype);
 								}
 								
 								// did we find one
-								if (found_mcm) {
-									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								if (msg) {
+									snprintf(str, slen, "%s", NULLSAFE(msg));
 								}
 							}
 						}
