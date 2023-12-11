@@ -2590,20 +2590,27 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 static void get_from_room(char_data *ch, char *arg, int howmany) {
 	obj_data *obj, *next_obj;
 	int dotmode, found = 0;
+	vehicle_data *veh;
 
 	dotmode = find_all_dots(arg);
 
 	if (dotmode == FIND_INDIV) {
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			sprintf(buf, "You don't see %s %s here.\r\n", AN(arg), arg);
-			send_to_char(buf, ch);
+			// was it a vehicle, not an object?
+			if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+				act("$V: you can't get that.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
+			else {
+				msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+			}
 		}
 		else {
 			obj_data *obj_next;
-			while(obj && howmany--) {
+			while (obj && howmany--) {
 				obj_next = obj->next_content;
-				if (!perform_get_from_room(ch, obj))
+				if (!perform_get_from_room(ch, obj)) {
 					break;
+				}
 				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
@@ -2616,13 +2623,19 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = 1;
-				if (!perform_get_from_room(ch, obj))
+				if (!perform_get_from_room(ch, obj)) {
 					break;
+				}
 			}
 		}
 		if (!found) {
-			if (dotmode == FIND_ALL)
+			if (dotmode == FIND_ALL) {
 				send_to_char("There doesn't seem to be anything here.\r\n", ch);
+			}
+			else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+				// tried to get a vehicle
+				act("$V: you can't get that.", FALSE, ch, NULL, veh, TO_CHAR);
+			}
 			else {
 				sprintf(buf, "You don't see any %ss here.\r\n", arg);
 				send_to_char(buf, ch);
