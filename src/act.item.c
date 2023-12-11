@@ -2630,7 +2630,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 		}
 		if (!found) {
 			if (dotmode == FIND_ALL) {
-				send_to_char("There doesn't seem to be anything here.\r\n", ch);
+				msg_to_char(ch, "There doesn't seem to be anything here%s.\r\n", (ROOM_VEHICLES(IN_ROOM(ch)) ? " you can take" : ""));
 			}
 			else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 				// tried to get a vehicle
