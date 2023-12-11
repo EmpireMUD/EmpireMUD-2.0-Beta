@@ -1661,6 +1661,7 @@ ACMD(do_role) {
 	size_t sizes[NUM_ROLES+2];
 	int found, iter;
 	bool any;
+	struct string_hash *str_iter, *next_str, *str_hash[NUM_ROLES+2];
 	
 	one_argument(argument, arg);
 
@@ -1714,14 +1715,16 @@ ACMD(do_role) {
 		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
 			*roles[iter] = '\0';
 			sizes[iter] = 0;
+			str_hash[iter] = NULL;
 		}
 		
-		// check player's skills
+		// check player's skills to build role hashes
 		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
 			if (plsk->level < SKILL_MAX_LEVEL(plsk->ptr)) {
 				continue;	// skip ones not at max
 			}
 			
+			// build role hashes
 			LL_FOREACH(SKILL_SYNERGIES(plsk->ptr), syn) {
 				if (get_skill_level(ch, syn->skill) < syn->level) {
 					continue;	// too low
@@ -1729,12 +1732,21 @@ ACMD(do_role) {
 				
 				// ok found, let's append -- for roles, +1 is to account for -1 == all
 				sprintf(part, "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
-				
-				if (sizes[syn->role+1] + strlen(part) + 1 < MAX_STRING_LENGTH) {
-					strcat(roles[syn->role+1], part);
-					sizes[syn->role+1] += strlen(part);
+				add_string_hash(&str_hash[syn->role+1], part, 1);
+			}
+		}
+		
+		// now build strings from the hashes
+		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
+			HASH_ITER(hh, str_hash[iter], str_iter, next_str) {
+				if (sizes[syn->role+1] + strlen(str_iter->str) + 1 < MAX_STRING_LENGTH) {
+					strcat(roles[syn->role+1], str_iter->str);
+					sizes[syn->role+1] += strlen(str_iter->str);
 				}
 			}
+			
+			// free as we go
+			free_string_hash(&str_hash[iter]);
 		}
 		
 		// and show them
