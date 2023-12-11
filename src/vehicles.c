@@ -4442,7 +4442,7 @@ OLC_MODULE(vedit_capacity) {
 OLC_MODULE(vedit_custom) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	
-	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);
+	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types, NULL);
 }
 
 

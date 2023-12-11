@@ -6727,8 +6727,9 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 * @param char *argument Text typed by the player.
 * @param struct custom_message **list Pointer to the list of custom messages.
 * @param const char **type_names List of names of valid types.
+* @param const char *type_help_string Optional: A formatted view of available custom message types (pass NULL instead to generate an unformatted list).
 */
-void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names) {
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names, const char *type_help_string) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct custom_message *custm, *change;
@@ -6901,9 +6902,15 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
 		msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
-		msg_to_char(ch, "Available types:\r\n");
-		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %s\r\n", type_names[iter]);
+		if (type_help_string && *type_help_string) {
+			send_to_char(type_help_string, ch);
+		}
+		else {
+			// generate help string
+			msg_to_char(ch, "Available types:\r\n");
+			for (iter = 0; *type_names[iter] != '\n'; ++iter) {
+				msg_to_char(ch, " %s\r\n", type_names[iter]);
+			}
 		}
 	}
 }

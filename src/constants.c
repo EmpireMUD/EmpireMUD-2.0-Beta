@@ -248,7 +248,7 @@ const char *ability_target_flags[] = {
 };
 
 
-// ABIL_CUSTOM_x
+// ABIL_CUSTOM_x (1/2): custom types for abilities
 const char *ability_custom_types[] = {
 	"self-to-char",	// 0
 	"self-to-room",
@@ -268,12 +268,27 @@ const char *ability_custom_types[] = {
 	"pre-targ-to-char",	// 15
 	"pre-targ-to-vict",
 	"pre-targ-to-room",
-	"veh-to-char",
-	"veh-to-room",
+	"per-veh-to-char",
+	"per-veh-to-room",
 	"per-item-to-char",	// 20
 	"per-item-to-room",
 	"\n"
 };
+
+
+// ABIL_CUSTOM_x (2/2): how they're shown in olc
+const char *ability_custom_type_help =
+"Types of messages:\r\n"
+" Ability that targets yourself or no one: &wself-to-char&0 self-to-room\r\n"
+" Targets a character: &wtarg-to-char&0 targ-to-vict &wtarg-to-room&0\r\n"
+" Shown before activation, targeting self: &wpre-self-to-char&0 pre-self-to-room\r\n"
+" Shown before activation, targeting character: &wpre-targ-to-char&0 pre-targ-to-vict &wpre-targ-to-room&0\r\n"
+" Fails when targeting self or no one: &wfail-self-to-char&0 fail-self-to-room\r\n"
+" Fails targeting a character: &wfail-targ-to-char&0 fail-targ-to-vict &wfail-targ-to-room&0\r\n"
+" Is counterspelled: &wcounterspell-to-char&0 counterspell-to-vict &wcounterspell-to-room&0\r\n"
+" When each vehicle is conjured: &wper-veh-to-char&0 per-veh-to-room\r\n"
+" When each item is conjured: &wper-item-to-char&0 per-item-to-room\r\n";
+
 
 
 // ADL_x: for adding to ability_data_list

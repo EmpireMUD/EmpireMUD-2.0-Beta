@@ -192,7 +192,7 @@ bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum v
 // olc processors/parsers
 void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
-void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names, const char *type_help_string);
 double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
 bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);

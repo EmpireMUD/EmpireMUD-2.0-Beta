@@ -24,6 +24,7 @@ extern const char *ability_type_flags[];
 extern const char *ability_type_notes[];
 extern const char *ability_target_flags[];
 extern const char *ability_custom_types[];
+extern const char *ability_custom_type_help;
 extern const char *ability_data_types[];
 extern const char *ability_effects[];
 extern const char *ability_gain_hooks[];
