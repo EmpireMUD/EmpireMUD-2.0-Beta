@@ -2351,9 +2351,8 @@ void process_morphing(char_data *ch) {
 * @param char_data *ch The musician.
 */
 void process_music(char_data *ch) {
-	struct custom_message *mcm, *first_mcm, *found_mcm;
+	char *msg;
 	obj_data *obj;
-	int count;
 	
 	if (!(obj = GET_EQ(ch, WEAR_HOLD)) || GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT) {
 		msg_to_char(ch, "You need to hold an instrument to play music!\r\n");
@@ -2363,65 +2362,35 @@ void process_music(char_data *ch) {
 	
 	// instrument-to-char
 	if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_CHAR)) {
-		GET_ACTION_VNUM(ch, 0) += 1;
-		
-		first_mcm = found_mcm = NULL;
-		count = 0;
-		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), mcm) {
-			if (mcm->type != OBJ_CUSTOM_INSTRUMENT_TO_CHAR) {
-				continue;
-			}
-			
-			// catch the first matching one just in case
-			if (!first_mcm) {
-				first_mcm = mcm;
-			}
-			if (++count == GET_ACTION_VNUM(ch, 0)) {
-				found_mcm = mcm;
-				break;
-			}
+		// find next message
+		if ((msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, GET_ACTION_VNUM(ch, 0)))) {
+			GET_ACTION_VNUM(ch, 0) += 1;
 		}
-		if (!found_mcm) {
-			// pull first one
-			found_mcm = first_mcm;
+		else {
+			msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, 0);
 			GET_ACTION_VNUM(ch, 0) = 1;
 		}
 		
 		// did we find one?
-		if (found_mcm && found_mcm->msg) {
-			act(found_mcm->msg, FALSE, ch, obj, NULL, TO_CHAR | TO_SPAMMY);
+		if (msg) {
+			act(msg, FALSE, ch, obj, NULL, TO_CHAR | TO_SPAMMY);
 		}
 	}
 	
 	// instrument-to-room
 	if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
-		GET_ACTION_VNUM(ch, 1) += 1;
-		
-		first_mcm = found_mcm = NULL;
-		count = 0;
-		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), mcm) {
-			if (mcm->type != OBJ_CUSTOM_INSTRUMENT_TO_ROOM) {
-				continue;
-			}
-			
-			// catch the first matching one just in case
-			if (!first_mcm) {
-				first_mcm = mcm;
-			}
-			if (++count == GET_ACTION_VNUM(ch, 1)) {
-				found_mcm = mcm;
-				break;
-			}
+		// find next message
+		if ((msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, GET_ACTION_VNUM(ch, 1)))) {
+			GET_ACTION_VNUM(ch, 1) += 1;
 		}
-		if (!found_mcm) {
-			// pull first one
-			found_mcm = first_mcm;
+		else {
+			msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, 0);
 			GET_ACTION_VNUM(ch, 1) = 1;
 		}
 		
 		// did we find one?
-		if (found_mcm && found_mcm->msg) {
-			act(found_mcm->msg, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
+		if (msg) {
+			act(msg, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		}
 	}
 }

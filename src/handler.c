@@ -7611,6 +7611,27 @@ struct custom_message *copy_custom_messages(struct custom_message *from) {
 
 
 /**
+* Counts how many messages are available of a given type.
+*
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const to check for.
+* @return int How many messages of that type were in the list.
+*/
+int count_custom_messages(struct custom_message *list, int type) {
+	struct custom_message *ocm;
+	int count = 0;
+	
+	LL_FOREACH(list, ocm) {
+		if (ocm->type == type) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Frees a list of custom messages.
 *
 * @param struct custom_message *mes The list to free.
@@ -7655,6 +7676,32 @@ char *get_custom_message(struct custom_message *list, int type) {
 
 
 /**
+* This gets a specific custom message of a given type from a list. Unlike
+* get_custom_message(), this only returns the one in the exact position you
+* requested, not random. You can check its existence in advance with
+* has_custom_message_pos().
+*
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
+* @param int pos Which message to get, in order (0 is the first message).
+* @return char* The custom message, or NULL if there is none in that position.
+*/
+char *get_custom_message_pos(struct custom_message *list, int type, int pos) {
+	struct custom_message *ocm;
+	char *found = NULL;
+	
+	LL_FOREACH(list, ocm) {
+		if (ocm->type == type && pos-- <= 0) {
+			found = ocm->msg;
+			break;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
 * @param struct custom_message *list The list of messages to check.
 * @param int type The type const for the message.
 * @return bool TRUE if the object has at least one message of the requested type.
@@ -7665,6 +7712,30 @@ bool has_custom_message(struct custom_message *list, int type) {
 	
 	LL_FOREACH(list, ocm) {
 		if (ocm->type == type) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* This is similar to has_custom_message() but checks for a specific message
+* position, for things that send the messages in order such as play-instrument.
+*
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
+* @param int pos Must have at least pos+1 messages (0 is the first message).
+* @return bool TRUE if the object has at a message of the requested type and position number.
+*/
+bool has_custom_message_pos(struct custom_message *list, int type, int pos) {
+	struct custom_message *ocm;
+	bool found = FALSE;
+	
+	LL_FOREACH(list, ocm) {
+		if (ocm->type == type && pos-- <= 0) {
 			found = TRUE;
 			break;
 		}

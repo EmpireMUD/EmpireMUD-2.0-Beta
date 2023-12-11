@@ -301,9 +301,12 @@ obj_data *unequip_char_to_room(char_data *ch, int pos);
 
 // custom message handlers
 struct custom_message *copy_custom_messages(struct custom_message *from);
+int count_custom_messages(struct custom_message *list, int type);
 void free_custom_messages(struct custom_message *mes);
 char *get_custom_message(struct custom_message *list, int type);
+char *get_custom_message_pos(struct custom_message *list, int type, int pos);
 bool has_custom_message(struct custom_message *list, int type);
+bool has_custom_message_pos(struct custom_message *list, int type, int pos);
 
 // custom message helpers
 #define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
