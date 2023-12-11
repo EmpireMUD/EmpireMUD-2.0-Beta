@@ -2670,6 +2670,11 @@ if %target.vnum% == 16653
   %load% obj 16654 %actor% inv
   set sweat %actor.inventory%
   if %sweat% && %sweat.vnum% == %16654
+    if %target.level% > 0
+      %scale% %sweat% %target.level%
+    else
+      %scale% %sweat% 1
+    end
     nop %sweat.bind(%target%)%
   end
   %purge% %target%
