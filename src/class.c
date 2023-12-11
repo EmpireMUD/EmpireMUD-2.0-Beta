@@ -1731,7 +1731,7 @@ ACMD(do_role) {
 				}
 				
 				// ok found, let's append -- for roles, +1 is to account for -1 == all
-				sprintf(part, "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+				sprintf(part, "%s%s\t0", (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
 				add_string_hash(&str_hash[syn->role+1], part, 1);
 			}
 		}
@@ -1739,9 +1739,8 @@ ACMD(do_role) {
 		// now build strings from the hashes
 		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
 			HASH_ITER(hh, str_hash[iter], str_iter, next_str) {
-				if (sizes[syn->role+1] + strlen(str_iter->str) + 1 < MAX_STRING_LENGTH) {
-					strcat(roles[syn->role+1], str_iter->str);
-					sizes[syn->role+1] += strlen(str_iter->str);
+				if (sizes[iter] + strlen(str_iter->str) + 3 < MAX_STRING_LENGTH) {
+					sizes[iter] += snprintf(roles[iter] + sizes[iter], sizeof(roles[iter]) - sizes[iter], "%s%s", (*roles[iter] ? ", " : ""), str_iter->str);
 				}
 			}
 			
