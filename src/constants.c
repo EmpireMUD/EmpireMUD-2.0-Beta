@@ -279,15 +279,15 @@ const char *ability_custom_types[] = {
 // ABIL_CUSTOM_x (2/2): how they're shown in olc
 const char *ability_custom_type_help =
 "Types of messages:\r\n"
-" Ability that targets yourself or no one: &wself-to-char&0 self-to-room\r\n"
-" Targets a character: &wtarg-to-char&0 targ-to-vict &wtarg-to-room&0\r\n"
-" Shown before activation, targeting self: &wpre-self-to-char&0 pre-self-to-room\r\n"
-" Shown before activation, targeting character: &wpre-targ-to-char&0 pre-targ-to-vict &wpre-targ-to-room&0\r\n"
-" Fails when targeting self or no one: &wfail-self-to-char&0 fail-self-to-room\r\n"
-" Fails targeting a character: &wfail-targ-to-char&0 fail-targ-to-vict &wfail-targ-to-room&0\r\n"
-" Is counterspelled: &wcounterspell-to-char&0 counterspell-to-vict &wcounterspell-to-room&0\r\n"
-" When each vehicle is conjured: &wper-veh-to-char&0 per-veh-to-room\r\n"
-" When each item is conjured: &wper-item-to-char&0 per-item-to-room\r\n";
+"&w Ability that targets yourself or no one: self-to-char self-to-room&0\r\n"
+" Targets a character: targ-to-char targ-to-vict targ-to-room\r\n"
+"&w Shown before activation, targeting self: pre-self-to-char pre-self-to-room&0\r\n"
+" Shown before activation, targeting character: pre-targ-to-char pre-targ-to-vict pre-targ-to-room\r\n"
+"&w Fails when targeting self or no one: fail-self-to-char fail-self-to-room&0\r\n"
+" Fails targeting a character: fail-targ-to-char fail-targ-to-vict fail-targ-to-room\r\n"
+"&w Is counterspelled: counterspell-to-char counterspell-to-vict counterspell-to-room&0\r\n"
+" When each vehicle is conjured: per-veh-to-char per-veh-to-room\r\n"
+"&w When each item is conjured: per-item-to-char per-item-to-room&0\r\n";
 
 
 
