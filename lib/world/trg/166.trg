@@ -2669,7 +2669,7 @@ if %target.vnum% == 16653
   * sweater version: replace item
   %load% obj 16654 %actor% inv
   set sweat %actor.inventory%
-  if %sweat% && %sweat.vnum% == %16654
+  if %sweat% && %sweat.vnum% == 16654
     if %target.level% > 0
       %scale% %sweat% %target.level%
     else
