@@ -4009,6 +4009,7 @@ void clear_player(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
 	GET_SPEAKING(ch) = NOTHING;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 }
 
 

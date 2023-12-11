@@ -1538,6 +1538,7 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 void extract_char_final(char_data *ch) {
 	empire_data *rescan_emp = IS_NPC(ch) ? NULL : GET_LOYALTY(ch);
 	char_data *k;
+	char_data *chiter;
 	descriptor_data *t_desc;
 	obj_data *obj;
 	int i;
@@ -1606,7 +1607,14 @@ void extract_char_final(char_data *ch) {
 		GET_DRIVING(ch) = NULL;
 	}
 	
-	// npc-only frees	
+	// check I'm not being used by someone's action
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (GET_ACTION_CHAR_TARG(chiter) == ch) {
+			GET_ACTION_CHAR_TARG(chiter) = NULL;
+		}
+	}
+	
+	// npc-only frees
 	if (IS_NPC(ch)) {
 		// free up pursuit
 		if (MOB_PURSUIT(ch)) {
@@ -1708,6 +1716,8 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
+	char_data *chiter;
+	
 	// update iterators
 	if (ch == global_next_player) {
 		global_next_player = global_next_player->next_plr;
@@ -1731,6 +1741,13 @@ void extract_char(char_data *ch) {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
 		}
 		++char_extractions_pending;
+	}
+	
+	// check I'm not being used by someone's action
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (GET_ACTION_CHAR_TARG(chiter) == ch) {
+			GET_ACTION_CHAR_TARG(chiter) = NULL;
+		}
 	}
 	
 	// get rid of friends now (extracts them as well)
@@ -6318,6 +6335,7 @@ void empty_obj_before_extract(obj_data *obj) {
 * @param obj_data *obj The object to extract and free.
 */
 void extract_obj(obj_data *obj) {
+	char_data *chiter;
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
 	
 	// safety checks
@@ -6331,6 +6349,13 @@ void extract_obj(obj_data *obj) {
 	
 	// remove from anywhere
 	check_obj_in_void(obj);
+	
+	// check I'm not being used by someone's action
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (GET_ACTION_OBJ_TARG(chiter) == obj) {
+			GET_ACTION_OBJ_TARG(chiter) = NULL;
+		}
+	}
 
 	/* Get rid of the contents of the object, as well. */
 	while (obj->contains) {
@@ -10890,10 +10915,19 @@ int get_number(char **name) {
 * @param vehicle_data *veh The vehicle to extract.
 */
 void extract_vehicle(vehicle_data *veh) {
+	char_data *chiter;
+	
 	if (!VEH_IS_EXTRACTED(veh)) {
 		check_dg_owner_purged_vehicle(veh);
 		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
+	}
+
+	// check I'm not being used by someone's action
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (GET_ACTION_VEH_TARG(chiter) == veh) {
+			GET_ACTION_VEH_TARG(chiter) = NULL;
+		}
 	}
 }
 
@@ -10904,6 +10938,8 @@ void extract_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle_final(vehicle_data *veh) {
+	char_data *chiter;
+	
 	// safety
 	check_dg_owner_purged_vehicle(veh);
 	if (veh == global_next_vehicle) {
@@ -10911,6 +10947,13 @@ void extract_vehicle_final(vehicle_data *veh) {
 	}
 	if (veh == next_pending_vehicle) {
 		next_pending_vehicle = next_pending_vehicle->next;
+	}
+
+	// check I'm not being used by someone's action
+	DL_FOREACH2(player_character_list, chiter, next_plr) {
+		if (GET_ACTION_VEH_TARG(chiter) == veh) {
+			GET_ACTION_VEH_TARG(chiter) = NULL;
+		}
 	}
 	
 	// delete interior

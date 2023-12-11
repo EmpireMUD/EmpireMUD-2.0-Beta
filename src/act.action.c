@@ -74,6 +74,7 @@ void process_mining(char_data *ch);
 void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
 void process_music(char_data *ch);
+void perform_over_time_ability(char_data *ch);
 void process_panning(char_data *ch);
 void process_planting(char_data *ch);
 void process_prospecting(char_data *ch);
@@ -150,6 +151,7 @@ const struct action_data_struct action_data[] = {
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
 	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
+	{ "ability", "is doing something...", NOBITS, perform_over_time_ability, NULL },	// ACT_OVER_TIME_ABILITY
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -212,6 +214,16 @@ void cancel_action(char_data *ch) {
 		}
 		
 		GET_ACTION(ch) = ACT_NONE;
+		
+		// clear targets
+		GET_ACTION_CHAR_TARG(ch) = NULL;
+		GET_ACTION_OBJ_TARG(ch) = NULL;
+		GET_ACTION_ROOM_TARG(ch) = NOWHERE;
+		GET_ACTION_VEH_TARG(ch) = NULL;
+		
+		// clear resources
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
 	}
 }
 
@@ -236,6 +248,12 @@ void start_action(char_data *ch, int type, int timer) {
 	GET_ACTION_VNUM(ch, 1) = 0;
 	GET_ACTION_VNUM(ch, 2) = 0;
 	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	
+	// clear targets, in case
+	GET_ACTION_CHAR_TARG(ch) = NULL;
+	GET_ACTION_OBJ_TARG(ch) = NULL;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
+	GET_ACTION_VEH_TARG(ch) = NULL;
 	
 	// ensure no resources already stored
 	free_resource_list(GET_ACTION_RESOURCES(ch));

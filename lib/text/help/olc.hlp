@@ -902,6 +902,7 @@ The following ability flags are available:
  &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
  &cNOT-IN-COMBAT&0 - Ability cannot be used in combat even if min-position is low.
  &cONE-AT-A-TIME&0 - For some ability types, prevents use when already active.
+ &cOVER-TIME&0 - Like a ritual or chant; see ABILEDIT OVER-TIME
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -1061,6 +1062,33 @@ and via the 'stat' command. You can put any information you want in the notes.
 
 See also: OLC, STAT
 #d
+"ABILEDIT OVER-TIME" "ABILEDIT OVER TIME" "OVER TIME ABILITY" "OVER-TIME ABILITY"
+
+Using the OVER-TIME flag on an ability causes it to take multiple turns, like a
+chant or ritual. These abilities cannot be used in combat and require that the
+player be standing, regardless of your minimum position setting.
+
+Most types of abilities support this flag. You can set any command name you
+like, but if you set the command to "ritual" or "chant", it will add the
+ability to the player's ordinary ritual or chant command.
+
+The length of the over-time ability is determined by the number of to-char
+messages it has. It still uses the self-to-* and targ-to-* messages. Set as
+many of these messages as you like and they will be played in order. The first
+message is played when the ability starts and the last one is played as it
+ends. Any message that only contains an asterisk (*) will take an action turn,
+but won't show a message for that turn.
+
+For example, Ritual of Burdens would be set up with these messages:
+ 1. [self-to-char] You whisper your burdens into the air...
+ 2. [self-to-char] *
+ 3. [self-to-char] You feel the weight of the world lift from your shoulders!
+ 4. [self-to-room] $n whispers $s burdens into the air...
+ 5. [self-to-room] *
+ 6. [self-to-room] $n seems uplifted!
+
+See also: OLC ABILITIES, CHANT, RITUAL
+#
 "ABILEDIT PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITIES" "PASSIVE BUFF ABILITY"
 
 The PASSIVE-BUFF ability type means that the ability applies stats to the

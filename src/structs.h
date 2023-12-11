@@ -558,6 +558,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
 #define ABILF_NOT_IN_COMBAT  BIT(16)	// q. prevents use in combat despite min-position
 #define ABILF_ONE_AT_A_TIME  BIT(17)	// r. for some types, prevents them from being used while already active
+#define ABILF_OVER_TIME  BIT(18)	// s. takes multiple turns, like a chant or ritual
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -665,6 +666,7 @@ typedef struct vehicle_data vehicle_data;
 
 // RUN_ABIL_x: modes for activating abilities
 #define RUN_ABIL_NORMAL  0	// normal command activation
+#define RUN_ABIL_OVER_TIME  1	// an over-time ability running its final code
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2162,6 +2164,7 @@ typedef enum {
 #define ACT_HUNTING			41
 #define ACT_FORAGING		42
 #define ACT_DISMANTLE_VEHICLE  43
+#define ACT_OVER_TIME_ABILITY  44
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -4733,6 +4736,10 @@ struct player_special_data {
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
 	char *movement_string;	// for run/etc
+	char_data *action_targ_char;	// unsaved: action targets this char
+	obj_data *action_targ_obj;	// unsaved: action targets this object
+	vehicle_data *action_targ_veh;	// unsaved: action targets this vehicle
+	room_vnum action_targ_room;	// unsaved: action targets this room
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in

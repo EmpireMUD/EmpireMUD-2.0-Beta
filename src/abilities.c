@@ -106,13 +106,17 @@ struct {
 * @param char_data *vict The targeted player, if any (or NULL).
 * @param obj_data *ovict The targeted object, if any (or NULL).
 * @param ability_data *abil The ability.
+* @param int use_pos For over-time abilities, pass the current message pos. For all others, pass NOTHING instead.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
-void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
+void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, int use_pos, struct ability_exec *data) {
 	bool any, invis;
 	char buf[MAX_STRING_LENGTH];
 	
 	bitvector_t act_flags = TO_ABILITY;
+	
+	#define _AAM_HAS(type)  (use_pos == NOTHING ? has_custom_message(ABIL_CUSTOM_MSGS(abil), (type)) : has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), (type), use_pos))
+	#define _AAM_MSG(type)  (use_pos == NOTHING ? get_custom_message(ABIL_CUSTOM_MSGS(abil), (type)) : get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), (type), use_pos))
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -127,25 +131,29 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 		// non-violent buff
 		act_flags |= TO_BUFF;
 	}
+	if (use_pos > 0) {
+		// counts as action spam
+		act_flags |= TO_SPAMMY;
+	}
 	
 	if (vict) {	// messaging with char target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 			// to-char
 			any = TRUE;
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			if (_AAM_HAS(ABIL_CUSTOM_SELF_TO_CHAR)) {
+				act(_AAM_MSG(ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
 		
 			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, ovict, vict, TO_ROOM | act_flags);
+			if (_AAM_HAS(ABIL_CUSTOM_SELF_TO_ROOM)) {
+				act(_AAM_MSG(ABIL_CUSTOM_SELF_TO_ROOM), invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
@@ -154,30 +162,30 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 		else {	// message: ch != vict
 			// to-char
 			any = TRUE;
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			if (_AAM_HAS(ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+				act(_AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
 			}
 		
 			// to vict
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, ovict, vict, TO_VICT | act_flags);
+			if (_AAM_HAS(ABIL_CUSTOM_TARGETED_TO_VICT)) {
+				act(_AAM_MSG(ABIL_CUSTOM_TARGETED_TO_VICT), invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		
 			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+			if (_AAM_HAS(ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+				act(_AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
@@ -187,20 +195,20 @@ void ability_activation_message(char_data *ch, char_data *vict, obj_data *ovict,
 	else if (ovict) {	// messaging with obj target
 		// to-char
 		any = TRUE;
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		if (_AAM_HAS(ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+			act(_AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
 		}
 	
 		// to room
-		if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-			act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		if (_AAM_HAS(ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+			act(_AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM), invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
@@ -747,6 +755,42 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
 	free(data);
+}
+
+
+/**
+* Things that are checked early in perform_ability_command(), which may also
+* be checked repeatedly in perform_over_time_ability(). This function should
+* send a message if it fails, and ONLY if it fails.
+*
+* @param char_data *ch The person trying to do the ability.
+* @param ability_data *abil Which ability they are doing.
+* @return bool TRUE if ok, FALSE to cancel out.
+*/
+bool check_ability_pre_target(char_data *ch, ability_data *abil) {
+	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
+		// pre-validates JUST the ability -- individual types must validate cost/cooldown
+		// sent its own error message
+		return FALSE;
+	}
+	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
+		// sent its own error message
+		return FALSE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
+		send_to_char("No way! You're fighting for your life!\r\n", ch);
+		return FALSE;
+	}
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && ABIL_IS_VIOLENT(abil)) {
+		msg_to_char(ch, "You can't %s%s here.\r\n", ABIL_COMMAND(abil) ? "use " : "", SAFE_ABIL_COMMAND(abil));
+		return FALSE;
+	}
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
+		return FALSE;	// sun fail
+	}
+	
+	// ok!
+	return TRUE;
 }
 
 
@@ -1389,6 +1433,97 @@ void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, abilit
 
 
 /**
+* For abilities stored to the character as action data, attempts to find and
+* validate targets again.
+*
+* @param char_data *ch The player doing the ability.
+* @param ability_data *abil Which ability.
+* @param char_data **vict Will bind a character target here, if any. (Optional)
+* @param obj_data **ovict Will bind an object target here, if any. (Optional)
+* @param vehicle_data **vvict Will bind a vehicle target here, if any. (Optional)
+* @param room_data **targ_room Will bind a room target here, if any. (Optional)
+* @return bool TRUE if targets were ok, FALSE if they are invalid.
+*/
+bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vict, obj_data **ovict, vehicle_data **vvict, room_data **targ_room) {
+	bool any;
+	
+	// init these first
+	if (vict) {
+		*vict = NULL;
+	}
+	if (ovict) {
+		*ovict = NULL;
+	}
+	if (vvict) {
+		*vvict = NULL;
+	}
+	if (targ_room) {
+		*targ_room = NULL;
+	}
+	
+	// validate character first
+	if (!ch || IS_NPC(ch)) {
+		return FALSE;	// failure
+	}
+	
+	// pull existing data first
+	if (vict) {
+		*vict = GET_ACTION_CHAR_TARG(ch);
+	}
+	if (ovict) {
+		*ovict = GET_ACTION_OBJ_TARG(ch);
+	}
+	if (vvict) {
+		*vvict = GET_ACTION_VEH_TARG(ch);
+	}
+	if (targ_room) {
+		*targ_room = real_room(GET_ACTION_ROOM_TARG(ch));
+	}
+	
+	// ATAR_x: attempt to validate
+	if (abil) {
+		// char targets
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) && (!vict || !*vict)) {
+			return FALSE;	// no char
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) && IN_ROOM(*vict) != IN_ROOM(ch)) {
+			return FALSE;	// wrong room
+		}
+		
+		// obj targets
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV | ATAR_OBJ_EQUIP) && (!ovict || !*ovict)) {
+			return FALSE;	// no obj
+		}
+		
+		// obj location
+		any = (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD) ? TRUE : FALSE);
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV) && (*ovict)->carried_by == ch) {
+			any = TRUE;
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && (*ovict)->worn_by == ch) {
+			any = TRUE;
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM) && IN_ROOM(*ovict) == IN_ROOM(ch)) {
+			any = TRUE;
+		}
+		if (!any) {
+			return FALSE;	// bad location
+		}
+		
+		// vehicle targets
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM | ATAR_VEH_WORLD) && (!vvict || !*vvict)) {
+			return FALSE;	// no vehicle
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD) && IN_ROOM(*vvict) != IN_ROOM(ch)) {
+			return FALSE;	// wrong location
+		}
+	}
+	
+	return TRUE;	// if we got here it's fine
+}
+
+
+/**
 * Removes all the passive buffs on a character and re-applies them. This can be
 * called at startup, when the player gains an ability, or when a player gains
 * a level (changes effect scaling).
@@ -1709,6 +1844,94 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 
 
 /**
+* Begins an over-time ability and sends the first message. It will also charge
+* any costs. Everything else should be pre-validated here.
+*
+* @param char_data *ch The person doing the ability (must be a player, not NPC).
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The character target (NULL if none).
+* @param obj_data *ovict The object target (NULL if none).
+* @param vehicle_data *vvict The vehicle target (NULL if none).
+* @param room_data *room_targ The room target (NULL if none).
+* @param int level Pre-determined ability level.
+* @param struct ability_exec *data The execution data for the ability.
+*/
+void start_over_time_ability(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data) {
+	if (!ch || IS_NPC(ch) || !abil) {
+		return;	// nothing to see here
+	}
+	
+	ability_activation_message(ch, vict, ovict, abil, 0, data);
+	
+	// TODO: this could also be ACT_CHANT/ACT_RITUAL
+	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
+	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
+	GET_ACTION_VNUM(ch, 1) = level;
+	GET_ACTION_CHAR_TARG(ch) = vict;
+	GET_ACTION_OBJ_TARG(ch) = ovict;
+	GET_ACTION_VEH_TARG(ch) = vvict;
+	GET_ACTION_ROOM_TARG(ch) = room_targ ? GET_ROOM_VNUM(room_targ) : NOWHERE;
+}
+
+
+/**
+* Validates the targets of an ability when first used. Also re-validates on
+* over-time abilities. This sends a message if it fails.
+*
+* @param char_data *ch The person using the ability.
+* @paran ability_data *abil Which ability.
+* @param char_data *vict Optional: The character target (may be NULL if not used).
+* @return bool TRUE if ok, FALSE if failed.
+*/
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict) {
+	if (!ch || !abil) {
+		return FALSE;	// missing abil
+	}
+	
+	if ((vict == ch) && ABIL_IS_VIOLENT(abil)) {
+		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
+		return FALSE;
+	}
+	if ((vict == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+		msg_to_char(ch, "You cannot use that on yourself!\r\n");
+		return FALSE;
+	}
+	if (vict && (vict != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+		msg_to_char(ch, "You can only use that on yourself!\r\n");
+		return FALSE;
+	}
+	if (vict && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
+		// TODO should this only be for violent spells?
+		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
+		return FALSE;
+	}
+	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
+		if (!can_fight(ch, vict)) {
+			act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+			return FALSE;
+		}
+		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, vict)) {
+			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			return FALSE;
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, vict) && FIGHTING(ch)) {
+			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
+			return FALSE;
+		}
+	}
+	/* TODO: if group abilities are added
+	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
+		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
+		return;
+	}
+	*/
+	
+	// looks ok
+	return TRUE;
+}
+
+
+/**
 * Counts the words of text in an ability's strings.
 *
 * @param ability_data *abil The ability whose strings to count.
@@ -1840,14 +2063,19 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param obj_data *ovict The object target, if any (may be NULL).
 * @param vehicle_data *vvict The vehicle target, if any (may be NULL).
 * @param int level The level to use the ability at.
-* @param int casttype SPELL_CAST, etc.
+* @param int run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int casttype, struct ability_exec *data) {
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int run_mode, struct ability_exec *data) {
 	int iter;
 	
 	if (!ch || !abil) {
 		return;
+	}
+	
+	if (run_mode == RUN_ABIL_OVER_TIME) {
+		// ability is being called at the end of an over-time action (already charged)
+		data->should_charge_cost = FALSE;
 	}
 	
 	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
@@ -1874,7 +2102,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check costs and cooldowns now
-	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
+	if (run_mode == RUN_ABIL_NORMAL && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;
 		return;
@@ -1899,6 +2127,12 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch);
 	
+	// WAIT! Over-time abilities stop here
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
+		start_over_time_ability(ch, abil, vict, ovict, vvict, NULL, level, data);
+		return;
+	}
+	
 	// counterspell?
 	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict)) {
 		ability_counterspell_message(ch, vict, abil, data);
@@ -1917,7 +2151,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// main messaging
-	ability_activation_message(ch, vict, ovict, abil, data);
+	if (run_mode != RUN_ABIL_OVER_TIME) {
+		ability_activation_message(ch, vict, ovict, abil, NOTHING, data);
+	}
 	
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
@@ -2300,28 +2536,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	// 1. pre-targeting checks
-	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
-		// pre-validates JUST the ability -- individual types must validate cost/cooldown
+	if (!check_ability_pre_target(ch, abil)) {
 		// sent its own error message
 		return;
-	}
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
-		// sent its own error message
-		return;
-	}
-	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
-		send_to_char("No way! You're fighting for your life!\r\n", ch);
-		return;
-	}
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && ABIL_IS_VIOLENT(abil)) {
-		msg_to_char(ch, "You can't %s%s here.\r\n", ABIL_COMMAND(abil) ? "use " : "", SAFE_ABIL_COMMAND(abil));
-		return;
-	}
-	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
-		return;	// sun fail
 	}
 	
-	// 2. find the target
+	// 2. ATAR_x: find the target
 	skip_spaces(&argument);
 	if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
 		has = TRUE;
@@ -2421,45 +2641,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	if ((vict == ch) && ABIL_IS_VIOLENT(abil)) {
-		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
+	else if (!validate_ability_target(ch, abil, vict)) {
+		// sent own message
 		return;
 	}
-	if ((vict == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
-		msg_to_char(ch, "You cannot use that on yourself!\r\n");
-		return;
-	}
-	if (vict && (vict != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
-		msg_to_char(ch, "You can only use that on yourself!\r\n");
-		return;
-	}
-	if (vict && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
-		// TODO should this only be for violent spells?
-		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
-		return;
-	}
-	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
-		if (!can_fight(ch, vict)) {
-			act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
-			return;
-		}
-		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, vict)) {
-			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-			return;
-		}
-		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, vict) && FIGHTING(ch)) {
-			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
-			return;
-		}
-	}
-	/* TODO: if group abilities are added
-	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
-		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
-		return;
-	}
-	*/
-	
-	// end target validation
 	
 	// 4. determine correct level (sometimes limited by skill level)
 	level = get_approximate_level(ch);
@@ -2491,6 +2676,68 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	// 9. clean up data
+	LL_FOREACH_SAFE(data->types, aet, next_aet) {
+		free(aet);
+	}
+	GET_RUNNING_ABILITY_DATA(ch) = NULL;
+	free(data);
+}
+
+
+/**
+* This function is called by the action message each update tick, for a person
+* who is doing an over-time ability.
+*
+* @param char_data *ch The person doing the ability.
+*/
+void perform_over_time_ability(char_data *ch) {
+	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
+	ability_data *abil;
+	char_data *vict;
+	obj_data *ovict;
+	vehicle_data *vvict;
+	room_data *targ_room;
+	struct ability_exec *data;
+	struct ability_exec_type *aet, *next_aet;
+	
+	// re-validate ability
+	if (!(abil = ability_proto(abil_vnum)) || !has_ability(ch, abil_vnum) || !check_ability_pre_target(ch, abil)) {
+		// lost the ability or can't use it now -- this sometimes sent a message but doesn't need to if not
+		cancel_action(ch);
+		return;
+	}
+	
+	// re-validate target
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict)) {
+		cancel_action(ch);
+		return;
+	}
+	
+	// construct data
+	CREATE(data, struct ability_exec, 1);
+	data->abil = abil;
+	data->should_charge_cost = FALSE;	// already charged, generally
+	data->matching_role = has_matching_role(ch, abil, TRUE);
+	GET_RUNNING_ABILITY_DATA(ch) = data;
+	
+	// message position is controlled by action timer
+	GET_ACTION_TIMER(ch) += 1;
+	ability_activation_message(ch, vict, ovict, abil, GET_ACTION_TIMER(ch), data);
+	
+	// detect continuing?
+	if (vict && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+		// ongoing ability: do nothing
+	}
+	else if (!vict && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+		// ongoing ability: do nothing
+	}
+	else {
+		// done!
+		// TODO "" should be the original argument, right?
+		call_ability(ch, abil, "", vict, ovict, vvict, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+	}
+	
+	// clean up data
 	LL_FOREACH_SAFE(data->types, aet, next_aet) {
 		free(aet);
 	}

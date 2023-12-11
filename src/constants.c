@@ -132,6 +132,7 @@ const char *ability_flags[] = {
 	"LIMIT-CROWD-CONTROL",	// 15
 	"NOT-IN-COMBAT",
 	"ONE-AT-A-TIME",
+	"OVER-TIME",
 	"\n"
 };
 
@@ -156,6 +157,7 @@ const char *ability_flag_notes[] = {
 	"limited crowd control",
 	"",	// NOT-IN-COMBAT
 	"",	// ONE-AT-A-TIME
+	"long action",
 	"\n"
 };
 
