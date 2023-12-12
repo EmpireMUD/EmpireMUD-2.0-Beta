@@ -1374,13 +1374,22 @@ void run_mob_echoes(void) {
 			// ok now find a random message to show?
 			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
 				// MOB_CUSTOM_x: types we use here
-				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
+				if (mcm->type == MOB_CUSTOM_ECHO) {
 					// ok = true
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (sun == SUN_LIGHT || sun == SUN_RISE)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_DAY && (sun == SUN_LIGHT || sun == SUN_RISE)) {
 					// day ok
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (sun == SUN_DARK || sun == SUN_SET)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_NIGHT && (sun == SUN_DARK || sun == SUN_SET)) {
+					// night ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// ok = true
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_DAY && (sun == SUN_LIGHT || sun == SUN_RISE) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// day ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_NIGHT && (sun == SUN_DARK || sun == SUN_SET) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
 					// night ok
 				}
 				else {
