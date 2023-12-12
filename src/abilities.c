@@ -2086,6 +2086,55 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 }
 
 
+/**
+* Sends the toggle messages, if present, for toggling off certain abilities.
+* If no toggle-to-char message is set, the character sees "Okay".
+*
+* @param char_data *ch The player toggling the ability off.
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct ability_exec *data) {
+	bool invis;
+	char *msg;
+	bitvector_t act_flags = TO_ABILITY;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
+	
+	// to-char
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_TOGGLE_TO_CHAR))) {
+		if (*msg != '*') {
+			act(msg, FALSE, ch, NULL, NULL, TO_CHAR | act_flags);
+			if (data) {
+				data->sent_any_msg = TRUE;
+			}
+		}
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		if (data) {
+			data->sent_any_msg = TRUE;
+		}
+	}
+	
+	// to room ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_TOGGLE_TO_ROOM)) && *msg != '*') {
+		act(msg, invis, ch, NULL, NULL, TO_ROOM | act_flags);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITIES OVER TIME COMMANDS ////////////////////////////////////////////
 
@@ -2999,11 +3048,10 @@ PREP_ABIL(prep_buff_ability) {
 	
 	// toggle off?
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
-		send_config_msg(ch, "ok_string");
+		send_ability_toggle_messages(vict, abil, data);
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
-		data->sent_any_msg = TRUE;	// ok_string is still a message
 		data->success = TRUE;	// I think this is a success?
 		
 		command_lag(ch, ABIL_WAIT_TYPE(abil));
@@ -3238,11 +3286,10 @@ PREP_ABIL(prep_room_affect_ability) {
 	
 	// toggle off?
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
-		send_config_msg(ch, "ok_string");
+		send_ability_toggle_messages(ch, abil, data);
 		affect_from_room_by_caster(room_targ, affect_vnum, ch, TRUE);
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
-		data->sent_any_msg = TRUE;	// ok_string is still a message
 		data->success = TRUE;	// I think this is a success?
 		
 		command_lag(ch, ABIL_WAIT_TYPE(abil));

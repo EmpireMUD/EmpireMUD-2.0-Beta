@@ -822,6 +822,8 @@ Message types:
  &cper-item-to-char&0 - To actor on types like conjure-object, when conjured.
  &cper-item-to-room&0 - To room on types like conjure-object, when conjured.
  &cover-time-longdesc&0 - How the player appears during an OVER-TIME ability.
+ &ctoggle-to-char&0 - To actor when turning off a TOGGLE ability.
+ &ctoggle-to-room&0 - To room when turning off a TOGGLE ability.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -8535,6 +8537,21 @@ TIP: If your string is longer than 80 characters (normal telnet window width),
 use '/fi' to format it with indentation. This puts the whole thing into a
 single paragraph, indented 3 spaces, with each line no longer than 80
 characters.
+#
+"TOGGLE ABILITY"
+
+Abilities with the TOGGLE flag are ones the user can turn off at will,
+generally by typing the ability's command again. This only applies to BUFF and
+ROOM-AFFECT abilities.
+
+These abilities have two additional custom messages available.
+ &ctoggle-to-char&0 - Shown to the character. If missing, they see "Okay."
+ &ctoggle-to-room&0 - Shown to the room. Nothing is shown if this is missing.
+
+If the affect itself has a wearoff or wearoff2room message on its generic,
+those are shown after the toggle messages.
+
+See also: ABILEDIT CUSTOM MESSAGES, AFFECT GENERIC
 #
 "TRIGEDIT ARGUMENTS"
 
