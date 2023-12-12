@@ -5437,17 +5437,25 @@ double olc_process_double(char_data *ch, char *argument, char *name, char *comma
 */
 bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
-	bool add = FALSE, remove = FALSE, toggle = FALSE, alldigit, found;
+	bool add = FALSE, remove = FALSE, toggle = FALSE, alldigit, found, one_per_line;
 	bitvector_t bit;
 	int iter;
 	
 	if (!*argument) {
+		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
+		for (iter = 0; *flag_names[iter] != '\n' && !one_per_line; ++iter) {
+			if (strlen(flag_names[iter]) + 10 > 30) {
+				// too long
+				one_per_line = TRUE;
+			}
+		}
+		
 		*buf = '\0';
 		for (iter = 0; *flag_names[iter] != '\n'; ++iter) {
 			sprintf(line, "%s%s", flag_names[iter], (IS_SET(existing_bits, BIT(iter)) ? " (on)" : ""));
-			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2) ? "\r\n" : ""));
+			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, (((iter % 2) || one_per_line) ? "\r\n" : ""));
 		}
-		if ((iter % 2) != 0) {
+		if (!one_per_line && (iter % 2) != 0) {
 			strcat(buf, "\r\n");
 		}
 		
@@ -6523,15 +6531,23 @@ void olc_process_string(char_data *ch, char *argument, const char *name, char **
 int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value) {
 	char buf[MAX_STRING_LENGTH], line[256];
 	int type, iter;
-	bool alldigit, found;
+	bool alldigit, found, one_per_line;
 	
 	if (!*argument) {
+		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
+		for (iter = 0; *type_names[iter] != '\n' && !one_per_line; ++iter) {
+			if (strlen(type_names[iter]) + 10 > 30) {
+				// too long
+				one_per_line = TRUE;
+			}
+		}
+		
 		*buf = '\0';
 		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
 			sprintf(line, "%s%s", type_names[iter], ((old_value == iter) ? " (current)" : ""));
-			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
+			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, (((iter % 2) || one_per_line) ? "\r\n" : ""));
 		}
-		if ((iter % 2) != 0) {
+		if (!one_per_line && (iter % 2) != 0) {
 			strcat(buf, "\r\n");
 		}
 		
