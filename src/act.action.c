@@ -846,6 +846,7 @@ void start_panning(char_data *ch, int dir) {
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION FINISHERS ////////////////////////////////////////////////////////
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_chopping) {
 	char buf[MAX_STRING_LENGTH], *cust;
 	obj_data *obj = NULL;
@@ -889,6 +890,7 @@ INTERACTION_FUNC(finish_chopping) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_digging) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *obj = NULL;
@@ -944,6 +946,7 @@ INTERACTION_FUNC(finish_digging) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_fishing) {
 	char buf[MAX_STRING_LENGTH];
 	char *to_char = NULL, *to_room = NULL;
@@ -997,6 +1000,7 @@ INTERACTION_FUNC(finish_fishing) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_foraging) {
 	obj_data *obj = NULL;
 	obj_vnum vnum = interaction->vnum;
@@ -1045,6 +1049,7 @@ INTERACTION_FUNC(finish_foraging) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_gathering) {
 	obj_data *obj = NULL;
 	char *cust;
@@ -1094,6 +1099,7 @@ INTERACTION_FUNC(finish_gathering) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_harvesting) {
 	crop_data *cp;
 	int count, num, obj_ok = 0;
@@ -1147,6 +1153,7 @@ INTERACTION_FUNC(finish_harvesting) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_mining) {
 	bool any = FALSE;
 	obj_data *obj = NULL;
@@ -1186,6 +1193,7 @@ INTERACTION_FUNC(finish_mining) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_panning) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
@@ -1227,6 +1235,7 @@ INTERACTION_FUNC(finish_panning) {
 
 
 // also used for sawing, tanning, chipping
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
 	char buf[MAX_STRING_LENGTH];
@@ -4036,6 +4045,7 @@ bool validate_gen_interact_room(char_data *ch, const struct gen_interact_data_t 
 
 
 // note: still need GET_ACTION in here
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(finish_gen_interact_room) {
 	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
 	char buf[MAX_STRING_LENGTH];

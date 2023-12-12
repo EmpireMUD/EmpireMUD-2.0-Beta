@@ -867,6 +867,7 @@ static void print_group(char_data *ch) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
 	int iter, amt, obj_ok = 0;
@@ -918,6 +919,7 @@ INTERACTION_FUNC(shear_interact) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;

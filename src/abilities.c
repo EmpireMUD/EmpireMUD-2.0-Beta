@@ -31,6 +31,7 @@
 * Contents:
 *   Helpers
 *   Ability Effects and Limits
+*   Ability Interaction Funcs
 *   Ability Messaging
 *   Abilities Over Time
 *   Ability Commands
@@ -50,6 +51,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
+void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data);
+void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data);
 
 
 // ability function prototypes
@@ -1649,6 +1652,117 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ABILITY INTERACTION FUNCS ///////////////////////////////////////////////
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_liquid_interaction) {
+	int amount;
+	
+	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
+		return FALSE;
+	}
+	
+	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
+	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
+	
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_object_interaction) {
+	int level, num, obj_ok = 0;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	obj_data *obj = NULL;
+	
+	level = get_ability_level(ch, ABIL_VNUM(abil));
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, level);
+		
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
+		
+		obj_ok = load_otrigger(obj);
+		if (obj_ok && obj->carried_by == ch) {
+			get_otrigger(obj, ch, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	// messaging?
+	if (obj_ok && obj) {
+		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data);
+	}
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_vehicle_interaction) {
+	bool junk;
+	int level, num;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	vehicle_data *veh = NULL;
+	
+	level = get_ability_level(ch, ABIL_VNUM(abil));
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		veh = read_vehicle(interaction->vnum, TRUE);
+		scale_vehicle_to_level(veh, level);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		
+		// this is borrowed from act.trade.c
+		if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+			if (VEH_CLAIMS_WITH_ROOM(veh)) {
+				// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
+				if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
+					empire_data *emp = get_or_create_empire(ch);
+					if (emp) {
+						int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
+						if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+							claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
+						}
+					}
+				}
+			
+				// and set the owner to the room owner
+				perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			}
+			else {
+				perform_claim_vehicle(veh, GET_LOYALTY(ch));
+			}
+		}
+		
+		special_vehicle_setup(ch, veh);
+		load_vtrigger(veh);
+	}
+	
+	// messaging?
+	if (veh) {
+		ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data);
+	}
+	
+	return TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ABILITY MESSAGING ///////////////////////////////////////////////////////
 
 /**
@@ -2850,23 +2964,6 @@ DO_ABIL(do_buff_ability) {
 }
 
 
-INTERACTION_FUNC(conjure_liquid_interaction) {
-	int amount;
-	
-	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
-		return FALSE;
-	}
-	
-	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
-	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
-	
-	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
-	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
-	
-	return TRUE;
-}
-
-
 /**
 * Handler for conjure-liquid abilities.
 *
@@ -2882,45 +2979,6 @@ DO_ABIL(do_conjure_liquid_ability) {
 }
 
 
-INTERACTION_FUNC(conjure_object_interaction) {
-	int level, num, obj_ok = 0;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	obj_data *obj = NULL;
-	
-	level = get_ability_level(ch, ABIL_VNUM(abil));
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, level);
-		
-		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-			obj_to_char(obj, ch);
-		}
-		else {
-			obj_to_room(obj, IN_ROOM(ch));
-		}
-		
-		obj_ok = load_otrigger(obj);
-		if (obj_ok && obj->carried_by == ch) {
-			get_otrigger(obj, ch, FALSE);
-		}
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	// messaging?
-	if (obj_ok && obj) {
-		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data);
-	}
-	
-	return TRUE;
-}
-
-
 /**
 * Handler for conjure-object abilities.
 *
@@ -2928,55 +2986,6 @@ INTERACTION_FUNC(conjure_object_interaction) {
 */
 DO_ABIL(do_conjure_object_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
-}
-
-
-INTERACTION_FUNC(conjure_vehicle_interaction) {
-	bool junk;
-	int level, num;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	vehicle_data *veh = NULL;
-	
-	level = get_ability_level(ch, ABIL_VNUM(abil));
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		veh = read_vehicle(interaction->vnum, TRUE);
-		scale_vehicle_to_level(veh, level);
-		vehicle_to_room(veh, IN_ROOM(ch));
-		
-		// this is borrowed from act.trade.c
-		if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
-			if (VEH_CLAIMS_WITH_ROOM(veh)) {
-				// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
-				if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
-					empire_data *emp = get_or_create_empire(ch);
-					if (emp) {
-						int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
-						if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
-							claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
-						}
-					}
-				}
-			
-				// and set the owner to the room owner
-				perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
-			}
-			else {
-				perform_claim_vehicle(veh, GET_LOYALTY(ch));
-			}
-		}
-		
-		special_vehicle_setup(ch, veh);
-		load_vtrigger(veh);
-	}
-	
-	// messaging?
-	if (veh) {
-		ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data);
-	}
-	
-	return TRUE;
 }
 
 

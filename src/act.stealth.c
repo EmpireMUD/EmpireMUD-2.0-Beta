@@ -183,6 +183,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(pickpocket_interact) {
 	int iter;
 	obj_data *obj = NULL;

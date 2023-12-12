@@ -305,6 +305,8 @@ void check_should_dismount(char_data *ch) {
 
 /**
 * Interaction func for "decays-to" and "consumes-to".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
 	obj_data *new_obj;

@@ -92,6 +92,8 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 /**
 * Interaction func for "combine". This almost always extracts the original
 * item, so it should basically always return TRUE.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(combine_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -479,6 +481,8 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 
 /**
 * Interaction func for "identify".
+* 
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(identifies_to_interact) {
 	char to_char[MAX_STRING_LENGTH];
@@ -1138,6 +1142,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(light_obj_interact) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *new = NULL;
@@ -1489,6 +1494,8 @@ void remove_honed_gear(char_data *ch) {
 
 /**
 * Interaction func for "seed".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(seed_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -1539,6 +1546,8 @@ INTERACTION_FUNC(seed_obj_interact) {
 
 /**
 * Interaction func for "separate".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];

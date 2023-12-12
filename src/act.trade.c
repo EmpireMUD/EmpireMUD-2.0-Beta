@@ -984,6 +984,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 
 
 // for do_tame
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(tame_interact) {
 	char buf[MAX_STRING_LENGTH];
 	char_data *newmob;

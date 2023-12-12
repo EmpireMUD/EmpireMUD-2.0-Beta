@@ -300,6 +300,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 
 
 // for devastation_ritual
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(devastate_crop) {	
 	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
@@ -327,6 +328,7 @@ INTERACTION_FUNC(devastate_crop) {
 
 
 // for devastation_ritual
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(devastate_trees) {
 	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
 	obj_data *newobj;

@@ -187,6 +187,7 @@ int mob_coins(char_data *mob) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(run_one_encounter) {
 	char_data *aggr;
 	int iter;

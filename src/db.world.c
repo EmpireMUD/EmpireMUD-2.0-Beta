@@ -3504,6 +3504,8 @@ void init_room(room_data *room, room_vnum vnum) {
 * Interaction function for building-ruins-to-building. This replaces the
 * building, ignoring interaction quantity, and transfers built-with resources
 * and contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;
@@ -3598,6 +3600,8 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 * Interaction function for building-ruins-to-vehicle. This loads a new vehicle,
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;

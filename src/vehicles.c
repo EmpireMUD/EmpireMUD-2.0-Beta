@@ -829,6 +829,8 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 * Interaction function for vehicle-ruins-to-vehicle. This loads a new vehicle,
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);

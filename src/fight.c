@@ -1464,6 +1464,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 
 
 // this drops the loot to the inventory of the 'ch' who is interacting -- so run it on the mob itself, usually
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(loot_interact) {
 	obj_data *obj;
 	int iter, scale_level = 0;

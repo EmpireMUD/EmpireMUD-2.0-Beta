@@ -39,6 +39,7 @@ ACMD(do_dismount);
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
 	int num, obj_ok = 0;
