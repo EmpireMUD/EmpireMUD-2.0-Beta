@@ -11044,6 +11044,7 @@ ACMD(do_slay) {
 			// this would prevent the death
 			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {
 				affect_from_char_by_bitvector(vict, NOTHING, AFF_AUTO_RESURRECT, FALSE);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_AUTO_RESURRECT);
 			}
 
 			die(vict, ch);
