@@ -262,7 +262,7 @@ const char *ability_target_flags[] = {
 	"OBJ-EQUIP",
 	"VEH-ROOM",
 	"VEH-WORLD",
-	"ROOM",
+	"ROOM-HERE",
 	"\n"
 };
 
