@@ -7767,17 +7767,19 @@ void do_stat_room(char_data *ch) {
 				}
 			}
 
-			sprintf(buf, "Affect: (%s) &c%s&0 ", buf3, get_generic_name_by_vnum(aff->type));
+			sprintf(buf, "Affect: (%s) &c%s&0", buf3, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
-				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
+				sprintf(buf2, " %+d to %s", aff->modifier, apply_types[(int) aff->location]);
 				strcat(buf, buf2);
 			}
 			if (aff->bitvector) {
-				if (*buf2)
+				if (*buf2) {
 					strcat(buf, ", sets ");
-				else
-					strcat(buf, "sets ");
+				}
+				else {
+					strcat(buf, " sets ");
+				}
 				sprintbit(aff->bitvector, room_aff_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
