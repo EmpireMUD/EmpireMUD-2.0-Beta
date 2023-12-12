@@ -538,8 +538,8 @@ Usage:  .data add action <type>
 These are things that happen when the ability is successful.
 
 Action types:
- &cdetect hide&0 - Will show hidden characters. Requires a room target.
- &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target.
+ &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends per-char messages for each hidden character.
+ &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target. Sends per-char messages for each hidden character.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
@@ -837,6 +837,9 @@ Message types:
  &cover-time-longdesc&0 - How the player appears during an OVER-TIME ability.
  &ctoggle-to-char&0 - To actor when turning off a TOGGLE ability.
  &ctoggle-to-room&0 - To room when turning off a TOGGLE ability.
+ &cper-char-to-char&0 - To actor when some abilities hit multiple characters.
+ &cper-char-to-vict&0 - To target when some abilities hit multiple characters.
+ &cper-char-to-room&0 - To actor when some abilities hit multiple characters.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d

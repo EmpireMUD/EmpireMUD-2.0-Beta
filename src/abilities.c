@@ -1946,6 +1946,68 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 
 
 /**
+* Sends the message for using an ability with a per-char message set. These
+* messages have no default and will be omitted if the ability doesn't have
+* them.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The victim, if any (or NULL; but won't show messages if NULL).
+* @param int quantity How many (for the x2 display when > 1).
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data) {
+	bool invis;
+	char buf[256], multi[24];
+	char *msg;
+	bitvector_t act_flags = TO_ABILITY;
+	
+	if (!ch || !abil || !vict) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
+	
+	if (quantity > 1) {
+		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+	}
+	else {
+		*multi = '\0';
+	}
+	
+	// to-char ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) && *msg != '*') {
+		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+	
+		// mark this now
+		if (data) {
+			data->sent_any_msg = TRUE;
+		}
+	}
+	
+	// to vict ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
+		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		act(buf, invis, ch, NULL, vict, TO_VICT | act_flags);
+	}
+	
+	// to room ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
+		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		act(buf, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+	}
+}
+
+
+/**
 * Sends the message for using an ability with a per-item message set. These
 * messages have no default and will be omitted if the ability doesn't have
 * them.
@@ -2577,10 +2639,9 @@ DO_ABIL(do_action_ability) {
 							SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 							if (CAN_SEE(ch, targ)) {
-								act("You sense $N hiding here!", FALSE, ch, NULL, targ, TO_CHAR);
+								send_ability_per_char_messages(ch, targ, 1, abil, data);
 								REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
 								affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
-								msg_to_char(targ, "You are discovered!\r\n");
 								data->success = TRUE;
 							}
 							
@@ -2603,7 +2664,7 @@ DO_ABIL(do_action_ability) {
 						
 						if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
 							if (CAN_SEE(ch, targ)) {
-								act("You sense $N here!", FALSE, ch, NULL, targ, TO_CHAR);
+								send_ability_per_char_messages(ch, targ, 1, abil, data);
 								data->success = TRUE;
 							}
 						}

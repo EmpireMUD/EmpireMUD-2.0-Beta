@@ -294,6 +294,9 @@ const char *ability_custom_types[] = {
 	"over-time-longdesc",
 	"toggle-to-char",
 	"toggle-to-room",
+	"per-char-to-char",	// 25
+	"per-char-to-vict",
+	"per-char-to-room",
 	"\n"
 };
 
@@ -310,8 +313,9 @@ const char *ability_custom_type_help =
 "&w Is counterspelled: counterspell-to-char counterspell-to-vict counterspell-to-room&0\r\n"
 " When each vehicle is conjured: per-veh-to-char per-veh-to-room\r\n"
 "&w When each item is conjured: per-item-to-char per-item-to-room&0\r\n"
-" When turning off a 'toggle' ability: toggle-to-char toggle-to-room\r\n"
-"&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n";
+" For each target/creature for some abilities: per-char-to-char per-char-to-vict per-char-to-room\r\n"
+"&w When turning off a 'toggle' ability: toggle-to-char toggle-to-room&0\r\n"
+" Long description when performing an over-tiem ability: over-time-longdesc\r\n";
 
 
 
