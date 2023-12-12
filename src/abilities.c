@@ -3311,9 +3311,11 @@ PREP_ABIL(prep_room_affect_ability) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_ability(ability_data *abil, char_data *ch) {
-	ability_data *iter, *next_iter;
+	ability_data *abiter, *next_abiter;
 	struct interaction_item *interact;
+	bitvector_t bits;
 	bool problem = FALSE;
+	int iter;
 	
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil) || !str_cmp(ABIL_NAME(abil), default_ability_name)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No name set");
@@ -3334,10 +3336,20 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
 	
 	// other abils
-	HASH_ITER(hh, ability_table, iter, next_iter) {
-		if (iter != abil && ABIL_VNUM(iter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(iter), ABIL_NAME(abil))) {
-			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(iter));
+	HASH_ITER(hh, ability_table, abiter, next_abiter) {
+		if (abiter != abil && ABIL_VNUM(abiter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(abiter), ABIL_NAME(abil))) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(abiter));
 			problem = TRUE;
+		}
+	}
+	
+	// buffs and passives
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		for (bits = ABIL_AFFECTS(abil), iter = 0; bits; bits >>= 1, ++iter) {
+			if (*affected_bits[iter] == '\n' && bits != NOBITS) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Invalid affect flags are set");
+				problem = TRUE;
+			}
 		}
 	}
 	
@@ -3402,6 +3414,25 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs");
 			problem = TRUE;
+		}
+	}
+	
+	// room affect
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Incompatible types: ROOM-AFFECT with a BUFF type");
+			problem = TRUE;
+		}
+		if (!ABIL_AFFECTS(abil)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No room affect flags set");
+			problem = TRUE;
+		}
+		
+		for (bits = ABIL_AFFECTS(abil), iter = 0; bits; bits >>= 1, ++iter) {
+			if (*room_aff_bits[iter] == '\n' && bits != NOBITS) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Invalid room affects are set");
+				problem = TRUE;
+			}
 		}
 	}
 	
