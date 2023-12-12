@@ -1412,6 +1412,7 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
 	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
 	GET_ACTION_VNUM(ch, 1) = level;
+	GET_ACTION_VNUM(ch, 2) = data->cost;
 	GET_ACTION_CHAR_TARG(ch) = vict;
 	GET_ACTION_OBJ_TARG(ch) = ovict;
 	GET_ACTION_VEH_TARG(ch) = vvict;
@@ -2030,6 +2031,33 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 					perform_dismount(ch);
 				}
 				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Cancels an over-time ability and attempts to refund any costs.
+*
+* @param char_data *ch The player.
+*/
+void cancel_over_time_ability(char_data *ch) {
+	ability_data *abil;
+	struct cooldown_data *cool, *next_cool;
+	
+	if ((abil = ability_proto(GET_ACTION_VNUM(ch, 0)))) {
+		// refund
+		if (GET_ACTION_VNUM(ch, 2) > 0) {
+			set_current_pool(ch, ABIL_COST_TYPE(abil), GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) + GET_ACTION_VNUM(ch, 2));
+		}
+		
+		// cooldown
+		if (ABIL_COOLDOWN(abil) != NOTHING) {
+			LL_FOREACH_SAFE(ch->cooldowns, cool, next_cool) {
+				if (cool->type == ABIL_COOLDOWN(abil)) {
+					remove_cooldown(ch, cool);
+				}
 			}
 		}
 	}

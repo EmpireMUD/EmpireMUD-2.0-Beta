@@ -44,6 +44,7 @@ void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
+void cancel_over_time_ability(char_data *ch);
 void cancel_siring(char_data *ch);
 
 // process protos
@@ -150,7 +151,7 @@ const struct action_data_struct action_data[] = {
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
 	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
-	{ "ability", "is doing something...", NOBITS, perform_over_time_ability, NULL },	// ACT_OVER_TIME_ABILITY
+	{ "ability", "is doing something...", NOBITS, perform_over_time_ability, cancel_over_time_ability },	// ACT_OVER_TIME_ABILITY
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };

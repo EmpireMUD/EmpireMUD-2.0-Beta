@@ -520,6 +520,11 @@ void perform_alternate(char_data *old, char_data *new) {
 		act("$n has left the game.", TRUE, old, NULL, NULL, TO_ROOM);
 	}
 	
+	if (GET_ACTION(old) == ACT_OVER_TIME_ABILITY) {
+		// not quit-safe
+		cancel_action(old);
+	}
+	
 	// save old char...
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	SAVE_CHAR(old);
@@ -3713,6 +3718,11 @@ ACMD(do_quit) {
 			if (d != ch->desc && d->character && (GET_IDNUM(d->character) == GET_IDNUM(ch))) {
 				STATE(d) = CON_DISCONNECT;
 			}
+		}
+		
+		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+			// not quit-safe
+			cancel_action(ch);
 		}
 		
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);

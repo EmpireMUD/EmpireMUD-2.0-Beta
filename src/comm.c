@@ -661,6 +661,11 @@ void perform_reboot(void) {
 			}
 		}
 		
+		if (GET_ACTION(desc->character) == ACT_OVER_TIME_ABILITY) {
+			// these are not reboot-safe
+			cancel_action(desc->character);
+		}
+		
 		// send output
 		write_to_descriptor(desc->descriptor, buf);
 		if (reboot_control.type == SCMD_REBOOT) {
