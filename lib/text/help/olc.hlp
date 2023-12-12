@@ -982,6 +982,7 @@ This tells the ability when to trigger skill gain:
  &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
  &cONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
  &cNOT-WHILE-ASLEEP&0 - Will not trigger skill gain while sleeping.
+ &cDYING&0 - Called when the player dies, before auto-resurrect.
 
 See also: OLC ABILITIES
 #d

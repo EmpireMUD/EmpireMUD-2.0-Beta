@@ -1299,6 +1299,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 		dot_remove(ch, ch->over_time_effects);
 	}
 	
+	// gain exp BEFORE auto-res
+	run_ability_gain_hooks(ch, killer, AGH_DYING);
+	
 	// somebody saaaaaaave meeeeeeeee
 	if (AFF_FLAGGED(ch, AFF_AUTO_RESURRECT)) {
 		affect_from_char_by_bitvector(ch, NOTHING, AFF_AUTO_RESURRECT, FALSE);
