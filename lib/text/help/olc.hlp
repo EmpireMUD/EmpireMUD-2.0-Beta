@@ -1265,6 +1265,14 @@ See HELP OLC RESOURCES for more information.
 
 See also: OLC CRAFTS, RESOURCE ACTIONS
 #d
+"ABILEDIT ROOM AFFECT ABILITY" "ABILEDIT ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITY" "ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITIES" "ROOM-AFFECT ABILITIES"
+
+The ROOM-AFFECT ability type means that the ability will place an effect on the
+room. This type of ability cannot be combined with buff or passive-buff
+abilities. It always targets the room -- you must set the &gROOM&0 target flag.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
+#d
 "ABILEDIT SCALE"
 
 Usage:  .scale <percent>
@@ -1345,6 +1353,7 @@ modify each other. They are:
  &cOBJ-EQUIP&0 - Targets an object you're wearing.
  &cVEH-ROOM&0 - Targets a vehicle in the room.
  &cVEH-WORLD&0 - Targets a vehicle anywhere.
+ &cROOM&0 - Targets the room.
 
 See also: OLC ABILITIES
 #d
@@ -1378,10 +1387,10 @@ The following types are available (each has its own help file):
  &cCONJURE-OBJECT&0 - Creates one or more items.
  &cCONJURE-LIQUID&0 - Creates liquid in a drink container.
  &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
+ &cROOM-AFFECT&0 - Similar to a buff, for the room.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
-   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
-   READY-WEAPONS ABILITY, COMPANION ABILITY, SUMMON ABILITY
+   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE" "WAIT TYPES"
 
@@ -2321,7 +2330,7 @@ INHERIT-BASE-CLIMATE flag.
 
 See also: SECTOR, STAT
 #d
-"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
+"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS" "ROOM AFFECTS" "ROOM AFFECT FLAGS"
 
 Usage:  .affects [add | remove] <flags>
 

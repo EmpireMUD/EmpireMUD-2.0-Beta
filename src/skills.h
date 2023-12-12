@@ -43,8 +43,8 @@
 #define CHECK_MAJESTY(ch)  (AFF_FLAGGED((ch), AFF_MAJESTY) && number(0, GET_CHARISMA(ch)))
 
 // ability utils
-#define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, struct ability_exec *data)
-#define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, struct ability_exec *data)
+#define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, room_data *room_targ, struct ability_exec *data)
+#define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, room_data *room_targ, struct ability_exec *data)
 
 
 // class.c prototypes

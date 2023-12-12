@@ -180,6 +180,7 @@ const char *ability_type_flags[] = {
 	"CONJURE-OBJECT",
 	"CONJURE-LIQUID",
 	"CONJURE-VEHICLE",	// 15
+	"ROOM-AFFECT",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -214,6 +215,7 @@ const char *ability_type_notes[] = {
 	"conjure",	// actually conjure object
 	"conjure liquid",
 	"conjure",	// 15, actually conjure vehicle (shown to players as conjure as it can conjure furniture and buildings too)
+	"room affect",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -246,6 +248,7 @@ const char *ability_target_flags[] = {
 	"OBJ-EQUIP",
 	"VEH-ROOM",
 	"VEH-WORLD",
+	"ROOM",
 	"\n"
 };
 

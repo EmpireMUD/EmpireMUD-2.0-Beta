@@ -579,6 +579,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_CONJURE_OBJECT  BIT(13)	// creates 1 or more items
 #define ABILT_CONJURE_LIQUID  BIT(14)	// puts liquid in a drink container
 #define ABILT_CONJURE_VEHICLE  BIT(15)	// creates a vehicle in the room
+#define ABILT_ROOM_AFFECT  BIT(16)	// puts an affect on a room
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -607,6 +608,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
 #define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
 #define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
+#define ATAR_ROOM  BIT(14)	// targets the room
 
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)

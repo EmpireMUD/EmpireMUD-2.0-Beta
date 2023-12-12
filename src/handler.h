@@ -72,6 +72,7 @@ void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster,
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, any_vnum type);
 void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_room_by_caster(room_data *room, any_vnum type, char_data *caster, bool show_msg);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
@@ -89,6 +90,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 void free_freeable_dots();
 bool room_affected_by_spell(room_data *room, any_vnum type);
+bool room_affected_by_spell_from_caster(room_data *room, any_vnum type, char_data *caster);
 void schedule_affect_expire(char_data *ch, struct affected_type *af);
 void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot);
 void show_wear_off_msg(char_data *ch, int atype);

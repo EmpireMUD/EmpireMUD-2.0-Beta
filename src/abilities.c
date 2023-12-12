@@ -46,7 +46,7 @@ const char *default_ability_name = "Unnamed Ability";
 const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 
 // local protos
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int run_mode, struct ability_exec *data);
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
@@ -70,6 +70,9 @@ PREP_ABIL(prep_damage_ability);
 
 DO_ABIL(do_dot_ability);
 PREP_ABIL(prep_dot_ability);
+
+DO_ABIL(do_room_affect_ability);
+PREP_ABIL(prep_room_affect_ability);
 
 
 // setup for abilities
@@ -96,6 +99,7 @@ struct {
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability },
 	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -2166,7 +2170,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	else {
 		// done!
-		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, targ_room, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
 		end_action(ch);
 	}
 	
@@ -2295,11 +2299,12 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param char_data *vict The character target, if any (may be NULL).
 * @param obj_data *ovict The object target, if any (may be NULL).
 * @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param room_data *room_targ For room target, if any (may be NULL).
 * @param int level The level to use the ability at.
 * @param int run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int run_mode, struct ability_exec *data) {
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data) {
 	int iter;
 	
 	if (!ch || !abil) {
@@ -2320,7 +2325,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			(do_ability_data[iter].prep_func)(ch, abil, level, vict, ovict, data);
+			(do_ability_data[iter].prep_func)(ch, abil, level, vict, ovict, room_targ, data);
 			
 			// adjust cost
 			if (ABIL_COST_PER_SCALE_POINT(abil)) {
@@ -2371,7 +2376,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// WAIT! Over-time abilities stop here
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
-		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, NULL, level, data);
+		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, level, data);
 		return;
 	}
 	
@@ -2400,7 +2405,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			(do_ability_data[iter].do_func)(ch, abil, level, vict, ovict, data);
+			(do_ability_data[iter].do_func)(ch, abil, level, vict, ovict, room_targ, data);
 		}
 	}
 	
@@ -2442,7 +2447,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 * All buff-type abilities come through here. This handles scaling and buff
 * maintenance/replacement.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
@@ -2550,7 +2555,7 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 /**
 * Handler for conjure-liquid abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_conjure_liquid_ability) {
 	if (!ovict) {
@@ -2604,7 +2609,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 /**
 * Handler for conjure-object abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_conjure_object_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
@@ -2663,7 +2668,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 /**
 * Handler for conjure-vehicle abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_conjure_vehicle_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
@@ -2673,7 +2678,7 @@ DO_ABIL(do_conjure_vehicle_ability) {
 /**
 * All damage abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict_data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
@@ -2709,7 +2714,7 @@ DO_ABIL(do_damage_ability) {
 * All damage-over-time abilities come through here. This handles scaling and
 * stacking.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict_data
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 DO_ABIL(do_dot_ability) {
 	any_vnum affect_vnum;
@@ -2755,6 +2760,43 @@ DO_ABIL(do_dot_ability) {
 
 
 /**
+* All room-affect abilities come through here.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+DO_ABIL(do_room_affect_ability) {
+	struct affected_type *af;
+	any_vnum affect_vnum;
+	double total_points = 1, remaining_points = 1;
+	int dur;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	total_points = get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points;
+	remaining_points = total_points;
+	
+	if (total_points <= 0) {
+		return;
+	}
+	
+	// determine duration (in seconds)
+	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	
+	// affect flags? cost == level 100 ability
+	if (room_targ && ABIL_AFFECTS(abil)) {
+		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points = MAX(0, remaining_points);
+		
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_to_room(room_targ, af);
+		free(af);	// affect_to_room duplicates affects
+	}
+	
+	data->success = TRUE;
+}
+
+
+/**
 * Performs an ability typed by a character. This function find the targets,
 * and pre-validates the ability.
 *
@@ -2769,6 +2811,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	vehicle_data *veh = NULL;
 	char_data *vict = NULL;
 	obj_data *ovict = NULL;
+	room_data *room_targ = NULL;
 	bool has = FALSE;
 	int cap, iter, level, number;
 	
@@ -2848,6 +2891,13 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
+		
+		// room target
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM)) {
+			// only targets in-room for now
+			room_targ = IN_ROOM(ch);
+			has = TRUE;
+		}
 	}
 	else {	// no arg and no tar-ignore
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
@@ -2903,7 +2953,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
-	call_ability(ch, abil, argument, vict, ovict, veh, level, RUN_ABIL_NORMAL, data);
+	call_ability(ch, abil, argument, vict, ovict, veh, room_targ, level, RUN_ABIL_NORMAL, data);
 	
 	// 7. costs and consequences
 	if (data->should_charge_cost) {
@@ -2932,7 +2982,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
@@ -2959,7 +3009,7 @@ PREP_ABIL(prep_buff_ability) {
 /**
 * Determines if ovict is a valid target for creating the liquid.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_conjure_liquid_ability) {
 	char buf[256];
@@ -3017,7 +3067,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 /**
 * Determines if player can conjure objects.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_conjure_object_ability) {
 	bool has_any, one_ata, any_inv, any_room;
@@ -3094,7 +3144,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 /**
 * Determines if player can conjure vehicles.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_conjure_vehicle_ability) {
 	struct interaction_item *interact;
@@ -3153,7 +3203,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_damage_ability) {
 	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
@@ -3161,10 +3211,37 @@ PREP_ABIL(prep_damage_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
 PREP_ABIL(prep_dot_ability) {
 	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
+}
+
+
+/**
+* This function 'stops' if the ability is a toggle and you're toggling it off,
+* which keeps it from charging/cooldowning.
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+PREP_ABIL(prep_room_affect_ability) {
+	any_vnum affect_vnum;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
+		send_config_msg(ch, "ok_string");
+		affect_from_room_by_caster(room_targ, affect_vnum, ch, TRUE);
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;	// free cancel
+		data->sent_any_msg = TRUE;	// ok_string is still a message
+		data->success = TRUE;	// I think this is a success?
+		
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
+		return;
+	}
+	
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
 }
 
 
@@ -3784,6 +3861,18 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
 						break;
 					}
+					case ABILT_ROOM_AFFECT: {
+						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+							exit(1);
+						}
+						
+						ABIL_AFFECT_VNUM(abil) = int_in[0];
+						ABIL_SHORT_DURATION(abil) = int_in[1];
+						ABIL_LONG_DURATION(abil) = int_in[2];
+						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+						break;
+					}
 					default: {
 						log("SYSERR: Unknown flag X%llu in %s", type, error);
 						exit(1);
@@ -3957,6 +4046,11 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		strcpy(temp, bitv_to_alpha(ABILT_PASSIVE_BUFF));
 		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
 		fprintf(fl, "X %s\n%s\n", temp, temp2);
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+		strcpy(temp, bitv_to_alpha(ABILT_ROOM_AFFECT));
+		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
+		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
 	}
 	
 	// end
@@ -4240,7 +4334,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
-	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS;
+	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS, only_room_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts;
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
@@ -4295,6 +4389,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("maxposition", max_pos, position_types)
 		FULLSEARCH_LIST("minposition", min_pos, position_types)
 		FULLSEARCH_LIST("ptech", only_ptech, player_tech_types)
+		FULLSEARCH_FLAGS("roomaffects", only_room_affs, room_aff_bits)
 		FULLSEARCH_INT("scale", only_scale, 0, INT_MAX)
 		FULLSEARCH_INT("scaleover", scale_over, 0, INT_MAX)
 		FULLSEARCH_INT("scaleunder", scale_under, 0, INT_MAX)
@@ -4404,7 +4499,10 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (not_flagged != NOBITS && ABILITY_FLAGGED(abil, not_flagged)) {
 			continue;
 		}
-		if (only_affs != NOBITS && (ABIL_AFFECTS(abil) & only_affs) != only_affs) {
+		if (only_affs != NOBITS && ((ABIL_AFFECTS(abil) & only_affs) != only_affs || IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT))) {
+			continue;
+		}
+		if (only_room_affs != NOBITS && (!IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT) || (ABIL_AFFECTS(abil) & only_room_affs) != only_room_affs)) {
 			continue;
 		}
 		if (only_flags != NOBITS && (ABIL_FLAGS(abil) & only_flags) != only_flags) {
@@ -4679,7 +4777,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 	// ABILT_x: type-specific data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 			strcpy(part, "unlimited");
 		}
@@ -4696,6 +4794,10 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		
 		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}	// end buff/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+		sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Room affect flags: \tg%s\t0\r\n", part);
+	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
 		sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
@@ -4808,7 +4910,7 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 	// type-specific data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 			sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
 		}
@@ -4833,7 +4935,11 @@ void olc_show_ability(char_data *ch) {
 			sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 		}
 	}	// end buff
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+		sprintbit(ABIL_AFFECTS(abil), room_aff_bits, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+	}	// end room affect
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
 		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}	// end buff/dot
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
@@ -4898,13 +5004,14 @@ int vnum_ability(char *searchname, char_data *ch) {
 OLC_MODULE(abiledit_affects) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF | ABILT_PASSIVE_BUFF;
-	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
+	}
+	else if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", room_aff_bits, ABIL_AFFECTS(abil));
 	}
 	else {
-		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 }
 

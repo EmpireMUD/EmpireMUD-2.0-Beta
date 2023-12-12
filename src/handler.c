@@ -386,7 +386,7 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 
 
 /**
-* Calls affect_remove on every affect of type "type" with location "apply".
+* Calls affect_remove on every affect of type "type" with a given caster.
 *
 * @param char_data *ch The person to remove affects from.
 * @param any_vnum type Any ATYPE_ const/vnum to match.
@@ -459,7 +459,7 @@ void affect_from_room(room_data *room, any_vnum type) {
 * Calls affect_remove_room on every affect of type "type" that sets AFF flag
 * "bits".
 *
-* @param room_data *rom The room to remove affects from.
+* @param room_data *room The room to remove affects from.
 * @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, shows the wear-off message.
@@ -471,6 +471,33 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 	
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
+				if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				shown = TRUE;
+			}
+			affect_remove_room(room, aff);
+		}
+	}
+}
+
+
+/**
+* Calls affect_remove on every affect of type "type" with a given caster.
+*
+* @param room_data *room The room to remove affects from.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
+* @param char_data *caster The person whose affects to remove.
+* @param bool show_msg If TRUE, will send the wears-off message.
+*/
+void affect_from_room_by_caster(room_data *room, any_vnum type, char_data *caster, bool show_msg) {
+	bool shown = FALSE;
+	struct affected_type *aff, *next_aff;
+	generic_data *gen;
+	
+	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+		if (aff->type == type && aff->cast_by == CAST_BY_ID(caster)) {
 			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
 				if (GET_AFFECT_WEAR_OFF_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
 					act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -1389,6 +1416,28 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 		}
 	}
 
+	return found;
+}
+
+
+/**
+* Matches both an ATYPE or affect generic, and a caster ID.
+*
+* @param room_data *room The room to check.
+* @param any_vnum type The ATYPE_ const or affect generic.
+* @param char_data *caster The caster to look for.
+* @return bool TRUE if so-affected, FALSE if not.
+*/
+bool room_affected_by_spell_from_caster(room_data *room, any_vnum type, char_data *caster) {
+	struct affected_type *hjp;
+	bool found = FALSE;
+	
+	for (hjp = ROOM_AFFECTS(room); hjp && !found; hjp = hjp->next) {
+		if (hjp->type == type && hjp->cast_by == CAST_BY_ID(caster)) {
+			found = TRUE;
+		}
+	}
+	
 	return found;
 }
 
