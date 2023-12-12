@@ -4582,7 +4582,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	
 	// resources
 	get_resource_display(ABIL_RESOURCE_COST(abil), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
@@ -4710,9 +4710,8 @@ void olc_show_ability(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 
 	// resources
-	sprintf(buf + strlen(buf), "Resource cost: <%sresourcecost\t0>\r\n", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)));
 	get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
-	strcat(buf, lbuf);
+	sprintf(buf + strlen(buf), "Resource cost: <%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
 
 	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
