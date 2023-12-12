@@ -71,6 +71,9 @@ PREP_ABIL(prep_damage_ability);
 DO_ABIL(do_dot_ability);
 PREP_ABIL(prep_dot_ability);
 
+DO_ABIL(do_paint_building_ability);
+PREP_ABIL(prep_paint_building_ability);
+
 DO_ABIL(do_room_affect_ability);
 PREP_ABIL(prep_room_affect_ability);
 
@@ -100,6 +103,7 @@ struct {
 	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
+	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -141,6 +145,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_LIMITATION: {
 			snprintf(output, sizeof(output), "%s: %s", temp, ability_limitations[adl->vnum]);
+			break;
+		}
+		case ADL_PAINT_COLOR: {
+			snprintf(output, sizeof(output), "%s: %s%s", temp, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		default: {
@@ -1591,6 +1599,14 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 				}
 				break;
 			}
+			case ABIL_LIMIT_PAINTABLE_BUILDING: {
+				room_data *home = HOME_ROOM(room);
+				if (!IS_ANY_BUILDING(home) || ROOM_AFF_FLAGGED(home, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(home, BLD_NO_PAINT)) {
+					msg_to_char(ch, "You can't do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
@@ -2824,6 +2840,33 @@ DO_ABIL(do_dot_ability) {
 
 
 /**
+* Applies color to the building.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+DO_ABIL(do_paint_building_ability) {
+	struct ability_data_list *adl;
+	room_data *home;
+	int count = 0, color = -1;
+	
+	// find a color
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_PAINT_COLOR) {
+			continue;
+		}
+		if (!number(0, count++)) {
+			color = adl->vnum;
+		}
+	}
+	
+	if (color != -1 && room_targ && (home = HOME_ROOM(room_targ)) && IS_ANY_BUILDING(home)) {
+		set_room_extra_data(home, ROOM_EXTRA_PAINT_COLOR, color);
+	}
+	data->success = TRUE;
+}
+
+
+/**
 * All room-affect abilities come through here.
 *
 * DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
@@ -3286,6 +3329,14 @@ PREP_ABIL(prep_damage_ability) {
 */
 PREP_ABIL(prep_dot_ability) {
 	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+PREP_ABIL(prep_paint_building_ability) {
+	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
 }
 
 
@@ -5294,6 +5345,9 @@ OLC_MODULE(abiledit_data) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		allowed_types |= ADL_SUMMON_MOB;
 	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PAINT_BUILDING)) {
+		allowed_types |= ADL_PAINT_COLOR;
+	}
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
@@ -5378,6 +5432,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_LIMITATION: {
 					if ((val_id = search_block(val_arg, ability_limitations, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Invalid limitation '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_PAINT_COLOR: {
+					if ((val_id = search_block(val_arg, paint_names, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid paint color '%s'.\r\n", val_arg);
 						return;
 					}
 					break;

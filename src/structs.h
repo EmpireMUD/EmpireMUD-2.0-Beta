@@ -581,6 +581,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_CONJURE_LIQUID  BIT(14)	// puts liquid in a drink container
 #define ABILT_CONJURE_VEHICLE  BIT(15)	// creates a vehicle in the room
 #define ABILT_ROOM_AFFECT  BIT(16)	// puts an affect on a room
+#define ABILT_PAINT_BUILDING  BIT(17)	// applies color to the building
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -654,6 +655,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
 #define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
 #define ADL_LIMITATION  BIT(4)	// special checks on the ability
+#define ADL_PAINT_COLOR  BIT(5)	// for paint-building, etc
 
 
 // AGH_x: ability gain hooks
@@ -682,6 +684,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_CAN_USE_ALLY  3	// ally permission on tile
 #define ABIL_LIMIT_CAN_USE_MEMBER  4	// member permission on tile
 #define ABIL_LIMIT_ON_ROAD  5	// must be a road
+#define ABIL_LIMIT_PAINTABLE_BUILDING  6	// building can be painted by a player
 
 
 // RUN_ABIL_x: modes for activating abilities

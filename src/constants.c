@@ -183,6 +183,7 @@ const char *ability_type_flags[] = {
 	"CONJURE-LIQUID",
 	"CONJURE-VEHICLE",	// 15
 	"ROOM-AFFECT",
+	"PAINT-BUILDING",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -218,6 +219,7 @@ const char *ability_type_notes[] = {
 	"conjure liquid",
 	"conjure",	// 15, actually conjure vehicle (shown to players as conjure as it can conjure furniture and buildings too)
 	"room affect",
+	"paint",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -310,6 +312,7 @@ const char *ability_data_types[] = {
 	"READY-WEAPON",
 	"SUMMON-MOB",
 	"LIMITATION",
+	"PAINT-COLOR",
 	"\n"
 };
 
@@ -351,6 +354,7 @@ const char *ability_limitations[] = {
 	"can use as ally",
 	"can use as member",
 	"on a road",	// 5
+	"paintable building",
 	"\n"
 };
 

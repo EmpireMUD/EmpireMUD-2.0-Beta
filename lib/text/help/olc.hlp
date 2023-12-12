@@ -1008,6 +1008,7 @@ Limitation types:
  &ccan use as ally&0 - Location must be unclaimed or you are an ally.
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
  &con a road&0 - Must be used on a road tile.
+ &cpaintable building&0 - Must be used on a building the player can paint.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
@@ -1119,6 +1120,16 @@ $n for their name.
 
 See also: OLC ABILITIES, CHANT, RITUAL
 #
+"ABILEDIT PAINT BUILDING ABILITY" "ABILEDIT PAINT-BUILDING ABILITY" "PAINT BUILDING ABILITY" "PAINT-BUILDING ABILITY" "PAINT BUILDING ABILITIES" "PAINT-BUILDING ABILITIES"
+
+A PAINT-BUILDING ability applies a color to the building. This requires at
+least one PAINT-COLOR data entry; more than 1 results in a random choice.
+It always targets the room -- you must set the &gROOM&0 target flag.
+
+For a list of paint colors, see HELP PAINT ITEM
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITIES" "PASSIVE BUFF ABILITY"
 
 The PASSIVE-BUFF ability type means that the ability applies stats to the
@@ -1401,6 +1412,7 @@ The following types are available (each has its own help file):
  &cCONJURE-LIQUID&0 - Creates liquid in a drink container.
  &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
  &cROOM-AFFECT&0 - Similar to a buff, for the room.
+ &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
