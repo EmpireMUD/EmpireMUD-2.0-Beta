@@ -1539,7 +1539,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 			continue;
 		}
 		
-		// ok
+		// ABIL_LIMIT_x:
 		switch (adl->vnum) {
 			case ABIL_LIMIT_ON_BARRIER: {
 				if (!room || !ROOM_BLD_FLAGGED(room, BLD_BARRIER)) {
@@ -1576,6 +1576,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 			case ABIL_LIMIT_CAN_USE_MEMBER: {
 				if (!room || !can_use_room(ch, room, MEMBERS_ONLY)) {
 					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_ON_ROAD: {
+				if (!room || !IS_ROAD(room)) {
+					msg_to_char(ch, "You need to do that on a road.\r\n");
+					return FALSE;
+				}
+				else if (!IS_COMPLETE(room)) {
+					msg_to_char(ch, "You need to finish the building first.\r\n");
 					return FALSE;
 				}
 				break;

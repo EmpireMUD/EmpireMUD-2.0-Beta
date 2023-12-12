@@ -1007,6 +1007,7 @@ Limitation types:
  &ccan use as guest&0 - Location must be unclaimed or you have guest access.
  &ccan use as ally&0 - Location must be unclaimed or you are an ally.
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
+ &con a road&0 - Must be used on a road tile.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

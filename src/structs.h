@@ -681,6 +681,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_CAN_USE_GUEST  2	// guest permission on tile
 #define ABIL_LIMIT_CAN_USE_ALLY  3	// ally permission on tile
 #define ABIL_LIMIT_CAN_USE_MEMBER  4	// member permission on tile
+#define ABIL_LIMIT_ON_ROAD  5	// must be a road
 
 
 // RUN_ABIL_x: modes for activating abilities

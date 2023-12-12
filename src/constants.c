@@ -350,6 +350,7 @@ const char *ability_limitations[] = {
 	"can use as guest",
 	"can use as ally",
 	"can use as member",
+	"on a road",	// 5
 	"\n"
 };
 
