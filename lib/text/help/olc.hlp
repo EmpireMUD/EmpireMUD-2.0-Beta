@@ -605,7 +605,8 @@ See also: OLC ABILITIES, DAMAGE ABILITY
 The BUFF ability type means that the ability gives some affects to the target.
 This includes 'debuffs', which give negative abilities to enemies.
 
-You must always set the VIOLENT flag on a debuff.
+You must always set the VIOLENT flag on a debuff. Also supports the TOGGLE
+flag for self-buffs.
 
 Buff abilities have the following properties:
  <&yshortduration&0> How long it lasts (at low skill level).
@@ -1272,6 +1273,14 @@ See also: OLC CRAFTS, RESOURCE ACTIONS
 The ROOM-AFFECT ability type means that the ability will place an effect on the
 room. This type of ability cannot be combined with buff or passive-buff
 abilities. It always targets the room -- you must set the &gROOM&0 target flag.
+
+These support the TOGGLE flag if the player can choose to end them.
+
+Properties of room-affect abilities:
+ <&yshortduration&0> How long it lasts (at low skill level).
+ <&ylongduration&0> How long it lasts (at high skill level).
+ <&yaffects&0> Room affect flags to set.
+ <&yaffectvnum&0> Which affect (generic) to use for the affect.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
 #d
