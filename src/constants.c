@@ -116,6 +116,8 @@ const char *reboot_type[] = { "reboot", "shutdown" };
 const char *ability_actions[] = {
 	"detect hide",	// 0
 	"detect earthmeld",
+	"detect players around",
+	"detect adventures around",
 	"\n"
 };
 

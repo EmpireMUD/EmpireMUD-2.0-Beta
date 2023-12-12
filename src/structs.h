@@ -621,6 +621,8 @@ typedef struct vehicle_data vehicle_data;
 // ABIL_ACTION_x: ability actions
 #define ABIL_ACTION_DETECT_HIDE  0	// finds hidden characters
 #define ABIL_ACTION_DETECT_EARTHMELD  1	// finds earthmelded characters
+#define ABIL_ACTION_DETECT_PLAYERS_AROUND  2	// finds other players in/near the city
+#define ABIL_ACTION_DETECT_ADVENTURES_AROUND  3	// finds detectable adventures near the player
 
 
 // ABIL_CUSTOM_x: custom message types

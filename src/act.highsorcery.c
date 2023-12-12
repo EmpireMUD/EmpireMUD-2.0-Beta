@@ -1777,6 +1777,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_detection) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
+/*
 	bool found_advs, found_players, wait;
 	char *dir_str;
 	int adv_dist, player_dist;
@@ -1795,50 +1796,15 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 		msg_to_char(ch, "You complete the ritual...\r\n");
 		
 		// check for players
-		player_dist = GET_EXTRA_ATT(ch, ATT_WHERE_RANGE) + (has_player_tech(ch, PTECH_WHERE_UPGRADE) ? 75 : 20);
-		player_dist = MAX(0, player_dist);
-		found_players = FALSE;
-		DL_FOREACH2(player_character_list, ch_iter, next_plr) {
-			if (ch_iter == ch || IS_IMMORTAL(ch_iter)) {
-				continue;	// skip these
-			}
-			if (find_city(GET_LOYALTY(ch), IN_ROOM(ch_iter)) != city && compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)) > player_dist) {
-				continue;	// not same city and too far
-			}
-			
-			// ok:
-			found_players = TRUE;
-			dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-			msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", PERS(ch_iter, ch_iter, FALSE), get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
-		}
-		
+
 		// check for adventures
-		adv_dist = 50 + GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
-		adv_dist = MAX(0, adv_dist);
-		found_advs = FALSE;
-		DL_FOREACH(instance_list, inst) {
-			loc = INST_FAKE_LOC(inst);
-			if (!loc || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-				continue;	// no location, or completed already
-			}
-			if (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_DETECTABLE)) {
-				continue;	// not detectable
-			}
-			if (find_city(GET_LOYALTY(ch), loc) != city && compute_distance(IN_ROOM(ch), loc) > adv_dist) {
-				continue;	// wrong city and too far
-			}
-		
-			// show instance
-			found_advs = TRUE;
-			dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-			msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
-		}
 		
 		if (!found_players && !found_advs) {
 			msg_to_char(ch, "You detect nothing of note in the city.\r\n");
 		}
 		gain_ability_exp(ch, ABIL_RITUAL_OF_DETECTION, 15);
 	}				
+	*/
 }
 
 
