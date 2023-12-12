@@ -2891,6 +2891,14 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
+		
+		// room target
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM)) {
+			if (is_abbrev(argptr, "room") || is_abbrev(argptr, "area") || is_abbrev(argptr, "here")) {
+				room_targ = IN_ROOM(ch);
+				has = TRUE;
+			}
+		}
 	}
 	else {	// no arg and no tar-ignore
 		// room target
