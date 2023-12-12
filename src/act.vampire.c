@@ -383,7 +383,7 @@ void sire_char(char_data *ch, char_data *victim) {
 		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
 		/* Turn off that SIRING action */
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 
 		queue_delayed_update(ch, CDU_SAVE);
 		queue_delayed_update(victim, CDU_SAVE);

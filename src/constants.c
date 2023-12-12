@@ -274,6 +274,7 @@ const char *ability_custom_types[] = {
 	"per-veh-to-room",
 	"per-item-to-char",	// 20
 	"per-item-to-room",
+	"over-time-longdesc",
 	"\n"
 };
 
@@ -289,7 +290,8 @@ const char *ability_custom_type_help =
 " Fails targeting a character: fail-targ-to-char fail-targ-to-vict fail-targ-to-room\r\n"
 "&w Is counterspelled: counterspell-to-char counterspell-to-vict counterspell-to-room&0\r\n"
 " When each vehicle is conjured: per-veh-to-char per-veh-to-room\r\n"
-"&w When each item is conjured: per-item-to-char per-item-to-room&0\r\n";
+"&w When each item is conjured: per-item-to-char per-item-to-room&0\r\n"
+" Long description when performing an over-tiem ability: over-time-longdesc\r\n";
 
 
 

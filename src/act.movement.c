@@ -902,8 +902,8 @@ void process_running(char_data *ch) {
 		
 		// finished this part of the run!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			if (GET_MOVEMENT_STRING(ch)) {
-				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &dir, &dist, FALSE) && dir != -1) {
+			if (GET_ACTION_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_ACTION_STRING(ch), &dir, &dist, FALSE) && dir != -1) {
 					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 					GET_ACTION_VNUM(ch, 1) = dist;
 				}
@@ -2782,8 +2782,8 @@ ACMD(do_run) {
 	}
 	else if (!*argument && GET_ACTION(ch) == ACT_RUNNING) {
 		msg_to_char(ch, "You are currently running %d tile%s %s.\r\n", GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
-		if (GET_MOVEMENT_STRING(ch)) {
-			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_ACTION_STRING(ch));
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_RUNNING) {
@@ -2841,10 +2841,10 @@ ACMD(do_run) {
 		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		
-		if (GET_MOVEMENT_STRING(ch)) {
-			free(GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
 		}
-		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
+		GET_ACTION_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		msg_to_char(ch, "You start running %s...\r\n", dirs[get_direction_for_char(ch, dir)]);
 	}

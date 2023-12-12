@@ -247,8 +247,6 @@ void process_copying_book(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
-		
 		if (!(book = book_proto(GET_ACTION_VNUM(ch, 0)))) {
 			msg_to_char(ch, "You finish copying the book, but there was an error and it's illegible.\r\n");
 		}
@@ -262,6 +260,7 @@ void process_copying_book(char_data *ch) {
 				get_otrigger(obj, ch, FALSE);
 			}
 		}
+		end_action(ch);
 	}
 	else if (GET_ACTION_TIMER(ch) == 6 && !PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		msg_to_char(ch, "You're halfway through copying out the book...\r\n");

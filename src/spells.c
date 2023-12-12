@@ -397,10 +397,10 @@ ACMD(do_ready) {
 	}
 	
 	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-	pre_ability_message(ch, NULL, NULL, found_abil, NULL);
+	send_pre_ability_messages(ch, NULL, NULL, found_abil, NULL);
 	
 	if (!skill_check(ch, ABIL_VNUM(found_abil), ABIL_DIFFICULTY(found_abil))) {
-		ability_fail_message(ch, NULL, NULL, found_abil, NULL);
+		send_ability_fail_messages(ch, NULL, NULL, found_abil, NULL);
 		return;
 	}
 	

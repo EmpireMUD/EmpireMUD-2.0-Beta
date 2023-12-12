@@ -418,7 +418,7 @@ void perform_ritual(char_data *ch) {
 	
 	// this triggers the end of the ritual, based on MESSAGE_END
 	if (*ritual_data[rit].strings[GET_ACTION_TIMER(ch)].to_char == '\n') {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		
 		if (ritual_data[rit].perform) {
 			(ritual_data[rit].perform)(ch, rit);

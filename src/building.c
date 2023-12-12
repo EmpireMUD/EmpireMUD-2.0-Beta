@@ -1111,7 +1111,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// Check if there's no longer a building in that place. 
 	if (!GET_BUILDING(room)) {
 		// Fail silently
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	
@@ -1158,7 +1158,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 				msg_to_char(ch, "You run out of resources and stop working.\r\n");
 			}
 			act("$n runs out of resources and stops working.", FALSE, ch, 0, 0, TO_ROOM);
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			return;
 		}
 	}
@@ -2169,13 +2169,13 @@ ACMD(do_dismantle) {
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	if (GET_ACTION(ch) == ACT_DISMANTLE_VEHICLE) {
 		msg_to_char(ch, "You stop dismantling.\r\n");
 		act("$n stops dismantling.", FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	

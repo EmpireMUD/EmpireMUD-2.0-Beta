@@ -44,7 +44,6 @@ void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
-void cancel_movement_string(char_data *ch);
 void cancel_siring(char_data *ch);
 
 // process protos
@@ -134,7 +133,7 @@ const struct action_data_struct action_data[] = {
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming the area!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
-	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
+	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, NULL },	// ACT_RUNNING
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
@@ -202,7 +201,8 @@ const struct gen_interact_data_t gen_interact_data[] = {
 //// CORE ACTION FUNCTIONS ///////////////////////////////////////////////////
 
 /**
-* Ends the character's current timed action prematurely.
+* Ends the character's current timed action prematurely and cancels it if
+* possible.
 *
 * @param char_data *ch The actor.
 */
@@ -213,7 +213,31 @@ void cancel_action(char_data *ch) {
 			(action_data[GET_ACTION(ch)].cancel_function)(ch);
 		}
 		
+		end_action(ch);
+	}
+}
+
+
+/**
+* Ends the character's current timed action without calling cancel functions.
+*
+* @param char_data *ch The actor.
+*/
+void end_action(char_data *ch) {
+	int iter;
+	
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 		GET_ACTION(ch) = ACT_NONE;
+		GET_ACTION_TIMER(ch) = 0;
+		
+		for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {
+			GET_ACTION_VNUM(ch, iter) = 0;
+		}
+		
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
+		}
+		GET_ACTION_STRING(ch) = NULL;
 		
 		// clear targets
 		GET_ACTION_CHAR_TARG(ch) = NULL;
@@ -236,6 +260,8 @@ void cancel_action(char_data *ch) {
 * @param int timer Countdown in action ticks
 */
 void start_action(char_data *ch, int type, int timer) {
+	int iter;
+	
 	// safety first
 	if (GET_ACTION(ch) != ACT_NONE) {
 		cancel_action(ch);
@@ -244,9 +270,9 @@ void start_action(char_data *ch, int type, int timer) {
 	GET_ACTION(ch) = type;
 	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 	GET_ACTION_TIMER(ch) = timer;
-	GET_ACTION_VNUM(ch, 0) = 0;
-	GET_ACTION_VNUM(ch, 1) = 0;
-	GET_ACTION_VNUM(ch, 2) = 0;
+	for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {
+		GET_ACTION_VNUM(ch, iter) = 0;
+	}
 	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 	
 	// clear targets, in case
@@ -698,18 +724,6 @@ void cancel_morphing(char_data *ch) {
 	}
 }
 
-/**
-* Frees the movement string.
-*
-* @param char_data *ch The person canceling the action.
-*/
-void cancel_movement_string(char_data *ch) {
-	if (GET_MOVEMENT_STRING(ch)) {
-		free(GET_MOVEMENT_STRING(ch));
-	}
-	GET_MOVEMENT_STRING(ch) = NULL;
-}
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION STARTERS /////////////////////////////////////////////////////////
@@ -1149,7 +1163,7 @@ INTERACTION_FUNC(finish_mining) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
 		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		if ((obj_ok = load_otrigger(obj))) {
 			get_otrigger(obj, ch, FALSE);
 		}
@@ -1320,9 +1334,7 @@ void perform_saw(char_data *ch) {
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
-		GET_ACTION(ch) = ACT_NONE;
-		free_resource_list(GET_ACTION_RESOURCES(ch));
-		GET_ACTION_RESOURCES(ch) = NULL;
+		end_action(ch);
 		
 		if (success && proto) {
 			gain_player_tech_exp(ch, PTECH_SAW_COMMAND, 10);
@@ -1354,7 +1366,7 @@ void process_bathing(char_data *ch) {
 		// finish
 		msg_to_char(ch, "You finish bathing and climb out of the water to dry off.\r\n");
 		act("$n finishes bathing and climbs out of the water to dry off.", FALSE, ch, 0, 0, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else {
 		// decrement
@@ -1518,11 +1530,9 @@ void process_chipping(char_data *ch) {
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
 		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
 		
 		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
-		free_resource_list(GET_ACTION_RESOURCES(ch));
-		GET_ACTION_RESOURCES(ch) = NULL;
+		end_action(ch);
 
 		if (success) {
 			gain_player_tech_exp(ch, PTECH_CHIP_COMMAND, 25);
@@ -1631,7 +1641,7 @@ void process_digging(char_data *ch) {
 		
 	// done?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		in_room = IN_ROOM(ch);
 		
 		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
@@ -1901,7 +1911,7 @@ void process_fishing(char_data *ch) {
 	}
 	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else {
 		// SUCCESS
@@ -1955,7 +1965,7 @@ void process_foraging(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 		
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		
 		// forage triggers
 		if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
@@ -2006,7 +2016,7 @@ void process_gathering(char_data *ch) {
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
 			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 		}
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, NULL, GUESTS_ALLOWED, finish_gathering)) {
@@ -2015,12 +2025,12 @@ void process_gathering(char_data *ch) {
 					GET_ACTION_TIMER(ch) = gather_base_timer;
 				}
 				else {
-					GET_ACTION(ch) = ACT_NONE;
+					end_action(ch);
 				}
 			}
 			else {
 				msg_to_char(ch, "You don't seem to be able to gather anything here.\r\n");
-				GET_ACTION(ch) = ACT_NONE;
+				end_action(ch);
 			}
 		}
 	}
@@ -2122,7 +2132,7 @@ void process_hunting(char_data *ch) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
 			// late check for depletion: make them hunt first
 			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			return;
 		}
 		
@@ -2148,7 +2158,7 @@ void process_hunting(char_data *ch) {
 			affect_join(mob, af, 0);
 		}
 		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
 		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
 	}
@@ -2330,11 +2340,18 @@ void process_minting(char_data *ch) {
 		act("$n finishes minting some coins!", FALSE, ch, NULL, NULL, TO_ROOM);
 		increase_coins(ch, emp, num);
 		
-		GET_ACTION(ch) = ACT_NONE;
-		gain_player_tech_exp(ch, PTECH_MINT, 30);
-		
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
+		}
+		else {
+			*tmp = '\0';
+		}
+		
+		end_action(ch);
+		gain_player_tech_exp(ch, PTECH_MINT, 30);
+		
+		// repeat?
+		if (*tmp) {
 			do_mint(ch, tmp, 0, 0);
 		}
 	}
@@ -2351,7 +2368,7 @@ void process_morphing(char_data *ch) {
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		finish_morphing(ch, morph_proto(GET_ACTION_VNUM(ch, 0)));
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else {
 		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
@@ -2446,7 +2463,7 @@ void process_panning(char_data *ch) {
 		act("$n sifts through the sand, looking for gold...", TRUE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 		
 		if (GET_ACTION_TIMER(ch) <= 0) {
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			
 			// pan will silently fail if depleted
 			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
@@ -2522,8 +2539,7 @@ void process_planting(char_data *ch) {
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
 		gain_player_tech_exp(ch, PTECH_PLANT_CROPS, 30);
-		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -2563,7 +2579,7 @@ void process_prospecting(char_data *ch) {
 			break;
 		}
 		case 0: {
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			init_mine(IN_ROOM(ch), ch, GET_LOYALTY(ch));
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE, GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING);
 			
@@ -2630,12 +2646,12 @@ void process_repairing(char_data *ch) {
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
 		complete_vehicle(veh);
 	}
 	else if (!found) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		
 		// missing next resource
 		if (VEH_NEEDS_RESOURCES(veh)) {
@@ -2705,9 +2721,7 @@ void process_scraping(char_data *ch) {
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
-		GET_ACTION(ch) = ACT_NONE;
-		free_resource_list(GET_ACTION_RESOURCES(ch));
-		GET_ACTION_RESOURCES(ch) = NULL;
+		end_action(ch);
 		
 		if (success && proto) {
 			gain_player_tech_exp(ch, PTECH_SCRAPE_COMMAND, 10);
@@ -2806,7 +2820,7 @@ void process_swap_skill_sets(char_data *ch) {
 		act("$n swaps skill sets.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
 		perform_swap_skill_sets(ch);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		
 		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));
 		set_mana(ch, MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4));
@@ -2841,11 +2855,9 @@ void process_tanning(char_data *ch) {
 		act("You finish tanning $p.", FALSE, ch, proto, NULL, TO_CHAR);
 		act("$n finishes tanning $p.", TRUE, ch, proto, NULL, TO_ROOM);
 
-		GET_ACTION(ch) = ACT_NONE;
 		
 		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
-		free_resource_list(GET_ACTION_RESOURCES(ch));
-		GET_ACTION_RESOURCES(ch) = NULL;
+		end_action(ch);
 		
 		if (success) {
 			gain_player_tech_exp(ch, PTECH_TAN, 20);
@@ -4153,7 +4165,7 @@ void process_gen_interact_room(char_data *ch) {
 		// do not un-set GET_ACTION before running interactions
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room)) {
-			GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 			in_room = IN_ROOM(ch);
 			
 			if (data->ptech) {
@@ -4166,11 +4178,11 @@ void process_gen_interact_room(char_data *ch) {
 			}
 		}
 		else if (data->msg.empty && *(data->msg.empty)) {
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			msg_to_char(ch, "%s\r\n", data->msg.empty);
 		}
 		else {
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			msg_to_char(ch, "You find nothing.\r\n");
 		}
 	}

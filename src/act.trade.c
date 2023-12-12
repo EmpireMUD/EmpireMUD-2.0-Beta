@@ -1113,7 +1113,7 @@ void cancel_gen_craft(char_data *ch) {
 		}
 	}
 	
-	GET_ACTION(ch) = ACT_NONE;
+	end_action(ch);
 }
 
 
@@ -1138,6 +1138,7 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 
 
 void finish_gen_craft(char_data *ch) {
+	any_vnum obj_vnum = GET_ACTION_VNUM(ch, 1);
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	bool applied_master = FALSE, is_master = FALSE;
 	int num = GET_ACTION_VNUM(ch, 2);
@@ -1149,8 +1150,6 @@ void finish_gen_craft(char_data *ch) {
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
 	is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
-	
-	GET_ACTION(ch) = ACT_NONE;
 
 	// basic sanity checking (vehicles are finished elsewhere)
 	if (!type || CRAFT_IS_VEHICLE(type) || CRAFT_IS_BUILDING(type)) {
@@ -1160,7 +1159,7 @@ void finish_gen_craft(char_data *ch) {
 	// soup handling
 	if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		// load the drink container back
-		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
+		obj = read_object(obj_vnum, TRUE);
 	
 		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj)));
 		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, GET_CRAFT_OBJECT(type));
@@ -1276,9 +1275,8 @@ void finish_gen_craft(char_data *ch) {
 		}
 	}
 	
-	// free the stored action resources now -- we no longer risk refunding them
-	free_resource_list(GET_ACTION_RESOURCES(ch));
-	GET_ACTION_RESOURCES(ch) = NULL;
+	// end now, which frees up the resources
+	end_action(ch);
 
 	// repeat as desired
 	if (num > 1) {
@@ -1355,7 +1353,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		// stop all actors on this type
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
-				GET_ACTION(vict) = ACT_NONE;
+				end_action(vict);
 			}
 		}
 	}
@@ -1373,7 +1371,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 

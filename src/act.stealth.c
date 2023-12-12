@@ -252,7 +252,7 @@ void perform_escape(char_data *ch) {
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	
-	GET_ACTION(ch) = ACT_NONE;
+	end_action(ch);
 	gain_ability_exp(ch, ABIL_ESCAPE, 50);
 }
 

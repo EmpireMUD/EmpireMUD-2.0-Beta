@@ -941,8 +941,8 @@ void free_char(char_data *ch) {
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
 		}
-		if (GET_MOVEMENT_STRING(ch)) {
-			free(GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
 		}
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
@@ -1345,6 +1345,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_ACTION_TIMER(ch) = i_in[2];
 						GET_ACTION_ROOM(ch) = i_in[3];
 					}
+				}
+				else if (!strn_cmp(line, "Actstr: ", 8)) {
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
+					}
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
 				}
 				else if (!strn_cmp(line, "Action-res: ", 12)) {
 					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
@@ -1947,10 +1953,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_MOUNT_VNUM(ch) = atoi(line + 12);
 				}
 				else if (!strn_cmp(line, "Mvstring: ", 10)) {
-					if (GET_MOVEMENT_STRING(ch)) {
-						free(GET_MOVEMENT_STRING(ch));
+					// old version of "Actstr:"
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
 					}
-					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + 10));
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2644,6 +2651,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
 	}
+	if (GET_ACTION_STRING(ch)) {
+		strcpy(temp, GET_ACTION_STRING(ch));
+		temp[MAX_ACTION_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
+		fprintf(fl, "Actstr: %s\n", temp);
+	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {
 		fprintf(fl, "Adventure Summon Instance: %d\n", GET_ADVENTURE_SUMMON_INSTANCE_ID(ch));
 		fprintf(fl, "Adventure Summon Loc: %d\n", GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
@@ -2827,11 +2839,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOUNT_VNUM(ch) != NOTHING) {
 		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
-	}
-	if (GET_MOVEMENT_STRING(ch)) {
-		strcpy(temp, GET_MOVEMENT_STRING(ch));
-		temp[MAX_MOVEMENT_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
-		fprintf(fl, "Mvstring: %s\n", temp);
 	}
 	
 	// 'O'

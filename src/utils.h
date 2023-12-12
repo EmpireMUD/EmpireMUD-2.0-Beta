@@ -1182,6 +1182,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))
 #define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_cycle))
 #define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_room))
+#define GET_ACTION_STRING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_string))
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
 #define GET_ACTION_RESOURCES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_resources))
@@ -1273,7 +1274,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MOUNT_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_list))
 #define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))
 #define GET_MOVE_TIME(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->move_time[(pos)]))
-#define GET_MOVEMENT_STRING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->movement_string))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
 #define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
@@ -2021,7 +2021,6 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 
 // abilities.c
-void ability_fail_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
@@ -2033,12 +2032,14 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
-void pre_ability_message(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
+void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, int use_pos, struct ability_exec *data);
+void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
+void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void setup_ability_companions(char_data *ch);
 const char *skip_conjure_words(const char *string);
 
@@ -2046,6 +2047,7 @@ const char *skip_conjure_words(const char *string);
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
 void do_burn_area(char_data *ch);
+void end_action(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);

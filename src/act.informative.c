@@ -960,6 +960,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
+	ability_data *abil;
 	struct custom_message *ocm;
 	struct affected_type *aff;
 	generic_data *gen;
@@ -1064,6 +1065,10 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				else {
 					sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 				}
+			}
+			else if (!IS_NPC(i) && GET_ACTION(i) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(i, 0))) && abil_has_custom_message(abil, ABIL_CUSTOM_OVER_TIME_LONGDESC)) {
+				// custom message
+				strcpy(buf, abil_get_custom_message(abil, ABIL_CUSTOM_OVER_TIME_LONGDESC));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				// show non-crafting action

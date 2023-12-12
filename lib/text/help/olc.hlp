@@ -815,6 +815,7 @@ Message types:
  &cper-veh-to-room&0 - To room on conjure-vehicle; use $V for the vehicle.
  &cper-item-to-char&0 - To actor on types like conjure-object, when conjured.
  &cper-item-to-room&0 - To room on types like conjure-object, when conjured.
+ &cover-time-longdesc&0 - How the player appears during an OVER-TIME ability.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -1086,6 +1087,10 @@ For example, Ritual of Burdens would be set up with these messages:
  4. [self-to-room] $n whispers $s burdens into the air...
  5. [self-to-room] *
  6. [self-to-room] $n seems uplifted!
+
+You can set how a player appears while performing the ability when someone
+types "look" in the room by setting an over-time-longdesc custom message with
+$n for their name.
 
 See also: OLC ABILITIES, CHANT, RITUAL
 #

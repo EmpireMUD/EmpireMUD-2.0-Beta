@@ -636,6 +636,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_PER_VEH_TO_ROOM  19
 #define ABIL_CUSTOM_PER_ITEM_TO_CHAR  20
 #define ABIL_CUSTOM_PER_ITEM_TO_ROOM  21
+#define ABIL_CUSTOM_OVER_TIME_LONGDESC  22
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used
@@ -3131,6 +3132,7 @@ typedef enum {
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
+#define MAX_ACTION_STRING  245	// any longer and it cannot be read from file
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
@@ -3149,7 +3151,6 @@ typedef enum {
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
-#define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
 #define MAX_OBJ_AFFECT  6
@@ -4739,7 +4740,7 @@ struct player_special_data {
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
-	char *movement_string;	// for run/etc
+	char *action_string;	// for run, abilities, etc
 	char_data *action_targ_char;	// unsaved: action targets this char
 	obj_data *action_targ_obj;	// unsaved: action targets this object
 	vehicle_data *action_targ_veh;	// unsaved: action targets this vehicle

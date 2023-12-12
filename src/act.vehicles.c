@@ -717,8 +717,8 @@ void process_driving(char_data *ch) {
 		
 		// finished this part of the drive!
 		if (GET_ACTION_VNUM(ch, 1) <= 0) {
-			if (GET_MOVEMENT_STRING(ch)) {
-				if (parse_next_dir_from_string(ch, GET_MOVEMENT_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[new_dir])) {
+			if (GET_ACTION_STRING(ch)) {
+				if (parse_next_dir_from_string(ch, GET_ACTION_STRING(ch), &new_dir, &dist, FALSE) && new_dir != -1 && new_dir != DIR_RANDOM && (subcmd == SCMD_PILOT || is_flat_dir[new_dir])) {
 					GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, new_dir);
 					GET_ACTION_VNUM(ch, 1) = dist;
 					
@@ -1773,8 +1773,8 @@ ACMD(do_drive) {
 			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
 		}
 		
-		if (GET_MOVEMENT_STRING(ch)) {
-			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_ACTION_STRING(ch));
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != drive_data[subcmd].action) {
@@ -1897,10 +1897,10 @@ ACMD(do_drive) {
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
-		if (GET_MOVEMENT_STRING(ch)) {
-			free(GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
 		}
-		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
+		GET_ACTION_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;

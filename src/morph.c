@@ -379,7 +379,7 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	
 	// in case this is called by something else while they're already morphing
 	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_MORPHING) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 

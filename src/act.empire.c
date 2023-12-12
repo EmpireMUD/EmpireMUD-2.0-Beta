@@ -7392,7 +7392,7 @@ void process_reclaim(char_data *ch) {
 		abandon_room(target);
 		claim_room(target, emp);
 		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -7436,7 +7436,7 @@ ACMD(do_reclaim) {
 	if (!*arg && GET_ACTION(ch) == ACT_RECLAIMING) {
 		msg_to_char(ch, "You stop trying to reclaim this area.\r\n");
 		act("$n stops trying to reclaim this area.", FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little busy right now.\r\n");
