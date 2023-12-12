@@ -7463,7 +7463,7 @@ void do_stat_room(char_data *ch) {
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
-	int found, num, zenith;
+	int duration, found, num, zenith;
 	bool comma;
 	adv_data *adv;
 	obj_data *j;
@@ -7752,7 +7752,22 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->expire_time - time(0)), get_generic_name_by_vnum(aff->type));
+			// duration setup
+			if (aff->expire_time == UNLIMITED) {
+				strcpy(buf2, "infinite");
+			}
+			else {
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				if (duration >= 60 * 60) {
+					sprintf(buf3, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+				}
+				else {
+					sprintf(buf3, "%d:%02d", (duration / 60), (duration % 60));
+				}
+			}
+
+			sprintf(buf, "Affect: (%s) &c%s&0 ", buf3, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
