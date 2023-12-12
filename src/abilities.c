@@ -1621,17 +1621,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 				break;
 			}
 			case ABIL_LIMIT_PAINTABLE_BUILDING: {
-				room_data *home = HOME_ROOM(room);
-				if (!IS_ANY_BUILDING(home) || ROOM_AFF_FLAGGED(home, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(home, BLD_NO_PAINT)) {
+				room_data *home = room ? HOME_ROOM(room) : NULL;
+				if (!home || !IS_ANY_BUILDING(home) || ROOM_AFF_FLAGGED(home, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(home, BLD_NO_PAINT)) {
 					msg_to_char(ch, "You can't do that here.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_IN_CITY: {
-				bool wait;
+				bool wait = FALSE;
 				
-				if (!ROOM_OWNER(room) && !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait)) {
+				if (!room || (!ROOM_OWNER(room) && !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait))) {
 					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
 					return FALSE;
 				}
@@ -1640,6 +1640,27 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 			case ABIL_LIMIT_HAVE_EMPIRE: {
 				if (!GET_LOYALTY(ch)) {
 					msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_INDOORS: {
+				if (!room || IS_OUTDOOR_TILE(room)) {
+					msg_to_char(ch, "You need to be indoors to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_OUTDOORS: {
+				if (!room || !IS_OUTDOOR_TILE(room)) {
+					msg_to_char(ch, "You need to be outdoors to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_ON_MAP: {
+				if (!room || GET_ROOM_VNUM(room) >= MAP_SIZE) {
+					msg_to_char(ch, "You need to be on the map to do that.\r\n");
 					return FALSE;
 				}
 				break;

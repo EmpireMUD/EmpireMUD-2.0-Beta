@@ -371,10 +371,13 @@ const char *ability_limitations[] = {
 	"can use as guest",
 	"can use as ally",
 	"can use as member",
-	"on a road",	// 5
+	"on a road",		// 5
 	"paintable building",
 	"in a city",
 	"have an empire",
+	"indoors",
+	"outdoors",		// 10
+	"on the map",
 	"\n"
 };
 

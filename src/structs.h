@@ -700,6 +700,9 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_PAINTABLE_BUILDING  6	// building can be painted by a player
 #define ABIL_LIMIT_IN_CITY  7	// must be in a city
 #define ABIL_LIMIT_HAVE_EMPIRE  8	// must be a member of an empire
+#define ABIL_LIMIT_INDOORS  9	// must be inside
+#define ABIL_LIMIT_OUTDOORS  10	// must be outdoors (includes in adventures)
+#define ABIL_LIMIT_ON_MAP  11	// won't work on interiors or adventures, but may include map buildings
 
 
 // RUN_ABIL_x: modes for activating abilities

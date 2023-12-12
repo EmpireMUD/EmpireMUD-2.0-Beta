@@ -1031,6 +1031,9 @@ Limitation types:
  &cpaintable building&0 - Must be used on a building the player can paint.
  &cin a city&0 - Must be in any city (tile must also be claimed).
  &chave an empire&0 - Must be a member of any empire.
+ &cindoors&0 - Must be indoors (including inside buildings on the map).
+ &coutdoors&0 - Must be outdoors (including some adventure rooms).
+ &con the map&0 - Must be on the map (includes the main room of buildings).
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
