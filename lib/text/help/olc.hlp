@@ -786,7 +786,12 @@ These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
 player using the ability, and capitalized letters for the target.
 
 If you set more than one message of the same type, one will be chosen at
-random each time.
+random each time -- except OVER-TIME abilities, which will play their self-to
+and targ-to messages in sequential order.
+
+Some messages have defaults that will show if you do not set them as custom
+messages. For abilities, the defaults can be prevented by setting a custom
+message that only contains * (asterisk).
 
 Message types:
  &cself-to-char&0 - Shown to the actor when the ability targets himself (or
@@ -1074,7 +1079,7 @@ like, but if you set the command to "ritual" or "chant", it will add the
 ability to the player's ordinary ritual or chant command.
 
 The length of the over-time ability is determined by the number of to-char
-messages it has. It still uses the self-to-* and targ-to-* messages. Set as
+messages it has. It still uses the self-to- and targ-to- messages. Set as
 many of these messages as you like and they will be played in order. The first
 message is played when the ability starts and the last one is played as it
 ends. Any message that only contains an asterisk (*) will take an action turn,
