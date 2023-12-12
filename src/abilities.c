@@ -2891,15 +2891,15 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
-		
+	}
+	else {	// no arg and no tar-ignore
 		// room target
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM)) {
 			// only targets in-room for now
 			room_targ = IN_ROOM(ch);
 			has = TRUE;
 		}
-	}
-	else {	// no arg and no tar-ignore
+		
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
 			if (FIGHTING(ch) != NULL) {
 				vict = ch;
@@ -2918,7 +2918,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		if (!has) {
-			msg_to_char(ch, "&&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			msg_to_char(ch, "&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
 			return;
 		}
 	}
