@@ -3768,6 +3768,7 @@ struct ability_data {
 	int cost_type;	// HEALTH, MANA, etc.
 	int cost;	// amount of h/v/m
 	int cost_per_scale_point;	// cost modifier when scaled
+	struct resource_data *resource_cost;	// additional costs
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag

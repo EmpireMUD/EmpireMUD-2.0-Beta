@@ -2060,6 +2060,11 @@ void cancel_over_time_ability(char_data *ch) {
 				}
 			}
 		}
+		
+		// refund the real resources they used
+		give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
 	}
 }
 
@@ -2180,11 +2185,20 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
-	// check costs and cooldowns now
-	if (run_mode == RUN_ABIL_NORMAL && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
-		return;
+	if (run_mode == RUN_ABIL_NORMAL) {
+		// check costs and cooldowns now -- normal run only
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
+		if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, TRUE, ABIL_NAME(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
 	}
 	
 	// ready to start the ability:
@@ -2746,6 +2760,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	if (data->should_charge_cost) {
 		// charge costs and cooldown unless the ability stopped itself -- regardless of success
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+		if (ABIL_RESOURCE_COST(abil)) {
+			extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : NULL);
+		}
 	}
 	if (data->success) {
 		// only if successful
@@ -3455,6 +3472,9 @@ void free_ability(ability_data *abil) {
 	if (ABIL_COMMAND(abil) && (!proto || ABIL_COMMAND(abil) != ABIL_COMMAND(proto))) {
 		free(ABIL_COMMAND(abil));
 	}
+	if (ABIL_RESOURCE_COST(abil) && (!proto || ABIL_RESOURCE_COST(abil) != ABIL_RESOURCE_COST(proto))) {
+		free_resource_list(ABIL_RESOURCE_COST(abil));
+	}
 	if (ABIL_CUSTOM_MSGS(abil) && (!proto || ABIL_CUSTOM_MSGS(abil) != ABIL_CUSTOM_MSGS(proto))) {
 		free_custom_messages(ABIL_CUSTOM_MSGS(abil));
 	}
@@ -3612,6 +3632,11 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			
 			case 'M': {	// custom messages
 				parse_custom_message(fl, &ABIL_CUSTOM_MSGS(abil), error);
+				break;
+			}
+			
+			case 'R': {	// resources
+				parse_resource(fl, &ABIL_RESOURCE_COST(abil), error);
 				break;
 			}
 			
@@ -3820,6 +3845,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	
 	// 'M' custom message
 	write_custom_messages_to_file(fl, 'M', ABIL_CUSTOM_MSGS(abil));
+	
+	// 'R': resources
+	write_resources_to_file(fl, 'R', ABIL_RESOURCE_COST(abil));
 	
 	// 'T' types
 	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
@@ -4425,6 +4453,7 @@ void save_olc_ability(descriptor_data *desc) {
 		ABIL_DATA(proto) = adl->next;
 		free(adl);
 	}
+	free_resource_list(ABIL_RESOURCE_COST(proto));
 	free_custom_messages(ABIL_CUSTOM_MSGS(proto));
 	free_apply_list(ABIL_APPLIES(proto));
 	
@@ -4487,6 +4516,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		// copy things that are pointers
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
+		ABIL_RESOURCE_COST(new) = copy_resource_list(ABIL_RESOURCE_COST(input));
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
@@ -4549,6 +4579,11 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	
+	// resources
+	get_resource_display(ABIL_RESOURCE_COST(abil), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", part);
+	
 	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
 	prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
@@ -4633,7 +4668,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 */
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct custom_message *custm;
 	struct apply_data *apply;
@@ -4673,6 +4708,12 @@ void olc_show_ability(char_data *ch) {
 	}
 	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+
+	// resources
+	sprintf(buf + strlen(buf), "Resource cost: <%sresourcecost\t0>\r\n", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)));
+	get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
+	strcat(buf, lbuf);
+
 	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
 	sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf, TRUE);
@@ -5194,6 +5235,12 @@ OLC_MODULE(abiledit_minposition) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_resourcecost) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	olc_process_resources(ch, argument, &ABIL_RESOURCE_COST(abil));
 }
 
 

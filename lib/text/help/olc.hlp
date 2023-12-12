@@ -1238,6 +1238,19 @@ Notes:
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
+"ABILEDIT RESOURCECOST" "ABILEDIT RESOURCE COST"
+
+Usage:  .resource add <type> <amount> <vnum/name>
+        .resource change <number> <quantity | vnum | name | flags> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to use the ability.
+
+See HELP OLC RESOURCES for more information.
+
+See also: OLC CRAFTS, RESOURCE ACTIONS
+#d
 "ABILEDIT SCALE"
 
 Usage:  .scale <percent>
