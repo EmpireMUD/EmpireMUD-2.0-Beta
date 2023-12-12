@@ -469,6 +469,31 @@ char *get_mine_type_name(room_data *room) {
 }
 
 
+/**
+* @param room_data *room The room to get a paint color for.
+* @param char_data *ch The person viewing it, optionally, for no-paint preferences. (May be NULL.)
+* @return char* The color code if any, e.g. "&r", or NULL if not painted.
+*/
+char *get_paint_color_string(room_data *room, char_data *ch) {
+	static char color[8];
+	
+	if (!ROOM_PAINT_COLOR(room)) {
+		return NULL;	// not painted
+	}
+	if (ch && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+		return NULL;	// no paint
+	}
+	
+	// otherwise...
+	sprinttype(ROOM_PAINT_COLOR(room), paint_colors, color, sizeof(color), "&0");
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT)) {
+		strtoupper(color);
+	}
+	
+	return color;
+}
+
+
 char *get_room_description(room_data *room) {
 	static char desc[MAX_STRING_LENGTH];
 
@@ -575,9 +600,8 @@ void replace_color_codes(char *string, char *new_color) {
 void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int tileset) {
 	struct icon_data *icon;
 	sector_data *sect;
-	bool enchanted;
 	char temp[256];
-	char *str;
+	char *str, *paint_code;
 	
 	// icon_buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(icon_buf, '@')) {
@@ -615,13 +639,13 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		// west (@u) barrier attachment
 		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
 			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
-				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				paint_code = r_west ? get_paint_color_string(r_west, ch) : NULL;
 				// west is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sv", paint_code ? paint_code : "&0");
 				str = str_replace("@u", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sV", paint_code ? paint_code : "&0");
 				str = str_replace("@U", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -641,13 +665,13 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		//  east (@v) barrier attachment
 		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
 			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
-				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				paint_code = r_east ? get_paint_color_string(r_east, ch) : NULL;
 				// east is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sv", paint_code ? paint_code : "&0");
 				str = str_replace("@v", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sV", paint_code ? paint_code : "&0");
 				str = str_replace("@V", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -2177,10 +2201,12 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 		strcpy(temp, GET_SECT_NAME(BASE_SECT(to_room)));
 		partial_dark = show_dark;
 	}
+	/* not showing this anymore
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
 		sprintf(temp, "Enchanted %s", GET_BLD_NAME(GET_BUILDING(to_room)));
 		whole_dark = show_dark;
 	}
+	*/
 	else if (GET_BUILDING(to_room)) {
 		strcpy(temp, GET_BLD_NAME(GET_BUILDING(to_room)));
 		whole_dark = show_dark;

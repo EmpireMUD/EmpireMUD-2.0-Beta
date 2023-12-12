@@ -1760,58 +1760,6 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 }
 
 
-RITUAL_SETUP_FUNC(start_ritual_of_defense) {
-	static struct resource_data *defense_res = NULL;
-	bool found = FALSE;
-	
-	if (!defense_res) {
-		add_to_resource_list(&defense_res, RES_OBJECT, o_IMPERIUM_SPIKE, 1, 0);
-		add_to_resource_list(&defense_res, RES_OBJECT, o_BLOODSTONE, 1, 0);
-	}
-	
-	// valid sects
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
-		found = TRUE;
-	}
-
-	if (!found) {
-		msg_to_char(ch, "You can't perform the Ritual of Defense here.\r\n");
-		return FALSE;
-	}
-	
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You need to finish it before you can cast Ritual of Defense.\r\n");
-		return FALSE;
-	}
-	
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
-		msg_to_char(ch, "The ritual has already been performed here.\r\n");
-		return FALSE;
-	}
-	
-	if (!has_resources(ch, defense_res, TRUE, TRUE, NULL)) {
-		// message sent by has_resources
-		return FALSE;
-	}
-	
-	// OK: take resources
-	extract_resources(ch, defense_res, TRUE, NULL);
-	start_ritual(ch, ritual);
-	return TRUE;
-}
-
-
-RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
-	msg_to_char(ch, "You finish the ritual and the walls take on a strange magenta glow!\r\n");
-	act("$n finishes the ritual and the walls take on a strange magenta glow!", FALSE, ch, NULL, NULL, TO_ROOM);
-	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
-		gain_ability_exp(ch, 186, 25);
-	}
-	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
-	affect_total_room(IN_ROOM(ch));
-}
-
-
 RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 	char_data *targ;
 	bool found, earthmeld;

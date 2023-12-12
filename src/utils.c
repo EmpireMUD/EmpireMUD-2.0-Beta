@@ -5324,7 +5324,7 @@ void sprinttype(int type, const char *names[], char *result, size_t max_result_s
 		snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		snprintf(result, max_result_size, "%s", error_value);
+		snprintf(result, max_result_size, "%s", NULLSAFE(error_value));
 	}
 }
 
