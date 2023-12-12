@@ -1207,6 +1207,7 @@ void annual_update_depletions(struct depletion_data **list) {
 * @param struct map_data *tile The map tile to update.
 */
 void annual_update_map_tile(struct map_data *tile) {
+	struct affected_type *aff, *next_aff;
 	struct resource_data *old_list;
 	sector_data *old_sect;
 	int trenched, amount;
@@ -1276,6 +1277,15 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
 			// this will tear it back down to its base type
 			disassociate_building(room);
+		}
+		
+		// random chance to lose permanent affs
+		if (!ROOM_OWNER(room)) {
+			LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+				if (aff->expire_time == UNLIMITED && number(1, 100) <= 5) {
+					affect_remove_room(room, aff);
+				}
+			}
 		}
 	}
 	
