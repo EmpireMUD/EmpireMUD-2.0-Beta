@@ -54,6 +54,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 
 // ability function prototypes
 DO_ABIL(do_action_ability);
+PREP_ABIL(prep_action_ability);
 
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
@@ -106,7 +107,7 @@ struct {
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
-	{ ABILT_ACTION, NULL, do_action_ability },
+	{ ABILT_ACTION, prep_action_ability, do_action_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -3183,6 +3184,14 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
 	free(data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+PREP_ABIL(prep_action_ability) {
+	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
 }
 
 
