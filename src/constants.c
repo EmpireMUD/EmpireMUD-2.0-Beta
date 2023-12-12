@@ -3986,6 +3986,7 @@ const char *room_aff_bits[] = {
 	"HIDE-REAL-NAME",
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
+	"PERMANENT-PAINT",
 	"\n"
 };
 

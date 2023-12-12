@@ -1648,7 +1648,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (ROOM_PAINT_COLOR(room)) {
 		sprinttype(ROOM_PAINT_COLOR(room), paint_names, col_buf, sizeof(col_buf), "UNDEFINED");
 		*col_buf = LOWER(*col_buf);
-		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
+		msg_to_char(ch, "The building %s %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_PERMANENT_PAINT) ? "is" : "has been painted"), (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
 	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {

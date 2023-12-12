@@ -2368,6 +2368,7 @@ Available affects:
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
  MAPOUT-BUILDING - appears as a building on the graphical map
  NO-TRACKS - characters do not leave tracks here and the track command fails
+ PERMANENT-PAINT - paint shows different and players cannot repaint
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here

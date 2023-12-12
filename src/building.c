@@ -588,7 +588,7 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL, TRUE);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME | ROOM_AFF_PERMANENT_PAINT);
 	cancel_permanent_affects_room(room);
 	affect_total_room(room);
 
@@ -2983,7 +2983,7 @@ ACMD(do_paint) {
 		msg_to_char(ch, "You don't have permission to paint it.\r\n");
 		return;
 	}
-	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
+	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
 		msg_to_char(ch, "You can't paint that.\r\n");
 		return;
 	}

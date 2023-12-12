@@ -3090,6 +3090,7 @@ typedef enum {
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 #define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
+#define ROOM_AFF_PERMANENT_PAINT  BIT(26)	// A. paint displays different and cannot be repainted; removed automatically on dismantle
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
