@@ -779,6 +779,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on abilities. Different types of abilities may use
 different messages; see the help files for each ability type for more info.
@@ -4859,6 +4860,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on mobs, which are shown at different times
 depending upon the type of message.
@@ -5823,6 +5825,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on objects for various actions. These messages
 may use the tokens $n/$e/$s/$m for name/he/his/him for the player using the
@@ -9100,6 +9103,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on vehicles.
 

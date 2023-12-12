@@ -6720,6 +6720,12 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 }
 
 
+// Simple vnum sorter for custom message lists
+int olc_sort_custom_messages(struct custom_message *a, struct custom_message *b) {
+	return a->type - b->type;
+}
+
+
 /**
 * Processes adding/changing custom messages for various olc types.
 *
@@ -6897,11 +6903,21 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "sort")) {
+		if (*list) {
+			LL_SORT(*list, olc_sort_custom_messages);
+			msg_to_char(ch, "Custom messages sorted.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Nothing to sort.\r\n");
+		}
+	}
 	else {
 		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
-		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
-		msg_to_char(ch, "Usage: custom move <number> <up | down>\r\n");
-		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "       custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "       custom move <number> <up | down>\r\n");
+		msg_to_char(ch, "       custom remove <number | all>\r\n");
+		msg_to_char(ch, "       custom sort\r\n");
 		if (type_help_string && *type_help_string) {
 			send_to_char(type_help_string, ch);
 		}
