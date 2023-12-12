@@ -7754,7 +7754,7 @@ void do_stat_room(char_data *ch) {
 
 			// duration setup
 			if (aff->expire_time == UNLIMITED) {
-				strcpy(buf2, "infinite");
+				strcpy(buf3, "infinite");
 			}
 			else {
 				duration = aff->expire_time - time(0);
