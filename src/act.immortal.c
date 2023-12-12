@@ -11029,7 +11029,7 @@ ACMD(do_slay) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
-			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
+			if (!IS_NPC(vict)) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
@@ -11042,8 +11042,8 @@ ACMD(do_slay) {
 			tag_mob(vict, ch);	// ensures loot binding if applicable
 
 			// this would prevent the death
-			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
+			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {
+				affect_from_char_by_bitvector(vict, NOTHING, AFF_AUTO_RESURRECT, FALSE);
 			}
 
 			die(vict, ch);

@@ -261,19 +261,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_PHOENIX_RITE: {
-			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
-			need_affect_total = TRUE;
-			break;
-		}
-		case ABIL_RITUAL_OF_BURDENS: {
-			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
-				msg_to_char(ch, "Your burdens return.\r\n");
-				affect_from_char(ch, ATYPE_UNBURDENED, TRUE);
-				need_affect_total = TRUE;
-			}
-			break;
-		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON, TRUE);
 			need_affect_total = TRUE;

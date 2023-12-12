@@ -1053,6 +1053,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HUNGRIER  BIT(41)	// P. character becomes hungry faster
 #define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
 #define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
+#define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
 
 
 // Injury flags -- IS_INJURED

@@ -1300,8 +1300,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// somebody saaaaaaave meeeeeeeee
-	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
-		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
+	if (AFF_FLAGGED(ch, AFF_AUTO_RESURRECT)) {
+		affect_from_char_by_bitvector(ch, NOTHING, AFF_AUTO_RESURRECT, FALSE);
 		set_health(ch, GET_MAX_HEALTH(ch) / 4);
 		if (!IS_VAMPIRE(ch)) {
 			set_blood(ch, GET_MAX_BLOOD(ch));
@@ -1312,9 +1312,8 @@ obj_data *die(char_data *ch, char_data *killer) {
 		set_move(ch, MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5));
 		set_mana(ch, MAX(GET_MANA(ch), GET_MAX_MANA(ch) / 5));
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
-		msg_to_char(ch, "A fiery phoenix erupts from your chest and restores you to your feet!\r\n");
-		act("A fiery phoenix erupts from $n's chest and restores $m to $s feet!", FALSE, ch, NULL, NULL, TO_ROOM);
-		gain_ability_exp(ch, ABIL_PHOENIX_RITE, 100);
+		msg_to_char(ch, "You come back to life and leap back to your feet!\r\n");
+		act("$n suddenly comes back to life and leaps to $s feet!", FALSE, ch, NULL, NULL, TO_ROOM);
 		return NULL;
 	}
 	
@@ -3449,8 +3448,8 @@ void death_log(char_data *ch, char_data *killer, int type) {
 		return;
 	}
 
-	// don't deathlog for phoenix rite -- they won't be dying
-	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
+	// don't deathlog for auto-resurrect -- they won't be dying
+	if (AFF_FLAGGED(ch, AFF_AUTO_RESURRECT)) {
 		return;
 	}
 

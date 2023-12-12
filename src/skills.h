@@ -204,7 +204,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
 // #define ABIL_BAT_FORM  162
-#define ABIL_RITUAL_OF_BURDENS  163
+// #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
 // #define ABIL_SUMMON_SWIFT  168
 // #define ABIL_SUMMON_MATERIALS  169
@@ -215,7 +215,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_SLOW  175
 #define ABIL_SIPHON  176
 #define ABIL_MIRRORIMAGE  177
-#define ABIL_PHOENIX_RITE  179
+// #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
 #define ABIL_VIGOR  183
 #define ABIL_RITUAL_OF_DEFENSE  186

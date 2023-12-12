@@ -1413,6 +1413,7 @@ const char *affected_bits[] = {
 	"HUNGRIER",
 	"THIRSTIER",
 	"IMMUNE-TEMPERATURE",
+	"AUTO-RESURRECT",
 	"\n"
 };
 
@@ -1462,6 +1463,7 @@ const char *affected_bits_consider[] = {
 	"",	// hungrier
 	"",	// thirstier
 	"",	// immune-temperature
+	"",	// AUTO-RESURRECT
 	"\n"
 };
 
@@ -1510,6 +1512,7 @@ const bool aff_is_bad[] = {
 	TRUE,	// 40 - slower-actions
 	TRUE,
 	TRUE,
+	FALSE,
 	FALSE,
 };
 

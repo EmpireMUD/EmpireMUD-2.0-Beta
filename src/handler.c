@@ -355,17 +355,21 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 * Calls affect_remove on every affect of type "type" that sets AFF flag "bits".
 *
 * @param char_data *ch The person to remove affects from.
-* @param any_vnum type Any ATYPE_ const/vnum to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match. Use NOTHING to match any atype and only check bitvector.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
 void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE, any = FALSE;
+	
+	if (type == NOTHING && !bits) {
+		return;	// no work at all
+	}
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
-		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+		if ((type == NOTHING || aff->type == type) && IS_SET(aff->bitvector, bits)) {
 			if (show_msg && !shown) {
 				show_wear_off_msg(ch, type);
 				shown = TRUE;

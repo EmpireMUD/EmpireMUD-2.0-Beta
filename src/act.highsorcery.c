@@ -98,8 +98,6 @@ const struct {
 
 // ritual prototypes
 RITUAL_FINISH_FUNC(perform_devastation_ritual);
-RITUAL_FINISH_FUNC(perform_phoenix_rite);
-RITUAL_FINISH_FUNC(perform_ritual_of_burdens);
 RITUAL_FINISH_FUNC(perform_ritual_of_defense);
 RITUAL_FINISH_FUNC(perform_ritual_of_detection);
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
@@ -136,10 +134,10 @@ struct ritual_data_type {
 	RITUAL_FINISH_FUNC(*perform);	// function pointer
 	struct ritual_strings strings[24];	// one sent per tick, terminate with MESSAGE_END
 } ritual_data[] = {
-	// 0: ritual of burdens
-	{ "burdens", 5, ABIL_RITUAL_OF_BURDENS, 0, SCMD_RITUAL,
+	// 0: ritual of burdens - CONVERTED
+	{ "burdens", 5, 163, 0, SCMD_RITUAL,
 		start_simple_ritual,
-		perform_ritual_of_burdens,
+		NULL,
 		{{ "You whisper your burdens into the air...", "$n whispers $s burdens into the air..." },
 		{ "\n", "\n" }
 	}},
@@ -153,10 +151,10 @@ struct ritual_data_type {
 		MESSAGE_END
 	}},
 	
-	// 2: phoenix rite
-	{ "phoenix", 25, ABIL_PHOENIX_RITE, 0, SCMD_RITUAL,
+	// 2: phoenix rite -- CONVERTED
+	{ "phoenix", 25, 179, 0, SCMD_RITUAL,
 		start_simple_ritual,
-		perform_phoenix_rite,
+		NULL,
 		{{ "You light some candles and begin the Phoenix Rite.", "$n lights some candles." },
 		{ "You sit and place the candles in a circle around you.", "$n sits and places the candles in a circle around $mself." },
 		NO_MESSAGE,
@@ -1602,21 +1600,6 @@ RITUAL_SETUP_FUNC(start_simple_ritual) {
 }
 
 
-RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
-	struct affected_type *af;
-	
-	int burden_levels[] = { 6, 12, 18 };
-	
-	msg_to_char(ch, "You feel the weight of the world lift from your shoulders!\r\n");
-	act("$n seems uplifted!", FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	af = create_mod_aff(ATYPE_UNBURDENED, 30 * SECS_PER_REAL_MIN, APPLY_INVENTORY, CHOOSE_BY_ABILITY_LEVEL(burden_levels, ch, ABIL_RITUAL_OF_BURDENS), ch);
-	affect_join(ch, af, 0);	
-	
-	gain_ability_exp(ch, ABIL_RITUAL_OF_BURDENS, 25);
-}
-
-
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	room_data *room, *next_room, *to_room = NULL, *map;
 	struct empire_city_data *city;
@@ -1776,19 +1759,6 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 			greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
 		}
 	}
-}
-
-
-RITUAL_FINISH_FUNC(perform_phoenix_rite) {
-	struct affected_type *af;
-	
-	msg_to_char(ch, "The flames on the remaining candles shoot toward you and form the crest of the Phoenix!\r\n");
-	act("The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!", FALSE, ch, NULL, NULL, TO_ROOM);
-
-	af = create_mod_aff(ATYPE_PHOENIX_RITE, UNLIMITED, APPLY_NONE, 0, ch);
-	affect_join(ch, af, 0);
-
-	gain_ability_exp(ch, ABIL_PHOENIX_RITE, 10);
 }
 
 
