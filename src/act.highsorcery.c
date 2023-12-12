@@ -98,11 +98,9 @@ const struct {
 
 // ritual prototypes
 RITUAL_FINISH_FUNC(perform_devastation_ritual);
-RITUAL_FINISH_FUNC(perform_ritual_of_detection);
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
 RITUAL_FINISH_FUNC(perform_siege_ritual);
 RITUAL_SETUP_FUNC(start_devastation_ritual);
-RITUAL_SETUP_FUNC(start_ritual_of_detection);
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
@@ -182,9 +180,9 @@ struct ritual_data_type {
 	}},
 	
 	// 5: ritual of detection
-	{ "detection", 15, ABIL_RITUAL_OF_DETECTION, 0, SCMD_RITUAL,
-		start_ritual_of_detection,
-		perform_ritual_of_detection,
+	{ "detection", 15, 193, 0, SCMD_RITUAL,
+		NULL,
+		NULL,
 		{{ "You pull a piece of chalk from your pocket and begin drawing circles on the ground.", "$n pulls out a piece of chalk and begins drawing circles on the ground." },
 		NO_MESSAGE,
 		{ "You make crossed lines through the circles you've drawn.", "$n makes crossed lines through the circles $e has drawn." },
@@ -1756,55 +1754,6 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 			greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
 		}
 	}
-}
-
-
-RITUAL_SETUP_FUNC(start_ritual_of_detection) {
-	bool wait;
-	
-	if (!GET_LOYALTY(ch)) {
-		msg_to_char(ch, "You must be a member of an empire to do this.\r\n");
-		return FALSE;
-	}
-	if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
-		msg_to_char(ch, "You can only use the Ritual of Detection in one of your own cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
-		return FALSE;
-	}
-
-	start_ritual(ch, ritual);
-	return TRUE;
-}
-
-
-RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
-/*
-	bool found_advs, found_players, wait;
-	char *dir_str;
-	int adv_dist, player_dist;
-	char_data *ch_iter;
-	struct empire_city_data *city;
-	struct instance_data *inst;
-	room_data *loc;
-	
-	if (!GET_LOYALTY(ch)) {
-		msg_to_char(ch, "The ritual fails as you aren't in any empire.\r\n");
-	}
-	else if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) || !(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
-		msg_to_char(ch, "The ritual fails as you aren't in one of your cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
-	}
-	else {
-		msg_to_char(ch, "You complete the ritual...\r\n");
-		
-		// check for players
-
-		// check for adventures
-		
-		if (!found_players && !found_advs) {
-			msg_to_char(ch, "You detect nothing of note in the city.\r\n");
-		}
-		gain_ability_exp(ch, ABIL_RITUAL_OF_DETECTION, 15);
-	}				
-	*/
 }
 
 

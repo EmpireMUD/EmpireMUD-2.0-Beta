@@ -540,7 +540,7 @@ These are things that happen when the ability is successful.
 Action types:
  &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends per-char messages for each hidden character.
  &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target. Sends per-char messages for each hidden character.
- &cdetect players around&0 - Find other players in where-range (or in same city). Sends per-char messages.
+ &cdetect players around&0 - Find other players in where-range (or in same city). Cannot customize the message.
  &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or same city).
 
 See also: OLC ABILITIES, ABILEDIT DATA
