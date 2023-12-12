@@ -3249,7 +3249,7 @@ PREP_ABIL(prep_room_affect_ability) {
 		return;
 	}
 	
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
+	get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
 }
 
 
