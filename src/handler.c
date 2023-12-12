@@ -293,11 +293,11 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 	for (hjp = ch->affected; hjp; hjp = next) {
 		next = hjp->next;
 		if (hjp->type == type) {
+			affect_remove(ch, hjp);
 			if (show_msg && !shown) {
 				show_wear_off_msg(ch, type);
 				shown = TRUE;
 			}
-			affect_remove(ch, hjp);
 			any = TRUE;
 		}
 	}

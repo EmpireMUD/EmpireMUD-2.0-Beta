@@ -100,7 +100,6 @@ const struct {
 RITUAL_FINISH_FUNC(perform_devastation_ritual);
 RITUAL_FINISH_FUNC(perform_ritual_of_detection);
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
-RITUAL_FINISH_FUNC(perform_sense_life_ritual);
 RITUAL_FINISH_FUNC(perform_siege_ritual);
 RITUAL_SETUP_FUNC(start_devastation_ritual);
 RITUAL_SETUP_FUNC(start_ritual_of_detection);
@@ -177,7 +176,7 @@ struct ritual_data_type {
 	// 4: sense life ritual
 	{ "senselife", 15, ABIL_SENSE_LIFE_RITUAL, 0, SCMD_RITUAL,
 		start_simple_ritual,
-		perform_sense_life_ritual,
+		NULL,
 		{{ "You murmur the words to the Sense Life Ritual...", "$n murmurs some arcane words..." },
 		MESSAGE_END
 	}},

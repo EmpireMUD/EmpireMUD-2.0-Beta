@@ -531,6 +531,18 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"ABILEDIT ACTIONS" "ABILITY ACTIONS"
+
+Usage:  .data add action <type>
+
+These are things that happen when the ability is successful.
+
+Action types:
+ &cdetect hide&0 - Will show hidden characters. Requires a room target.
+ &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target.
+
+See also: OLC ABILITIES, ABILEDIT DATA
+#d
 "ABILEDIT AFFECTS" "ABILEDIT AFFECT"
 
 Usage:  .affects [add | remove] <flag>
@@ -861,7 +873,9 @@ The 'data' field is used by different types of abilities. Available types are:
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
  &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
  &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability.
- &cLIMITATION&0 - Adds a limitation to the ability. see ABILEDIT LIMITATIONS
+ &cLIMITATION&0 - Adds a limitation to the ability. See ABILEDIT LIMITATIONS
+ &cPAINT-COLOR&0 - See PAINT ITEM for list of colors.
+ &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d

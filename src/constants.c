@@ -112,6 +112,14 @@ const char *reboot_type[] = { "reboot", "shutdown" };
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY CONSTANTS ///////////////////////////////////////////////////////
 
+// ABIL_ACTION_x: ability actions
+const char *ability_actions[] = {
+	"detect hide",	// 0
+	"detect earthmeld",
+	"\n"
+};
+
+
 // ABILF_x (1/2): ability flags
 const char *ability_flags[] = {
 	"VIOLENT",	// 0
@@ -184,6 +192,7 @@ const char *ability_type_flags[] = {
 	"CONJURE-VEHICLE",	// 15
 	"ROOM-AFFECT",
 	"PAINT-BUILDING",
+	"ACTION",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -220,6 +229,7 @@ const char *ability_type_notes[] = {
 	"conjure",	// 15, actually conjure vehicle (shown to players as conjure as it can conjure furniture and buildings too)
 	"room affect",
 	"paint",
+	"action",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -312,7 +322,8 @@ const char *ability_data_types[] = {
 	"READY-WEAPON",
 	"SUMMON-MOB",
 	"LIMITATION",
-	"PAINT-COLOR",
+	"PAINT-COLOR",	// 5
+	"ACTION",
 	"\n"
 };
 

@@ -18,6 +18,7 @@ extern const char *reboot_type[];
 extern const char *version;
 
 // ability constants
+extern const char *ability_actions[];
 extern const char *ability_flags[];
 extern const char *ability_flag_notes[];
 extern const char *ability_type_flags[];

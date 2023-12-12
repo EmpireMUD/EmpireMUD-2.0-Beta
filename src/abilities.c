@@ -53,6 +53,8 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 
 
 // ability function prototypes
+DO_ABIL(do_action_ability);
+
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
 
@@ -104,6 +106,7 @@ struct {
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
+	{ ABILT_ACTION, NULL, do_action_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -149,6 +152,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_PAINT_COLOR: {
 			snprintf(output, sizeof(output), "%s: %s%s", temp, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			break;
+		}
+		case ADL_ACTION: {
+			snprintf(output, sizeof(output), "%s: %s", temp, ability_actions[adl->vnum]);
 			break;
 		}
 		default: {
@@ -2528,6 +2535,81 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		else {
 			// send a full fail
 			send_ability_fail_messages(ch, vict, ovict, abil, data);
+		}
+	}
+}
+
+
+/**
+* Performs an action.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+*/
+DO_ABIL(do_action_ability) {
+	struct ability_data_list *adl;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_ACTION) {
+			continue;
+		}
+		
+		// ABIL_ACTION_x: these should set data->success to TRUE if they succeed
+		switch (adl->vnum) {
+			case ABIL_ACTION_DETECT_HIDE: {
+				char_data *targ;
+				bool had_sense;
+				
+				if (room_targ) {
+					had_sense = AFF_FLAGGED(ch, AFF_SENSE_HIDE) ? TRUE : FALSE;
+					
+					DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
+						if (targ == ch) {
+							continue;
+						}
+						
+						if (AFF_FLAGGED(targ, AFF_HIDE)) {
+							// hidden target
+							SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+
+							if (CAN_SEE(ch, targ)) {
+								act("You sense $N hiding here!", FALSE, ch, NULL, targ, TO_CHAR);
+								REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+								affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
+								msg_to_char(targ, "You are discovered!\r\n");
+								data->success = TRUE;
+							}
+							
+							if (!had_sense) {
+								REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+							}
+						}
+					}
+				}
+				break;
+			}
+			case ABIL_ACTION_DETECT_EARTHMELD: {
+				char_data *targ;
+				
+				if (room_targ) {
+					DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
+						if (targ == ch) {
+							continue;
+						}
+						
+						if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+							if (CAN_SEE(ch, targ)) {
+								act("You sense $N here!", FALSE, ch, NULL, targ, TO_CHAR);
+								data->success = TRUE;
+							}
+						}
+					}
+				}
+				break;
+			}
 		}
 	}
 }
@@ -5346,6 +5428,9 @@ OLC_MODULE(abiledit_data) {
 	
 	// ADL_x: determine valid types first
 	allowed_types |= ADL_EFFECT | ADL_LIMITATION;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
+		allowed_types |= ADL_ACTION;
+	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		allowed_types |= ADL_PLAYER_TECH;
 	}
@@ -5449,6 +5534,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_PAINT_COLOR: {
 					if ((val_id = search_block(val_arg, paint_names, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Invalid paint color '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_ACTION: {
+					if ((val_id = search_block(val_arg, ability_actions, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid ability action '%s'.\r\n", val_arg);
 						return;
 					}
 					break;

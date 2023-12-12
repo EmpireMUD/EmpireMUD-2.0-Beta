@@ -1304,7 +1304,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// somebody saaaaaaave meeeeeeeee
 	if (AFF_FLAGGED(ch, AFF_AUTO_RESURRECT)) {
-		affect_from_char_by_bitvector(ch, NOTHING, AFF_AUTO_RESURRECT, FALSE);
+		affects_from_char_by_aff_flag(ch, AFF_AUTO_RESURRECT, FALSE);
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_AUTO_RESURRECT);	// in case of mobs
 		set_health(ch, GET_MAX_HEALTH(ch) / 4);
 		if (!IS_VAMPIRE(ch)) {

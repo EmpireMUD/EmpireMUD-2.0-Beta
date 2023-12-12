@@ -582,6 +582,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_CONJURE_VEHICLE  BIT(15)	// creates a vehicle in the room
 #define ABILT_ROOM_AFFECT  BIT(16)	// puts an affect on a room
 #define ABILT_PAINT_BUILDING  BIT(17)	// applies color to the building
+#define ABILT_ACTION  BIT(18)	// performs an action (from data list)
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -615,6 +616,11 @@ typedef struct vehicle_data vehicle_data;
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
 #define VEH_ATARS  (ATAR_VEH_ROOM | ATAR_VEH_WORLD)
+
+
+// ABIL_ACTION_x: ability actions
+#define ABIL_ACTION_DETECT_HIDE  0	// finds hidden characters
+#define ABIL_ACTION_DETECT_EARTHMELD  1	// finds earthmelded characters
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -656,6 +662,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
 #define ADL_LIMITATION  BIT(4)	// special checks on the ability
 #define ADL_PAINT_COLOR  BIT(5)	// for paint-building, etc
+#define ADL_ACTION  BIT(6)	// has a specific action when successful
 
 
 // AGH_x: ability gain hooks
