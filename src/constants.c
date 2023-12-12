@@ -133,6 +133,7 @@ const char *ability_flags[] = {
 	"NOT-IN-COMBAT",
 	"ONE-AT-A-TIME",
 	"OVER-TIME",
+	"SPOKEN",
 	"\n"
 };
 
@@ -158,6 +159,7 @@ const char *ability_flag_notes[] = {
 	"",	// NOT-IN-COMBAT
 	"",	// ONE-AT-A-TIME
 	"long action",
+	"spoken aloud",
 	"\n"
 };
 

@@ -914,6 +914,7 @@ The following ability flags are available:
  &cNOT-IN-COMBAT&0 - Ability cannot be used in combat even if min-position is low.
  &cONE-AT-A-TIME&0 - For some ability types, prevents use when already active.
  &cOVER-TIME&0 - Like a ritual or chant; see ABILEDIT OVER-TIME
+ &cSPOKEN&0 - Ability is spoken aloud and is blocked by the SILENT room affect.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

@@ -559,6 +559,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_NOT_IN_COMBAT  BIT(16)	// q. prevents use in combat despite min-position
 #define ABILF_ONE_AT_A_TIME  BIT(17)	// r. for some types, prevents them from being used while already active
 #define ABILF_OVER_TIME  BIT(18)	// s. takes multiple turns, like a chant or ritual
+#define ABILF_SPOKEN  BIT(19)	// t. ability is said out loud (blocked by the SILENT room affect)
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

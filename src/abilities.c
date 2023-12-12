@@ -419,6 +419,10 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
 		return FALSE;	// sun fail
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_SPOKEN) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
+		msg_to_char(ch, "You can't seem to get the words out.\r\n");
+		return FALSE;
+	}
 	
 	// ok!
 	return TRUE;
