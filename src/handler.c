@@ -511,6 +511,23 @@ void affect_from_room_by_caster(room_data *room, any_vnum type, char_data *caste
 
 
 /**
+* Shuts off any unlimited-duration effects on the room, e.g. when dismantling.
+*
+* @param room_data *room The room to remove "unlimited" effects from.
+*/
+void cancel_permanent_affects_room(room_data *room) {
+	struct affected_type *hjp, *next;
+
+	LL_FOREACH_SAFE(ROOM_AFFECTS(room), hjp, next) {
+		next = hjp->next;
+		if (hjp->expire_time == UNLIMITED) {
+			affect_remove_room(room, hjp);
+		}
+	}
+}
+
+
+/**
 * Applies an effect to a character, replacing the version that used 4 arguments
 * instead of bitvectors. You cannot set both add & average; it prefers add if
 * you do.

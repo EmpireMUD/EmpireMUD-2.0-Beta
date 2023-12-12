@@ -589,6 +589,7 @@ void disassociate_building(room_data *room) {
 	
 	// remove bits including dismantle
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME);
+	cancel_permanent_affects_room(room);
 	affect_total_room(room);
 
 	// free up the customs
