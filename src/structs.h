@@ -610,7 +610,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
 #define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
 #define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
-#define ATAR_ROOM  BIT(14)	// targets the room
+#define ATAR_ROOM_HERE  BIT(14)	// targets the room you're in
 
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)

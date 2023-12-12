@@ -1125,7 +1125,7 @@ See also: OLC ABILITIES, CHANT, RITUAL
 
 A PAINT-BUILDING ability applies a color to the building. This requires at
 least one PAINT-COLOR data entry; more than 1 results in a random choice.
-It always targets the room -- you must set the &gROOM&0 target flag.
+It always targets the room -- you must set a &gROOM&0 target flag.
 
 For a list of paint colors, see HELP PAINT ITEM
 
@@ -1286,7 +1286,7 @@ See also: OLC CRAFTS, RESOURCE ACTIONS
 
 The ROOM-AFFECT ability type means that the ability will place an effect on the
 room. This type of ability cannot be combined with buff or passive-buff
-abilities. It always targets the room -- you must set the &gROOM&0 target flag.
+abilities. It always targets the room -- you must set a &gROOM&0 target flag.
 
 These support the TOGGLE flag if the player can choose to end them.
 
@@ -1378,7 +1378,7 @@ modify each other. They are:
  &cOBJ-EQUIP&0 - Targets an object you're wearing.
  &cVEH-ROOM&0 - Targets a vehicle in the room.
  &cVEH-WORLD&0 - Targets a vehicle anywhere.
- &cROOM&0 - Targets the room.
+ &cROOM-HERE&0 - Targets the room you're in.
 
 See also: OLC ABILITIES
 #d

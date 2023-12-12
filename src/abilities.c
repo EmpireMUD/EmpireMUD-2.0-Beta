@@ -1423,9 +1423,10 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 * @param char_data *ch The person using the ability.
 * @paran ability_data *abil Which ability.
 * @param char_data *vict Optional: The character target (may be NULL if not used).
+* @param room_data *room_targ Optional: The room target (may be NULL if not used).
 * @return bool TRUE if ok, FALSE if failed.
 */
-bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict) {
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, room_data *room_targ) {
 	if (!ch || !abil) {
 		return FALSE;	// missing abil
 	}
@@ -1460,6 +1461,10 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict)
 			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
 			return FALSE;
 		}
+	}
+	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
+		msg_to_char(ch, "You have to use it on the room you're in.\r\n");
+		return FALSE;
 	}
 	if (!check_ability_limitations(ch, abil, IN_ROOM(ch))) {
 		// sends own message when false
@@ -2230,7 +2235,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict)) {
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict, targ_room)) {
 		cancel_action(ch);
 		return;
 	}
@@ -3005,7 +3010,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		
 		// room target
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM)) {
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
 			if (is_abbrev(argptr, "room") || is_abbrev(argptr, "area") || is_abbrev(argptr, "here")) {
 				room_targ = IN_ROOM(ch);
 				has = TRUE;
@@ -3014,7 +3019,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else {	// no arg and no tar-ignore
 		// room target
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM)) {
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
 			// only targets in-room for now
 			room_targ = IN_ROOM(ch);
 			has = TRUE;
@@ -3053,7 +3058,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	else if (!validate_ability_target(ch, abil, vict)) {
+	else if (!validate_ability_target(ch, abil, vict, room_targ)) {
 		// sent own message
 		return;
 	}
