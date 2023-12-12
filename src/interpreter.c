@@ -116,7 +116,6 @@ ACMD(do_credits);
 ACMD(do_customize);
 
 ACMD(do_damage_spell);
-ACMD(do_darkness);
 ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_deathshroud);
@@ -659,7 +658,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "cast", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_CAST ),
 	SCMD_CMD( "compact", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
-	ABILITY_CMD( "darkness", POS_STANDING, do_darkness, NO_MIN, CTYPE_SKILL, ABIL_DARKNESS ),
 	SCMD_CMD( "date", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_DATE ),
 	GRANT_CMD( "dc", POS_DEAD, do_dc, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_DC ),
 	SCMD_CMD( "drink", POS_RESTING, do_drink, NO_MIN, CTYPE_UTIL, SCMD_DRINK ),

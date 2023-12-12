@@ -79,7 +79,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 /**
 * @param room_data *room The room to check.
-* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_MAGIC_DARKNESS -- presumably because you already checked it.
 * @return bool TRUE if any adjacent room is light; otherwise FALSE.
 */
 bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness) {
@@ -1429,7 +1429,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						// nothing to show?
 						send_to_char(blocked_tile, ch);
 					}
-					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) && !show_blocked) {
+					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_MAGIC_DARKNESS) && !show_blocked) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
@@ -1720,7 +1720,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\t[B300]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
 	}
 	
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS)) {
 		msg_to_char(ch, "The area is blanketed in an inky darkness.\r\n");
 	}
 
@@ -2313,7 +2313,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 				strcpy(roombuf, "Blocked");
 			}
 		}
-		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_MAGIC_DARKNESS)) {
 			// magic dark
 			strcpy(roombuf, "Dark");
 		}

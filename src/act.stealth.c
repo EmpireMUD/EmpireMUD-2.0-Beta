@@ -663,45 +663,6 @@ ACMD(do_backstab) {
 }
 
 
-ACMD(do_darkness) {
-	struct affected_type *af;
-	int cost = 15;
-
-	if (!can_use_ability(ch, ABIL_DARKNESS, MOVE, cost, COOLDOWN_DARKNESS)) {
-		// sends own message
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DARKNESS)) {
-		return;
-	}
-	else if (room_affected_by_spell(IN_ROOM(ch), ATYPE_DARKNESS)) {
-		affect_from_room(IN_ROOM(ch), ATYPE_DARKNESS);
-		
-		msg_to_char(ch, "You wave your hand and the darkness dissipates.\r\n");
-		act("$n waves $s hand and the darkness dissipates.", FALSE, ch, 0, 0, TO_ROOM);
-
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_OTHER);
-	}
-	else {
-		msg_to_char(ch, "You draw upon the shadows to blanket the area in an inky darkness!\r\n");
-		act("Shadows seem to spread from $n, blanketing the area in an inky darkness!", FALSE, ch, 0, 0, TO_ROOM);
-
-		CREATE(af, struct affected_type, 1);
-		af->type = ATYPE_DARKNESS;
-		af->cast_by = CAST_BY_ID(ch);
-		af->expire_time = time(0) + 75;
-		af->modifier = 0;
-		af->location = APPLY_NONE;
-		af->bitvector = ROOM_AFF_DARK;
-
-		affect_to_room(IN_ROOM(ch), af);
-		free(af);	// affect_to_room duplicates affects
-		gain_ability_exp(ch, ABIL_DARKNESS, 20);
-		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DARKNESS, 15, WAIT_ABILITY);
-	}
-}
-
-
 ACMD(do_disguise) {
 	char_data *vict;
 	

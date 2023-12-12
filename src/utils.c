@@ -5807,7 +5807,7 @@ sector_data *get_sect_by_name(char *name) {
 */
 bool check_sunny(room_data *room) {
 	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
-	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
+	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS));
 }
 
 
@@ -6754,7 +6754,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 *
 * @param room_data *room The room to check (which may be light).
 * @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
-* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_MAGIC_DARKNESS -- presumably because you already checked it.
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {

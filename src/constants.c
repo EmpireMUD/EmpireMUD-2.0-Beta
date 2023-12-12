@@ -1082,6 +1082,7 @@ const char *player_tech_types[] = {
 	"Saw-Command",
 	"Scrape-Command",
 	"Map-Memory",
+	"See-In-Magic-Darkness",
 	"\n"
 };
 
@@ -3956,7 +3957,7 @@ const char *road_types[] = {
 
 /* ROOM_AFF_x: */
 const char *room_aff_bits[] = {
-	"DARK",	// 0
+	"MAGIC-DARKNESS",	// 0
 	"SILENT",
 	"*HAS-INSTANCE",
 	"CHAMELEON",

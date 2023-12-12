@@ -1941,7 +1941,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_MAGIC_DARKNESS)) {
 		return FALSE;
 	}
 	
@@ -2035,7 +2035,7 @@ void process_tower(room_data *room) {
 	}
 	
 	// darkness effect
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS)) {
 		return;
 	}
 	
