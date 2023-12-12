@@ -696,6 +696,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_CAN_USE_MEMBER  4	// member permission on tile
 #define ABIL_LIMIT_ON_ROAD  5	// must be a road
 #define ABIL_LIMIT_PAINTABLE_BUILDING  6	// building can be painted by a player
+#define ABIL_LIMIT_IN_CITY  7	// must be in a city
+#define ABIL_LIMIT_HAVE_EMPIRE  8	// must be a member of an empire
 
 
 // RUN_ABIL_x: modes for activating abilities

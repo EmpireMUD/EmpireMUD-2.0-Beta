@@ -371,6 +371,8 @@ const char *ability_limitations[] = {
 	"can use as member",
 	"on a road",	// 5
 	"paintable building",
+	"in a city",
+	"have an empire",
 	"\n"
 };
 

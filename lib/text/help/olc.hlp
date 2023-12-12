@@ -1027,6 +1027,8 @@ Limitation types:
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
  &con a road&0 - Must be used on a road tile.
  &cpaintable building&0 - Must be used on a building the player can paint.
+ &cin a city&0 - Must be in any city (tile must also be claimed).
+ &chave an empire&0 - Must be a member of any empire.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

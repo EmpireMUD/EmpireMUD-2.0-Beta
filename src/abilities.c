@@ -1625,6 +1625,22 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 				}
 				break;
 			}
+			case ABIL_LIMIT_IN_CITY: {
+				bool wait;
+				
+				if (!ROOM_OWNER(room) && !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait)) {
+					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_HAVE_EMPIRE: {
+				if (!GET_LOYALTY(ch)) {
+					msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
