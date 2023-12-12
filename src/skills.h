@@ -218,7 +218,7 @@ bool trigger_counterspell(char_data *ch);
 // #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
 #define ABIL_VIGOR  183
-#define ABIL_RITUAL_OF_DEFENSE  186
+// #define ABIL_RITUAL_OF_DEFENSE  186
 #define ABIL_RITUAL_OF_TELEPORTATION  187
 #define ABIL_PORTAL_MAGIC  189
 #define ABIL_PORTAL_MASTER  190

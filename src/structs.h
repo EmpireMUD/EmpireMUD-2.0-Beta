@@ -648,6 +648,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
 #define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
 #define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
+#define ADL_LIMITATION  BIT(4)	// special checks on the ability
 
 
 // AGH_x: ability gain hooks
@@ -667,6 +668,14 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
 #define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
 #define AGH_NOT_WHILE_ASLEEP  BIT(15)	// prevent gains while sleeping (or dying)
+
+
+// ABIL_LIMIT_x: Limitations when trying to use an ability
+#define ABIL_LIMIT_ON_BARRIER  0	// must be on a barrier
+#define ABIL_LIMIT_OWN_TILE  1	// must own the tile
+#define ABIL_LIMIT_CAN_USE_GUEST  2	// guest permission on tile
+#define ABIL_LIMIT_CAN_USE_ALLY  3	// ally permission on tile
+#define ABIL_LIMIT_CAN_USE_MEMBER  4	// member permission on tile
 
 
 // RUN_ABIL_x: modes for activating abilities

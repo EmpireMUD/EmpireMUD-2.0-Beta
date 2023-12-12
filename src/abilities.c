@@ -30,7 +30,9 @@
 /**
 * Contents:
 *   Helpers
+*   Ability Effects and Limits
 *   Ability Messaging
+*   Abilities Over Time
 *   Ability Commands
 *   Utilities
 *   Database
@@ -44,6 +46,8 @@ const char *default_ability_name = "Unnamed Ability";
 const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 
 // local protos
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, int level, int run_mode, struct ability_exec *data);
+bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 
@@ -129,6 +133,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_SUMMON_MOB: {
 			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			break;
+		}
+		case ADL_LIMITATION: {
+			snprintf(output, sizeof(output), "%s: %s", temp, ability_limitations[adl->vnum]);
 			break;
 		}
 		default: {
@@ -1388,42 +1396,6 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 
 
 /**
-* Begins an over-time ability and sends the first message. It will also charge
-* any costs. Everything else should be pre-validated here.
-*
-* @param char_data *ch The person doing the ability (must be a player, not NPC).
-* @param ability_data *abil The ability being used.
-* @param char *argument The remaining arguments.
-* @param char_data *vict The character target (NULL if none).
-* @param obj_data *ovict The object target (NULL if none).
-* @param vehicle_data *vvict The vehicle target (NULL if none).
-* @param room_data *room_targ The room target (NULL if none).
-* @param int level Pre-determined ability level.
-* @param struct ability_exec *data The execution data for the ability.
-*/
-void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data) {
-	if (!ch || IS_NPC(ch) || !abil) {
-		return;	// nothing to see here
-	}
-	
-	send_ability_activation_messages(ch, vict, ovict, abil, 0, data);
-	
-	// TODO: this could also be ACT_CHANT/ACT_RITUAL?
-	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
-	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
-	GET_ACTION_VNUM(ch, 1) = level;
-	GET_ACTION_VNUM(ch, 2) = data->cost;
-	GET_ACTION_CHAR_TARG(ch) = vict;
-	GET_ACTION_OBJ_TARG(ch) = ovict;
-	GET_ACTION_VEH_TARG(ch) = vvict;
-	GET_ACTION_ROOM_TARG(ch) = room_targ ? GET_ROOM_VNUM(room_targ) : NOWHERE;
-	if (GET_ACTION_STRING(ch)) {
-		GET_ACTION_STRING(ch) = str_dup(NULLSAFE(argument));
-	}
-}
-
-
-/**
 * Validates the targets of an ability when first used. Also re-validates on
 * over-time abilities. This sends a message if it fails.
 *
@@ -1468,6 +1440,10 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict)
 			return FALSE;
 		}
 	}
+	if (!check_ability_limitations(ch, abil, IN_ROOM(ch))) {
+		// sends own message when false
+		return FALSE;
+	}
 	/* TODO: if group abilities are added
 	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
 		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
@@ -1494,6 +1470,112 @@ int wordcount_ability(ability_data *abil) {
 	count += wordcount_custom_messages(ABIL_CUSTOM_MSGS(abil));
 	
 	return count;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
+
+/**
+* For abilities with 'effects' data, this function manages them. This function
+* is silent unless an effect happens.
+*
+* @param ability_dta *abil The ability being used.
+* @param char_data *ch The character using the ability.
+*/
+void apply_ability_effects(ability_data *abil, char_data *ch) {
+	struct ability_data_list *data;
+	
+	if (!abil || !ch) {
+		return;	// no harm
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), data) {
+		if (data->type != ADL_EFFECT) {
+			continue;
+		}
+		
+		// ABIL_EFFECT_x: applying the effect
+		switch (data->vnum) {
+			case ABIL_EFFECT_DISMOUNT: {
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					act("$n climbs down from $s mount.", TRUE, ch, NULL, NULL, TO_ROOM);
+					perform_dismount(ch);
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Determines if a player can use an ability based on its limitations. Sends a
+* message in case of failure, but not on success.
+*
+* @param char_data *ch The player using the ability.
+* @param ability_data *abil Which ability.
+* @param room_data *room Optional: For room-targeting abilities, must provide the room. (or NULL)
+* @return bool TRUE if ok, FALSE if there was a problem. Only sends a message if it was false.
+*/
+bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room) {
+	struct ability_data_list *adl;
+	
+	if (!ch || !abil) {
+		return FALSE;	// no work
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_LIMITATION) {
+			continue;
+		}
+		
+		// ok
+		switch (adl->vnum) {
+			case ABIL_LIMIT_ON_BARRIER: {
+				if (!room || !ROOM_BLD_FLAGGED(room, BLD_BARRIER)) {
+					msg_to_char(ch, "You need to do that on a barrier or wall of some kind.\r\n");
+					return FALSE;
+				}
+				else if (!IS_COMPLETE(room)) {
+					msg_to_char(ch, "You need to finish building the barrier first.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_OWN_TILE: {
+				if (!room || !GET_LOYALTY(ch) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+					msg_to_char(ch, "You need to do that at a location you own.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_USE_GUEST: {
+				if (!room || !can_use_room(ch, room, GUESTS_ALLOWED)) {
+					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_USE_ALLY: {
+				if (!room || !can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
+					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_USE_MEMBER: {
+				if (!room || !can_use_room(ch, room, MEMBERS_ONLY)) {
+					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+		}
+	}
+	
+	return TRUE;	// ok
 }
 
 
@@ -2001,41 +2083,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// ABILITY COMMANDS ////////////////////////////////////////////////////////
-
-/**
-* For abilities with 'effects' data, this function manages them. This function
-* is silent unless an effect happens.
-*
-* @param ability_dta *abil The ability being used.
-* @param char_data *ch The character using the ability.
-*/
-void apply_ability_effects(ability_data *abil, char_data *ch) {
-	struct ability_data_list *data;
-	
-	if (!abil || !ch) {
-		return;	// no harm
-	}
-	
-	LL_FOREACH(ABIL_DATA(abil), data) {
-		if (data->type != ADL_EFFECT) {
-			continue;
-		}
-		
-		// ABIL_EFFECT_x: applying the effect
-		switch (data->vnum) {
-			case ABIL_EFFECT_DISMOUNT: {
-				if (IS_RIDING(ch)) {
-					msg_to_char(ch, "You climb down from your mount.\r\n");
-					act("$n climbs down from $s mount.", TRUE, ch, NULL, NULL, TO_ROOM);
-					perform_dismount(ch);
-				}
-				break;
-			}
-		}
-	}
-}
-
+//// ABILITIES OVER TIME COMMANDS ////////////////////////////////////////////
 
 /**
 * Cancels an over-time ability and attempts to refund any costs.
@@ -2068,6 +2116,107 @@ void cancel_over_time_ability(char_data *ch) {
 	}
 }
 
+
+/**
+* This function is called by the action message each update tick, for a person
+* who is doing an over-time ability.
+*
+* @param char_data *ch The person doing the ability.
+*/
+void perform_over_time_ability(char_data *ch) {
+	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
+	ability_data *abil;
+	char_data *vict;
+	obj_data *ovict;
+	vehicle_data *vvict;
+	room_data *targ_room;
+	struct ability_exec *data;
+	struct ability_exec_type *aet, *next_aet;
+	
+	// re-validate ability
+	if (!(abil = ability_proto(abil_vnum)) || !has_ability(ch, abil_vnum) || !check_ability_pre_target(ch, abil)) {
+		// lost the ability or can't use it now -- this sometimes sent a message but doesn't need to if not
+		cancel_action(ch);
+		return;
+	}
+	
+	// re-validate target
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict)) {
+		cancel_action(ch);
+		return;
+	}
+	
+	// construct data
+	CREATE(data, struct ability_exec, 1);
+	data->abil = abil;
+	data->should_charge_cost = FALSE;	// already charged, generally
+	data->matching_role = has_matching_role(ch, abil, TRUE);
+	GET_RUNNING_ABILITY_DATA(ch) = data;
+	
+	// message position is controlled by action timer
+	GET_ACTION_TIMER(ch) += 1;
+	send_ability_activation_messages(ch, vict, ovict, abil, GET_ACTION_TIMER(ch), data);
+	
+	// detect continuing?
+	if (vict && vict != ch && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+		// ongoing ability: do nothing
+	}
+	else if ((!vict || vict == ch) && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+		// ongoing ability: do nothing
+	}
+	else {
+		// done!
+		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		end_action(ch);
+	}
+	
+	// clean up data
+	LL_FOREACH_SAFE(data->types, aet, next_aet) {
+		free(aet);
+	}
+	GET_RUNNING_ABILITY_DATA(ch) = NULL;
+	free(data);
+}
+
+
+/**
+* Begins an over-time ability and sends the first message. It will also charge
+* any costs. Everything else should be pre-validated here.
+*
+* @param char_data *ch The person doing the ability (must be a player, not NPC).
+* @param ability_data *abil The ability being used.
+* @param char *argument The remaining arguments.
+* @param char_data *vict The character target (NULL if none).
+* @param obj_data *ovict The object target (NULL if none).
+* @param vehicle_data *vvict The vehicle target (NULL if none).
+* @param room_data *room_targ The room target (NULL if none).
+* @param int level Pre-determined ability level.
+* @param struct ability_exec *data The execution data for the ability.
+*/
+void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data) {
+	if (!ch || IS_NPC(ch) || !abil) {
+		return;	// nothing to see here
+	}
+	
+	send_ability_activation_messages(ch, vict, ovict, abil, 0, data);
+	
+	// TODO: this could also be ACT_CHANT/ACT_RITUAL?
+	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
+	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
+	GET_ACTION_VNUM(ch, 1) = level;
+	GET_ACTION_VNUM(ch, 2) = data->cost;
+	GET_ACTION_CHAR_TARG(ch) = vict;
+	GET_ACTION_OBJ_TARG(ch) = ovict;
+	GET_ACTION_VEH_TARG(ch) = vvict;
+	GET_ACTION_ROOM_TARG(ch) = room_targ ? GET_ROOM_VNUM(room_targ) : NOWHERE;
+	if (GET_ACTION_STRING(ch)) {
+		GET_ACTION_STRING(ch) = str_dup(NULLSAFE(argument));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY COMMANDS ////////////////////////////////////////////////////////
 
 /**
 * This checks if "string" is an ability's command, and performs it if so. This
@@ -2772,68 +2921,6 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	// 9. clean up data
-	LL_FOREACH_SAFE(data->types, aet, next_aet) {
-		free(aet);
-	}
-	GET_RUNNING_ABILITY_DATA(ch) = NULL;
-	free(data);
-}
-
-
-/**
-* This function is called by the action message each update tick, for a person
-* who is doing an over-time ability.
-*
-* @param char_data *ch The person doing the ability.
-*/
-void perform_over_time_ability(char_data *ch) {
-	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
-	ability_data *abil;
-	char_data *vict;
-	obj_data *ovict;
-	vehicle_data *vvict;
-	room_data *targ_room;
-	struct ability_exec *data;
-	struct ability_exec_type *aet, *next_aet;
-	
-	// re-validate ability
-	if (!(abil = ability_proto(abil_vnum)) || !has_ability(ch, abil_vnum) || !check_ability_pre_target(ch, abil)) {
-		// lost the ability or can't use it now -- this sometimes sent a message but doesn't need to if not
-		cancel_action(ch);
-		return;
-	}
-	
-	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict)) {
-		cancel_action(ch);
-		return;
-	}
-	
-	// construct data
-	CREATE(data, struct ability_exec, 1);
-	data->abil = abil;
-	data->should_charge_cost = FALSE;	// already charged, generally
-	data->matching_role = has_matching_role(ch, abil, TRUE);
-	GET_RUNNING_ABILITY_DATA(ch) = data;
-	
-	// message position is controlled by action timer
-	GET_ACTION_TIMER(ch) += 1;
-	send_ability_activation_messages(ch, vict, ovict, abil, GET_ACTION_TIMER(ch), data);
-	
-	// detect continuing?
-	if (vict && vict != ch && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
-		// ongoing ability: do nothing
-	}
-	else if ((!vict || vict == ch) && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
-		// ongoing ability: do nothing
-	}
-	else {
-		// done!
-		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
-		end_action(ch);
-	}
-	
-	// clean up data
 	LL_FOREACH_SAFE(data->types, aet, next_aet) {
 		free(aet);
 	}
@@ -4989,7 +5076,7 @@ OLC_MODULE(abiledit_data) {
 	bool found;
 	
 	// ADL_x: determine valid types first
-	allowed_types |= ADL_EFFECT;
+	allowed_types |= ADL_EFFECT | ADL_LIMITATION;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		allowed_types |= ADL_PLAYER_TECH;
 	}
@@ -5076,6 +5163,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_SUMMON_MOB: {
 					if ((val_id = atoi(val_arg)) <= 0 || !mob_proto(val_id)) {
 						msg_to_char(ch, "Invalid mob vnum for summonable mob '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_LIMITATION: {
+					if ((val_id = search_block(val_arg, ability_limitations, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid limitation '%s'.\r\n", val_arg);
 						return;
 					}
 					break;

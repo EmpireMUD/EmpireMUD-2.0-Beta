@@ -301,6 +301,7 @@ const char *ability_data_types[] = {
 	"EFFECT",
 	"READY-WEAPON",
 	"SUMMON-MOB",
+	"LIMITATION",
 	"\n"
 };
 
@@ -330,6 +331,17 @@ const char *ability_gain_hooks[] = {
 	"ONLY-USING-READY-WEAPON",
 	"ONLY-USING-COMPANIONS",
 	"NOT-WHILE-ASLEEP",	// 15
+	"\n"
+};
+
+
+// ABIL_LIMIT_x: Limitations when trying to use an ability
+const char *ability_limitations[] = {
+	"on a barrier tile", 	// 0
+	"own the tile",
+	"can use as guest",
+	"can use as ally",
+	"can use as member",
 	"\n"
 };
 

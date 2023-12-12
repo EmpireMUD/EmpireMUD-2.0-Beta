@@ -98,13 +98,11 @@ const struct {
 
 // ritual prototypes
 RITUAL_FINISH_FUNC(perform_devastation_ritual);
-RITUAL_FINISH_FUNC(perform_ritual_of_defense);
 RITUAL_FINISH_FUNC(perform_ritual_of_detection);
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
 RITUAL_FINISH_FUNC(perform_sense_life_ritual);
 RITUAL_FINISH_FUNC(perform_siege_ritual);
 RITUAL_SETUP_FUNC(start_devastation_ritual);
-RITUAL_SETUP_FUNC(start_ritual_of_defense);
 RITUAL_SETUP_FUNC(start_ritual_of_detection);
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
@@ -165,9 +163,9 @@ struct ritual_data_type {
 	}},
 	
 	// 3: ritual of defense
-	{ "defense", 15, ABIL_RITUAL_OF_DEFENSE, 0, SCMD_RITUAL,
-		start_ritual_of_defense,
-		perform_ritual_of_defense,
+	{ "defense", 15, 186, 0, SCMD_RITUAL,
+		NULL,
+		NULL,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
 		{ "You say, 'Empower now this wall of stone...'", "$n says, 'Empower now this wall of stone...'" },
 		{ "You say, 'With wisdom of the sages...'", "$n says, 'With wisdom of the sages...'" },
@@ -1807,7 +1805,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
 	msg_to_char(ch, "You finish the ritual and the walls take on a strange magenta glow!\r\n");
 	act("$n finishes the ritual and the walls take on a strange magenta glow!", FALSE, ch, NULL, NULL, TO_ROOM);
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
-		gain_ability_exp(ch, ABIL_RITUAL_OF_DEFENSE, 25);
+		gain_ability_exp(ch, 186, 25);
 	}
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
 	affect_total_room(IN_ROOM(ch));

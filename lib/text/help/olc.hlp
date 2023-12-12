@@ -857,7 +857,8 @@ The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
  &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
- &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability
+ &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability.
+ &cLIMITATION&0 - Adds a limitation to the ability. see ABILEDIT LIMITATIONS
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -991,6 +992,19 @@ be targeted by this ability.
 Any affect flag can be used for this.
 
 See also: AFFECT FLAGS, OLC ABILITIES
+#d
+"ABILEDIT LIMITATIONS" "ABILEDIT LIMITS" "ABILITY LIMITATIONS" "ABILITY LIMITS"
+
+Usage:  .data add limitation <type>
+
+Limitation types:
+ &con a barrier tile&0 - Must be used on a barrier (wall) tile.
+ &cown the tile&0 - Your empire must own the location.
+ &ccan use as guest&0 - Location must be unclaimed or you have guest access.
+ &ccan use as ally&0 - Location must be unclaimed or you are an ally.
+ &ccan use as member&0 - Location must be unclaimed or owned by your empire.
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
