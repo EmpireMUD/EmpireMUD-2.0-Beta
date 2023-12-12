@@ -726,7 +726,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
 #define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
 #define ADV_GLOBAL_NEARBY  BIT(14)	// o. will show the closest one no matter how far away
-#define ADV_DETECTABLE  BIT(15)	// p. can be found e.g. with ritual of detection
+#define ADV_DETECTABLE  BIT(15)	// p. can be found with the ability action "detect adventures around"
 
 
 // ADV_LINK_x: adventure link rule types

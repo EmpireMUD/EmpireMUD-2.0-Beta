@@ -1541,7 +1541,7 @@ The following adventure flags are available:
  &cCHECK-OUTSIDE-FIGHTS&0 - Makes sure nobody is fighting a mob from the instance
  &c   outside the adventure, before despawning.
  &cGLOBAL-NEARBY&0 - Shows the nearest location from any distance.
- &cDETECTABLE&0 - Can be detected e.g. with Ritual of Detection.
+ &cDETECTABLE&0 - Can be detected with the ability action "detect adventures around".
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
