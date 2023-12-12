@@ -2592,13 +2592,15 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check for a no-effect/fail message
 	if (!data->success && !data->no_msg) {
+		/* currently always showing the whole fail message
 		if (data->sent_any_msg) {
 			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
 		}
 		else {
 			// send a full fail
+		*/
 			send_ability_fail_messages(ch, vict, ovict, abil, data);
-		}
+		// }
 	}
 }
 
