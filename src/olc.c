@@ -5444,7 +5444,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 	if (!*argument) {
 		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
 		for (iter = 0; *flag_names[iter] != '\n' && !one_per_line; ++iter) {
-			if (strlen(flag_names[iter]) + 10 > 30) {
+			if (strlen(flag_names[iter]) + 5 > 30) {
 				// too long
 				one_per_line = TRUE;
 			}
