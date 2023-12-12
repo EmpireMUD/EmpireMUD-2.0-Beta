@@ -1224,6 +1224,11 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			amount = 5;
 			break;
 		}
+		case AGH_DYING: {
+			// things that gain on death REALLY gain
+			amount = 100;
+			break;
+		}
 		case AGH_MELEE:
 		case AGH_RANGED:
 		case AGH_DODGE:
