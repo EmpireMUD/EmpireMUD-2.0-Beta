@@ -1623,7 +1623,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		act_flags |= TO_SPAMMY;
 	}
 	
-	if (vict) {	// messaging with char target
+	if (vict || (!vict && !ovict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 			// to-char
 			any = TRUE;

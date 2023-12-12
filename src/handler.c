@@ -952,6 +952,11 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 */
 void affect_to_room(room_data *room, struct affected_type *af) {
 	struct affected_type *affected_alloc;
+	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
+	
+	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_AFFECT);
+	}
 
 	CREATE(affected_alloc, struct affected_type, 1);
 
