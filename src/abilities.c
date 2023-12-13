@@ -1999,6 +1999,19 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_WITHIN_RANGE: {
+				room_data *target = room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch)));
+				if (compute_distance(IN_ROOM(ch), target) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+					if (vict) {
+						act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR);
+					}
+					else {
+						msg_to_char(ch, "It's too far away.\r\n");
+					}
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

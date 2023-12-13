@@ -400,6 +400,7 @@ const char *ability_limitations[] = {
 	"not distracted",
 	"not immobilized",	// 15
 	"can teleport here",
+	"within range",
 	"\n"
 };
 

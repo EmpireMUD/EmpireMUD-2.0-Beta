@@ -721,6 +721,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_NOT_DISTRACTED  14	// player must not have DISTRACTED aff
 #define ABIL_LIMIT_NOT_IMMOBILIZED  15	// player must not have IMMOBILIZED aff
 #define ABIL_LIMIT_CAN_TELEPORT_HERE  16	// player can teleport here
+#define ABIL_LIMIT_WITHIN_RANGE  17	// enforces RANGE data on target
 
 
 // RUN_ABIL_x: modes for activating abilities

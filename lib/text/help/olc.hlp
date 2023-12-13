@@ -1077,6 +1077,7 @@ Limitation types:
  &cnot distracted&0 - User does not have DISTRACTED affect.
  &cnot immobilized&0 - User does not have IMMOBILIZED affect.
  &ccan teleport here&0 - Current room does not block teleport.
+ &cwithin range&0 - Compares distance to the target against RANGE data.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
