@@ -428,6 +428,16 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		// sent its own error message
 		return FALSE;
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && GET_ACTION_VNUM(ch, 0) == ABIL_VNUM(abil)) {
+		// already doing it
+		msg_to_char(ch, "You stop what you were doing.\r\n");
+		cancel_action(ch);
+		return FALSE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're already doing something else.\r\n");
+		return FALSE;
+	}
 	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		// sent its own error message
 		return FALSE;
@@ -445,16 +455,6 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 	}
 	if (ABILITY_FLAGGED(abil, ABILF_SPOKEN) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
 		msg_to_char(ch, "You can't seem to get the words out.\r\n");
-		return FALSE;
-	}
-	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && GET_ACTION_VNUM(ch, 0) == ABIL_VNUM(abil)) {
-		// already doing it
-		msg_to_char(ch, "You stop what you were doing.\r\n");
-		cancel_action(ch);
-		return FALSE;
-	}
-	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already doing something else.\r\n");
 		return FALSE;
 	}
 	
