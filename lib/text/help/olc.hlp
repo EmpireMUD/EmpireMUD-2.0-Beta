@@ -550,7 +550,8 @@ Action types:
  &cdevastate area&0 - Collect resources within 3 tiles. Use $1 for the tile
    name in per-item messages.
  &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
-   per-item-to messages (but no item) for the message when the evolution works.
+   spec-to messages when the evolution works with $1 as the old sector name and
+   $2 as the new one.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

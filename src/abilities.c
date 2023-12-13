@@ -1676,15 +1676,21 @@ DO_ABIL(abil_action_devastate_area) {
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 DO_ABIL(abil_action_magic_growth) {
+	char was_name[256];
+	char *repl_array[2];
 	sector_data *preserve;
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
 	if ((evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
 		preserve = (BASE_SECT(room_targ) != SECT(room_targ)) ? BASE_SECT(room_targ) : NULL;
+		snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
 		
-		send_ability_per_item_messages(ch, ovict, 1, abil, data, NULL);
 		change_terrain(room_targ, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
+		
+		repl_array[0] = was_name;
+		repl_array[1] = GET_SECT_NAME(SECT(room_targ));
+		send_ability_special_messages(ch, NULL, ovict, abil, data, repl_array, 2);
 		
 		remove_depletion(room_targ, DPLTN_PICK);
 		remove_depletion(room_targ, DPLTN_FORAGE);
@@ -3963,10 +3969,16 @@ PREP_ABIL(prep_room_affect_ability) {
 */
 bool audit_ability(ability_data *abil, char_data *ch) {
 	ability_data *abiter, *next_abiter;
+	struct ability_data_list *adl;
 	struct interaction_item *interact;
 	bitvector_t bits;
 	bool problem = FALSE;
 	int iter;
+	
+	const char *ignore_same_command[] = {
+		"chant", "conjure", "ritual",
+		"\n"
+	};
 	
 	if (!ABIL_NAME(abil) || !*ABIL_NAME(abil) || !str_cmp(ABIL_NAME(abil), default_ability_name)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No name set");
@@ -3982,15 +3994,49 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 			problem = TRUE;
 		}
 	}
+	if (ABIL_TARGETS(abil) == NOBITS) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "No targets set");
+		problem = TRUE;
+	}
 	
 	// interactions
 	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
 	
 	// other abils
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
-		if (abiter != abil && ABIL_VNUM(abiter) != ABIL_VNUM(abil) && !str_cmp(ABIL_NAME(abiter), ABIL_NAME(abil))) {
+		if (abiter == abil || ABIL_VNUM(abiter) == ABIL_VNUM(abil)) {
+			continue;
+		}
+		if (!str_cmp(ABIL_NAME(abiter), ABIL_NAME(abil))) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(abiter));
 			problem = TRUE;
+		}
+		if (ABIL_COMMAND(abil) && ABIL_COMMAND(abiter) && !str_cmp(ABIL_COMMAND(abil), ABIL_COMMAND(abiter)) && search_block(ABIL_COMMAND(abil), ignore_same_command, TRUE) == NOTHING) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Same command as ability %d %s", ABIL_VNUM(abiter), ABIL_NAME(abiter));
+			problem = TRUE;
+		}
+	}
+	
+	// data
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		switch (adl->type) {
+			case ADL_ACTION: {
+				switch (adl->vnum) {
+					case ABIL_ACTION_DETECT_HIDE:
+					case ABIL_ACTION_DETECT_EARTHMELD:
+					case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
+						break;
+					}
+					case ABIL_ACTION_DETECT_ADVENTURES_AROUND:
+					case ABIL_ACTION_MAGIC_GROWTH: {
+						break;
+					}
+					case ABIL_ACTION_DEVASTATE_AREA: {
+					}
+
+				}
+				break;
+			}
 		}
 	}
 	
