@@ -205,7 +205,7 @@ struct ritual_data_type {
 	}},
 	
 	// 7: devastation ritual
-	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0, SCMD_RITUAL,
+	{ "devastation", 15, 191, 0, SCMD_RITUAL,
 		NULL,
 		NULL,
 		{{ "You plant your staff hard into the ground and begin focusing mana...", "$n plants $s staff hard into the ground and begins drawing mana toward $mself..." },
@@ -1785,20 +1785,5 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 		
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
 	}
-}
-
-
-RITUAL_SETUP_FUNC(start_devastation_ritual) {
-	if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "You need to be outdoors to do perform the Devastation Ritual.\r\n");
-		return FALSE;
-	}
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to devastate here.\r\n");
-		return FALSE;
-	}
-
-	start_ritual(ch, ritual);
-	return TRUE;
 }
 

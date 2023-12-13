@@ -54,9 +54,9 @@ INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
-void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data);
-void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data);
-void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data);
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
+void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
+void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
 
 
 // ability function prototypes
@@ -1568,7 +1568,7 @@ DO_ABIL(abil_action_detect_earthmeld) {
 		
 		if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
 			if (CAN_SEE(ch, targ)) {
-				send_ability_per_char_messages(ch, targ, 1, abil, data);
+				send_ability_per_char_messages(ch, targ, 1, abil, data, NULL);
 				data->success = TRUE;
 			}
 		}
@@ -1597,7 +1597,7 @@ DO_ABIL(abil_action_detect_hide) {
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 			if (CAN_SEE(ch, targ)) {
-				send_ability_per_char_messages(ch, targ, 1, abil, data);
+				send_ability_per_char_messages(ch, targ, 1, abil, data, NULL);
 				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
 				affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
 				data->success = TRUE;
@@ -1695,21 +1695,20 @@ DO_ABIL(abil_action_devastate_area) {
 			data->success = TRUE;
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
-			msg_to_char(ch, "You devastate the seeded field!\r\n");
-			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
+			msg_to_char(ch, "You devastate a seeded field!\r\n");
+			if (ROOM_PEOPLE(to_room)) {
+				act("The seeded field is devastated!", FALSE, ROOM_PEOPLE(to_room), NULL, ch, TO_CHAR | TO_NOTVICT);
+			}
 			
 			// check to default sect
 			uncrop_tile(to_room);
 			data->success = TRUE;
 		}
 		else {
-			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");
-			return;
+			// fail -- end without success
 		}
 	}
-	else {
-		msg_to_char(ch, "The Devastation Ritual is complete.\r\n");
-	}
+	// else no room = no sucess
 }
 
 
@@ -1931,7 +1930,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	
 	// messaging?
 	if (obj_ok && obj) {
-		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data);
+		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
 	}
 	
 	return TRUE;
@@ -1981,7 +1980,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 	
 	// messaging?
 	if (veh) {
-		ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data);
+		send_ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data, NULL);
 	}
 	
 	return TRUE;
@@ -1993,14 +1992,13 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 *
 * INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
-INTERACTION_FUNC(devastate_crop) {	
+INTERACTION_FUNC(devastate_crop) {
+	char type[256];
+	int num = interaction->quantity, obj_ok;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	crop_data *cp = ROOM_CROP(inter_room);
+	ability_data *abil = data->abil;
 	obj_data *newobj;
-	int num = interaction->quantity;
-	
-	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
-	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
-	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
@@ -2010,9 +2008,16 @@ INTERACTION_FUNC(devastate_crop) {
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		if (load_otrigger(newobj) && newobj->carried_by) {
+		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
 			get_otrigger(newobj, newobj->carried_by, FALSE);
 		}
+	}
+	
+	if (newobj && obj_ok) {
+		snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
+		strtolower(type);
+		
+		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
 	}
 	
 	return TRUE;
@@ -2025,35 +2030,30 @@ INTERACTION_FUNC(devastate_crop) {
 * INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(devastate_trees) {
-	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	char type[256];
+	int num, obj_ok;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
 	obj_data *newobj;
-	int num;
-	
-	snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
-	strtolower(type);
-	
-	if (interaction->quantity != 1) {
-		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s (x%d)!", type, get_obj_name_by_proto(interaction->vnum), interaction->quantity);
-	}
-	else {
-		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s!", type, get_obj_name_by_proto(interaction->vnum));
-	}
-	act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-	
-	snprintf(buf, sizeof(buf), "$n's powerful ritual devastates the %s!", type);
-	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		if (load_otrigger(newobj) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
-	}
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
+		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
+	}
+	
+	if (newobj && obj_ok) {
+		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
+		strtolower(type);
+		
+		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
 	}
 	
 	return TRUE;
@@ -2383,11 +2383,12 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 * @param int quantity How many (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
+* @param char *special_text Optional: Will replace $$ in the message with this (may be NULL).
 */
-void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data) {
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
 	bool invis;
 	char buf[256], multi[24];
-	char *msg;
+	char *msg, *repl;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil || !vict) {
@@ -2413,7 +2414,9 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+		free(repl);
 	
 		// mark this now
 		if (data) {
@@ -2424,13 +2427,17 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	// to vict ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, invis, ch, NULL, vict, TO_VICT | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, invis, ch, NULL, vict, TO_VICT | act_flags);
+		free(repl);
 	}
 	
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
+		free(repl);
 	}
 }
 
@@ -2445,11 +2452,12 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 * @param int quantity How many items (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
+* @param char *special_text Optional: Will replace $$ in the message with this (may be NULL).
 */
-void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data) {
+void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
 	bool invis;
 	char buf[256], multi[24];
-	char *msg;
+	char *msg, *repl;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil || !ovict) {
@@ -2475,7 +2483,9 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		free(repl);
 	
 		// mark this now
 		if (data) {
@@ -2486,7 +2496,9 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		free(repl);
 	}
 }
 
@@ -2501,11 +2513,12 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 * @param int quantity How many vehicles (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
+* @param char *special_text Optional: Will replace $$ in the message with this (may be NULL).
 */
-void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data) {
+void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
 	bool invis;
 	char buf[256], multi[24];
-	char *msg;
+	char *msg, *repl;
 	bitvector_t act_flags = TO_ABILITY;
 	
 	if (!ch || !abil || !vvict) {
@@ -2531,7 +2544,9 @@ void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantit
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, FALSE, ch, NULL, vvict, TO_CHAR | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | act_flags);
+		free(repl);
 	
 		// mark this now
 		if (data) {
@@ -2542,7 +2557,9 @@ void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantit
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		act(buf, invis, ch, NULL, vvict, TO_ROOM | act_flags);
+		repl = str_replace("$$", NULLSAFE(special_text), buf);
+		act(repl, invis, ch, NULL, vvict, TO_ROOM | act_flags);
+		free(repl);
 	}
 }
 

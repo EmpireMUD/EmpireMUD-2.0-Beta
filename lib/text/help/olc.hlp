@@ -542,6 +542,7 @@ Action types:
  &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target. Sends per-char messages for each hidden character.
  &cdetect players around&0 - Find other players in where-range (or in same city). Cannot customize the message.
  &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or same city).
+ &cdevastate area&0 - Collect resources within 3 tiles. Use $$ for the tile name in per-item messages.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
