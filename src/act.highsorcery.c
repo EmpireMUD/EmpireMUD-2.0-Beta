@@ -97,10 +97,8 @@ const struct {
 #define MESSAGE_END  { "\n", "\n" }  // end of sequence (one final tick to get here)
 
 // ritual prototypes
-RITUAL_FINISH_FUNC(perform_devastation_ritual);
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
 RITUAL_FINISH_FUNC(perform_siege_ritual);
-RITUAL_SETUP_FUNC(start_devastation_ritual);
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
@@ -208,8 +206,8 @@ struct ritual_data_type {
 	
 	// 7: devastation ritual
 	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0, SCMD_RITUAL,
-		start_devastation_ritual,
-		perform_devastation_ritual,
+		NULL,
+		NULL,
 		{{ "You plant your staff hard into the ground and begin focusing mana...", "$n plants $s staff hard into the ground and begins drawing mana toward $mself..." },
 		NO_MESSAGE,
 		{ "You send out shockwaves of mana from your staff...", "$n's staff sends out shockwaves of mana..." },
@@ -295,72 +293,6 @@ bool can_use_ritual(char_data *ch, int ritual) {
 		return FALSE;
 	}
 		
-	return TRUE;
-}
-
-
-// for devastation_ritual
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(devastate_crop) {	
-	crop_data *cp = ROOM_CROP(inter_room);
-	obj_data *newobj;
-	int num = interaction->quantity;
-	
-	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
-	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
-	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
-	}
-	
-	while (num-- > 0) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		if (load_otrigger(newobj) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
-	}
-	
-	return TRUE;
-}
-
-
-// for devastation_ritual
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(devastate_trees) {
-	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
-	obj_data *newobj;
-	int num;
-	
-	snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
-	strtolower(type);
-	
-	if (interaction->quantity != 1) {
-		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s (x%d)!", type, get_obj_name_by_proto(interaction->vnum), interaction->quantity);
-	}
-	else {
-		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s!", type, get_obj_name_by_proto(interaction->vnum));
-	}
-	act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-	
-	snprintf(buf, sizeof(buf), "$n's powerful ritual devastates the %s!", type);
-	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		if (load_otrigger(newobj) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
 	return TRUE;
 }
 
@@ -1870,78 +1802,3 @@ RITUAL_SETUP_FUNC(start_devastation_ritual) {
 	return TRUE;
 }
 
-
-RITUAL_FINISH_FUNC(perform_devastation_ritual) {
-	room_data *rand_room, *to_room = NULL;
-	crop_data *cp;
-	int dist, iter;
-	int x, y;
-	
-	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
-	#define DEVASTATE_RANGE  3	// tiles
-
-	// check this room
-	if (CAN_DEVASTATE(IN_ROOM(ch)) && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		to_room = IN_ROOM(ch);
-	}
-	
-	// check surrounding rooms in star patter
-	for (dist = 1; !to_room && dist <= DEVASTATE_RANGE; ++dist) {
-		for (iter = 0; !to_room && iter < NUM_2D_DIRS; ++iter) {
-			rand_room = real_shift(IN_ROOM(ch), shift_dir[iter][0] * dist, shift_dir[iter][1] * dist);
-			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(IN_ROOM(ch), rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
-				to_room = rand_room;
-			}
-		}
-	}
-	
-	// check max radius
-	for (x = -DEVASTATE_RANGE; !to_room && x <= DEVASTATE_RANGE; ++x) {
-		for (y = -DEVASTATE_RANGE; !to_room && y <= DEVASTATE_RANGE; ++y) {
-			rand_room = real_shift(IN_ROOM(ch), x, y);
-			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(IN_ROOM(ch), rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
-				to_room = rand_room;
-			}
-		}
-	}
-	
-	// SUCCESS: distribute resources
-	if (to_room) {
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
-			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
-			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
-			uncrop_tile(to_room);
-		}
-		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
-			change_chop_territory(to_room);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
-			msg_to_char(ch, "You devastate the seeded field!\r\n");
-			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
-			
-			// check to default sect
-			uncrop_tile(to_room);
-		}
-		else {
-			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");
-			return;
-		}
-	
-		gain_ability_exp(ch, ABIL_DEVASTATION_RITUAL, 10);
-		
-		// auto-repeat
-		if (GET_MANA(ch) >= ritual_data[ritual].cost) {
-			set_mana(ch, GET_MANA(ch) - ritual_data[ritual].cost);
-			GET_ACTION(ch) = ACT_RITUAL;
-			GET_ACTION_TIMER(ch) = 0;
-			// other variables are still set up
-		}
-		else {
-			msg_to_char(ch, "You do not have enough mana to continue the ritual.\r\n");
-		}
-	}
-	else {
-		msg_to_char(ch, "The Devastation Ritual is complete.\r\n");
-	}
-}

@@ -623,6 +623,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_DETECT_EARTHMELD  1	// finds earthmelded characters
 #define ABIL_ACTION_DETECT_PLAYERS_AROUND  2	// finds other players in/near the city
 #define ABIL_ACTION_DETECT_ADVENTURES_AROUND  3	// finds detectable adventures near the player
+#define ABIL_ACTION_DEVASTATE_AREA  4	// collects a chop or crop resource within 3 tiles
 
 
 // ABIL_CUSTOM_x: custom message types

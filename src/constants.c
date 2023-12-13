@@ -118,6 +118,7 @@ const char *ability_actions[] = {
 	"detect earthmeld",
 	"detect players around",
 	"detect adventures around",
+	"devastate area",
 	"\n"
 };
 

@@ -50,6 +50,8 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 // local protos
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
+INTERACTION_FUNC(devastate_crop);
+INTERACTION_FUNC(devastate_trees);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data);
@@ -1640,6 +1642,77 @@ DO_ABIL(abil_action_detect_players_around) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_devastate_area) {
+	room_data *rand_room, *to_room = NULL;
+	crop_data *cp;
+	int dist, iter;
+	int x, y;
+	
+	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
+	#define DEVASTATE_RANGE  3	// tiles
+	
+	if (!room_targ) {
+		return;	// nothing to do
+	}
+
+	// check this room
+	if (CAN_DEVASTATE(room_targ) && can_use_room(ch, room_targ, MEMBERS_ONLY)) {
+		to_room = room_targ;
+	}
+	
+	// check surrounding rooms in star patter
+	for (dist = 1; !to_room && dist <= DEVASTATE_RANGE; ++dist) {
+		for (iter = 0; !to_room && iter < NUM_2D_DIRS; ++iter) {
+			rand_room = real_shift(room_targ, shift_dir[iter][0] * dist, shift_dir[iter][1] * dist);
+			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
+				to_room = rand_room;
+			}
+		}
+	}
+	
+	// check max radius
+	for (x = -DEVASTATE_RANGE; !to_room && x <= DEVASTATE_RANGE; ++x) {
+		for (y = -DEVASTATE_RANGE; !to_room && y <= DEVASTATE_RANGE; ++y) {
+			rand_room = real_shift(room_targ, x, y);
+			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
+				to_room = rand_room;
+			}
+		}
+	}
+	
+	// SUCCESS: distribute resources
+	if (to_room) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
+			uncrop_tile(to_room);
+			data->success = TRUE;
+		}
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
+			change_chop_territory(to_room);
+			data->success = TRUE;
+		}
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
+			msg_to_char(ch, "You devastate the seeded field!\r\n");
+			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
+			
+			// check to default sect
+			uncrop_tile(to_room);
+			data->success = TRUE;
+		}
+		else {
+			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");
+			return;
+		}
+	}
+	else {
+		msg_to_char(ch, "The Devastation Ritual is complete.\r\n");
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
@@ -1909,6 +1982,78 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 	// messaging?
 	if (veh) {
 		ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data);
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* for devastation_ritual
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+*/
+INTERACTION_FUNC(devastate_crop) {	
+	crop_data *cp = ROOM_CROP(inter_room);
+	obj_data *newobj;
+	int num = interaction->quantity;
+	
+	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
+	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
+	}
+	
+	while (num-- > 0) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* for devastation_ritual
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+*/
+INTERACTION_FUNC(devastate_trees) {
+	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	obj_data *newobj;
+	int num;
+	
+	snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
+	strtolower(type);
+	
+	if (interaction->quantity != 1) {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s (x%d)!", type, get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s!", type, get_obj_name_by_proto(interaction->vnum));
+	}
+	act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	
+	snprintf(buf, sizeof(buf), "$n's powerful ritual devastates the %s!", type);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
+		if (load_otrigger(newobj) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
 	return TRUE;
@@ -2848,7 +2993,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			(do_ability_data[iter].do_func)(ch, abil, level, vict, ovict, room_targ, data);
+			call_do_abil(do_ability_data[iter].do_func);
 		}
 	}
 	
@@ -2908,19 +3053,23 @@ DO_ABIL(do_action_ability) {
 		// ABIL_ACTION_x: these should set data->success to TRUE only if they succeed
 		switch (adl->vnum) {
 			case ABIL_ACTION_DETECT_HIDE: {
-				abil_action_detect_hide(ch, abil, level, vict, ovict, room_targ, data);
+				call_do_abil(abil_action_detect_hide);
 				break;
 			}
 			case ABIL_ACTION_DETECT_EARTHMELD: {
-				abil_action_detect_earthmeld(ch, abil, level, vict, ovict, room_targ, data);
+				call_do_abil(abil_action_detect_earthmeld);
 				break;
 			}
 			case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
-				abil_action_detect_players_around(ch, abil, level, vict, ovict, room_targ, data);
+				call_do_abil(abil_action_detect_players_around);
 				break;
 			}
 			case ABIL_ACTION_DETECT_ADVENTURES_AROUND: {
-				abil_action_detect_adventures_around(ch, abil, level, vict, ovict, room_targ, data);
+				call_do_abil(abil_action_detect_adventures_around);
+				break;
+			}
+			case ABIL_ACTION_DEVASTATE_AREA: {
+				call_do_abil(abil_action_devastate_area);
 				break;
 			}
 		}

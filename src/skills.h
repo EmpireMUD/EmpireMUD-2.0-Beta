@@ -46,6 +46,8 @@
 #define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, room_data *room_targ, struct ability_exec *data)
 #define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, room_data *room_targ, struct ability_exec *data)
 
+#define call_do_abil(name)  (name)(ch, abil, level, vict, ovict, room_targ, data)
+
 
 // class.c prototypes
 void assign_class_abilities(char_data *ch, class_data *cls, int role);
