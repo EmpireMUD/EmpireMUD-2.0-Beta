@@ -2291,6 +2291,13 @@ ACMD(do_conjure) {
 	
 	// no-arg: show conjurable list
 	if (!*arg) {
+		// already doing this?
+		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(ch, 0))) && (plab = get_ability_data(ch, ABIL_VNUM(abil), FALSE)) && VALID_CONJURE_ABIL(ch, plab)) {
+			msg_to_char(ch, "You stop conjuring.\r\n");
+			cancel_action(ch);
+			return;
+		}
+		
 		size = snprintf(buf, sizeof(buf), "You can conjure the following things:\r\n");
 		
 		found = full = FALSE;
@@ -3745,7 +3752,7 @@ ACMD(do_quit) {
 
 
 // also do_chant: handles SCMD_RITUAL, SCMD_CHANT
-ACMD(do_ritual2) {
+ACMD(do_ritual) {
 	bool found, full;
 	char *arg2;
 	size_t size;

@@ -97,9 +97,7 @@ const struct {
 
 // ritual prototypes
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation);
-RITUAL_FINISH_FUNC(perform_siege_ritual);
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
-RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
 
 // SCMD_RITUAL, SCMD_CHANT
@@ -182,9 +180,9 @@ struct ritual_data_type {
 	}},
 	
 	// 6: siege ritual
-	{ "siege", 30, ABIL_SIEGE_RITUAL, 0, SCMD_RITUAL,
-		start_siege_ritual,
-		perform_siege_ritual,
+	{ "siege", 30, 172, 0, SCMD_RITUAL,
+		NULL,
+		NULL,
 		{{ "You draw mana to yourself...", "$n begins drawing mana to $mself..." },
 		NO_MESSAGE,
 		{ "You concentrate your power into a ball of fire...", "$n concentrates $s power into a fireball..." },
@@ -1093,7 +1091,7 @@ ACMD(do_mirrorimage) {
 }
 
 
-ACMD(do_ritual) {
+ACMD(do_ritual_old) {
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int iter, rit = NOTHING;
 	bool found, result = FALSE;
@@ -1595,100 +1593,4 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	}
 }
 
-
-RITUAL_SETUP_FUNC(start_siege_ritual) {
-	vehicle_data *veh_targ;
-	room_data *room_targ;
-	int dir;
-	
-	if (!*argument) {
-		msg_to_char(ch, "Besiege which direction, building, or vehicle?\r\n");
-	}
-	else if (!find_siege_target_for_vehicle(ch, NULL, argument, &room_targ, &dir, &veh_targ)) {
-		// sends own messages
-	}
-	else {
-		// ready:
-
-		// trigger hostile immediately so they are attackable
-		if (room_targ && ROOM_OWNER(room_targ) && ROOM_OWNER(room_targ) != GET_LOYALTY(ch)) {
-			trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
-		}
-		if (veh_targ && VEH_OWNER(veh_targ) && VEH_OWNER(veh_targ) != GET_LOYALTY(ch)) {
-			trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
-		}
-	
-		start_ritual(ch, ritual);
-		// action 0 is ritual #
-		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
-		GET_ACTION_VNUM(ch, 2) = veh_targ ? veh_script_id(veh_targ) : NOTHING;
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-
-RITUAL_FINISH_FUNC(perform_siege_ritual) {
-	vehicle_data *veh_targ = NULL;
-	room_data *room_targ = NULL;
-	sector_data *secttype;
-	int dam;
-	
-	// get the target back
-	if (GET_ACTION_VNUM(ch, 1) != NOTHING) {
-		room_targ = real_room(GET_ACTION_VNUM(ch, 1));
-	}
-	else if (GET_ACTION_VNUM(ch, 2) != NOTHING) {
-		veh_targ = find_vehicle(GET_ACTION_VNUM(ch, 2));
-		if (veh_targ && IN_ROOM(veh_targ) != IN_ROOM(ch)) {
-			// must not really be valid
-			veh_targ = NULL;
-		}
-	}
-	
-	if (!room_targ && !veh_targ) {
-		msg_to_char(ch, "You don't seem to have a valid target, and the ritual fails.\r\n");
-	}
-	else if (room_targ && !validate_siege_target_room(ch, NULL, room_targ)) {
-		// sends own message
-	}
-	else if (veh_targ && !validate_siege_target_vehicle(ch, NULL, veh_targ)) {
-		// sends own message
-	}
-	else {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-		
-		dam = 1 + GET_INTELLIGENCE(ch);
-		
-		msg_to_char(ch, "You shoot one powerful fireball...\r\n");
-		act("$n shoots one powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		if (room_targ) {
-			secttype = SECT(room_targ);
-			
-			if (ROOM_OWNER(room_targ) && GET_LOYALTY(ch) != ROOM_OWNER(room_targ)) {
-				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
-			}
-			
-			besiege_room(ch, room_targ, dam, NULL);
-			
-			if (SECT(room_targ) != secttype) {
-				msg_to_char(ch, "It is destroyed!\r\n");
-				act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
-			}
-		}
-		else if (veh_targ) {
-			if (VEH_OWNER(veh_targ) && GET_LOYALTY(ch) != VEH_OWNER(veh_targ)) {
-				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
-			}
-			
-			besiege_vehicle(ch, veh_targ, dam, SIEGE_MAGICAL, NULL);
-		}
-		
-		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
-	}
-}
 
