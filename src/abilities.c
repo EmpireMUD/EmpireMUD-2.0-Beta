@@ -4188,6 +4188,12 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 	}
 	
+	// violent types?
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT | ABILT_BUILDING_DAMAGE) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "Missing VIOLENT flag");
+		problem = TRUE;
+	}
+	
 	// buffs and passives
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
 		for (bits = ABIL_AFFECTS(abil), iter = 0; bits; bits >>= 1, ++iter) {
