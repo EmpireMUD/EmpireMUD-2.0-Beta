@@ -422,8 +422,123 @@ T a 0
 S
 #265
 Chant of Illusions~
-0 -1 1.00 0 0 0
-T m 0
+rs -1 1.00 0 0 0
+C
+chant 8 o 2 0 0 -1 0 0 5 0
+D 16 5 0
+D 16 3 0
+M
+0
+You start the chant of illusions...~
+M
+0
+You chant, 'In shadows whispered by ancient trees,'~
+M
+0
+*~
+M
+0
+You chant, 'Nature's cloak, a subtle tease.'~
+M
+0
+*~
+M
+0
+You chant, 'Illusions woven 'neath the boughs,'~
+M
+0
+*~
+M
+0
+You chant, 'Where secrets dance, where silence vows.'~
+M
+0
+*~
+M
+0
+You watch as plants begin to grow around the road...~
+M
+0
+*~
+M
+0
+You chant, 'Overgrowth veils the trodden way,'~
+M
+0
+*~
+M
+0
+You chant, 'Hidden path, in wild display!'~
+M
+0
+*~
+M
+0
+As you finish the chant, the road is cloaked in illusion!~
+M
+1
+$n starts the chant of illusions...~
+M
+1
+$n chants, 'In shadows whispered by ancient trees,'~
+M
+1
+*~
+M
+1
+$n chants, 'Nature's cloak, a subtle tease.'~
+M
+1
+*~
+M
+1
+$n chants, 'Illusions woven 'neath the boughs,'~
+M
+1
+*~
+M
+1
+$n chants, 'Where secrets dance, where silence vows.'~
+M
+1
+*~
+M
+1
+You watch as plants begin to grow around the road...~
+M
+1
+*~
+M
+1
+$n chants, 'Overgrowth veils the trodden way,'~
+M
+1
+*~
+M
+1
+$n chants, 'Hidden path, in wild display!'~
+M
+1
+*~
+M
+1
+As $n finishes the chant, the road is cloaked in illusion!~
+M
+8
+You finish the chant, but it has no effect.~
+M
+9
+*~
+M
+22
+$n is chanting around the road.~
+R
+1119 1 0 0
+R
+1206 1 0 0
+T q 1
+X q
+-1 -1 -1 d
 S
 #267
 Astral Werewolf Form~

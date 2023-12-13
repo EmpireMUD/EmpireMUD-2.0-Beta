@@ -1,48 +1,48 @@
 #100
 Mage Armor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 3 0
 T e 1
 S
 #101
 Archery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 38 0
 T e 1
 S
 #102
 Quick Draw~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #103
 Firstaid~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #104
 Fleet~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #105
 Finesse~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #106
 Stunning Blow~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #107
 Veintap~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #108
 Weaken~
-a -1 0.50 h 0
+a -1 0.50 h 0 0
 A
 1 -1
 A
@@ -64,47 +64,47 @@ X b
 S
 #109
 Heal~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #110
 Heal Friend~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #111
 Heal Party~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #112
 Healing Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #113
 Healing Elixirs~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #114
 Rejuvenate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #115
 Purify~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #116
 Cleanse~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #117
 Ready Fireball~
-0 -1 1.00 0 bcn
+0 -1 1.00 0 bcn 0
 C
 unknown 5 0 2 30 0 -1 0 0 3 0
 D 4 1105 0
@@ -112,7 +112,7 @@ T g 1
 S
 #118
 Lightningbolt~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
 lightningbolt 7 bf 2 10 3 2023 9 8 3 0
 T c 8
@@ -124,7 +124,7 @@ X d
 S
 #119
 Hasten~
-d -1 1.00 0 abc
+d -1 1.00 0 abc 0
 C
 hasten 5 be 2 15 0 -1 0 0 5 0
 M
@@ -148,12 +148,12 @@ X b
 S
 #120
 Counterspell~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #121
 Entangle~
-abfop -1 1.00 o 0
+abfop -1 1.00 o 0 0
 A
 2 -1
 C
@@ -182,7 +182,7 @@ X b
 S
 #122
 Familiar~
-0 -1 1.00 0 o
+0 -1 1.00 0 o 0
 C
 unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 500 0
@@ -199,38 +199,105 @@ T h 0
 S
 #123
 Nature Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #124
 Wrath of Nature Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #125
 Skybrand~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #126
 Chant of Nature~
-0 -1 1.00 0 0
-T m 0
+su -1 1.00 0 0 0
+C
+chant 8 o 2 0 0 -1 0 0 5 0
+D 16 12 0
+D 64 5 0
+M
+0
+You start the chant of nature...~
+M
+0
+You chant, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+0
+*~
+M
+0
+You chant, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+0
+*~
+M
+0
+You chant, 'O Viridius, greenest father, god of vines that coil...'~
+M
+0
+*~
+M
+0
+You chant, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+0
+*~
+M
+1
+$n starts the chant of nature...~
+M
+1
+$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+1
+*~
+M
+1
+$n chants, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+1
+*~
+M
+1
+$n chants, 'O Viridius, greenest father, god of vines that coil...'~
+M
+1
+*~
+M
+1
+$n chants, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+1
+*~
+M
+20
+As you chant, the plants around you grow with amazing speed!~
+M
+21
+As $n chants, the plants around $m grow with amazing speed!~
+M
+22
+$n is loudly reciting a chant.~
+T s 1
 S
 #136
 Inspire~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #137
 Customize Building~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 10 0
 T e 1
 S
 #138
 Bodyguard~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 1 25 0 2030 0 0 1 0
 D 8 205 0
@@ -238,85 +305,85 @@ T h 0
 S
 #142
 Pickpocket~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 33 0
 T e 1
 S
 #143
 Steal~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #144
 Infiltrate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 21 0
 T e 1
 S
 #145
 Improved Infiltrate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 22 0
 T e 1
 S
 #146
 Escape~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #147
 Appraisal~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 45 0
 T e 1
 S
 #148
 Concealment~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #149
 Secret Cache~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #150
 Cling to Shadow~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 20 0
 T e 1
 S
 #151
 Unseen Passing~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 31 0
 T e 1
 S
 #152
 Cloak of Darkness~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 25 0
 T e 1
 S
 #153
 Shadowstep~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #154
 Vaultcracking~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 47 0
 T e 1
 S
 #155
 Jab~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #156
 Blind~
-a -1 1.00 h 0
+a -1 1.00 h 0 0
 C
 blind 7 bf 1 15 0 2040 10 0 2 2
 M
@@ -343,56 +410,77 @@ X b
 S
 #157
 Sap~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #158
 Dagger Mastery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #159
 Poisons~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 34 0
 T a 1
 T e 0
 S
 #160
 Deadly Poisons~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 35 0
 T a 1
 T e 0
 S
 #161
 Prick~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #162
 Bat Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #163
 Ritual of Burdens~
-0 -1 1.00 0 0
-T m 0
+s -1 1.00 0 0 0
+A
+19 1
+C
+ritual 8 bg 2 5 0 -1 0 0 5 0
+M
+0
+You whisper your burdens into the air...~
+M
+0
+You feel the weight of the world lift from your shoulders!~
+M
+1
+$n whispers $s burdens into the air...~
+M
+1
+$n seems uplifted!~
+M
+22
+$n is whispering something into the air.~
+T b 1
+X b
+-1 1800 1800 0
 S
 #164
 Staffmaking~
-0 170 1.00 0 0
+0 170 1.00 0 0 0
 T a 0
 S
 #165
 Manashield~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #166
 Foresight~
-0 -1 0.50 0 adf
+0 -1 0.50 0 adf 0
 A
 18 1
 C
@@ -418,12 +506,12 @@ X b
 S
 #167
 Enchant Weapons~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #168
 Summon Swift~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 C
 unknown 8 0 2 10 0 2032 60 0 5 2
 D 8 400 0
@@ -447,28 +535,28 @@ T i 0
 S
 #169
 Summon Materials~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 77 0
 T e 0
 S
 #170
 Powerful Staves~
-0 170 1.00 0 0
+0 170 1.00 0 0 0
 T a 0
 S
 #171
 Staff Mastery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #172
 Siege Ritual~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #173
 Colorburst~
-ab -1 0.50 o 0
+ab -1 0.50 o 0 0
 A
 17 -1
 C
@@ -497,27 +585,27 @@ X b
 S
 #174
 Enervate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #175
 Slow~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #176
 Siphon~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #177
 Mirrorimage~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #178
 Sunshock~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
 sunshock 7 bf 2 11 4 2018 9 8 3 0
 T c 3
@@ -529,105 +617,327 @@ X c
 S
 #179
 Phoenix Rite~
-0 -1 1.00 0 0
-T m 0
+s -1 1.00 0 aq 0
+C
+ritual 8 0 0 0 0 -1 0 0 5 0
+M
+0
+You light some candles and begin the Phoenix Rite.~
+M
+0
+You sit and place the candles in a circle around you.~
+M
+0
+*~
+M
+0
+You focus on the flame of the candles...~
+M
+0
+*~
+M
+0
+You reach out to the sides and grab the flame of the candles in your hands!~
+M
+0
+The flames on the remaining candles shoot toward you and form the crest of the Phoenix!~
+M
+1
+$n lights some candles.~
+M
+1
+$n sits and places the candles in a circle around $mself.~
+M
+1
+*~
+M
+1
+$n moves back and forth as if in a trance.~
+M
+1
+*~
+M
+1
+$n's hands shoot out to the sides and grab the flames of the candles!~
+M
+1
+The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!~
+M
+22
+$n is sitting in a circle of candles.~
+T b 1
+X b
+3017 -1 -1 S
 S
 #180
 Disenchant~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #181
 Greater Enchantments~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #182
 Dangerous Leathers~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #183
 Vigor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #184
 Enchant Armor~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #185
 Enchant Tools~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #186
 Ritual of Defense~
-0 -1 1.00 0 0
-T m 0
+rst -1 1.00 0 0 0
+C
+ritual 8 o 2 50 0 -1 0 0 5 0
+D 16 0 0
+D 16 1 0
+D 32 11 0
+M
+0
+You begin the incantation for the Ritual of Defense.~
+M
+0
+You say, 'Empower now this wall of stone...'~
+M
+0
+You say, 'With wisdom of the sages...'~
+M
+0
+You say, 'Ward against the foes above...'~
+M
+0
+You say, 'And strong, withstand the ages!'~
+M
+0
+You finish the ritual and the walls take on a strange magenta glow!~
+M
+1
+*~
+M
+1
+$n says, 'Empower now this wall of stone...'~
+M
+1
+$n says, 'With wisdom of the sages...'~
+M
+1
+$n says, 'Ward against the foes above...'~
+M
+1
+$n says, 'And strong, withstand the ages!'~
+M
+1
+$n finishes the ritual and the walls take on a strange magenta glow!~
+M
+22
+$n is performing the ritual of defense.~
+R
+1114 1 0 0
+R
+104 1 0 0
+T q 1
+T r 1
+X q
+-1 -1 -1 jA
 S
 #187
 Ritual of Teleportation~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #188
 City Teleportation~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 49 0
 T e 1
 S
 #189
 Portal Magic~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 36 0
 T e 0
 S
 #190
 Portal Master~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 37 0
 T e 0
 S
 #191
 Devastation Ritual~
-0 -1 1.00 0 0
-T m 0
+su -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0 -1 0 0 5 0
+D 16 10 0
+D 16 4 0
+D 16 11 0
+D 64 4 0
+M
+0
+You plant your staff hard into the ground and begin focusing mana...~
+M
+1
+$n plants $s staff hard into the ground and begins drawing mana toward $mself...~
+M
+0
+*~
+M
+1
+*~
+M
+0
+You send out shockwaves of mana from your staff...~
+M
+1
+$n's staff sends out shockwaves of mana...~
+M
+0
+*~
+M
+1
+*~
+M
+0
+*~
+M
+1
+*~
+M
+22
+$n has $s staff planted in the ground, focusing mana!~
+M
+9
+*~
+M
+8
+The Devastation Ritual has ended.~
+M
+20
+You devastate the $$ and collect $p!~
+M
+21
+$n devastates the $$ and collects $p!~
+T s 1
 S
 #192
 Sense Life Ritual~
-0 -1 1.00 0 0
-T m 0
+s -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0 -1 0 0 5 2
+D 64 0 0
+D 64 1 0
+M
+0
+You murmur the words to the Sense Life Ritual...~
+M
+0
+You finish the ritual and your eyes are opened...~
+M
+1
+$n murmurs some arcane words...~
+M
+1
+$n finishes the ritual and $s eyes flash a bright white.~
+M
+8
+You sense no unseen presence.~
+M
+9
+*~
+M
+22
+$n is murmuring something.~
+M
+25
+You sense $N here!~
+M
+26
+You are discovered!~
+T s 1
 S
 #193
 Ritual of Detection~
-0 -1 1.00 0 0
-T m 0
+s -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0 -1 0 0 5 0
+D 16 1 0
+D 16 7 0
+D 16 8 0
+D 64 2 0
+D 64 3 0
+M
+0
+You pull a piece of chalk from your pocket and begin drawing circles on the ground.~
+M
+0
+*~
+M
+0
+You make crossed lines through the circles you've drawn.~
+M
+0
+*~
+M
+0
+You begin writing the words 'where', 'find', and 'reveal' on the ground.~
+M
+1
+$n pulls out a piece of chalk and begins drawing circles on the ground.~
+M
+1
+*~
+M
+1
+$n makes crossed lines through the circles $e has drawn.~
+M
+1
+*~
+M
+1
+$n begins writing words in the circles on the ground.~
+M
+22
+$n is writing on the ground with chalk.~
+T s 1
 S
 #194
 Master Tailor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #195
 Master Blacksmith~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #196
 Deadly Weapons~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #197
 Imperial Armors~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #198
 Basic Crafts~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 D 1 66 0
 D 1 67 0
 T a 0
@@ -635,7 +945,7 @@ T e 0
 S
 #199
 Magical Vestments~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 $

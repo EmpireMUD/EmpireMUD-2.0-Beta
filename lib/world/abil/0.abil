@@ -95,8 +95,26 @@ T e 1
 S
 #11
 Darkness~
-0 -1 1.00 0 0 0
-T m 0
+c -1 1.00 0 0 0
+C
+darkness 8 o 1 15 0 2036 15 0 1 0
+D 1 84 0
+M
+0
+You draw upon the shadows to blanket the area in an inky darkness!~
+M
+1
+Shadows seem to spread from $n, blanketing the area in an inky darkness!~
+M
+23
+You wave your hand...~
+M
+24
+$n waves $s hand and the darkness dissipates.~
+T q 1
+T e 1
+X q
+3003 75 75 a
 S
 #12
 Deathshroud~
