@@ -199,6 +199,7 @@ const char *ability_type_flags[] = {
 	"ROOM-AFFECT",
 	"PAINT-BUILDING",
 	"ACTION",
+	"BUILDING-DAMAGE",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -236,6 +237,7 @@ const char *ability_type_notes[] = {
 	"room affect",
 	"paint",
 	"action",
+	"building damage",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -269,6 +271,7 @@ const char *ability_target_flags[] = {
 	"VEH-ROOM",
 	"VEH-WORLD",
 	"ROOM-HERE",
+	"ROOM-ADJACENT",	// 15
 	"\n"
 };
 
@@ -345,6 +348,7 @@ const char *ability_data_types[] = {
 // ABIL_EFFECT_x: things that happen when an ability is used
 const char *ability_effects[] = {
 	"dismount",	// 0
+	"distrust from hostile",
 	"\n"
 };
 
@@ -387,6 +391,7 @@ const char *ability_limitations[] = {
 	"outdoors",		// 10
 	"on the map",
 	"terraform approval",
+	"valid siege target",
 	"\n"
 };
 

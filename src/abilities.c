@@ -49,7 +49,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 
 // local protos
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
-bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
+bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
@@ -67,6 +67,9 @@ PREP_ABIL(prep_action_ability);
 
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
+
+DO_ABIL(do_building_damage_ability);
+PREP_ABIL(prep_building_damage_ability);
 
 DO_ABIL(do_conjure_liquid_ability);
 PREP_ABIL(prep_conjure_liquid_ability);
@@ -117,6 +120,7 @@ struct {
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
 	{ ABILT_ACTION, prep_action_ability, do_action_ability },
+	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -1024,10 +1028,10 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 * @param char_data **vict Will bind a character target here, if any. (Optional)
 * @param obj_data **ovict Will bind an object target here, if any. (Optional)
 * @param vehicle_data **vvict Will bind a vehicle target here, if any. (Optional)
-* @param room_data **targ_room Will bind a room target here, if any. (Optional)
+* @param room_data **room_targ Will bind a room target here, if any. (Optional)
 * @return bool TRUE if targets were ok, FALSE if they are invalid.
 */
-bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vict, obj_data **ovict, vehicle_data **vvict, room_data **targ_room) {
+bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vict, obj_data **ovict, vehicle_data **vvict, room_data **room_targ) {
 	bool any;
 	
 	// init these first
@@ -1040,8 +1044,8 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	if (vvict) {
 		*vvict = NULL;
 	}
-	if (targ_room) {
-		*targ_room = NULL;
+	if (room_targ) {
+		*room_targ = NULL;
 	}
 	
 	// validate character first
@@ -1059,8 +1063,8 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	if (vvict) {
 		*vvict = GET_ACTION_VEH_TARG(ch);
 	}
-	if (targ_room) {
-		*targ_room = real_room(GET_ACTION_ROOM_TARG(ch));
+	if (room_targ) {
+		*room_targ = real_room(GET_ACTION_ROOM_TARG(ch));
 	}
 	
 	// ATAR_x: attempt to validate
@@ -1101,6 +1105,16 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD) && IN_ROOM(*vvict) != IN_ROOM(ch)) {
 			return FALSE;	// wrong location
+		}
+		
+		// room targets
+		if (room_targ && *room_targ) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT) && !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (*room_targ == IN_ROOM(ch) || compute_distance(IN_ROOM(ch), *room_targ) >= 2)) {
+				return FALSE;	// same room or >= 2 not allowed
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT) && *room_targ != IN_ROOM(ch)) {
+				return FALSE;	// different room not allowed
+			}
 		}
 	}
 	
@@ -1393,10 +1407,12 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 * @param char_data *ch The person using the ability.
 * @paran ability_data *abil Which ability.
 * @param char_data *vict Optional: The character target (may be NULL if not used).
+* @param obj_data *ovict Optional: Object target (may be NULL).
+* @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
 * @param room_data *room_targ Optional: The room target (may be NULL if not used).
 * @return bool TRUE if ok, FALSE if failed.
 */
-bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, room_data *room_targ) {
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	if (!ch || !abil) {
 		return FALSE;	// missing abil
 	}
@@ -1436,7 +1452,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		msg_to_char(ch, "You have to use it on the room you're in.\r\n");
 		return FALSE;
 	}
-	if (!check_ability_limitations(ch, abil, IN_ROOM(ch))) {
+	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ)) {
 		// sends own message when false
 		return FALSE;
 	}
@@ -1472,7 +1488,7 @@ int wordcount_ability(ability_data *abil) {
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY ACTIONS /////////////////////////////////////////////////////////
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
@@ -1513,7 +1529,7 @@ DO_ABIL(abil_action_detect_adventures_around) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_earthmeld) {
 	char_data *targ;
 	
@@ -1536,7 +1552,7 @@ DO_ABIL(abil_action_detect_earthmeld) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_hide) {
 	char_data *targ;
 	bool had_sense;
@@ -1571,7 +1587,7 @@ DO_ABIL(abil_action_detect_hide) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_players_around) {
 	bool wait;
 	char where_str[256];
@@ -1604,7 +1620,7 @@ DO_ABIL(abil_action_detect_players_around) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_devastate_area) {
 	room_data *rand_room, *to_room = NULL;
 	crop_data *cp;
@@ -1674,7 +1690,7 @@ DO_ABIL(abil_action_devastate_area) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_magic_growth) {
 	char was_name[256];
 	char *repl_array[2];
@@ -1710,8 +1726,12 @@ DO_ABIL(abil_action_magic_growth) {
 *
 * @param ability_dta *abil The ability being used.
 * @param char_data *ch The character using the ability.
+* @param char_data *vict Optional: Character target (may be NULL).
+* @param obj_data *ovict Optional: Object target (may be NULL).
+* @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
+* @param room_data *room_targ Optional: For room-targeting abilities, must provide the room (may be NULL).
 */
-void apply_ability_effects(ability_data *abil, char_data *ch) {
+void apply_ability_effects(ability_data *abil, char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	struct ability_data_list *data;
 	
 	if (!abil || !ch) {
@@ -1733,6 +1753,26 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 				}
 				break;
 			}
+			case ABIL_EFFECT_DISTRUST_FROM_HOSTILE: {
+				empire_data *emp = NULL;
+				
+				if (vict && GET_LOYALTY(vict)) {
+					emp = GET_LOYALTY(vict);
+				}
+				else if (vvict && VEH_OWNER(vvict)) {
+					emp = VEH_OWNER(vvict);
+				}
+				else if (room_targ && ROOM_OWNER(room_targ)) {
+					emp = ROOM_OWNER(vvict);
+				}
+				
+				// if any
+				if (emp && emp != GET_LOYALTY(ch) && !IS_NPC(ch)) {
+					trigger_distrust_from_hostile(ch, emp);
+				}
+				
+				break;
+			}
 		}
 	}
 }
@@ -1744,10 +1784,13 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 *
 * @param char_data *ch The player using the ability.
 * @param ability_data *abil Which ability.
-* @param room_data *room Optional: For room-targeting abilities, must provide the room. (or NULL)
+* @param char_data *vict Optional: Character target (may be NULL).
+* @param obj_data *ovict Optional: Object target (may be NULL).
+* @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
+* @param room_data *room_targ Optional: For room-targeting abilities, must provide the room (may be NULL).
 * @return bool TRUE if ok, FALSE if there was a problem. Only sends a message if it was false.
 */
-bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room) {
+bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	struct ability_data_list *adl;
 	room_data *any_room;
 	
@@ -1755,7 +1798,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 		return FALSE;	// no work
 	}
 	
-	any_room = room ? room : IN_ROOM(ch);	// used for types that can use either
+	any_room = room_targ ? room_targ : IN_ROOM(ch);	// used for types that can use either
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		if (adl->type != ADL_LIMITATION) {
@@ -1861,6 +1904,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 			case ABIL_LIMIT_TERRAFORM_APPROVAL: {
 				if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
 					send_config_msg(ch, "need_approval_string");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_VALID_SIEGE_TARGET: {
+				if (room_targ && !validate_siege_target_room(ch, NULL, room_targ)) {
+					// sends own messages
+					return FALSE;
+				}
+				if (vvict && !validate_siege_target_vehicle(ch, NULL, vvict)) {
+					// sends own messages
 					return FALSE;
 				}
 				break;
@@ -2822,7 +2876,7 @@ void perform_over_time_ability(char_data *ch) {
 	char_data *vict;
 	obj_data *ovict;
 	vehicle_data *vvict;
-	room_data *targ_room;
+	room_data *room_targ;
 	struct ability_exec *data;
 	struct ability_exec_type *aet, *next_aet;
 	
@@ -2834,7 +2888,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &targ_room) || !validate_ability_target(ch, abil, vict, targ_room)) {
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ)) {
 		cancel_action(ch);
 		return;
 	}
@@ -2859,13 +2913,13 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	else {
 		// done!
-		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, targ_room, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
 		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
 			strcpy(arg, NULLSAFE(GET_ACTION_STRING(ch)));
 			end_action(ch);
-			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, targ_room, GET_ACTION_VNUM(ch, 1), data);
+			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, room_targ, GET_ACTION_VNUM(ch, 1), data);
 		}
 		else {
 			// end
@@ -3023,7 +3077,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			(do_ability_data[iter].prep_func)(ch, abil, level, vict, ovict, room_targ, data);
+			call_prep_abil(do_ability_data[iter].prep_func);
 			
 			// adjust cost
 			if (ABIL_COST_PER_SCALE_POINT(abil)) {
@@ -3070,7 +3124,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	send_pre_ability_messages(ch, vict, ovict, abil, data);
 	
 	// locked in! apply the effects
-	apply_ability_effects(abil, ch);
+	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
 	
 	// WAIT! Over-time abilities stop here
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
@@ -3146,7 +3200,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 /**
 * Performs an ability action.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_action_ability) {
 	struct ability_data_list *adl;
@@ -3195,7 +3249,7 @@ DO_ABIL(do_action_ability) {
 * All buff-type abilities come through here. This handles scaling and buff
 * maintenance/replacement.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
@@ -3284,9 +3338,36 @@ DO_ABIL(do_buff_ability) {
 
 
 /**
+* Deals siege damage to the targeted vehicle or room.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_building_damage_ability) {
+	int dam = 1 + GET_INTELLIGENCE(ch);
+	sector_data *secttype;
+	bld_data *bldtype;
+	
+	if (vvict) {
+		besiege_vehicle(ch, vvict, dam, SIEGE_MAGICAL, NULL);
+	}
+	else if (room_targ) {
+		secttype = SECT(room_targ);
+		bldtype = GET_BUILDING(room_targ);
+		
+		besiege_room(ch, room_targ, dam, NULL);
+		
+		if (SECT(room_targ) != secttype || bldtype != GET_BUILDING(room_targ)) {
+			msg_to_char(ch, "It is destroyed!\r\n");
+			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+}
+
+
+/**
 * Handler for conjure-liquid abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_liquid_ability) {
 	if (!ovict) {
@@ -3301,7 +3382,7 @@ DO_ABIL(do_conjure_liquid_ability) {
 /**
 * Handler for conjure-object abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_object_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
@@ -3311,7 +3392,7 @@ DO_ABIL(do_conjure_object_ability) {
 /**
 * Handler for conjure-vehicle abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_vehicle_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
@@ -3321,7 +3402,7 @@ DO_ABIL(do_conjure_vehicle_ability) {
 /**
 * All damage abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
@@ -3357,7 +3438,7 @@ DO_ABIL(do_damage_ability) {
 * All damage-over-time abilities come through here. This handles scaling and
 * stacking.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_dot_ability) {
 	any_vnum affect_vnum;
@@ -3405,7 +3486,7 @@ DO_ABIL(do_dot_ability) {
 /**
 * Applies color to the building.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_paint_building_ability) {
 	struct ability_data_list *adl;
@@ -3432,7 +3513,7 @@ DO_ABIL(do_paint_building_ability) {
 /**
 * All room-affect abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_room_affect_ability) {
 	struct affected_type *af;
@@ -3478,12 +3559,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	char arg[MAX_INPUT_LENGTH], *argptr = arg;
 	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
-	vehicle_data *veh = NULL;
+	vehicle_data *vvict = NULL;
 	char_data *vict = NULL;
 	obj_data *ovict = NULL;
-	room_data *room_targ = NULL;
+	room_data *room_targ = NULL, *to_room;
 	bool has = FALSE;
-	int cap, iter, level, number;
+	int cap, find_dir, iter, level, number;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -3563,12 +3644,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		
 		// vehicle targets
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM)) {
-			if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
+			if ((vvict = get_vehicle_in_room_vis(ch, argptr, &number))) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
-			if ((veh = get_vehicle_vis(ch, argptr, &number))) {
+			if ((vvict = get_vehicle_vis(ch, argptr, &number))) {
 				has = TRUE;
 			}
 		}
@@ -3577,6 +3658,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
 			if (is_abbrev(argptr, "room") || is_abbrev(argptr, "area") || is_abbrev(argptr, "here")) {
 				room_targ = IN_ROOM(ch);
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT)) {
+			if ((find_dir = parse_direction(ch, argptr)) != NO_DIR && is_flat_dir[find_dir] && (to_room = dir_to_room(IN_ROOM(ch), find_dir, TRUE)) && to_room != IN_ROOM(ch)) {
+				room_targ = to_room;
 				has = TRUE;
 			}
 		}
@@ -3622,7 +3709,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	else if (!validate_ability_target(ch, abil, vict, room_targ)) {
+	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ)) {
 		// sent own message
 		return;
 	}
@@ -3642,7 +3729,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
-	call_ability(ch, abil, argument, vict, ovict, veh, room_targ, level, RUN_ABIL_NORMAL, data);
+	call_ability(ch, abil, argument, vict, ovict, vvict, room_targ, level, RUN_ABIL_NORMAL, data);
 	
 	// 7. costs and consequences
 	if (data->should_charge_cost) {
@@ -3673,7 +3760,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_action_ability) {
 	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
@@ -3683,7 +3770,7 @@ PREP_ABIL(prep_action_ability) {
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
@@ -3704,10 +3791,16 @@ PREP_ABIL(prep_buff_ability) {
 }
 
 
+// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_building_damage_ability) {
+	get_ability_type_data(data, ABILT_BUILDING_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUILDING_DAMAGE, data);
+}
+
+
 /**
 * Determines if ovict is a valid target for creating the liquid.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_liquid_ability) {
 	char buf[256];
@@ -3765,7 +3858,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 /**
 * Determines if player can conjure objects.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_object_ability) {
 	bool has_any, one_ata, any_inv, any_room;
@@ -3842,7 +3935,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 /**
 * Determines if player can conjure vehicles.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_vehicle_ability) {
 	struct interaction_item *interact;
@@ -3901,7 +3994,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_damage_ability) {
 	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
@@ -3909,7 +4002,7 @@ PREP_ABIL(prep_damage_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_dot_ability) {
 	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
@@ -3917,7 +4010,7 @@ PREP_ABIL(prep_dot_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_paint_building_ability) {
 	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
@@ -3927,7 +4020,7 @@ PREP_ABIL(prep_paint_building_ability) {
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_room_affect_ability) {
 	any_vnum affect_vnum;

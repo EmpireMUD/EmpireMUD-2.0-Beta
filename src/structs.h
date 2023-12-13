@@ -584,6 +584,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_ROOM_AFFECT  BIT(16)	// puts an affect on a room
 #define ABILT_PAINT_BUILDING  BIT(17)	// applies color to the building
 #define ABILT_ACTION  BIT(18)	// performs an action (from data list)
+#define ABILT_BUILDING_DAMAGE  BIT(19)	// blasts a building or vehicle
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -613,6 +614,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
 #define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
 #define ATAR_ROOM_HERE  BIT(14)	// targets the room you're in
+#define ATAR_ROOM_ADJACENT  BIT(15)	// targets in a direction
 
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
@@ -664,6 +666,7 @@ typedef struct vehicle_data vehicle_data;
 
 // ABIL_EFFECT_x: things that happen when an ability is used
 #define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
+#define ABIL_EFFECT_DISTRUST_FROM_HOSTILE  1	// causes a distrust state with the target
 
 
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
@@ -710,6 +713,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_OUTDOORS  10	// must be outdoors (includes in adventures)
 #define ABIL_LIMIT_ON_MAP  11	// won't work on interiors or adventures, but may include map buildings
 #define ABIL_LIMIT_TERRAFORM_APPROVAL  12	// check player approval
+#define ABIL_LIMIT_VALID_SIEGE_TARGET  13	// validate for siege damage
 
 
 // RUN_ABIL_x: modes for activating abilities

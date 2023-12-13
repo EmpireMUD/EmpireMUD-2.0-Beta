@@ -641,6 +641,19 @@ Buff abilities have the following properties:
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
+"ABILEDIT BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITIES" "BUILDING DAMAGE ABILITY" "ABILEDIT BUILDING DAMAGE ABILITY"
+
+The BUILDING-DAMAGE type is capable of dealing damage to both buildings and
+vehicles, depending on the targets you set on the ability.
+
+You should always set the VIOLENT flag on this as well as the "distrust from
+hostile" effect and the "valid siege target" limitation.
+
+This uses the &cself-to-*&0 messages for building targets and the &ctarg-to-*&0
+messages for vehicle targets.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT COMPANION ABILITY" "COMPANION ABILITY" "COMPANION ABILITIES"
 
 The COMPANION ability type adds 1 or more mobs to the player's 'companions'
@@ -1453,6 +1466,8 @@ The following types are available (each has its own help file):
  &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
  &cROOM-AFFECT&0 - Similar to a buff, for the room.
  &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
+ &cACTION&0 - Executes and action; see ABILEDIT ACTIONS.
+ &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
@@ -1479,11 +1494,14 @@ Choose the wait type that best fits your ability:
 
 See also: COMMAND LAG, OLC ABILITIES
 #d
-"ABILITY EFFECTS"
+"ABILITY EFFECTS" "ABILEDIT EFFECTS"
 
-Some abilities have 'effects' which happen when the ability is activated.
+Some abilities have 'effects' which happen when the ability is activated. These
+happen at the beginning of the ability.
+
 Available effect types are:
- &cdismount&0 - the player will be dismounted
+ &cdismount&0 - The player will be dismounted
+ &cdistrust from hostile&0 - Triggers distrust from the target's empire
 
 See also: ABILEDIT DATA
 #d
