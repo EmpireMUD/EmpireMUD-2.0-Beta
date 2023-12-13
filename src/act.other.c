@@ -2281,7 +2281,7 @@ ACMD(do_conjure) {
 	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "conjure")))
 	
 	skip_spaces(&argument);	// keep whole arg too (may be the whole conjure type)
-	arg2 = any_one_word(argument, arg);	// first arg: conjure type
+	arg2 = one_word(argument, arg);	// first arg: conjure type
 	skip_spaces(&arg2);	// remaining arg
 	
 	if (IS_NPC(ch)) {
@@ -3756,7 +3756,7 @@ ACMD(do_ritual2) {
 	
 	#define VALID_RITCHANT_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_COMMAND(abil) && !str_cmp(ABIL_COMMAND(abil), ritual_scmd[subcmd]))
 	
-	arg2 = any_one_word(argument, arg);	// first arg: ritual/chant type
+	arg2 = one_word(argument, arg);	// first arg: ritual/chant type
 	skip_spaces(&arg2);	// remaining arg
 	
 	if (IS_NPC(ch)) {
