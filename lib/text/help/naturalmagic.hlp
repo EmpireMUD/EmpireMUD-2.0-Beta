@@ -147,20 +147,6 @@ To brew potions you will require:
 See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS,
 RECIPES, CRAFTING ABILITIES
 #
-CHANT
-
-Usage:  chant <type>
-
-There are several ancient chants whose power you can still wield today.
-Chants have no beginning or end, but you can stop chanting by typing the
-command again.
-
-Unlike most timed actions, chants are not running on a timer. Their effect,
-if any, happens at random as you chant. Some chants have a higher random chance
-than others.
-
-See also: help for individual chants, like HELP CHANT OF NATURE
-#
 "CHANT OF ILLUSIONS"
 
 Chant of Illusions

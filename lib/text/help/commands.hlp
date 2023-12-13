@@ -436,6 +436,19 @@ slash-channel you are currently in.
 
 See also: SLASH-CHANNELS, STATUS MESSAGES
 #
+CHANT CHANTS
+
+Usage:  chant [name] [target]
+        chant "<name>" [target]
+
+There are several ancient chants whose power you can still wield today. Type
+chant by itself to see if you know any chants. If a chant has multiple words
+in the name, you can use "quotes" around the name.
+
+Type "stop" to cancel a chant. Some chants do not end on their own.
+
+See also: help for individual chants, like HELP CHANT OF NATURE
+#
 CHART CHARTS
 
 Usage:  chart <island>
@@ -2090,6 +2103,19 @@ your group members, try the 'group' command by itself or the 'summary' command.
 If you want to see your own stats from combat, use 'meters'.
 
 See also: GROUP, METERS, SUMMARY
+#
+RITUAL RITE
+
+Usage:  ritual [type] [target]
+        ritual "<type>" [target]
+
+Sorcerers can learn powerful rituals. Type the ritual command by itself to see
+which ones you know. If a ritual has multiple words in the name, you can put
+quotes around it when using the ritual, or abbreviate it to one word.
+
+Type "stop" to cancel a ritual.
+
+See also: help for individual rituals, like HELP RITUAL OF BURDENS
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
