@@ -31,7 +31,6 @@
 *   Data
 *   Helpers
 *   Commands
-*   Chants
 *   Rituals
 */
 
@@ -102,13 +101,6 @@ RITUAL_FINISH_FUNC(perform_siege_ritual);
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
-
-// chant prototypes
-RITUAL_FINISH_FUNC(perform_chant_of_illusions);
-RITUAL_FINISH_FUNC(perform_chant_of_nature);
-RITUAL_SETUP_FUNC(start_chant_of_illusions);
-RITUAL_SETUP_FUNC(start_chant_of_nature);
-
 
 // SCMD_RITUAL, SCMD_CHANT
 const char *ritual_scmd[] = { "ritual", "chant" };
@@ -237,9 +229,9 @@ struct ritual_data_type {
 	}},
 	
 	// 9: chant of nature
-	{ "nature", 0, ABIL_CHANT_OF_NATURE, 0, SCMD_CHANT,
-		start_chant_of_nature,
-		perform_chant_of_nature,
+	{ "nature", 0, 126, 0, SCMD_CHANT,
+		NULL,
+		NULL,
 		{{ "You start the chant of nature...", "$n starts the chant of nature..." },
 		{ "You chant, 'O ancient Ash, bubbling waters, let life flow anew...'", "$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'" },
 		NO_MESSAGE,
@@ -253,9 +245,9 @@ struct ritual_data_type {
 	}},
 	
 	// 10: chant of illusions
-	{ "illusions", 0, ABIL_CHANT_OF_ILLUSIONS, 0, SCMD_CHANT,
-		start_chant_of_illusions,
-		perform_chant_of_illusions,
+	{ "illusions", 0, 265, 0, SCMD_CHANT,
+		NULL,
+		NULL,
 		{{ "You start the chant of illusions...", "$n starts the chant of illusions..." },
 		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
 		NO_MESSAGE,
@@ -1428,93 +1420,6 @@ ACMD(do_vigor) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 	}
-}
-
-
- ///////////////////////////////////////////////////////////////////////////////
-//// CHANTS ///////////////////////////////////////////////////////////////////
-
-RITUAL_SETUP_FUNC(start_chant_of_illusions) {
-	static struct resource_data *illusion_res = NULL;
-	if (!illusion_res) {
-		add_to_resource_list(&illusion_res, RES_OBJECT, o_NOCTURNIUM_SPIKE, 1, 0);
-		add_to_resource_list(&illusion_res, RES_OBJECT, o_IRIDESCENT_IRIS, 1, 0);
-	}
-	
-	if (!IS_ROAD(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't perform the chant of illusions here.\r\n");
-		return FALSE;
-	}
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Complete the building first.\r\n");
-		return FALSE;
-	}
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
-		msg_to_char(ch, "You don't have permission to perform that chant here.\r\n");
-		return FALSE;
-	}
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_CHAMELEON)) {
-		msg_to_char(ch, "This road is already cloaked in illusion.\r\n");
-		return FALSE;
-	}
-	if (!has_resources(ch, illusion_res, TRUE, TRUE, NULL)) {
-		// message sent by has_resources
-		return FALSE;
-	}
-	
-	// OK
-	extract_resources(ch, illusion_res, TRUE, NULL);
-	start_ritual(ch, ritual);
-	return TRUE;
-}
-
-RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
-	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
-		msg_to_char(ch, "You finish the chant, but it has no effect.\r\n");
-		return;
-	}
-	
-	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
-	affect_total_room(IN_ROOM(ch));
-	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
-}
-
-
-RITUAL_SETUP_FUNC(start_chant_of_nature) {
-	if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
-		send_config_msg(ch, "need_approval_string");
-		return FALSE;
-	}
-	
-	start_ritual(ch, ritual);
-	return TRUE;
-}
-
-RITUAL_FINISH_FUNC(perform_chant_of_nature) {
-	sector_data *preserve;
-	struct evolution_data *evo;
-	
-	// percentage is checked in the evolution data
-	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
-		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
-		
-		// messaging
-		msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
-		act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		change_terrain(IN_ROOM(ch), evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
-		
-		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
-		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
-		
-		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
-	}
-	else {
-		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 0.5);
-	}
-	
-	// restart it automatically
-	start_ritual(ch, ritual);
 }
 
 

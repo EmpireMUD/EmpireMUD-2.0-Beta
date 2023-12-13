@@ -538,11 +538,18 @@ Usage:  .data add action <type>
 These are things that happen when the ability is successful.
 
 Action types:
- &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends per-char messages for each hidden character.
- &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room target. Sends per-char messages for each hidden character.
- &cdetect players around&0 - Find other players in where-range (or in same city). Cannot customize the message.
- &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or same city).
- &cdevastate area&0 - Collect resources within 3 tiles. Use $$ for the tile name in per-item messages.
+ &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends
+   per-char messages for each hidden character.
+ &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room
+   target. Sends per-char messages for each hidden character.
+ &cdetect players around&0 - Find other players in where-range (or in same
+   city). Cannot customize the message.
+ &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or
+   same city).
+ &cdevastate area&0 - Collect resources within 3 tiles. Use $$ for the tile
+   name in per-item messages.
+ &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
+   per-item-to messages (but no item) for the message when the evolution works.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
@@ -1036,6 +1043,7 @@ Limitation types:
  &cindoors&0 - Must be indoors (including inside buildings on the map).
  &coutdoors&0 - Must be outdoors (including some adventure rooms).
  &con the map&0 - Must be on the map (includes the main room of buildings).
+ &cterraform approval&0 - Check if the player needs/has approval for this.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

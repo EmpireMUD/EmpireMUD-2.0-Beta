@@ -185,7 +185,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_ENTANGLE  121
 // #define ABIL_FAMILIAR  122
 #define ABIL_SKYBRAND  125
-#define ABIL_CHANT_OF_NATURE  126
+// #define ABIL_CHANT_OF_NATURE  126
 // formerly: #define ABIL_REWARD  127
 // formerly: #define ABIL_SUMMON_GUARDS  128
 // formerly: #define ABIL_PROSPECT  130
@@ -268,7 +268,7 @@ bool trigger_counterspell(char_data *ch);
 // #define ABIL_SKELETAL_HULK  260
 // #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
-#define ABIL_CHANT_OF_ILLUSIONS  265
+// #define ABIL_CHANT_OF_ILLUSIONS  265
 // #define ABIL_ASTRAL_WEREWOLF_FORM  267
 #define ABIL_WHISPERSTRIDE 268
 // #define ABIL_WEREWOLF_FORM  269

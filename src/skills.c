@@ -196,14 +196,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			need_affect_total = TRUE;
 			break;
 		}
-		case ABIL_CHANT_OF_NATURE: {
-			if (GET_ACTION(ch) == ACT_CHANTING) {
-				msg_to_char(ch, "You end the chant.\r\n");
-				act("$n ends the chant.", FALSE, ch, NULL, NULL, TO_ROOM);
-				cancel_action(ch);
-			}
-			break;
-		}
 		case ABIL_CLAWS: {
 			retract_claws(ch);
 			need_affect_total = TRUE;

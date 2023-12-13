@@ -1713,6 +1713,27 @@ DO_ABIL(abil_action_devastate_area) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_magic_growth) {
+	sector_data *preserve;
+	struct evolution_data *evo;
+	
+	// percentage is checked in the evolution data
+	if ((evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
+		preserve = (BASE_SECT(room_targ) != SECT(room_targ)) ? BASE_SECT(room_targ) : NULL;
+		
+		send_ability_per_item_messages(ch, ovict, 1, abil, data, NULL);
+		change_terrain(room_targ, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
+		
+		remove_depletion(room_targ, DPLTN_PICK);
+		remove_depletion(room_targ, DPLTN_FORAGE);
+	}
+	
+	// always a success (no expected outcome)
+	data->success = TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
@@ -1866,6 +1887,13 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 			case ABIL_LIMIT_ON_MAP: {
 				if (GET_ROOM_VNUM(any_room) >= MAP_SIZE) {
 					msg_to_char(ch, "You need to be on the map to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_TERRAFORM_APPROVAL: {
+				if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
+					send_config_msg(ch, "need_approval_string");
 					return FALSE;
 				}
 				break;
@@ -3098,6 +3126,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_DEVASTATE_AREA: {
 				call_do_abil(abil_action_devastate_area);
+				break;
+			}
+			case ABIL_ACTION_MAGIC_GROWTH: {
+				call_do_abil(abil_action_magic_growth);
 				break;
 			}
 		}

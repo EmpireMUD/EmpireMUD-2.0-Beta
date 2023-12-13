@@ -119,6 +119,7 @@ const char *ability_actions[] = {
 	"detect players around",
 	"detect adventures around",
 	"devastate area",
+	"magic growth evolution",
 	"\n"
 };
 
@@ -381,6 +382,7 @@ const char *ability_limitations[] = {
 	"indoors",
 	"outdoors",		// 10
 	"on the map",
+	"terraform approval",
 	"\n"
 };
 

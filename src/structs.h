@@ -625,6 +625,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_DETECT_PLAYERS_AROUND  2	// finds other players in/near the city
 #define ABIL_ACTION_DETECT_ADVENTURES_AROUND  3	// finds detectable adventures near the player
 #define ABIL_ACTION_DEVASTATE_AREA  4	// collects a chop or crop resource within 3 tiles
+#define ABIL_ACTION_MAGIC_GROWTH  5	// triggers a magic growth evolution
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -705,6 +706,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_INDOORS  9	// must be inside
 #define ABIL_LIMIT_OUTDOORS  10	// must be outdoors (includes in adventures)
 #define ABIL_LIMIT_ON_MAP  11	// won't work on interiors or adventures, but may include map buildings
+#define ABIL_LIMIT_TERRAFORM_APPROVAL  12	// check player approval
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -3032,7 +3034,7 @@ typedef enum {
 
 
 // EVO_x: world evolutions
-#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping, chant of nature, etc
+#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping
 #define EVO_CROP_GROWS  1	// e.g. 'seeded field' crop-grows to 'crop' [no value]
 #define EVO_ADJACENT_ONE  2	// called when adjacent to at least 1 of [value=sector]
 #define EVO_ADJACENT_MANY  3	// called when adjacent to at least 6 of [value=sector]

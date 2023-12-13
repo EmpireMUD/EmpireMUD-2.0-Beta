@@ -66,7 +66,6 @@
 
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
-#define o_NOCTURNIUM_SPIKE  1119
 
 // herbs
 #define o_IRIDESCENT_IRIS  1206
