@@ -3555,6 +3555,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : NULL);
 		}
 	}
+	else {
+		// has wait type even without cost
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
+	}
 	if (data->success) {
 		// only if successful
 		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
@@ -3596,8 +3600,6 @@ PREP_ABIL(prep_buff_ability) {
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
 		data->success = TRUE;	// I think this is a success?
-		
-		command_lag(ch, ABIL_WAIT_TYPE(abil));
 		return;
 	}
 	
@@ -3842,8 +3844,15 @@ PREP_ABIL(prep_room_affect_ability) {
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
 		data->success = TRUE;	// I think this is a success?
-		
-		command_lag(ch, ABIL_WAIT_TYPE(abil));
+		return;
+	}
+	
+	// one-at-a-time?
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
+		msg_to_char(ch, "The area is already affected by that ability.\r\n");
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;	// free cancel
+		data->no_msg = TRUE;
 		return;
 	}
 	

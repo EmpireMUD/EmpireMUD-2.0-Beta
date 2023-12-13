@@ -224,7 +224,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_RITUAL_OF_TELEPORTATION  187
 #define ABIL_PORTAL_MAGIC  189
 #define ABIL_PORTAL_MASTER  190
-#define ABIL_DEVASTATION_RITUAL  191
+// #define ABIL_DEVASTATION_RITUAL  191
 // #define ABIL_SENSE_LIFE_RITUAL  192
 // #define ABIL_RITUAL_OF_DETECTION  193
 // #define ABIL_BASIC_CRAFTS  198	// no longer used in code
