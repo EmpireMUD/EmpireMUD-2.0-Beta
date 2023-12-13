@@ -3764,15 +3764,15 @@ ACMD(do_ritual2) {
 		return;
 	}
 	
-	// already doing this?
-	if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(ch, 0))) && (plab = get_ability_data(ch, ABIL_VNUM(abil), FALSE)) && VALID_RITCHANT_ABIL(ch, plab)) {
-		msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
-		cancel_action(ch);
-		return;
-	}
-	
 	// no-arg: show list
 	if (!*arg) {
+		// already doing this?
+		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(ch, 0))) && (plab = get_ability_data(ch, ABIL_VNUM(abil), FALSE)) && VALID_RITCHANT_ABIL(ch, plab)) {
+			msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
+			cancel_action(ch);
+			return;
+		}
+		
 		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", ritual_scmd[subcmd]);
 		
 		found = full = FALSE;
