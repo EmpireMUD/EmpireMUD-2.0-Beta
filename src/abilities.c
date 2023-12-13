@@ -30,6 +30,7 @@
 /**
 * Contents:
 *   Helpers
+*   Ability Actions
 *   Ability Effects and Limits
 *   Ability Interaction Funcs
 *   Ability Messaging
@@ -51,6 +52,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data);
 void ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data);
 
@@ -1511,6 +1513,134 @@ int wordcount_ability(ability_data *abil) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ABILITY ACTIONS /////////////////////////////////////////////////////////
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_detect_adventures_around) {
+	bool wait;
+	char *dir_str;
+	int adv_dist;
+	struct instance_data *inst;
+	struct empire_city_data *match_city;
+	room_data *loc;
+	
+	if (!room_targ) {
+		return;	// nothing to do
+	}
+	
+	match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
+	adv_dist = 50 + GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
+	adv_dist = MAX(0, adv_dist);
+	DL_FOREACH(instance_list, inst) {
+		loc = INST_FAKE_LOC(inst);
+		if (!loc || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+			continue;	// no location, or completed already
+		}
+		if (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_DETECTABLE)) {
+			continue;	// not detectable
+		}
+		if ((!match_city || find_city(ROOM_OWNER(room_targ), loc) != match_city) && compute_distance(room_targ, loc) > adv_dist) {
+			continue;	// wrong city and too far
+		}
+		
+		// show instance
+		data->success = TRUE;
+		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
+		msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_detect_earthmeld) {
+	char_data *targ;
+	
+	if (!room_targ) {
+		return;	// no work
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
+		if (targ == ch) {
+			continue;
+		}
+		
+		if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+			if (CAN_SEE(ch, targ)) {
+				send_ability_per_char_messages(ch, targ, 1, abil, data);
+				data->success = TRUE;
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_detect_hide) {
+	char_data *targ;
+	bool had_sense;
+	
+	if (!room_targ) {
+		return;	// nothing to do
+	}
+	
+	had_sense = AFF_FLAGGED(ch, AFF_SENSE_HIDE) ? TRUE : FALSE;
+	
+	DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
+		if (targ == ch) {
+			continue;
+		}
+		
+		if (AFF_FLAGGED(targ, AFF_HIDE)) {
+			// hidden target
+			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+
+			if (CAN_SEE(ch, targ)) {
+				send_ability_per_char_messages(ch, targ, 1, abil, data);
+				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+				affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
+				data->success = TRUE;
+			}
+			
+			if (!had_sense) {
+				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
+DO_ABIL(abil_action_detect_players_around) {
+	bool wait;
+	char *dir_str;
+	int player_dist;
+	char_data *ch_iter;
+	struct empire_city_data *match_city;
+	
+	if (!room_targ) {
+		return;	// no work
+	}
+	
+	match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
+	player_dist = GET_EXTRA_ATT(ch, ATT_WHERE_RANGE) + (has_player_tech(ch, PTECH_WHERE_UPGRADE) ? 75 : 20);
+	player_dist = MAX(0, player_dist);
+	DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+		if (ch_iter == ch || IS_IMMORTAL(ch_iter)) {
+			continue;	// skip these
+		}
+		if ((!match_city || find_city(ROOM_OWNER(room_targ), IN_ROOM(ch_iter)) != match_city) && compute_distance(room_targ, IN_ROOM(ch_iter)) > player_dist) {
+			continue;	// not same city and too far
+		}
+
+		// ok:
+		data->success = TRUE;
+		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
+		msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", PERS(ch_iter, ch_iter, FALSE), get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
 /**
@@ -2757,7 +2887,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 
 
 /**
-* Performs an action.
+* Performs an ability action.
 *
 * DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 */
@@ -2773,119 +2903,22 @@ DO_ABIL(do_action_ability) {
 			continue;
 		}
 		
-		// ABIL_ACTION_x: these should set data->success to TRUE if they succeed
+		// ABIL_ACTION_x: these should set data->success to TRUE only if they succeed
 		switch (adl->vnum) {
 			case ABIL_ACTION_DETECT_HIDE: {
-				char_data *targ;
-				bool had_sense;
-				
-				if (!room_targ) {
-					break;
-				}
-				
-				had_sense = AFF_FLAGGED(ch, AFF_SENSE_HIDE) ? TRUE : FALSE;
-				
-				DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
-					if (targ == ch) {
-						continue;
-					}
-					
-					if (AFF_FLAGGED(targ, AFF_HIDE)) {
-						// hidden target
-						SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
-
-						if (CAN_SEE(ch, targ)) {
-							send_ability_per_char_messages(ch, targ, 1, abil, data);
-							REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
-							affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
-							data->success = TRUE;
-						}
-						
-						if (!had_sense) {
-							REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
-						}
-					}
-				}
+				abil_action_detect_hide(ch, abil, level, vict, ovict, room_targ, data);
 				break;
 			}
 			case ABIL_ACTION_DETECT_EARTHMELD: {
-				char_data *targ;
-				
-				if (!room_targ) {
-					break;
-				}
-				
-				DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
-					if (targ == ch) {
-						continue;
-					}
-					
-					if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
-						if (CAN_SEE(ch, targ)) {
-							send_ability_per_char_messages(ch, targ, 1, abil, data);
-							data->success = TRUE;
-						}
-					}
-				}
+				abil_action_detect_earthmeld(ch, abil, level, vict, ovict, room_targ, data);
 				break;
 			}
 			case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
-				bool wait;
-				char *dir_str;
-				int player_dist;
-				char_data *ch_iter;
-				struct empire_city_data *match_city;
-				
-				if (!room_targ) {
-					break;
-				}
-				
-				match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
-				player_dist = GET_EXTRA_ATT(ch, ATT_WHERE_RANGE) + (has_player_tech(ch, PTECH_WHERE_UPGRADE) ? 75 : 20);
-				player_dist = MAX(0, player_dist);
-				DL_FOREACH2(player_character_list, ch_iter, next_plr) {
-					if (ch_iter == ch || IS_IMMORTAL(ch_iter)) {
-						continue;	// skip these
-					}
-					if ((!match_city || find_city(ROOM_OWNER(room_targ), IN_ROOM(ch_iter)) != match_city) && compute_distance(room_targ, IN_ROOM(ch_iter)) > player_dist) {
-						continue;	// not same city and too far
-					}
-			
-					// ok:
-					data->success = TRUE;
-					dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-					msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", PERS(ch_iter, ch_iter, FALSE), get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
-				}
+				abil_action_detect_players_around(ch, abil, level, vict, ovict, room_targ, data);
 				break;
 			}
 			case ABIL_ACTION_DETECT_ADVENTURES_AROUND: {
-				bool wait;
-				char *dir_str;
-				int adv_dist;
-				struct instance_data *inst;
-				struct empire_city_data *match_city;
-				room_data *loc;
-				
-				match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
-				adv_dist = 50 + GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
-				adv_dist = MAX(0, adv_dist);
-				DL_FOREACH(instance_list, inst) {
-					loc = INST_FAKE_LOC(inst);
-					if (!loc || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-						continue;	// no location, or completed already
-					}
-					if (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_DETECTABLE)) {
-						continue;	// not detectable
-					}
-					if ((!match_city || find_city(ROOM_OWNER(room_targ), loc) != match_city) && compute_distance(room_targ, loc) > adv_dist) {
-						continue;	// wrong city and too far
-					}
-					
-					// show instance
-					data->success = TRUE;
-					dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-					msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
-				}
+				abil_action_detect_adventures_around(ch, abil, level, vict, ovict, room_targ, data);
 				break;
 			}
 		}
