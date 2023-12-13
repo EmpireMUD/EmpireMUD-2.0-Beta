@@ -770,7 +770,12 @@ NEVER share the name with a game command.
 Players can only use this command if they have this ability. You can use
 'skill buy <your skill name>' to buy and test the ability.
 
-See also: OLC ABILITIES
+Some commands have special behavior instead:
+ &cchant&0 - Add this ability to the player's chant command.
+ &cconjure&0 - Add this ability to the player's conjure command.
+ &critual&0 - Add this ability to the player's ritual command.
+
+See also: OLC ABILITIES, CHANT, CONJURE, RITUAL
 #d
 "ABILEDIT COOLDOWN" "ABILEDIT CDTIME"
 
