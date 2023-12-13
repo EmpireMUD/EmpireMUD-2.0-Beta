@@ -2119,11 +2119,12 @@ INTERACTION_FUNC(devastate_trees) {
 * @param char_data *ch The player using the ability.
 * @param char_data *vict The targeted player, if any (or NULL).
 * @param obj_data *ovict The targeted object, if any (or NULL).
+* @param vehicle_data *vvict The targeted vehicle (NULL if none).
 * @param ability_data *abil The ability.
 * @param int use_pos For over-time abilities, pass the current message pos. For all others, pass NOTHING instead.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
-void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, int use_pos, struct ability_exec *data) {
+void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data) {
 	bool any, invis;
 	char buf[MAX_STRING_LENGTH];
 	char *msg;
@@ -2150,7 +2151,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		act_flags |= TO_SPAMMY;
 	}
 	
-	if (vict || (!vict && !ovict)) {	// messaging with char target or no target
+	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 			// to-char
 			any = TRUE;
@@ -2240,6 +2241,32 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+	}
+	else if (vvict) {	// messaging with vehicle target
+		// to-char
+		any = TRUE;
+		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+			if (*msg != '*') {
+				act(msg, FALSE, ch, ovict, vvict, TO_CHAR | act_flags);
+			}
+		}
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, ovict, vvict, TO_CHAR | act_flags);
+		}
+	
+		// to room
+		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+			if (*msg != '*') {
+				act(msg, invis, ch, ovict, vvict, TO_ROOM | act_flags);
+			}
+		}
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			// don't message if it's damage + there's an attack type
+			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, ovict, vvict, TO_ROOM | act_flags);
 		}
 	}
 	
@@ -2902,7 +2929,7 @@ void perform_over_time_ability(char_data *ch) {
 	
 	// message position is controlled by action timer
 	GET_ACTION_TIMER(ch) += 1;
-	send_ability_activation_messages(ch, vict, ovict, abil, GET_ACTION_TIMER(ch), data);
+	send_ability_activation_messages(ch, vict, ovict, vvict, abil, GET_ACTION_TIMER(ch), data);
 	
 	// detect continuing?
 	if (vict && vict != ch && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
@@ -2955,7 +2982,7 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 		return;	// nothing to see here
 	}
 	
-	send_ability_activation_messages(ch, vict, ovict, abil, 0, data);
+	send_ability_activation_messages(ch, vict, ovict, vvict, abil, 0, data);
 	
 	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
 	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
@@ -3151,7 +3178,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// main messaging
 	if (run_mode != RUN_ABIL_OVER_TIME) {
-		send_ability_activation_messages(ch, vict, ovict, abil, NOTHING, data);
+		send_ability_activation_messages(ch, vict, ovict, vvict, abil, NOTHING, data);
 	}
 	
 	// run the abilities
@@ -3349,6 +3376,7 @@ DO_ABIL(do_building_damage_ability) {
 	
 	if (vvict) {
 		besiege_vehicle(ch, vvict, dam, SIEGE_MAGICAL, NULL);
+		data->success = TRUE;
 	}
 	else if (room_targ) {
 		secttype = SECT(room_targ);
@@ -3360,6 +3388,7 @@ DO_ABIL(do_building_damage_ability) {
 			msg_to_char(ch, "It is destroyed!\r\n");
 			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
+		data->success = TRUE;
 	}
 }
 
