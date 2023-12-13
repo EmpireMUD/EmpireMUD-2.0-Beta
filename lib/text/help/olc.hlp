@@ -542,13 +542,14 @@ Action types:
    per-char messages for each hidden character.
  &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room
    target. Sends per-char messages for each hidden character.
- &cdetect players around&0 - Find other players in where-range (or in same
+ &cdetect players around&0 - Find other players in near the user (or in same
    city). Use $1 for the location in per-char messages to display the target.
- &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or
-   same city). Use $1 for the tile name and $2 for the adventure in spec-to
-   messages.
- &cdevastate area&0 - Collect resources within 3 tiles. Use $1 for the tile
-   name in per-item messages.
+   Uses RANGE data, defaults to normal "where" range.
+ &cdetect adventures around&0 - Find DETECTABLE adventures nearby (or same
+   city). Use $1 for the tile name and $2 for the adventure in spec-to
+   messages. Uses RANGE data, defaults to normal "nearby" range.
+ &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
+   name in per-item messages. Uses RANGE data, default 3 if not given.
  &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
    spec-to messages when the evolution works with $1 as the old sector name and
    $2 as the new one.

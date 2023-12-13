@@ -585,6 +585,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_PAINT_BUILDING  BIT(17)	// applies color to the building
 #define ABILT_ACTION  BIT(18)	// performs an action (from data list)
 #define ABILT_BUILDING_DAMAGE  BIT(19)	// blasts a building or vehicle
+#define ABILT_TELEPORT  BIT(20)	// relocates the player
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
@@ -678,6 +679,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_LIMITATION  BIT(4)	// special checks on the ability
 #define ADL_PAINT_COLOR  BIT(5)	// for paint-building, etc
 #define ADL_ACTION  BIT(6)	// has a specific action when successful
+#define ADL_RANGE  BIT(7)	// some abilities can control range
 
 
 // AGH_x: ability gain hooks

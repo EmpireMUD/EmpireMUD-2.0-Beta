@@ -92,6 +92,9 @@ PREP_ABIL(prep_paint_building_ability);
 DO_ABIL(do_room_affect_ability);
 PREP_ABIL(prep_room_affect_ability);
 
+DO_ABIL(do_teleport_ability);
+PREP_ABIL(prep_teleport_ability);
+
 
 // setup for abilities
 struct {
@@ -121,6 +124,7 @@ struct {
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
 	{ ABILT_ACTION, prep_action_ability, do_action_ability },
 	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability },
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability },
 	
 	{ NOBITS }	// this goes last
 };
@@ -128,7 +132,6 @@ struct {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
-
 
 /**
 * String display for one ADL item.
@@ -170,6 +173,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_ACTION: {
 			snprintf(output, sizeof(output), "%s: %s", temp, ability_actions[adl->vnum]);
+			break;
+		}
+		case ADL_RANGE: {
+			snprintf(output, sizeof(output), "%s: %d", temp, adl->vnum);
 			break;
 		}
 		default: {
@@ -628,6 +635,32 @@ ability_data *find_player_ability_by_tech(char_data *ch, int ptech) {
 	}
 	
 	return NULL;	// if we got here
+}
+
+
+/**
+* Gets numeric data from the ability, e.g. a RANGE value.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type, e.g. ADL_RANGE.
+* @param bool allow_random If TRUE, picks at random when multiple values are set. If FALSE, returns the first match.
+* @return int The data value if found, or 0 if none exists.
+*/
+int get_ability_data_value(ability_data *abil, int type, bool allow_random) {
+	struct ability_data_list *adl;
+	int found = 0, count = 0;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type && !number(0, count++)) {
+			found = adl->vnum;
+			
+			if (!allow_random) {
+				break;	// only wanted first one
+			}
+		}
+	}
+	
+	return found;
 }
 
 
@@ -1514,8 +1547,12 @@ DO_ABIL(abil_action_detect_adventures_around) {
 		return;	// nothing to do
 	}
 	
+	adv_dist = get_ability_data_value(abil, ADL_RANGE, TRUE);
+	if (!adv_dist) {
+		adv_dist = 50 + GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);	// default
+	}
+	
 	match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
-	adv_dist = 50 + GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
 	adv_dist = MAX(0, adv_dist);
 	DL_FOREACH(instance_list, inst) {
 		loc = INST_FAKE_LOC(inst);
@@ -1612,8 +1649,13 @@ DO_ABIL(abil_action_detect_players_around) {
 		return;	// no work
 	}
 	
+	player_dist = get_ability_data_value(abil, ADL_RANGE, TRUE);
+	if (!player_dist) {
+		// default
+		player_dist = GET_EXTRA_ATT(ch, ATT_WHERE_RANGE) + (has_player_tech(ch, PTECH_WHERE_UPGRADE) ? 75 : 20);
+	}
+	
 	match_city = (ROOM_OWNER(room_targ) && is_in_city_for_empire(room_targ, ROOM_OWNER(room_targ), TRUE, &wait)) ? find_city(ROOM_OWNER(room_targ), room_targ) : NULL;
-	player_dist = GET_EXTRA_ATT(ch, ATT_WHERE_RANGE) + (has_player_tech(ch, PTECH_WHERE_UPGRADE) ? 75 : 20);
 	player_dist = MAX(0, player_dist);
 	DL_FOREACH2(player_character_list, ch_iter, next_plr) {
 		if (ch_iter == ch || IS_IMMORTAL(ch_iter)) {
@@ -1637,10 +1679,14 @@ DO_ABIL(abil_action_devastate_area) {
 	room_data *rand_room, *to_room = NULL;
 	crop_data *cp;
 	int dist, iter;
-	int x, y;
+	int x, y, range;
 	
 	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
-	#define DEVASTATE_RANGE  3	// tiles
+	
+	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
+	if (!range) {
+		range = 3;	// default
+	}
 	
 	if (!room_targ) {
 		return;	// nothing to do
@@ -1652,20 +1698,20 @@ DO_ABIL(abil_action_devastate_area) {
 	}
 	
 	// check surrounding rooms in star patter
-	for (dist = 1; !to_room && dist <= DEVASTATE_RANGE; ++dist) {
+	for (dist = 1; !to_room && dist <= range; ++dist) {
 		for (iter = 0; !to_room && iter < NUM_2D_DIRS; ++iter) {
 			rand_room = real_shift(room_targ, shift_dir[iter][0] * dist, shift_dir[iter][1] * dist);
-			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
+			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= range && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
 				to_room = rand_room;
 			}
 		}
 	}
 	
 	// check max radius
-	for (x = -DEVASTATE_RANGE; !to_room && x <= DEVASTATE_RANGE; ++x) {
-		for (y = -DEVASTATE_RANGE; !to_room && y <= DEVASTATE_RANGE; ++y) {
+	for (x = -range; !to_room && x <= range; ++x) {
+		for (y = -range; !to_room && y <= range; ++y) {
 			rand_room = real_shift(room_targ, x, y);
-			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= DEVASTATE_RANGE && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
+			if (rand_room && CAN_DEVASTATE(rand_room) && compute_distance(room_targ, rand_room) <= range && can_use_room(ch, rand_room, MEMBERS_ONLY)) {
 				to_room = rand_room;
 			}
 		}
@@ -3589,6 +3635,15 @@ DO_ABIL(do_room_affect_ability) {
 
 
 /**
+* Various types of teleportation.
+*
+* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_teleport_ability) {
+}
+
+
+/**
 * Performs an ability typed by a character. This function find the targets,
 * and pre-validates the ability.
 *
@@ -4088,6 +4143,12 @@ PREP_ABIL(prep_room_affect_ability) {
 	}
 	
 	get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
+}
+
+
+// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_teleport_ability) {
+	get_ability_type_data(data, ABILT_TELEPORT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_TELEPORT, data);
 }
 
 
@@ -6120,7 +6181,7 @@ OLC_MODULE(abiledit_data) {
 	bool found;
 	
 	// ADL_x: determine valid types first
-	allowed_types |= ADL_EFFECT | ADL_LIMITATION;
+	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
 		allowed_types |= ADL_ACTION;
 	}
@@ -6237,6 +6298,18 @@ OLC_MODULE(abiledit_data) {
 						return;
 					}
 					break;
+				}
+				case ADL_RANGE: {
+					if (is_abbrev(val_arg, "unlimited") || is_abbrev(val_arg, "infinite") || !strcmp(val_arg, "-1")) {
+						val_id = UNLIMITED;
+					}
+					else if (isdigit(*val_arg) && atoi(val_arg) > 0) {
+						val_id = atoi(val_arg);
+					}
+					else {
+						msg_to_char(ch, "Range must be 'unlimited' or a number. Invalid range '%s' given.\r\n", val_arg);
+						return;
+					}
 				}
 			}
 			

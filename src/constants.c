@@ -200,6 +200,7 @@ const char *ability_type_flags[] = {
 	"PAINT-BUILDING",
 	"ACTION",
 	"BUILDING-DAMAGE",
+	"TELEPORT",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -238,6 +239,7 @@ const char *ability_type_notes[] = {
 	"paint",
 	"action",
 	"building damage",
+	"teleportation",	// 20
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -341,6 +343,7 @@ const char *ability_data_types[] = {
 	"LIMITATION",
 	"PAINT-COLOR",	// 5
 	"ACTION",
+	"RANGE",
 	"\n"
 };
 
