@@ -543,10 +543,10 @@ Action types:
  &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room
    target. Sends per-char messages for each hidden character.
  &cdetect players around&0 - Find other players in where-range (or in same
-   city). Cannot customize the message.
+   city). Use $1 for the location in per-char messages to display the target.
  &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or
    same city).
- &cdevastate area&0 - Collect resources within 3 tiles. Use $$ for the tile
+ &cdevastate area&0 - Collect resources within 3 tiles. Use $1 for the tile
    name in per-item messages.
  &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
    per-item-to messages (but no item) for the message when the evolution works.
