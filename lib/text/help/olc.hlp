@@ -1072,6 +1072,10 @@ Limitation types:
  &coutdoors&0 - Must be outdoors (including some adventure rooms).
  &con the map&0 - Must be on the map (includes the main room of buildings).
  &cterraform approval&0 - Check if the player needs/has approval for this.
+ &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
+ &cnot distracted&0 - User does not have DISTRACTED affect.
+ &cnot immobilized&0 - User does not have IMMOBILIZED affect.
+ &ccan teleport here&0 - Current room does not block teleport.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

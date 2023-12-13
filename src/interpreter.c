@@ -366,7 +366,6 @@ ACMD(do_selfdelete);
 ACMD(do_separate);
 ACMD(do_set);
 ACMD(do_shadowcage);
-ACMD(do_shadowstep);
 ACMD(do_share);
 ACMD(do_shear);
 ACMD(do_sheathe);
@@ -973,7 +972,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
 	STANDARD_CMD( "shadowlash", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SHADOWLASH, CTYPE_COMBAT, NOBITS, ABIL_SHADOWLASH ),
-	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "ship", POS_SLEEPING, do_ship, NO_MIN, CTYPE_EMPIRE ),

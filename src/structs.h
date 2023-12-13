@@ -717,6 +717,9 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_ON_MAP  11	// won't work on interiors or adventures, but may include map buildings
 #define ABIL_LIMIT_TERRAFORM_APPROVAL  12	// check player approval
 #define ABIL_LIMIT_VALID_SIEGE_TARGET  13	// validate for siege damage
+#define ABIL_LIMIT_NOT_DISTRACTED  14	// player must not have DISTRACTED aff
+#define ABIL_LIMIT_NOT_IMMOBILIZED  15	// player must not have IMMOBILIZED aff
+#define ABIL_LIMIT_CAN_TELEPORT_HERE  16	// player can teleport here
 
 
 // RUN_ABIL_x: modes for activating abilities

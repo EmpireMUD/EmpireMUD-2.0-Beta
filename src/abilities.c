@@ -1977,6 +1977,27 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_NOT_DISTRACTED: {
+				if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
+					msg_to_char(ch, "You're too distracted to do that.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_IMMOBILIZED: {
+				if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
+					msg_to_char(ch, "You can't do that while immobilized.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_TELEPORT_HERE: {
+				if (!can_teleport_to(ch, IN_ROOM(ch), FALSE)) {
+					msg_to_char(ch, "You can't do that here.\r\n");
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

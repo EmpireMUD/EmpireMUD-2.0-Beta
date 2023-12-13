@@ -395,6 +395,9 @@ const char *ability_limitations[] = {
 	"on the map",
 	"terraform approval",
 	"valid siege target",
+	"not distracted",
+	"not immobilized",	// 15
+	"can teleport here",
 	"\n"
 };
 
