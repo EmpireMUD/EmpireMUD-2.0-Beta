@@ -3746,7 +3746,7 @@ ACMD(do_quit) {
 
 // also do_chant: handles SCMD_RITUAL, SCMD_CHANT
 ACMD(do_ritual2) {
-	bool found, full, needs_target;
+	bool found, full;
 	char *arg2;
 	size_t size;
 	ability_data *abil;
@@ -3804,7 +3804,6 @@ ACMD(do_ritual2) {
 	found = FALSE;
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 		abil = plab->ptr;
-		needs_target = (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID) ? TRUE : FALSE);
 		if (!VALID_RITCHANT_ABIL(ch, plab)) {
 			continue;	// not a conjure ability
 		}
@@ -3818,7 +3817,7 @@ ACMD(do_ritual2) {
 			return;
 		}
 		
-		perform_ability_command(ch, abil, needs_target ? arg2 : argument);
+		perform_ability_command(ch, abil, arg2);
 		found = TRUE;
 		break;
 	}
