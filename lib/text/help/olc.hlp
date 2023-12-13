@@ -878,6 +878,7 @@ Message types:
  &cspec-to-char&0 - Special messaging on some abilities, to the actor.
  &cspec-to-vict&0 - Special messaging on some abilities, to the target.
  &cspec-to-room&0 - Special messaging on some abilities, to the room.
+ &cno-argument&0 - Shown when the player does not type an argument.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d

@@ -3812,7 +3812,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		if (!has) {
-			msg_to_char(ch, "&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			if (abil_has_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT)) {
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR);
+			}
+			else {
+				msg_to_char(ch, "&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
+			}
 			return;
 		}
 	}

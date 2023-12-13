@@ -311,6 +311,7 @@ const char *ability_custom_types[] = {
 	"spec-to-char",
 	"spec-to-vict",
 	"spec-to-room",	// 30
+	"no-argument",
 	"\n"
 };
 
@@ -330,7 +331,8 @@ const char *ability_custom_type_help =
 " For each target/creature for some abilities: per-char-to-char per-char-to-vict per-char-to-room\r\n"
 "&w Special messaging for some abilities: spec-to-char spec-to-vict spec-to-room&0\r\n"
 " When turning off a 'toggle' ability: toggle-to-char toggle-to-room\r\n"
-"&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n";
+"&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n"
+" Other messages: no-argument\r\n";
 
 
 
