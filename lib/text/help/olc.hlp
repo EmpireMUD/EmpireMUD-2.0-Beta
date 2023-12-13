@@ -649,8 +649,12 @@ vehicles, depending on the targets you set on the ability.
 You should always set the VIOLENT flag on this as well as the "distrust from
 hostile" effect and the "valid siege target" limitation.
 
-This uses the &cself-to-*&0 messages for building targets and the &ctarg-to-*&0
-messages for vehicle targets.
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent on each tick for building targets: &cself-to-char&0 and &cself-to-room&0
+ Sent on each tick for vehicle targets: &ctarg-to-char&0 and &ctarg-to-room&0
+ Sent on failure for building targets: &cfail-self-to-char&0 and &cfail-self-to-room&0
+ Sent on failure for vehicle targets: &cfail-targ-to-char&0 and &cfail-targ-to-room&0
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
