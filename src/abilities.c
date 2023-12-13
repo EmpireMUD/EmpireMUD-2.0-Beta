@@ -4021,17 +4021,31 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		switch (adl->type) {
 			case ADL_ACTION: {
+				// ABIL_ACTION_x: audits
 				switch (adl->vnum) {
 					case ABIL_ACTION_DETECT_HIDE:
 					case ABIL_ACTION_DETECT_EARTHMELD:
 					case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
+						if (!abil_has_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) {
+							olc_audit_msg(ch, ABIL_VNUM(abil), "Missing per-char-to-char message for ability action");
+							problem = TRUE;
+						}
 						break;
 					}
 					case ABIL_ACTION_DETECT_ADVENTURES_AROUND:
 					case ABIL_ACTION_MAGIC_GROWTH: {
+						if (!abil_has_custom_message(abil, ABIL_CUSTOM_SPEC_TO_CHAR)) {
+							olc_audit_msg(ch, ABIL_VNUM(abil), "Missing spec-to-char message for ability action");
+							problem = TRUE;
+						}
 						break;
 					}
 					case ABIL_ACTION_DEVASTATE_AREA: {
+						if (!abil_has_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) {
+							olc_audit_msg(ch, ABIL_VNUM(abil), "Missing per-item-to-char message for ability action");
+							problem = TRUE;
+						}
+						break;
 					}
 
 				}
