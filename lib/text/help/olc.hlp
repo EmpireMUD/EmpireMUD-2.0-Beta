@@ -1060,23 +1060,28 @@ See also: AFFECT FLAGS, OLC ABILITIES
 Usage:  .data add limitation <type>
 
 Limitation types:
- &con a barrier tile&0 - Must be used on a barrier (wall) tile.
- &cown the tile&0 - Your empire must own the location.
- &ccan use as guest&0 - Location must be unclaimed or you have guest access.
- &ccan use as ally&0 - Location must be unclaimed or you are an ally.
+ &cally permission at target&0 - Has ally (or better) access at the target location.
+ &ccan teleport here&0 - Current room does not block teleport.
+ &ccan teleport target&0 - Target room does not block teleport.
+ &ccan use as ally&0 - Location must be unclaimed or you are an ally (or better).
+ &ccan use as guest&0 - Location must be unclaimed or you have guest access (or better).
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
- &con a road&0 - Must be used on a road tile.
- &cpaintable building&0 - Must be used on a building the player can paint.
- &cin a city&0 - Must be in any city (tile must also be claimed).
+ &cguest permission at target&0 - Has guest (or better) access at the target location.
  &chave an empire&0 - Must be a member of any empire.
+ &cin a city&0 - Must be in any city (tile must also be claimed).
  &cindoors&0 - Must be indoors (including inside buildings on the map).
- &coutdoors&0 - Must be outdoors (including some adventure rooms).
+ &cmember permission at target&0 - Has member access at the target location.
+ &cnot distracted&0 - User does not have DISTRACTED affect.
+ &cnot god target&0 - Target player must not be a god or immortal.
+ &cnot immobilized&0 - User does not have IMMOBILIZED affect.
+ &con a barrier tile&0 - Must be used on a barrier (wall) tile.
+ &con a road&0 - Must be used on a road tile.
  &con the map&0 - Must be on the map (includes the main room of buildings).
+ &coutdoors&0 - Must be outdoors (including some adventure rooms).
+ &cown the tile&0 - Your empire must own the location.
+ &cpaintable building&0 - Must be used on a building the player can paint.
  &cterraform approval&0 - Check if the player needs/has approval for this.
  &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
- &cnot distracted&0 - User does not have DISTRACTED affect.
- &cnot immobilized&0 - User does not have IMMOBILIZED affect.
- &ccan teleport here&0 - Current room does not block teleport.
  &cwithin range&0 - Compares distance to the target against RANGE data.
 
 See also: OLC ABILITIES, ABILEDIT DATA

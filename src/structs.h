@@ -722,6 +722,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_NOT_IMMOBILIZED  15	// player must not have IMMOBILIZED aff
 #define ABIL_LIMIT_CAN_TELEPORT_HERE  16	// player can teleport here
 #define ABIL_LIMIT_WITHIN_RANGE  17	// enforces RANGE data on target
+#define ABIL_LIMIT_NOT_GOD_TARGET  18	// cannot target gods/immortal
+#define ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET  19	// must have guest permission at the target location
+#define ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET  20	// must have ally permission at the target location
+#define ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET  21	// must have member permission at the target location
+#define ABIL_LIMIT_CAN_TELEPORT_TARGET  22	// target room is teleport-able
 
 
 // RUN_ABIL_x: modes for activating abilities

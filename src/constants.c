@@ -401,6 +401,11 @@ const char *ability_limitations[] = {
 	"not immobilized",	// 15
 	"can teleport here",
 	"within range",
+	"not god target",
+	"guest permission at target",
+	"ally permission at target",	// 20
+	"member permission at target",
+	"can teleport target",
 	"\n"
 };
 

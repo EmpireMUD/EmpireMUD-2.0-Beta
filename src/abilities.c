@@ -1851,13 +1851,17 @@ void apply_ability_effects(ability_data *abil, char_data *ch, char_data *vict, o
 */
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	struct ability_data_list *adl;
-	room_data *any_room;
+	room_data *any_room, *other_room;
 	
 	if (!ch || !abil) {
 		return FALSE;	// no work
 	}
 	
-	any_room = room_targ ? room_targ : IN_ROOM(ch);	// used for types that can use either
+	// any_room is the target room IF it targets a room, or else ch's room
+	any_room = room_targ ? room_targ : IN_ROOM(ch);
+	
+	// other_room is the room the target is in, for all types
+	other_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		if (adl->type != ADL_LIMITATION) {
@@ -2000,14 +2004,48 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				break;
 			}
 			case ABIL_LIMIT_WITHIN_RANGE: {
-				room_data *target = room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch)));
-				if (compute_distance(IN_ROOM(ch), target) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+				if (compute_distance(IN_ROOM(ch), other_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
 					if (vict) {
 						act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR);
 					}
 					else {
 						msg_to_char(ch, "It's too far away.\r\n");
 					}
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_GOD_TARGET: {
+				if (vict && vict != ch && (IS_GOD(vict) || IS_IMMORTAL(vict))) {
+					msg_to_char(ch, "You can't target a god!\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET: {
+				if (!can_use_room(ch, other_room, GUESTS_ALLOWED)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET: {
+				if (!can_use_room(ch, other_room, MEMBERS_AND_ALLIES)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET: {
+				if (!can_use_room(ch, other_room, MEMBERS_ONLY)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_TELEPORT_TARGET: {
+				if (!can_teleport_to(ch, other_room, FALSE)) {
+					msg_to_char(ch, "You can't teleport there.\r\n");
 					return FALSE;
 				}
 				break;
