@@ -303,6 +303,9 @@ const char *ability_custom_types[] = {
 	"per-char-to-char",	// 25
 	"per-char-to-vict",
 	"per-char-to-room",
+	"spec-to-char",
+	"spec-to-vict",
+	"spec-to-room",	// 30
 	"\n"
 };
 
@@ -317,11 +320,12 @@ const char *ability_custom_type_help =
 "&w Fails when targeting self or no one: fail-self-to-char fail-self-to-room&0\r\n"
 " Fails targeting a character: fail-targ-to-char fail-targ-to-vict fail-targ-to-room\r\n"
 "&w Is counterspelled: counterspell-to-char counterspell-to-vict counterspell-to-room&0\r\n"
-" When each vehicle is conjured: per-veh-to-char per-veh-to-room\r\n"
-"&w When each item is conjured: per-item-to-char per-item-to-room&0\r\n"
+" For each vehicle on some types: per-veh-to-char per-veh-to-room\r\n"
+"&w For each item on some types: per-item-to-char per-item-to-room&0\r\n"
 " For each target/creature for some abilities: per-char-to-char per-char-to-vict per-char-to-room\r\n"
-"&w When turning off a 'toggle' ability: toggle-to-char toggle-to-room&0\r\n"
-" Long description when performing an over-tiem ability: over-time-longdesc\r\n";
+"&w Special messaging for some abilities: spec-to-char spec-to-vict spec-to-room&0\r\n"
+" When turning off a 'toggle' ability: toggle-to-char toggle-to-room\r\n"
+"&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n";
 
 
 

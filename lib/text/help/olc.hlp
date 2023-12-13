@@ -545,7 +545,8 @@ Action types:
  &cdetect players around&0 - Find other players in where-range (or in same
    city). Use $1 for the location in per-char messages to display the target.
  &cdetect adventures around&0 - Find DETECTABLE adventures in nearby-range (or
-   same city).
+   same city). Use $1 for the tile name and $2 for the adventure in spec-to
+   messages.
  &cdevastate area&0 - Collect resources within 3 tiles. Use $1 for the tile
    name in per-item messages.
  &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
@@ -840,16 +841,19 @@ Message types:
  &cpre-targ-to-char&0 - To actor before an ability executes, when targeted.
  &cpre-targ-to-vict&0 - To victim before an ability executes, when targeted.
  &cpre-targ-to-room&0 - To room before an ability executes, when targeted.
- &cper-veh-to-char&0 - To actor on types like conjure-vehicle, when it's conjured.
+ &cper-veh-to-char&0 - To actor on types like conjure-vehicle, per vehicle.
  &cper-veh-to-room&0 - To room on conjure-vehicle; use $V for the vehicle.
- &cper-item-to-char&0 - To actor on types like conjure-object, when conjured.
- &cper-item-to-room&0 - To room on types like conjure-object, when conjured.
+ &cper-item-to-char&0 - To actor on types like conjure-object, per item.
+ &cper-item-to-room&0 - To room on types like conjure-object, per item.
  &cover-time-longdesc&0 - How the player appears during an OVER-TIME ability.
  &ctoggle-to-char&0 - To actor when turning off a TOGGLE ability.
  &ctoggle-to-room&0 - To room when turning off a TOGGLE ability.
  &cper-char-to-char&0 - To actor when some abilities hit multiple characters.
  &cper-char-to-vict&0 - To target when some abilities hit multiple characters.
  &cper-char-to-room&0 - To actor when some abilities hit multiple characters.
+ &cspec-to-char&0 - Special messaging on some abilities, to the actor.
+ &cspec-to-vict&0 - Special messaging on some abilities, to the target.
+ &cspec-to-room&0 - Special messaging on some abilities, to the room.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d

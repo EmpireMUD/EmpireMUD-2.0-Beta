@@ -54,9 +54,10 @@ INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
-void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
-void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
-void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
+void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
+void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
+void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data, char **replace, int replace_count);
 void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data);
 
 
@@ -1474,7 +1475,8 @@ int wordcount_ability(ability_data *abil) {
 // DO_ABIL provides: ch, abil, level, vict, ovict, room_targ, data
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
-	char *dir_str;
+	char where_str[256];
+	char *dir_str, *repl_array[2];
 	int adv_dist;
 	struct instance_data *inst;
 	struct empire_city_data *match_city;
@@ -1502,7 +1504,11 @@ DO_ABIL(abil_action_detect_adventures_around) {
 		// show instance
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		msg_to_char(ch, "You detect %s at %s%s - %d %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
+		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
+		
+		repl_array[0] = where_str;
+		repl_array[1] = GET_ADV_NAME(INST_ADVENTURE(inst));
+		send_ability_special_messages(ch, NULL, NULL, abil, data, repl_array, 2);
 	}
 }
 
@@ -1592,7 +1598,7 @@ DO_ABIL(abil_action_detect_players_around) {
 		// ok:
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		snprintf(where_str, sizeof(where_str), "%s%s - %d %s\r\n", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
+		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
 		send_ability_per_char_messages(ch, ch_iter, 1, abil, data, where_str);
 	}
 }
@@ -2367,9 +2373,9 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 * @param int quantity How many (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
-* @param char *special_text Optional: Will replace $1 in the message with this (may be NULL).
+* @param char *replace_1 Optional: Will replace $1 in the message with this (may be NULL).
 */
-void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
+void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1) {
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
@@ -2398,7 +2404,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
 		free(repl);
 	
@@ -2411,7 +2417,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	// to vict ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_VICT | act_flags);
 		free(repl);
 	}
@@ -2419,7 +2425,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		free(repl);
 	}
@@ -2436,9 +2442,9 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 * @param int quantity How many items (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
-* @param char *special_text Optional: Will replace $1 in the message with this (may be NULL).
+* @param char *replace_1 Optional: Will replace $1 in the message with this (may be NULL).
 */
-void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
+void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1) {
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
@@ -2467,7 +2473,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
 		free(repl);
 	
@@ -2480,7 +2486,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		free(repl);
 	}
@@ -2497,9 +2503,9 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 * @param int quantity How many vehicles (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
-* @param char *special_text Optional: Will replace $1 in the message with this (may be NULL).
+* @param char *replace_1 Optional: Will replace $1 in the message with this (may be NULL).
 */
-void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text) {
+void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1) {
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
@@ -2528,7 +2534,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	// to-char ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | act_flags);
 		free(repl);
 	
@@ -2541,9 +2547,96 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	// to room ONLY if there's a custom message
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
-		repl = str_replace("$1", NULLSAFE(special_text), buf);
+		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vvict, TO_ROOM | act_flags);
 		free(repl);
+	}
+}
+
+
+/**
+* Sends the message for using an ability with a "special" message set, which
+* allows more replacements. These messages have no default and will be omitted
+* if the ability doesn't have them.
+*
+* Replacement dollarsign codes are 1-based, not 0-based, so:
+*   $1 = replace[0]
+*   $2 = replace[1]
+*   (replace_count would be 2 here)
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict Optional: Character target (may be NULL).
+* @param obj_data *ovict Optional: Object target (may be NULL).
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+* @param char **replace Array of replacements for $1, $2, $3, etc.
+* @param int replace_count Number of elements in the replace set.
+*/
+void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data, char **replace, int replace_count) {
+	bool invis;
+	char tok[4];
+	char *msg, *repl;
+	int iter;
+	bitvector_t act_flags = TO_ABILITY;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= TO_BUFF;
+	}
+	
+	// to-char ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_CHAR)) && *msg != '*') {
+		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
+			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			repl = str_replace(tok, replace[iter], msg);
+			if (iter > 0) {
+				free(msg);
+			}
+			msg = repl;
+		}
+		
+		act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+	
+		// mark this now
+		if (data) {
+			data->sent_any_msg = TRUE;
+		}
+	}
+	
+	// to vict ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_VICT)) && *msg != '*') {
+		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
+			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			repl = str_replace(tok, replace[iter], msg);
+			if (iter > 0) {
+				free(msg);
+			}
+			msg = repl;
+		}
+		
+		act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
+	}
+	
+	// to room ONLY if there's a custom message
+	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_ROOM)) && *msg != '*') {
+		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
+			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			repl = str_replace(tok, replace[iter], msg);
+			if (iter > 0) {
+				free(msg);
+			}
+			msg = repl;
+		}
+		
+		act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 	}
 }
 
