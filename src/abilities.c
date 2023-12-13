@@ -6299,7 +6299,7 @@ OLC_MODULE(abiledit_data) {
 					break;
 				}
 				case ADL_EFFECT: {
-					if ((val_id = search_block(val_arg, ability_effects, FALSE)) == NOTHING) {
+					if ((val_id = search_block_multi_isname(val_arg, ability_effects)) == NOTHING) {
 						msg_to_char(ch, "Invalid ability effect '%s'.\r\n", val_arg);
 						return;
 					}
@@ -6320,7 +6320,7 @@ OLC_MODULE(abiledit_data) {
 					break;
 				}
 				case ADL_LIMITATION: {
-					if ((val_id = search_block(val_arg, ability_limitations, FALSE)) == NOTHING) {
+					if ((val_id = search_block_multi_isname(val_arg, ability_limitations)) == NOTHING) {
 						msg_to_char(ch, "Invalid limitation '%s'.\r\n", val_arg);
 						return;
 					}
@@ -6334,7 +6334,7 @@ OLC_MODULE(abiledit_data) {
 					break;
 				}
 				case ADL_ACTION: {
-					if ((val_id = search_block(val_arg, ability_actions, FALSE)) == NOTHING) {
+					if ((val_id = search_block_multi_isname(val_arg, ability_actions)) == NOTHING) {
 						msg_to_char(ch, "Invalid ability action '%s'.\r\n", val_arg);
 						return;
 					}

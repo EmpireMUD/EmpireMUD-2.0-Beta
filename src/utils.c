@@ -2389,7 +2389,7 @@ int search_block(char *arg, const char **list, int exact) {
 
 	l = strlen(arg);
 
-	for (i = 0; **(list + i) != '\n'; i++) {
+	for (i = 0; **(list + i) != '\n'; ++i) {
 		if (!str_cmp(arg, *(list + i))) {
 			return i;	// exact or otherwise
 		}
@@ -2399,6 +2399,30 @@ int search_block(char *arg, const char **list, int exact) {
 	}
 
 	return part;	// if any
+}
+
+
+/**
+* Variant of search_block that uses multi_isname for matches. This simpilfies
+* typing some text, especially in OLC. It still prefers exact matches.
+*
+* @param char *arg The input.
+* @param const char **list A "\n"-terminated name list.
+* @return int The entry in the list, or NOTHING if not found.
+*/
+int search_block_multi_isname(char *arg, const char **list) {
+	int iter, partial = NOTHING;
+	
+	for (iter = 0; **(list + iter) != '\n'; ++iter) {
+		if (!str_cmp(arg, *(list + iter))) {
+			return iter;	// exact match
+		}
+		else if (partial == NOTHING && multi_isname(arg, *(list + iter))) {
+			partial = iter;
+		}
+	}
+	
+	return partial;	// if any
 }
 
 
