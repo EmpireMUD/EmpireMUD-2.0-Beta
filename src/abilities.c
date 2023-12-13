@@ -447,6 +447,16 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		msg_to_char(ch, "You can't seem to get the words out.\r\n");
 		return FALSE;
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && GET_ACTION_VNUM(ch, 0) == ABIL_VNUM(abil)) {
+		// already doing it
+		msg_to_char(ch, "You stop what you were doing.\r\n");
+		cancel_action(ch);
+		return FALSE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're already doing something else.\r\n");
+		return FALSE;
+	}
 	
 	// ok!
 	return TRUE;
