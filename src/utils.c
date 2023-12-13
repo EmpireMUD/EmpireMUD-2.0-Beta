@@ -5269,6 +5269,55 @@ const char *skip_filler(const char *string) {
 }
 
 
+/**
+* This function gets just the portion of a string after removing any initial
+* word that was on the conjure_words[] list.
+*
+* If you want to save the result somewhere, you should str_dup() it
+*
+* @param const char *string The original string.
+* @param const char **wordlist The list of words to skip.
+* @param bool also_skip_filler If TRUE, also skips fill words and reserved words.
+*/
+const char *skip_wordlist(const char *string, const char **wordlist, bool also_skip_filler) {
+	static char remainder[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH];
+	char *ptr, *ot;
+	int pos = 0;
+	
+	*remainder = '\0';
+	
+	if (!string || !wordlist) {
+		log("SYSERR: skip_wordlist received a NULL %s pointer.", string ? "string" : "wordlist");
+		return (const char *)remainder;
+	}
+	
+	do {
+		string += pos;
+		ot = (char*)string;	// just to skip_spaces on it, which won't modify the string
+		skip_spaces(&ot);
+		string = ot;
+		
+		if ((ptr = strchr(string, ' '))) {
+			pos = ptr - string;
+		}
+		else {
+			pos = 0;
+		}
+		
+		if (pos > 0) {
+			strncpy(temp, string, pos);
+		}
+		temp[pos] = '\0';
+	} while (search_block(temp, wordlist, TRUE) != NOTHING && (also_skip_filler || fill_word(temp) || reserved_word(temp)));
+	
+	// when we get here, string is a pointer to the start of the real name
+	strcpy(remainder, string);
+	
+	return (const char *)remainder;
+}
+
+
 /*
  * If you don't have a 'const' array, just cast it as such.  It's safer
  * to cast a non-const array as const than to cast a const one as non-const.

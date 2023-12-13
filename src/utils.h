@@ -1980,6 +1980,7 @@ void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvect
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
 const char *skip_filler(const char *string);
+const char *skip_wordlist(const char *string, const char **wordlist, bool also_skip_filler);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
 char *time_length_string(int seconds);
@@ -2042,7 +2043,6 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void setup_ability_companions(char_data *ch);
-const char *skip_conjure_words(const char *string);
 
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);

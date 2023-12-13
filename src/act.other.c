@@ -2302,7 +2302,7 @@ ACMD(do_conjure) {
 			
 			// show it
 			if (IS_SET(ABIL_TYPES(abil), my_types)) {
-				ptr = skip_conjure_words(ABIL_NAME(abil));
+				ptr = skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE);
 				
 				// append
 				if (size + strlen(ptr) + 3 < sizeof(buf)) {
@@ -2345,10 +2345,10 @@ ACMD(do_conjure) {
 		if (!VALID_CONJURE_ABIL(ch, plab)) {
 			continue;	// not a conjure ability
 		}
-		if (needs_target && !isname(arg, skip_conjure_words(ABIL_NAME(abil)))) {
+		if (needs_target && !isname(arg, skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE))) {
 			continue;	// wrong name: targeted
 		}
-		if (!needs_target && !multi_isname(argument, skip_conjure_words(ABIL_NAME(abil)))) {
+		if (!needs_target && !multi_isname(argument, skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE))) {
 			continue;	// wrong name: not-targeted
 		}
 		
@@ -3740,6 +3740,91 @@ ACMD(do_quit) {
 		
 		// ensure quit characters are gone right away
 		extract_pending_chars();
+	}
+}
+
+
+// also do_chant: handles SCMD_RITUAL, SCMD_CHANT
+ACMD(do_ritual2) {
+	bool found, full, needs_target;
+	char *arg2;
+	size_t size;
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	
+	const char *ritual_scmd[] = { "ritual", "chant" };
+	
+	#define VALID_RITCHANT_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && !str_cmp(ABIL_COMMAND(abil), ritual_scmd[subcmd]))
+	
+	arg2 = any_one_word(argument, arg);	// first arg: ritual/chant type
+	skip_spaces(&arg2);	// remaining arg
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot do that.\r\n");
+		return;
+	}
+	
+	// no-arg: show list
+	if (!*arg) {
+		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", ritual_scmd[subcmd]);
+		
+		found = full = FALSE;
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			abil = plab->ptr;
+			if (!VALID_RITCHANT_ABIL(ch, plab)) {
+				continue;
+			}
+			
+			// append
+			if (size + strlen(ABIL_NAME(abil)) + 3 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", ABIL_NAME(abil));
+			}
+			else {
+				full = TRUE;
+				break;
+			}
+			
+			// found 1
+			found = TRUE;
+		}
+		
+		if (!found) {
+			strcat(buf, " nothing\r\n");	// always room for this if !found
+		}
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}	// end no-arg
+	
+	// with arg: determine what they typed
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		needs_target = (IS_SET(ABIL_TYPES(abil), ABILT_CONJURE_LIQUID) ? TRUE : FALSE);
+		if (!VALID_RITCHANT_ABIL(ch, plab)) {
+			continue;	// not a conjure ability
+		}
+		if (!multi_isname(arg, ABIL_NAME(abil))) {
+			continue;	// wrong name: not-targeted
+		}
+		
+		// match!
+		if (GET_POS(ch) < POS_RESTING || GET_POS(ch) < ABIL_MIN_POS(abil)) {
+			send_low_pos_msg(ch);	// not high enough pos for this conjure
+			return;
+		}
+		
+		perform_ability_command(ch, abil, needs_target ? arg2 : argument);
+		found = TRUE;
+		break;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "You don't know that %s.\r\n", ritual_scmd[subcmd]);
 	}
 }
 
