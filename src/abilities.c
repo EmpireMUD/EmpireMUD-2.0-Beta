@@ -568,6 +568,27 @@ ability_data *find_ability_by_vnum(any_vnum vnum) {
 
 
 /**
+* Finds an ability data entry that matches.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to find.
+* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
+*/
+struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int type, any_vnum vnum) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type && adl->vnum == vnum) {
+			return adl;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Finds an ability that is attached to a skill -- this works similar to the
 * find_ability() function except that it ignores partial matches that aren't
 * attached to the skill.
@@ -5415,14 +5436,13 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
+	int only_action = NOTHING, only_effect = NOTHING, only_limit = NOTHING, only_paint = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING;
-	struct ability_data_list *data;
 	ability_data *abil, *next_abil;
 	struct custom_message *cust;
 	struct apply_data *app;
 	struct interaction_item *inter;
 	size_t size;
-	bool found;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP ABILEDIT FULLSEARCH for syntax.\r\n");
@@ -5439,6 +5459,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
+		FULLSEARCH_LIST("action", only_action, ability_actions)
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
 		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
 		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
@@ -5447,6 +5468,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("custom", find_custom, ability_custom_types)
 		FULLSEARCH_LIST("damagetype", only_damage, damage_types)
 		FULLSEARCH_LIST("difficulty", only_diff, skill_check_difficulty)
+		FULLSEARCH_LIST("effect", only_effect, ability_effects)
 		FULLSEARCH_FLAGS("flags", only_flags, ability_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, ability_flags)
 		FULLSEARCH_FLAGS("gains", only_gains, ability_gain_hooks)
@@ -5455,6 +5477,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("immunity", only_immunities, affected_bits)
 		FULLSEARCH_FLAGS("immune", only_immunities, affected_bits)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_LIST("limitation", only_limit, ability_limitations)
 		FULLSEARCH_LIST("linkedtrait", only_linked, apply_types)
 		FULLSEARCH_INT("maxcooldowntime", max_cd, 0, INT_MAX)
 		FULLSEARCH_INT("mincooldowntime", min_cd, 0, INT_MAX)
@@ -5464,6 +5487,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_INT("mincostperscalepoint", min_cost_per, 0, INT_MAX)
 		FULLSEARCH_LIST("maxposition", max_pos, position_types)
 		FULLSEARCH_LIST("minposition", min_pos, position_types)
+		FULLSEARCH_LIST("paintcolor", only_paint, paint_names)
 		FULLSEARCH_LIST("ptech", only_ptech, player_tech_types)
 		FULLSEARCH_FLAGS("roomaffects", only_room_affs, room_aff_bits)
 		FULLSEARCH_INT("scale", only_scale, 0, INT_MAX)
@@ -5614,16 +5638,20 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (only_ptech != NOTHING) {
-			found = FALSE;
-			LL_FOREACH(ABIL_DATA(abil), data) {
-				if (data->type == ADL_PLAYER_TECH && data->vnum == only_ptech) {
-					found = TRUE;
-				}
-			}
-			if (!found) {
-				continue;
-			}
+		if (only_ptech != NOTHING && !find_ability_data_entry_for(abil, ADL_PLAYER_TECH, only_ptech)) {
+			continue;
+		}
+		if (only_action != NOTHING && !find_ability_data_entry_for(abil, ADL_ACTION, only_action)) {
+			continue;
+		}
+		if (only_effect != NOTHING && !find_ability_data_entry_for(abil, ADL_EFFECT, only_effect)) {
+			continue;
+		}
+		if (only_limit != NOTHING && !find_ability_data_entry_for(abil, ADL_LIMITATION, only_limit)) {
+			continue;
+		}
+		if (only_paint != NOTHING && !find_ability_data_entry_for(abil, ADL_PAINT_COLOR, only_paint)) {
+			continue;
 		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;

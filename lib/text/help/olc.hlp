@@ -984,6 +984,7 @@ can specify multiple fields if you want. Any arguments that don't start with a
 dash (-) are matched to the ability's keywords and other text.
 
 Fields:
+  &c-action&0 - Search a specific type from ABILEDIT ACTIONS
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP APPLIES
   &c-attacktype&0 - see HELP ABILEDIT ATTACK TYPE
@@ -991,15 +992,18 @@ Fields:
   &c-custom&0 - has a specific type, see HELP ABILEDIT CUSTOM
   &c-damagetype&0 - see HELP ABILEDIT DAMAGE TYPE
   &c-difficulty&0 - see HELP ABILEDIT DIFFICULTY
+  &c-effect&0 - Search a specific type from ABILEDIT EFFECTS
   &c-flagged&0, &cunflagged&0 - see HELP ABILEDIT FLAGS
   &c-gainhooks&0 - see HELP ABILEDIT GAIN HOOKS
   &c-immunities&0 - see HELP AFFECT FLAGS
+  &c-limitation&0 - Search a specific type from ABILEDIT LIMITS
   &c-linkedtrait&0 - see HELP APPLIES
   &c-mincooldown&0, &c-maxcooldown&0 - cooldown time within these limits
   &c-mincost&0, &c-maxcost&0 - base cost within these limits
   &c-mincostperscalepoint&0, &c-maxcostperscalepoint&0 - scaled cost limits
   &c-minduration&0, &c-maxduration&0 - short/long duration within these limits
   &c-minposition&0, &c-maxposition&0 - required position within these limits
+  &c-paintcolor&0 - Search a specific paint color in ability data (PAINT ITEM has the list)
   &c-ptech&0 - see HELP PTECH
   &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
   &c-targets&0 - see HELP ABILEDIT TARGETS
