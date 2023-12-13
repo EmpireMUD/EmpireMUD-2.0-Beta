@@ -1994,7 +1994,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 */
 INTERACTION_FUNC(devastate_crop) {
 	char type[256];
-	int num = interaction->quantity, obj_ok;
+	int num = interaction->quantity, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	crop_data *cp = ROOM_CROP(inter_room);
 	ability_data *abil = data->abil;
@@ -2031,7 +2031,7 @@ INTERACTION_FUNC(devastate_crop) {
 */
 INTERACTION_FUNC(devastate_trees) {
 	char type[256];
-	int num, obj_ok;
+	int num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
 	obj_data *newobj;
