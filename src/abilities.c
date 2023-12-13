@@ -57,6 +57,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
 void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *special_text);
+void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data);
 
 
 // ability function prototypes
@@ -2734,6 +2735,7 @@ void cancel_over_time_ability(char_data *ch) {
 */
 void perform_over_time_ability(char_data *ch) {
 	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
+	char arg[MAX_INPUT_LENGTH];
 	ability_data *abil;
 	char_data *vict;
 	obj_data *ovict;
@@ -2776,7 +2778,17 @@ void perform_over_time_ability(char_data *ch) {
 	else {
 		// done!
 		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, targ_room, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
-		end_action(ch);
+		
+		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
+			// auto-repeat
+			strcpy(arg, NULLSAFE(GET_ACTION_STRING(ch)));
+			end_action(ch);
+			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, targ_room, GET_ACTION_VNUM(ch, 1), data);
+		}
+		else {
+			// end
+			end_action(ch);
+		}
 	}
 	
 	// clean up data
@@ -2809,7 +2821,6 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 	
 	send_ability_activation_messages(ch, vict, ovict, abil, 0, data);
 	
-	// TODO: this could also be ACT_CHANT/ACT_RITUAL?
 	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
 	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
 	GET_ACTION_VNUM(ch, 1) = level;

@@ -145,6 +145,7 @@ const char *ability_flags[] = {
 	"ONE-AT-A-TIME",
 	"OVER-TIME",
 	"SPOKEN",
+	"REPEAT-OVER-TIME",	// 20
 	"\n"
 };
 
@@ -171,6 +172,7 @@ const char *ability_flag_notes[] = {
 	"",	// ONE-AT-A-TIME
 	"long action",
 	"spoken aloud",
+	"auto-repeating",
 	"\n"
 };
 

@@ -935,6 +935,7 @@ The following ability flags are available:
  &cONE-AT-A-TIME&0 - For some ability types, prevents use when already active.
  &cOVER-TIME&0 - Like a ritual or chant; see ABILEDIT OVER-TIME
  &cSPOKEN&0 - Ability is spoken aloud and is blocked by the SILENT room affect.
+ &cREPEAT-OVER-TIME&0 - Over-time ability auto-repeats if successful.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
