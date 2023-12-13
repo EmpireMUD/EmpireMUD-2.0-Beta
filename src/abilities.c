@@ -2477,7 +2477,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 * them.
 *
 * @param char_data *ch The player using the ability.
-* @param obj_data *ovict The item, if any (or NULL; but won't show messages if NULL).
+* @param obj_data *ovict The item, if any (or NULL).
 * @param int quantity How many items (for the x2 display when > 1).
 * @param ability_data *abil The ability.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
@@ -2489,7 +2489,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	char *msg, *repl;
 	bitvector_t act_flags = TO_ABILITY;
 	
-	if (!ch || !abil || !ovict) {
+	if (!ch || !abil) {
 		return;	// no work
 	}
 	if (data && data->no_msg) {
