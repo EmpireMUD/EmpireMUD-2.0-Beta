@@ -1688,10 +1688,13 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 */
 bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *room) {
 	struct ability_data_list *adl;
+	room_data *any_room;
 	
 	if (!ch || !abil) {
 		return FALSE;	// no work
 	}
+	
+	any_room = room ? room : IN_ROOM(ch);	// used for types that can use either
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		if (adl->type != ADL_LIMITATION) {
@@ -1701,67 +1704,66 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 		// ABIL_LIMIT_x:
 		switch (adl->vnum) {
 			case ABIL_LIMIT_ON_BARRIER: {
-				if (!room || !ROOM_BLD_FLAGGED(room, BLD_BARRIER)) {
+				if (!ROOM_BLD_FLAGGED(any_room, BLD_BARRIER)) {
 					msg_to_char(ch, "You need to do that on a barrier or wall of some kind.\r\n");
 					return FALSE;
 				}
-				else if (!IS_COMPLETE(room)) {
+				else if (!IS_COMPLETE(any_room)) {
 					msg_to_char(ch, "You need to finish building the barrier first.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_OWN_TILE: {
-				if (!room || !GET_LOYALTY(ch) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+				if (!GET_LOYALTY(ch) || ROOM_OWNER(any_room) != GET_LOYALTY(ch)) {
 					msg_to_char(ch, "You need to do that at a location you own.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_GUEST: {
-				if (!room || !can_use_room(ch, room, GUESTS_ALLOWED)) {
-					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+				if (!can_use_room(ch, any_room, GUESTS_ALLOWED)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_ALLY: {
-				if (!room || !can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
-					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+				if (!can_use_room(ch, any_room, MEMBERS_AND_ALLIES)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_MEMBER: {
-				if (!room || !can_use_room(ch, room, MEMBERS_ONLY)) {
-					msg_to_char(ch, "You don't have permission to do that here.\r\n");
+				if (!can_use_room(ch, any_room, MEMBERS_ONLY)) {
+					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_ON_ROAD: {
-				if (!room || !IS_ROAD(room)) {
+				if (!IS_ROAD(any_room)) {
 					msg_to_char(ch, "You need to do that on a road.\r\n");
 					return FALSE;
 				}
-				else if (!IS_COMPLETE(room)) {
-					msg_to_char(ch, "You need to finish the building first.\r\n");
+				else if (!IS_COMPLETE(any_room)) {
+					msg_to_char(ch, "You need to finish building first.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_PAINTABLE_BUILDING: {
-				room_data *home = room ? HOME_ROOM(room) : NULL;
+				room_data *home = any_room ? HOME_ROOM(any_room) : NULL;
 				if (!home || !IS_ANY_BUILDING(home) || ROOM_AFF_FLAGGED(home, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(home, BLD_NO_PAINT)) {
-					msg_to_char(ch, "You can't do that here.\r\n");
+					msg_to_char(ch, "You can't do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_IN_CITY: {
 				bool wait = FALSE;
-				
-				if (!room || (!ROOM_OWNER(room) && !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait))) {
+				if (!ROOM_OWNER(any_room) && !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
 					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
 					return FALSE;
 				}
@@ -1775,21 +1777,21 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, room_data *roo
 				break;
 			}
 			case ABIL_LIMIT_INDOORS: {
-				if (!room || IS_OUTDOOR_TILE(room)) {
+				if (IS_OUTDOOR_TILE(any_room)) {
 					msg_to_char(ch, "You need to be indoors to do that.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_OUTDOORS: {
-				if (!room || !IS_OUTDOOR_TILE(room)) {
+				if (!IS_OUTDOOR_TILE(any_room)) {
 					msg_to_char(ch, "You need to be outdoors to do that.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_ON_MAP: {
-				if (!room || GET_ROOM_VNUM(room) >= MAP_SIZE) {
+				if (GET_ROOM_VNUM(any_room) >= MAP_SIZE) {
 					msg_to_char(ch, "You need to be on the map to do that.\r\n");
 					return FALSE;
 				}
