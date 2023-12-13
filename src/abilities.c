@@ -1998,7 +1998,7 @@ INTERACTION_FUNC(devastate_crop) {
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	crop_data *cp = ROOM_CROP(inter_room);
 	ability_data *abil = data->abil;
-	obj_data *newobj;
+	obj_data *newobj = NULL;
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
@@ -2034,7 +2034,7 @@ INTERACTION_FUNC(devastate_trees) {
 	int num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
-	obj_data *newobj;
+	obj_data *newobj = NULL;
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
