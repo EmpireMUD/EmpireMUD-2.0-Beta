@@ -3631,10 +3631,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 2. ATAR_x: find the target
 	skip_spaces(&argument);
-	if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
-		has = TRUE;
-	}
-	else if (*argument) {
+	if (*argument) {
 		argument = one_argument(argument, arg);
 		skip_spaces(&argument);	// anything left
 		
@@ -3708,6 +3705,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
+	}
+	else if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
+		has = TRUE;
 	}
 	else {	// no arg and no tar-ignore
 		// room target
