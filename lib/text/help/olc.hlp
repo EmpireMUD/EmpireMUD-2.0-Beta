@@ -784,7 +784,7 @@ See also: OLC ABILITIES, CHANT, CONJURE, RITUAL
 #d
 "ABILEDIT COOLDOWN" "ABILEDIT CDTIME"
 
-Usage:  .cooldown <vnum | none>
+Usage:  .cooldown <vnum | none> [seconds]
         .cdtime <seconds>
 
 These two properties determine what cooldown an ability has, if any. The vnum
@@ -797,7 +797,7 @@ See also: COOLDOWN GENERICS, OLC ABILITIES
 #d
 "ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE" "ABILEDIT COSTPERSCALEPOINT" "ABILEDIT COST PER SCALE POINT"
 
-Usage:  .cost <amount>
+Usage:  .cost <amount> [health | move | mana | blood]
         .costperscalepoint <amount>
         .costtype <health | move | mana | blood>
 

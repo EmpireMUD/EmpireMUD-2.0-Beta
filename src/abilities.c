@@ -48,6 +48,7 @@ const char *default_ability_name = "Unnamed Ability";
 const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 
 // local protos
+OLC_MODULE(abiledit_costtype);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
@@ -6117,6 +6118,7 @@ OLC_MODULE(abiledit_command) {
 OLC_MODULE(abiledit_cooldown) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	any_vnum old;
+	char arg2[MAX_INPUT_LENGTH];
 	
 	if (!str_cmp(argument, "none")) {
 		ABIL_COOLDOWN(abil) = NOTHING;
@@ -6124,12 +6126,18 @@ OLC_MODULE(abiledit_cooldown) {
 		msg_to_char(ch, "It no longer has a cooldown.\r\n");
 	}
 	else {
+		two_arguments(argument, arg, arg2);
+		
 		old = ABIL_COOLDOWN(abil);
-		ABIL_COOLDOWN(abil) = olc_process_number(ch, argument, "cooldown vnum", "cooldown", 0, MAX_VNUM, ABIL_COOLDOWN(abil));
+		ABIL_COOLDOWN(abil) = olc_process_number(ch, arg, "cooldown vnum", "cooldown", 0, MAX_VNUM, ABIL_COOLDOWN(abil));
 
 		if (!find_generic(ABIL_COOLDOWN(abil), GENERIC_COOLDOWN)) {
 			msg_to_char(ch, "Invalid cooldown generic vnum %d. Old value restored.\r\n", ABIL_COOLDOWN(abil));
 			ABIL_COOLDOWN(abil) = old;
+		}
+		else if (*arg2) {
+			// pass thru to cdtime
+			abiledit_cdtime(ch, type, arg2);
 		}
 	}
 }
@@ -6137,12 +6145,19 @@ OLC_MODULE(abiledit_cooldown) {
 
 OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	char arg2[MAX_INPUT_LENGTH];
 	
 	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | conjure_types)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
-		ABIL_COST(abil) = olc_process_number(ch, argument, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
+		two_arguments(argument, arg, arg2);
+		ABIL_COST(abil) = olc_process_number(ch, arg, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
+		
+		// optional cost type: pass through
+		if (*arg2) {
+			abiledit_costtype(ch, type, arg2);
+		}
 	}
 }
 
