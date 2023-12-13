@@ -501,6 +501,30 @@ struct ability_data_list *copy_data_list(struct ability_data_list *input) {
 
 
 /**
+* Finds and removes an entry from an ability data list, by vnum.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to remove.
+* @return bool TRUE if any were removed, FALSE if not found.
+*/
+bool delete_vnum_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) {
+	struct ability_data_list *adl, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
+		if (adl->type == type && adl->vnum == vnum) {
+			LL_DELETE(ABIL_DATA(abil), adl);
+			free(adl);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Finds an ability by ambiguous argument, which may be a vnum or a name.
 * Names are matched by exact match first, or by multi-abbrev.
 *

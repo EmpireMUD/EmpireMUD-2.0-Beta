@@ -300,7 +300,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_territory_data *ter, *next_ter;
-	struct ability_data_list *adl, *next_adl;
 	char_data *proto, *mob_iter, *next_mob;
 	struct empire_npc_data *end, *next_end;
 	descriptor_data *desc;
@@ -392,13 +391,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-				LL_DELETE(ABIL_DATA(abil), adl);
-				free(adl);
-				found = TRUE;
-			}
-		}
+		found |= delete_vnum_from_ability_data_list(abil, ADL_SUMMON_MOB, vnum);
 		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_MOB, vnum);
 		
 		if (found) {
@@ -540,13 +533,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
-					free(adl);
-					found = TRUE;
-				}
-			}
+			found |= delete_vnum_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUMMON_MOB, vnum);
 			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_MOB, vnum);
 		
 			if (found) {
@@ -848,7 +835,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		any = FALSE;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
+			if (find_ability_data_entry_for(abil, ADL_SUMMON_MOB, vnum)) {
 				any = TRUE;
 				break;
 			}

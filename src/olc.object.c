@@ -464,7 +464,6 @@ char *list_one_object(obj_data *obj, bool detail) {
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct empire_trade_data *trade, *next_trade;
-	struct ability_data_list *adl, *next_adl;
 	struct trading_post_data *tpd, *next_tpd;
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
@@ -638,13 +637,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-				LL_DELETE(ABIL_DATA(abil), adl);
-				free(adl);
-				found = TRUE;
-			}
-		}
+		found |= delete_vnum_from_ability_data_list(abil, ADL_READY_WEAPON, vnum);
 		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_OBJ, vnum);
 		
 		if (found) {
@@ -897,13 +890,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
-					free(adl);
-					found = TRUE;
-				}
-			}
+			found |= delete_vnum_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_READY_WEAPON, vnum);
 			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_OBJ, vnum);
 		
 			if (found) {
@@ -1379,7 +1366,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		any = FALSE;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
+			if (find_ability_data_entry_for(abil, ADL_READY_WEAPON, vnum)) {
 				any = TRUE;
 				break;
 			}
