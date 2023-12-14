@@ -1077,6 +1077,7 @@ Limitation types:
  &cmember permission at target&0 - Has member access at the target location.
  &cnot distracted&0 - User does not have DISTRACTED affect.
  &cnot god target&0 - Target player must not be a god or immortal.
+ &cnot here&0 - Target cannot be in same room.
  &cnot immobilized&0 - User does not have IMMOBILIZED affect.
  &con a barrier tile&0 - Must be used on a barrier (wall) tile.
  &con a road&0 - Must be used on a road tile.

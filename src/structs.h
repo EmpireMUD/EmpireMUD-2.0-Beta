@@ -733,6 +733,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET  21	// must have member permission at the target location
 #define ABIL_LIMIT_CAN_TELEPORT_TARGET  22	// target room is teleport-able
 #define ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC  23	// check loyalty of target and forbid npcs from other empires
+#define ABIL_LIMIT_NOT_HERE  24	// cannot target own room
 
 
 // RUN_ABIL_x: modes for activating abilities

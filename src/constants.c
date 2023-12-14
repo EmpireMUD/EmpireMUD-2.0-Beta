@@ -412,6 +412,7 @@ const char *ability_limitations[] = {
 	"member permission at target",
 	"can teleport target",
 	"target not foreign empire npc",
+	"not here",
 	"\n"
 };
 

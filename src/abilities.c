@@ -2169,6 +2169,13 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_NOT_HERE: {
+				if (other_room && other_room == IN_ROOM(ch)) {
+					msg_to_char(ch, "You can't target this location.\r\n");
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
@@ -4005,7 +4012,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_EXIT)) {
-			if (is_abbrev(argptr, "exit") && (room_targ = get_exit_room(IN_ROOM(ch)))) {
+			if (is_abbrev(argptr, "exit") && (find_room = get_exit_room(IN_ROOM(ch)))) {
+				room_targ = find_room;
 				has = TRUE;
 			}
 		}
@@ -4022,12 +4030,14 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_COORDS)) {
-			if (HAS_NAVIGATION(ch) && (room_targ = parse_room_from_coords(argptr))) {
+			if (HAS_NAVIGATION(ch) && (find_room = parse_room_from_coords(argptr))) {
+				room_targ = find_room;
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_CITY)) {
 			if (GET_LOYALTY(ch) && (city = find_city_by_name(GET_LOYALTY(ch), argptr))) {
+				room_targ = city->location;
 				has = TRUE;
 			}
 		}
