@@ -3777,6 +3777,61 @@ DO_ABIL(do_room_affect_ability) {
 * DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_teleport_ability) {
+	room_data *was_in = IN_ROOM(ch), *to_room;
+	bool infiltrate;
+	
+	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
+	
+	if (to_room != IN_ROOM(ch)) {
+		infiltrate = HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch)) && !can_use_room(ch, to_room, GUESTS_ALLOWED);
+		
+		if (infiltrate && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
+			// failure (will message as a fail on the ability)
+			// fall through to log infiltrate attempt
+		}
+		else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
+			// no message (will message as a fail on the ability)
+			return;
+		}
+		else {
+			act("You shadowstep to $N!", FALSE, ch, NULL, vict, TO_CHAR);
+			char_from_room(ch);
+			char_to_room(ch, to_room);
+			qt_visit_room(ch, to_room);
+			look_at_room(ch);
+			act("$n steps out of the shadows!", TRUE, ch, NULL, NULL, TO_ROOM);
+		
+			GET_LAST_DIR(ch) = NO_DIR;
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
+		
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
+			entry_memory_mtrigger(ch);
+			greet_mtrigger(ch, NO_DIR, "ability");
+			greet_memory_mtrigger(ch);
+			greet_vtrigger(ch, NO_DIR, "ability");
+			
+			msdp_update_room(ch);	// once we're sure we're staying
+			data->success = TRUE;
+		}
+		
+		// chance to log
+		if (infiltrate && ROOM_OWNER(to_room) && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
+				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			else {
+				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted shadowstepping into (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+		}
+	
+		if (infiltrate && ROOM_OWNER(to_room)) {
+			// distrust just in case
+			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
+			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
+			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+			add_offense(ROOM_OWNER(to_room), OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(to_room), was_in) ? OFF_SEEN : NOBITS);
+		}
+	}
 }
 
 
@@ -4277,7 +4332,6 @@ PREP_ABIL(prep_room_affect_ability) {
 
 // PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_teleport_ability) {
-	int diff;
 	room_data *to_room;
 	
 	// determine what we are teleporting to
@@ -4305,8 +4359,7 @@ PREP_ABIL(prep_teleport_ability) {
 			}
 			
 			// otherwise attempt the infiltrate and logs on failure
-			diff = EMPIRE_HAS_TECH(ROOM_OWNER(to_room), TECH_LOCKS) ? DIFF_RARELY : DIFF_HARD;
-			if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, diff)) {
+			if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
 				// infiltrate failed -- log it
 				if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
