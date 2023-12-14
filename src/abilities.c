@@ -3360,12 +3360,6 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		data->should_charge_cost = FALSE;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
-		return;
-	}
-	
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
@@ -3400,16 +3394,15 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// ready to start the ability:
-	if (ABIL_IS_VIOLENT(abil)) {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
+	if (ABIL_IS_VIOLENT(abil) && SHOULD_APPEAR(ch)) {
+		appear(ch);
+	}
 	
-		// start meters now, to track direct damage()
-		check_start_combat_meters(ch);
-		if (vict) {
-			check_start_combat_meters(vict);
-		}
+	// these happen immediately before the first message
+	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
+		return;
 	}
 	
 	// pre-messages if any
@@ -3424,6 +3417,14 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
 		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, level, data);
 		return;
+	}
+	
+	// start meters now, to track direct damage()
+	if (ABIL_IS_VIOLENT(abil)) {
+		check_start_combat_meters(ch);
+		if (vict) {
+			check_start_combat_meters(vict);
+		}
 	}
 	
 	// counterspell?
