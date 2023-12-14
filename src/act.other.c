@@ -3755,7 +3755,7 @@ ACMD(do_quit) {
 ACMD(do_ritual) {
 	bool found, full;
 	char *arg2;
-	size_t size;
+	size_t size, count;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
 	
@@ -3783,6 +3783,7 @@ ACMD(do_ritual) {
 		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", ritual_scmd[subcmd]);
 		
 		found = full = FALSE;
+		count = 0;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_RITCHANT_ABIL(ch, plab)) {
@@ -3790,8 +3791,8 @@ ACMD(do_ritual) {
 			}
 			
 			// append
-			if (size + strlen(ABIL_NAME(abil)) + 3 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", ABIL_NAME(abil));
+			if (size + strlen(ABIL_NAME(abil)) + 38 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ABIL_NAME(abil), ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
 			}
 			else {
 				full = TRUE;
@@ -3805,6 +3806,10 @@ ACMD(do_ritual) {
 		if (!found) {
 			strcat(buf, " nothing\r\n");	// always room for this if !found
 		}
+		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			strcat(buf, "\r\n");
+		}
+		
 		if (full) {
 			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
 		}

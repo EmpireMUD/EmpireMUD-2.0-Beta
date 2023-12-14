@@ -67,7 +67,7 @@ and the transition into a slower time frame deals serious magical damage.
 
 City Teleportation (High Sorcery ability)
 
-Usage:  ritual teleport <city>
+Usage:  ritual "city teleport" <city>
 Cooldown:  15 minutes
 Cost:  15 mana
 
@@ -76,7 +76,7 @@ can use the city's name or number. Use "city list" to see available cities.
 
 This ability gains experience any time you use it to teleport to a city.
 
-See also: TELEPORTATION, CITY
+See also: RITUAL, CITY
 #
 COLORBURST
 
@@ -403,16 +403,15 @@ See also: RITUAL
 
 Ritual of Teleportation (High Sorcery skill)
 
-Usage:  ritual teleportation [target]
-Cooldown:  15 minutes (teleport home only)
+Usage:  ritual teleport [home]
+Cooldown:  10 minutes
 Cost:  25 mana
 
 With the basic teleportation ability, you can teleport at random (2 to 7 map
 tiles in any direction) or you can teleport to your home. You won't be able to
 teleport out of (or into) any room owned by a non-allied empire.
 
-This ability gains experience any time you teleport (using this ability or City
-Teleportation).
+This ability gains experience any time you use it to teleport.
 
 See also: CITY TELEPORTATION, RITUAL
 #
