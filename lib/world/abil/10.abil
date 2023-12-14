@@ -393,4 +393,34 @@ M
 But nothing seems to happen.~
 T n 1
 S
+#1020
+Collapse Portal~
+0 -1 1.00 0 0 0
+C
+collapse 8 j 2 15 0 -1 0 0 5 0
+D 64 6 0
+D 16 26 8
+M
+2
+You grab $p...~
+M
+4
+$n grabs $p...~
+M
+10
+... but can't seem to collapse it.~
+M
+12
+... but nothing happens.~
+M
+20
+... and draw it shut.~
+M
+21
+... and draws it shut.~
+M
+31
+Collapse which portal?~
+T s 1
+S
 $
