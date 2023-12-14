@@ -381,7 +381,6 @@ ACMD(do_skybrand);
 ACMD(do_slash_channel);
 ACMD(do_slay);
 ACMD(do_sleep);
-ACMD(do_slow);
 ACMD(do_sneak);
 ACMD(do_snoop);
 ACMD(do_socials);
@@ -988,7 +987,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "skybrand", POS_FIGHTING, do_skybrand, NO_MIN, CTYPE_COMBAT, ABIL_SKYBRAND ),
 	SIMPLE_CMD( "sleep", POS_SLEEPING, do_sleep, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SLAY ),
-	ABILITY_CMD( "slow", POS_FIGHTING, do_slow, NO_MIN, CTYPE_COMBAT, ABIL_SLOW ),
 	STANDARD_CMD( "smelt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "sneak", POS_STANDING, do_sneak, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_STAY_HIDDEN, ABIL_SNEAK ),
 	GRANT_CMD( "snoop", POS_DEAD, do_snoop, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SNOOP ),

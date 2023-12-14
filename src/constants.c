@@ -290,9 +290,9 @@ const char *ability_custom_types[] = {
 	"targ-to-char",
 	"targ-to-vict",
 	"targ-to-room",
-	"counterspell-to-char",	// 5
-	"counterspell-to-vict",
-	"counterspell-to-room",
+	"counter-to-char",	// 5
+	"counter-to-vict",
+	"counter-to-room",
 	"fail-self-to-char",
 	"fail-self-to-room",
 	"fail-targ-to-char",	// 10
@@ -330,7 +330,7 @@ const char *ability_custom_type_help =
 " Shown before activation, targeting character: pre-targ-to-char pre-targ-to-vict pre-targ-to-room\r\n"
 "&w Fails when targeting self or no one: fail-self-to-char fail-self-to-room&0\r\n"
 " Fails targeting a character: fail-targ-to-char fail-targ-to-vict fail-targ-to-room\r\n"
-"&w Is counterspelled: counterspell-to-char counterspell-to-vict counterspell-to-room&0\r\n"
+"&w Is counterspelled: counter-to-char counter-to-vict counter-to-room&0\r\n"
 " For each vehicle on some types: per-veh-to-char per-veh-to-room\r\n"
 "&w For each item on some types: per-item-to-char per-item-to-room&0\r\n"
 " For each target/creature for some abilities: per-char-to-char per-char-to-vict per-char-to-room\r\n"

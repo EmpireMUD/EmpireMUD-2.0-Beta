@@ -850,10 +850,9 @@ Message types:
    or object.
  &ctarg-to-vict&0 - Shown to the victim when the ability targets a char/obj.
  &ctarg-to-room&0 - Shown to the rest of the room when targeting a char/obj.
- &ccounterspell-to-char&0 - Shown to the actor when a counterspell cancels the
-   ability.
- &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
- &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+ &ccounter-to-char&0 - To the actor when a counterspell cancels the ability.
+ &ccounter-to-vict&0 - Shown to the ability's victim after the counterspell.
+ &ccounter-to-room&0 - Shown to the room after the counterspell.
  &cfail-self-to-char&0 - Shown to the actor when the ability fails targeting
    himself (or targets nobody).
  &cfail-self-to-room&0 - To room when the ability fails targeting self/nobody.
