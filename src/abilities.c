@@ -1148,6 +1148,48 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 
 
 /**
+* Determines if an over-time ability can be used in combat at all.
+*
+* @param char_data *ch The player who might be doing an over-time ability.
+* @return bool TRUE if allowed in combat, FALSE if not.
+*/
+bool over_time_ability_allows_fighting(char_data *ch) {
+	ability_data *abil;
+	
+	if (ch && !IS_NPC(ch) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+		if ((abil = ability_proto(GET_ACTION_VNUM(ch, 0)))) {
+			if (ABIL_MIN_POS(abil) <= POS_FIGHTING && !ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// else:
+	return FALSE;
+}
+
+
+/**
+* Gets the minimum position for the character's current over-time ability, if any.
+*
+* @param char_data *ch The player who might be doing an over-time ability.
+* @return int The POS_ const that the player can use for the ability. Returns POS_STANDING if no over-time ability is running.
+*/
+int over_time_ability_min_pos(char_data *ch) {
+	ability_data *abil;
+	
+	if (ch && !IS_NPC(ch) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+		if ((abil = ability_proto(GET_ACTION_VNUM(ch, 0)))) {
+			return ABIL_MIN_POS(abil);
+		}
+	}
+	
+	// no ability?
+	return POS_STANDING;
+}
+
+
+/**
 * For abilities stored to the character as action data, attempts to find and
 * validate targets again.
 *
