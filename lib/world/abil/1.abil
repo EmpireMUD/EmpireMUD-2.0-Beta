@@ -214,7 +214,7 @@ T m 0
 S
 #126
 Chant of Nature~
-su -1 1.00 0 0 0
+stu -1 1.00 0 0 0
 C
 chant 8 o 2 0 0 -1 0 0 5 0
 D 16 12 0
@@ -274,14 +274,14 @@ M
 1
 *~
 M
-20
-As you chant, the plants around you grow with amazing speed!~
-M
-21
-As $n chants, the plants around $m grow with amazing speed!~
-M
 22
 $n is loudly reciting a chant.~
+M
+28
+As you chant, the plants around you grow with amazing speed!~
+M
+30
+As $n chants, the plants around $m grow with amazing speed!~
 T s 1
 S
 #136
@@ -367,8 +367,71 @@ T e 1
 S
 #153
 Shadowstep~
-0 -1 1.00 0 0 0
-T m 0
+s -1 1.00 0 0 0
+C
+shadowstep 8 dh 1 50 0 2037 60 0 1 0
+D 2 0 0
+D 128 7 0
+D 16 16 0
+D 16 14 0
+D 16 15 0
+D 16 17 0
+D 16 18 0
+D 16 22 0
+D 16 23 0
+D 16 24 0
+M
+2
+*~
+M
+2
+You step into the shadows and emerge at $N!~
+M
+3
+*~
+M
+3
+*~
+M
+4
+*~
+M
+4
+$n steps into the shadows!~
+M
+10
+*~
+M
+11
+... but nothing happens~
+M
+12
+... but nothing happens~
+M
+15
+You gather the shadows around yourself...~
+M
+16
+The shadows gather around you...~
+M
+17
+$n gathers the shadows around $mself...~
+M
+28
+*~
+M
+29
+$n steps out of the shadows!~
+M
+30
+$n steps out of the shadows!~
+M
+31
+Shadowstep to whom?~
+M
+22
+The shadows cling to $n before you.~
+T u 1
 S
 #154
 Vaultcracking~
@@ -444,7 +507,7 @@ T k 1
 S
 #163
 Ritual of Burdens~
-s -1 1.00 0 0 0
+st -1 1.00 0 0 0
 A
 19 1
 C
@@ -466,7 +529,7 @@ M
 $n is whispering something into the air.~
 T b 1
 X b
--1 1800 1800 0
+3052 1800 1800 0
 S
 #164
 Staffmaking~
@@ -551,8 +614,135 @@ T m 0
 S
 #172
 Siege Ritual~
-0 -1 1.00 0 0 0
-T m 0
+as -1 1.00 0 0 0
+C
+ritual 8 mp 2 30 0 -1 0 0 3 0
+D 16 13 0
+D 2 1 0
+M
+0
+You draw mana to yourself...~
+M
+0
+*~
+M
+0
+You concentrate your power into a ball of fire...~
+M
+0
+*~
+M
+0
+You summon the full force of your magic...~
+M
+0
+*~
+M
+0
+You twist and grow the ball of fire in your hands...~
+M
+0
+*~
+M
+0
+You shoot one powerful fireball...~
+M
+1
+$n begins drawing mana to $mself...~
+M
+1
+*~
+M
+1
+$n concentrates $s power into a fireball...~
+M
+1
+*~
+M
+1
+$n draws more mana...~
+M
+1
+*~
+M
+1
+$n twists and grows the ball of fire in $s hands...~
+M
+1
+*~
+M
+1
+$n shoots one powerful fireball...~
+M
+2
+You draw mana to yourself as you focus on $V...~
+M
+2
+*~
+M
+2
+You concentrate your power into a ball of fire...~
+M
+2
+*~
+M
+2
+You summon the full force of your magic...~
+M
+2
+*~
+M
+2
+You twist and grow the ball of fire in your hands...~
+M
+2
+*~
+M
+2
+You shoot one powerful fireball at $V...~
+M
+4
+$n begins drawing mana to $mself as $e focuses on $V...~
+M
+4
+*~
+M
+4
+$n concentrates $s power into a fireball...~
+M
+4
+*~
+M
+4
+$n draws more mana...~
+M
+4
+*~
+M
+4
+$n twists and grows the ball of fire in $s hands...~
+M
+4
+*~
+M
+4
+$n shoots one powerful fireball at $V...~
+M
+8
+Your ritual fails.~
+M
+9
+$n's ritual fails.~
+M
+10
+Your ritual fails.~
+M
+12
+$n's ritual fails.~
+M
+22
+$n is conjuring a huge fireball!~
+T t 1
 S
 #173
 Colorburst~
@@ -757,14 +947,91 @@ X q
 S
 #187
 Ritual of Teleportation~
-0 -1 1.00 0 0 0
-T m 0
+s -1 1.00 0 0 0
+C
+ritual 8 rs 2 25 0 2019 600 0 5 0
+D 16 3 0
+D 16 16 0
+D 16 22 0
+D 128 7 0
+M
+0
+You wrap yourself up and begin chanting...~
+M
+0
+There is a bright blue glow all around you...~
+M
+0
+There's a bright flash of light all around you...~
+M
+1
+$n wraps $mself up and begins chanting...~
+M
+1
+$n begins to glow bright blue, like a flame...~
+M
+1
+$n vanishes in a brilliant flash of light!~
+M
+8
+... but nothing seems to happen.~
+M
+9
+... but nothing seems to happen.~
+M
+22
+$n is glowing bright blue!~
+M
+28
+*~
+M
+30
+$n appears with a brilliant flash of light!~
+T u 1
 S
 #188
 City Teleportation~
-0 -1 1.00 0 0 0
+s -1 1.00 0 0 0
+C
+ritual 8 t 2 25 0 2020 900 0 5 0
 D 1 49 0
-T e 1
+D 16 3 0
+D 16 16 0
+D 16 22 0
+M
+0
+You wrap yourself up and begin chanting...~
+M
+0
+There is a bright blue glow all around you...~
+M
+0
+There's a bright flash of light all around you...~
+M
+1
+$n wraps $mself up and begins chanting...~
+M
+1
+$n begins to glow bright blue, like a flame...~
+M
+1
+$n vanishes in a brilliant flash of light!~
+M
+8
+... but nothing seems to happen.~
+M
+9
+... but nothing seems to happen.~
+M
+22
+$n is glowing bright blue!~
+M
+28
+*~
+M
+30
+$n appears with a brilliant flash of light!~
+T u 1
 S
 #189
 Portal Magic~
@@ -787,6 +1054,7 @@ D 16 10 0
 D 16 4 0
 D 16 11 0
 D 64 4 0
+D 128 3 0
 M
 0
 You plant your staff hard into the ground and begin focusing mana...~
@@ -913,6 +1181,12 @@ $n begins writing words in the circles on the ground.~
 M
 22
 $n is writing on the ground with chalk.~
+M
+25
+You detect $N at $1~
+M
+28
+You detect $2 at $1~
 T s 1
 S
 #194

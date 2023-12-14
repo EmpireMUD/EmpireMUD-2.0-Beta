@@ -324,7 +324,7 @@ X b
 S
 #1018
 Shimmering Anvil~
-r -1 1.00 0 0 0
+rt -1 1.00 0 0 0
 C
 conjure 8 a 2 100 0 2063 3600 0 5 0
 I 35 1100 100.00 1  # VEHICLE-CONJURE: shimmering anvil
