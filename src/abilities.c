@@ -3343,7 +3343,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// pre-messages if any
-	send_pre_ability_messages(ch, vict, ovict, abil, data);
+	if (run_mode == RUN_ABIL_NORMAL) {
+		send_pre_ability_messages(ch, vict, ovict, abil, data);
+	}
 	
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
