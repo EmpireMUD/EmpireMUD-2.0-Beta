@@ -6516,6 +6516,11 @@ OLC_MODULE(abiledit_command) {
 	}
 	else {
 		olc_process_string(ch, argument, "command", &ABIL_COMMAND(abil));
+		
+		if (ABIL_WAIT_TYPE(abil) == WAIT_NONE) {
+			// set a default now
+			ABIL_WAIT_TYPE(abil) = WAIT_ABILITY;
+		}
 	}
 }
 
