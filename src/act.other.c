@@ -2272,7 +2272,7 @@ ACMD(do_conjure) {
 	bool found, full, needs_target;
 	char *arg2;
 	const char *ptr;
-	size_t size;
+	size_t size, count;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
 	
@@ -2301,6 +2301,7 @@ ACMD(do_conjure) {
 		size = snprintf(buf, sizeof(buf), "You can conjure the following things:\r\n");
 		
 		found = full = FALSE;
+		count = 0;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_CONJURE_ABIL(ch, plab)) {
@@ -2312,8 +2313,8 @@ ACMD(do_conjure) {
 				ptr = skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE);
 				
 				// append
-				if (size + strlen(ptr) + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", ptr);
+				if (size + strlen(ptr) + 38 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ptr, ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
 				}
 				else {
 					full = TRUE;
@@ -2335,6 +2336,10 @@ ACMD(do_conjure) {
 		if (!found) {
 			strcat(buf, " nothing\r\n");	// always room for this if !found
 		}
+		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			strcat(buf, "\r\n");
+		}
+		
 		if (full) {
 			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
 		}
