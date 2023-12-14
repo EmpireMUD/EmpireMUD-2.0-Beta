@@ -538,6 +538,7 @@ Usage:  .data add action <type>
 These are things that happen when the ability is successful.
 
 Action types:
+ &cclose portal&0 - Will close both sides of a targeted portal.
  &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends
    per-char messages for each hidden character.
  &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room

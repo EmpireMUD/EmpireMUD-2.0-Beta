@@ -1646,6 +1646,36 @@ int wordcount_ability(ability_data *abil) {
 //// ABILITY ACTIONS /////////////////////////////////////////////////////////
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_close_portal) {
+	obj_data *obj, *reverse = NULL;
+	room_data *to_room;
+
+	if (ovict && IS_PORTAL(ovict) && GET_OBJ_TIMER(ovict) != UNLIMITED && (to_room = real_room(GET_PORTAL_TARGET_VNUM(ovict)))) {
+		// find the reverse ovict
+		DL_FOREACH2(ROOM_CONTENTS(to_room), obj, next_content) {
+			if (GET_PORTAL_TARGET_VNUM(obj) == GET_ROOM_VNUM(IN_ROOM(ch))) {
+				reverse = obj;
+				break;
+			}
+		}
+		
+		// remove it
+		extract_obj(ovict);
+		
+		if (reverse) {
+			if (ROOM_PEOPLE(to_room)) {
+				act("$p is closed from the other side!", FALSE, ROOM_PEOPLE(to_room), reverse, NULL, TO_CHAR | TO_ROOM);
+			}
+			extract_obj(reverse);
+		}
+		
+		data->success = TRUE;
+		data->stop = TRUE;	// target is gone
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
@@ -3532,6 +3562,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_MAGIC_GROWTH: {
 				call_do_abil(abil_action_magic_growth);
+				break;
+			}
+			case ABIL_ACTION_CLOSE_PORTAL: {
+				call_do_abil(abil_action_close_portal);
 				break;
 			}
 		}
