@@ -213,7 +213,7 @@ bool trigger_counterspell(char_data *ch);
 // #define ABIL_SUMMON_MATERIALS  169
 #define ABIL_STAFF_MASTERY  171
 // #define ABIL_SIEGE_RITUAL  172
-#define ABIL_COLORBURST  173
+// #define ABIL_COLORBURST  173
 #define ABIL_ENERVATE  174
 // #define ABIL_SLOW  175
 #define ABIL_SIPHON  176

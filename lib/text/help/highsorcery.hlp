@@ -98,12 +98,12 @@ Colorburst (High Sorcery ability)
 
 Usage:  colorburst [victim]
 Cooldown:  30 seconds
-Cost:  15 / 30 / 45 mana
+Cost:  14+ mana (based on level)
 Debuff type:  magical
 
 Shoot a disorienting burst of color at your foe and makes it harder for them
-to hit you. Colorburst causes a to-hit penalty of -5, -10, or -20 depending
-on your skill level, with a bonus based on your Intelligence.
+to hit anything in combat. The size of the penalty depends upon your skill
+level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
