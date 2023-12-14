@@ -4284,6 +4284,7 @@ PREP_ABIL(prep_teleport_ability) {
 	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
 	
 	// see if we're infiltrating
+	// TODO could this be moved to a function
 	if (HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch))) {
 		if (ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
 			// stealthable seems to apply
