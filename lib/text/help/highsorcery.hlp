@@ -78,6 +78,20 @@ This ability gains experience any time you use it to teleport to a city.
 
 See also: RITUAL, CITY
 #
+COLLAPSE "COLLAPSE PORTAL"
+
+Collapse Portal (High Sorcery ability)
+
+Command:  collapse <portal>
+Cost:  15 mana
+
+This power can close portals opened by players. Collapsing one end also closes
+the other end of the portal.
+
+Gain skill whenever you collapse a portal.
+
+See also: PORTAL, PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS
+#
 COLORBURST
 
 Colorburst (High Sorcery ability)
@@ -321,22 +335,19 @@ four minutes of portal sickness instead of five.
 You can gain Portal Magic skill whenever someone in your empire uses your
 portal magic to open a portal.
 
-See also: PORTAL, PORTAL MASTER
+See also: COLLAPSE, PORTAL, PORTAL MASTER
 #
-"PORTAL MASTER" COLLAPSE
+"PORTAL MASTER"
 
 Portal Master (High Sorcery ability)
 
-Command:  collapse <portal>
-Cost:  15 mana
-
 Becoming a Portal Master removes the same-island-only limit on your empire's
-portals. It also allows you to collapse portals yourself.
+portals.
 
 You can gain Portal Master skill whenever someone in your empire opens a
-portal, and whenever you collapse a portal.
+portal.
 
-See also: PORTAL, PORTAL MAGIC, PORTAL SICKNESS
+See also: COLLAPSE, PORTAL, PORTAL MAGIC, PORTAL SICKNESS
 #
 "RITUAL OF BURDENS" "BURDENS RITUAL" "BURDEN RITUAL"
 

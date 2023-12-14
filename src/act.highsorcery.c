@@ -246,69 +246,6 @@ void summon_materials(char_data *ch, char *argument) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
-
-ACMD(do_collapse) {
-	obj_data *portal, *obj, *reverse = NULL;
-	room_data *to_room;
-	int cost = 15;
-	
-	one_argument(argument, arg);
-	
-	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE)) {
-		msg_to_char(ch, "You don't have the correct ability to collapse portals.\r\n");
-		return;
-	}
-	if (!can_use_ability(ch, NO_ABIL, MANA, cost, NOTHING)) {
-		return;
-	}
-	
-	if (!*arg) {
-		msg_to_char(ch, "Collapse which portal?\r\n");
-		return;
-	}
-	
-	if (!(portal = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
-		return;
-	}
-	
-	if (!IS_PORTAL(portal) || GET_OBJ_TIMER(portal) == UNLIMITED) {
-		msg_to_char(ch, "You can't collapse that.\r\n");
-		return;
-	}
-	
-	if (!(to_room = real_room(GET_PORTAL_TARGET_VNUM(portal)))) {
-		msg_to_char(ch, "You can't collapse that.\r\n");
-		return;
-	}
-	
-	// find the reverse portal
-	DL_FOREACH2(ROOM_CONTENTS(to_room), obj, next_content) {
-		if (GET_PORTAL_TARGET_VNUM(obj) == GET_ROOM_VNUM(IN_ROOM(ch))) {
-			reverse = obj;
-			break;
-		}
-	}
-
-	// do it
-	charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-	
-	act("You grab $p and draw it shut!", FALSE, ch, portal, NULL, TO_CHAR);
-	act("$n grabs $p and draws it shut!", FALSE, ch, portal, NULL, TO_ROOM);
-	
-	extract_obj(portal);
-	
-	if (reverse) {
-		if (ROOM_PEOPLE(to_room)) {
-			act("$p is collapsed from the other side!", FALSE, ROOM_PEOPLE(to_room), reverse, NULL, TO_CHAR | TO_ROOM);
-		}
-		extract_obj(reverse);
-	}
-	
-	gain_player_tech_exp(ch, PTECH_PORTAL_UPGRADE, 20);
-}
-
-
 ACMD(do_colorburst) {
 	char_data *vict = NULL;
 	struct affected_type *af;
