@@ -413,6 +413,7 @@ const char *ability_limitations[] = {
 	"can teleport target",
 	"target not foreign empire npc",
 	"not here",
+	"check city found time",
 	"\n"
 };
 

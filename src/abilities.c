@@ -2176,6 +2176,14 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_CHECK_CITY_FOUND_TIME: {
+				bool wait;
+				if (ROOM_OWNER(other_room) && !is_in_city_for_empire(other_room, ROOM_OWNER(other_room), TRUE, &wait)) {
+					msg_to_char(ch, "%s city was founded too recently; you'll have to wait.\r\n", (other_room == IN_ROOM(ch) ? "This" : "That"));
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

@@ -1070,6 +1070,7 @@ Limitation types:
  &ccan use as ally&0 - Location must be unclaimed or you are an ally (or better).
  &ccan use as guest&0 - Location must be unclaimed or you have guest access (or better).
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
+ &ccheck city found time&0 - Fails if the target city is not established yet.
  &cguest permission at target&0 - Has guest (or better) access at the target location.
  &chave an empire&0 - Must be a member of any empire.
  &cin a city&0 - Must be in any city (tile must also be claimed).
