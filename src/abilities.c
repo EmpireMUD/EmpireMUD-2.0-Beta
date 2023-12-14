@@ -1587,8 +1587,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		msg_to_char(ch, "You can only use that on yourself!\r\n");
 		return FALSE;
 	}
-	if (vict && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
-		// TODO should this only be for violent spells?
+	if (vict && ABIL_IS_VIOLENT(abil) && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
 		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
 		return FALSE;
 	}
@@ -3405,13 +3404,13 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
+	// locked in! apply the effects
+	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
+	
 	// pre-messages if any
 	if (run_mode == RUN_ABIL_NORMAL) {
 		send_pre_ability_messages(ch, vict, ovict, abil, data);
 	}
-	
-	// locked in! apply the effects
-	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
 	
 	// WAIT! Over-time abilities stop here
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
