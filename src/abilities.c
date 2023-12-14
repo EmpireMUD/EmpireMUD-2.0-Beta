@@ -3970,7 +3970,11 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 2. ATAR_x: find the target
 	skip_spaces(&argument);
-	if (*argument) {
+	if (ABIL_TARGETS(abil) == ATAR_IGNORE) {
+		// if it has _only_ ATAR_IGNORE, skip argument entirely
+		has = TRUE;
+	}
+	else if (*argument) {
 		argument = one_argument(argument, arg);
 		skip_spaces(&argument);	// anything left
 		
@@ -4070,6 +4074,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 	}
 	else if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
+		// if it had multiple types including IGNORE, but no arg:
 		has = TRUE;
 	}
 	else {	// no arg and no tar-ignore

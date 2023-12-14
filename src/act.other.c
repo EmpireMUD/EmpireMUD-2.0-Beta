@@ -2372,7 +2372,7 @@ ACMD(do_conjure) {
 				return;
 			}
 			
-			perform_ability_command(ch, abil, needs_target ? arg2 : whole_arg);
+			perform_ability_command(ch, abil, needs_target ? arg2 : "");
 			found = TRUE;
 			break;
 		}
