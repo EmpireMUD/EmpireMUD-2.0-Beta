@@ -3794,13 +3794,13 @@ DO_ABIL(do_teleport_ability) {
 			return;
 		}
 		else {
-			act("You shadowstep to $N!", FALSE, ch, NULL, vict, TO_CHAR);
 			char_from_room(ch);
 			char_to_room(ch, to_room);
 			qt_visit_room(ch, to_room);
 			look_at_room(ch);
-			act("$n steps out of the shadows!", TRUE, ch, NULL, NULL, TO_ROOM);
-		
+			
+			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
+			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 		
