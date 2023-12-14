@@ -406,6 +406,9 @@ const char *ability_limitations[] = {
 	"ally permission at target",	// 20
 	"member permission at target",
 	"can teleport target",
+	"target not foreign empire npc",
+	"can infiltrate target",
+	"stealthable ok",	// 25
 	"\n"
 };
 

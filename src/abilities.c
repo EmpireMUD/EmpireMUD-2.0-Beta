@@ -104,11 +104,10 @@ struct {
 	DO_ABIL(*do_func);	// runs the ability
 } do_ability_data[] = {
 	
-	// ABILT_x: setup by type
+	// ABILT_x: setup by type; they run in this order:
+	
+	// types that don't run functions
 	{ ABILT_CRAFT, NULL, NULL },
-	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
-	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
 	{ ABILT_PLAYER_TECH, NULL, NULL },
 	{ ABILT_PASSIVE_BUFF, NULL, NULL },
 	{ ABILT_READY_WEAPONS, NULL, NULL },
@@ -118,15 +117,24 @@ struct {
 	{ ABILT_MORPH, NULL, NULL },
 	{ ABILT_AUGMENT, NULL, NULL },
 	{ ABILT_CUSTOM, NULL, NULL },
+	
+	// ones that should run early
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability },
+	
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability },
 	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
-	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
-	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
-	{ ABILT_ACTION, prep_action_ability, do_action_ability },
-	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability },
-	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability },
 	
+	// run these late
+	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
+	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
+	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability },
+	
+	// alaways run actions last
+	{ ABILT_ACTION, prep_action_ability, do_action_ability },
 	{ NOBITS }	// this goes last
 };
 
@@ -2092,6 +2100,53 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				if (!can_teleport_to(ch, other_room, FALSE)) {
 					msg_to_char(ch, "You can't teleport there.\r\n");
 					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC: {
+				if (vict && IS_NPC(vict) && ((GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch)) || !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED))) {
+					msg_to_char(ch, "You can't target an NPC in another empire.\r\n");
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_CAN_INFILTRATE_TARGET: {
+				int diff;
+				
+				// are they truly trying to infiltrate?
+				if (HOME_ROOM(other_room) != HOME_ROOM(IN_ROOM(ch)) && ROOM_OWNER(other_room) && !can_use_room(ch, other_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(other_room), DIPL_WAR | DIPL_THIEVERY))) {
+					if (!can_infiltrate(ch, ROOM_OWNER(other_room))) {
+						// sends own message
+						return FALSE;
+					}
+					
+					// otherwise attempts it and logs on failure
+					diff = EMPIRE_HAS_TECH(ROOM_OWNER(other_room), TECH_LOCKS) ? DIFF_RARELY : DIFF_HARD;
+					if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, diff)) {
+						// infiltrate failed -- log it
+						if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
+							log_to_empire(ROOM_OWNER(other_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(other_room), Y_COORD(other_room));
+						}
+						else {
+							log_to_empire(ROOM_OWNER(other_room), ELOG_HOSTILITY, "%s has been spotted infiltrating at (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(other_room), Y_COORD(other_room));
+						}
+						msg_to_char(ch, "You fail to infiltrate.\r\n");
+						return FALSE;
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_STEALTHABLE_OK: {
+				if (GET_LOYALTY(ch) && ROOM_OWNER(other_room) && GET_LOYALTY(ch) != ROOM_OWNER(other_room) && !can_use_room(ch, other_room, GUESTS_ALLOWED) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(other_room), DIPL_WAR | DIPL_THIEVERY)) {
+					// stealthable seems to apply
+					if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+						msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
+						return FALSE;
+					}
+					if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
+						msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
+						return FALSE;
+					}
 				}
 				break;
 			}

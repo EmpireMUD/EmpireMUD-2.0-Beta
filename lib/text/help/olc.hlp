@@ -1065,6 +1065,7 @@ Usage:  .data add limitation <type>
 
 Limitation types:
  &cally permission at target&0 - Has ally (or better) access at the target location.
+ &ccan infiltrate target&0 - Target's location must be neutral or infiltrate-able.
  &ccan teleport here&0 - Current room does not block teleport.
  &ccan teleport target&0 - Target room does not block teleport.
  &ccan use as ally&0 - Location must be unclaimed or you are an ally (or better).
@@ -1084,6 +1085,8 @@ Limitation types:
  &coutdoors&0 - Must be outdoors (including some adventure rooms).
  &cown the tile&0 - Your empire must own the location.
  &cpaintable building&0 - Must be used on a building the player can paint.
+ &cstealthable ok&0 - Player must have stealth permission and stealthable toggle.
+ &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
  &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
  &cwithin range&0 - Compares distance to the target against RANGE data.
