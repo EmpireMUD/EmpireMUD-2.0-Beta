@@ -2270,6 +2270,7 @@ ACMD(do_confirm) {
 
 ACMD(do_conjure) {
 	bool found, full, needs_target;
+	char whole_arg[MAX_INPUT_LENGTH];
 	char *arg2;
 	const char *ptr;
 	size_t size, count;
@@ -2280,9 +2281,9 @@ ACMD(do_conjure) {
 	
 	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "conjure")))
 	
-	skip_spaces(&argument);	// keep whole arg too (may be the whole conjure type)
-	arg2 = one_word(argument, arg);	// first arg: conjure type
-	skip_spaces(&arg2);	// remaining arg
+	quoted_arg_or_all(argument, whole_arg);	// keep whole arg
+	arg2 = one_word(argument, arg);	// also split first arg: conjure type
+	skip_spaces(&arg2);	// remaining args
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot conjure.\r\n");
@@ -2360,7 +2361,7 @@ ACMD(do_conjure) {
 		if (needs_target && !multi_isname(arg, skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE))) {
 			continue;	// wrong name: targeted
 		}
-		if (!needs_target && !multi_isname(argument, skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE))) {
+		if (!needs_target && !multi_isname(whole_arg, skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE))) {
 			continue;	// wrong name: not-targeted
 		}
 		
@@ -2371,7 +2372,7 @@ ACMD(do_conjure) {
 				return;
 			}
 			
-			perform_ability_command(ch, abil, needs_target ? arg2 : argument);
+			perform_ability_command(ch, abil, needs_target ? arg2 : whole_arg);
 			found = TRUE;
 			break;
 		}
