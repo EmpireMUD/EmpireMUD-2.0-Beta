@@ -507,7 +507,7 @@ T k 1
 S
 #163
 Ritual of Burdens~
-st -1 1.00 0 0 0
+st -1 0.68 0 0 0
 A
 19 1
 C
@@ -780,8 +780,30 @@ T m 0
 S
 #175
 Slow~
-0 -1 1.00 0 0 0
-T m 0
+ab -1 1.00 o 0 0
+C
+slow 7 bfh 2 20 0 2015 75 0 5 0
+M
+2
+$N grows lethargic and starts to glow gray as you shout the slow hex at $M!~
+M
+3
+$n shouts something at you... The world takes on a gray tone and you become more lethargic.~
+M
+4
+$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!~
+M
+5
+You try to use a slow hex on $N, but $E deflects it!~
+M
+6
+$n tries to hex you, but it's deflected by your counterspell!~
+M
+7
+$n tries to hex $N, but $E deflects it.~
+T b 1
+X b
+-1 35 75 s
 S
 #176
 Siphon~
@@ -809,7 +831,7 @@ S
 Phoenix Rite~
 s -1 1.00 0 aq 0
 C
-ritual 8 0 0 0 0 -1 0 0 5 0
+ritual 8 bg 0 0 0 -1 0 0 5 0
 M
 0
 You light some candles and begin the Phoenix Rite.~
@@ -993,11 +1015,11 @@ S
 City Teleportation~
 s -1 1.00 0 0 0
 C
-ritual 8 t 2 25 0 2020 900 0 5 0
-D 1 49 0
+ritual 8 t 2 15 0 2020 900 0 5 0
 D 16 3 0
 D 16 16 0
 D 16 22 0
+D 16 25 0
 M
 0
 You wrap yourself up and begin chanting...~
