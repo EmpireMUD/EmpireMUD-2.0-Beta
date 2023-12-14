@@ -54,9 +54,6 @@
 #define o_PEACHES  3004
 #define o_CORN  3005
 
-// clay
-#define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -74,7 +71,7 @@
 #define o_GLOWING_SEASHELL  1300
 
 // for catapults/ships
-#define o_HEAVY_SHOT  2135	// TODO: This could be a material or item type
+#define o_HEAVY_SHOT  2135	// TODO: Could apply the ammo system to vehicles
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -148,8 +145,6 @@
 
 
 // GENERIC_AFFECTS (ATYPE_x) for affects/dots
-#define ATYPE_FLY  3001
-#define ATYPE_DARKNESS  3003
 #define ATYPE_POISON  3004
 #define ATYPE_BOOST  3005
 #define ATYPE_CUT_DEEP  3006
@@ -163,18 +158,14 @@
 #define ATYPE_SKYBRAND  3020
 #define ATYPE_COUNTERSPELL  3021
 #define ATYPE_REJUVENATE  3023
-#define ATYPE_ENTANGLE  3024
 #define ATYPE_BITE_PENALTY  3025	// called "biting" / ATYPE_BITING (search hint)
 #define ATYPE_INSPIRE  3026
 #define ATYPE_JABBED  3027
-#define ATYPE_REGEN_POTION  3029
-#define ATYPE_NATURE_POTION  3030
 #define ATYPE_VIGOR  3031
 #define ATYPE_ENERVATE  3032
 #define ATYPE_ENERVATE_GAIN  3033
 #define ATYPE_SIPHON  3034
 #define ATYPE_SLOW  3035
-#define ATYPE_TRIPPING  3037
 #define ATYPE_SIPHON_DRAIN  3038
 #define ATYPE_DG_AFFECT  3039
 #define ATYPE_CLAWS  3040
@@ -239,8 +230,6 @@
 #define COOLDOWN_SLOW  2015
 #define COOLDOWN_SIPHON  2016
 #define COOLDOWN_MIRRORIMAGE  2017
-#define COOLDOWN_TELEPORT_HOME  2019
-#define COOLDOWN_TELEPORT_CITY  2020
 #define COOLDOWN_REJUVENATE  2021
 #define COOLDOWN_CLEANSE  2022
 #define COOLDOWN_SKYBRAND  2024
@@ -248,9 +237,6 @@
 #define COOLDOWN_HEARTSTOP  2026
 #define COOLDOWN_TAME  2033
 #define COOLDOWN_SEARCH  2034
-#define COOLDOWN_TERRIFY  2035
-#define COOLDOWN_DARKNESS  2036
-#define COOLDOWN_SHADOWSTEP  2037
 #define COOLDOWN_BACKSTAB  2038
 #define COOLDOWN_JAB  2039
 #define COOLDOWN_BLIND  2040
