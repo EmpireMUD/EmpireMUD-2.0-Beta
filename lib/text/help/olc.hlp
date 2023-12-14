@@ -1466,6 +1466,45 @@ modify each other. They are:
 
 See also: OLC ABILITIES
 #d
+"ABILEDIT TELEPORT ABILITY" "TELEPORT ABILITY" "TELEPORT ABILITIES"
+
+The TELEPORT ability type moves the player from one room to another. It can
+target any target type.
+
+If you use the ROOM-RANDOM target, you must set a RANGE in the ability's data.
+This range will only apply to random targets unless you also add the "within
+range" limitation, which will apply it to all targets.
+
+Messages when teleporting to rooms:
+ Sent at the start: &cpre-self-to-char&0 and &cpre-self-to-room&0
+ Sent right before teleporting: &cself-to-char&0 and &cself-to-room&0
+ Sent after self-to-char with bad target: &cfail-self-to-char&0 and &cfail-self-to-room&0
+ Sent when appearing: &cspec-to-char&0 and &spec-to-room&0
+ 
+Pre-self-to-char
+Self-to-char 1
+
+ Ritual of Teleportation> 
+Self-to-char 2
+Fail-self-to-char
+
+
+Messages when teleporting to targets:
+ Sent at the start: &cpre-targ-to-char&0 &cpre-targ-to-vict&0 &cpre-targ-to-room&0
+ Sent right before teleporting: &ctarg-to-char&0 &ctarg-to-vict&0 and &ctarg-to-room&0
+ Sent after targ-to-char with bad target: &cfail-targ-to-char&0 &cfail-targ-to-vict&0 and &cfail-targ-to-room&0
+ Sent when appearing: &cspec-to-char&0 &cspec-to-vict&0 and &spec-to-room&0
+ Note: &c-to-vict&0 messages are sent even from another room.
+
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent when each item appears: &cper-item-to-char&0 and &cper-item-to-room&0
+   Using &y$p&0 for the item. These messages are also optional.
+ Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
+   &cfail-self-to-room&0
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT TYPES"
 
 Usage:  .types add <type> [weight]
@@ -1500,6 +1539,7 @@ The following types are available (each has its own help file):
  &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
  &cACTION&0 - Executes and action; see ABILEDIT ACTIONS.
  &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
+ &cTELEPORT&0 - Teleports the player; see ABILEDIT TELEPORT.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
