@@ -142,6 +142,10 @@ struct {
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+// stops execution, e.g. in a PREP function
+#define CANCEL_ABILITY(data)  { data->stop = TRUE; data->should_charge_cost = FALSE; data->no_msg = TRUE; }
+
+
 /**
 * String display for one ADL item.
 *
@@ -2110,46 +2114,6 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
-			case ABIL_LIMIT_CAN_INFILTRATE_TARGET: {
-				int diff;
-				
-				// are they truly trying to infiltrate?
-				if (HOME_ROOM(other_room) != HOME_ROOM(IN_ROOM(ch)) && ROOM_OWNER(other_room) && !can_use_room(ch, other_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(other_room), DIPL_WAR | DIPL_THIEVERY))) {
-					if (!can_infiltrate(ch, ROOM_OWNER(other_room))) {
-						// sends own message
-						return FALSE;
-					}
-					
-					// otherwise attempts it and logs on failure
-					diff = EMPIRE_HAS_TECH(ROOM_OWNER(other_room), TECH_LOCKS) ? DIFF_RARELY : DIFF_HARD;
-					if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, diff)) {
-						// infiltrate failed -- log it
-						if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
-							log_to_empire(ROOM_OWNER(other_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(other_room), Y_COORD(other_room));
-						}
-						else {
-							log_to_empire(ROOM_OWNER(other_room), ELOG_HOSTILITY, "%s has been spotted infiltrating at (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(other_room), Y_COORD(other_room));
-						}
-						msg_to_char(ch, "You fail to infiltrate.\r\n");
-						return FALSE;
-					}
-				}
-				break;
-			}
-			case ABIL_LIMIT_STEALTHABLE_OK: {
-				if (GET_LOYALTY(ch) && ROOM_OWNER(other_room) && GET_LOYALTY(ch) != ROOM_OWNER(other_room) && !can_use_room(ch, other_room, GUESTS_ALLOWED) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(other_room), DIPL_WAR | DIPL_THIEVERY)) {
-					// stealthable seems to apply
-					if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
-						msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
-						return FALSE;
-					}
-					if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
-						msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
-						return FALSE;
-					}
-				}
-				break;
-			}
 		}
 	}
 	
@@ -4090,14 +4054,12 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	}
 	if (!IS_DRINK_CONTAINER(ovict)) {
 		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR);
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
+		CANCEL_ABILITY(data);
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
 		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR);
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
+		CANCEL_ABILITY(data);
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
@@ -4118,8 +4080,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 				// 1 is not water, or existing is not basic water
 				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
 				act(buf, FALSE, ch, ovict, NULL, TO_CHAR);
-				data->stop = TRUE;
-				data->should_charge_cost = FALSE;
+				CANCEL_ABILITY(data);
 				return;
 			}
 		}
@@ -4185,22 +4146,19 @@ PREP_ABIL(prep_conjure_object_ability) {
 		}
 		
 		if (one_ata && has_any) {
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			CANCEL_ABILITY(data);
 			return;
 		}
 	}
 	
 	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
+		CANCEL_ABILITY(data);
 		return;
 	}
 	if (any_room && any_size > 0 && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && (any_size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 		msg_to_char(ch, "You can't use that ability because the room is full.\r\n");
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
+		CANCEL_ABILITY(data);
 		return;
 	}
 }
@@ -4231,8 +4189,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
 				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
 					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR);
-					data->stop = TRUE;
-					data->should_charge_cost = FALSE;
+					CANCEL_ABILITY(data);
 					return;
 				}
 			}
@@ -4241,26 +4198,22 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		// check vehicle flagging
 		if (VEH_FLAGGED(proto, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)))) {
 			msg_to_char(ch, "You can't do that inside a building.\r\n");
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			CANCEL_ABILITY(data);
 			return;
 		}
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(proto, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
 			msg_to_char(ch, "You can't do that inside a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			CANCEL_ABILITY(data);
 			return;
 		}
 		if (VEH_SIZE(proto) > 0 && total_vehicle_size_in_room(IN_ROOM(ch), NULL) + VEH_SIZE(proto) > config_get_int("vehicle_size_per_tile")) {
 			msg_to_char(ch, "This area is already too full to do that.\r\n");
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			CANCEL_ABILITY(data);
 			return;
 		}
 		if (VEH_SIZE(proto) == 0 && total_small_vehicles_in_room(IN_ROOM(ch), NULL) >= config_get_int("vehicle_max_per_tile")) {
 			msg_to_char(ch, "This area is already too full to do that.\r\n");
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			CANCEL_ABILITY(data);
 			return;
 		}
 	}
@@ -4314,9 +4267,7 @@ PREP_ABIL(prep_room_affect_ability) {
 	// one-at-a-time?
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
 		msg_to_char(ch, "The area is already affected by that ability.\r\n");
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;	// free cancel
-		data->no_msg = TRUE;
+		CANCEL_ABILITY(data);
 		return;
 	}
 	
@@ -4326,6 +4277,49 @@ PREP_ABIL(prep_room_affect_ability) {
 
 // PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_teleport_ability) {
+	int diff;
+	room_data *to_room;
+	
+	// determine what we are teleporting to
+	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
+	
+	// see if we're infiltrating
+	if (HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch))) {
+		if (ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
+			// stealthable seems to apply
+			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+				msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+			if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
+				msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+			if (!can_infiltrate(ch, ROOM_OWNER(to_room))) {
+				// sends own message
+				CANCEL_ABILITY(data);
+				return;
+			}
+			
+			// otherwise attempt the infiltrate and logs on failure
+			diff = EMPIRE_HAS_TECH(ROOM_OWNER(to_room), TECH_LOCKS) ? DIFF_RARELY : DIFF_HARD;
+			if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, diff)) {
+				// infiltrate failed -- log it
+				if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
+					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
+				}
+				else {
+					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted infiltrating at (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(to_room), Y_COORD(to_room));
+				}
+				msg_to_char(ch, "You fail to infiltrate.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+		}
+	}
+	
 	get_ability_type_data(data, ABILT_TELEPORT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_TELEPORT, data);
 }
 
