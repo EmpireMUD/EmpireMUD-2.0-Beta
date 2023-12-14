@@ -34,6 +34,8 @@ also has the Allow-Multiple type. This is only supported for mobs and rooms.
 Note: Ability triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
+For rituals, ability triggers will fire during the start AND end of the ritual.
+
 Variables: 
   &c%actor%&0 - The user of the ability.
   &c%ability%&0 - The vnum of the ability.
