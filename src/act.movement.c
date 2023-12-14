@@ -2758,7 +2758,7 @@ ACMD(do_rest) {
 			break;
 	}
 	
-	if (GET_POS(ch) == POS_RESTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+	if (GET_POS(ch) == POS_SITTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !action_flagged(ch, ACTF_RESTING)) {
 		cancel_action(ch);
 	}
 }

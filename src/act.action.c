@@ -150,7 +150,7 @@ const struct action_data_struct action_data[] = {
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
 	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
-	{ "ability", "is doing something...", ACTF_SITTING | ACTF_FIGHTING, perform_over_time_ability, cancel_over_time_ability },	// ACT_OVER_TIME_ABILITY
+	{ "ability", "is doing something...", ACTF_SITTING | ACTF_RESTING | ACTF_FIGHTING, perform_over_time_ability, cancel_over_time_ability },	// ACT_OVER_TIME_ABILITY
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -359,7 +359,7 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (GET_POS(ch) < POS_SITTING || (GET_POS(ch) == POS_FIGHTING && !IS_SET(act_flags, ACTF_FIGHTING)) || (!IS_SET(act_flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
+		if (GET_POS(ch) < POS_RESTING || (GET_POS(ch) == POS_FIGHTING && !IS_SET(act_flags, ACTF_FIGHTING)) || (!IS_SET(act_flags, ACTF_RESTING) && GET_POS(ch) < POS_SITTING) || (!IS_SET(act_flags, ACTF_SITTING | ACTF_RESTING | ACTF_FIGHTING) && GET_POS(ch) < POS_STANDING)) {
 			// in most positions, they should know why they're stopping... these two are an exception:
 			if (GET_POS(ch) == POS_SITTING || GET_POS(ch) == POS_RESTING) {
 				msg_to_char(ch, "You can't keep %s while %s.\r\n", action_data[GET_ACTION(ch)].name, (GET_POS(ch) == POS_RESTING ? "resting" : "sitting"));

@@ -2254,6 +2254,7 @@ typedef enum {
 #define ACTF_EVEN_FASTER  BIT(11)	// another speed boost for various actions
 #define ACTF_IGNORE_COND  BIT(12)	// not slowed by hunger/thirst/slow
 #define ACTF_FIGHTING  BIT(13)	// may be performed in combat
+#define ACTF_RESTING  BIT(14)	// may be used while resting
 
 
 // BONUS_x: bonus traits
