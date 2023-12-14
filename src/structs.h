@@ -2215,13 +2215,13 @@ typedef enum {
 #define ACT_MORPHING		19
 #define ACT_SCRAPING		20
 #define ACT_BATHING			21
-#define ACT_CHANTING		22
+	#define ACT_CHANTING		22	// deprecated as of b5.166
 #define ACT_PROSPECTING		23
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
 #define ACT_ESCAPING		26
 #define ACT_RUNNING			27
-#define ACT_RITUAL			28
+	#define ACT_RITUAL			28	// deprecated as of b5.166
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
 #define ACT_DRIVING			31

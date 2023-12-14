@@ -3858,6 +3858,12 @@ DO_ABIL(do_teleport_ability) {
 			return;
 		}
 		else {
+			// any existing adventure summon location is no longer valid after a voluntary teleport
+			// ... if the travel is further than the ability's range (which is used for random or targeted teleports, and is usually very close)
+			if (compute_distance(was_in, to_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+				cancel_adventure_summon(ch);
+			}
+			
 			char_from_room(ch);
 			char_to_room(ch, to_room);
 			qt_visit_room(ch, to_room);
@@ -3876,6 +3882,18 @@ DO_ABIL(do_teleport_ability) {
 			
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
+			
+			// teleport companion, too
+			if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
+				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
+				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
+				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
+				enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
+				entry_memory_mtrigger(GET_COMPANION(ch));
+				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+				greet_memory_mtrigger(GET_COMPANION(ch));
+				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+			}
 		}
 		
 		// chance to log
