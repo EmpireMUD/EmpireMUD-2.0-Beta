@@ -30,6 +30,7 @@ extern const char *ability_data_types[];
 extern const char *ability_effects[];
 extern const char *ability_gain_hooks[];
 extern const char *ability_limitations[];
+extern const int ability_limitation_misc[];
 extern const char *conjure_words[];
 
 // adventure constants

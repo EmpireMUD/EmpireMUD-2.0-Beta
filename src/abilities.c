@@ -1992,6 +1992,7 @@ void apply_ability_effects(ability_data *abil, char_data *ch, char_data *vict, o
 * @return bool TRUE if ok, FALSE if there was a problem. Only sends a message if it was false.
 */
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+	char part[256];
 	struct ability_data_list *adl;
 	room_data *any_room, *other_room;
 	
@@ -2210,6 +2211,14 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				bool wait;
 				if (ROOM_OWNER(other_room) && !is_in_city_for_empire(other_room, ROOM_OWNER(other_room), TRUE, &wait)) {
 					msg_to_char(ch, "%s city was founded too recently; you'll have to wait.\r\n", (other_room == IN_ROOM(ch) ? "This" : "That"));
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_ITEM_TYPE: {
+				if (ovict && GET_OBJ_TYPE(ovict) != adl->misc) {
+					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
+					msg_to_char(ch, "You must target %s %s item.\r\n", AN(part), part);
 					return FALSE;
 				}
 				break;
@@ -4636,7 +4645,13 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 						}
 						break;
 					}
-
+					case ABIL_LIMIT_ITEM_TYPE: {
+						if (!adl->misc) {
+							olc_audit_msg(ch, ABIL_VNUM(abil), "No type set on item type limitation");
+							problem = TRUE;
+						}
+						break;
+					}
 				}
 				break;
 			}
@@ -6592,7 +6607,7 @@ OLC_MODULE(abiledit_data) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], temp[256];
 	struct ability_data_list *adl, *next_adl;
 	bitvector_t allowed_types = 0;
-	int iter, num, type_id, val_id;
+	int iter, num, type_id, val_id, misc = 0;
 	bool found;
 	
 	// ADL_x: determine valid types first
@@ -6694,7 +6709,33 @@ OLC_MODULE(abiledit_data) {
 					break;
 				}
 				case ADL_LIMITATION: {
-					if ((val_id = search_block_multi_isname(val_arg, ability_limitations)) == NOTHING) {
+					char val_a[MAX_INPUT_LENGTH], val_b[MAX_INPUT_LENGTH];
+					
+					// these sometimes have a "misc" value so we try to split this
+					chop_last_arg(val_arg, val_a, val_b);
+					
+					// try whole arg first
+					if ((val_id = search_block_multi_isname(val_arg, ability_limitations))) {
+						if (ability_limitation_misc[val_id] != ABLIM_NOTHING) {
+							msg_to_char(ch, "You need to provide a type for the %s limitation.\r\n", ability_limitations[val_id]);
+							return;
+						}
+					}
+					// try partial arg
+					if ((val_id = search_block_multi_isname(val_a, ability_limitations)) && ability_limitation_misc[val_id] != ABLIM_NOTHING) {
+						// process val_b as limit type
+						switch (ability_limitation_misc[val_id]) {
+							case ABLIM_ITEM_TYPE: {
+								if ((misc = search_block(val_b, item_types, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid item type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
+									return;
+								}
+								break;
+							}
+						}
+						// otherwise pass through and we're good
+					}
+					else {
 						msg_to_char(ch, "Invalid limitation '%s'.\r\n", val_arg);
 						return;
 					}
@@ -6735,6 +6776,7 @@ OLC_MODULE(abiledit_data) {
 				CREATE(adl, struct ability_data_list, 1);
 				adl->type = BIT(type_id);
 				adl->vnum = val_id;
+				adl->misc = misc;
 				LL_APPEND(ABIL_DATA(abil), adl);
 				
 				msg_to_char(ch, "You add data: %s\r\n", ability_data_display(adl));

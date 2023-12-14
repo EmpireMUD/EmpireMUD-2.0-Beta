@@ -736,6 +736,12 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC  23	// check loyalty of target and forbid npcs from other empires
 #define ABIL_LIMIT_NOT_HERE  24	// cannot target own room
 #define ABIL_LIMIT_CHECK_CITY_FOUND_TIME  25	// check founded-too-recently
+#define ABIL_LIMIT_ITEM_TYPE  26	// requires a specific item type
+
+
+// data needed for ability limits:
+#define ABLIM_NOTHING  0
+#define ABLIM_ITEM_TYPE  1	// requires an ITEM_ const
 
 
 // RUN_ABIL_x: modes for activating abilities
