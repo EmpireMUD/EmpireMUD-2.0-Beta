@@ -616,11 +616,16 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
 #define ATAR_ROOM_HERE  BIT(14)	// targets the room you're in
 #define ATAR_ROOM_ADJACENT  BIT(15)	// targets in a direction
+#define ATAR_ROOM_EXIT  BIT(16)	// targets the outside of the current place
+#define ATAR_ROOM_HOME  BIT(17)	// targets the player's home room
+#define ATAR_ROOM_RANDOM  BIT(18)	// targets a random room (combine with a RANGE limit)
+#define ATAR_ROOM_CITY  BIT(19)	// targets a city from one's own empire
+#define ATAR_ROOM_COORDS  BIT(20)	// targets a room by coordinates
 
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
 #define VEH_ATARS  (ATAR_VEH_ROOM | ATAR_VEH_WORLD)
-#define ROOM_ATARS  (ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT)
+#define ROOM_ATARS  (ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
 
 
 // ABIL_ACTION_x: ability actions

@@ -274,6 +274,11 @@ const char *ability_target_flags[] = {
 	"VEH-WORLD",
 	"ROOM-HERE",
 	"ROOM-ADJACENT",	// 15
+	"ROOM-EXIT",
+	"ROOM-HOME",
+	"ROOM-RANDOM",
+	"ROOM-CITY",
+	"ROOM-COORDS",	// 20
 	"\n"
 };
 

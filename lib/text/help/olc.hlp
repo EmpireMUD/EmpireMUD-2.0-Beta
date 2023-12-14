@@ -1457,6 +1457,12 @@ modify each other. They are:
  &cVEH-ROOM&0 - Targets a vehicle in the room.
  &cVEH-WORLD&0 - Targets a vehicle anywhere.
  &cROOM-HERE&0 - Targets the room you're in.
+ &cROOM-ADJACENT&0 - Targets in a direction.
+ &cROOM-EXIT&0 - Targets the exit (from a building or vehicle).
+ &cROOM-HOME&0 - Targets the player's home, if any.
+ &cROOM-RANDOM&0 - Targets a random room up to the RANGE data.
+ &cROOM-CITY&0 - Targets a city (center) in the player's empire by city name.
+ &cROOM-COORDS&0 - Targets a room by coordinates.
 
 See also: OLC ABILITIES
 #d

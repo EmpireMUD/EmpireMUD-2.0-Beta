@@ -829,6 +829,43 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 
 
 /**
+* Chooses a random room up to the ability's RANGE data. If there is no range
+* data, it returns the current room. Does not return the current room if a
+* valid range is available.
+*
+* @param char_data *ch The pperson lookin for a random room.
+* @param ability_data *abil Which ability they are using.
+* @return room_data* The random room, NULL if none found, or current room if range 0.
+*/
+room_data *get_random_room_for_ability(char_data *ch, ability_data *abil) {
+	room_data *rand_room, *to_room = NULL;
+	int rand_x, rand_y, range;
+	int tries = 0;
+	
+	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
+	
+	if (!range) {
+		return IN_ROOM(ch);	// no range
+	}
+	
+	while (!to_room && tries < 100) {
+		// randomport!
+		rand_x = number(0, 1) ? number(1, range) : number(-range, -1);
+		rand_y = number(0, 1) ? number(1, range) : number(-range, -1);
+		rand_room = real_shift(HOME_ROOM(IN_ROOM(ch)), rand_x, rand_y);
+		
+		// found outdoors! (we don't pick interiors at random)
+		if (rand_room && !ROOM_IS_CLOSED(rand_room)) {
+			to_room = rand_room;
+		}
+		++tries;
+	}
+	
+	return to_room;	// if any
+}
+
+
+/**
 * Gives a modifier (as a decimal, like 1.0 for 100%) based on a character's
 * value in a given trait. For example, for Strength, 100% is the character's
 * maximum possible strength.
@@ -1175,15 +1212,16 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 			
 			// obj location
 			if (IS_SET(ABIL_TARGETS(abil), OBJ_ATARS)) {
-				match = (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD) ? TRUE : FALSE);
+				match = FALSE;
+				match |= (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD) ? TRUE : FALSE);
 				if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV) && (*ovict)->carried_by == ch) {
-					match = TRUE;
+					match = TRUE;	// ok: carried
 				}
 				if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && (*ovict)->worn_by == ch) {
-					match = TRUE;
+					match = TRUE;	// ok: worn
 				}
 				if (IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM) && IN_ROOM(*ovict) == IN_ROOM(ch)) {
-					match = TRUE;
+					match = TRUE;	// ok: in room
 				}
 				if (!match) {
 					return FALSE;	// bad location
@@ -1204,11 +1242,28 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 		if (room_targ && *room_targ) {
 			any_targ = TRUE;
 			
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT) && !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (*room_targ == IN_ROOM(ch) || compute_distance(IN_ROOM(ch), *room_targ) >= 2)) {
-				return FALSE;	// same room or >= 2 not allowed
+			match = FALSE;
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_COORDS)) {
+				match = TRUE;	// ok: any coords
 			}
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT) && *room_targ != IN_ROOM(ch)) {
-				return FALSE;	// different room not allowed
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT) && *room_targ != IN_ROOM(ch) && compute_distance(IN_ROOM(ch), *room_targ) < 2) {
+				match = TRUE;	// ok: adjacent/exit, not here, within 2 distance
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && *room_targ == IN_ROOM(ch)) {
+				match = TRUE;	// ok: same room
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME) && ROOM_PRIVATE_OWNER(HOME_ROOM(*room_targ)) == GET_IDNUM(ch)) {
+				match = TRUE;	// ok: is home
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_CITY) && ROOM_OWNER(*room_targ) == GET_LOYALTY(ch) && IS_CITY_CENTER(*room_targ)) {
+				match = TRUE;	// ok: is home
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM) && compute_distance(IN_ROOM(ch), *room_targ) <= get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+				match = TRUE;	// ok: random and within range
+			}
+			
+			if (!match) {
+				return FALSE;	// bad room
 			}
 		}
 		
@@ -3849,6 +3904,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	char arg[MAX_INPUT_LENGTH], *argptr = arg;
 	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
+	struct empire_city_data *city;
 	vehicle_data *vvict = NULL;
 	char_data *vict = NULL;
 	obj_data *ovict = NULL;
@@ -3948,9 +4004,29 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_EXIT)) {
+			if (is_abbrev(argptr, "exit") && (room_targ = get_exit_room(IN_ROOM(ch)))) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME)) {
+			if (is_abbrev(argptr, "home") && (room_targ = find_home(ch))) {
+				has = TRUE;
+			}
+		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT)) {
 			if ((find_dir = parse_direction(ch, argptr)) != NO_DIR && is_flat_dir[find_dir] && (to_room = dir_to_room(IN_ROOM(ch), find_dir, TRUE)) && to_room != IN_ROOM(ch)) {
 				room_targ = to_room;
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_COORDS)) {
+			if (HAS_NAVIGATION(ch) && (room_targ = parse_room_from_coords(argptr))) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_CITY)) {
+			if (GET_LOYALTY(ch) && (city = find_city_by_name(GET_LOYALTY(ch), argptr))) {
 				has = TRUE;
 			}
 		}
@@ -3960,10 +4036,23 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else {	// no arg and no tar-ignore
 		// room target
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM)) {
+			room_targ = get_random_room_for_ability(ch, abil);
+			has = TRUE;
+		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
-			// only targets in-room for now
 			room_targ = IN_ROOM(ch);
 			has = TRUE;
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME)) {
+			if ((room_targ = find_home(ch))) {
+				has = TRUE;
+			}
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_EXIT)) {
+			if ((room_targ = get_exit_room(IN_ROOM(ch)))) {
+				has = TRUE;
+			}
 		}
 		
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
