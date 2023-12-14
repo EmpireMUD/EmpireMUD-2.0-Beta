@@ -154,46 +154,57 @@ struct {
 */
 char *ability_data_display(struct ability_data_list *adl) {
 	static char output[MAX_STRING_LENGTH];
-	char temp[256];
+	char type_str[256], part[256];
 	
-	prettier_sprintbit(adl->type, ability_data_types, temp);
+	prettier_sprintbit(adl->type, ability_data_types, type_str);
 	
 	// ADL_x: display by type
 	switch (adl->type) {
 		case ADL_PLAYER_TECH: {
-			snprintf(output, sizeof(output), "%s: %s", temp, player_tech_types[adl->vnum]);
+			snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
 			break;
 		}
 		case ADL_EFFECT: {
-			snprintf(output, sizeof(output), "%s: %s", temp, ability_effects[adl->vnum]);
+			snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
 			break;
 		}
 		case ADL_READY_WEAPON: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_obj_name_by_proto(adl->vnum));
+			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
 		case ADL_SUMMON_MOB: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
 			break;
 		}
 		case ADL_LIMITATION: {
-			snprintf(output, sizeof(output), "%s: %s", temp, ability_limitations[adl->vnum]);
+			switch (ability_limitation_misc[adl->vnum]) {
+				case ABLIM_ITEM_TYPE: {
+					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_NOTHING:
+				default: {
+					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
+					break;
+				}
+			}
 			break;
 		}
 		case ADL_PAINT_COLOR: {
-			snprintf(output, sizeof(output), "%s: %s%s", temp, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		case ADL_ACTION: {
-			snprintf(output, sizeof(output), "%s: %s", temp, ability_actions[adl->vnum]);
+			snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
 			break;
 		}
 		case ADL_RANGE: {
-			snprintf(output, sizeof(output), "%s: %d", temp, adl->vnum);
+			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: ???", temp);
+			snprintf(output, sizeof(output), "%s: ???", type_str);
 			break;
 		}
 	}
@@ -6715,15 +6726,14 @@ OLC_MODULE(abiledit_data) {
 					chop_last_arg(val_arg, val_a, val_b);
 					
 					// try whole arg first
-					if ((val_id = search_block_multi_isname(val_arg, ability_limitations))) {
+					if ((val_id = search_block_multi_isname(val_arg, ability_limitations)) != NOTHING) {
 						if (ability_limitation_misc[val_id] != ABLIM_NOTHING) {
 							msg_to_char(ch, "You need to provide a type for the %s limitation.\r\n", ability_limitations[val_id]);
 							return;
 						}
 					}
-					// try partial arg
-					if ((val_id = search_block_multi_isname(val_a, ability_limitations)) && ability_limitation_misc[val_id] != ABLIM_NOTHING) {
-						// process val_b as limit type
+					else if ((val_id = search_block_multi_isname(val_a, ability_limitations)) != NOTHING && ability_limitation_misc[val_id] != ABLIM_NOTHING) {
+						// partial arg: process val_b as limit type
 						switch (ability_limitation_misc[val_id]) {
 							case ABLIM_ITEM_TYPE: {
 								if ((misc = search_block(val_b, item_types, FALSE)) == NOTHING) {
