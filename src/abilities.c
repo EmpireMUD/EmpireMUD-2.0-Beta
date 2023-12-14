@@ -1660,6 +1660,7 @@ DO_ABIL(abil_action_close_portal) {
 		}
 		
 		// remove it
+		send_ability_per_item_messages(ch, ovict, 1, abil, data, NULL);
 		extract_obj(ovict);
 		
 		if (reverse) {
