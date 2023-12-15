@@ -1,7 +1,5 @@
 DG-SCRIPTS DG_SCRIPTS DGSCRIPTS TRIGGERS
 
-DG Scripts 1.0.12 e5.0.1
-
 Stands for Death Gate scripts and are named after the original MUD they came
 from. DG Scripts is a popular CircleMUD snippet and is also included with
 TBAMUD, the successor to the CIrcleMUD project.
@@ -13,6 +11,8 @@ exist from its CircleMUD base code. For the most part, EmpireMUD's version of
 DG Scripts attempts to preserve the variables and syntax of classic DG Scripts
 in order to make the system easy to learn for people already familiar with the
 scripting system, and to make it easier to use online DG Scripts tutorials.
+
+Type 'version' to see the current version of the scripting system.
 
 See: TRIGEDIT
 #d
