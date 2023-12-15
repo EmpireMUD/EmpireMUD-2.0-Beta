@@ -7060,7 +7060,7 @@ OLC_MODULE(abiledit_ahook) {
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: ahook add <type> [value]\r\n");
+		msg_to_char(ch, "Usage: ahook add <type> <percent> [value]\r\n");
 		msg_to_char(ch, "Usage: ahook remove <number | all>\r\n");
 		
 		found = FALSE;
