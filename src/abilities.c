@@ -4603,7 +4603,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (ABIL_TARGETS(abil) == NOBITS) {
+	if (ABIL_COMMAND(abil) && ABIL_TARGETS(abil) == NOBITS) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No targets set");
 		problem = TRUE;
 	}
