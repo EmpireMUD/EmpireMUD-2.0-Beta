@@ -157,8 +157,33 @@ T m 0
 S
 #232
 Stagger Jab~
-0 -1 1.00 0 0 0
-T m 0
+akv -1 0.50 h 0 0
+A
+17 -1
+C
+unknown 7 bfh 0 0 0 -1 0 4 0 0
+H 1 155 100.00 0
+M
+2
+$N is staggered by that jab!~
+M
+3
+You're staggered by that jab!~
+M
+4
+$N is staggered by that jab!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X b
+3054 15 15 0
 S
 #233
 Shadowcage~
@@ -172,8 +197,33 @@ T m 0
 S
 #235
 Crucial Jab~
-0 -1 1.00 0 0 0
-T m 0
+akv -1 0.20 h 0 0
+A
+2 -1
+C
+unknown 7 bfh 0 0 0 -1 0 0 0 0
+H 1 155 100.00 0
+M
+2
+That jab seems to have hit something crucial on $N!~
+M
+3
+That jab seems to have hit something crucial on you!~
+M
+4
+That jab seems to have hit something crucial on $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X b
+3057 10 10 0
 S
 #236
 Diversion~
@@ -182,8 +232,33 @@ T m 0
 S
 #237
 Shadow Jab~
-0 -1 1.00 0 0 0
-T m 0
+akv -1 0.50 h 0 0
+A
+18 -1
+C
+unknown 7 bfh 0 0 0 -1 0 4 0 0
+H 1 155 100.00 0
+M
+2
+Shadows spew from $N's wound to cover $M!~
+M
+3
+Shadows spew from the wound and cover you!~
+M
+4
+Shadows spew from $N's wound to cover $M!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X b
+3059 15 15 0
 S
 #238
 Fastcasting~
