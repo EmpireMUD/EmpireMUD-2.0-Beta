@@ -227,7 +227,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 			if (VEH_FLAGGED(veh_iter, VEH_NO_BUILDING)) {
 				if (ch) {
 					sprintf(buf, "You can't %s that around $V.", command);
-					act(buf, FALSE, ch, NULL, veh_iter, TO_CHAR);
+					act(buf, FALSE, ch, NULL, veh_iter, TO_CHAR | ACT_VEH_VICT);
 				}
 				return FALSE;
 			}
@@ -1655,8 +1655,8 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		in_room = IN_ROOM(from_veh);
 		
 		if (ch) {
-			act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
-			act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM);
+			act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		
 		// look up original recipe
@@ -2071,14 +2071,14 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (VEH_IS_DISMANTLING(veh)) {
 		// already being dismantled: RESUME
 		if (can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
-			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
 			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 	}
 	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
@@ -2126,8 +2126,8 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		}
 		
 		// ok: start dismantle
-		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		
 		start_dismantle_vehicle(veh);
 		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
@@ -2447,11 +2447,11 @@ ACMD(do_dedicate) {
 		return;
 	}
 	if (ded_veh && !can_use_vehicle(ch, ded_veh, MEMBERS_ONLY)) {
-		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (ded_veh && !VEH_FLAGGED(ded_veh, VEH_DEDICATE)) {
-		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -2492,9 +2492,9 @@ ACMD(do_dedicate) {
 	}
 	if (ded_veh) {
 		snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM | ACT_VEH_VICT);
 		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		// update strs:
@@ -2884,8 +2884,8 @@ ACMD(do_maintain) {
 		else {
 			start_action(ch, ACT_REPAIR_VEHICLE, -1);
 			GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
-			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
-			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 	}
 	else if (*arg && !multi_isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
@@ -2990,11 +2990,11 @@ ACMD(do_paint) {
 	
 	// validate painting: vehicle
 	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
-		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -3037,8 +3037,8 @@ ACMD(do_paint) {
 		set_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
 	}
 	if (paint_veh) {
-		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR);
-		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM);
+		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM | ACT_VEH_VICT);
 		
 		// brighten if same color or remove bright if not
 		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
@@ -3202,11 +3202,11 @@ ACMD(do_unpaint) {
 	
 	// validate unpainting: vehicle
 	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (paint_veh && !VEH_PAINT_COLOR(paint_veh)) {
-		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -3218,8 +3218,8 @@ ACMD(do_unpaint) {
 		REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 	}
 	if (paint_veh) {
-		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
-		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
+		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM | ACT_VEH_VICT);
 		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 	}
@@ -3364,7 +3364,7 @@ ACMD(do_upgrade) {
 	
 	// validate upgrade: vehicle
 	if (from_veh && !can_use_vehicle(ch, from_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
+		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, from_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (from_veh && VEH_FLAGGED(from_veh, VEH_ON_FIRE)) {

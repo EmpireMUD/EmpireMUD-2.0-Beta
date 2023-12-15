@@ -576,10 +576,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 			// send the message, if needed
 			if (!IS_SET(flags, SILENT_AFF) && (gen = find_generic(af->type, GENERIC_AFFECT))) {
 				if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
-					act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
+					act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | ACT_AFFECT);
 				}
 				if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
-					act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
+					act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | ACT_AFFECT);
 				}
 			}
 			
@@ -949,10 +949,10 @@ void affect_to_char(char_data *ch, struct affected_type *af) {
 	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
 	
 	if (gen && GET_AFFECT_APPLY_TO_CHAR(gen)) {
-		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
+		act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | ACT_AFFECT);
 	}
 	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen)) {
-		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | ACT_AFFECT);
 	}
 	
 	affect_to_char_silent(ch, af);
@@ -972,7 +972,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	generic_data *gen = find_generic(af->type, GENERIC_AFFECT);
 	
 	if (gen && GET_AFFECT_APPLY_TO_ROOM(gen) && ROOM_PEOPLE(room)) {
-		act(GET_AFFECT_APPLY_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_AFFECT);
+		act(GET_AFFECT_APPLY_TO_ROOM(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | ACT_AFFECT);
 	}
 
 	CREATE(affected_alloc, struct affected_type, 1);
@@ -1368,10 +1368,10 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 	// any messaging
 	if ((gen = find_generic(type, GENERIC_AFFECT))) {
 		if (GET_AFFECT_APPLY_TO_CHAR(gen)) {
-			act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | TO_AFFECT);
+			act(GET_AFFECT_APPLY_TO_CHAR(gen), FALSE, ch, NULL, NULL, TO_CHAR | ACT_AFFECT);
 		}
 		if (GET_AFFECT_APPLY_TO_ROOM(gen)) {
-			act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | TO_AFFECT);
+			act(GET_AFFECT_APPLY_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM | ACT_AFFECT);
 		}
 	}
 }

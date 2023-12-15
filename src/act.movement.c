@@ -243,11 +243,11 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	// vehicles
 	if (GET_LEADING_VEHICLE(ch)) {
 		if (!VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_CAN_PORTAL)) {
-			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 			return FALSE;
 		}
 		if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
-			act("$V can't be led into $v.", FALSE, ch, GET_ROOM_VEHICLE(to_room), GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEHICLE_OBJ);
+			act("$V can't be led into $v.", FALSE, ch, GET_ROOM_VEHICLE(to_room), GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 			return FALSE;
 		}
 		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
@@ -467,7 +467,7 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	/* Notify the room */
 	sprintf(lbuf + strlen(lbuf), "%s%s.", ((obj) ? "" : "the "), (obj) ? "$p" : (ex->keyword ? "$F" : "door"));
 	if (!obj || IN_ROOM(obj)) {
-		act(lbuf, FALSE, ch, obj, obj ? NULL : ex->keyword, TO_ROOM);
+		act(lbuf, FALSE, ch, obj, obj ? NULL : ex->keyword, TO_ROOM | ACT_STR_VICT);
 	}
 
 	/* Notify the other room */
@@ -1276,13 +1276,13 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	
 	if (!VEH_IS_COMPLETE(veh)) {
 		if (ch) {
-			act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't move anywhere until it's complete!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
 	if (VEH_HEALTH(veh) < 1) {
 		if (ch) {
-			act("$V can't move anywhere until it's repaired!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't move anywhere until it's repaired!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
@@ -1291,7 +1291,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		if (ch) {
 			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
@@ -1299,13 +1299,13 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	// check size limits
 	if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, GET_LOYALTY(ch)) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
 		if (ch) {
-			act("There is already too much there for $V to go there.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("There is already too much there for $V to go there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
 	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		if (ch) {
-			act("$V cannot go there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V cannot go there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
@@ -1321,21 +1321,21 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		// prevent entering from outside if mounts are not allowed
 		if ((!veh_can_go_in || !veh_allows_veh) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
 			if (ch) {
-				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			}
 			return FALSE;
 		}
 		// prevent moving from an allowed building to a disallowed building (usually due to interlink)
 		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !veh_allows_veh && !veh_allows_veh_home) {
 			if (ch) {
-				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			}
 			return FALSE;
 		}
 		// prevent moving deeper into a building if part of it does not allow vehicles and you're in the entrance room
 		if (IS_MAP_BUILDING(IN_ROOM(veh)) && (VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room))) {
 			if (ch) {
-				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
+				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			}
 			return FALSE;
 		}
@@ -1343,14 +1343,14 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	
 	// climate checks
 	if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
-		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		return FALSE;
 	}
 	
 	// barrier?
 	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
 		if (ch) {
-			act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't move that close to the barrier.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
@@ -1358,19 +1358,19 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	// terrain-based checks
 	if (WATER_SECT(to_room) && !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING)) {
 		if (ch) {
-			act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't go onto the water.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
 	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
 		if (ch) {
-			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
 	if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH | VEH_FLYING)) {
 		if (ch) {
-			act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V can't go into rough terrain.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
 	}
@@ -1437,14 +1437,14 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
 			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-			act(buf, FALSE, ROOM_PEOPLE(was_in), portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
+			act(buf, FALSE, ROOM_PEOPLE(was_in), portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		
 		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
 		
 		snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
+		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 	}
 	
 	// now followers
@@ -1656,16 +1656,16 @@ int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) 
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
 			snprintf(buf, sizeof(buf), "$v %s behind $N.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-			act(buf, FALSE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
+			act(buf, FALSE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_ROOM | ACT_VEH_OBJ);
 		}
 		
 		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
 		
 		snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 		snprintf(buf, sizeof(buf), "$V %s in behind $n.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
-		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM);
+		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM | ACT_VEH_VICT);
 	}
 	// leading mob (attempt move)
 	if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
@@ -1713,7 +1713,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	
 	// check if it can be ignored by SM_ANIMAL_MOVEMENT
 	if ((MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) && IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-		is_animal_move = TO_ANIMAL_MOVE;
+		is_animal_move = ACT_ANIMAL_MOVE;
 	}
 	
 	// prepare empty room message
@@ -1748,10 +1748,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
 		if (veh && is_bld) {
-			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
-			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
 			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
@@ -1765,10 +1765,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
 		if (veh && is_bld) {
-			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
@@ -1847,7 +1847,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	
 	// check if it can be ignored by SM_ANIMAL_MOVEMENT
 	if ((MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) && IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-		is_animal_move = TO_ANIMAL_MOVE;
+		is_animal_move = ACT_ANIMAL_MOVE;
 	}
 	
 	// prepare empty room message
@@ -1880,10 +1880,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
 		if (veh && is_bld) {
-			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
-			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
 			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
@@ -1897,10 +1897,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
 		if (veh && is_bld) {
-			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
@@ -2408,7 +2408,7 @@ ACMD(do_gen_door) {
 
 	if ((obj) || (ex)) {
 		if (!(DOOR_IS_OPENABLE(ch, obj, ex)))
-			act("You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR);
+			act("You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
 		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN))
 			send_to_char("But it's already closed!\r\n", ch);
 		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED))

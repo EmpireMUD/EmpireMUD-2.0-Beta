@@ -489,7 +489,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	// was the target a vehicle?
 	if (found_veh != NULL) {
 		look_at_vehicle(found_veh, ch);
-		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM | ACT_VEH_VICT);
 		if (look_inside && VEH_FLAGGED(found_veh, VEH_CONTAINER)) {
 			look_in_obj(ch, NULL, NULL, found_veh);
 		}
@@ -508,7 +508,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			act("$n looks at $p.", TRUE, ch, ex_obj, NULL, TO_ROOM);
 		}
 		if (ex_veh) {
-			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM);
+			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		send_to_char(exdesc, ch);
 		found = TRUE;
@@ -585,11 +585,11 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	else if (veh) {
 		// vehicle section
 		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
-			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		else {
 			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
 	}

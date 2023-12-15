@@ -463,8 +463,8 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	char_data *iter;
 	
 	if (ch) {
-		act("You finish dismantling $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n finishes dismantling $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You finish dismantling $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n finishes dismantling $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	}
 	
 	if (IN_ROOM(veh)) {
@@ -555,12 +555,12 @@ void fully_empty_vehicle(vehicle_data *veh, room_data *to_room) {
 			
 			// remove people
 			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
-				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
+				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 				if (to_room) {
 					char_to_room(ch, to_room);
 					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
-					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
+					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 					msdp_update_room(ch);
 				}
 				else {
@@ -947,7 +947,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	}
 	
 	if (message && ROOM_PEOPLE(IN_ROOM(veh))) {
-		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 	}
 	
 	// delete the NPCs who live here first so they don't do an 'ejected-then-leave'
@@ -1246,7 +1246,7 @@ void start_vehicle_burning(vehicle_data *veh) {
 		do_unseat_from_vehicle(VEH_SITTING_ON(veh));
 	}
 	if (VEH_LED_BY(veh)) {
-		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR);
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
 		VEH_LED_BY(veh) = NULL;
 	}
@@ -2103,37 +2103,37 @@ void process_dismantle_vehicle(char_data *ch) {
 			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from $V.", get_obj_name_by_proto(res->vnum));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n removes %s from $V.", get_obj_name_by_proto(res->vnum));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_LIQUID: {
 				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from $V.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves some %s from $V.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_COINS: {
 				snprintf(buf, sizeof(buf), "You retrieve %s from $V.", money_amount(real_empire(res->vnum), res->amount));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", res->amount == 1 ? "a coin" : "some coins");
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_POOL: {
 				snprintf(buf, sizeof(buf), "You regain %d %s point%s from $V.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", pool_types[res->vnum]);
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_CURRENCY: {
 				snprintf(buf, sizeof(buf), "You retrieve %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 		}
@@ -3311,7 +3311,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(iter))) {
-			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM);
+			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(iter);
 	}
@@ -4229,7 +4229,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
 	}
 	else {
-		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
 	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {

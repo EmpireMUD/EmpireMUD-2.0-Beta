@@ -2656,7 +2656,7 @@ void process_repairing(char_data *ch) {
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
 		end_action(ch);
-		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		complete_vehicle(veh);
 	}
 	else if (!found) {
@@ -4000,11 +4000,11 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	}
 	else if (can_veh_but_no_permit && no_guest_room) {
 		snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns this area.", data->command);
-		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if (can_veh_but_no_permit) {
 		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
-		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else {
 		msg_to_char(ch, "You can't %s here.\r\n", data->command);

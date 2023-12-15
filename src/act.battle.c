@@ -221,9 +221,9 @@ ACMD(do_charge) {
 		
 		// 'charge' ability cost :D
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_CHARGE, 3 * SECS_PER_REAL_MIN, WAIT_COMBAT_ABILITY);
-		act("You charge at $N!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
-		act("$n charges at you!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
-		act("$n charges at $N!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+		act("You charge at $N!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
+		act("$n charges at you!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
+		act("$n charges at $N!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 		
 		// apply temporary hit/damage boosts
 		af = create_mod_aff(ATYPE_CHARGE, 5, APPLY_TO_HIT, 100, ch);
@@ -297,14 +297,14 @@ ACMD(do_disarm) {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DISARM, 30, WAIT_COMBAT_ABILITY);
 		
 		if (!skill_check(ch, ABIL_DISARM, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
-			act("You attempt to disarm $N, but fail.", FALSE, ch, 0, victim, TO_CHAR | TO_ABILITY);
-			act("$n attempts to disarm you, but fails.", FALSE, ch, 0, victim, TO_VICT | TO_ABILITY);
-			act("$n attempts to disarm $N, but fails.", FALSE, ch, 0, victim, TO_NOTVICT | TO_ABILITY);
+			act("You attempt to disarm $N, but fail.", FALSE, ch, 0, victim, TO_CHAR | ACT_ABILITY);
+			act("$n attempts to disarm you, but fails.", FALSE, ch, 0, victim, TO_VICT | ACT_ABILITY);
+			act("$n attempts to disarm $N, but fails.", FALSE, ch, 0, victim, TO_NOTVICT | ACT_ABILITY);
 		}
 		else {
-			act("You skillfully disarm $N!", FALSE, ch, 0, victim, TO_CHAR | TO_ABILITY);
-			act("$n disarms you! (Your weapon will not work until it wears off.)", FALSE, ch, 0, victim, TO_VICT | TO_ABILITY);
-			act("$n skillfully disarms $N!", TRUE, ch, 0, victim, TO_NOTVICT | TO_ABILITY);
+			act("You skillfully disarm $N!", FALSE, ch, 0, victim, TO_CHAR | ACT_ABILITY);
+			act("$n disarms you! (Your weapon will not work until it wears off.)", FALSE, ch, 0, victim, TO_VICT | ACT_ABILITY);
+			act("$n skillfully disarms $N!", TRUE, ch, 0, victim, TO_NOTVICT | ACT_ABILITY);
 
 			af = create_flag_aff(ATYPE_DISARM, CHOOSE_BY_ABILITY_LEVEL(disarm_levels, ch, ABIL_DISARM), AFF_DISARMED, ch);
 			affect_join(victim, af, 0);
@@ -373,18 +373,18 @@ ACMD(do_firstaid) {
 	
 	if (ch == vict) {
 		snprintf(buf, sizeof(buf), "You apply first aid to your wounds.%s", report_healing(ch, amount, ch));
-		act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
 		
-		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+		act("$n applies first aid to $s wounds.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You apply first aid to $N's wounds.%s", report_healing(vict, amount, ch));
-		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_HEAL);
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | ACT_HEAL);
 		
 		snprintf(buf, sizeof(buf), "$n applies first aid to your wounds.%s", report_healing(vict, amount, vict));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_HEAL);
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_HEAL);
 		
-		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
+		act("$n applies first aid to $N's wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_HEAL);
 	}
 	
 	// remove DoTs
@@ -440,12 +440,12 @@ ACMD(do_heartstop) {
 		
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HEARTSTOP, 30, WAIT_COMBAT_ABILITY);
 
-		act("You grab $N and press hard against $S throat...", FALSE, ch, 0, victim, TO_CHAR | TO_ABILITY);
-		act("$n grabs you and presses hard against your throat...", FALSE, ch, 0, victim, TO_VICT | TO_ABILITY);
-		act("$n grabs $N and presses hard against $S throat...", TRUE, ch, 0, victim, TO_NOTVICT | TO_ABILITY);
+		act("You grab $N and press hard against $S throat...", FALSE, ch, 0, victim, TO_CHAR | ACT_ABILITY);
+		act("$n grabs you and presses hard against your throat...", FALSE, ch, 0, victim, TO_VICT | ACT_ABILITY);
+		act("$n grabs $N and presses hard against $S throat...", TRUE, ch, 0, victim, TO_NOTVICT | ACT_ABILITY);
 
 		if (!skill_check(ch, ABIL_HEARTSTOP, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
-			act("But nothing happens.", FALSE, ch, NULL, victim, TO_CHAR | TO_ABILITY);
+			act("But nothing happens.", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
 			if (!FIGHTING(victim)) {
 				hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
 			}
@@ -459,7 +459,7 @@ ACMD(do_heartstop) {
 		af = create_flag_aff(ATYPE_HEARTSTOP, 20, AFF_CANT_SPEND_BLOOD, ch);
 		affect_join(victim, af, ADD_DURATION);
 
-		act("Your blood becomes inert!", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
+		act("Your blood becomes inert!", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
 		
 		if (!FIGHTING(victim)) {
 			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
@@ -627,8 +627,8 @@ ACMD(do_outrage) {
 		
 		charge_ability_cost(ch, MOVE, base_cost, COOLDOWN_OUTRAGE, 9, WAIT_COMBAT_ABILITY);
 		
-		act("You spin wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_CHAR | TO_ABILITY);
-		act("$n spins wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_ROOM | TO_ABILITY);
+		act("You spin wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_ABILITY);
+		act("$n spins wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_ROOM | ACT_ABILITY);
 		
 		found = FALSE;
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {

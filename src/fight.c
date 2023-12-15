@@ -824,7 +824,7 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 		
 		// then people in here
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
-			act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+			act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			if (!IS_NPC(ch)) {
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
@@ -2124,14 +2124,14 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 	
 	// block message to onlookers
 	pbuf = replace_fight_string("$N blocks $n's #x.", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
+	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT | ACT_COMBAT_MISS);
 
 	// block message to ch
 	if (ch->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&y", ch);
 		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
+		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR | ACT_COMBAT_MISS);
 	}
 
 	// block message to victim
@@ -2139,7 +2139,7 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 		// send color separately because of act capitalization
 		send_to_char("&r", victim);
 		pbuf = replace_fight_string("You block $n's #x.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
-		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
+		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | ACT_COMBAT_MISS);
 	}
 	
 	// ensure combat
@@ -2158,13 +2158,13 @@ void block_missile_attack(char_data *ch, char_data *victim, int type) {
 	char buf[MAX_STRING_LENGTH];
 	
 	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", attack_hit_info[type].first_pers);
-	act(buf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
+	act(buf, FALSE, ch, NULL, victim, TO_CHAR | ACT_COMBAT_MISS);
 	
 	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", attack_hit_info[type].third_pers);
-	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
+	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | ACT_COMBAT_MISS);
 	
 	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", attack_hit_info[type].third_pers);
-	act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_COMBAT_MISS);
+	act(buf, FALSE, ch, NULL, victim, TO_VICT | ACT_COMBAT_MISS);
 }
 
 
@@ -2401,7 +2401,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		}
 	}
 	
-	fmsg_type = (dam > 0 ? TO_COMBAT_HIT : TO_COMBAT_MISS);
+	fmsg_type = (dam > 0 ? ACT_COMBAT_HIT : ACT_COMBAT_MISS);
 
 	/* damage message to onlookers */
 	if (!AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
@@ -2474,13 +2474,13 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	
 	if (attacktype < TYPE_SUFFERING) {
 		// is a combat attack
-		hit_flags |= TO_COMBAT_HIT;
-		miss_flags |= TO_COMBAT_MISS;
+		hit_flags |= ACT_COMBAT_HIT;
+		miss_flags |= ACT_COMBAT_MISS;
 	}
 	else {
 		// is a special ability
-		hit_flags |= TO_ABILITY;
-		miss_flags |= TO_ABILITY;
+		hit_flags |= ACT_ABILITY;
+		miss_flags |= ACT_ABILITY;
 	}
 	
 	if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
@@ -3029,13 +3029,13 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			// SIEGE_x: warn the occupants
 			switch (siege_type) {
 				case SIEGE_BURNING: {
-					act("$V burns down!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					act("$V burns down!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 					break;
 				}
 				case SIEGE_PHYSICAL:
 				case SIEGE_MAGICAL:
 				default: {
-					act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+					act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 					break;
 				}
 			}
@@ -3045,7 +3045,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		siege_kill_vehicle_occupants(veh, attacker, by_vehicle, IN_ROOM(veh));
 		
 		if (VEH_SITTING_ON(veh)) {
-			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
+			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			if (!IS_NPC(VEH_SITTING_ON(veh))) {
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, VEH_SITTING_ON(veh), "%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
@@ -3350,11 +3350,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 		default:			/* >= POSITION SLEEPING */
 			if (dam > (GET_MAX_HEALTH(victim) / 10)) {
-				act("&rThat really did HURT!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? TO_COMBAT_HIT : TO_ABILITY));
+				act("&rThat really did HURT!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? ACT_COMBAT_HIT : ACT_ABILITY));
 			}
 
 			if (GET_HEALTH(victim) <= (GET_MAX_HEALTH(victim) / 20)) {
-				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? TO_COMBAT_HIT : TO_ABILITY));
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? ACT_COMBAT_HIT : ACT_ABILITY));
 			}
 
 			break;
@@ -3811,9 +3811,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
 			// cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
-				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR | TO_ABILITY);
-				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
-				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT | TO_ABILITY);
+				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
+				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
+				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT | ACT_ABILITY);
 				
 				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
 
@@ -3827,9 +3827,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
 				affect_join(victim, af, 0);
 				
-				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR | TO_ABILITY);
-				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT | TO_ABILITY);
-				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT | TO_ABILITY);
+				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
+				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
+				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT | ACT_ABILITY);
 
 				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);

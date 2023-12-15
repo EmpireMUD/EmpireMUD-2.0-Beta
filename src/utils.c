@@ -3118,7 +3118,7 @@ EVENTFUNC(check_leading_event) {
 	
 	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
-		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
@@ -3492,22 +3492,22 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			}
 			case APPLY_RES_CRAFT: {
 				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
 			}
 			case APPLY_RES_REPAIR: {
 				if (!messaged_char) {
-					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room) {
-					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
@@ -3533,10 +3533,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3567,10 +3567,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3667,19 +3667,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
 				case APPLY_RES_REPAIR: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}

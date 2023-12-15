@@ -1234,7 +1234,7 @@ ACMD(do_boost) {
 	free(af);
 	
 	if (boost_data[pos].msg) {
-		act(boost_data[pos].msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+		act(boost_data[pos].msg, FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
 	}
 	
 	gain_ability_exp(ch, ABIL_BOOST, 20);
@@ -1272,9 +1272,9 @@ ACMD(do_claws) {
 		}
 	}
 
-	act("You focus your blood into your hands...", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
-	act("Your fingers grow into grotesque claws!", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
-	act("$n's fingers grow into giant claws!", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
+	act("You focus your blood into your hands...", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
+	act("Your fingers grow into grotesque claws!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
+	act("$n's fingers grow into giant claws!", TRUE, ch, NULL, NULL, TO_ROOM | ACT_BUFF);
 	
 	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
 	affect_join(ch, af, 0);
@@ -1622,20 +1622,20 @@ ACMD(do_regenerate) {
 			case REGEN_HEALTH: {
 				heal(ch, ch, amount);
 				snprintf(buf, sizeof(buf), "You focus your blood into regeneration.%s", report_healing(ch, amount, ch));
-				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
+				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 				break;
 			}
 			case REGEN_MANA: {
 				set_mana(ch, GET_MANA(ch) + amount);
-				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
+				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 				break;
 			}
 			case REGEN_MOVE: {
 				set_move(ch, GET_MOVE(ch) + amount);
-				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
+				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 				break;
 			}
 		}

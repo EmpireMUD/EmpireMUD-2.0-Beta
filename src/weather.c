@@ -906,7 +906,7 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		// ok: show it
 		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
-		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM);
+		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM | ACT_STR_OBJ);
 		return TRUE;
 	}
 	

@@ -420,7 +420,7 @@ ACMD(do_point) {
 		if (ch->desc) {
 			clear_last_act_message(ch->desc);
 		}
-		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR);
+		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR | (obj ? NOBITS : ACT_VEH_OBJ));
 		if (ch->desc && ch->desc->last_act_message) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, ch->desc->last_act_message, FALSE, 0, NOTHING);
 		}
@@ -433,7 +433,7 @@ ACMD(do_point) {
 				
 				color = CUSTOM_COLOR_CHAR(pers, CUSTOM_COLOR_EMOTE);
 				sprintf(buf, "\t%c%s", color, to_room);
-				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING);
+				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING | (obj ? NOBITS : ACT_VEH_OBJ));
 				
 				// channel history
 				if (pers->desc && pers->desc->last_act_message) {

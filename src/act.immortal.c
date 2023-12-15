@@ -8622,7 +8622,7 @@ ACMD(do_autostore) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		else if (veh) {
-			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
@@ -9830,8 +9830,8 @@ ACMD(do_load) {
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		get_vehicle_interior(veh);	// ensure inside is loaded
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
-		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
-		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 		
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
@@ -10236,9 +10236,9 @@ ACMD(do_purge) {
 				request_vehicle_save_in_world(veh);
 			}
 			
-			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			}
 			extract_vehicle(veh);
 		}
@@ -10490,8 +10490,8 @@ ACMD(do_rescale) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
-		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 	}
 	else if (obj) {
 		// item mode
@@ -10546,13 +10546,13 @@ ACMD(do_restore) {
 	if (veh) {
 		// found vehicle target here
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 
 		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		else {
-			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
@@ -11488,14 +11488,14 @@ ACMD(do_trans) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		send_config_msg(ch, "ok_string");
 	}

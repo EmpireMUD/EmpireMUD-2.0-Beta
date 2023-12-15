@@ -1635,7 +1635,7 @@ EVENTFUNC(obj_hour_event) {
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
 					if (ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM);
+						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 					}
 					start_vehicle_burning(veh);
 					
@@ -2023,7 +2023,7 @@ void point_update_vehicle(vehicle_data *veh) {
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		if (!besiege_vehicle(NULL, veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING, NULL)) {
 			// extracted

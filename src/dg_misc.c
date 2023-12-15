@@ -539,7 +539,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 			
 			// found
 			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 			
 			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
@@ -821,10 +821,10 @@ void send_char_pos(char_data *ch, int dam) {
 			break;
 		default: {                        /* >= POSITION SLEEPING */
 			if (dam > (GET_MAX_HEALTH(ch) / 4)) {
-				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
 			}
 			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4)) {
-				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
 			}
 			break;
 		}

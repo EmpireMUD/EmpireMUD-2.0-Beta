@@ -2444,7 +2444,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	char buf[MAX_STRING_LENGTH];
 	char *msg;
 	
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	#define _AAM_MSG(type)  (use_pos == NOTHING ? get_custom_message(ABIL_CUSTOM_MSGS(abil), (type)) : get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), (type), use_pos))
 	
@@ -2459,7 +2459,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	if (use_pos > 0) {
 		// counts as action spam
@@ -2563,25 +2563,25 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		any = TRUE;
 		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, ovict, vvict, TO_CHAR | act_flags);
+				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
 			}
 		}
 		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, vvict, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
 		}
 	
 		// to room
 		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
-				act(msg, invis, ch, ovict, vvict, TO_ROOM | act_flags);
+				act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 			}
 		}
 		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
-			act(buf, invis, ch, ovict, vvict, TO_ROOM | act_flags);
+			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		}
 	}
 	
@@ -2618,34 +2618,34 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 	// to-char
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR))) {
 		if (*msg != '*') {
-			act(msg, FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+			act(msg, FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
 		}
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
 	}
 	
 	// to vict
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT))) {
 		if (*msg != '*') {
-			act(msg, FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+			act(msg, FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 		}
 	}
 	else {
 		snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 	}
 	
 	// to room
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM))) {
 		if (*msg != '*') {
-			act(msg, FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+			act(msg, FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 		}
 	}
 	else {
 		snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-		act(buf, FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+		act(buf, FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 	}
 }
 
@@ -2661,7 +2661,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 */
 void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool invis;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	char *msg;
 	
 	if (!ch || !abil) {
@@ -2674,7 +2674,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	// mark this now
@@ -2781,7 +2781,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	if (!ch || !abil || !vict) {
 		return;	// no work
@@ -2793,7 +2793,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	if (quantity > 1) {
@@ -2850,7 +2850,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -2862,7 +2862,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	if (quantity > 1) {
@@ -2911,7 +2911,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	if (!ch || !abil || !vvict) {
 		return;	// no work
@@ -2923,7 +2923,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	if (quantity > 1) {
@@ -2937,7 +2937,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
-		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | act_flags);
+		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
 		free(repl);
 	
 		// mark this now
@@ -2950,7 +2950,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
-		act(repl, invis, ch, NULL, vvict, TO_ROOM | act_flags);
+		act(repl, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		free(repl);
 	}
 }
@@ -2979,7 +2979,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	char tok[4];
 	char *msg, *repl;
 	int iter;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -2991,7 +2991,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	// to-char ONLY if there's a custom message
@@ -3055,7 +3055,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 */
 void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool any, invis;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	char *msg;
 	
 	if (!ch || !abil) {
@@ -3069,7 +3069,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
@@ -3132,7 +3132,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct ability_exec *data) {
 	bool invis;
 	char *msg;
-	bitvector_t act_flags = TO_ABILITY;
+	bitvector_t act_flags = ACT_ABILITY;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -3144,7 +3144,7 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
 		// non-violent buff
-		act_flags |= TO_BUFF;
+		act_flags |= ACT_BUFF;
 	}
 	
 	// to-char
@@ -4431,7 +4431,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
 				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
-					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR);
+					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | ACT_VEH_VICT);
 					CANCEL_ABILITY(data);
 					return;
 				}

@@ -395,15 +395,15 @@ ACMD(do_confer) {
 		// messaging
 		if (ch == vict) {
 			snprintf(buf, sizeof(buf), "You confer your own strength into %s!", confer_list[type].name);
-			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
 			// no message to room!
 		}
 		else {
 			sprintf(buf, "You confer your strength into $N's %s!", confer_list[type].name);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_BUFF);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | ACT_BUFF);
 			sprintf(buf, "$n confers $s strength into your %s!", confer_list[type].name);
-			act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_BUFF);
-			act("$n confers $s strength into $N!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_BUFF);
+			act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_BUFF);
+			act("$n confers $s strength into $N!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_BUFF);
 		}
 		
 		// determine how much to give: based on what a point of strength is worth
@@ -483,8 +483,8 @@ ACMD(do_counterspell) {
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		
-		act("You ready a counterspell.", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
-		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
+		act("You ready a counterspell.", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
+		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_BUFF);
 		
 		af = create_flag_aff(ATYPE_COUNTERSPELL, 30 * SECS_PER_REAL_MIN, 0, ch);
 		affect_join(ch, af, 0);
@@ -703,18 +703,18 @@ ACMD(do_heal) {
 		amount *= 0.75;
 		amount = MAX(1, amount);
 		
-		act("You muster up as much mana as you can and send out a shockwave, healing the entire party!", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-		act("$n draws up as much mana as $e can and sends it out in a shockwave, healing $s entire party!", FALSE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+		act("You muster up as much mana as you can and send out a shockwave, healing the entire party!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
+		act("$n draws up as much mana as $e can and sends it out in a shockwave, healing $s entire party!", FALSE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 			if (!IS_DEAD(ch_iter) && in_same_group(ch, ch_iter)) {
 				heal(ch, ch_iter, amount);
 				
 				snprintf(buf, sizeof(buf), "You heal $N!%s", report_healing(ch_iter, amount, ch));
-				act(buf, FALSE, ch, NULL, ch_iter, TO_CHAR | TO_HEAL);
+				act(buf, FALSE, ch, NULL, ch_iter, TO_CHAR | ACT_HEAL);
 				
 				snprintf(buf, sizeof(buf), "You are healed!%s", report_healing(ch_iter, amount, ch_iter));
-				act(buf, FALSE, ch, NULL, ch_iter, TO_VICT | TO_HEAL);
+				act(buf, FALSE, ch, NULL, ch_iter, TO_VICT | ACT_HEAL);
 				
 				if (FIGHTING(ch_iter) && !FIGHTING(ch)) {
 					engage_combat(ch, FIGHTING(ch_iter), FALSE);
@@ -730,18 +730,18 @@ ACMD(do_heal) {
 		
 		if (ch == vict) {
 			snprintf(buf, sizeof(buf), "You swirl your mana around your body to heal your wounds.%s", report_healing(vict, amount, ch));
-			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | ACT_HEAL);
 			
-			act("$n's body swirls with mana and $s wounds seem to heal.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
+			act("$n's body swirls with mana and $s wounds seem to heal.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_HEAL);
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You let your mana pulse and wave around $N, healing $S wounds.%s", report_healing(vict, amount, ch));
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_HEAL);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | ACT_HEAL);
 			
 			snprintf(buf, sizeof(buf), "$n sends forth a wave of mana, which pulses through your body and heals your wounds.%s", report_healing(vict, amount, vict));
-			act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_HEAL);
+			act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_HEAL);
 			
-			act("A wave of mana shoots from $n to $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | TO_HEAL);
+			act("A wave of mana shoots from $n to $N, healing $S wounds.", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_HEAL);
 		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
@@ -1162,15 +1162,15 @@ ACMD(do_skybrand) {
 	
 	// counterspell??
 	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
-		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
-		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
-		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+		act("You can't seem to mark $N with the skybrand!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
+		act("$n tries to mark you with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
+		act("$n tries to mark $N with a skybrand, but fails!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 	}
 	else {
 		// succeed
-		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR | TO_ABILITY);
-		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT | TO_ABILITY);
-		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT | TO_ABILITY);
+		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
+		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
+		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);

@@ -1037,7 +1037,7 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 		is_spammy = TRUE;
 	}
 	
-	if (IS_SET(act_flags, TO_ANIMAL_MOVE)) {
+	if (IS_SET(act_flags, ACT_ANIMAL_MOVE)) {
 		is_animal_move = TRUE;
 	}
 
@@ -1059,10 +1059,10 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 		if (ch && IN_ROOM(ch)) {
 			list = ROOM_PEOPLE(IN_ROOM(ch));
 		}
-		else if (!IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
+		else if (!IS_SET(act_flags, ACT_VEH_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
 			list = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
 		}
-		else if (IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
+		else if (IS_SET(act_flags, ACT_VEH_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
 			list = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
 		}
 		
@@ -1225,14 +1225,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 
 	const char *ACTNULL = "<NULL>";
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
+	#define IAF(flag)  IS_SET(act_flags, (flag))
 	
 	// check group?
-	if (IS_SET(act_flags, TO_GROUP_ONLY) && to != ch && (!GROUP(to) || GROUP(to) != GROUP(ch))) {
+	if (IAF(TO_GROUP_ONLY) && to != ch && (!GROUP(to) || GROUP(to) != GROUP(ch))) {
 		return;
 	}
 	
 	// check fight messages (may exit early)
-	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_BUFF)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF)) {
 		show = any = FALSE;
 		if (!show && vict_obj && to == vict_obj) {
 			any = TRUE;
@@ -1242,7 +1243,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
 		}
-		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_BUFFS_IN_COMBAT);
 		}
@@ -1255,7 +1256,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_AFFECT)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT)) {
 		// aff flags in combat
 		show = any = FALSE;
 		if (!show && to == ch) {
@@ -1266,7 +1267,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
 		}
-		if (!show && vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+		if (!show && vict_obj && to != ch && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
 		}
@@ -1278,7 +1279,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IS_SET(act_flags, TO_ABILITY)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1292,7 +1293,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ME);
 		}
-		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ALLIES);
 		}
@@ -1313,7 +1314,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && IS_SET(act_flags, TO_HEAL)) {
+	if (!IS_NPC(to) && IAF(ACT_HEAL)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1327,7 +1328,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ME);
 		}
-		if (!show && vict_obj && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 			any = TRUE;
 			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ALLIES);
 		}
@@ -1344,10 +1345,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
+	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS)) {
 		show = any = FALSE;
 		// hits
-		if (IS_SET(act_flags, TO_COMBAT_HIT)) {
+		if (IAF(ACT_COMBAT_HIT)) {
 			if (!show && to == ch && !vict_obj) {
 				any = TRUE;	// hitting self with no vict-obj
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ME);
@@ -1364,7 +1365,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_HITS);
 			}
-			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ALLIES);
 			}
@@ -1381,7 +1382,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			}
 		}
 		// misses
-		if (IS_SET(act_flags, TO_COMBAT_MISS)) {
+		if (IAF(ACT_COMBAT_MISS)) {
 			if (!show && to == ch && !vict_obj) {
 				any = TRUE;	// hitting self with no vict-obj
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
@@ -1398,7 +1399,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_MISSES);
 			}
-			if (!show && vict_obj && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ALLIES);
 			}
@@ -1426,22 +1427,35 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	for (;;) {
 		if (*orig == '$') {
 			switch (*(++orig)) {
-				case 'n':
+				case 'n': {
 					i = PERS(ch, (char_data*)to, FALSE);
 					break;
-				case 'N':
+				}
+				case 'N': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $N with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, FALSE));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'o':
+				}
+				case 'o': {
+					if (IAF(ACT_NON_OBJ_OBJ)) {
+						log("SYSERR: Using $o with a non-obj obj flag: %s", orig);
+					}
 					i = PERS(ch, (char_data*)to, TRUE);
 					real_ch = TRUE;
 					break;
-				case 'O':
+				}
+				case 'O': {
+					if (!IAF(ACT_OBJ_VICT)) {
+						log("SYSERR: Using $O without ACT_OBJ_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
 					real_vict = TRUE;
 					break;
+				}
 				case 'k': {	// loyalty/empire adjective of $n
 					if (GET_LOYALTY(ch)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
@@ -1453,6 +1467,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'K': {	// loyalty/empire adjective of $N
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $K with a non-mob vict_obj flag: %s", orig);
+					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
@@ -1474,6 +1491,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'L': {	// loyalty/empire name of $N
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $L with a non-mob vict_obj flag: %s", orig);
+					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
@@ -1484,64 +1504,114 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					break;
 				}
-				case 'm':
+				case 'm': {
 					i = real_ch ? REAL_HMHR(ch) : HMHR(ch);
 					break;
-				case 'M':
+				}
+				case 'M': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $M with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HMHR((char_data*) vict_obj) : HMHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 's':
+				}
+				case 's': {
 					i = real_ch ? REAL_HSHR(ch) : HSHR(ch);
 					break;
-				case 'S':
+				}
+				case 'S': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $S with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSHR((char_data*) vict_obj) : HSHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'e':
+				}
+				case 'e': {
 					i = real_ch ? REAL_HSSH(ch) : HSSH(ch);
 					break;
-				case 'E':
+				}
+				case 'E': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $E with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSSH((char_data*) vict_obj) : HSSH((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'p':
+				}
+				case 'p': {
+					if (IAF(ACT_NON_OBJ_OBJ)) {
+						log("SYSERR: Using $p with a non-obj obj flag: %s", orig);
+					}
 					CHECK_NULL(obj, OBJS((obj_data*)obj, (char_data*)to));
 					break;
-				case 'P':
+				}
+				case 'P': {
+					if (!IAF(ACT_OBJ_VICT)) {
+						log("SYSERR: Using $P without ACT_OBJ_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
 					dg_target = (obj_data*) vict_obj;
 					break;
-				case 'a':
+				}
+				case 'a': {
+					if (IAF(ACT_NON_OBJ_OBJ)) {
+						log("SYSERR: Using $a with a non-obj obj flag: %s", orig);
+					}
 					CHECK_NULL(obj, SANA((obj_data*)obj));
 					break;
-				case 'A':
+				}
+				case 'A': {
+					if (!IAF(ACT_OBJ_VICT)) {
+						log("SYSERR: Using $A without ACT_OBJ_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
 					dg_target = (obj_data*) vict_obj;
 					break;
-				case 'T':
+				}
+				case 'T': {
+					if (!IAF(ACT_STR_VICT)) {
+						log("SYSERR: Using $T without ACT_STR_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (const char *) vict_obj);
 					dg_arg = (char *) vict_obj;
 					break;
-				case 't':
+				}
+				case 't': {
+					if (!IAF(ACT_STR_OBJ)) {
+						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
+					}
 					CHECK_NULL(obj, (char *) obj);
 					break;
-				case 'F':
+				}
+				case 'F': {
+					if (!IAF(ACT_STR_VICT)) {
+						log("SYSERR: Using $F without ACT_STR_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
-				case 'v': {	// $v: vehicle -- you need to pass ACT_VEHICLE_OBJ to use this
+				}
+				case 'v': {	// $v: vehicle
+					if (!IAF(ACT_VEH_OBJ)) {
+						log("SYSERR: Using $v without ACT_VEH_OBJ: %s", orig);
+					}
 					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
 					break;
 				}
 				case 'V': {	// $V: vehicle
+					if (!IAF(ACT_VEH_VICT)) {
+						log("SYSERR: Using $V without ACT_VEH_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
 					break;
 				}
-				case '$':
+				case '$': {
 					i = "$";
 					break;
+				}
 				default: {
-					if (!IS_SET(act_flags, TO_IGNORE_BAD_CODE)) {
+					if (!IAF(TO_IGNORE_BAD_CODE)) {
 						log("SYSERR: Illegal $-code to act(): %c", *orig);
 						log("SYSERR: %s", orig);
 						i = "";
@@ -1583,7 +1653,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		to->desc->last_act_message = strdup(lbuf);
 		
-		if (IS_SET(act_flags, TO_QUEUE)) {
+		if (IAF(TO_QUEUE)) {
 			stack_simple_msg_to_desc(to->desc, lbuf);
 		}
 		else {	// send normally
@@ -1592,7 +1662,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
-		act_mtrigger(to, lbuf, ch, dg_victim, IS_SET(act_flags, ACT_VEHICLE_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
+		act_mtrigger(to, lbuf, ch, dg_victim, IAF(ACT_NON_OBJ_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
 

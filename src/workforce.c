@@ -2194,7 +2194,7 @@ INTERACTION_FUNC(one_dig_chore) {
 			else {
 				sprintf(buf, "$n digs up %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
-			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 		}
 		return TRUE;
 	}
@@ -2331,7 +2331,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 	if (worker && can_do) {
 		charge_workforce(emp, CHORE_DISMANTLE_MINES, room, worker, 1, NOTHING, 0);
 		if (veh) {
-			act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			start_dismantle_vehicle(veh);
 		}
 		else {
@@ -2945,7 +2945,7 @@ INTERACTION_FUNC(one_production_chore) {
 			else {
 				sprintf(buf, "$n produces %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
-			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 		}
 		return TRUE;
 	}
@@ -3236,17 +3236,17 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		if (!VEH_NEEDS_RESOURCES(veh)) {
 			if (chore == CHORE_MAINTENANCE) {
 				add_workforce_production_log(emp, WPLOG_MAINTENANCE, 0, 1);
-				act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+				act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			}
 			else {
 				add_workforce_production_log(emp, WPLOG_VEHICLE_DONE, VEH_VNUM(veh), 1);
-				act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+				act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			}
 			complete_vehicle(veh);
 		}
 		else {
 			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
-			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 			request_vehicle_save_in_world(veh);
 		}
 	}
@@ -3330,7 +3330,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 			}
 		}
 		else {	// still working on it
-			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 		}
 	}
 	else if (can_do) {

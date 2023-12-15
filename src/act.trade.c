@@ -778,9 +778,9 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
 	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 }
 
 
@@ -1307,7 +1307,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		return;
 	}
 	if (VEH_IS_DISMANTLING(veh)) {
-		act("You can't work on $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("You can't work on $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -1346,7 +1346,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
-		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		
 		// WARNING: complete_vehicle runs triggers that could purge the vehicle
 		complete_vehicle(veh);
@@ -1945,9 +1945,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	}
 	
 	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	
 	process_gen_craft_vehicle(ch, type);
 	request_vehicle_save_in_world(veh);

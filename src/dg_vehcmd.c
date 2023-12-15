@@ -685,7 +685,7 @@ VCMD(do_vpurge) {
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(v);
 	}

@@ -3689,8 +3689,8 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 		if (GET_LOYALTY(ch) != VEH_OWNER(veh)) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s abandoned %s owned by %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(ch)));
 		}
-		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		perform_abandon_vehicle(veh);
 	}
 }
@@ -4214,10 +4214,10 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
 		send_config_msg(ch, "ok_string");
 		if (GET_LOYALTY(ch) != emp) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has claimed %s for %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(emp), room_log_identifier(IN_ROOM(ch)));
-			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		else {
-			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		perform_claim_vehicle(veh, emp);
 	}

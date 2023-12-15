@@ -333,8 +333,8 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	}
 	else {
 		if (cont) {
-			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
-			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR | ACT_OBJ_VICT);
+			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM | ACT_OBJ_VICT);
 			
 			// use the water
 			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
@@ -682,8 +682,8 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 		
 		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 			if (into_veh) {
-				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEHICLE_OBJ);
-				act("$n skillfully herds $N into $v.", FALSE, ch, into_veh, mob, TO_ROOM | ACT_VEHICLE_OBJ);
+				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEH_OBJ);
+				act("$n skillfully herds $N into $v.", FALSE, ch, into_veh, mob, TO_ROOM | ACT_VEH_OBJ);
 			}
 			else if (out) {
 				act("You skillfully herd $N out.", FALSE, ch, NULL, mob, TO_CHAR);
@@ -946,18 +946,18 @@ INTERACTION_FUNC(skin_interact) {
 	
 	// only show loot to the skinner
 	if (!obj_ok) {
-		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR);
-		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM);
+		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else if (interaction->quantity > 1) {
 		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
-		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
+		act(buf, FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
 		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
-		act(buf, FALSE, ch, obj, inter_item, TO_ROOM);
+		act(buf, FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else {
-		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR);
-		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM);
+		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	
 	return TRUE;

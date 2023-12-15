@@ -1148,7 +1148,7 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 		// but this purge CANNOT be prevented by the trigger
 		if (destroy_vtrigger(veh, "despawn")) {		
 			if (ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 		}
 		
@@ -1332,7 +1332,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 							scale_vehicle_to_level(veh, INST_LEVEL(inst));
 						}
 						if (ROOM_PEOPLE(IN_ROOM(veh))) {
-							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 						}
 						load_vtrigger(veh);
 					}
