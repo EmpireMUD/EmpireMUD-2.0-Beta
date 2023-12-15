@@ -185,7 +185,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
 // #define ABIL_FAMILIAR  122
-#define ABIL_SKYBRAND  125
+// #define ABIL_SKYBRAND  125
 // #define ABIL_CHANT_OF_NATURE  126
 // formerly: #define ABIL_REWARD  127
 // formerly: #define ABIL_SUMMON_GUARDS  128

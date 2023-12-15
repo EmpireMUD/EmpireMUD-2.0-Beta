@@ -375,7 +375,6 @@ ACMD(do_sire);
 ACMD(do_sit);
 ACMD(do_skills);
 ACMD(do_skin);
-ACMD(do_skybrand);
 ACMD(do_slash_channel);
 ACMD(do_slay);
 ACMD(do_sleep);
@@ -980,7 +979,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "sit", POS_RESTING, do_sit, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "skills", POS_DEAD, do_skills, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "skin", POS_STANDING, do_skin, NO_MIN, CTYPE_SKILL ),
-	ABILITY_CMD( "skybrand", POS_FIGHTING, do_skybrand, NO_MIN, CTYPE_COMBAT, ABIL_SKYBRAND ),
 	SIMPLE_CMD( "sleep", POS_SLEEPING, do_sleep, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SLAY ),
 	STANDARD_CMD( "smelt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),

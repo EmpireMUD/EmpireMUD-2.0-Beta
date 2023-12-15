@@ -164,7 +164,7 @@ ACMD(do_damage_spell) {
 	}
 	
 	// cost calculations
-	cost = round((dmg + dot_dmg) * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND) * damage_spell[type].cost_mod);
+	cost = round((dmg + dot_dmg) * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, subcmd) * damage_spell[type].cost_mod);
 	
 	// check ability and cost
 	if (!can_use_ability(ch, subcmd, MANA, cost, damage_spell[type].cooldown_type)) {

@@ -832,15 +832,14 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
+Linked trait:  Intelligence
 Cost:  based on damage and skill level
 Debuff type:  magical
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.
 
-In caster or solo role, damage is based on total level, Intelligence, and
-Bonus-Magical damage. In all other roles, it is based on skill level and
-Intelligence only.
+Damage is higher in the caster role.
 
 If you cast this spell with no target, it will target the person you are
 fighting.
