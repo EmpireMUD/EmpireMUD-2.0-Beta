@@ -53,6 +53,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
+void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
@@ -462,7 +463,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 		
 		if (total_points < 0) {	// no work
 			GET_RUNNING_ABILITY_DATA(ch) = NULL;
-			free(data);
+			free_ability_exec(data);
 			return;
 		}
 	}
@@ -514,7 +515,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	}
 	
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
-	free(data);
+	free_ability_exec(data);
 }
 
 
@@ -570,6 +571,57 @@ void check_abilities(void) {
 			ABIL_MASTERY_ABIL(abil) = NOTHING;
 		}
 	}
+}
+
+
+/**
+* Runs simple checks, silently, to see if the ability is likely to be valid.
+* Some of these will be checked again, with messages, later.
+*
+* @param char_data *ch The person performing abilities.
+* @param ability_data *abil The pre-validated ability, which the character has.
+* @return bool TRUE if ok to proceed; FALSE if not.
+*/
+bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
+	// like check_ability_pre_target():
+	if (GET_POS(ch) < ABIL_MIN_POS(abil) || (FIGHTING(ch) && ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT))) {
+		return FALSE;	// min pos or combat
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL) && CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+		return FALSE;	// animal
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT) && AFF_FLAGGED(ch, AFF_NO_ATTACK)) {
+		return FALSE;	// invulnerable
+	}
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && ABIL_IS_VIOLENT(abil)) {
+		return FALSE;	// peaceful
+	}
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, FALSE)) {
+		return FALSE;	// sun fail
+	}
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !CAN_SPEND_BLOOD(ch)) {
+		return FALSE;	// can't spend blood
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_SPOKEN) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
+		return FALSE;	// silent
+	}
+	if (ABIL_REQUIRES_TOOL(abil) && !has_all_tools(ch, ABIL_REQUIRES_TOOL(abil))) {
+		return FALSE;	// missing tools
+	}
+	if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, FALSE, ABIL_NAME(abil))) {
+		return FALSE;	// missing resources
+	}
+	
+	// other checks similar to what will be called with messages in call_ability():
+	if (ABIL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < ABIL_COST(abil)) {
+		return FALSE;	// unlikely to afford cost
+	}
+	if (ABIL_COOLDOWN(abil) != NOTHING && get_cooldown_time(ch, ABIL_COOLDOWN(abil)) > 0) {
+		return FALSE;	// on cooldown
+	}
+	
+	// ok!
+	return TRUE;
 }
 
 
@@ -1596,6 +1648,7 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
+		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, opponent, NULL, NULL, NULL);
 	}
 }
 
@@ -1662,7 +1715,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 
 /**
 * Validates the targets of an ability when first used. Also re-validates on
-* over-time abilities. This sends a message if it fails.
+* over-time abilities.
 *
 * @param char_data *ch The person using the ability.
 * @paran ability_data *abil Which ability.
@@ -1670,45 +1723,62 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 * @param obj_data *ovict Optional: Object target (may be NULL).
 * @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
 * @param room_data *room_targ Optional: The room target (may be NULL if not used).
+* @param bool send_msgs If TRUE, sends a message on failure. If FALSE, is silent.
 * @return bool TRUE if ok, FALSE if failed.
 */
-bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bool send_msgs) {
 	if (!ch || !abil) {
 		return FALSE;	// missing abil
 	}
 	
 	if ((vict == ch) && ABIL_IS_VIOLENT(abil)) {
-		msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
+		if (send_msgs) {
+			msg_to_char(ch, "You can't %s yourself -- that could be bad for your health!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "use that ability on");
+		}
 		return FALSE;
 	}
 	if ((vict == ch) && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
-		msg_to_char(ch, "You cannot use that on yourself!\r\n");
+		if (send_msgs) {
+			msg_to_char(ch, "You cannot use that on yourself!\r\n");
+		}
 		return FALSE;
 	}
 	if (vict && (vict != ch) && IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
-		msg_to_char(ch, "You can only use that on yourself!\r\n");
+		if (send_msgs) {
+			msg_to_char(ch, "You can only use that on yourself!\r\n");
+		}
 		return FALSE;
 	}
 	if (vict && ABIL_IS_VIOLENT(abil) && AFF_FLAGGED(ch, AFF_CHARM) && (GET_LEADER(ch) == vict)) {
-		msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
+		if (send_msgs) {
+			msg_to_char(ch, "You are afraid you might hurt your leader!\r\n");
+		}
 		return FALSE;
 	}
 	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
 		if (!can_fight(ch, vict)) {
-			act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+			if (send_msgs) {
+				act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+			}
 			return FALSE;
 		}
 		if (!ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) && NOT_MELEE_RANGE(ch, vict)) {
-			msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			if (send_msgs) {
+				msg_to_char(ch, "You need to be at melee range to do this.\r\n");
+			}
 			return FALSE;
 		}
 		if (ABILITY_FLAGGED(abil, ABILF_RANGED_ONLY) && !NOT_MELEE_RANGE(ch, vict) && FIGHTING(ch)) {
-			msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
+			if (send_msgs) {
+				msg_to_char(ch, "You need to be in ranged combat to do this.\r\n");
+			}
 			return FALSE;
 		}
 	}
 	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
-		msg_to_char(ch, "You have to use it on the room you're in.\r\n");
+		if (send_msgs) {
+			msg_to_char(ch, "You have to use it on the room you're in.\r\n");
+		}
 		return FALSE;
 	}
 	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ)) {
@@ -3311,7 +3381,6 @@ void perform_over_time_ability(char_data *ch) {
 	vehicle_data *vvict;
 	room_data *room_targ;
 	struct ability_exec *data;
-	struct ability_exec_type *aet, *next_aet;
 	
 	// re-validate ability
 	if (!(abil = ability_proto(abil_vnum)) || !has_ability(ch, abil_vnum) || !check_ability_pre_target(ch, abil)) {
@@ -3321,7 +3390,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ)) {
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, TRUE)) {
 		cancel_action(ch);
 		return;
 	}
@@ -3361,11 +3430,8 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// clean up data
-	LL_FOREACH_SAFE(data->types, aet, next_aet) {
-		free(aet);
-	}
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
-	free(data);
+	free_ability_exec(data);
 }
 
 
@@ -3518,14 +3584,17 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
-	if (run_mode == RUN_ABIL_NORMAL) {
-		// check costs and cooldowns now -- normal run only
+	if (run_mode != RUN_ABIL_OVER_TIME) {
+		// check costs and cooldowns now -- not on over-time
 		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
 			// sends own message
 			data->stop = TRUE;
 			data->should_charge_cost = FALSE;
 			return;
 		}
+	}
+	if (run_mode == RUN_ABIL_NORMAL) {
+		// resource cost check -- normal ONLY
 		if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, TRUE, ABIL_NAME(abil))) {
 			// sends own message
 			data->stop = TRUE;
@@ -3549,8 +3618,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
 	
-	// pre-messages if any
-	if (run_mode == RUN_ABIL_NORMAL) {
+	// pre-messages if any (skip on over-time: already sent)
+	if (run_mode != RUN_ABIL_OVER_TIME) {
 		send_pre_ability_messages(ch, vict, ovict, abil, data);
 	}
 	
@@ -3629,6 +3698,164 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		*/
 			send_ability_fail_messages(ch, vict, ovict, abil, data);
 		// }
+	}
+}
+
+
+/**
+* Attempts to run any abilities that have a matching hook type. This is used
+* to chain abilities, or to let abilities modify damage.
+*
+* @param char_data *ch The player (not supported for NPCS).
+* @param bitvector_t hook_type Which AHOOK_ type is running.
+* @param char_data *vict Optional: Character target (may be NULL).
+* @param obj_data *ovict Optional: Character object (may be NULL).
+* @param vehicle_data *vvict Optional: Character vehicle (may be NULL).
+* @param room_data *room_targ Optional: Character room (may be NULL).
+* @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
+*/
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+	bool any_targ, free_limiter = FALSE;
+	int cap, level;
+	struct ability_hook *ahook;
+	char_data *use_char;
+	obj_data *use_obj;
+	room_data *use_room;
+	vehicle_data *use_veh;
+	struct ability_exec *data;
+	struct player_ability_data *plab, *next_plab;
+	struct vnum_hash **use_limiter = NULL, *my_limiter = NULL;
+	
+	if (IS_NPC(ch) || IS_DEAD(ch) || EXTRACTED(ch)) {
+		return;
+	}
+	
+	// inherit or create a limiter
+	if (GET_RUNNING_ABILITY_LIMITER(ch)) {
+		use_limiter = GET_RUNNING_ABILITY_LIMITER(ch);
+	}
+	else {
+		use_limiter = &my_limiter;
+		GET_RUNNING_ABILITY_LIMITER(ch) = use_limiter;
+		free_limiter = TRUE;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!plab->ptr || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;
+		}
+		if (!ABIL_HAS_HOOK(plab->ptr, hook_type)) {
+			continue;	// shortcut
+		}
+		if (ABILITY_FLAGGED(plab->ptr, ABILF_OVER_TIME)) {
+			log("SYSERR: Hook ability %d %s is flagged OVER-TIME", ABIL_VNUM(plab->ptr), ABIL_NAME(plab->ptr));
+			continue;
+		}
+		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(plab->ptr))) {
+			continue;	// already ran
+		}
+		
+		LL_FOREACH(ABIL_HOOKS(plab->ptr), ahook) {
+			if (!IS_SET(ahook->type, hook_type)) {
+				continue;	// wrong type
+			}
+			if (ahook->value != hook_value) {
+				continue;	// wrong value
+			}
+			if (number(1, 10000) > ahook->percent * 100) {
+				continue;	// failed percent check
+			}
+			if (!pre_check_hooked_ability(ch, plab->ptr)) {
+				continue;	// unlikely to succeed
+			}
+			
+			// incoming targets
+			use_char = vict;
+			use_obj = ovict;
+			use_veh = vvict;
+			use_room = room_targ;
+			
+			// compare targets
+			if (IS_SET(ABIL_TARGETS(plab->ptr), ATAR_SELF_ONLY)) {
+				use_char = ch;	// convert to self
+			}
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_FIGHT_VICT)) {
+				use_char = FIGHTING(ch);	// set to self
+			}
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_FIGHT_SELF)) {
+				use_char = ch;	// set to self
+			}
+			if (IS_SET(ABIL_TARGETS(plab->ptr), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
+				use_room = IN_ROOM(ch);	// convert to this room
+			}
+				
+			// validation of targets
+			if (use_char == ch && (ABIL_IS_VIOLENT(plab->ptr) || IS_SET(ABIL_TARGETS(plab->ptr), ATAR_NOT_SELF))) {
+				use_char = NULL;	// can't target self
+			}
+			if (use_char && use_char != ch && IN_ROOM(use_char) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)) {
+				use_char = NULL;	// char in wrong room
+			}
+			if (use_char && (IS_DEAD(use_char) || EXTRACTED(use_char))) {
+				use_char = NULL;	// gone
+			}
+			if (use_veh && IN_ROOM(use_veh) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_VEH_WORLD)) {
+				use_veh = NULL;	// veh in wrong room
+			}
+			if (use_veh && VEH_IS_EXTRACTED(use_veh)) {
+				use_veh = NULL;	// gone
+			}
+			
+			// do we have any mandatory targets left?
+			if (!IS_SET(ABIL_TARGETS(plab->ptr), ATAR_IGNORE)) {
+				any_targ = FALSE;
+				if (IS_SET(ABIL_TARGETS(plab->ptr), CHAR_ATARS) && use_char) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(plab->ptr), OBJ_ATARS) && use_obj) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(plab->ptr), VEH_ATARS) && use_veh) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(plab->ptr), ROOM_ATARS) && use_room) {
+					any_targ = TRUE;
+				}
+				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, FALSE)) {
+					continue;	// no apparent targets
+				}
+			}
+			
+			// match!
+			
+			// mark already run FIRST
+			add_vnum_hash(use_limiter, ABIL_VNUM(plab->ptr), 1);
+			
+			// determine level
+			level = get_approximate_level(ch);
+			if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(plab->ptr) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(plab->ptr)))) < CLASS_SKILL_CAP) {
+				level = MIN(level, cap);	// constrain by skill level
+			}
+			
+			// construct data
+			CREATE(data, struct ability_exec, 1);
+			data->abil = plab->ptr;
+			data->should_charge_cost = TRUE;	// may still charge
+			data->matching_role = has_matching_role(ch, plab->ptr, TRUE);
+			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
+			
+			// the big GO
+			call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, level, RUN_ABIL_HOOKED, data);
+			
+			// clean up data
+			GET_RUNNING_ABILITY_DATA(ch) = NULL;
+			free_ability_exec(data);
+		}
+	}
+	
+	if (free_limiter) {
+		GET_RUNNING_ABILITY_LIMITER(ch) = NULL;
+		free_vnum_hash(&my_limiter);
 	}
 }
 
@@ -4081,7 +4308,6 @@ DO_ABIL(do_teleport_ability) {
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
 	char arg[MAX_INPUT_LENGTH], *argptr = arg;
-	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	vehicle_data *vvict = NULL;
@@ -4281,7 +4507,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ)) {
+	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, TRUE)) {
 		// sent own message
 		return;
 	}
@@ -4320,14 +4546,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
 			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 		}
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), vict, ovict, vvict, room_targ);
 	}
 	
 	// 9. clean up data
-	LL_FOREACH_SAFE(data->types, aet, next_aet) {
-		free(aet);
-	}
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
-	free(data);
+	free_ability_exec(data);
 }
 
 
@@ -5177,6 +5401,24 @@ void free_ability(ability_data *abil) {
 	}
 	
 	free(abil);
+}
+
+
+/**
+* Frees the ability execution data when done.
+*
+* @param struct ability_exec *data The data to free.
+*/
+void free_ability_exec(struct ability_exec *data) {
+	struct ability_exec_type *aet;
+	
+	if (data) {
+		while ((aet = data->types)) {
+			data->types = aet->next;
+			free(aet);
+		}
+		free(data);
+	}
 }
 
 

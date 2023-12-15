@@ -162,6 +162,7 @@ bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
 	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE) && check_solo_role(ch)) {
 		if (can_gain_skill) {
 			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BLOOD_FORTITUDE, ch, NULL, NULL, NULL);
 		}
 		return TRUE;
 	}
@@ -597,6 +598,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
 		}
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TASTE_BLOOD, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -764,6 +766,8 @@ void update_biting_char(char_data *ch) {
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
 	gain_ability_exp(ch, ABIL_BITE, 5);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SANGUINE_RESTORATION, ch, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BITE, victim, NULL, NULL, NULL);
 }
 
 
@@ -1081,6 +1085,7 @@ ACMD(do_bite) {
 					gain_player_tech_exp(ch, PTECH_BITE_TANK_UPGRADE, 10);
 				}
 			}
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BITE, victim, NULL, NULL, NULL);
 		}
 		
 		// if this attack would kill them, need to go into blood drinking instead
@@ -1238,6 +1243,7 @@ ACMD(do_boost) {
 	}
 	
 	gain_ability_exp(ch, ABIL_BOOST, 20);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOOST, ch, NULL, NULL, NULL);
 }
 
 
@@ -1285,6 +1291,7 @@ ACMD(do_claws) {
 
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_CLAWS, 20);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLAWS, ch, NULL, NULL, NULL);
 }
 
 
@@ -1359,6 +1366,10 @@ ACMD(do_command) {
 			if (un_charm && !EXTRACTED(victim)) {
 				REMOVE_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			}
+			
+			if (!IS_DEAD(victim) && !EXTRACTED(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VAMP_COMMAND, victim, NULL, NULL, NULL);
+			}
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
@@ -1409,6 +1420,7 @@ ACMD(do_deathshroud) {
 		GET_POS(ch) = POS_SLEEPING;
 		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_ability_exp(ch, ABIL_DEATHSHROUD, 50);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DEATHSHROUD, ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1493,6 +1505,7 @@ ACMD(do_mummify) {
 		free(af);
 		
 		gain_ability_exp(ch, ABIL_MUMMIFY, 50);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MUMMIFY, ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1639,6 +1652,8 @@ ACMD(do_regenerate) {
 				break;
 			}
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REGENERATE, ch, NULL, NULL, NULL);
 	}
 	else {
 		msg_to_char(ch, "You focus your blood but fail to regenerate yourself.\r\n");
@@ -1732,5 +1747,6 @@ ACMD(do_veintap) {
 		request_obj_save_in_world(container);
 		
 		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VEINTAP, NULL, container, NULL, NULL);
 	}
 }

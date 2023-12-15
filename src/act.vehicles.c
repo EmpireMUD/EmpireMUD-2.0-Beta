@@ -459,6 +459,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 					gain_ability_exp(ch, ABIL_STEAL, 50);
 					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 				}
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, NULL, obj, NULL, NULL);
 			}
 			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 				// un-steal if this was the original owner

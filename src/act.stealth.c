@@ -251,6 +251,7 @@ void perform_escape(char_data *ch) {
 		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ESCAPE, ch, NULL, NULL, IN_ROOM(ch));
 	}
 	
 	end_action(ch);
@@ -478,6 +479,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
 		}
+		run_ability_hooks(vict, AHOOK_ABILITY, ABIL_RESIST_POISON, vict, NULL, NULL, NULL);
 		if (!number(0, 2)) {
 			if (GET_POISON_CHARGES(obj) <= 0) {
 				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
@@ -655,6 +657,8 @@ ACMD(do_backstab) {
 				FIGHT_MODE(vict) = FMODE_MELEE;
 				FIGHT_WAIT(vict) = 0;
 			}
+			
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BACKSTAB, vict, NULL, NULL, NULL);
 		}
 		
 		if (can_gain_exp_from(ch, vict)) {
@@ -711,6 +715,8 @@ ACMD(do_disguise) {
 		set_disguise(ch, PERS(vict, vict, FALSE), GET_SEX(vict));
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -862,6 +868,8 @@ ACMD(do_hide) {
 	if (npc_access || has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
+	
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, ch, NULL, NULL, NULL);
 }
 
 
@@ -1062,6 +1070,7 @@ ACMD(do_jab) {
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_STAGGER_JAB, 15, APPLY_TO_HIT, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAGGER_JAB, vict, NULL, NULL, NULL);
 			}
 			
 			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
@@ -1069,6 +1078,7 @@ ACMD(do_jab) {
 				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
 				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 15, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, NOBITS);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CRUCIAL_JAB, vict, NULL, NULL, NULL);
 			}
 			
 			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
@@ -1076,7 +1086,10 @@ ACMD(do_jab) {
 				int value = ceil(GET_CHARISMA(ch) / 5);
 				af = create_mod_aff(ATYPE_SHADOW_JAB, 15, APPLY_DEXTERITY, -value, ch);
 				affect_join(vict, af, ADD_MODIFIER);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SHADOW_JAB, vict, NULL, NULL, NULL);
 			}
+			
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, vict, NULL, NULL, NULL);
 		}
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_JAB, 15);
@@ -1263,6 +1276,8 @@ ACMD(do_prick) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_PRICK, 15);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PRICK, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1328,6 +1343,8 @@ ACMD(do_sap) {
 		
 		// release other saps here
 		limit_crowd_control(vict, ATYPE_SAP);
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SAP, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1439,6 +1456,7 @@ ACMD(do_shadowcage) {
 ACMD(do_sneak) {
 	int dir;
 	bool sneaking = FALSE;
+	room_data *was_in = IN_ROOM(ch);
 
 	// Already sneaking? Allow without skill
 	if (AFF_FLAGGED(ch, AFF_SNEAK)) {
@@ -1498,6 +1516,10 @@ ACMD(do_sneak) {
 	
 	if (!sneaking) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_SNEAK);
+	}
+	
+	if (IN_ROOM(ch) != was_in) {
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1571,6 +1593,7 @@ ACMD(do_steal) {
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, NULL, NULL, NULL, NULL);
 				}
 			}
 		}

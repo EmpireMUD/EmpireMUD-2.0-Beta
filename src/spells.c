@@ -49,6 +49,7 @@ bool trigger_counterspell(char_data *ch) {
 		msg_to_char(ch, "Your counterspell goes off!\r\n");
 		affect_from_char(ch, ATYPE_COUNTERSPELL, FALSE);
 		gain_ability_exp(ch, ABIL_COUNTERSPELL, 100);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_COUNTERSPELL, NULL, NULL, NULL, NULL);
 		return TRUE;
 	}
 	
@@ -237,6 +238,7 @@ ACMD(do_damage_spell) {
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, subcmd, 15);
 	}
+	run_ability_hooks(ch, AHOOK_ABILITY, subcmd, vict, NULL, NULL, NULL);
 }
 
 
@@ -246,7 +248,7 @@ ACMD(do_damage_spell) {
 ACMD(do_ready) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;
-	int scale_level, ch_level = 0, pos;
+	int scale_level, ch_level = 0, pos, obj_ok;
 	ability_data *abil, *found_abil;
 	bool found, full, later = TRUE;
 	struct ability_data_list *adl;
@@ -453,6 +455,8 @@ ACMD(do_ready) {
 	
 	gain_ability_exp(ch, ABIL_VNUM(found_abil), 15);
 	
-	load_otrigger(obj);
+	obj_ok = load_otrigger(obj);
 	// this goes directly to equipment so a GET trigger does not fire
+	
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(found_abil), NULL, (obj_ok ? obj : NULL), NULL, NULL);
 }

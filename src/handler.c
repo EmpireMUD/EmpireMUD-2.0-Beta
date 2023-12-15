@@ -5208,6 +5208,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 						switch (res->type) {
 							case INTERACT_RESTRICT_ABILITY: {
 								gain_ability_exp(ch, res->vnum, 5);
+								run_ability_hooks(ch, AHOOK_ABILITY, res->vnum, inter_mob, inter_item, inter_veh, inter_room);
 								break;
 							}
 							case INTERACT_RESTRICT_PTECH: {

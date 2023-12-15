@@ -839,6 +839,7 @@ void finish_building(char_data *ch, room_data *room) {
 			if (!emp || GET_LOYALTY(c) == emp) {
 				if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 3);
+					run_ability_hooks(c, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), NULL, NULL, NULL, room);
 				}
 			}
 		}
@@ -1144,6 +1145,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 			// skillups (building only)
 			if (type && act_type == ACT_BUILDING && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 				gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
+				run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), NULL, NULL, NULL, room);
 			}
 		}
 		else {
@@ -2822,6 +2824,7 @@ ACMD(do_lay) {
 		// skillup before sect change
 		if (SECT_FLAGGED(check_sect, SECTF_ROUGH)) {
 			gain_ability_exp(ch, ABIL_PATHFINDING, 15);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PATHFINDING, NULL, NULL, NULL, IN_ROOM(ch));
 		}
 				
 		// change it over

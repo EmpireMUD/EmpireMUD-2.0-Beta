@@ -434,29 +434,6 @@ struct attack_hit_type {
 };
 
 
-// passes data throughout an ability call
-struct ability_exec {
-	ability_data *abil;	// which ability (pointer)
-	bool stop;	// indicates no further types should process
-	bool success;	// indicates the player should be charged
-	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
-	bool no_msg;	// indicates you shouldn't send messages
-	bool matching_role;	// if FALSE, no bonuses from matching role
-	int cost;	// for types that raise the cost later
-	bool should_charge_cost;	// if TRUE, will charge regardless of success
-	
-	struct ability_exec_type *types;	// LL of type data
-};
-
-
-// preliminary data from ability setup
-struct ability_exec_type {
-	bitvector_t type;
-	double scale_points;
-	struct ability_exec_type *next;
-};
-
-
 // constants.c externs that need skills.h
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const double armor_scale_bonus[NUM_ARMOR_TYPES];

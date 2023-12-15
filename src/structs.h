@@ -758,6 +758,7 @@ typedef struct vehicle_data vehicle_data;
 // RUN_ABIL_x: modes for activating abilities
 #define RUN_ABIL_NORMAL  0	// normal command activation
 #define RUN_ABIL_OVER_TIME  1	// an over-time ability running its final code
+#define RUN_ABIL_HOOKED  2	// called from a hook (triggered) ability
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3928,6 +3929,29 @@ struct ability_type {
 };
 
 
+// passes data throughout an ability call
+struct ability_exec {
+	ability_data *abil;	// which ability (pointer)
+	bool stop;	// indicates no further types should process
+	bool success;	// indicates the player should be charged
+	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
+	bool no_msg;	// indicates you shouldn't send messages
+	bool matching_role;	// if FALSE, no bonuses from matching role
+	int cost;	// for types that raise the cost later
+	bool should_charge_cost;	// if TRUE, will charge regardless of success
+	
+	struct ability_exec_type *types;	// LL of type data
+};
+
+
+// preliminary data from ability setup
+struct ability_exec_type {
+	bitvector_t type;
+	double scale_points;
+	struct ability_exec_type *next;
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE STRUCTS ///////////////////////////////////////////////////////
 
@@ -5035,6 +5059,7 @@ struct char_special_data {
 	int carry_items;	// Number of items carried
 	
 	struct ability_exec *running_ability_data;	// while running an ability, its data is here for reference anywhere
+	struct vnum_hash **running_ability_limiter;	// while running a chain of abilities, stores the limiter here
 	struct stored_event *stored_events;	// linked list of stored dg events
 };
 

@@ -312,6 +312,8 @@ ACMD(do_disenchant) {
 				}
 			}
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, NULL, obj, NULL, NULL);
 	}
 }
 
@@ -380,6 +382,8 @@ ACMD(do_dispel) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISPEL, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -445,6 +449,7 @@ ACMD(do_enervate) {
 		affect_join(ch, af2, 0);
 
 		engage_combat(ch, vict, FALSE);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ENERVATE, vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -645,6 +650,7 @@ ACMD(do_mirrorimage) {
 	
 	add_follower(mob, ch, FALSE);
 	gain_ability_exp(ch, ABIL_MIRRORIMAGE, 15);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MIRRORIMAGE, mob, NULL, NULL, NULL);
 	
 	load_mtrigger(mob);
 }
@@ -721,6 +727,7 @@ ACMD(do_siphon) {
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SIPHON, vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -809,5 +816,7 @@ ACMD(do_vigor) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VIGOR, vict, NULL, NULL, NULL);
 	}
 }

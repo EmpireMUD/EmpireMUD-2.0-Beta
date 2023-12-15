@@ -401,6 +401,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
 #define GET_ROPE_VNUM(ch)  ((ch)->char_specials.rope_vnum)
 #define GET_RUNNING_ABILITY_DATA(ch)  ((ch)->char_specials.running_ability_data)
+#define GET_RUNNING_ABILITY_LIMITER(ch)  ((ch)->char_specials.running_ability_limiter)
 #define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
@@ -2044,6 +2045,7 @@ void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ);
 void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data);
 void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);

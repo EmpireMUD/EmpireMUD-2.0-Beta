@@ -446,6 +446,7 @@ bool point_update_player(char_data *ch) {
 	
 	if (GET_MOUNT_LIST(ch)) {
 		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STABLEMASTER, ch, NULL, NULL, NULL);
 	}
 	
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
@@ -2335,6 +2336,7 @@ int mana_gain(char_data *ch, bool info_only) {
 			
 				if (!info_only) {
 					gain_ability_exp(ch, ABIL_SOLAR_POWER, 1);
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SOLAR_POWER, ch, NULL, NULL, NULL);
 				}
 			}
 		}

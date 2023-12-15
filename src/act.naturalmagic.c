@@ -282,6 +282,8 @@ ACMD(do_cleanse) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLEANSE, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -572,6 +574,7 @@ ACMD(do_earthmeld) {
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_EARTHMELD, NULL, NULL, NULL, NULL);
 }
 
 
@@ -721,6 +724,8 @@ ACMD(do_heal) {
 				}
 				
 				will_gain |= can_gain_exp_from(ch, ch_iter);
+				
+				run_ability_hooks(ch, AHOOK_ABILITY, abil, ch_iter, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -749,6 +754,10 @@ ACMD(do_heal) {
 		}
 		
 		will_gain = can_gain_exp_from(ch, vict);
+		run_ability_hooks(ch, AHOOK_ABILITY, abil, vict, NULL, NULL, NULL);
+		if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, vict, NULL, NULL, NULL);
+		}
 	}
 	
 	if (abil != NO_ABIL && will_gain) {
@@ -897,6 +906,8 @@ ACMD(do_purify) {
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1025,6 +1036,11 @@ ACMD(do_rejuvenate) {
 
 	if (FIGHTING(vict) && !FIGHTING(ch)) {
 		engage_combat(ch, FIGHTING(vict), FALSE);
+	}
+	
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, vict, NULL, NULL, NULL);
+	if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1174,6 +1190,7 @@ ACMD(do_skybrand) {
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 30, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, TRUE);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SKYBRAND, vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -1220,5 +1237,7 @@ ACMD(do_soulsight) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
 		}
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SOULSIGHT, vict, NULL, NULL, NULL);
 	}
 }
