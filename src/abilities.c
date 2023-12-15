@@ -6840,7 +6840,7 @@ OLC_MODULE(abiledit_affectvnum) {
 	
 	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
@@ -7024,7 +7024,7 @@ OLC_MODULE(abiledit_attacktype) {
 	
 	bitvector_t allowed_types = ABILT_DAMAGE;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
@@ -7104,42 +7104,25 @@ OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char arg2[MAX_INPUT_LENGTH];
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | conjure_types)) {
-		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
-	}
-	else {
-		two_arguments(argument, arg, arg2);
-		ABIL_COST(abil) = olc_process_number(ch, arg, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
-		
-		// optional cost type: pass through
-		if (*arg2) {
-			abiledit_costtype(ch, type, arg2);
-		}
+	two_arguments(argument, arg, arg2);
+	ABIL_COST(abil) = olc_process_number(ch, arg, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
+	
+	// optional cost type: pass through
+	if (*arg2) {
+		abiledit_costtype(ch, type, arg2);
 	}
 }
 
 
 OLC_MODULE(abiledit_costperscalepoint) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), conjure_types)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
-	}
+	ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
 }
 
 
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | conjure_types)) {
-		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
-	}
-	else {
-		ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
-	}
+	ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
 }
 
 
@@ -7155,7 +7138,7 @@ OLC_MODULE(abiledit_damagetype) {
 	
 	bitvector_t allowed_types = ABILT_DAMAGE | ABILT_DOT;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
@@ -7396,7 +7379,7 @@ OLC_MODULE(abiledit_interaction) {
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_DAMAGE | ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+	if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_DAMAGE | ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
@@ -7460,7 +7443,7 @@ OLC_MODULE(abiledit_maxstacks) {
 	
 	bitvector_t allowed_types = ABILT_DOT;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
