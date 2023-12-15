@@ -1064,23 +1064,6 @@ ACMD(do_jab) {
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
 			apply_dot_effect(vict, ATYPE_JABBED, 15, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
-			
-			if (has_ability(ch, ABIL_STAGGER_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
-				struct affected_type *af;
-				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_STAGGER_JAB, 15, APPLY_TO_HIT, -value, ch);
-				affect_join(vict, af, ADD_MODIFIER);
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAGGER_JAB, vict, NULL, NULL, NULL);
-			}
-			
-			if (has_ability(ch, ABIL_CRUCIAL_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
-				struct affected_type *af;
-				int value = round(GET_COMPUTED_LEVEL(ch) / 80);
-				af = create_mod_aff(ATYPE_CRUCIAL_JAB, 15, APPLY_DEXTERITY, -value, ch);
-				affect_join(vict, af, NOBITS);
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CRUCIAL_JAB, vict, NULL, NULL, NULL);
-			}
-			
 			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, vict, NULL, NULL, NULL);
 		}
 		if (can_gain_exp_from(ch, vict)) {

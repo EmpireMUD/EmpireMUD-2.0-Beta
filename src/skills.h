@@ -247,10 +247,10 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_BLOODSWEAT  229
 #define ABIL_SHADOW_KICK  231
-#define ABIL_STAGGER_JAB  232
+// #define ABIL_STAGGER_JAB  232
 #define ABIL_SHADOWCAGE  233
 #define ABIL_HOWL  234
-#define ABIL_CRUCIAL_JAB  235
+// #define ABIL_CRUCIAL_JAB  235
 #define ABIL_DIVERSION  236
 // #define ABIL_SHADOW_JAB  237
 #define ABIL_ANCESTRAL_HEALING  239
