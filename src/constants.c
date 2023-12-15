@@ -387,6 +387,20 @@ const char *ability_gain_hooks[] = {
 };
 
 
+// AHOOK_x: Ability hooks (things that cause an ability to run itself)
+const char *ability_hook_types[] = {
+	"Ability",	// 0
+	"Attack",
+	"Attack-Type",
+	"Damage-Type",
+	"Kill",
+	"Melee-Attack",	// 5
+	"Ranged-Attack",
+	"Weapon-Type",
+	"\n"
+};
+
+
 // ABIL_LIMIT_x (1/2): Limitations when trying to use an ability
 const char *ability_limitations[] = {
 	"on a barrier tile", 	// 0

@@ -54,6 +54,7 @@ OLC_MODULE(olc_wordcount);
 // ability modules
 OLC_MODULE(abiledit_affects);
 OLC_MODULE(abiledit_affectvnum);
+OLC_MODULE(abiledit_ahook);
 OLC_MODULE(abiledit_apply);
 OLC_MODULE(abiledit_attacktype);
 OLC_MODULE(abiledit_cdtime);
@@ -567,6 +568,8 @@ const struct olc_command_data olc_data[] = {
 	// ability commands
 	{ "affects", abiledit_affects, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "affectvnum", abiledit_affectvnum, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "ahooks", abiledit_ahook, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "abilityhooks", abiledit_ahook, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "apply", abiledit_apply, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "attacktype", abiledit_attacktype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cdtime", abiledit_cdtime, OLC_ABILITY, OLC_CF_EDITOR },

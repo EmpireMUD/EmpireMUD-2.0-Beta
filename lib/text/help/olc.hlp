@@ -583,6 +583,34 @@ you have sapped.
 
 See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
+"ABILEDIT AHOOK" "ABILEDIT AHOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS"
+
+Usage:  .ahook add <type> <percent> [value]
+        .ahook remove <number | all>
+
+The 'ahook' field is for ability hooks -- conditions which can cause this
+ability to trigger.
+
+Available types of hooks are:
+ &cAbility&0 - Triggered by an ability successfully executing, targeting the same
+   targets if possible.
+ &cAttack&0 - Triggered by any attack, targeting the attack's target.
+ &cAttack-Type&0 - Triggered by an attack, targeting its target. See ATTACK TYPES.
+ &cDamage-Type&0 - Triggered by dealing damage, targeting the damage's victim.
+   Types are &yphysical&0, &ymagical&0, &yfire&0, &ypoison&0, &ydirect&0.
+ &cKill&0 - Triggered by any kill, targeting self (e.g. buff on kill).
+ &cMelee-Attack&0 - Triggered by any melee attack, targeting the attack's target.
+ &cRanged-Attack&0 - By any ranged attack, targeting the attack's target.
+ &cWeapon-Type&0 - Triggered by any &yblunt&0, &ysharp&0, or &ymagic&0 attack,
+   targeting the attack's target.
+
+If the hook would normally target an enemy, but this ability only targets
+yourself, only targets the room, or has the IGNORE target flag, the target will
+change. Use this, for example, to have an ability that buffs you when you deal
+fire damage.
+
+See also: OLC ABILITIES
+#d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
 
 Usage:  .apply add <value> <apply>

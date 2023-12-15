@@ -113,6 +113,8 @@
 #define ABIL_DIFFICULTY(abil)  ((abil)->difficulty)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
 #define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
+#define ABIL_HOOKS(abil)  ((abil)->hooks)
+#define ABIL_HOOK_FLAGS(abil)  ((abil)->hook_flags)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
 #define ABIL_INTERACTIONS(abil)  ((abil)->interactions)
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
@@ -138,6 +140,7 @@
 
 // utils
 #define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
+#define ABIL_HAS_HOOK(abil, type)  (IS_SET(ABIL_HOOK_FLAGS(abil), (type)) ? TRUE : FALSE)
 #define ABIL_IS_CLASS(abil)  ((abil)->is_class)
 #define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
 #define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)

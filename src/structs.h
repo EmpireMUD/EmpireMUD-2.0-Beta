@@ -709,6 +709,17 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_DYING  BIT(16)	// calledwhen the player dies (before auto-resurrect)
 
 
+// AHOOK_x: Ability hooks (things that cause an ability to run itself)
+#define AHOOK_ABILITY			BIT(0)	// after another ability finishes
+#define AHOOK_ATTACK			BIT(1)	// any attack
+#define AHOOK_ATTACK_TYPE		BIT(2)	// specific attack type
+#define AHOOK_DAMAGE_TYPE		BIT(3)	// specific damage type
+#define AHOOK_KILL				BIT(4)	// any kill
+#define AHOOK_MELEE_ATTACK		BIT(5)	// after any melee attack
+#define AHOOK_RANGED_ATTACK		BIT(6)	// after any ranged attack
+#define AHOOK_WEAPON_TYPE		BIT(7)	// blunt/sharp/etc
+
+
 // ABIL_LIMIT_x: Limitations when trying to use an ability
 #define ABIL_LIMIT_ON_BARRIER  0	// must be on a barrier
 #define ABIL_LIMIT_OWN_TILE  1	// must own the tile
@@ -3866,11 +3877,13 @@ struct ability_data {
 	int max_stacks;	// dot
 	struct ability_data_list *data;	// LL of additional data
 	struct interaction_item *interactions;	// LL of regular interactions
+	struct ability_hook *hooks;	// LL of hooks for this ability
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
+	bitvector_t hook_flags;	// quick reference for hook types
 	bool is_class;	// assignment comes from a class
 	bool is_synergy;	// assignemnt comes from a synergy
 	
@@ -3893,6 +3906,17 @@ struct ability_gain_hook {
 	any_vnum ability;
 	bitvector_t triggers;	// AGH_ flags
 	UT_hash_handle hh;	// GET_ABILITY_GAIN_HOOKS(ch)
+};
+
+
+// Ability hooks (things that cause an ability to run itself)
+struct ability_hook {
+	bitvector_t type;	// AHOOK_ const
+	any_vnum value;	// depends on type
+	double percent;	// chance to execute
+	int misc;	// for expansion
+	
+	struct ability_hook *next;	// LL
 };
 
 
