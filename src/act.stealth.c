@@ -1081,14 +1081,6 @@ ACMD(do_jab) {
 				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CRUCIAL_JAB, vict, NULL, NULL, NULL);
 			}
 			
-			if (has_ability(ch, ABIL_SHADOW_JAB) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && check_solo_role(ch)) {
-				struct affected_type *af;
-				int value = ceil(GET_CHARISMA(ch) / 5);
-				af = create_mod_aff(ATYPE_SHADOW_JAB, 15, APPLY_DEXTERITY, -value, ch);
-				affect_join(vict, af, ADD_MODIFIER);
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SHADOW_JAB, vict, NULL, NULL, NULL);
-			}
-			
 			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, vict, NULL, NULL, NULL);
 		}
 		if (can_gain_exp_from(ch, vict)) {
