@@ -339,23 +339,17 @@ second person will release the first one.
 
 Gains experience when you use Sap, even if it fails.
 #
-SEARCH
+"SEARCH ABILITY"
 
 Search (Stealth ability)
 
 Usage:  search
 Cooldown:  10 seconds
 
-When you know where to look, it's easier to find hidden thieves and assassins.
-This ability reveals people who use the hide command, although it doesn't
-always find them on the first try, and it won't find anyone who has Cling to
-Shadow.
+This ability allows you to use the search command. Gains experience when you
+search a room.
 
-You can also find out if someone is earthmelded beneath you.
-
-Gains experience when you search a room.
-
-See also: HIDE, SENSE LIFE RITUAL
+See also: SEARCH COMMAND
 #
 "SECRET CACHE" SECRETCACHE
 

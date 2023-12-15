@@ -788,13 +788,15 @@ done
 Search for Traps - Jungle Temple~
 2 p 100
 ~
-if %abilityname% != Search
-  return 1
-  halt
-end
+return 1
 %send% %actor% You search for traps...
 %echoaround% %actor% ~%actor% searches for traps...
-context %instance.id%
+* lacking ability?
+if !%actor.has_tech(Search-Command)% || %actor.aff_flagged(BLIND)%
+  %send% %actor% You can't spot any traps in this room...
+  halt
+end
+* actual search
 switch %room_trap%
   case 18504
     %send% %actor% You find a pit trap. JUMP after triggering to avoid it.
@@ -809,8 +811,6 @@ switch %room_trap%
     %send% %actor% You can't spot any traps in this room...
   break
 done
-return 0
-halt
 ~
 #18513
 Mob block higher template id~

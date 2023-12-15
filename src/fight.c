@@ -414,32 +414,13 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 * @return int The hit %.
 */
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill) {
-	double base_chance, spar = 0.0;
+	double base_chance;
 	
 	// starting value
 	base_chance = base_hit_chance + GET_TO_HIT(ch);
 	
 	// add dexterity (will be counter-balanced by dodge dexterity)
 	base_chance += GET_DEXTERITY(ch) * hit_per_dex;
-	
-	// skills: sparring
-	if (has_ability(ch, ABIL_SPARRING)) {
-		if (IS_CLASS_ABILITY(ch, ABIL_SPARRING)) {
-			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
-		}
-		else if (IS_SPECIALTY_ABILITY(ch, ABIL_SPARRING)) {
-			spar = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.05);
-		}
-		else {
-			spar = 10.0;
-		}
-		
-		base_chance += spar;
-		
-		if (can_gain_skill && can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_SPARRING, 2);
-		}
-	}
 	
 	// penalty
 	if (off_hand) {

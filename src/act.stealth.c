@@ -1335,21 +1335,17 @@ ACMD(do_sap) {
 ACMD(do_search) {
 	char_data *targ;
 	bool found = FALSE, earthmeld = FALSE;
-
-	if (!can_use_ability(ch, ABIL_SEARCH, NOTHING, 0, COOLDOWN_SEARCH)) {
-		// sends own message
+	
+	if (AFF_FLAGGED(ch, AFF_BLIND)) {
+		msg_to_char(ch, "How can you do that? You're blind!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_BLIND))
-		msg_to_char(ch, "How can you do that, you're blind!\r\n");
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE))
-		msg_to_char(ch, "You can't see well enough here to search for anyone!\r\n");
-	else if (AFF_FLAGGED(ch, AFF_SENSE_HIDE))
+	else if (!has_player_tech(ch, PTECH_SEARCH_COMMAND) || !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+		// fruitless search
+		act("$n begins searching around!", TRUE, ch, NULL, NULL, TO_ROOM);
 		msg_to_char(ch, "You search, but find nobody.\r\n");
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SEARCH)) {
-		return;
 	}
 	else {
-		act("$n begins searching around!", TRUE, ch, 0, 0, TO_ROOM);
+		act("$n begins searching around!", TRUE, ch, NULL, NULL, TO_ROOM);
 		
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
 			if (ch == targ)
@@ -1366,7 +1362,7 @@ ACMD(do_search) {
 
 				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
-				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				if (player_tech_skill_check(ch, PTECH_SEARCH_COMMAND, DIFF_HARD) && CAN_SEE(ch, targ)) {
 					act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
 					msg_to_char(targ, "You are discovered!\r\n");
 					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
@@ -1378,7 +1374,7 @@ ACMD(do_search) {
 			}
 			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
 				// earthmelded targets (only do once)
-				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				if (player_tech_skill_check(ch, PTECH_SEARCH_COMMAND, DIFF_HARD) && CAN_SEE(ch, targ)) {
 					act("You find signs that someone is earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
 					found = earthmeld = TRUE;
 				}
@@ -1389,7 +1385,7 @@ ACMD(do_search) {
 			msg_to_char(ch, "You search, but find nobody.\r\n");
 
 		charge_ability_cost(ch, NOTHING, 0, COOLDOWN_SEARCH, 10, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_SEARCH, 20);
+		gain_player_tech_exp(ch, PTECH_SEARCH_COMMAND, 20);
 	}
 }
 

@@ -1147,7 +1147,7 @@ const char *player_tech_types[] = {
 	"Shear-Upgrade",
 	"Steal-Upgrade",
 	"Swimming",
-	"*",
+	"Search-Command",
 	"Two-Handed-Mastery",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",

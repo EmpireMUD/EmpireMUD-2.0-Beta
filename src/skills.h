@@ -134,7 +134,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_DISGUISE  13
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
-#define ABIL_SEARCH  18
+// #define ABIL_SEARCH  18
 // #define ABIL_DAYWALKING  19
 #define ABIL_HIDE  20
 // #define ABIL_HORRID_FORM  21
@@ -164,7 +164,7 @@ bool trigger_counterspell(char_data *ch);
 // #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
-#define ABIL_SPARRING  95
+// #define ABIL_SPARRING  95
 #define ABIL_KICK  96
 #define ABIL_BASH  97
 #define ABIL_CUT_DEEP  98

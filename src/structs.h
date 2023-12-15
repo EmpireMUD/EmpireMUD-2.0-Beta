@@ -2665,7 +2665,7 @@ typedef enum {
 #define PTECH_SHEAR_UPGRADE  46	// more results from shear
 #define PTECH_STEAL_UPGRADE  47	// can steal from vaults
 #define PTECH_SWIMMING  48	// player can enter water tiles
-	#define PTECH_TELEPORT_CITY  49	// deprecated in b5.166
+#define PTECH_SEARCH_COMMAND  49	// allows 'search' command
 #define PTECH_TWO_HANDED_MASTERY  50	// bonus damage from 2H weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
