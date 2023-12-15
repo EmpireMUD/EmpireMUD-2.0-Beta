@@ -381,7 +381,7 @@ double get_combat_speed(char_data *ch, int pos) {
 * @return int The total dodge %.
 */
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) {
-	double base, refl = 0.0;
+	double base;
 	
 	// no default dodge amount
 	base = GET_DODGE(ch);
