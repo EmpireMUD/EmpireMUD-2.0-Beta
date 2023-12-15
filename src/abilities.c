@@ -6898,6 +6898,7 @@ OLC_MODULE(abiledit_affects) {
 
 OLC_MODULE(abiledit_affectvnum) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	generic_data *gen;
 	any_vnum old;
 	
 	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
@@ -6913,7 +6914,10 @@ OLC_MODULE(abiledit_affectvnum) {
 		old = ABIL_AFFECT_VNUM(abil);
 		ABIL_AFFECT_VNUM(abil) = olc_process_number(ch, argument, "affect vnum", "affectvnum", 0, MAX_VNUM, ABIL_AFFECT_VNUM(abil));
 
-		if (!find_generic(ABIL_AFFECT_VNUM(abil), GENERIC_AFFECT)) {
+		if ((gen = find_generic(ABIL_AFFECT_VNUM(abil), GENERIC_AFFECT))) {
+			msg_to_char(ch, "It is now: %s\r\n", GEN_NAME(gen));
+		}
+		else {
 			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", ABIL_AFFECT_VNUM(abil));
 			ABIL_AFFECT_VNUM(abil) = old;
 		}
