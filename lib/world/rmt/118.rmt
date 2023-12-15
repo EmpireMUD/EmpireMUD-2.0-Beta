@@ -1277,7 +1277,6 @@ scrapes~
 looks more like the wall slides out, but you don't see how to open it. You'd
 have to search around.
 ~
-T 11921
 T 11936
 S
 #11816
@@ -1351,7 +1350,7 @@ be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
 T 11825
-T 11921
+T 11936
 S
 #11818
 A Most Peculiar Maze~
@@ -1705,7 +1704,7 @@ his portrait reads:
 ~
 M 1 11831 100.00 5
 T 11825
-T 11921
+T 11936
 S
 #11823
 A Most Peculiar Maze~
@@ -2544,8 +2543,7 @@ cabinets skeleton~
    You open one of the cabinets but there's a skeleton inside and you quickly
 shut it.
 ~
-T 11921
-T 11921
+T 11936
 S
 #11836
 The Lich Labs~
@@ -2633,7 +2631,6 @@ The walls in here are ebony, except the outer wall, which is stone.
 M 1 11836 100.00 1
 M 1 11834 100.00 5
 T 11936
-T 11921
 S
 #11837
 The Experimentation Chamber~
@@ -2842,7 +2839,6 @@ bookshelf bookshelves shelf shelves chains spine~
 books on enchanting. Each and every book is chained to the shelf by its spine.
 ~
 T 11926
-T 11921
 T 11936
 S
 #11840
@@ -2964,7 +2960,6 @@ The east doorway leads back to the main lab.
 ~
 M 1 11833 100.00 1
 T 11936
-T 11921
 S
 #11860
 The Upper Walkway of the Tower Skycleave~

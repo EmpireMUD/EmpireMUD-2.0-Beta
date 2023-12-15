@@ -750,7 +750,7 @@ ab -1 0.50 o 0 0
 A
 17 -1
 C
-ccolorburst 7 bf 2 13 2 2013 30 8 3 0
+colorburst 7 bf 2 13 2 2013 30 8 3 0
 M
 5
 You fire a burst of color at $N, but $E deflects it!~

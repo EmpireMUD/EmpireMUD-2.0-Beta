@@ -2079,79 +2079,6 @@ Skycleave: Search ability for hints and secret passages~
 * It is no longer used because search is handled by command triggers (#11936)
 return 1
 halt
-if %ability% != 18 && %abilityname% != Search
-  * wrong ability
-  halt
-end
-set spirit %instance.mob(11900)%
-switch %room.template%
-  case 11815
-  case 11915
-    * goblin cages (both phases)
-    if %room.north(room)%
-      * Already open
-      halt
-    end
-    * Not already open
-    %send% %actor% You search around and find a hidden switch on the side of the bin...
-    %echoaround% %actor% ~%actor% seems to have found something while searching around...
-    %load% mob 11923
-    return 0
-  break
-  case 11817
-  case 11917
-    * Back of the passage
-    if !%room.northwest(room)%
-      %send% %actor% You search around and notice a note by the exit to the passage.
-      %send% %actor% It reads: Secret Pass Phrase 'O ala lilo'
-      %echoaround% %actor% ~%actor% searches around and finds a note.
-      return 0
-    end
-  break
-  case 11822
-  case 11922
-    * Outside the passage, walkway side
-    if !%room.southeast(room)%
-      %send% %actor% It looks like there's a secret passage in the wall. Perhaps one of the portraits has a hint on how to open it.
-      %echoaround% %actor% ~%actor% searches around.
-      return 0
-    end
-  break
-  case 11835
-    * Eruditorium
-    if %room.people(11847)%
-      %send% %actor% It doesn't look like it would be a good idea to get in Kara Virduke's way as she searches the room.
-    else
-      %send% %actor% You search the room, but can't figure out what Kara Virduke was looking for in here.
-      %echoaround% %actor% ~%actor% searches around the room.
-    end
-    return 0
-  break
-  case 11836
-    * Lich labs
-    if !%spirit.lich_released%
-      %send% %actor% You search around but keep noticing the lich's repository rattling, and the instructions on the blackboard.
-      %echoaround% %actor% ~%actor% searches around the room.
-      return 0
-    end
-  break
-  case 11839
-  case 11939
-    * Enchanting lab
-    if !%room.east(room)%
-      %send% %actor% You search around the illusory wall, trying to figure out how to open it, but can't find a way.
-      %send% %actor% Perhaps there's a clue in the painting's name.
-      %echoaround% %actor% ~%actor% searches around the wall.
-      return 0
-    end
-  break
-  case 11841
-    * Attunement lab 3A
-    %send% %actor% You're not sure how anybody finds anything in this place... it's a mess.
-    %echoaround% %actor% ~%actor% searches around fruitlessly.
-    return 0
-  break
-done
 ~
 #11922
 Skycleave: Secret passage levers~
@@ -2716,6 +2643,7 @@ end
 Skycleave: Room commands (Pixy Races, Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
 touch open disturb wake awaken search attune look bet wager~
+set search_list 11815 11817 11822 11835 11836 11839 11841 11915 11917 11922 11939
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
@@ -2743,10 +2671,14 @@ elseif open /= %cmd% && (%room.template% == 11839 || %room.template% == 11939)
     end
     return 1
   end
-elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
+elseif search /= %cmd% && %search_list% ~= %room.template%
   * goblin cages: searching without skill?
-  if !%actor.ptech(Search-Command)% || %actor.aff_flagged(BLIND)%
+  if !%actor.has_tech(Search-Command)% && (%room.template% == 11815 || %room.template% == 11915)
     %send% %actor% You try to search around the bin, but whatever you're looking for, you don't have the skill to find it.
+    %echoaround% %actor% ~%actor% searches around the room.
+    return 1
+  elseif !%actor.has_tech(Search-Command)%
+    %send% %actor% You don't see anything interesting.
     %echoaround% %actor% ~%actor% searches around the room.
     return 1
   else
@@ -2759,6 +2691,7 @@ elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
         * goblin cages (both phases)
         if %room.north(room)%
           * Already open
+          return 0
           halt
         end
         * Not already open
@@ -2773,6 +2706,8 @@ elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
           %send% %actor% You search around and notice a note by the exit to the passage.
           %send% %actor% It reads: Secret Pass Phrase 'O ala lilo'
           %echoaround% %actor% ~%actor% searches around and finds a note.
+        else
+          return 0
         end
       break
       case 11822
@@ -2781,6 +2716,8 @@ elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
         if !%room.southeast(room)%
           %send% %actor% It looks like there's a secret passage in the wall. Perhaps one of the portraits has a hint on how to open it.
           %echoaround% %actor% ~%actor% searches around.
+        else
+          return 0
         end
       break
       case 11835
@@ -2794,9 +2731,25 @@ elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
       break
       case 11836
         * Lich labs
-        if !%spirit.lich_released%
+        if (desk /= %arg% || antique /= %arg%)
+          %send% %actor% You make the mistake of touching the antique desk...
+          %echoaround% %actor% ~%actor% tries to open the antique desk...
+          %echo% An ethereal spirit flies out of the desk and swirls around the room, howling as it goes!
+          set ch %room.people%
+          while %ch%
+            set next_ch %ch.next_in_room%
+            if !%ch.aff_flagged(!ATTACK)%
+              %dot% #11936 %ch% 1000 30 magical
+              %damage% %ch% 100 magical
+            end
+            set ch %next_ch%
+          done
+          %echo% The spirit returns to the desk, which slams shut with a thud!
+        elseif !%spirit.lich_released%
           %send% %actor% You search around but keep noticing the lich's repository rattling, and the instructions on the blackboard.
           %echoaround% %actor% ~%actor% searches around the room.
+        else
+          return 0
         end
       break
       case 11839
@@ -2806,6 +2759,8 @@ elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
           %send% %actor% You search around the illusory wall, trying to figure out how to open it, but can't find a way.
           %send% %actor% Perhaps there's a clue in the painting's name.
           %echoaround% %actor% ~%actor% searches around the wall.
+        else
+          return 0
         end
       break
       case 11841

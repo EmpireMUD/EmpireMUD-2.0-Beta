@@ -1360,7 +1360,6 @@ scrapes~
 looks more like the wall slides out, but you don't see how to open it. You'd
 have to search around.
 ~
-T 11921
 T 11936
 S
 #11916
@@ -1435,7 +1434,7 @@ be oak, though they're rough and unfinished.
 M 1 11922 100.00 4
 T 11917
 T 11825
-T 11921
+T 11936
 S
 #11918
 The Pixy Races~
@@ -1831,7 +1830,7 @@ There are nameplates under the portraits.
 ~
 M 1 11831 100.00 5
 T 11825
-T 11921
+T 11936
 S
 #11923
 A Small Bedroom~
@@ -2991,7 +2990,6 @@ bookshelf bookshelves shelf shelves chains spine~
 books on enchanting. Each and every book is chained to the shelf by its spine.
 ~
 T 11926
-T 11921
 T 11936
 S
 #11940

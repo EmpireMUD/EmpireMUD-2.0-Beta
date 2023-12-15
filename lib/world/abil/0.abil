@@ -198,7 +198,8 @@ S
 #18
 Search~
 0 -1 1.00 0 0 0
-T m 0
+D 1 49 0
+T e 1
 S
 #19
 Daywalking~
@@ -615,8 +616,12 @@ T m 0
 S
 #84
 Reflexes~
-0 -1 1.00 0 0 0
-T m 0
+l -1 1.00 0 d 0
+A
+18 1
+T f 1
+X f
+0
 S
 #85
 Shield Block~
@@ -626,8 +631,12 @@ T e 1
 S
 #86
 Quick Block~
-0 -1 1.00 0 0 0
-T m 0
+l -1 1.00 0 e 0
+A
+13 1
+T f 1
+X f
+0
 S
 #87
 Reforge~
@@ -679,8 +688,12 @@ T m 0
 S
 #95
 Sparring~
-0 -1 1.00 0 0 0
-T m 0
+ik -1 1.00 0 bc 0
+A
+17 1
+T f 1
+X f
+0
 S
 #96
 Kick~

@@ -786,8 +786,8 @@ done
 ~
 #18512
 Search for Traps - Jungle Temple~
-2 p 100
-~
+2 c 0
+search~
 return 1
 %send% %actor% You search for traps...
 %echoaround% %actor% ~%actor% searches for traps...
@@ -797,6 +797,7 @@ if !%actor.has_tech(Search-Command)% || %actor.aff_flagged(BLIND)%
   halt
 end
 * actual search
+context %instance.id%
 switch %room_trap%
   case 18504
     %send% %actor% You find a pit trap. JUMP after triggering to avoid it.
