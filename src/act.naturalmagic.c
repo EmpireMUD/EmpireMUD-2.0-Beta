@@ -1129,10 +1129,9 @@ ACMD(do_skybrand) {
 	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
 	if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
-		dmg += GET_BONUS_MAGICAL(ch) / dur;
 	}
-	
-	dmg += GET_INTELLIGENCE(ch) / dur;	// always add int
+	dmg += GET_BONUS_MAGICAL(ch) / MAX(1, dur/DOT_INTERVAL);
+	dmg += GET_INTELLIGENCE(ch) / MAX(1, dur/DOT_INTERVAL);	// always add int
 	
 	// determine cost
 	cost = round(dmg * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND));

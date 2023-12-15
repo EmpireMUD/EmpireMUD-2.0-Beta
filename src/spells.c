@@ -135,11 +135,11 @@ ACMD(do_damage_spell) {
 	// calculate damage in order to calculate cost
 	if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
 		dmg = get_approximate_level(ch) / 8.0;
-		dmg += GET_BONUS_MAGICAL(ch);
 	}
 	else {	// not on a role
 		dmg = get_ability_level(ch, subcmd) / 8.0;
 	}
+	dmg += GET_BONUS_MAGICAL(ch);
 	
 	dmg += GET_INTELLIGENCE(ch);	// both add this
 	dmg *= damage_spell[type].damage_mod;	// modify by the spell
@@ -155,11 +155,8 @@ ACMD(do_damage_spell) {
 		}
 		
 		// apply bonus-mag (slightly different than previous IF)
-		if ((IS_NPC(ch) || GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
-			dot_dmg += GET_BONUS_MAGICAL(ch) / MAX(1, damage_spell[type].dot_duration);
-		}
-		
-		dot_dmg += GET_INTELLIGENCE(ch) / MAX(1, damage_spell[type].dot_duration);	// always add int
+		dot_dmg += GET_BONUS_MAGICAL(ch) / MAX(1, (damage_spell[type].dot_duration / DOT_INTERVAL));
+		dot_dmg += GET_INTELLIGENCE(ch) / MAX(1, (damage_spell[type].dot_duration / DOT_INTERVAL));	// always add int
 		
 		// finally:
 		dot_dmg = round(dot_dmg * damage_spell[type].dot_dmg_mod);
