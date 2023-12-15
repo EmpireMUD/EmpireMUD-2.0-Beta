@@ -575,6 +575,47 @@ void check_abilities(void) {
 
 
 /**
+* This will delete any matching hooks.
+*
+* @param ability_data *abil Which ability to delete hooks from.
+* @param int hook_type Which AHOOK_ const to look for.
+* @param int hook_value Which value to match.
+* @return bool TRUE if abil had that hook and it was deleted, FALSE if not.
+*/
+
+bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value) {
+	struct ability_hook *ahook, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_HOOKS(abil), ahook, next) {
+		if (ahook->type == hook_type && ahook->value == hook_value) {
+			LL_DELETE(ABIL_HOOKS(abil), ahook);
+			free(ahook);
+			any = TRUE;
+		}
+	}
+	return any;
+}
+
+
+/**
+* @param ability_data *abil Which ability.
+* @param int hook_type Which AHOOK_ const to look for.
+* @param int hook_value Which value to match (ability vnum or 0 for many other types).
+* @return bool TRUE if abil has that hook, FALSE if not.
+*/
+bool has_ability_hook(ability_data *abil, int hook_type, int hook_value) {
+	struct ability_hook *ahook;
+	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
+		if (ahook->type == hook_type && ahook->value == hook_value) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
 * Runs simple checks, silently, to see if the ability is likely to be valid.
 * Some of these will be checked again, with messages, later.
 *
@@ -3747,10 +3788,6 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 		if (!ABIL_HAS_HOOK(plab->ptr, hook_type)) {
 			continue;	// shortcut
 		}
-		if (ABILITY_FLAGGED(plab->ptr, ABILF_OVER_TIME)) {
-			log("SYSERR: Hook ability %d %s is flagged OVER-TIME", ABIL_VNUM(plab->ptr), ABIL_NAME(plab->ptr));
-			continue;
-		}
 		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(plab->ptr))) {
 			continue;	// already ran
 		}
@@ -4922,6 +4959,14 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No targets set");
 		problem = TRUE;
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && ABIL_HOOKS(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "OVER-TIME flag with ability hooks");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME) && !ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "REPEAT-OVER-TIME flag without OVER-TIME");
+		problem = TRUE;
+	}
 	
 	// interactions
 	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
@@ -5152,7 +5197,11 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
-		if (ABIL_MASTERY_ABIL(abiter) == vnum) {
+		any = FALSE;
+		any |= (ABIL_MASTERY_ABIL(abiter) == vnum);
+		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 		}
@@ -5916,9 +5965,15 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	
 	// update other abilities
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
+		found = FALSE;
 		if (ABIL_MASTERY_ABIL(abiter) == vnum) {
 			ABIL_MASTERY_ABIL(abiter) = NOTHING;
-			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted mastery ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
+			found = TRUE;
+		}
+		found |= delete_from_ability_hooks(abil, AHOOK_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost related deleted ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abiter));
 		}
 	}
@@ -6035,8 +6090,14 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	// update olc editors
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
 			if (ABIL_MASTERY_ABIL(GET_OLC_ABILITY(desc)) == vnum) {
 				ABIL_MASTERY_ABIL(GET_OLC_ABILITY(desc)) = NOTHING;
+				found = TRUE;
+			}
+			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
+			
+			if (found) {
 				msg_to_desc(desc, "The mastery ability has been deleted from the ability you're editing.\r\n");
 			}
 		}

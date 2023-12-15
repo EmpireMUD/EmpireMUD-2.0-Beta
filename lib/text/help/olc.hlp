@@ -583,13 +583,17 @@ you have sapped.
 
 See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
-"ABILEDIT AHOOK" "ABILEDIT AHOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS"
+"ABILEDIT AHOOK" "ABILEDIT AHOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS" "HOOKED ABILITIES" "HOOK ABILITIES"
 
 Usage:  .ahook add <type> <percent> [value]
         .ahook remove <number | all>
 
 The 'ahook' field is for ability hooks -- conditions which can cause this
-ability to trigger.
+ability to trigger. A hooked ability can only run once per execution, meaning
+abilities never trigger each other in circles. This also means abilities that
+target multiple things will only trigger a hooked ability once (including
+an ability with multiple summons). Hooked abilities may never use the OVER-TIME
+flag.
 
 Available types of hooks are:
  &cAbility&0 - Triggered by an ability successfully executing, targeting the same
@@ -608,6 +612,9 @@ If the hook would normally target an enemy, but this ability only targets
 yourself, only targets the room, or has the IGNORE target flag, the target will
 change. Use this, for example, to have an ability that buffs you when you deal
 fire damage.
+
+Hooked abilities send normal &cpre-&0, &ctarg-&0, &cself-&0, and &cfail-&0
+messages. You can set custom messages to * to silence them, as usual.
 
 See also: OLC ABILITIES
 #d
