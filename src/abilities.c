@@ -222,26 +222,27 @@ char *ability_data_display(struct ability_data_list *adl) {
 */
 char *ability_hook_display(struct ability_hook *ahook) {
 	static char output[MAX_STRING_LENGTH];
-	char type_str[256];
+	char type_str[256], label[256];
 	
 	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
+	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
 	
 	// AHOOK_x: display by type
 	switch (ahook->type) {
 		case AHOOK_ABILITY: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, ahook->value, get_ability_name_by_vnum(ahook->value));
+			snprintf(output, sizeof(output), "%s: %d %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_ATTACK_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, attack_hit_info[ahook->value].name);
+			snprintf(output, sizeof(output), "%s: %s", label, attack_hit_info[ahook->value].name);
 			break;
 		}
 		case AHOOK_WEAPON_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, weapon_types[ahook->value]);
+			snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
 			break;
 		}
 		case AHOOK_DAMAGE_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, damage_types[ahook->value]);
+			snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
 			break;
 		}
 		
@@ -250,11 +251,11 @@ char *ability_hook_display(struct ability_hook *ahook) {
 		case AHOOK_KILL:
 		case AHOOK_MELEE_ATTACK:
 		case AHOOK_RANGED_ATTACK: {
-			snprintf(output, sizeof(output), "%s", type_str);
+			snprintf(output, sizeof(output), "%s", label);
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", type_str, ahook->type, ahook->value, ahook->misc);
+			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
 			break;
 		}
 	}
@@ -6621,7 +6622,6 @@ OLC_MODULE(abiledit_ahook) {
 	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], temp[256];
 	struct ability_hook *ahook, *next_ahook;
-	bitvector_t allowed_types = 0;
 	double percent = 100.0;
 	int iter, num, type_id, val_id, misc = 0;
 	bool found;
@@ -6762,11 +6762,9 @@ OLC_MODULE(abiledit_ahook) {
 		found = FALSE;
 		msg_to_char(ch, "Allowed types:");
 		for (iter = 0; *ability_hook_types[iter] != '\n'; ++iter) {
-			if (IS_SET(allowed_types, BIT(iter))) {
-				prettier_sprintbit(BIT(iter), ability_hook_types, temp);
-				msg_to_char(ch, "%s%s", found ? ", " : " ", temp);
-				found = TRUE;
-			}
+			prettier_sprintbit(BIT(iter), ability_hook_types, temp);
+			msg_to_char(ch, "%s%s", found ? ", " : " ", temp);
+			found = TRUE;
 		}
 		msg_to_char(ch, "%s\r\n", found ? "" : " none");
 	}
