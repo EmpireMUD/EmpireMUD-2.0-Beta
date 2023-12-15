@@ -5456,7 +5456,12 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 		*buf = '\0';
 		for (iter = 0; *flag_names[iter] != '\n'; ++iter) {
 			sprintf(line, "%s%s", flag_names[iter], (IS_SET(existing_bits, BIT(iter)) ? " (on)" : ""));
-			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, (((iter % 2) || one_per_line) ? "\r\n" : ""));
+			if (one_per_line) {
+				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line);
+			}
+			else {
+				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2))? "\r\n" : "");
+			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {
 			strcat(buf, "\r\n");
@@ -6548,7 +6553,12 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 		*buf = '\0';
 		for (iter = 0; *type_names[iter] != '\n'; ++iter) {
 			sprintf(line, "%s%s", type_names[iter], ((old_value == iter) ? " (current)" : ""));
-			sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, (((iter % 2) || one_per_line) ? "\r\n" : ""));
+			if (one_per_line) {
+				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (old_value == iter) ? "&g" : "", line);
+			}
+			else {
+				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
+			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {
 			strcat(buf, "\r\n");
