@@ -1007,6 +1007,8 @@ The following ability flags are available:
  &cOVER-TIME&0 - Like a ritual or chant; see ABILEDIT OVER-TIME
  &cSPOKEN&0 - Ability is spoken aloud and is blocked by the SILENT room affect.
  &cREPEAT-OVER-TIME&0 - Over-time ability auto-repeats if successful.
+ &cCUMULATIVE-BUFF&0 - Buff can stack its effect.
+ &cCUMULATIVE-DURATION&0 - Buff can stack its duration.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -1234,6 +1236,10 @@ For example, Ritual of Burdens would be set up with these messages:
 You can set how a player appears while performing the ability when someone
 types "look" in the room by setting an over-time-longdesc custom message with
 $n for their name.
+
+Over-time abilities can NOT have ability hooks. That is, you cannot chain into
+an over-time action. Non-over-time abilites can, however, chain from over-time
+ones.
 
 See also: OLC ABILITIES, CHANT, RITUAL
 #
