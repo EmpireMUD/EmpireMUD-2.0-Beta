@@ -3549,8 +3549,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	char_data *check;
 	
 	// some config TODO move this into the config system?
-	int cut_deep_durations[] = { 15, 15, 30 };
-	int stunning_blow_durations[] = { 5, 5, 10 };
 	double big_game_hunter[] = { 1.05, 1.05, 1.10 };
 
 	// brief sanity
@@ -3799,36 +3797,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (weapon) {
 				run_ability_hooks(ch, AHOOK_ATTACK_TYPE, w_type, victim, NULL, NULL, NULL);
 				run_ability_hooks(ch, AHOOK_WEAPON_TYPE, attack_hit_info[w_type].weapon_type, victim, NULL, NULL, NULL);
-			}
-			
-			/* cut deep: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
-				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
-				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
-				act("$n's last attack cuts deep -- $N is bleeding!", FALSE, ch, NULL, victim, TO_NOTVICT | ACT_ABILITY);
-				
-				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
-
-				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_CUT_DEEP, 10);
-				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CUT_DEEP, victim, NULL, NULL, NULL);
-			}
-			*/
-		
-			// stunning blow: players only
-			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
-				af = create_flag_aff(ATYPE_STUNNING_BLOW, CHOOSE_BY_ABILITY_LEVEL(stunning_blow_durations, ch, ABIL_STUNNING_BLOW), AFF_STUNNED, ch);
-				affect_join(victim, af, 0);
-				
-				act("That last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
-				act("$n's last blow hit you hard! You're knocked to the floor, stunned.", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
-				act("$n's last blow seems to stun $N!", FALSE, ch, NULL, victim, TO_NOTVICT | ACT_ABILITY);
-
-				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_STUNNING_BLOW, 10);
-				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STUNNING_BLOW, victim, NULL, NULL, NULL);
 			}
 			
 			// poison could kill too

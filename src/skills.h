@@ -167,13 +167,13 @@ bool trigger_counterspell(char_data *ch);
 // #define ABIL_SPARRING  95
 #define ABIL_KICK  96
 #define ABIL_BASH  97
-#define ABIL_CUT_DEEP  98
+// #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
 #define ABIL_FLEET  104
 #define ABIL_FINESSE  105
-#define ABIL_STUNNING_BLOW  106
+// #define ABIL_STUNNING_BLOW  106
 #define ABIL_VEINTAP  107
 #define ABIL_HEAL  109
 #define ABIL_HEAL_FRIEND  110
