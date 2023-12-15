@@ -32,8 +32,31 @@ T m 0
 S
 #106
 Stunning Blow~
-0 -1 1.00 0 0 0
-T m 0
+av -1 1.00 hE 0 0
+C
+unknown 7 bfh 0 0 0 -1 0 0 0 0
+H 128 0 10.00 0
+M
+2
+That last blow seems to stun $N!~
+M
+3
+$n's last blow hit you hard! You're knocked to the floor, stunned.~
+M
+4
+$n's last blow seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X b
+3049 5 10 t
 S
 #107
 Veintap~

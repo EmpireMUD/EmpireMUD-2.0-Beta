@@ -707,8 +707,31 @@ T m 0
 S
 #98
 Cut Deep~
-0 -1 1.00 0 0 0
-T m 0
+ak -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0 -1 0 0 0 0
+H 128 1 10.00 0
+M
+2
+You cut deep wounds in $N -- $E is bleeding!~
+M
+3
+$n's last attack cuts deep -- you are bleeding!~
+M
+4
+$n's last attack cuts deep -- $N is bleeding!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T d 1
+X d
+3006 15 30 0 5
 S
 #99
 Big Game Hunter~
