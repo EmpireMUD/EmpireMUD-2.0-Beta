@@ -697,13 +697,24 @@ X f
 S
 #96
 Kick~
-0 -1 1.00 0 0 0
-T m 0
+ak -1 1.00 0 0 0
+C
+kck 7 bf 1 10 0 2011 6 1 2 1
+T c 1
+X c
+54 0
 S
 #97
 Bash~
-0 -1 1.00 0 0 0
-T m 0
+agkp -1 1.00 hE 0 0
+C
+bsh 7 bf 1 15 0 2012 9 0 2 0
+T c 1
+T b 1
+X b
+3047 5 5 t
+X c
+95 0
 S
 #98
 Cut Deep~
