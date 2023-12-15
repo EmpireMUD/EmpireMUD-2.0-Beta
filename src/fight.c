@@ -3801,7 +3801,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				run_ability_hooks(ch, AHOOK_WEAPON_TYPE, attack_hit_info[w_type].weapon_type, victim, NULL, NULL, NULL);
 			}
 			
-			// cut deep: players only
+			/* cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				act("You cut deep wounds in $N -- $E is bleeding!", FALSE, ch, NULL, victim, TO_CHAR | ACT_ABILITY);
 				act("$n's last attack cuts deep -- you are bleeding!", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
@@ -3814,6 +3814,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				}
 				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CUT_DEEP, victim, NULL, NULL, NULL);
 			}
+			*/
 		
 			// stunning blow: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_PHYSICAL_DEBUFFS | AFF_IMMUNE_STUN) && skill_check(ch, ABIL_STUNNING_BLOW, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_BLUNT) {
