@@ -90,6 +90,9 @@ For each type, there is a help file named &yVTRIG <type>&0.
 
 All vehicle scripts provide the &c%self%&0 variable.
 
+The correct way to get a vehicle's short description in a send/echo is:
+@%veh% - short desc, something
+
 When using field  - The variable returns:
 &canimals_harnessed&0 - Number of animals harnessed to the vehicle.
 &canimals_required&0 - Number of animals needed for the vehicle to move.

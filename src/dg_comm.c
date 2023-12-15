@@ -47,7 +47,7 @@ char *any_one_name(char *argument, char *first_arg) {
 }
 
 
-void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type[], bool use_queue) {
+void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], int token_type[], char type[], bool use_queue) {
 	char sb[MAX_STRING_LENGTH];
 	int i, iter;
 
@@ -58,19 +58,24 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 
 		switch (type[i]) {
 			case '~': {
-				if (!otokens[i])
+				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					strcat(sb,"someone");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb, "you");
-				else
+				}
+				else {
 					strcat(sb,PERS((char_data*)otokens[i], ch, FALSE));
+				}
 				break;
 			}
 			case '|': {
-				if (!otokens[i])
+				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					strcat(sb, "someone's");
-				else if ((char_data*)otokens[i] == ch)
+				}
+				else if ((char_data*)otokens[i] == ch) {
 					strcat(sb, "your");
+				}
 				else {
 					strcat(sb,PERS((char_data*) otokens[i], ch, FALSE));
 					strcat(sb,"'s");
@@ -78,7 +83,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '^': {
-				if (!otokens[i]) {
+				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
 					// TODO if we had plural pronoun support, !see people should be "their"
 					strcat(sb,"its");
@@ -92,7 +97,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '&': {
-				if (!otokens[i]) {
+				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
 					// TODO if we had plural pronoun support, !see people should be "they"
 					strcat(sb,"it");
@@ -106,7 +111,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '*': {
-				if (!otokens[i]) {
+				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
 					// TODO if we had plural pronoun support, !see people should be "them"
 					strcat(sb,"it");
@@ -120,10 +125,18 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 				break;
 			}
 			case '@': {
-				if (!otokens[i])
+				if (!otokens[i]) {
 					strcat(sb,"something");
-				else
+				}
+				else if (token_type[i] == TYPE_OBJ) {
 					strcat(sb,OBJS(((obj_data*) otokens[i]), ch));
+				}
+				else if (token_type[i] == TYPE_VEH) {
+					strcat(sb,get_vehicle_short_desc(((vehicle_data*) otokens[i]), ch));
+				}
+				else {
+					strcat(sb,"something");
+				}
 				break;
 			}
 		}
@@ -157,10 +170,12 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 	char str[MAX_INPUT_LENGTH * 2];
 	char type[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
-	char *tokens[MAX_INPUT_LENGTH], *s, *p;
-	void *otokens[MAX_INPUT_LENGTH];
+	char *tokens[1024], *s, *p;
+	void *otokens[1024];
+	int token_type[1024];
 	char_data *to;
 	obj_data *obj;
+	vehicle_data *veh;
 	int i;
 	int to_sleeping = 1, is_spammy = 0, is_animal_move = 0; /* mainly for windows compiles */
 
@@ -182,6 +197,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 					*s = '\0';
 					p = any_one_name(++p, name);
 					otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name, NULL);
+					token_type[i] = TYPE_MOB;
 					tokens[++i] = ++s;
 				}
 				else {
@@ -201,21 +217,31 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 
 					if (*name == UID_CHAR) {
 						obj = get_obj(name);
+						if (!obj) {
+							veh = get_vehicle(name);
+						}
 					}
 					else if (find_invis) {
 						obj = get_obj_in_room(IN_ROOM(ch), name);
+						if (!obj) {
+							veh = get_vehicle_room(IN_ROOM(ch), name, NULL);
+						}
 					}
-					else if (!(obj = get_obj_in_list_vis(ch, name, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
+					else if ((obj = get_obj_in_list_vis(ch, name, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 						// nothing
 					}
-					else if (!(obj = get_obj_in_equip_vis(ch, name, NULL, ch->equipment, NULL))) {
+					else if ((obj = get_obj_in_equip_vis(ch, name, NULL, ch->equipment, NULL))) {
 						// nothing
 					}
 					else {
 						obj = get_obj_in_list_vis(ch, name, NULL, ch->carrying);
+						if (!obj) {
+							veh = get_vehicle_in_room_vis(ch, name, NULL);
+						}
 					}
 
-					otokens[i] = obj;
+					otokens[i] = obj ? (void*)obj : (void*)veh;
+					token_type[i] = obj ? TYPE_OBJ : (veh ? TYPE_VEH : TYPE_OBJ);
 					tokens[++i] = ++s;
 				}
 				else {
@@ -242,12 +268,12 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 	tokens[++i] = NULL;
 
 	if (IS_SET(targets, TO_CHAR) && SENDOK(ch) && (AWAKE(ch) || IS_SET(targets, TO_SLEEP)))
-		sub_write_to_char(ch, tokens, otokens, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
+		sub_write_to_char(ch, tokens, otokens, token_type, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
 
 	if (IS_SET(targets, TO_ROOM)) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), to, next_in_room) {
 			if (to != ch && SENDOK(to) && (AWAKE(to) || IS_SET(targets, TO_SLEEP))) {
-				sub_write_to_char(to, tokens, otokens, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
+				sub_write_to_char(to, tokens, otokens, token_type, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
 			}
 		}
 	}

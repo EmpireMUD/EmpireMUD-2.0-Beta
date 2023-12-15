@@ -677,7 +677,8 @@ Names and pronouns:
 &c&&%var%&0 - he/she/it, you
 &c*%var%&0 - him/her/it, you
 &c^%var%&0 - his/her/its, your
-* object only:
+
+Object or vehicle names:
 &c@%obj%&0 - short desc, something
 #d
 "SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
