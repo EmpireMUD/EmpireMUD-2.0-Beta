@@ -7410,7 +7410,7 @@ OLC_MODULE(abiledit_longduration) {
 	
 	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
@@ -7501,7 +7501,7 @@ OLC_MODULE(abiledit_shortduration) {
 	
 	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
 	
-	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
+	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
