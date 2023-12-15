@@ -1582,7 +1582,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					if (!IAF(ACT_STR_OBJ)) {
 						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
 					}
-					CHECK_NULL(obj, (char *) obj);
+					CHECK_NULL(obj, (const char *) obj);
 					break;
 				}
 				case 'F': {
@@ -1590,6 +1590,13 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 						log("SYSERR: Using $F without ACT_STR_VICT: %s", orig);
 					}
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
+					break;
+				}
+				case 'f': {
+					if (!IAF(ACT_STR_OBJ)) {
+						log("SYSERR: Using $f without ACT_STR_OBJ: %s", orig);
+					}
+					CHECK_NULL(obj, fname((const char *) obj));
 					break;
 				}
 				case 'v': {	// $v: vehicle

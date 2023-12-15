@@ -9775,12 +9775,13 @@ Item variables:
  $a - a/an for the 1st item             $A - a/an for the 2nd item
 
 Vehicle variables:
- $v - short desc for the 1st vehicle (in the code, requires ACT_VEH_OBJ)
- $V - short desc for the 2nd vehicle (in the code, requires ACT_VEH_VICT)
+ $v - short desc for the 1st vehicle
+ $V - short desc for the 2nd vehicle
 
 Misc variables (code only):
  $t - The obj parameter as a string
  $T - The vict_obj parameter as a string
+ $f - The first word of a string passed to the obj parameter
  $F - The first word of a string passed to the vict_obj parameter
 #d
 $~
