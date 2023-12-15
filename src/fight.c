@@ -3544,7 +3544,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
-	struct affected_type *af;
 	double attack_speed, cur_speed, dam;
 	char_data *check;
 	
