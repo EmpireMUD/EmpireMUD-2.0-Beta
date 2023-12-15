@@ -7156,7 +7156,7 @@ OLC_MODULE(abiledit_interaction) {
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_DAMAGE | ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
