@@ -3962,6 +3962,7 @@ DO_ABIL(do_buff_ability) {
 	double total_points = 1, remaining_points = 1, share, amt;
 	int dur, total_w = 1;
 	bool messaged, unscaled;
+	bitvector_t aff_options;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
@@ -3992,8 +3993,10 @@ DO_ABIL(do_buff_ability) {
 			remaining_points = MAX(0, remaining_points);
 		}
 		
+		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+		
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
-		affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+		affect_join(vict, af, aff_options);
 		messaged = TRUE;
 	}
 	
@@ -4011,7 +4014,8 @@ DO_ABIL(do_buff_ability) {
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		if (apply_never_scales[apply->location] || unscaled) {
 			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
-			affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+			affect_join(vict, af, aff_options);
 			messaged = TRUE;
 			continue;
 		}
@@ -4026,7 +4030,8 @@ DO_ABIL(do_buff_ability) {
 			remaining_points = MAX(0, total_points);
 			
 			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
-			affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
+			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+			affect_join(vict, af, aff_options);
 			messaged = TRUE;
 		}
 	}

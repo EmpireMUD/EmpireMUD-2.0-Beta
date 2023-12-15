@@ -561,6 +561,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_OVER_TIME  BIT(18)	// s. takes multiple turns, like a chant or ritual
 #define ABILF_SPOKEN  BIT(19)	// t. ability is said out loud (blocked by the SILENT room affect)
 #define ABILF_REPEAT_OVER_TIME  BIT(20)	// u. self-repeats an over-time ability if it succeeds
+#define ABILF_CUMULATIVE_BUFF  BIT(21)	// v. buff stacks effect
+#define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

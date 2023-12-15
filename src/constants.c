@@ -148,6 +148,8 @@ const char *ability_flags[] = {
 	"OVER-TIME",
 	"SPOKEN",
 	"REPEAT-OVER-TIME",	// 20
+	"CUMULATIVE-BUFF",
+	"CUMULATIVE-DURATION",
 	"\n"
 };
 
@@ -175,6 +177,8 @@ const char *ability_flag_notes[] = {
 	"long action",
 	"spoken aloud",
 	"auto-repeating",
+	"cumulative",
+	"extendable",
 	"\n"
 };
 
