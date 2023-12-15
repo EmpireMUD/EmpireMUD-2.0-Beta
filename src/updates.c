@@ -3333,6 +3333,33 @@ PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
 }
 
 
+// updates with the new required affect on phoenix rite
+PLAYER_UPDATE_FUNC(b5_166_phoenix_rite_update) {
+	struct affected_type *hjp;
+	
+	int PHOENIX_RITE = 3017;
+	
+	LL_FOREACH(ch->affected, hjp) {
+		if (hjp->type == PHOENIX_RITE && hjp->bitvector == NOBITS) {
+			hjp->bitvector = AFF_AUTO_RESURRECT;
+		}
+	}
+}
+
+// applies traits now required for enchanted walls
+void b5_166_barrier_magentafication(void) {
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY) && ROOM_BLD_FLAGGED(room, BLD_BARRIER) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_PERMANENT_PAINT)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PERMANENT_PAINT);
+			set_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR, 11);
+			affect_total_room(room);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3431,6 +3458,7 @@ const struct {
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
+	{ "b5.166", b5_166_barrier_magentafication, b5_166_phoenix_rite_update, "Updating enchanted walls and phoenix rites" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
