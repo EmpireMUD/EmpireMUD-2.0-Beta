@@ -1090,22 +1090,7 @@ void affect_total(char_data *ch) {
 	if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
 		GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
-
-	// ability-based modifiers
-	if (!IS_NPC(ch)) {
-		/* old version of these abilities, pre-b5.100
-		if (has_ability(ch, ABIL_ENDURANCE)) {
-			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
-		}
-		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
-			GET_MAX_MANA(ch) *= 1.35;
-		}
-		if (has_ability(ch, ABIL_ARCANE_POWER)) {
-			GET_MAX_MANA(ch) *= 1.35;
-		}
-		*/
-	}
-
+	
 	/* Make sure maximums are considered */
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		GET_ATT(ch, iter) = MAX(0, MIN(GET_ATT(ch, iter), att_max(ch)));

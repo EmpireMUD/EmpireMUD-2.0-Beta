@@ -176,14 +176,14 @@ ACMD(do_bash) {
 		
 				// release other saps here
 				limit_crowd_control(vict, ATYPE_BASH);
-			}			
-		}		
+			}
+		}
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BASH, vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_BASH, 15);
 	}
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BASH, vict, NULL, NULL, NULL);
 }
 
 
@@ -519,18 +519,11 @@ ACMD(do_kick) {
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
 
 	if (success) {
-		if (has_ability(ch, ABIL_SHADOW_KICK) && check_solo_role(ch) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS)) {
-			struct affected_type *af;
-			int value = round(GET_COMPUTED_LEVEL(ch) / 50);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_PHYSICAL, -value, ch);
-			affect_join(vict, af, 0);
-			af = create_mod_aff(ATYPE_SHADOW_KICK, 10, APPLY_BONUS_MAGICAL, -value, ch);
-			affect_join(vict, af, 0);
-		}
-	
 		dam = GET_STRENGTH(ch) * (IS_CLASS_ABILITY(ch, ABIL_KICK) ? 4 : 2);
 		dam += GET_BONUS_PHYSICAL(ch);
 		damage(ch, vict, dam, ATTACK_KICK, DAM_PHYSICAL, NULL);
+		
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_KICK, vict, NULL, NULL, NULL);
 	}
 	else {
 		damage(ch, vict, 0, ATTACK_KICK, DAM_PHYSICAL, NULL);
@@ -539,7 +532,6 @@ ACMD(do_kick) {
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_KICK, 15);
 	}
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_KICK, vict, NULL, NULL, NULL);
 }
 
 
