@@ -152,8 +152,53 @@ T e 1
 S
 #231
 Shadow Kick~
-0 -1 1.00 0 0 0
-T m 0
+ak -1 2.00 h 0 0
+A
+21 -1
+A
+22 -1
+C
+unknown 7 bfh 0 0 0 -1 0 0 0 0
+H 1 96 100.00 0
+M
+2
+... Your shadow kicks $N hard!~
+M
+2
+... Your shadow kicks $N in the back!~
+M
+2
+... Your shadow kicks $N out of nowhere!~
+M
+3
+... $n's shadow kicks you hard!~
+M
+3
+... $n's shadow kicks you in the back!~
+M
+3
+... $n's shadow kicks you out of nowhere!~
+M
+4
+... $n's shadow kicks $N hard!~
+M
+4
+... $n's shadow kicks $N in the back!~
+M
+4
+... $n's shadow kicks $N out of nowhere!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X b
+3053 10 10 0
 S
 #232
 Stagger Jab~
