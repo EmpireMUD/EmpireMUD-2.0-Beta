@@ -230,7 +230,7 @@ char *ability_hook_display(struct ability_hook *ahook) {
 	// AHOOK_x: display by type
 	switch (ahook->type) {
 		case AHOOK_ABILITY: {
-			snprintf(output, sizeof(output), "%s: %d %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
+			snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_ATTACK_TYPE: {
