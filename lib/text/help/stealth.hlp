@@ -100,8 +100,7 @@ Crucial Jab
 Stealth Synergy Ability: 100 Survival
 Debuff type: physical
 
-Your Jab ability causes a debuff equal to your total level divided by 80 to
-your victim's Dexterity, for 10 seconds.
+Your Jab ability causes a debuff to your victim's Dexterity for 10 seconds.
 
 See also: JAB
 #
@@ -367,9 +366,10 @@ See also: BUILD, VAULT
 Shadow Jab
 Stealth Synergy Ability:  100 Vampire
 Debuff type:  physical
+Linked trait: Charisma
 
-Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
-up) to your victim's dodge, for 15 seconds. This effect may stack.
+Your Jab ability now causes a debuff to your victim's dodge for 15 seconds.
+This effect may stack. It is stronger in the melee role.
 
 See also: JAB
 #
@@ -441,9 +441,10 @@ See also: HIDE
 Stagger Jab
 Stealth Synergy Ability:  100 Battle
 Debuff type:  physical
+Linked trait: Charisma
 
-Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
-up) to your victim's to-hit, for 15 seconds. This effect may stack.
+Your Jab ability now causes your victim to suffer lower to-hit for 15 seconds.
+This effect may stack. It is stronger in the melee role.
 
 See also: JAB
 #
