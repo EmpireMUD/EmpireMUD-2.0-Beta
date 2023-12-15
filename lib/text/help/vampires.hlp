@@ -49,7 +49,7 @@ If you have the Vampire skill at level 100, the amount of blood will continue
 to rise with your level. You will gain experience with this ability when
 drinking blood.
 
-See also: BITE
+See also: BITE, PASSIVES
 #
 "BAT FORM"
 
@@ -164,7 +164,7 @@ At high skill levels, you may get a stronger boost at the same cost. You can
 end your boosts early by typing "boost end". Gains experience when you activate
 your boosts.
 
-See also: ROLE
+See also: PASSIVES, ROLE
 #
 CLAWS
 
@@ -347,6 +347,8 @@ live creatures in the dark and raises your light radius. However, it doesn't
 enable you to see items on the ground.
 
 Gains experience passively when you're standing in a dark room.
+
+See also: PASSIVES
 #
 REGENERATE
 
@@ -379,7 +381,7 @@ Sanguine Restoration also grants you a larger blood pool.
 
 You will gain experience with this ability when drinking blood.
 
-See also: BITE
+See also: BITE, PASSIVES
 #
 "SAVAGE BITE"
 

@@ -254,7 +254,7 @@ solo roles.
 
 Gain experience when you take damage.
 
-See also: TANK, ROLE
+See also: TANK, PASSIVES, ROLE
 #
 EVASION EVADE
 
@@ -524,14 +524,13 @@ See also: RESCUE
 Quick Block (Battle ability)
 
 As you learn to block more quickly, your shield becomes more effective. Quick
-Block gives you +10 to Block. As a class-level ability, it instead gives +10%
-of your level, with a minimum of +10. This is included in the Block rating
-shown on your score.
+Block grants you a passive boost to your block rating. It is more effective in
+the tank role.
 
 Gain experience whenever you are attacked with a blockable attack and have a
 shield equipped.
 
-See also: BLOCK
+See also: BLOCK, PASSIVES, ROLE
 #
 "QUICK DRAW"
 
@@ -577,16 +576,12 @@ REFLEXES
 Reflexes (Battle ability)
 
 With training, your reflexes become good enough that you dodge more often.
-This ability gives at least +10 dodge automatically.
+This ability boosts your dodge rating passively. It is more effective in the
+tank role.
 
-As a specialty ability, it adds 5% of your total level to your dodge.
-At Battle 100, it adds 10% of your total level to your dodge.
+Gain experience when someone tries to hit you and you dodge.
 
-This dodge bonus is reflected on your 'score'.
-
-Gain experience when someone tries to hit you.
-
-See also: IMPROVED REFLEXES
+See also: IMPROVED REFLEXES, PASSIVES, ROLE
 #
 RESCUE
 

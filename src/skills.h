@@ -158,8 +158,8 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_TRACK  73
 #define ABIL_RESIST_POISON  77
 #define ABIL_PATHFINDING  83
-#define ABIL_REFLEXES  84
-#define ABIL_QUICK_BLOCK  86
+// #define ABIL_REFLEXES  84
+// #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
 // #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93

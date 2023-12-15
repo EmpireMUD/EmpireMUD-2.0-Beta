@@ -40,7 +40,7 @@ The improved version is called Nightsight.
 
 Gains experience passively when you're standing in a dark room.
 
-See also: DARK, NIGHTSIGHT
+See also: DARK, NIGHTSIGHT, PASSIVES
 #
 CARTOGRAPHY
 
@@ -398,7 +398,7 @@ wasting movement points or wandering into the mouth of a shark.
 
 Gains experience when you swim around.
 
-See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALK
+See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALK, PASSIVES
 #
 THIRST "SATED THIRST"
 

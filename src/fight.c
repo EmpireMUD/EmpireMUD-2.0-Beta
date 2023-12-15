@@ -282,24 +282,10 @@ double get_base_dps(obj_data *weapon) {
 int get_block_rating(char_data *ch, bool can_gain_skill) {
 	double rating = 0.0;
 	
-	double quick_block_base = 10.0;
-	double quick_block_scale = 0.1;	// % of level
-	
 	rating = GET_BLOCK(ch);
-	
-	// quick block procs to add 10%
-	if (has_ability(ch, ABIL_QUICK_BLOCK)) {
-		if (IS_CLASS_ABILITY(ch, ABIL_QUICK_BLOCK)) {
-			rating += MAX(quick_block_base, get_approximate_level(ch) * quick_block_scale);
-		}
-		else {
-			rating += quick_block_base;
-		}
-	}
 	
 	if (can_gain_skill) {
 		gain_player_tech_exp(ch, PTECH_BLOCK, 2);
-		gain_ability_exp(ch, ABIL_QUICK_BLOCK, 2);
 	}
 		
 	return rating;
@@ -402,25 +388,6 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 	
 	// dexterity (balances to-hit dexterity)
 	base += GET_DEXTERITY(ch) * hit_per_dex;
-	
-	// skills
-	if (has_ability(ch, ABIL_REFLEXES)) {
-		if (IS_CLASS_ABILITY(ch, ABIL_REFLEXES)) {
-			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.1);
-		}
-		else if (IS_SPECIALTY_ABILITY(ch, ABIL_REFLEXES)) {
-			refl = MAX(10.0, GET_COMPUTED_LEVEL(ch) * 0.05);
-		}
-		else {
-			refl = 10.0;
-		}
-		
-		base += refl;
-		
-		if (can_gain_skill && can_gain_exp_from(ch, attacker)) {
-			gain_ability_exp(ch, ABIL_REFLEXES, 2);
-		}
-	}
 	
 	// npc
 	if (IS_NPC(ch)) {
