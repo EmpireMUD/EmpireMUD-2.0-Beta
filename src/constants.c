@@ -26,6 +26,7 @@
 *   Ability Constants
 *   Adventure Constants
 *   Archetype Constants
+*   Attack Message Constants
 *   Augment Constants
 *   Class Constants
 *   Player Constants
@@ -643,6 +644,36 @@ const struct archetype_menu_type archetype_menu[] = {
 	},
 	
 	{ NOTHING, "\n", "\n" }	// this goes last
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ATTACK MESSAGE CONSTANTS ////////////////////////////////////////////////
+
+// AMDF_x: Attack message flags
+const char *attack_message_flags[] = {
+	"WEAPON",	// 0
+	"MOBILE",
+	"DISARMABLE",
+	"\n"
+};
+
+
+// SPD_x: speeds for attacks
+const char *attack_speed_types[] = {
+	"Fast",
+	"Normal",
+	"Slow",
+	"\n"
+};
+
+
+// WEAPON_x: Weapon types
+const char *weapon_types[] = {
+	"blunt",	// 0
+	"sharp",
+	"magic",
+	"\n"
 };
 
 
@@ -4373,15 +4404,6 @@ const char *skill_flags[] = {
 	"VAMPIRE",
 	"CASTER",
 	"REMOVED-BY-PURIFY",	// 5
-	"\n"
-};
-
-
-// WEAPON_x: Weapon types
-const char *weapon_types[] = {
-	"blunt",	// 0
-	"sharp",
-	"magic",
 	"\n"
 };
 

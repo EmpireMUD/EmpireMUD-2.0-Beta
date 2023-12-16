@@ -118,8 +118,15 @@ OLC_MODULE(archedit_type);
 
 // attack modules
 OLC_MODULE(attackedit_back);
+OLC_MODULE(attackedit_damagetype);
+OLC_MODULE(attackedit_firstperson);
+OLC_MODULE(attackedit_flags);
 OLC_MODULE(attackedit_message);
 OLC_MODULE(attackedit_name);
+OLC_MODULE(attackedit_noun);
+OLC_MODULE(attackedit_speed);
+OLC_MODULE(attackedit_thirdperson);
+OLC_MODULE(attackedit_weapontype);
 OLC_MODULE(attackedit_die2char);
 OLC_MODULE(attackedit_die2vict);
 OLC_MODULE(attackedit_die2room);
@@ -652,8 +659,15 @@ const struct olc_command_data olc_data[] = {
 	
 	// attacks
 	{ "back", attackedit_back, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "damagetype", attackedit_damagetype, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "firstperson", attackedit_firstperson, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "flags", attackedit_flags, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "messages", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "noun", attackedit_noun, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "speeds", attackedit_speed, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "thirdperson", attackedit_thirdperson, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "weapontype", attackedit_weapontype, OLC_ATTACK, OLC_CF_EDITOR },
 	// attacks: messages
 	{ "die2char", attackedit_die2char, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "die2vict", attackedit_die2vict, OLC_ATTACK, OLC_CF_EDITOR },

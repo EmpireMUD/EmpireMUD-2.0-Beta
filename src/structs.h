@@ -51,6 +51,7 @@
 *     Ability Structs
 *     Adventure Structs
 *     Archetype Structs
+*     Attack Message Structs
 *     Augment Structs
 *     Book Structs
 *     Building Structs
@@ -4151,6 +4152,72 @@ struct archetype_menu_type {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ATTACK MESSAGE STRUCTS //////////////////////////////////////////////////
+
+// AMDF_x: Attack message flags
+#define AMDF_WEAPON			BIT(0)	// allowed on weapons
+#define AMDF_MOBILE			BIT(1)	// allowed on mobiles
+#define AMDF_DISARMABLE		BIT(2)	// can be disarmed
+
+
+// MSG_x: each fight message has these 4 types
+#define MSG_DIE		0	// messages when death
+#define MSG_MISS	1	// messages when miss
+#define MSG_HIT		2	// messages when hit
+#define MSG_GOD		3	// messages when hit on god
+#define NUM_MSG_TYPES  4	// total
+
+
+// SPD_x: speeds for attacks
+#define SPD_FAST	0
+#define SPD_NORMAL	1
+#define SPD_SLOW	2
+#define NUM_ATTACK_SPEEDS  3
+
+
+// WEAPON_x: Weapon types
+#define WEAPON_BLUNT	0
+#define WEAPON_SHARP	1	// like wolverine
+#define WEAPON_MAGIC	2
+
+
+// fight message list
+struct attack_message_data {
+	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
+	char *name;	// for display purposes
+	bitvector_t flags;	// AMDF_ flags
+	
+	// used by attack types:
+	char *first_pers;	// You "slash"
+	char *third_pers;	// $n "slashes"
+	char *noun;		// ... with your "swing"
+	double speed[NUM_ATTACK_SPEEDS];	// SPD_ { fast, normal, slow }
+	int weapon_type;	// WEAPON_ type
+	int damage_type;	// DAM_ type
+	
+	struct attack_message_set *msg_list;	// Linked list of messages
+	int num_msgs;	// How many attack messages are in the list
+	
+	UT_hash_handle hh;	// attack_message_table hash (by vnum)
+};
+
+
+// individual trio of fight messages
+struct attack_message_type {
+	char *attacker_msg;	// message to attacker
+	char *victim_msg;	// message to victim
+	char *room_msg;	// message to room
+};
+
+
+// part of fight messages
+struct attack_message_set {
+	struct attack_message_type msg[NUM_MSG_TYPES];	// the 4 message types
+	struct attack_message_set *next;	// to next messages of this kind
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// AUGMENT STRUCTS /////////////////////////////////////////////////////////
 
 struct augment_data {
@@ -5941,72 +6008,6 @@ struct player_faction_data {
 	int value;	// reputation points
 	int rep;	// REP_ const
 	UT_hash_handle hh;	// GET_FACTIONS(ch) hash
-};
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// FIGHT MESSAGE STRUCTS ///////////////////////////////////////////////////
-
-// AMDF_x: Attack message flags
-#define AMDF_WEAPON			BIT(0)	// allowed on weapons
-#define AMDF_MOBILE			BIT(1)	// allowed on mobiles
-#define AMDF_DISARMABLE		BIT(2)	// can be disarmed
-
-
-// MSG_x: each fight message has these 4 types
-#define MSG_DIE		0	// messages when death
-#define MSG_MISS	1	// messages when miss
-#define MSG_HIT		2	// messages when hit
-#define MSG_GOD		3	// messages when hit on god
-#define NUM_MSG_TYPES  4	// total
-
-
-// SPD_x: speeds for attacks
-#define SPD_FAST	0
-#define SPD_NORMAL	1
-#define SPD_SLOW	2
-#define NUM_ATTACK_SPEEDS  3
-
-
-// WEAPON_x: Weapon types
-#define WEAPON_BLUNT	0
-#define WEAPON_SHARP	1	// like wolverine
-#define WEAPON_MAGIC	2
-
-
-// fight message list
-struct attack_message_data {
-	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
-	char *name;	// for display purposes
-	bitvector_t flags;	// AMDF_ flags
-	
-	// used by attack types:
-	char *first_pers;	// You "slash"
-	char *third_pers;	// $n "slashes"
-	char *noun;		// ... with your "swing"
-	double speed[NUM_ATTACK_SPEEDS];	// SPD_ { fast, normal, slow }
-	int weapon_type;	// WEAPON_ type
-	int damage_type;	// DAM_ type
-	
-	struct attack_message_set *msg_list;	// Linked list of messages
-	int num_msgs;	// How many attack messages are in the list
-	
-	UT_hash_handle hh;	// attack_message_table hash (by vnum)
-};
-
-
-// individual trio of fight messages
-struct attack_message_type {
-	char *attacker_msg;	// message to attacker
-	char *victim_msg;	// message to victim
-	char *room_msg;	// message to room
-};
-
-
-// part of fight messages
-struct attack_message_set {
-	struct attack_message_type msg[NUM_MSG_TYPES];	// the 4 message types
-	struct attack_message_set *next;	// to next messages of this kind
 };
 
 

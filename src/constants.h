@@ -48,6 +48,11 @@ extern const char *archetype_flags[];
 extern const char *archetype_types[];
 extern const struct archetype_menu_type archetype_menu[];
 
+// attack message constants
+extern const char *attack_message_flags[];
+extern const char *attack_speed_types[];
+extern const char *weapon_types[];
+
 // augment constants
 extern const char *augment_types[];
 extern const struct augment_type_data augment_info[];
@@ -265,7 +270,6 @@ extern const char *damage_types[];
 extern const int damage_type_to_dot_attack[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
-extern const char *weapon_types[];
 
 // social constants
 extern const char *social_flags[];

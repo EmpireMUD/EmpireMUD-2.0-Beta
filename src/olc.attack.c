@@ -698,7 +698,11 @@ char *fread_action(FILE *fl, int type, int type_pos) {
 */
 void load_fight_messages(void) {
 	any_vnum type;
-	char chk[READ_SIZE+1], error[256];
+	bool extended = FALSE;
+	char chk[READ_SIZE+1], error[256], str_in[256], line[256];
+	char char_in;
+	double dbl_in[3];
+	int iter, int_in[2];
 	int version;	// new versions must be greater than old ones
 	struct attack_message_set *messages;
 	attack_message_data *amd, *next_amd;
@@ -723,8 +727,13 @@ void load_fight_messages(void) {
 	// load all records
 	while (*chk == 'M') {
 		// determine type/format
-		if (sscanf(chk, "M%d", &type) == 1) {
-			// b5.166 format: type was in M line
+		if (sscanf(chk, "M%d %s %c", &type, str_in, &char_in) == 3 && char_in == '+') {
+			// b5.166 format: type was in M line, extended format
+			version = 5166;
+			extended = TRUE;
+		}
+		else if (sscanf(chk, "M%d %s ", &type, str_in) == 2) {
+			// b5.166 format: type was in M line; simple format
 			version = 5166;
 		}
 		else {
@@ -733,6 +742,7 @@ void load_fight_messages(void) {
 			sscanf(chk, " %d\n", &type);
 			
 			version = 30;	// circle 3.0
+			strcpy(str_in, "0");
 		}
 		
 		// find or create message entry
@@ -740,12 +750,52 @@ void load_fight_messages(void) {
 		snprintf(error, sizeof(error), "attack message %d:%d", type, ATTACK_NUM_MSGS(amd));
 		
 		// header info?
+		ATTACK_FLAGS(amd) = asciiflag_conv(str_in);
+		
 		if (version >= 5166) {
+			// read: name
 			if (ATTACK_NAME(amd)) {
 				// free first: more than 1 entry can have the name
 				free(ATTACK_NAME(amd));
 			}
 			ATTACK_NAME(amd) = fread_string(fl, error);
+			
+			// had the + indicator
+			if (extended) {
+				// read: first-person
+				if (ATTACK_FIRST_PERSON(amd)) {
+					free(ATTACK_FIRST_PERSON(amd));
+				}
+				ATTACK_FIRST_PERSON(amd) = fread_string(fl, error);
+				
+				// read: third-person
+				if (ATTACK_THIRD_PERSON(amd)) {
+					free(ATTACK_THIRD_PERSON(amd));
+				}
+				ATTACK_THIRD_PERSON(amd) = fread_string(fl, error);
+				
+				// read: noun
+				if (ATTACK_NOUN(amd)) {
+					free(ATTACK_NOUN(amd));
+				}
+				ATTACK_NOUN(amd) = fread_string(fl, error);
+				
+				// damagetype weapontype slow normalspeed fast
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing numeric line of %s", error);
+					exit(1);
+				}
+				if (sscanf(line, "%d %d %lf %lf %lf", &int_in[0], &int_in[1], &dbl_in[SPD_SLOW], &dbl_in[SPD_NORMAL], &dbl_in[SPD_FAST]) != 5) {
+					log("SYSERR: Unexpected data in numeric line of %s", error);
+					exit(1);
+				}
+				
+				ATTACK_DAMAGE_TYPE(amd) = int_in[0];
+				ATTACK_WEAPON_TYPE(amd) = int_in[0];
+				for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
+					ATTACK_SPEED(amd, iter) = dbl_in[iter];
+				}
+			}
 		}
 		
 		// read 1 set: does not use create_attack_message_entry():
@@ -850,7 +900,7 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_THIRD_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NOUN(amd)));
-			fprintf(fl, "%d %d %lf %lf %lf\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_SLOW), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_FAST));
+			fprintf(fl, "%d %d %.1f %.1f %.1f\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_SLOW), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_FAST));
 		}
 		
 		// print message triplets in order, with '#' in place of blanks.
@@ -1093,7 +1143,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: \tc%d\t0\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	
@@ -1217,9 +1267,9 @@ void olc_show_one_message(char_data *ch) {
 */
 void olc_show_attack_message(char_data *ch) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	char buf[MAX_STRING_LENGTH * 2];
+	char buf[MAX_STRING_LENGTH * 2], lbuf[MAX_STRING_LENGTH];
 	char *to_show;
-	int count;
+	int count, iter;
 	struct attack_message_set *ams;
 	
 	if (!amd) {
@@ -1235,6 +1285,23 @@ void olc_show_attack_message(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
+	
+	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ATTACK_FLAGS(amd), NOBITS), lbuf);
+	
+	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+		sprintf(buf + strlen(buf), "<%sfirstperson\t0> %s\r\n", OLC_LABEL_STR(ATTACK_FIRST_PERSON(amd), default_attack_first_person), ATTACK_FIRST_PERSON(amd) ? ATTACK_FIRST_PERSON(amd) : "(none)");
+		sprintf(buf + strlen(buf), "<%sthirdperson\t0> %s\r\n", OLC_LABEL_STR(ATTACK_THIRD_PERSON(amd), default_attack_third_person), ATTACK_THIRD_PERSON(amd) ? ATTACK_THIRD_PERSON(amd) : "(none)");
+		sprintf(buf + strlen(buf), "<%snoun\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NOUN(amd), default_attack_noun), ATTACK_NOUN(amd) ? ATTACK_NOUN(amd) : "(none)");
+		
+		sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ATTACK_DAMAGE_TYPE(amd), 0), damage_types[ATTACK_DAMAGE_TYPE(amd)]);
+		sprintf(buf + strlen(buf), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(ATTACK_WEAPON_TYPE(amd), 0), weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		
+		sprintf(buf + strlen(buf), "Speeds: <%sspeed\t0>\r\n", OLC_LABEL_CHANGED);
+		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
+			sprintf(buf + strlen(buf), "   %s: %.1f seconds\r\n", attack_speed_types[iter], ATTACK_SPEED(amd, iter));
+		}
+	}
 	
 	sprintf(buf + strlen(buf), "Messages: <%smessage\t0>\r\n", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
 	
@@ -1555,6 +1622,106 @@ OLC_MODULE(attackedit_back) {
 }
 
 
+OLC_MODULE(attackedit_clearextended) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't do that while editing a message (use .back to return to the menu).\r\n");
+		return;
+	}
+	
+	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		ATTACK_DAMAGE_TYPE(amd) = 0;
+		ATTACK_WEAPON_TYPE(amd) = 0;
+		
+		if (ATTACK_FIRST_PERSON(amd)) {
+			free(ATTACK_FIRST_PERSON(amd));
+			ATTACK_FIRST_PERSON(amd) = NULL;
+		}
+		if (ATTACK_THIRD_PERSON(amd)) {
+			free(ATTACK_THIRD_PERSON(amd));
+			ATTACK_THIRD_PERSON(amd) = NULL;
+		}
+		if (ATTACK_NOUN(amd)) {
+			free(ATTACK_NOUN(amd));
+			ATTACK_NOUN(amd) = NULL;
+		}
+		
+		msg_to_char(ch, "Extended data cleared.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Nothing to clear.\r\n");
+	}
+}
+
+
+OLC_MODULE(attackedit_damagetype) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the damage type while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else {
+		ATTACK_DAMAGE_TYPE(amd) = olc_process_type(ch, argument, "damage type", "damagetype", damage_types, ATTACK_DAMAGE_TYPE(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_firstperson) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the strings while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
+		}
+		else {
+			if (ATTACK_FIRST_PERSON(amd)) {
+				free(ATTACK_FIRST_PERSON(amd));
+			}
+			ATTACK_FIRST_PERSON(amd) = NULL;
+			msg_to_char(ch, "You remove the first-person string.\r\n");
+		}
+	}
+	else {
+		olc_process_string(ch, argument, "first-person", &ATTACK_FIRST_PERSON(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_flags) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the flags while editing a message (use .back to return to the menu).\r\n");
+		return;
+	}
+	
+	ATTACK_FLAGS(amd) = olc_process_flag(ch, argument, "attack", "flags", attack_message_flags, ATTACK_FLAGS(amd));
+	
+	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+		// ensure strings if they added a flag that causes extended data
+		if (!ATTACK_FIRST_PERSON(amd)) {
+			ATTACK_FIRST_PERSON(amd) = strdup(default_attack_first_person);
+		}
+		if (!ATTACK_THIRD_PERSON(amd)) {
+			ATTACK_THIRD_PERSON(amd) = strdup(default_attack_third_person);
+		}
+		if (!ATTACK_NOUN(amd)) {
+			ATTACK_NOUN(amd) = strdup(default_attack_noun);
+		}
+	}
+}
+
+
 OLC_MODULE(attackedit_message) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
 	char *arg2;
@@ -1628,5 +1795,110 @@ OLC_MODULE(attackedit_name) {
 	}
 	else {
 		olc_process_string(ch, argument, "name", &ATTACK_NAME(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_noun) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the strings while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
+		}
+		else {
+			if (ATTACK_NOUN(amd)) {
+				free(ATTACK_NOUN(amd));
+			}
+			ATTACK_NOUN(amd) = NULL;
+			msg_to_char(ch, "You remove the noun string.\r\n");
+		}
+	}
+	else {
+		olc_process_string(ch, argument, "noun", &ATTACK_NOUN(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_speed) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	double val;
+	int speed_type;
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the speed while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else {
+		half_chop(argument, arg1, arg2);
+		
+		if (!*arg1 || !*arg2) {
+			msg_to_char(ch, "Usage:  .speed <fast | normal | slow> <value>\r\n");
+		}
+		else if ((speed_type = search_block(arg1, attack_speed_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid speed type '%s'.\r\n", arg1);
+		}
+		else if (!str_cmp(arg2, "basic") || !str_cmp(arg2, "base")) {
+			ATTACK_SPEED(amd, speed_type) = basic_speed;
+			msg_to_char(ch, "%s attack set to %.1f seconds.\r\n", attack_speed_types[speed_type], ATTACK_SPEED(amd, speed_type));
+		}
+		else if ((val = atof(arg2)) < 0.1 || val > 10.0) {
+			msg_to_char(ch, "You must specify a speed between 0.1 and 10.0 seconds.\r\n");
+		}
+		else {
+			ATTACK_SPEED(amd, speed_type) = val;
+			msg_to_char(ch, "%s attack set to %.1f seconds.\r\n", attack_speed_types[speed_type], ATTACK_SPEED(amd, speed_type));
+		}
+	}
+}
+
+
+OLC_MODULE(attackedit_thirdperson) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the strings while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
+		}
+		else {
+			if (ATTACK_THIRD_PERSON(amd)) {
+				free(ATTACK_THIRD_PERSON(amd));
+			}
+			ATTACK_THIRD_PERSON(amd) = NULL;
+			msg_to_char(ch, "You remove the third-person string.\r\n");
+		}
+	}
+	else {
+		olc_process_string(ch, argument, "third-person", &ATTACK_THIRD_PERSON(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_weapontype) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the weapon type while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!ATTACK_HAS_EXTENDED_DATA(amd)) {
+		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
+	}
+	else {
+		ATTACK_WEAPON_TYPE(amd) = olc_process_type(ch, argument, "weapon type", "weapontype", weapon_types, ATTACK_WEAPON_TYPE(amd));
 	}
 }
