@@ -6,8 +6,8 @@
 * messages are used for failed spells, and weapon messages for misses and
 * death blows.
 *
-* All records must start with 'M' in the first column (for 'Message').
-* The next line must contain the damage number (defined in spells.h),
+* All records must start with 'M###' (for 'Message') where ### is the vnum.
+* then the name with a tilde (~)
 * then the messages (one per line):
 *   Death Message (damager, damagee, onlookers)
 *   Miss Message (damager, damagee, onlookers)
@@ -21,9 +21,12 @@
 * that, unlike the socials file, all twelve lines must be present for each
 * record, regardless of any '#' fields which may be contained in it.
 
-* Hit
-M
- 0
+M0 ab +
+RESERVED~
+hit~
+hits~
+hit~
+0 0 4.0 4.0 4.0
 You punch $N's head with a blow that crushes $S skull!
 $n punches your head with a blow that crushes your skull!
 $n punches $N's head so hard that $S skull cracks open!
@@ -37,9 +40,12 @@ Your fist flops as your body refuses to fight the mighty $N.
 $n seems to be having trouble getting $s body to fight you!!
 $n's body rebels against $m when $e tries to punch $N.
 
-* Slash
-M
- 1
+M1 abc +
+slash~
+slash~
+slashes~
+slash~
+0 0 2.6 2.8 3.0
 You beautifully slash $N into two parts -- both dead.
 Your upper body is disconnected from your legs as $n slashes at you -- R.I.P.!
 $N is slashed in two by a masterful stroke of $n!
@@ -52,8 +58,9 @@ $N nimbly avoids $n's slash.
 Your cunning slash at $N is fruitless.
 You nimbly stop a slash from $n.
 $N stops a cunning slash from $n who looks disappointed.
-M
- 1
+
+M1 abc 
+slash~
 Your slash at $N results in a pool of blood and $S immediate death!
 Blood spurts all over as $n slashes at you. You die...
 $n slashes at $N who colors everything red with blood from $S lethal wound.
@@ -66,8 +73,9 @@ $n's slash misses $N who laughs in sheer delight, HA!
 Come on, what makes you think you can slash at a GOD?!
 You barely register the puny creature before you...
 The great $N seems to ignore $n's slashes.
-M
- 1
+
+M1 abc 
+slash~
 $N cries out in agony as you slash $S ribcage open!
 Your ribcage is slashed open by $n -- R.I.P.!
 $n nicely dissects $N's ribcage with a single slash!
@@ -80,8 +88,9 @@ $n's slash at $N misses $M by a mile.
 It's rude to try to slash a GOD, you know.
 $n tries to slash you -- how rude!
 $n tries to slash $N -- how rude!
-M
- 1
+
+M1 abc 
+slash~
 Your powerful slash cleanly cuts off $N's head, which rolls away with a look of horror on it.
 You briefly feel the sensation of flight as $n slices your head cleanly off!
 $n cleanly slices off $N's head which rolls away with a look of horror on it!
@@ -95,9 +104,12 @@ Yeah, right.
 $n tries to slash you... yeah, right.
 $n tries to slash $N... yeah, right.
 
-* Slice
-M
- 2
+M2 abc +
+slice~
+slice~
+slices~
+swing~
+0 1 3.0 3.2 3.4
 You beautifully slice $N into two parts -- both dead.
 Your upper body is disconnected from your legs as $n slices you in half -- R.I.P.!
 $N is sliced in two by a masterful stroke of $n!
@@ -111,9 +123,12 @@ Your cunning slice at $N is fruitless.
 You nimbly stop a slice from $n.
 $N stops a cunning slice from $n who looks disappointed.
 
-* Jab
-M
- 3
+M3 abc +
+jab~
+jab~
+jabs~
+jab~
+0 1 2.6 2.8 3.0
 You drive your jab directly into the heart of $N, killing $M!
 With a powerful driving force, $n's jab tears right through your chest causing instant death!
 $n drives $s jab through $N's chest, killing $M!
@@ -126,8 +141,9 @@ You watch in fright as $n jabs at $N, missing by mere inches!
 Jab -- God... What are you thinking?
 $n tries to jab you, somewhat comical to tell the truth.
 $n jabs at $N, then looks horrified as $N grins at $m!
-M
- 3
+
+M3 abc 
+jab~
 You violently jab $N repeatedly, causing $S death!
 You die a horrid death as $n jabs you repeatedly all over your body!
 As $n jabs $N all over the place, $N falls lifeless to the ground.
@@ -141,9 +157,12 @@ You jab at $N, and all that happens is that $E slaps himself as if a mosquito bi
 Was that a bee you just felt?  Oh... wait, it was just $n.
 $N begins to slap at $Mself as $n tries to jab $M.
 
-* Stab
-M
- 4
+M4 abc +
+stab~
+stab~
+stabs~
+stab~
+0 1 2.0 2.2 2.4
 You successfully pierce $N and $S dead body falls to the ground in a lifeless heap.
 $n pierces you. You are no longer a living member of this world -- R.I.P.!
 $n pierces $N whose suddenly lifeless body falls to the ground!
@@ -156,8 +175,9 @@ $n tries to pierce air instead of fighting $N.
 The mighty $N begins to think you a nuisance!!!
 Your patience is almost gone when you stare back at $n.
 The air is loaded when $N angrily wards off a piercing attack from $n.
-M
- 4
+
+M4 abc 
+stab~
 You pierce $N's heart, you heartbreaker you...
 $n breaks your heart, goodbye cruel world...
 $n pierces the heart of $N who falls to the ground clutching at the wound!
@@ -170,8 +190,9 @@ $n lunges at $N but can't pierce $M.
 The great $N sends you a piercing look, OOPS!
 You return $n's pierce with a piercing look, hmmm...
 $N returns $n's pierce with a piercing look, hmmm...
-M
- 4
+
+M4 abc 
+stab~
 You stab $N through the heart!  Instant death!
 $n drives a stab at you, it pierces your heart!  RIP!
 $n stabs brutally at $N, killing $M as $E is impaled!
@@ -184,8 +205,9 @@ $n stabs at $N, but $e misses!
 You stab at $N!  Too bad $E's a god, huh?
 $n stabs at you!  Lucky for you that you are immune to this kind of thing.
 You watch in pity as $n stabs towards $N missing in the most futile way possible!
-M
- 4
+
+M4 abc 
+stab~
 You stab forth towards $N, hitting $M in the abdomen causing a messy but mortal wound!
 $n stabs you in the stomach, and you watch your insides fall out as you die.
 Making a mess of $N, $n kills $M with a stab to the midsection.
@@ -199,9 +221,12 @@ Gods can't be stabbed, did noone ever teach you that?  And $N just so happens to
 It sure is nice being a god isn't it... especially since $n can't hit you with $s stabs.
 $n stabs at $N only to discover $N's immunity to stabbing weapons.
 
-* Pound
-M
- 5
+M5 abc +
+pound~
+pound~
+pounds~
+swing~
+0 0 3.4 3.6 3.8
 You pound $N right into the ground!
 $n pounds you six feet under.
 $n pounds $N mightily on the head, crushing $S entire body!
@@ -214,8 +239,9 @@ $n looks perturbed as $s pound misses $N!
 You pound $N!  And $E thanks you for it?  *boggle*
 $n gives you a pound. Wonder what the exchange rate is...
 $n starts giving pounds to $N who begins to count the money.
-M
- 5
+
+M5 abc 
+pound~
 You pound on $N with reckless abandon when you realize that $E is dead.
 With $s reckless pounding attacks, you succumb to death.
 $N falls under $n's pounding blows, yet $n continues $s attack!
@@ -229,9 +255,12 @@ Who are you trying to kid?
 Hmmm... I think you missed the joke that $n was trying to tell you.
 $N looks somewhat perplexed as $n tries to pound $M!
 
-* Hammer
-M
- 6
+M6 abc +
+hammer~
+hammer~
+hammers~
+hammer~
+0 0 3.4 3.6 3.8
 You hammer $N right into the ground!
 $n hammer you six feet under.
 $n hammers $N mightily on the head, crushing $S entire body!
@@ -245,9 +274,12 @@ You hammer $N!  And $E thanks you for it?  *boggle*
 $n tries to hammer you.
 $n starts trying to hammer $N.
 
-* Whip
-M
- 7
+M7 abc +
+whip~
+whip~
+whips~
+whip~
+0 0 2.8 3.0 3.2
 You whip $N's head right off of $S body!
 $n whips your head right off of your body!
 $n whips $N's head right off of $S body!
@@ -260,8 +292,9 @@ $n cracks $s whip at $N but only hits $mself in the face!
 You'd better stop before $N whips your butt.
 $n is trying to whip you... how cute!
 $n tries to whip $N - isn't $e cute?
-M
- 7
+
+M7 abc 
+whip~
 Your dextrous whip messily tears $N's torso right off!
 $n's whip messily tears you right in half!
 With an evil grin, $n messily whips $N in half!
@@ -275,9 +308,12 @@ Don't try to whip $N.
 $n is trying to whip you. Yawn.
 $n tries to whip $N - yawn.
 
-* Pick
-M
- 8
+M8 abc +
+pick~
+jab~
+jabs~
+pick~
+0 1 3.4 3.6 3.8
 You impale $N with your pick, killing $M painfully!
 You are impaled upon $n's pick!
 $n impales $N with $s pick, painfully killing $M!
@@ -291,9 +327,12 @@ Why would you try to jab at $N?
 $n is trying to jab at $N, but can't seem to.
 Silly $n is trying to jab at you!
 
-* Bite
-M
- 9
+M9 ab +
+bite~
+bite~
+bites~
+bite~
+0 1 2.2 2.4 2.6
 You sink your teeth deep into $N's neck -- blood sprays everywhere!
 $n sinks $s teeth deep into your neck, tearing your jugular vein to bits!
 $n sinks $s teeth deep into $N's neck, tearing $S jugular vein to bits!
@@ -306,8 +345,9 @@ $n fiercely snaps $s teeth at $N but misses the mark.
 You attempt to bite $N. Ouch!  That hurt!
 $n tries to bite you, how funny.
 $n tries to bite $N - funny, huh?
-M
- 9
+
+M9 ab 
+bite~
 You bite $N through $S ribcage and into $S heart -- $e falls to the ground in agony.
 $n bites through your ribcage and into your heart -- you fall to the ground writhing in agony...
 $n's powerful jaw bites through $N's ribcage into $S heart -- $E falls to the ground writhing in agony!
@@ -321,9 +361,12 @@ Aren't you trying to bite off more than you can chew?
 $n snaps at you but realizes $e is biting off more than $e can chew.
 $n stupidly tries to bite off more than $e can chew by snapping at $N.
 
-* Claw
-M
- 10
+M10 ab +
+claw~
+claw~
+claws~
+claw~
+0 1 2.4 2.6 2.8
 You claw $N's face right off!
 $n claws your face right off!
 $n claws $N's face right off!
@@ -336,8 +379,9 @@ $n tries to claw at $N, missing by a hair!
 You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
-M
- 10
+
+M10 ab 
+claw~
 Your razor-sharp claws rip $N wide open!
 $n's razor-sharp claws rip you wide open!
 $n's razor-sharp claws rip $N wide open!
@@ -351,9 +395,12 @@ You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
-* Kick
-M
- 11
+M11 ab +
+kick~
+kick~
+kicks~
+kick~
+0 0 2.6 2.8 3.0
 You kick $N in the kidneys, killing $M!
 $n's kick to your kidneys proves fatal!
 $n kicks $N in the kidneys, causing swift death!
@@ -367,9 +414,12 @@ You must be crazy, trying to kick a God!
 $n must be crazy, $e's trying to kick you.
 $n tries to kick $N, but it turns out more crazy than effective.
 
-* Fire
-M
- 12
+M12 abc +
+fire~
+burn~
+burns~
+fire~
+2 0 2.6 2.8 3.0
 You swing at $N, who catches fire and is incinerated!
 $n swings at you... You catch fire and are incinerated!
 $n swings at $N, who catches fire and is incinerated!
@@ -383,9 +433,12 @@ You try to burn $N, but the fire doesn't seem to hurt $M...
 $n tries to burn you, but the fire mostly just tickles.
 $n tries to burn $N, but the fire doesn't seem to do much.
 
-* Vampire Claws
-M
- 13
+M13 ab +
+vampire claws~
+claw~
+claws~
+claw~
+0 1 2.4 2.6 2.8
 You claw $N's head right off!
 $n claws your head right off!
 $n claws $N's head right off!
@@ -398,8 +451,9 @@ $n tries to claw at $N, missing by a hair!
 You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
-M
- 13
+
+M13 ab 
+vampire claws~
 Your razor-sharp claws tear $N wide open!
 $n's razor-sharp claws tear you wide open!
 $n's razor-sharp claws tear $N wide open!
@@ -413,9 +467,12 @@ You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
-* Crush
-M
- 14
+M14 ab +
+crush~
+crush~
+crushes~
+blow~
+0 0 3.6 3.8 4.0
 You crush $N until $E stops wriggling!
 $n crushes you until your vision goes red, and then black. You are dead!
 $n crushes $N until $E stops wriggling!
@@ -428,8 +485,9 @@ $n tries to crush $N, but misses!
 You want to crush $N, but you can't seem to.
 $n tries to crush you, but can't seem to.
 $n tries to crush $N, but can't seem to.
-M
- 14
+
+M14 ab 
+crush~
 You flatten $N to death!
 $n flattens you to death!
 $n flattens $N to death!
@@ -443,9 +501,12 @@ You want to crush $N, but you can't seem to.
 $n tries to crush you, but can't seem to.
 $n tries to crush $N, but can't seem to.
 
-* Hit
-M
- 15
+M15 ab +
+hit~
+hit~
+hits~
+hit~
+0 0 2.8 3.0 3.2
 You punch $N's head with a blow that crushes $S skull!
 $n punches your head with a blow that crushes your skull!
 $n punches $N's head so hard that $S skull cracks open!
@@ -458,8 +519,9 @@ $N barely avoids a blow from $n!
 Your fist flops as your body refuses to fight the mighty $N.
 $n seems to be having trouble getting $s body to fight you!!
 $n's body rebels against $m when $e tries to punch $N.
-M
- 15
+
+M15 ab 
+hit~
 You punch $N in $S kidneys resulting in $S immediate death!
 You receive a punch in your kidneys which ends your worldly misery -- R.I.P.!
 $n punches $N in the kidneys causing immediate death!
@@ -472,8 +534,9 @@ $n practices shadow-boxing while $N takes a break.
 Instead of letting you punch $M, $N forces you to play Punch and Judy!!!
 You convince $n of playing Punch and Judy instead of punching you.
 $N convinces $n that no punching is necessary.
-M
- 15
+
+M15 ab 
+hit~
 You hit $N with such force that $S neck snaps in two!
 $n hits you with such force that your neck snaps in two!
 $N's neck is snapped in two by a powerful blow from $n!
@@ -486,8 +549,9 @@ $n tries to hit $N who easily avoids the blow.
 You try to hit $N but hit yourself instead!
 $n tries to hit you but hits $mself instead!
 $n tries to hit $N but hits $mself instead!
-M
- 15
+
+M15 ab 
+hit~
 You hit $N with a blow that breaks $S spine!
 $n hits you with a blow that breaks your spine!
 $n hits $N with a blow that breaks $S spine!
@@ -501,9 +565,12 @@ It isn't polite to swing at a GOD!
 $n tries to take a swing at you -- how pathetic!
 $n pathetically tries to take a swing at $N - ha!
 
-* Magic Fire
-M
- 16
+M16 abc +
+magic fire~
+blast~
+blasts~
+blast~
+1 2 3.6 3.8 4.0
 You scorch $N with hotter and hotter fire until $E is blackened and dead!
 $n's fire burns and burns, until you succumb to the flames!
 $n scorches $N with hotter and hotter fire until $E is blackened and dead!
@@ -517,9 +584,12 @@ You shoot fire at $N, but it doesn't seem to affect $M.
 $n shoots fire at you, but you can barely feel it.
 $n shoots fire at $N, who isn't even singed.
 
-* Lightning Staff
-M
- 17
+M17 abc +
+lightning staff~
+zap~
+zaps~
+staff~
+1 2 2.2 2.5 2.8
 Your lightning fries $N so thoroughly you can actually see $S skeleton!
 $n's lightning surges through you, cooking you from the inside out!
 $n's lightning fries $N so thoroughly you can actually see $S skeleton!
@@ -533,9 +603,12 @@ You shoot lightning at $N, but it doesn't seem to affect $M.
 $n shoots lightning at you, but you can barely feel it.
 $n shoots lightning at $N, who isn't even singed.
 
-* Burn Staff
-M
- 18
+M18 abc +
+burn staff~
+burn~
+burns~
+staff~
+1 2 2.6 2.9 3.2
 You aim your staff and roast $N until $E's fully cooked!
 $n aims $s staff and you feel hot -- HOTTER -- DEAD!
 $n aims $s staff at $N and roasts $M until $E's fully cooked!
@@ -549,9 +622,12 @@ You try to burn $N, but it doesn't seem to affect $M.
 $n tries to burn you, but you can barely feel it.
 $n tries to burn $N, who isn't even singed.
 
-* Agony Staff
-M
- 19
+M19 abc +
+agony staff~
+agonize~
+agonizes~
+staff~
+1 2 3.3 3.6 3.9
 You raise your staff high as $N crumples to the ground in agony and dies!
 $n raises $s staff high as the agony overwhelms you and you crumple to the ground!
 $n raises $s staff high and $N crumples to the ground in agony, and dies!
@@ -565,9 +641,12 @@ You raise your staff toward $N, but it seems to have no effect.
 $n raises $s staff at you, but you feel nothing.
 $n raises $s staff at $N, but it seems to have no effect.
 
-* Magic Frost
-M
- 20
+M20 abc +
+magic frost~
+chill~
+chills~
+frost~
+1 2 4.1 4.3 4.5
 You freeze $N solid, until all color drains from $M and $E is dead!
 $n freezes you solid, until your vision fades to black, and you are dead!
 $n freezes $N solid, until all color drains from $N and $E is dead!
@@ -580,8 +659,9 @@ $n shoots a blast of arctic air at $N, but misses.
 You try to freeze $N, but nearly wind up frozen yourself!
 $n tries to freeze you, but nearly winds up frozen $mself.
 $n tries to freeze $N, but nearly winds up frozen $mself.
-M
- 20
+
+M20 abc 
+magic frost~
 You grab $N, draining heat from $M until $E falls dead!
 $n grabs you, draining heat from your body until you die!
 $n grabs $N, draining heat from $S body until $E dies!
@@ -595,9 +675,12 @@ You try to freeze $N, but nearly wind up frozen yourself!
 $n tries to freeze you, but nearly winds up frozen $mself.
 $n tries to freeze $N, but nearly winds up frozen $mself.
 
-* Magic Shock
-M
- 21
+M21 abc +
+magic shock~
+shock~
+shocks~
+shock~
+1 2 2.6 2.8 3.0
 You create an arc of electricity straight through $N, stopping $S heart!
 $n creates an arc of electricity straight through you, stopping your heart!
 $n creates an arc of electricity straight through $N, stopping $S heart!
@@ -610,8 +693,9 @@ $n shoots sparks at $N, to no effect.
 Your bolt of electricity hits $N, to no avail.
 $n's bolt of electricity hits you, to no avail.
 $n's bolt of electricity hits $N, to no avail.
-M
- 21
+
+M21 abc 
+magic shock~
 You hurl sparks at $N, cutting through $M, killing $M!
 $n hurls sparks at you, cutting through you, until it kills you!
 $n hurls sparks at $N, cutting through $M, until it kills $M!
@@ -625,9 +709,12 @@ Your bolt of electricity hits $N, to no avail.
 $n's bolt of electricity hits you, to no avail.
 $n's bolt of electricity hits $N, to no avail.
 
-* Magic Light
-M
- 22
+M22 abc +
+magic light~
+flash~
+flashes~
+light~
+1 2 2.8 3.0 3.2
 You shoot blinding light at $N, until it pierces straight through $M, killing $M!
 $n shoots blinding light at you, until it pierces straight through you, killing you!
 $n shoots blinding light at $N, until it pierces straight through $M, killing $N!
@@ -640,8 +727,9 @@ $n blasts $N with light, but misses!
 You try to shoot a flash of light at $N, but $E doesn't seem to mind.
 $n tries to shoot a flash of light at you, but it doesn't seem to affect you!
 $n tries to shoot a flash of light at $N, but $E doesn't seem to mind.
-M
- 22
+
+M22 abc 
+magic light~
 You shoot a beam of light straight through $N, leaving a hole in $S chest!
 $n shoots a beam of light straight through you, leaving a hole in your chest!
 $n shoots a beam of light straight through $N, leaving a hole in $S chest!
@@ -655,9 +743,12 @@ You try to shoot a flash of light at $N, but $E doesn't seem to mind.
 $n tries to shoot a flash of light at you, but it doesn't seem to affect you!
 $n tries to shoot a flash of light at $N, but $E doesn't seem to mind.
 
-* Sting
-M
- 23
+M23 ab +
+sting~
+sting~
+stings~
+sting~
+0 1 3.6 3.8 4.0
 You sting $N in the chest, piercing $S heart!
 $n stings you in the chest, piercing your heart!
 $n stings $N in the chest, piercing $S heart!
@@ -670,8 +761,9 @@ $N dodges as $n tries to sting $M!
 You try to sting $N, but can't penetrate $S skin!
 $n tries to sting you, but can't seem to penetrate your skin!
 $n tries to sting $N, but can't seem to penetrate $S skin!
-M
- 23
+
+M23 ab 
+sting~
 You sting $N furiously, over and over, until $E collapses, dead!
 $n stings you furiously, over and over, causing searing pain until you collapse, dead!
 $n stings $N furiously, over and over, until $E collapses, dead!
@@ -685,9 +777,12 @@ You try to sting $N, but can't penetrate $S skin!
 $n tries to sting you, but can't seem to penetrate your skin!
 $n tries to sting $N, but can't seem to penetrate $S skin!
 
-* Swipe
-M
- 24
+M24 ab +
+swipe~
+swipe~
+swipes~
+swipe~
+0 0 3.6 3.8 4.0
 You swipe at $N hard, knocking $M to the ground, dead!
 $n swipes hard at you, knocking you to the ground, dead!
 $n swipes hard at $N, knocking $M to the ground, dead!
@@ -700,8 +795,9 @@ $n swipes at $N, but misses!
 You swipe at $N, who merely laughs.
 $n swipes at you, but you merely laugh.
 $n swipes at $N, who merely laughs.
-M
- 24
+
+M24 ab 
+swipe~
 You swipe $N's legs out from under $M and as $E falls, $E hits $S head, killing $M!
 $n swipes your legs out from under you. You hit your head as you fall, killing you!
 $n swipes $N's legs out from under $M and as $E falls, $E hits $S head, killing $M!
@@ -715,9 +811,12 @@ You swipe at $N, who merely laughs.
 $n swipes at you, but you merely laugh.
 $n swipes at $N, who merely laughs.
 
-* Tail Swipe
-M
- 25
+M25 ab +
+tail swipe~
+swipe~
+swipes~
+tail swipe~
+0 0 4.0 4.2 4.4
 You swipe your tail into $N with such force that it knocks the life out of $M!
 $n swipes $s tail into you with such force that it knocks the life out of you!
 $n swipes $s tail into $N with such force that it knocks the life out of $M!
@@ -730,8 +829,9 @@ $n swipes at $N with $s tail, but misses!
 You swipe with your tail at $N, who merely laughs.
 $n swipes with $s tail at you, but you merely laugh.
 $n swipes with $s tail at $N, who merely laughs.
-M
- 24
+
+M25 ab 
+tail swipe~
 You swipe your tail into $N's head with so much force that it shatters $S skull!
 $n swipes $s tail into your head with so much force that the last thing you feel is your skull shattering!
 $n swipes $s tail into $N's head with so much force that it shatters $S skull!
@@ -745,9 +845,12 @@ You swipe with your tail at $N, who merely laughs.
 $n swipes with $s tail at you, but you merely laugh.
 $n swipes with $s tail at $N, who merely laughs.
 
-* Peck
-M
- 26
+M26 ab +
+peck~
+peck~
+pecks~
+peck~
+0 0 2.6 2.8 3.0
 You peck at $N's eye socket, cracking $S skull and exposing $S brain!
 $n pecks at your eye socket, cracking your skull. You are dead!
 $n pecks at $N's eye socket, cracking $S skull and exposing $S brain!
@@ -760,8 +863,9 @@ $n pecks at $N, but misses!
 You try to peck at $N, but $E tells you to peck off.
 $n tries to peck at you, but you tell $m to peck off.
 $n tries to peck at $N, but $N tells $m to peck off.
-M
- 26
+
+M26 ab 
+peck~
 You peck at $N over and over, until $E's just a bloody heap!
 $n pecks at you over and over, until you're just a bloody heap!
 $n pecks at $N over and over, until $E's just a bloody heap!
@@ -775,9 +879,12 @@ You try to peck at $N, but cannot bring yourself to do so.
 $n tries to peck at you, but cannot bring $mself to do so.
 $n tries to peck at $N, but cannot bring $mself to do so.
 
-* Gore
-M
- 27
+M27 ab +
+gore~
+gore~
+gores~
+gore~
+0 0 3.9 4.1 4.3
 You gore $N straight through the heart!
 $n gores you straight through the heart!
 $n gores $N straight through the heart!
@@ -790,8 +897,9 @@ $n misses wildly as $e tries to gore $N!
 You go to gore $N, but merely bow your head in worship.
 $n goes to gore you, but merely bows $s head in worship.
 $n goes to gore $N, but merely bows $s head in worship.
-M
- 27
+
+M27 ab 
+gore~
 You gore fiercely at $N, ripping out $S entrails -- $E is dead!
 $n gores fiercely at you, ripping out your entrails -- you are dead!
 $n gores fiercely at $N, ripping out $S entrails -- $E is dead!
@@ -805,9 +913,12 @@ You go to gore $N, but merely bow your head in worship.
 $n goes to gore you, but merely bows $s head in worship.
 $n goes to gore $N, but merely bows $s head in worship.
 
-* Mana Blast
-M
- 28
+M28 ab +
+mana blast~
+blast~
+blasts~
+blast~
+1 2 2.8 3.0 3.2
 You blast $N with mana until $S skin is peeling off and $E doubles over!
 $n blasts you with mana until your skin is searing and peeling off!
 $n blasts $N with mana until $S skin is peeling off and $E doubles over!
@@ -820,8 +931,9 @@ $N ducks out of the way as $n blasts mana at $M.
 You blast mana at $N, who seems to absorb it.
 $n blasts mana at you, but it only seems to refresh you.
 $n blasts mana at $N, who laughs and absorbs it.
-M
- 28
+
+M28 ab 
+mana blast~
 You hit $N hard with a blast of mana, knocking $M to the ground!
 $n hits you hard with a blast of mana, and everything goes dark!
 $n hits $N hard with a blad of mana, knocking $M out!
@@ -835,9 +947,12 @@ $N makes playful animal shapes with the mana you blast at $M.
 $n blasts you with mana, which you form into playful animal shapes.
 $N maakes playful animal shapes with a blast of mana from $n.
 
-* Bow (shoot)
-M
- 29
+M29 abc +
+bow~
+shoot~
+shoots~
+shot~
+0 1 2.2 2.6 3.2
 Your arrow pierces $N's heart, killing $M!
 An arrow shot by $n pierces your heart, killing you!
 An arrow shot by $n pierces $N's heart, killing $M!
@@ -850,8 +965,9 @@ $N steps aside as $n's arrow whistles past $M.
 Your arrow flies wildly, dodging $N by way of magic.
 $n's arrow flies wildly through the air, missing you completely.
 $n's arrow dances around $N, but doesn't manage to hit $M.
-M
- 29
+
+M29 abc 
+bow~
 Your arrow pierces $N's eye socket, killing $M instantly!
 An arrow shot by $n pierces your eye socket, killing you instantly!
 An arrow shot by $n pierces $N's eye socket, killing $M instantly!
@@ -865,9 +981,12 @@ Your arrow flies wildly, dodging $N by way of magic.
 $n's arrow flies wildly through the air, missing you completely.
 $n's arrow dances around $N, but doesn't manage to hit $M.
 
-* Crossbow (shoot)
-M
- 30
+M30 abc +
+crossbow~
+shoot~
+shoots~
+shot~
+0 1 3.7 3.9 4.3
 You shoot a bolt straight through $N's neck, and $E falls over dead.
 $n shoots a bolt straight through your neck, and it's the last thing you see.
 $n shoots a bolt straight through $N's neck, and $E falls over dead.
@@ -880,8 +999,9 @@ $n shoots a bolt straight over $N's shoulder.
 Your bolt stops just short of $N, and falls straight to the ground.
 $n's bolt stops just short of you, and falls straight to the ground.
 $n's bolt stops just short of $N, and falls straight to the ground.
-M
- 30
+
+M30 abc 
+crossbow~
 Your bolt hits $N in the spleen, sending $M to an early grave.
 $n shoots a bolt in your spleen, sending you to an early grave.
 $n shoots a $N in the spleen, spending $M to an early grave.
@@ -895,9 +1015,12 @@ Your bolt stops just short of $N, and falls straight to the ground.
 $n's bolt stops just short of you, and falls straight to the ground.
 $n's bolt stops just short of $N, and falls straight to the ground.
 
-* Pistol (shoot)
-M
- 31
+M31 abc +
+pistol~
+shoot~
+shoots~
+shot~
+0 0 2.0 2.4 3.0
 $N clutches $S chest as your shot pierces it, killing $M.
 You clutch your chest as a shot from $n burns through you, and it's the last thing you see.
 $n shoots $N in the chest, killing $M.
@@ -910,8 +1033,9 @@ $n shoots at $N, but misses completely.
 Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
-M
- 31
+
+M31 abc 
+pistol~
 You shoot $N right between the eyes, dropping $M to the ground!
 The last thing you see is $n, shooting you right between the eyes!
 A well-aimed shot from $n strikes $N right between the eyes, dropping $M to the ground!
@@ -925,9 +1049,12 @@ Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
 
-* Musket (shoot)
-M
- 32
+M32 abc +
+musket~
+shoot~
+shoots~
+shot~
+0 0 3.6 3.8 4.2
 $N's chest explodes as your clever shot blasts through $S sternum!
 Your chest explodes as a clever shot from $n blasts through your sternum!
 $N's chest explodes after a clever shot from $n!
@@ -940,8 +1067,9 @@ $n shoots at $N, but misses completely.
 Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
-M
- 32
+
+M32 abc 
+musket~
 Your shot rips through $N's leg, opening a major artery and killing $M almost instantly!
 A shot from $n rips painfully through your leg, and you bleed out before you can take action!
 A loud shot from $n rips through $N's leg, opening a major artery and killing $M almost instantly!
@@ -955,9 +1083,12 @@ Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
 
-* Fire Breath
-M
- 33
+M33 ab +
+fire breath~
+breathe fire at~
+breathes fire at~
+fire breath~
+1 2 3.6 3.8 4.0
 You scorch $N with hotter and hotter fire breath until $E is blackened and dead!
 $n's fire breath burns and burns, until you succumb to the flames!
 $n scorches $N with hotter and hotter fire breath until $E is blackened and dead!
@@ -971,9 +1102,12 @@ You breathe fire at $N, but it doesn't seem to affect $M.
 $n breathes fire fire at you, but you can barely feel it.
 $n breathes fire fire at $N, who isn't even singed.
 
-* Sling (shoot)
-M
- 34
+M34 abc +
+sling~
+shoot~
+shoots~
+shot~
+0 0 3.0 3.5 4.0
 You sling the bullet right between $N's eyes and $E falls limply to the ground!
 The last thing you see is $n's sling bullet coming at your head!
 $n slings a bullet right between $N's eyes and $E falls limply to the ground!
@@ -986,8 +1120,9 @@ $n shoots at $N, but misses completely.
 Your sling bullet stops in midair before $N.
 A sling bullet from $n stops in midair before you.
 A sling bullet from $n stops in midair before $N.
-M
- 34
+
+M34 abc 
+sling~
 Your sling bullet grazes $N's neck and $E falls to the ground trying in vain to stop the profuse bleeding!
 You feel a sling bullet from $n graze your neck, and the warm, wet feeling of blood gushing into your clothing as your vision goes dark!
 A sling bullet from $n seems to graze $N's neck, but $E falls to the ground, trying in vein to stop the profuse bleeding!
@@ -1001,9 +1136,12 @@ Your sling bullet stops in midair before $N, and drops to the ground.
 A sling bullet from $n stops in midair before you, and drops to the ground.
 A sling bullet from $n stops in midair before $N, and drops to the ground.
 
-* Spear-thrower (shoot)
-M
- 35
+M35 abc +
+spear-thrower~
+shoot~
+shoots~
+shot~
+0 1 3.5 4.0 4.5
 You hurl the dart right into $N's chest so hard $E flies backwards, hits $S head, and dies!
 The last thing you see is a dart from $n hitting you in the chest so hard you fly backwards!
 $n hurls a dart right into $N's chest so hard $E flies backwards, hits $S head, and dies!
@@ -1016,8 +1154,9 @@ $n shoots at $N, but misses completely.
 You shoot a dart at $N but it vanishes before it hits $M.
 $n shoots a dart at you, but it vanishes before it reaches you.
 $n shoots a dart at $N, but it vanishes before it hits $M.
-M
- 35
+
+M35 abc 
+spear-thrower~
 You shoot the dart straight into $N's heart! $E staggers backwards and dies.
 $n shoots a dart straight into your heart! You clutch at your chest as the world goes dark.
 $n shoots a dart straight into $N's heart! $E staggers backwards and dies.
@@ -1031,9 +1170,12 @@ You hurl a dart at $N but it explodes into flower petals.
 $n hurls a dart at you, but it explodes into flower petals.
 $n hurls a dart at $N, but it explodes into flower petals.
 
-* Animal Whip
-M
- 36
+M36 ab +
+animal whip~
+animal whip~
+whip~
+whips", "whip~
+0 0 2.8 3.0 3.2
 You whip $N's head right off of $S body!
 $n whips your head right off of your body!
 $n whips $N's head right off of $S body!
@@ -1046,8 +1188,9 @@ $n tries to whip at $N but only whips $mself in the face!
 You'd better stop before $N whips you.
 $n is trying to whip you... how cute!
 $n tries to whip $N - isn't $e cute?
-M
- 36
+
+M36 ab 
+animal whip~
 Your dextrous whip messily tears $N's torso right off!
 $n's whip messily tears you right in half!
 With an evil grin, $n messily whips $N in half!
@@ -1061,9 +1204,8 @@ Don't try to whip $N.
 $n is trying to whip you. Yawn.
 $n tries to whip $N - yawn.
 
-* Suffering
-M
- 50
+M50 0 
+Suffering~
 #
 You feel wounded -- too wounded -- you die...
 $N lies suffering on the ground until no blood is left in $S body.
@@ -1076,8 +1218,9 @@ $N lies helplessly on the ground and suffers...
 #
 Suffer god victim - should never see.
 Suffer god room - should never see.
-M
- 50
+
+M50 0 
+Suffering~
 #
 You can only lie still as your last heartbeat ebbs...
 $N suffers from bloodlack, and the lack of a beating heart...
@@ -1091,9 +1234,8 @@ $N lies immobile on the ground, suffering...
 Suffer god victim -- should never see.
 Suffer god room -- should never see.
 
-* Guard Tower
-M
- 51
+M51 0 
+Guard Tower~
 #
 A well-aimed arrow from a near-by guard tower pierces your heart, killing you!
 A well-aimed arrow from a near-by guard tower pierces $N's heart, killing $M!
@@ -1106,8 +1248,9 @@ You hear a dull thud as an arrow pierces $N in the shoulder!
 #
 #
 #
-M
- 51
+
+M51 0 
+Guard Tower~
 #
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
@@ -1120,8 +1263,9 @@ You hear a dull thud as an arrow pierces $N in the leg!
 #
 #
 #
-M
- 51
+
+M51 0 
+Guard Tower~
 #
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
@@ -1134,8 +1278,9 @@ You hear a dull thud as an arrow pierces $N in the arm!
 #
 #
 #
-M
- 51
+
+M51 0 
+Guard Tower~
 #
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
@@ -1149,9 +1294,8 @@ You hear a dull thud as an arrow pierces $N in the stomach!
 #
 #
 
-* Arrow (no longer used because bows use normal attack types now)
-M
- 53
+M53 0 
+Arrow~
 Your arrow pierces $N's heart, killing $M!
 An arrow shot by $n pierces your heart, killing you!
 An arrow shot by $n pierces $N's heart, killing $M!
@@ -1165,9 +1309,8 @@ Your arrow flies wildly, dodging $N by way of magic.
 $n's arrow flies wildly through the air, missing you completely.
 $n's arrow dances around $N, but doesn't manage to hit $M.
 
-* Kick
-M
- 54
+M54 0 
+Kick (ability)~
 Your kick at $N's kidneys made $M die.
 $n kills you by kicking your kidneys in!
 $N dies from $n's last kick in $S kidneys!
@@ -1180,8 +1323,9 @@ $n wipes $s boots in the face of $N!
 $N makes you kick at a huge stone appearing from nowhere -- OUCH!
 You make $n kick a huge stone appearing from nowhere -- *giggle*
 $n starts kicking a huge stone which suddenly appears.
-M
- 54
+
+M54 0 
+Kick (ability)~
 Your kick at $N's face splits $S head open -- yummy!
 $n aims a kick at your face which splits your head in two!
 $n neatly kicks $N's head into pieces -- YUMMY!
@@ -1195,9 +1339,8 @@ You attempt to kick $N but lose your balance and fall face down in some mud that
 When $n tries to kick you, you quickly make $m fall in some mud you have created.
 $n falls face down in some mud created by $N.
 
-* Bash
-M
- 55
+M55 0 
+Bash~
 $N doesn't recover from your bash -- $E is dead!
 As $n bashes at you, you give up living and die...
 $N dies after $n has bashed $M!
@@ -1211,9 +1354,8 @@ Your effort to bash $N sends YOU sprawling on the ground.
 $n fruitlessly tries to bash you and is sent sprawling.
 $n dares a bash at $N and is sent sprawling without touching $M.
 
-* Sunburn
-M
- 56
+M56 0 
+Sunburn~
 #
 You scream in agony as the flames envelop your body!
 $n screams in agony as the flames envelop $m and $e crumples to the ground!
@@ -1227,9 +1369,8 @@ You wince in pain as the sun scorches your unliving flesh!
 #
 #
 
-* Searing poison (no longer used because searing poison is scripted now)
-M
- 57
+M57 0 
+Poison~
 $N winces in pain and falls over dead from your searing poison!
 You wince in pain as your insides burn up and you fall over dead from $n's burning poison.
 $N winces in pain and falls over dead from $n's searing poison!
@@ -1243,9 +1384,8 @@ $N winces in pain as $E is burned from the inside by $n's searing poison!
 #
 #
 
-* Creo Ignem: fire attack
-M
- 58
+M58 0 
+Creo Ignem (1.0)~
 You shoot a bolt of fire at $N, who is incinerated!
 Your flesh is incinerated by a bolt of fire from $n's hand!
 $n shoots a bolt of fire at $N, who is incinerated!
@@ -1259,9 +1399,8 @@ You shoot a bolt of fire at $N, but miss!
 $n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 
-* Bite attack (Vampire ability)
-M
- 59
+M59 0 
+Vampire Bite~
 Your fangs sink into $N's neck...
 You feel $n's fangs sink into your neck...
 $n sinks $s fangs into $N's neck...
@@ -1274,8 +1413,9 @@ $N shouts in pain as $n takes a bite out of $M with $s fangs!
 Your fangs retreat into your gums as you try -- and fail -- to bite $N!
 $n's fangs retreat into $s gums as $e tries -- and fails -- to bite you!
 $n's fangs retreat into $s gums as $e tries -- and fails -- to bite $N!
-M
- 59
+
+M59 0 
+Vampire Bite~
 Your fangs sink into $N's neck...
 You feel $n's fangs sink into your neck...
 $n sinks $s fangs into $N's neck...
@@ -1289,9 +1429,8 @@ Your fangs crack and chip as you try -- and fail -- to bite $N!
 $n's fangs crack and chip as $e tries -- and fails -- to bite you!
 $n's fangs crack and chip as $e tries -- and fails -- to bite $N!
 
-* Lightning Bolt
-M
- 60
+M60 0 
+Lightningbolt~
 Your lightning bolt cuts straight through $N -- $E falls over dead.
 You reel in pain as $n's lightning bolt cuts straight through you, and you fall down dead.
 $N staggers as $n's lightning bolt cuts straight through $M -- $E falls down dead.
@@ -1305,9 +1444,8 @@ Your lightning bolt misses $N.
 $n shoots a lightning bolt at you, but misses.
 $n shoots a lightning bolt at $N, but misses.
 
-* Physical DoT
-M
- 61
+M61 0 
+Physical DoT~
 $N bleeds out from $S open wounds, and dies.
 You bleed out from your open wounds and die.
 $N bleeds out from $S open wounds, and dies.
@@ -1320,8 +1458,9 @@ $N winces in pain from $S open wounds.
 #
 #
 #
-M
- 61
+
+M61 0 
+Physical DoT~
 $N succumbs to $S open wounds, and dies.
 You succumb to your open wounds and die.
 $N succumbs to $S open wounds, and dies.
@@ -1335,9 +1474,8 @@ $N bleeds from open wounds.
 #
 #
 
-* Backstab
-M
- 62
+M62 0 
+Backstab~
 You leap from the shadows and strike $N in the heart!
 You hear a sound behind you but it's too late, as $n strikes true to your heart!
 $n leaps from the shadows and stabs $N in the back, and $N crumples to the ground instantly!
@@ -1351,9 +1489,8 @@ You try to surprise $N but find that impossible, and $E easily avoids your backs
 $n tries to surprise you with a backstab, but that would be silly.
 $n attempts to surprise $N by attacking from behind, but it is fruitless.
 
-* Sunshock
-M
- 63
+M63 0 
+Sunshock~
 You sunshock $N for all you've got, burning off bits of $S flesh as $E dies!
 $n strikes you with a powerful sunshock, burning off bits of your flesh as you die in agony!
 $n strikes $N with a powerful sunshock, burning off bits of $S flesh as $E dies!
@@ -1367,9 +1504,8 @@ $N basks in the glow of your sunshock.
 You bask in the glow of $n's sunshock.
 $N basks in the glow of $n's sunshock.
 
-* Magical DoT
-M
- 64
+M64 0 
+Magical DoT~
 The searing magical pain proves too much for $N, and $E falls over dead!
 The searing magical pain proves too much, and you fall over dead!
 The searing magical pain proves too much for $N, and $E falls over dead!
@@ -1382,8 +1518,9 @@ $N twitches as magical pain sears through $M!
 #
 #
 #
-M
- 64
+
+M64 0 
+Magical DoT~
 The residual magic flowing through $N proves too much, and $E falls over dead!
 The residual magic flowing through you proves too much, and you fall over dead!
 The residual magic flowing through $N proves too much, and $E falls over dead!
@@ -1397,9 +1534,8 @@ $N seems to be burning on the inside as magical pain courses through $M!
 #
 #
 
-* Fire DoT
-M
- 65
+M65 0 
+Fire DoT~
 The fire overtakes $N and $E burns to death!
 The fire overtakes you and you burn to death!
 The fire overtakes $N and $E burns to death!
@@ -1412,8 +1548,9 @@ $N shouts in pain as the fire scorches $S flesh!
 #
 #
 #
-M
- 65
+
+M65 0 
+Fire DoT~
 $N falls over dead, burnt to a crisp!
 You fall over dead, burnt to a crisp!
 $N falls over dead, burnt to a crisp!
@@ -1427,9 +1564,8 @@ $N is on fire, $S flesh sizzles and $E appears to be in agony!
 #
 #
 
-* Poison DoT
-M
- 66
+M66 0 
+Poison DoT~
 The poison reaches $N's heart and $E crumples to the ground, dead!
 The poison reaches your heart and you crumple to the ground, dead!
 The poison reaches $N's heart and $E crumples to the ground, dead!
@@ -1442,8 +1578,9 @@ $N winces in pain as poison courses through $S blood!
 #
 #
 #
-M
- 66
+
+M66 0 
+Poison DoT~
 $N suddenly falls over, dead from poison!
 The poison hits your brain. Your vision fades to black and you fall down dead!
 $N suddenly falls over, dead from poison!
@@ -1457,9 +1594,8 @@ $N acts like $E's burning from the inside as poison flows through $S veins!
 #
 #
 
-* Ablate
-M
- 67
+M67 0 
+Ablate~
 Your spell ablates pieces off of $N until there's not enough left to live!
 $n's spell ablates pieces off of you, leaving you in agony until you are dead!
 $n casts an ablation spell on $N, who flakes off in pieces until nothing remains.
@@ -1473,9 +1609,8 @@ You try to ablate $N, but it is futile.
 $n tries futilely to cast ablate on you.
 $n tries to ablate $N, but it has no effect.
 
-* Acidblast
-M
- 68
+M68 0 
+Acidblast~
 Your acid blast is too effective, and $N melts into a fleshy puddle on the ground!
 $n throws a blast of acid at you, and you scream in pain as you melt into a fleshy puddle!
 A blast of acid from $n to $N reduces $M into a dead, fleshy puddle on the ground.
@@ -1489,9 +1624,8 @@ Your acid blast has no effect on $N.
 $n throws an acid blast at you, to no avail.
 $n throws an acid blast at $N, but it seems to do nothing.
 
-* Arclight
-M
- 69
+M69 0 
+Arclight~
 The brilliant white jets of your arclight shred $N to pieces!
 You collapse in pain as the brilliant white jets from $n's arclight shred you to pieces!
 $N screams and collapses as $n's brilliant white jets of arclight shred $M to pieces.
@@ -1505,9 +1639,8 @@ $N seems to absorb your arclight with no trouble.
 $n casts arclight at you, which you simply absorb.
 $n casts arclight at $N, but $E seems unaffected.
 
-* Astralclaw
-M
- 70
+M70 0 
+Astralclaw~
 Your astral claws shred $N until nothing remains but a bloody pulp!
 Astral claws from $n appear around you, painfully shredding you until you die in agony!
 $n casts astral claws at $N, who is shredded until nothing remains but a bloody pulp.
@@ -1521,9 +1654,8 @@ You slash at $N with astral claws, but $E doesn't even seem to notice.
 You ignore $n's futile attempts to slash you with astral claws.
 $n slashes futilely at the air in front of $N.
 
-* Chronoblast
-M
- 71
+M71 0 
+Chronoblast~
 Your chronoblast seems to slow $N down so much that $S heart stops!
 Time seems to stop around you, as $n's chronoblast stops your heart!
 $n casts chronoblast and $N freezes completely, before toppling over, dead.
@@ -1537,9 +1669,8 @@ You cast chronoblast at $N, but somehow $E seems faster!
 $n casts chronoblast at you, giving you more time to enjoy the fight.
 $n casts chronoblast at $N, who seems to speed up instead of slowing down!
 
-* Deathtouch
-M
- 72
+M72 0 
+Deathtouch~
 Your deathtouch seems to wilt $N down to nothing!
 $n touches you, and $s deathtouch is too much for your poor heart to take!
 $n touches $N, who wilts down to the ground and dies!
@@ -1553,9 +1684,8 @@ You grasp $N, but your deathtouch cannot harm so majestic a person.
 $n grasps your arm and you feel the tingle of a futile deathtouch.
 $n grasps $N's arm, but $s deathtouch seems futile against $N's majesty.
 
-* Dispirit
-M
- 73
+M73 0 
+Dispirit~
 Your dispiriting yowl seems too much for $N, who grasps $S head and crumples to the floor!
 $n lets out a dispiriting yowl, and you fall to the floor clutching your head...
 $n lets out a dispiriting yowl, and $N falls to the floor clutching $S head.
@@ -1569,9 +1699,8 @@ You yowl at $N, but the only person dispirited here is you.
 $n yowls at you, but $s dispiriting cry has no effect on you.
 $n lets out a dispiriting yowl, but $N doesn't seem to mind.
 
-* Erode
-M
- 74
+M74 0 
+Erode~
 You cast erode at $N, whose skin falls off in dry chunks as $E falls down, dead.
 You fall down dead as $n's erode spell breaks off your skin in dry chunks.
 $N falls down dead as every last bit of $S skin falls off in dry chunks from $n's erode spell.
@@ -1585,9 +1714,8 @@ You attempt to erode $N, but $E is immune.
 $n attempts to erode you, but you are immune.
 $n attempts to erode $N, who shrugs it off.
 
-* Scour
-M
- 75
+M75 0 
+Scour~
 You scour away at $N until nothing living remains!
 $n's magic scours away at you until nothing living remains!
 $n scours away at $N with $s magic, until nothing living remains!
@@ -1601,9 +1729,8 @@ You scour $N with your magic, and $E seems to appreciate it.
 You feel cleaner as $N's magic begins to scour you.
 $n magically scours $N, who actually looks cleaner afterwards.
 
-* Shadowlash
-M
- 76
+M76 0 
+Shadowlash~
 Your shadowlash wraps around $N and consumes $M in the darkness!
 $n lashes out at you with shadows which wrap around you, smothering out the light -- and your life!
 $n's shadowlash wraps around $N, consuming $M in the darkness.
@@ -1617,9 +1744,8 @@ Your shadows lash out at $N, but are deflected by $S own shadow.
 Your shadow deflects a shadowlash from $N.
 $n's shadow lashes out at $N, but is deflected by $S own shadow.
 
-* Soulchain
-M
- 77
+M77 0 
+Soulchain~
 You toss a magical soulchain at $N, which seems to separate $S spirit from $S body!
 $n tosses a magical soulchain at you, separating your spirit from your body!
 $n tosses a magical soulchain at $N, separating $S spirit from $S body.
@@ -1633,9 +1759,8 @@ Your soulchain doesn't even seem to tickle $N.
 $n casts a soulchain on you, but it doesn't seem to have any effect.
 $n tries to soulchain $N, but $N barely seems to notice.
 
-* Starstrike
-M
- 78
+M78 0 
+Starstrike~
 A meteor from your starstrike cuts straight through $N's heart, and $E crumples.
 You move too late as meteor from $n's starstrike cuts straight through your heart!
 $n brings down a meteoric starstrike, straight through $N's heart.
@@ -1649,9 +1774,8 @@ You summon a starstrike, but $N merely watches with joy as the stars fall.
 $n summons falling stars, much to your delight.
 $N watches with delight as $n's starstrike lights up the sky.
 
-* Thornlash
-M
- 79
+M79 0 
+Thornlash~
 Your thornlash coils tightly around $N, choking off $S airway as it rends $S flesh!
 A thornlash from $n coils tightly around you, choking off your airway as you die in pain!
 $N dies silently as a thornlash from $n coils tightly around $M and cuts off $S airway.
