@@ -4159,6 +4159,8 @@ struct archetype_menu_type {
 #define AMDF_MOBILE			BIT(1)	// allowed on mobiles
 #define AMDF_DISARMABLE		BIT(2)	// can be disarmed
 
+#define AMDF_FLAGS_REQUIRE_EXTENDED_DATA  (AMDF_WEAPON | AMDF_MOBILE)
+
 
 // MSG_x: each fight message has these 4 types
 #define MSG_DIE		0	// messages when death

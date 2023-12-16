@@ -720,7 +720,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define ATTACK_WEAPON_TYPE(amd)		((amd)->weapon_type)
 
 #define ATTACK_FLAGGED(amd, flag)		IS_SET(ATTACK_FLAGS(amd), (flag))
-#define ATTACK_HAS_EXTENDED_DATA(amd)	(ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE) || ATTACK_DAMAGE_TYPE(amd) != 0 || ATTACK_FIRST_PERSON(amd) || ATTACK_NOUN(amd) || ATTACK_THIRD_PERSON(amd) || ATTACK_WEAPON_TYPE(amd) != 0)
+#define ATTACK_HAS_EXTENDED_DATA(amd)	(ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA) || ATTACK_DAMAGE_TYPE(amd) != 0 || ATTACK_FIRST_PERSON(amd) || ATTACK_NOUN(amd) || ATTACK_THIRD_PERSON(amd) || ATTACK_WEAPON_TYPE(amd) != 0)
 
 
  //////////////////////////////////////////////////////////////////////////////

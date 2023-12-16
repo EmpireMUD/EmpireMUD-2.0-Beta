@@ -1071,7 +1071,7 @@ void save_olc_attack_message(descriptor_data *desc) {
 	}
 	
 	// if it can be used on weapons and mobs, they are required
-	if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+	if (ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 		if (!ATTACK_FIRST_PERSON(amd)) {
 			ATTACK_FIRST_PERSON(amd) = strdup(default_attack_first_person);
 		}
@@ -1360,7 +1360,7 @@ void olc_show_attack_message(char_data *ch) {
 		sprintf(buf + strlen(buf), "%d. %s\r\n", ++count, to_show ? to_show : "(blank)");
 	}
 	
-	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 		sprintf(buf + strlen(buf), "To clear extended data: <%sclearextended\t0>\r\n", OLC_LABEL_CHANGED);
 	}
 	
@@ -1654,7 +1654,7 @@ OLC_MODULE(attackedit_clearextended) {
 		return;
 	}
 	
-	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 		ATTACK_DAMAGE_TYPE(amd) = 0;
 		ATTACK_WEAPON_TYPE(amd) = 0;
 		
@@ -1704,7 +1704,7 @@ OLC_MODULE(attackedit_firstperson) {
 		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		if (ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
 		}
 		else {
@@ -1833,7 +1833,7 @@ OLC_MODULE(attackedit_noun) {
 		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		if (ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
 		}
 		else {
@@ -1896,7 +1896,7 @@ OLC_MODULE(attackedit_thirdperson) {
 		msg_to_char(ch, "Set the WEAPON or MOBILE flag to enable extended attack data.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
-		if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		if (ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
 			msg_to_char(ch, "You cannot remove this property while the WEAPON or MOBILE flags are on.\r\n");
 		}
 		else {
