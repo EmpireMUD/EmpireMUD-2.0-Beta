@@ -753,6 +753,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_WIELD_ANY_WEAPON  27	// checks for a weapon in the wield slot -- and not disarmed
 #define ABIL_LIMIT_WIELD_ATTACK_TYPE  28	// wielding a weapon with a given attack
 #define ABIL_LIMIT_WIELD_WEAPON_TYPE  29	// wielding a weapon with a given damage type
+#define ABIL_LIMIT_NOT_BEING_ATTACKED  30	// no characters hitting actor
 
 
 // ABLIM_x: data needed for ability limits:

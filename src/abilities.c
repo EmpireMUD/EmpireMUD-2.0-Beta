@@ -2510,6 +2510,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_NOT_BEING_ATTACKED: {
+				char_data *ch_iter;
+				
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (FIGHTING(ch_iter) == ch) {
+						msg_to_char(ch, "You can't do that someone is attacking you!\r\n");
+						return FALSE;
+					}
+				}
+				break;
+			}
 		}
 	}
 	

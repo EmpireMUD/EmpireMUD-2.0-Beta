@@ -1114,6 +1114,7 @@ Limitation types:
  &cindoors&0 - Must be indoors (including inside buildings on the map).
  &citem type <TYPE>&0 - Obj target must be a specific type.
  &cmember permission at target&0 - Has member access at the target location.
+ &cnot being attacked&0 - No characters in combat are targeting the actor.
  &cnot distracted&0 - User does not have DISTRACTED affect.
  &cnot god target&0 - Target player must not be a god or immortal.
  &cnot here&0 - Target cannot be in same room.
