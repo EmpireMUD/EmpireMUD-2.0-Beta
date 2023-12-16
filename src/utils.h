@@ -707,10 +707,20 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 
 
 // for attack messages
-#define ATTACK_VNUM(amd)		((amd)->vnum)
-#define ATTACK_MSG_LIST(amd)	((amd)->msg_list)
-#define ATTACK_NAME(amd)		((amd)->name)
-#define ATTACK_NUM_MSGS(amd)	((amd)->num_msgs)
+#define ATTACK_VNUM(amd)			((amd)->vnum)
+#define ATTACK_DAMAGE_TYPE(amd)		((amd)->damage_type)
+#define ATTACK_FIRST_PERSON(amd)	((amd)->first_pers)
+#define ATTACK_FLAGS(amd)			((amd)->flags)
+#define ATTACK_MSG_LIST(amd)		((amd)->msg_list)
+#define ATTACK_NAME(amd)			((amd)->name)
+#define ATTACK_NOUN(amd)			((amd)->noun)
+#define ATTACK_NUM_MSGS(amd)		((amd)->num_msgs)
+#define ATTACK_SPEED(amd, type)		((amd)->speed[(type)])
+#define ATTACK_THIRD_PERSON(amd)	((amd)->third_pers)
+#define ATTACK_WEAPON_TYPE(amd)		((amd)->weapon_type)
+
+#define ATTACK_FLAGGED(amd, flag)		IS_SET(ATTACK_FLAGS(amd), (flag))
+#define ATTACK_HAS_EXTENDED_DATA(amd)	(ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE) || ATTACK_DAMAGE_TYPE(amd) != 0 || ATTACK_FIRST_PERSON(amd) || ATTACK_NOUN(amd) || ATTACK_THIRD_PERSON(amd) || ATTACK_WEAPON_TYPE(amd) != 0)
 
 
  //////////////////////////////////////////////////////////////////////////////

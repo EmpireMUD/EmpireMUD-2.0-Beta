@@ -39,6 +39,9 @@
 
 // local data
 const char *default_attack_name = "Unnamed Attack";
+const char *default_attack_first_person = "attack";
+const char *default_attack_third_person = "attacks";
+const char *default_attack_noun = "attack";
 
 const char *messages_file_header =
 "* Note: all lines between records which start with '*' are comments and\n"
@@ -517,9 +520,15 @@ void remove_attack_message_from_table(attack_message_data *amd) {
 * @param attack_message_data *amd The message data to initialize.
 */
 void clear_attack_message(attack_message_data *amd) {
+	int iter;
+	
 	memset((char *) amd, 0, sizeof(attack_message_data));
 	
 	ATTACK_VNUM(amd) = NOTHING;
+	
+	for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
+		ATTACK_SPEED(amd, iter) = basic_speed;
+	}
 }
 
 
@@ -567,6 +576,15 @@ void free_attack_message(attack_message_data *amd) {
 	
 	if (ATTACK_NAME(amd) && (!proto || ATTACK_NAME(amd) != ATTACK_NAME(proto))) {
 		free(ATTACK_NAME(amd));
+	}
+	if (ATTACK_FIRST_PERSON(amd) && (!proto || ATTACK_FIRST_PERSON(amd) != ATTACK_FIRST_PERSON(proto))) {
+		free(ATTACK_FIRST_PERSON(amd));
+	}
+	if (ATTACK_THIRD_PERSON(amd) && (!proto || ATTACK_THIRD_PERSON(amd) != ATTACK_THIRD_PERSON(proto))) {
+		free(ATTACK_THIRD_PERSON(amd));
+	}
+	if (ATTACK_NOUN(amd) && (!proto || ATTACK_NOUN(amd) != ATTACK_NOUN(proto))) {
+		free(ATTACK_NOUN(amd));
 	}
 	
 	if (ATTACK_MSG_LIST(amd) && (!proto || ATTACK_MSG_LIST(amd) != ATTACK_MSG_LIST(proto))) {
@@ -823,8 +841,17 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 	// sets of messages
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
 		fprintf(fl, "\n");	// records are spaced by blank lines
-		fprintf(fl, "M%d\n", ATTACK_VNUM(amd));	// M# indicates the b5.166 attack message format
+		
+		// record begins M#### flags +
+		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), ATTACK_HAS_EXTENDED_DATA(amd) ? "+" : "");	// M# indicates the b5.166 attack message format
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NAME(amd)));
+		
+		if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)));
+			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_THIRD_PERSON(amd)));
+			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NOUN(amd)));
+			fprintf(fl, "%d %d %lf %lf %lf\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_SLOW), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_FAST));
+		}
 		
 		// print message triplets in order, with '#' in place of blanks.
 		for (iter = 0; msg_order[iter] != -1; ++iter) {
@@ -952,16 +979,52 @@ void save_olc_attack_message(descriptor_data *desc) {
 	if (ATTACK_NAME(proto)) {
 		free(ATTACK_NAME(proto));
 	}
+	if (ATTACK_FIRST_PERSON(proto)) {
+		free(ATTACK_FIRST_PERSON(proto));
+	}
+	if (ATTACK_THIRD_PERSON(proto)) {
+		free(ATTACK_THIRD_PERSON(proto));
+	}
+	if (ATTACK_NOUN(proto)) {
+		free(ATTACK_NOUN(proto));
+	}
 	LL_FOREACH_SAFE(ATTACK_MSG_LIST(proto), ams, next_ams) {
 		free_attack_message_set(ams);
 	}
 	
-	// sanity
+	// sanity: name required
 	if (!ATTACK_NAME(amd) || !*ATTACK_NAME(amd)) {
 		if (ATTACK_NAME(amd)) {
 			free(ATTACK_NAME(amd));
 		}
 		ATTACK_NAME(amd) = str_dup(default_attack_name);
+	}
+	
+	// these are optional
+	if (ATTACK_FIRST_PERSON(amd) && !*ATTACK_FIRST_PERSON(amd)) {
+		free(ATTACK_FIRST_PERSON(amd));
+		ATTACK_FIRST_PERSON(amd) = NULL;
+	}
+	if (ATTACK_THIRD_PERSON(amd) && !*ATTACK_THIRD_PERSON(amd)) {
+		free(ATTACK_THIRD_PERSON(amd));
+		ATTACK_THIRD_PERSON(amd) = NULL;
+	}
+	if (ATTACK_NOUN(amd) && !*ATTACK_NOUN(amd)) {
+		free(ATTACK_NOUN(amd));
+		ATTACK_NOUN(amd) = NULL;
+	}
+	
+	// if it can be used on weapons and mobs, they are required
+	if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		if (!ATTACK_FIRST_PERSON(amd)) {
+			ATTACK_FIRST_PERSON(amd) = strdup(default_attack_first_person);
+		}
+		if (!ATTACK_THIRD_PERSON(amd)) {
+			ATTACK_THIRD_PERSON(amd) = strdup(default_attack_third_person);
+		}
+		if (!ATTACK_NOUN(amd)) {
+			ATTACK_NOUN(amd) = strdup(default_attack_noun);
+		}
 	}
 	
 	// save data back over the proto-type
@@ -993,6 +1056,10 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 		
 		// copy things that are pointers
 		ATTACK_NAME(dupe) = ATTACK_NAME(input) ? str_dup(ATTACK_NAME(input)) : NULL;
+		ATTACK_FIRST_PERSON(dupe) = ATTACK_FIRST_PERSON(input) ? str_dup(ATTACK_FIRST_PERSON(input)) : NULL;
+		ATTACK_THIRD_PERSON(dupe) = ATTACK_THIRD_PERSON(input) ? str_dup(ATTACK_THIRD_PERSON(input)) : NULL;
+		ATTACK_NOUN(dupe) = ATTACK_NOUN(input) ? str_dup(ATTACK_NOUN(input)) : NULL;
+		
 		ATTACK_MSG_LIST(dupe) = copy_attack_msg_list(ATTACK_MSG_LIST(input));
 	}
 	else {

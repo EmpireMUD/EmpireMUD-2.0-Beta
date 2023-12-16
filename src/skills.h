@@ -408,26 +408,13 @@ bool trigger_counterspell(char_data *ch);
 #define RESCUE_FOCUS  2		// mob changes focus
 
 
-// SPD_x: speeds for attack_hit_info.speed
-#define SPD_FAST  0
-#define SPD_NORMAL  1
-#define SPD_SLOW  2
-#define NUM_SPEEDS  3
-
-
-// WEAPON_x: Weapon types
-#define WEAPON_BLUNT  0
-#define WEAPON_SHARP  1
-#define WEAPON_MAGIC  2
-
-
 // TYPE_ Attacktypes with grammar
 struct attack_hit_type {
 	const char *name;
 	const char *first_pers;	// You "slash"
 	const char *third_pers;	// $n "slashes"
 	const char *noun;	// ... with your "swing"
-	double speed[NUM_SPEEDS];	// { fast, normal, slow }
+	double speed[NUM_ATTACK_SPEEDS];	// { fast, normal, slow }
 	int weapon_type;	// WEAPON_ type
 	int damage_type;	// DAM_ type
 	bool disarmable;	// whether or not disarm works
