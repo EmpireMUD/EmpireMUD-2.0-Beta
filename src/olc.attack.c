@@ -785,7 +785,7 @@ void load_fight_messages(void) {
 					log("SYSERR: Missing numeric line of %s", error);
 					exit(1);
 				}
-				if (sscanf(line, "%d %d %lf %lf %lf", &int_in[0], &int_in[1], &dbl_in[SPD_SLOW], &dbl_in[SPD_NORMAL], &dbl_in[SPD_FAST]) != 5) {
+				if (sscanf(line, "%d %d %lf %lf %lf", &int_in[0], &int_in[1], &dbl_in[SPD_FAST], &dbl_in[SPD_NORMAL], &dbl_in[SPD_SLOW]) != 5) {
 					log("SYSERR: Unexpected data in numeric line of %s", error);
 					exit(1);
 				}
@@ -900,7 +900,7 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_THIRD_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NOUN(amd)));
-			fprintf(fl, "%d %d %.1f %.1f %.1f\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_SLOW), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_FAST));
+			fprintf(fl, "%d %d %.1f %.1f %.1f\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_FAST), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_SLOW));
 		}
 		
 		// print message triplets in order, with '#' in place of blanks.
@@ -1132,9 +1132,9 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 * @param attack_message_data *amd The attack message to display.
 */
 void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
-	char buf[MAX_STRING_LENGTH * 2];
+	char buf[MAX_STRING_LENGTH * 2], lbuf[MAX_STRING_LENGTH];;
 	char *to_show;
-	int count;
+	int count, iter;
 	size_t size;
 	struct attack_message_set *ams;
 	
@@ -1144,7 +1144,22 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+
+	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", lbuf);
 	
+	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]\r\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0]\r\n", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "Speeds: [");
+		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "]\r\n");
+	}
+
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	
 	// message section (abbreviated)
