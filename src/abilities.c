@@ -56,6 +56,7 @@ INTERACTION_FUNC(devastate_trees);
 void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
+void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
@@ -3811,6 +3812,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		}
 	}
 	
+	// right after the do-funcs
+	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
+	
 	// exp gain unless we hit something that prevented costs
 	if (data->should_charge_cost && (!vict || can_gain_exp_from(ch, vict))) {
 		// TODO some way to modify this amount?
@@ -3843,6 +3847,36 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		*/
 			send_ability_fail_messages(ch, vict, ovict, abil, data);
 		// }
+	}
+}
+
+
+/**
+* Things that proc right after an ability runs.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The character target, if any (may be NULL).
+* @param obj_data *ovict The object target, if any (may be NULL).
+* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param room_data *room_targ For room target, if any (may be NULL).
+* @param struct ability_exec *data The execution data to pass back and forth.
+*/
+void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data) {
+	if (data->stop) {
+		return;
+	}
+	
+	// counts as a weapon hit
+	if (vict && vict != ch && data->success && ABILITY_FLAGGED(abil, ABILF_WEAPON_HIT)) {
+		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && attack_hit_info[GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))].weapon_type == WEAPON_SHARP) {
+			// chance to poison
+			if (!number(0, 1) && apply_poison(ch, vict) < 0) {
+				// dedz
+				data->stop = TRUE;
+				return;
+			}
+		}
 	}
 }
 
