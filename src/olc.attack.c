@@ -735,6 +735,7 @@ void load_fight_messages(void) {
 		else if (sscanf(chk, "M%d %s ", &type, str_in) == 2) {
 			// b5.166 format: type was in M line; simple format
 			version = 5166;
+			extended = FALSE;
 		}
 		else {
 			// older format: read type from next line
@@ -742,6 +743,7 @@ void load_fight_messages(void) {
 			sscanf(chk, " %d\n", &type);
 			
 			version = 30;	// circle 3.0
+			extended = FALSE;
 			strcpy(str_in, "0");
 		}
 		
