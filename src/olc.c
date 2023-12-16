@@ -120,6 +120,18 @@ OLC_MODULE(archedit_type);
 OLC_MODULE(attackedit_back);
 OLC_MODULE(attackedit_message);
 OLC_MODULE(attackedit_name);
+OLC_MODULE(attackedit_die2char);
+OLC_MODULE(attackedit_die2vict);
+OLC_MODULE(attackedit_die2room);
+OLC_MODULE(attackedit_miss2char);
+OLC_MODULE(attackedit_miss2vict);
+OLC_MODULE(attackedit_miss2room);
+OLC_MODULE(attackedit_hit2char);
+OLC_MODULE(attackedit_hit2vict);
+OLC_MODULE(attackedit_hit2room);
+OLC_MODULE(attackedit_god2char);
+OLC_MODULE(attackedit_god2vict);
+OLC_MODULE(attackedit_god2room);
 
 // augment modules
 OLC_MODULE(augedit_ability);
@@ -642,6 +654,19 @@ const struct olc_command_data olc_data[] = {
 	{ "back", attackedit_back, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "message", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
+	// attacks: messages
+	{ "die2char", attackedit_die2char, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "die2vict", attackedit_die2vict, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "die2room", attackedit_die2room, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "miss2char", attackedit_miss2char, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "miss2vict", attackedit_miss2vict, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "miss2room", attackedit_miss2room, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "hit2char", attackedit_hit2char, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "hit2vict", attackedit_hit2vict, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "hit2room", attackedit_hit2room, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "god2char", attackedit_god2char, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "god2vict", attackedit_god2vict, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "god2room", attackedit_god2room, OLC_ATTACK, OLC_CF_EDITOR },
 	
 	// augments
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },

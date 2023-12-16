@@ -33,6 +33,7 @@
 *   Database
 *   OLC Handlers
 *   Displays
+*   OLC Message Modules
 *   OLC Modules
 */
 
@@ -1079,6 +1080,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 void olc_show_one_message(char_data *ch) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
 	char buf[MAX_STRING_LENGTH * 2];
+	int iter;
 	struct attack_message_set *ams;
 	
 	// find message
@@ -1093,22 +1095,47 @@ void olc_show_one_message(char_data *ch) {
 	*buf = '\0';
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s #%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), GET_OLC_ATTACK_NUM(ch->desc));
 	
+	for (iter = 1; iter < 80; ++iter) {
+		strcat(buf, "-");
+	}
+	strcat(buf, "\r\n");
+	
 	// messages
 	sprintf(buf + strlen(buf), "<%sdie2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].attacker_msg), ams->msg[MSG_DIE].attacker_msg ? ams->msg[MSG_DIE].attacker_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%sdie2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].victim_msg), ams->msg[MSG_DIE].victim_msg ? ams->msg[MSG_DIE].victim_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%sdie2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].room_msg), ams->msg[MSG_DIE].room_msg ? ams->msg[MSG_DIE].room_msg : "(none)");
 	
+	for (iter = 1; iter < 80; ++iter) {
+		strcat(buf, "-");
+	}
+	strcat(buf, "\r\n");
+	
 	sprintf(buf + strlen(buf), "<%smiss2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].attacker_msg), ams->msg[MSG_MISS].attacker_msg ? ams->msg[MSG_MISS].attacker_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%smiss2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].victim_msg), ams->msg[MSG_MISS].victim_msg ? ams->msg[MSG_MISS].victim_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%smiss2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].room_msg), ams->msg[MSG_MISS].room_msg ? ams->msg[MSG_MISS].room_msg : "(none)");
+	
+	for (iter = 1; iter < 80; ++iter) {
+		strcat(buf, "-");
+	}
+	strcat(buf, "\r\n");
 	
 	sprintf(buf + strlen(buf), "<%shit2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].attacker_msg), ams->msg[MSG_HIT].attacker_msg ? ams->msg[MSG_HIT].attacker_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%shit2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].victim_msg), ams->msg[MSG_HIT].victim_msg ? ams->msg[MSG_HIT].victim_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%shit2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].room_msg), ams->msg[MSG_HIT].room_msg ? ams->msg[MSG_HIT].room_msg : "(none)");
 	
+	for (iter = 1; iter < 80; ++iter) {
+		strcat(buf, "-");
+	}
+	strcat(buf, "\r\n");
+	
 	sprintf(buf + strlen(buf), "<%sgod2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].attacker_msg), ams->msg[MSG_GOD].attacker_msg ? ams->msg[MSG_GOD].attacker_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%sgod2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].victim_msg), ams->msg[MSG_GOD].victim_msg ? ams->msg[MSG_GOD].victim_msg : "(none)");
 	sprintf(buf + strlen(buf), "<%sgod2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].room_msg), ams->msg[MSG_GOD].room_msg ? ams->msg[MSG_GOD].room_msg : "(none)");
+	
+	for (iter = 1; iter < 80; ++iter) {
+		strcat(buf, "-");
+	}
+	strcat(buf, "\r\n");
 	
 	sprintf(buf + strlen(buf), "Return to main menu: <%sback\t0>\r\n", OLC_LABEL_UNCHANGED);
 	page_string(ch->desc, buf, TRUE);
@@ -1201,6 +1228,165 @@ int vnum_attack_message(char *searchname, char_data *ch) {
 	}
 	
 	return found;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC MESSAGE MODULES /////////////////////////////////////////////////////
+
+OLC_MODULE(attackedit_die2char) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "die2char", &ams->msg[MSG_DIE].attacker_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_die2vict) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "die2vict", &ams->msg[MSG_DIE].victim_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_die2room) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "die2room", &ams->msg[MSG_DIE].room_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_miss2char) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "miss2char", &ams->msg[MSG_MISS].attacker_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_miss2vict) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "miss2vict", &ams->msg[MSG_MISS].victim_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_miss2room) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "miss2room", &ams->msg[MSG_MISS].room_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_hit2char) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "hit2char", &ams->msg[MSG_HIT].attacker_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_hit2vict) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "hit2vict", &ams->msg[MSG_HIT].victim_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_hit2room) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "hit2room", &ams->msg[MSG_HIT].room_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_god2char) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "god2char", &ams->msg[MSG_GOD].attacker_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_god2vict) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "god2vict", &ams->msg[MSG_GOD].victim_msg);
+	}
+}
+
+
+OLC_MODULE(attackedit_god2room) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
+		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "god2room", &ams->msg[MSG_GOD].room_msg);
+	}
 }
 
 
