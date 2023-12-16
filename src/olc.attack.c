@@ -1090,12 +1090,27 @@ void olc_show_one_message(char_data *ch) {
 	}
 	
 	// one message view
+	*buf = '\0';
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s #%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), GET_OLC_ATTACK_NUM(ch->desc));
 	
 	// messages
 	sprintf(buf + strlen(buf), "<%sdie2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].attacker_msg), ams->msg[MSG_DIE].attacker_msg ? ams->msg[MSG_DIE].attacker_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%sdie2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].victim_msg), ams->msg[MSG_DIE].victim_msg ? ams->msg[MSG_DIE].victim_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%sdie2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].room_msg), ams->msg[MSG_DIE].room_msg ? ams->msg[MSG_DIE].room_msg : "(none)");
 	
-	sprintf(buf + strlen(buf), "<%sback\t0> to return to the main menu\r\n", OLC_LABEL_UNCHANGED);
+	sprintf(buf + strlen(buf), "<%smiss2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].attacker_msg), ams->msg[MSG_MISS].attacker_msg ? ams->msg[MSG_MISS].attacker_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%smiss2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].victim_msg), ams->msg[MSG_MISS].victim_msg ? ams->msg[MSG_MISS].victim_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%smiss2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_MISS].room_msg), ams->msg[MSG_MISS].room_msg ? ams->msg[MSG_MISS].room_msg : "(none)");
+	
+	sprintf(buf + strlen(buf), "<%shit2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].attacker_msg), ams->msg[MSG_HIT].attacker_msg ? ams->msg[MSG_HIT].attacker_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%shit2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].victim_msg), ams->msg[MSG_HIT].victim_msg ? ams->msg[MSG_HIT].victim_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%shit2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_HIT].room_msg), ams->msg[MSG_HIT].room_msg ? ams->msg[MSG_HIT].room_msg : "(none)");
+	
+	sprintf(buf + strlen(buf), "<%sgod2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].attacker_msg), ams->msg[MSG_GOD].attacker_msg ? ams->msg[MSG_GOD].attacker_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%sgod2vict\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].victim_msg), ams->msg[MSG_GOD].victim_msg ? ams->msg[MSG_GOD].victim_msg : "(none)");
+	sprintf(buf + strlen(buf), "<%sgod2room\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_GOD].room_msg), ams->msg[MSG_GOD].room_msg ? ams->msg[MSG_GOD].room_msg : "(none)");
+	
+	sprintf(buf + strlen(buf), "Return to main menu: <%sback\t0>\r\n", OLC_LABEL_UNCHANGED);
 	page_string(ch->desc, buf, TRUE);
 }
 
