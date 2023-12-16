@@ -247,39 +247,39 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 	dta = dtv = dtr = mta = mtv = mtr = gta = gtv = gtr = FALSE;
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
 		if (!ams->msg[MSG_DIE].attacker_msg && !dta) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-attacker message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2char message.");
 			problem = dta = TRUE;
 		}
 		if (!ams->msg[MSG_DIE].victim_msg && !dtv) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-victim message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2vict message.");
 			problem = dtv = TRUE;
 		}
 		if (!ams->msg[MSG_DIE].room_msg && !dtr) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-room message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2room message.");
 			problem = dtr = TRUE;
 		}
 		if (!ams->msg[MSG_MISS].attacker_msg && !mta) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-attacker message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss2char message.");
 			problem = mta = TRUE;
 		}
 		if (!ams->msg[MSG_MISS].victim_msg && !mtv) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-victim message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss2vict message.");
 			problem = mtv = TRUE;
 		}
 		if (!ams->msg[MSG_MISS].room_msg && !mtr) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-room message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss2room message.");
 			problem = mtr = TRUE;
 		}
 		if (!ams->msg[MSG_GOD].attacker_msg && !gta) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-attacker message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god2char message.");
 			problem = gta = TRUE;
 		}
 		if (!ams->msg[MSG_GOD].victim_msg && !gtv) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-victim message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god2vict message.");
 			problem = gtv = TRUE;
 		}
 		if (!ams->msg[MSG_GOD].room_msg && !gtr) {
-			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-room message.");
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god2room message.");
 			problem = gtr = TRUE;
 		}
 	}
@@ -1093,7 +1093,7 @@ void olc_show_one_message(char_data *ch) {
 	
 	// one message view
 	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s #%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), GET_OLC_ATTACK_NUM(ch->desc));
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0: Message %s%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), OLC_LABEL_UNCHANGED, GET_OLC_ATTACK_NUM(ch->desc));
 	
 	for (iter = 1; iter < 80; ++iter) {
 		strcat(buf, "-");
@@ -1490,24 +1490,57 @@ OLC_MODULE(attackedit_back) {
 
 OLC_MODULE(attackedit_message) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	char *arg2;
 	int num;
+	struct attack_message_set *ams, *next_ams;
 	
 	char *USAGE = "Usage:  .message <number | add | remove>\r\n";
+	
+	// arg2 for remove only
+	arg2 = one_argument(argument, arg);
 	
 	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
 		msg_to_char(ch, "You are already editing a message (use .back to return to the menu).\r\n");
 	}
-	else if (!*argument) {
+	else if (!*arg) {
 		send_to_char(USAGE, ch);
 	}
-	else if (!str_cmp(argument, "add")) {
+	else if (!str_cmp(arg, "add")) {
+		// create message
+		CREATE(ams, struct attack_message_set, 1);
+		add_attack_message(amd, ams);
+		
+		// and send to the editor
+		GET_OLC_ATTACK_NUM(ch->desc) = ATTACK_NUM_MSGS(amd);
+		olc_show_attack_message(ch);
 	}
-	else if (!str_cmp(argument, "remove")) {
+	else if (!str_cmp(arg, "remove")) {
+		skip_spaces(&arg2);
+		if (!*arg2 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage:  .message remove <number>\r\n");
+		}
+		else if ((num = atoi(arg2)) < 1 || num > ATTACK_NUM_MSGS(amd)) {
+			msg_to_char(ch, "Invalid message number '%s'.\r\n", arg2);
+		}
+		else {
+			LL_FOREACH_SAFE(ATTACK_MSG_LIST(amd), ams, next_ams) {
+				if (--num <= 0) {
+					// found
+					msg_to_char(ch, "You remove message %d.\r\n", atoi(arg2));
+					LL_DELETE(ATTACK_MSG_LIST(amd), ams);
+					free_attack_message_set(ams);
+					return;	// done
+				}
+			}
+			
+			// if we got here, somehow there was no match
+			msg_to_char(ch, "Message %d not found.\r\n", atoi(arg2));
+		}
 	}
-	else if (isdigit(*argument)) {
-		num = atoi(argument);
+	else if (isdigit(*arg)) {
+		num = atoi(arg);
 		if (num < 1 || num > ATTACK_NUM_MSGS(amd)) {
-			msg_to_char(ch, "Invalid message number '%s'.\r\n", argument);
+			msg_to_char(ch, "Invalid message number '%s'.\r\n", arg);
 		}
 		else {
 			GET_OLC_ATTACK_NUM(ch->desc) = num;

@@ -2408,6 +2408,15 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"ATTACKEDIT BACK"
+
+Usage:  .back
+
+This command sends you back to the main menu when you were editing one of the
+individual messages inside the attack message set.
+
+See also: OLC ATTACKS
+#d
 "ATTACKEDIT FULLSEARCH" "ATTACK FULLSEARCH"
 
 Usage:  .attack fullsearch -<field> <argument> <...>
@@ -2421,6 +2430,81 @@ Fields:
 
 Examples:
  > .attack fullsearch slash -vmin 10000 -vmax 10099
+#d
+"ATTACKEDIT HIT2CHAR" "ATTACKEDIT HIT2VICT" "ATTACKEDIT HIT2ROOM"
+
+Usage:  .hit2char <message | none>
+        .hit2vict <message | none>
+        .hit2room <message | none>
+
+These are the messages shown when one character hits another one. This message
+is not used for basic weapon/mob attacks but should be provided for special
+attacks unless they're not shown.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT DIE2CHAR" "ATTACKEDIT DIE2VICT" "ATTACKEDIT DIE2ROOM"
+
+Usage:  .die2char <message | none>
+        .die2vict <message | none>
+        .die2room <message | none>
+
+These are the messages shown when one character kills another one. This message
+should usually be provided by all messages.
+
+The killer (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT MISS2CHAR" "ATTACKEDIT MISS2VICT" "ATTACKEDIT MISS2ROOM"
+
+Usage:  .miss2char <message | none>
+        .miss2vict <message | none>
+        .miss2room <message | none>
+
+These are the messages shown when one character tries to hit another, but
+misses. This message should usually be provided by all messages, but may be
+omitted for damage abilities that don't miss.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT GOD2CHAR" "ATTACKEDIT GOD2VICT" "ATTACKEDIT GOD2ROOM"
+
+Usage:  .god2char <message | none>
+        .god2vict <message | none>
+        .god2room <message | none>
+
+These are the messages shown when a character tries to hit a god or immortal.
+This message should usually be provided by all messages, but may be omitted,
+for example, on DoTs that don't show tick messages to immortals.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The god (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT MESSAGE"
+
+Usage:  .message <number>
+        .message add
+        .message remove <number>
+
+Each attack set has multiple messages. In combat, these are chosen at random to
+provide variety. Use the .message command to choose a set to edit. Once inside
+the message menu, use .back to return to the main menu.
+
+The main menu only displays a preview of each set. Usually the preview is the
+hit2char or die2char message, if available.
+
+See also: OLC ATTACKS, ATTACKEDIT HIT2CHAR, ATTACKEDIT DIE2CHAR,
+   ATTACKEDIT MISS2CHAR, ATTACKEDIT GOD2CHAR
 #d
 "ATTACKEDIT NAME"
 
