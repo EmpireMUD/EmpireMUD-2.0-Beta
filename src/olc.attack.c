@@ -1314,7 +1314,7 @@ void olc_show_attack_message(char_data *ch) {
 		
 		sprintf(buf + strlen(buf), "Speeds: <%sspeed\t0>\r\n", OLC_LABEL_CHANGED);
 		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
-			sprintf(buf + strlen(buf), "   %s: %.1f seconds\r\n", attack_speed_types[iter], ATTACK_SPEED(amd, iter));
+			sprintf(buf + strlen(buf), "   %s: %s%.1f\t0 seconds\r\n", attack_speed_types[iter], OLC_LABEL_VAL(ATTACK_SPEED(amd, iter), basic_speed), ATTACK_SPEED(amd, iter));
 		}
 	}
 	
