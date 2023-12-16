@@ -2150,6 +2150,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	int room_lev = 0, room_min = 0, room_max = 0;
 	int pools_down[NUM_POOLS];
 	int iter;
+	attack_message_data *amd;
 	
 	// sanity
 	if (!IS_NPC(mob)) {
@@ -2278,11 +2279,12 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// damage
 	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 9.5);
-	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
+	amd = real_attack_message(MOB_ATTACK_TYPE(mob));
+	value = target * ((amd && ATTACK_SPEED(amd, SPD_NORMAL) > 0.0) ? ATTACK_SPEED(amd, SPD_NORMAL) : basic_speed);
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
-	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
 	if (MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {

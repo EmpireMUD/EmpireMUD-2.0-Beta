@@ -831,7 +831,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		case ITEM_WEAPON: {
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type]);
+			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(obj))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(obj))]);
 			break;
 		}
 		case ITEM_ARMOR:
@@ -903,7 +903,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			msg_to_char(ch, "Damage type is %s.\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(obj)));
 			break;
 		case ITEM_AMMO:
 			if (GET_AMMO_QUANTITY(obj) > 0) {

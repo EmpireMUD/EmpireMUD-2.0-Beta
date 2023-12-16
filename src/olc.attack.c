@@ -28,6 +28,7 @@
 /**
 * Contents:
 *   Helpers
+*   Quick Getters
 *   Dynamic Attack Messages
 *   Utilities
 *   Database
@@ -109,24 +110,6 @@ struct attack_message_set *get_one_attack_message(attack_message_data *amd, int 
 
 
 /**
-* Gets a attack's name by vnum, safely.
-*
-* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
-* @return const char* The name, or UNKNOWN if none.
-*/
-const char *get_attack_name_by_vnum(any_vnum vnum) {
-	attack_message_data *amd = real_attack_message(vnum);
-	
-	if (!amd) {
-		return "UNKNOWN";	// sanity
-	}
-	else {
-		return ATTACK_NAME(amd);
-	}
-}
-
-
-/**
 * Counts the words of text in an attack's strings.
 *
 * @param attack_message_data *amd The attack whose strings to count.
@@ -147,6 +130,136 @@ int wordcount_attack_message(attack_message_data *amd) {
 	}
 	
 	return count;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUICK GETTERS ///////////////////////////////////////////////////////////
+
+/**
+* Gets a attack's DAMAGE_ type by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return int The DAMAGE_ type, or UNKNOWN if none.
+*/
+int get_attack_damage_type_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd) {
+		return 0;
+	}
+	else {
+		return ATTACK_DAMAGE_TYPE(amd);
+	}
+}
+
+
+/**
+* Gets a attack's first-person string by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return const char* The first-person string, or UNKNOWN if none.
+*/
+const char *get_attack_first_person_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd || !ATTACK_FIRST_PERSON(amd)) {
+		return "UNKNOWN";	// sanity
+	}
+	else {
+		return ATTACK_FIRST_PERSON(amd);
+	}
+}
+
+
+/**
+* Gets a attack's name by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return const char* The name, or UNKNOWN if none.
+*/
+const char *get_attack_name_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd) {
+		return "UNKNOWN";	// sanity
+	}
+	else {
+		return ATTACK_NAME(amd);
+	}
+}
+
+/**
+* Gets a attack's noun string by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return const char* The noun string, or UNKNOWN if none.
+*/
+const char *get_attack_noun_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd || !ATTACK_NOUN(amd)) {
+		return "UNKNOWN";	// sanity
+	}
+	else {
+		return ATTACK_NOUN(amd);
+	}
+}
+
+
+/**
+* Gets a attack's third-person string by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return const char* The third-person string, or UNKNOWN if none.
+*/
+const char *get_attack_third_person_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd || !ATTACK_THIRD_PERSON(amd)) {
+		return "UNKNOWN";	// sanity
+	}
+	else {
+		return ATTACK_THIRD_PERSON(amd);
+	}
+}
+
+
+/**
+* Gets a attack's WEAPON_ type by vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @return int The WEAPON_ type, or UNKNOWN if none.
+*/
+int get_attack_weapon_type_by_vnum(any_vnum vnum) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd) {
+		return 0;
+	}
+	else {
+		return ATTACK_WEAPON_TYPE(amd);
+	}
+}
+
+
+/**
+* Tells you whether or not an attack type is flagged with a given flag, by
+* vnum, safely.
+*
+* @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
+* @param bitvector_t amdf_flags Which AMDF_ flags to look for.
+* @return bool TRUE if at least 1 of those flags is set, FALSE if not.
+*/
+bool is_attack_flagged_by_vnum(any_vnum vnum, bitvector_t amdf_flags) {
+	attack_message_data *amd = real_attack_message(vnum);
+	
+	if (!amd) {
+		return 0;
+	}
+	else {
+		return ATTACK_FLAGGED(amd, amdf_flags) ? TRUE : FALSE;
+	}
 }
 
 

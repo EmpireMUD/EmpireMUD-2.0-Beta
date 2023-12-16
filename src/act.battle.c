@@ -282,7 +282,7 @@ ACMD(do_disarm) {
 	else if (!IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD)) {
 		msg_to_char(ch, "You can't disarm someone who isn't wielding a weapon.\r\n");
 	}
-	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && !attack_hit_info[MOB_ATTACK_TYPE(victim)].disarmable) {
+	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && !is_attack_flagged_by_vnum(MOB_ATTACK_TYPE(victim), AMDF_DISARMABLE)) {
 		act("You can't disarm $M -- $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
 	}
 	else if (AFF_FLAGGED(victim, AFF_DISARMED)) {

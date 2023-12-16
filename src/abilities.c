@@ -247,7 +247,7 @@ char *ability_hook_display(struct ability_hook *ahook) {
 			break;
 		}
 		case AHOOK_ATTACK_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, attack_hit_info[ahook->value].name);
+			snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_WEAPON_TYPE: {
@@ -2544,14 +2544,14 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", attack_hit_info[adl->misc].name);
+					snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", get_attack_name_by_vnum(adl->misc));
 				}
 				break;
 			}
 			case ABIL_LIMIT_WIELD_WEAPON_TYPE: {
 				want_weapon = TRUE;
 				
-				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && attack_hit_info[GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))].weapon_type == adl->misc) {
+				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))) == adl->misc) {
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
@@ -3917,7 +3917,7 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 	
 	// counts as a weapon hit
 	if (vict && vict != ch && data->success && ABILITY_FLAGGED(abil, ABILF_WEAPON_HIT)) {
-		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && attack_hit_info[GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))].weapon_type == WEAPON_SHARP) {
+		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))) == WEAPON_SHARP) {
 			// chance to poison
 			if (!number(0, 1) && apply_poison(ch, vict) < 0) {
 				// dedz

@@ -223,14 +223,14 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		}
 		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARMED)) {
 			// disarmed mob
-			if (attack_hit_info[MOB_ATTACK_TYPE(ch)].damage_type == DAM_MAGICAL) {
+			if (get_attack_damage_type_by_vnum(MOB_ATTACK_TYPE(ch)) == DAM_MAGICAL) {
 				w_type = TYPE_MANA_BLAST;
 			}
 			else {
 				w_type = TYPE_HIT;
 			}
 		}
-		else if (AFF_FLAGGED(ch, AFF_DISARMED) && weapon && IS_WEAPON(weapon) && attack_hit_info[GET_WEAPON_TYPE(weapon)].damage_type == DAM_MAGICAL) {
+		else if (AFF_FLAGGED(ch, AFF_DISARMED) && weapon && IS_WEAPON(weapon) && get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(weapon)) == DAM_MAGICAL) {
 			w_type = TYPE_MANA_BLAST;
 		}
 		else {
@@ -307,15 +307,18 @@ double get_base_speed(char_data *ch, int pos) {
 	obj_data *weapon = GET_EQ(ch, pos);
 	double base = 3.0;
 	int w_type;
+	attack_message_data *amd;
 	
 	w_type = get_attack_type(ch, weapon);
 	
 	if (weapon) {
 		base = get_weapon_speed(weapon);
 	}
+	else if ((amd = real_attack_message(w_type)) && ATTACK_SPEED(amd, SPD_NORMAL) > 0.0) {
+		base = ATTACK_SPEED(amd, SPD_NORMAL);
+	}
 	else {
-		// basic speed
-		base = attack_hit_info[w_type].speed[SPD_NORMAL];
+		base = basic_speed;	// default
 	}
 	
 	return base;
@@ -448,6 +451,7 @@ int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_sk
 double get_weapon_speed(obj_data *weapon) {
 	int spd;
 	double speed;
+	attack_message_data *amd;
 
 	// determine speed
 	spd = SPD_NORMAL;
@@ -458,14 +462,14 @@ double get_weapon_speed(obj_data *weapon) {
 		spd = SPD_FAST;
 	}
 
-	if (IS_WEAPON(weapon)) {
-		speed = attack_hit_info[GET_WEAPON_TYPE(weapon)].speed[spd];
+	if (IS_WEAPON(weapon) && (amd = real_attack_message(GET_WEAPON_TYPE(weapon))) && ATTACK_SPEED(amd, spd) > 0.0) {
+		speed = ATTACK_SPEED(amd, spd);
 	}
-	else if (IS_MISSILE_WEAPON(weapon)) {
-		speed = attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].speed[spd];
+	else if (IS_MISSILE_WEAPON(weapon) && (amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(weapon))) && ATTACK_SPEED(amd, spd) > 0.0) {
+		speed = ATTACK_SPEED(amd, spd);
 	}
 	else {
-		speed = 2.0;
+		speed = basic_speed;
 	}
 	
 	return speed;
@@ -2073,17 +2077,18 @@ void update_guard_towers(void) {
 * @param int w_type the weapon type
 */
 void block_attack(char_data *ch, char_data *victim, int w_type) {
+	attack_message_data *amd = real_attack_message(w_type);
 	char *pbuf;
 	
 	// block message to onlookers
-	pbuf = replace_fight_string("$N blocks $n's #x.", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
+	pbuf = replace_fight_string("$N blocks $n's #x.", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"), ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack"));
 	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT | ACT_COMBAT_MISS);
 
 	// block message to ch
 	if (ch->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&y", ch);
-		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
+		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"), ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack"));
 		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR | ACT_COMBAT_MISS);
 	}
 
@@ -2091,7 +2096,7 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 	if (victim->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&r", victim);
-		pbuf = replace_fight_string("You block $n's #x.&0", attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
+		pbuf = replace_fight_string("You block $n's #x.&0", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"), ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack"));
 		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | ACT_COMBAT_MISS);
 	}
 	
@@ -2109,14 +2114,15 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 */
 void block_missile_attack(char_data *ch, char_data *victim, int type) {
 	char buf[MAX_STRING_LENGTH];
+	attack_message_data *amd = real_attack_message(type);
 	
-	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", attack_hit_info[type].first_pers);
+	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"));
 	act(buf, FALSE, ch, NULL, victim, TO_CHAR | ACT_COMBAT_MISS);
 	
-	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", attack_hit_info[type].third_pers);
+	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
 	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | ACT_COMBAT_MISS);
 	
-	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", attack_hit_info[type].third_pers);
+	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
 	act(buf, FALSE, ch, NULL, victim, TO_VICT | ACT_COMBAT_MISS);
 }
 
@@ -2133,6 +2139,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	bitvector_t fmsg_type;
 	char message[1024], *ptr;
 	int iter, msgnum;
+	attack_message_data *amd;
 
 	static struct dam_weapon_type {
 		int damage;
@@ -2354,21 +2361,22 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 		}
 	}
 	
+	amd = real_attack_message(w_type);
 	fmsg_type = (dam > 0 ? ACT_COMBAT_HIT : ACT_COMBAT_MISS);
 
 	/* damage message to onlookers */
 	if (!AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
-		ptr = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun);
+		ptr = replace_fight_string(dam_weapons[msgnum].to_room, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack"));
 		act(ptr, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
 	}
 
 	/* damage message to damager */
 	if (ch->desc && ch != victim && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
 		if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\ty%s (%d)\t0", replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun), dam);
+			snprintf(message, sizeof(message), "\ty%s (%d)\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), dam);
 		}
 		else { // no damage numbers
-			snprintf(message, sizeof(message), "\ty%s\t0", replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun));
+			snprintf(message, sizeof(message), "\ty%s\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
 		}
 		act(message, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
 	}
@@ -2376,10 +2384,10 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	/* damage message to damagee */
 	if (victim->desc) {
 		if (SHOW_FIGHT_MESSAGES(victim, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\tr%s (%+d)\t0", replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun), -1 * dam);
+			snprintf(message, sizeof(message), "\tr%s (%+d)\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), -1 * dam);
 		}
 		else { // no damage numbers
-			snprintf(message, sizeof(message), "\tr%s\t0", replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].first_pers, attack_hit_info[w_type].third_pers, attack_hit_info[w_type].noun));
+			snprintf(message, sizeof(message), "\tr%s\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
 		}
 		act(message, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
 	}
@@ -3539,6 +3547,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	bool can_gain_skill;
 	empire_data *victim_emp;
 	double attack_speed, cur_speed, dam;
+	attack_message_data *amd;
 	char_data *check;
 	
 	// some config TODO move this into the config system?
@@ -3621,12 +3630,15 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
 	success = check_hit_vs_dodge(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
 	
+	// for messaging
+	amd = real_attack_message(w_type);
+	
 	// blockable?
 	if (success && AWAKE(victim)) {
-		if (attack_hit_info[w_type].damage_type == DAM_PHYSICAL) {
+		if (amd && ATTACK_DAMAGE_TYPE(amd) == DAM_PHYSICAL) {
 			block = check_block(victim, ch, TRUE);
 		}
-		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && attack_hit_info[w_type].damage_type == DAM_MAGICAL) {
+		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && amd && ATTACK_DAMAGE_TYPE(amd) == DAM_MAGICAL) {
 			// half-chance
 			block = check_block(victim, ch, TRUE) && !number(0, 1);
 			gain_player_tech_exp(victim, PTECH_BLOCK_MAGICAL, 2);
@@ -3638,7 +3650,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// miss
 		combat_meter_miss(ch);
 		combat_meter_dodge(victim);
-		ret_val = damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type, NULL);
+		ret_val = damage(ch, victim, 0, w_type, amd ? ATTACK_DAMAGE_TYPE(amd) : DAM_PHYSICAL, NULL);
 		if (can_gain_exp_from(victim, ch)) {
 			run_ability_gain_hooks(victim, ch, AGH_DODGE);
 		}
@@ -3744,12 +3756,12 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		dam = MAX(0, dam);
 
 		// anything after this must NOT rely on victim being alive
-		result = damage(ch, victim, (int) dam, w_type, attack_hit_info[w_type].damage_type, NULL);
+		result = damage(ch, victim, (int) dam, w_type, amd ? ATTACK_DAMAGE_TYPE(amd) : DAM_PHYSICAL, NULL);
 		
 		// exp gain
 		if (combat_round) {
 			if (!IS_NPC(ch)) {
-				if (attack_hit_info[w_type].disarmable) {
+				if (amd && ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) {
 					if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 						gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 					}
@@ -3789,11 +3801,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			if (weapon) {
 				run_ability_hooks(ch, AHOOK_ATTACK_TYPE, w_type, victim, NULL, NULL, NULL);
-				run_ability_hooks(ch, AHOOK_WEAPON_TYPE, attack_hit_info[w_type].weapon_type, victim, NULL, NULL, NULL);
+				if (amd) {
+					run_ability_hooks(ch, AHOOK_WEAPON_TYPE, ATTACK_WEAPON_TYPE(amd), victim, NULL, NULL, NULL);
+				}
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_SHARP) {
 				if (!number(0, 1) && apply_poison(ch, victim) < 0) {
 					// dedz
 					result = -1;
@@ -4207,7 +4221,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// damage last! it's sometimes fatal for vict
-		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), attack_hit_info[GET_MISSILE_WEAPON_TYPE(weapon)].damage_type, NULL);
+		ret = damage(ch, vict, dam, GET_MISSILE_WEAPON_TYPE(weapon), get_attack_damage_type_by_vnum(GET_MISSILE_WEAPON_TYPE(weapon)), NULL);
 		
 		if (ret > 0 && !EXTRACTED(vict) && !IS_DEAD(vict) && IN_ROOM(vict) == IN_ROOM(ch)) {
 			// affects?

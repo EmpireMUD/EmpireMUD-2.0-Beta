@@ -1115,7 +1115,7 @@ ADMIN_UTIL(util_exportcsv) {
 			// wear, type, flags, attack
 			sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, str1, TRUE);
 			sprintbit(GET_OBJ_EXTRA(obj), extra_bits, str2, TRUE);
-			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
+			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)) : "");
 			
 			// applies, affects, triggers
 			fprintf(fl, "\"");	// leading quote for applies
@@ -6662,7 +6662,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		sprintf(buf + strlen(buf), ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
@@ -7241,7 +7241,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(j)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(j)].damage_type]);
+			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
@@ -7285,7 +7285,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(j)].name);
+			msg_to_char(ch, "Damage type: %s\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
 			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:

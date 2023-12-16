@@ -415,7 +415,7 @@ char **get_weapon_types_string(void) {
 		CREATE(wtypes, char*, NUM_ATTACK_TYPES+1);
 		
 		for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-			wtypes[iter] = str_dup(attack_hit_info[iter].name);
+			wtypes[iter] = str_dup(get_attack_name_by_vnum(iter));
 		}
 		
 		// must terminate
@@ -2166,7 +2166,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), GET_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj));
 			}
@@ -2202,7 +2202,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), GET_MISSILE_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj));
 			}

@@ -2819,10 +2819,10 @@ int get_attack_type_by_name(char *name) {
 	int iter, abbrev = NOTHING;
 	
 	for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-		if (!str_cmp(name, attack_hit_info[iter].name)) {
+		if (!str_cmp(name, get_attack_name_by_vnum(iter))) {
 			return iter;	// exact
 		}
-		else if (abbrev == NOTHING && is_abbrev(name, attack_hit_info[iter].name)) {
+		else if (abbrev == NOTHING && is_abbrev(name, get_attack_name_by_vnum(iter))) {
 			abbrev = iter;
 		}
 	}

@@ -4753,32 +4753,33 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "attack")) {
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
+							attack_message_data *amd = real_attack_message(type);
 							if (!subfield || !*subfield || !str_cmp(subfield, "0") || is_abbrev(subfield, "name")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].name);
+								snprintf(str, slen, "%s", amd ? ATTACK_NAME(amd) : "");
 							}
 							else if (!str_cmp(subfield, "1") || is_abbrev(subfield, "first-person")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].first_pers);
+								snprintf(str, slen, "%s", amd ? ATTACK_FIRST_PERSON(amd) : "");
 							}
 							else if (!str_cmp(subfield, "3") || is_abbrev(subfield, "third-person")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].third_pers);
+								snprintf(str, slen, "%s", amd ? ATTACK_THIRD_PERSON(amd) : "");
 							}
 							else if (is_abbrev(subfield, "noun")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].noun);
+								snprintf(str, slen, "%s", amd ? ATTACK_NOUN(amd) : "");
 							}
 							else if (is_abbrev(subfield, "sharp")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_SHARP ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_SHARP) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "blunt")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_BLUNT ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_BLUNT) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "magic")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_MAGIC ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_MAGIC) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "damage")) {
-								snprintf(str, slen, "%s", damage_types[attack_hit_info[type].damage_type]);
+								snprintf(str, slen, "%s", damage_types[amd ? ATTACK_DAMAGE_TYPE(amd) : 0]);
 							}
 							else if (is_abbrev(subfield, "disarmable")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].disarmable);
+								snprintf(str, slen, "%d", (amd && ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) ? 1 : 0);
 							}
 						}
 						else {	// not a weapon

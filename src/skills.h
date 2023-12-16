@@ -330,7 +330,7 @@ bool trigger_counterspell(char_data *ch);
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))
-#define IS_MAGIC_ATTACK(type)  (attack_hit_info[(type)].damage_type == DAM_MAGICAL)
+#define IS_MAGIC_ATTACK(type)  (get_attack_damage_type_by_vnum((type)) == DAM_MAGICAL)
 
 
 /* new attack types can be added here - up to TYPE_SUFFERING */
@@ -424,7 +424,6 @@ struct attack_hit_type {
 // constants.c externs that need skills.h
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const double armor_scale_bonus[NUM_ARMOR_TYPES];
-extern struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES];
 extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
 
 
