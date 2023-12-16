@@ -48,8 +48,8 @@ const char *messages_file_header =
 "* messages are used for failed spells, and weapon messages for misses and\n"
 "* death blows.\n"
 "*\n"
-"* All records must start with 'M' in the first column (for 'Message').\n"
-"* The next line must contain the damage number (defined in spells.h),\n"
+"* All records must start with 'M###' (for 'Message') where ### is the vnum.\n"
+"* then the name with a tilde (~)\n"
 "* then the messages (one per line):\n"
 "*   Death Message (damager, damagee, onlookers)\n"
 "*   Miss Message (damager, damagee, onlookers)\n"
@@ -82,7 +82,7 @@ const char *get_attack_name_by_vnum(any_vnum vnum) {
 	attack_message_data *amd = real_attack_message(vnum);
 	
 	if (!amd) {
-		return default_attack_name;	// sanity
+		return "UNKNOWN";	// sanity
 	}
 	else {
 		return ATTACK_NAME(amd);
@@ -126,7 +126,7 @@ int wordcount_attack_message(attack_message_data *amd) {
 void add_attack_message(attack_message_data *add_to, struct attack_message_set *messages) {
 	if (add_to && messages) {
 		++ATTACK_NUM_MSGS(add_to);
-		LL_PREPEND(ATTACK_MSG_LIST(add_to), messages);
+		LL_APPEND(ATTACK_MSG_LIST(add_to), messages);
 	}
 }
 
