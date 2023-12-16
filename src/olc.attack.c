@@ -993,7 +993,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Mesage count: \tc%d\tc\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: \tc%d\t0\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	
