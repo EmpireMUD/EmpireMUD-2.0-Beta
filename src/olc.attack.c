@@ -1010,6 +1010,18 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 		else if (ams->msg[MSG_GOD].attacker_msg) {
 			to_show = ams->msg[MSG_GOD].attacker_msg;
 		}
+		else if (ams->msg[MSG_HIT].room_msg) {
+			to_show = ams->msg[MSG_HIT].room_msg;
+		}
+		else if (ams->msg[MSG_DIE].room_msg) {
+			to_show = ams->msg[MSG_DIE].room_msg;
+		}
+		else if (ams->msg[MSG_MISS].room_msg) {
+			to_show = ams->msg[MSG_MISS].room_msg;
+		}
+		else if (ams->msg[MSG_GOD].room_msg) {
+			to_show = ams->msg[MSG_GOD].room_msg;
+		}
 		else {
 			to_show = NULL;	// maybe empty
 		}
@@ -1063,6 +1075,18 @@ void olc_show_attack_message(char_data *ch) {
 		}
 		else if (ams->msg[MSG_GOD].attacker_msg) {
 			to_show = ams->msg[MSG_GOD].attacker_msg;
+		}
+		else if (ams->msg[MSG_HIT].room_msg) {
+			to_show = ams->msg[MSG_HIT].room_msg;
+		}
+		else if (ams->msg[MSG_DIE].room_msg) {
+			to_show = ams->msg[MSG_DIE].room_msg;
+		}
+		else if (ams->msg[MSG_MISS].room_msg) {
+			to_show = ams->msg[MSG_MISS].room_msg;
+		}
+		else if (ams->msg[MSG_GOD].room_msg) {
+			to_show = ams->msg[MSG_GOD].room_msg;
 		}
 		else {
 			to_show = NULL;	// maybe empty
