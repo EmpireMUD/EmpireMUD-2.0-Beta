@@ -7002,7 +7002,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}	// end buff/dot
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil));
+		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
 	}	// end damage
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
 		sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
@@ -7119,6 +7119,8 @@ OLC_MODULE(abiledit_apply) {
 
 OLC_MODULE(abiledit_attacktype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	int old = ABIL_ATTACK_TYPE(abil);
+	attack_message_data *amd;
 	
 	bitvector_t allowed_types = ABILT_DAMAGE;
 	
@@ -7127,6 +7129,13 @@ OLC_MODULE(abiledit_attacktype) {
 	}
 	else {
 		ABIL_ATTACK_TYPE(abil) = olc_process_number(ch, argument, "attack type", "attacktype", 0, MAX_VNUM, ABIL_ATTACK_TYPE(abil));
+		if ((amd = real_attack_message(ABIL_ATTACK_TYPE(abil)))) {
+			msg_to_char(ch, "It is now: %s\r\n", ATTACK_NAME(amd));
+		}
+		else {
+			msg_to_char(ch, "Invalid attack message vnum %d. Old value restored.\r\n", ABIL_ATTACK_TYPE(abil));
+			ABIL_ATTACK_TYPE(abil) = old;
+		}
 	}
 }
 
