@@ -32,15 +32,15 @@ Backstab (Stealth ability)
 
 Usage:  backstab [victim]
 Cooldown:  9 seconds
-Cost:  15 move
+Cost:  25 move
 
 A brave warrior looks his foe in the eye, but a clever assassin looks his
 target in the back as he strikes. You must wield a stabbing weapon to use this
-ability.
+ability -- and have no one attacking you.
 
-Backstab deals 2x weapon damage on a successful attack, and the opponent has
-no chance to dodge if the attack succeeds. A particularly skilled assassin
-deals 4x weapon damage instead.
+Backstab deals massive weapon damage on a successful attack, and the opponent
+has no chance to dodge if the attack succeeds. A particularly skilled assassin
+can deal even more damage.
 
 Gains experience when you use Backstab, even if it fails.
 #
