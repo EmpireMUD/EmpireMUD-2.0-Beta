@@ -408,19 +408,6 @@ bool trigger_counterspell(char_data *ch);
 #define RESCUE_FOCUS  2		// mob changes focus
 
 
-// TYPE_ Attacktypes with grammar
-struct attack_hit_type {
-	const char *name;
-	const char *first_pers;	// You "slash"
-	const char *third_pers;	// $n "slashes"
-	const char *noun;	// ... with your "swing"
-	double speed[NUM_ATTACK_SPEEDS];	// { fast, normal, slow }
-	int weapon_type;	// WEAPON_ type
-	int damage_type;	// DAM_ type
-	bool disarmable;	// whether or not disarm works
-};
-
-
 // constants.c externs that need skills.h
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const double armor_scale_bonus[NUM_ARMOR_TYPES];
