@@ -170,8 +170,8 @@ EVENTFUNC(dot_update_event) {
 		
 		// custom messages?
 		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
-			custom_fmessage = create_fight_message(NOTHING);
-			add_fight_message(custom_fmessage, create_attack_message_entry(TRUE,
+			custom_fmessage = create_attack_message(NOTHING);
+			add_attack_message(custom_fmessage, create_attack_message_entry(TRUE,
 				GET_AFFECT_DEATH_TO_ROOM(gen),	// actually death to-attacker
 				GET_AFFECT_DEATH_TO_CHAR(gen),
 				GET_AFFECT_DEATH_TO_ROOM(gen),
@@ -191,7 +191,7 @@ EVENTFUNC(dot_update_event) {
 		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type, custom_fmessage);
 		
 		if (custom_fmessage) {
-			free_message_list(custom_fmessage);
+			free_attack_message(custom_fmessage);
 		}
 		
 		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {

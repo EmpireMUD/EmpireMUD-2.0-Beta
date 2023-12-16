@@ -116,6 +116,9 @@ OLC_MODULE(archedit_name);
 OLC_MODULE(archedit_skill);
 OLC_MODULE(archedit_type);
 
+// attack modules
+OLC_MODULE(attackedit_name);
+
 // augment modules
 OLC_MODULE(augedit_ability);
 OLC_MODULE(augedit_apply);
@@ -547,17 +550,17 @@ OLC_MODULE(vedit_speed);
 // main olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -632,6 +635,9 @@ const struct olc_command_data olc_data[] = {
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "startingskill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "type", archedit_type, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	
+	// attacks
+	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
 	
 	// augments
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
@@ -1073,7 +1079,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ATTACK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -1198,6 +1204,11 @@ OLC_MODULE(olc_abort) {
 			case OLC_ARCHETYPE: {
 				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
 				GET_OLC_ARCHETYPE(ch->desc) = NULL;
+				break;
+			}
+			case OLC_ATTACK: {
+				free_attack_message(GET_OLC_ATTACK(ch->desc));
+				GET_OLC_ATTACK(ch->desc) = NULL;
 				break;
 			}
 			case OLC_AUGMENT: {
@@ -1378,6 +1389,15 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						found |= audit_archetype(arch, ch);
+					}
+				}
+				break;
+			}
+			case OLC_ATTACK: {
+				attack_message_data *amd, *next_amd;
+				HASH_ITER(hh, attack_message_table, amd, next_amd) {
+					if (ATTACK_VNUM(amd) >= from_vnum && ATTACK_VNUM(amd) <= to_vnum) {
+						found |= audit_attack_message(amd, ch);
 					}
 				}
 				break;
@@ -1633,6 +1653,11 @@ OLC_MODULE(olc_copy) {
 			exists = (archetype_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_ATTACK: {
+			found = (real_attack_message(vnum) != NULL);
+			exists = (real_attack_message(from_vnum) != NULL);
+			break;
+		}
 		case OLC_AUGMENT: {
 			found = (augment_proto(vnum) != NULL);
 			exists = (augment_proto(from_vnum) != NULL);
@@ -1805,6 +1830,12 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;
 			SET_BIT(GET_ARCH_FLAGS(GET_OLC_ARCHETYPE(ch->desc)), ARCH_IN_DEVELOPMENT);	// ensure flag
 			olc_show_archetype(ch);
+			break;
+		}
+		case OLC_ATTACK: {
+			GET_OLC_ATTACK(ch->desc) = setup_olc_attack_message(real_attack_message(from_vnum));
+			GET_OLC_ATTACK(ch->desc)->vnum = vnum;
+			olc_show_attack_message(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -2020,6 +2051,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_archetype(ch, vnum);
 			break;
 		}
+		case OLC_ATTACK: {
+			void olc_delete_attack_message(char_data *ch, any_vnum vnum);
+			olc_delete_attack_message(ch, vnum);
+			break;
+		}
 		case OLC_AUGMENT: {
 			void olc_delete_augment(char_data *ch, any_vnum vnum);
 			olc_delete_augment(ch, vnum);
@@ -2151,6 +2187,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_ARCHETYPE: {
 			olc_show_archetype(ch);
+			break;
+		}
+		case OLC_ATTACK: {
+			olc_show_attack_message(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -2294,6 +2334,13 @@ OLC_MODULE(olc_edit) {
 			GET_OLC_ARCHETYPE(ch->desc) = setup_olc_archetype(archetype_proto(vnum));
 			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;			
 			olc_show_archetype(ch);
+			break;
+		}
+		case OLC_ATTACK: {
+			// this will set up from existing OR new automatically based on real_attack_message
+			GET_OLC_ATTACK(ch->desc) = setup_olc_attack_message(real_attack_message(vnum));
+			GET_OLC_ATTACK(ch->desc)->vnum = vnum;			
+			olc_show_attack_message(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
@@ -2506,6 +2553,10 @@ OLC_MODULE(olc_free) {
 					free = (archetype_proto(iter) == NULL);
 					break;
 				}
+				case OLC_ATTACK: {
+					free = (real_attack_message(iter) == NULL);
+					break;
+				}
 				case OLC_AUGMENT: {
 					free = (augment_proto(iter) == NULL);
 					break;
@@ -2622,6 +2673,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_ABILITY: {
 			void olc_fullsearch_abil(char_data *ch, char *argument);
 			olc_fullsearch_abil(ch, argument);
+			break;
+		}
+		case OLC_ATTACK: {
+			void olc_fullsearch_attack_message(char_data *ch, char *argument);
+			olc_fullsearch_attack_message(ch, argument);
 			break;
 		}
 		case OLC_BUILDING: {
@@ -2805,6 +2861,20 @@ OLC_MODULE(olc_list) {
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_archetype(arch, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_ATTACK: {
+				char *list_one_attack_message(attack_message_data *amd, bool detail);
+				attack_message_data *amd, *next_amd;
+				HASH_ITER(hh, attack_message_table, amd, next_amd) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (ATTACK_VNUM(amd) >= from_vnum && ATTACK_VNUM(amd) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_attack_message(amd, show_details));
 					}
 				}
 				break;
@@ -3550,6 +3620,15 @@ OLC_MODULE(olc_save) {
 				GET_OLC_ARCHETYPE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_ATTACK: {
+				void save_olc_attack_message(descriptor_data *desc);
+				snprintf(name, sizeof(name), "%s", NULLSAFE(ATTACK_NAME(GET_OLC_ATTACK(ch->desc))));
+				save_olc_attack_message(ch->desc);
+				audit_attack_message(GET_OLC_ATTACK(ch->desc), ch);
+				free_attack_message(GET_OLC_ATTACK(ch->desc));
+				GET_OLC_ATTACK(ch->desc) = NULL;
+				break;
+			}
 			case OLC_AUGMENT: {
 				void save_olc_augment(descriptor_data *desc);
 				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(GET_OLC_AUGMENT(ch->desc))));
@@ -3781,6 +3860,11 @@ OLC_MODULE(olc_search) {
 			case OLC_ABILITY: {
 				void olc_search_ability(char_data *ch, any_vnum vnum);
 				olc_search_ability(ch, vnum);
+				break;
+			}
+			case OLC_ATTACK: {
+				void olc_search_attack_message(char_data *ch, any_vnum vnum);
+				olc_search_attack_message(ch, vnum);
 				break;
 			}
 			case OLC_ARCHETYPE: {
@@ -4142,6 +4226,16 @@ OLC_MODULE(olc_wordcount) {
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
 						wordcount += wordcount_archetype(arch);
+					}
+				}
+				break;
+			}
+			case OLC_ATTACK: {
+				attack_message_data *amd, *next_amd;
+				HASH_ITER(hh, attack_message_table, amd, next_amd) {
+					if (ATTACK_VNUM(amd) >= from_vnum && ATTACK_VNUM(amd) <= to_vnum) {
+						++count;
+						wordcount += wordcount_attack_message(amd);
 					}
 				}
 				break;
@@ -5285,6 +5379,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	else if (OLC_FLAGGED(ch, OLC_FLAG_ALL_VNUMS) || (GET_OLC_MIN_VNUM(ch) <= vnum && GET_OLC_MAX_VNUM(ch) >= vnum)) {
 		// OLC_x: olc allows/disallows
 		if (IS_SET(type, OLC_ARCHETYPE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ARCHETYPE)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_ATTACK) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ATTACKS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_AUGMENT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_AUGMENT)) {

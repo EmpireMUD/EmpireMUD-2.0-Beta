@@ -53,7 +53,8 @@
 #define OLC_SHOP  BIT(23)
 #define OLC_PROGRESS  BIT(24)
 #define OLC_EVENT  BIT(25)
-#define NUM_OLC_TYPES  26
+#define OLC_ATTACK  BIT(26)
+#define NUM_OLC_TYPES  27
 
 
 // olc command flags
@@ -90,6 +91,7 @@
 #define OLC_FLAG_NO_SHOPS  BIT(24)	// cannot edit shops
 #define OLC_FLAG_NO_PROGRESS  BIT(25)	// cannot edit progress
 #define OLC_FLAG_NO_EVENTS  BIT(26)	// cannot edit events
+#define OLC_FLAG_NO_ATTACKS  BIT(27)	// cannot edit attacks
 
 
 // for trigger editing
@@ -134,6 +136,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 bool audit_ability(ability_data *abil, char_data *ch);
 bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 bool audit_archetype(archetype_data *arch, char_data *ch);
+bool audit_attack_message(attack_message_data *amd, char_data *ch);
 bool audit_augment(augment_data *aug, char_data *ch);
 bool audit_building(bld_data *bld, char_data *ch);
 bool audit_class(class_data *cls, char_data *ch);
@@ -218,6 +221,7 @@ void save_olc_vehicle(descriptor_data *desc);
 ability_data *setup_olc_ability(ability_data *input);
 adv_data *setup_olc_adventure(adv_data *input);
 archetype_data *setup_olc_archetype(archetype_data *input);
+attack_message_data *setup_olc_attack_message(attack_message_data *input);
 augment_data *setup_olc_augment(augment_data *input);
 book_data *setup_olc_book(book_data *input);
 bld_data *setup_olc_building(bld_data *input);
@@ -245,6 +249,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input);
 void olc_show_ability(char_data *ch);
 void olc_show_adventure(char_data *ch);
 void olc_show_archetype(char_data *ch);
+void olc_show_attack_message(char_data *ch);
 void olc_show_augment(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_class(char_data *ch);
@@ -295,6 +300,7 @@ int wordcount_string(const char *string);
 int wordcount_ability(ability_data *abil);
 int wordcount_adventure(struct adventure_data *adv);
 int wordcount_archetype(archetype_data *arch);
+int wordcount_attack_message(attack_message_data *amd);
 int wordcount_augment(augment_data *aug);
 int wordcount_book(book_data *book);
 int wordcount_building(bld_data *bld);

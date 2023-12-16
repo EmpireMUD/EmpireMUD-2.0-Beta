@@ -161,6 +161,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
 		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
 		// OLC_x: auto-auditors
+		msg_to_char(ch, "Attack messages:\r\n");
+		olc_audit(ch, OLC_ATTACK, buf);
 		msg_to_char(ch, "Crafts:\r\n");
 		olc_audit(ch, OLC_CRAFT, buf);
 		msg_to_char(ch, "Mobs:\r\n");

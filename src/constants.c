@@ -3283,6 +3283,7 @@ const char *olc_flag_bits[] = {
 	"!SHOPS",
 	"!PROGRESS",
 	"!EVENTS",
+	"!ATTACKS",
 	"\n"
 };
 
@@ -3315,6 +3316,7 @@ const char *olc_type_bits[] = {
 	"shop",
 	"progression",
 	"event",
+	"attackmessage",
 	"\n"
 };
 

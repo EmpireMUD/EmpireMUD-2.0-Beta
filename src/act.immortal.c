@@ -11788,6 +11788,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No archetypes by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		extern int vnum_attack_message(char *searchname, char_data *ch);
+		if (!vnum_attack_message(buf2, ch)) {
+			msg_to_char(ch, "No attack messages by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "augment")) {
 		extern int vnum_augment(char *searchname, char_data *ch);
 		if (!vnum_augment(buf2, ch)) {
@@ -11943,6 +11949,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_archetype(ch, arch);
+	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		void do_stat_attack_message(char_data *ch, attack_message_data *amd);
+		attack_message_data *amd = real_attack_message(number);
+		if (!amd) {
+			msg_to_char(ch, "There is no attack message with that number.\r\n");
+			return;
+		}
+		do_stat_attack_message(ch, amd);
 	}
 	else if (is_abbrev(buf, "augment")) {
 		void do_stat_augment(char_data *ch, augment_data *aug);

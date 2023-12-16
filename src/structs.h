@@ -4628,6 +4628,7 @@ struct descriptor_data {
 	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
+	attack_message_data *olc_attack;	// attack message being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	class_data *olc_class;	// class being edited
@@ -5956,11 +5957,12 @@ struct player_faction_data {
 // fight message list
 struct attack_message_data {
 	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
+	char *name;	// for display purposes
 	
 	struct attack_message_set *msg_list;	// Linked list of messages
 	int num_msgs;	// How many attack messages are in the list
 	
-	UT_hash_handle hh;	// fight_message_table hash (by vnum)
+	UT_hash_handle hh;	// attack_message_table hash (by vnum)
 };
 
 

@@ -535,6 +535,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_OLC_ABILITY(desc)  ((desc)->olc_ability)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
 #define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
+#define GET_OLC_ATTACK(desc)  ((desc)->olc_attack)
 #define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
@@ -702,6 +703,13 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+// for attack messages
+#define ATTACK_VNUM(amd)		((amd)->vnum)
+#define ATTACK_MSG_LIST(amd)	((amd)->msg_list)
+#define ATTACK_NAME(amd)		((amd)->name)
+#define ATTACK_NUM_MSGS(amd)	((amd)->num_msgs)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2031,9 +2039,11 @@ void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
+bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc);
 bool delete_vnum_from_ability_data_list(ability_data *abil, int type, any_vnum vnum);
 ability_data *find_ability_on_skill(char *name, skill_data *skill);
 struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int type, any_vnum vnum);
+struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, int type, any_vnum vnum, int misc);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
 void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players);
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);

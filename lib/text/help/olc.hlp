@@ -17,7 +17,8 @@ CONTROLS.
 
 Available types are:
  .abil - abilities               .adv - adventures
- .aug - augments                 .arch - archetypes
+ .arch - archetypes              .attack - attack messages
+ .aug - augments
  .b - buildings                  .book - books
  .c - crafts                     .class - classes
  .crop - crops                   .ev - events
@@ -57,7 +58,7 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
    OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS,
-   OLC SHOPS
+   OLC SHOPS, OLC ATTACKS
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -68,8 +69,9 @@ some common ones:
 
 abil - ability
 adv - adventure
-aug - augment
 arch - archetypes
+attack - attack messages
+aug - augment
 bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
@@ -2382,6 +2384,54 @@ Available types:
 
 See also: OLC ARCHETYPES
 #d
+ATTACKEDIT "OLC ATTACKS" "OLC ATTACK MESSAGES" "ATTACK OLC" "ATTACK MESSAGE OLC" "ATTACK EDIT"
+
+Usage:  .attack <command>
+        .<command>
+
+The .olc attack message editor allows you to add, edit, or delete messages from
+the system. It provides an in-game menu for controlling how attacks appear in
+combat.
+
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP ATTACKEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .attack edit 123
+ > .name Smoosh
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ATTACKEDIT FULLSEARCH" "ATTACK FULLSEARCH"
+
+Usage:  .attack fullsearch -<field> <argument> <...>
+
+This command allows you to search for attack messages matching certain
+criteria. You can specify multiple fields if you want. Any arguments that don't
+start with a dash (-) are matched to the attack's name and strings.
+
+Fields:
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .attack fullsearch slash -vmin 10000 -vmax 10099
+#d
+"ATTACKEDIT NAME"
+
+Usage:  .name <name>
+
+The name of a attack message is used to identify it. The name should be short
+and concise. These are often lowercase for weapon attacks, but may start with a
+capital letter for special attacks.
+
+See also: OLC ATTACKS
+#d
 AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
 
 Usage:  .aug <command>
@@ -4237,7 +4287,7 @@ The following flags for generics are available:
 
 See also: OLC GENERICS
 #d
-"GENEDIT FULLSEARCH" "GENERIC FULLSEARCH
+"GENEDIT FULLSEARCH" "GENERIC FULLSEARCH"
 
 Usage:  .gen fullsearch -<field> <argument> <...>
 
@@ -6924,6 +6974,8 @@ Available flags:
  - !GENERICS - Cannot edit generics
  - !SHOPS - Cannot edit shops
  - !PROGRESS - Cannot edit progressions
+ - !EVENTS - Cannot edit events
+ - !ATTACKS - Cannot edit attack messages
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -7089,6 +7141,7 @@ See the individual help files such as OEDIT FULLSEARCH.
 
 Supported types:
   ability
+  attack
   building (search designatable rooms with -flag ROOM)
   craft
   crop
@@ -7119,6 +7172,7 @@ Information provided by the -d flag:
  abilities: mastery
  adventure: mob/object/room count
  archetypes: skills, skill point total, and attribute total
+ attacks: number of messages in the set
  augments: ability/skill, applies
  book: byline
  class: skill requirements
@@ -7685,7 +7739,7 @@ The following quest flags are available:
 
 See also: OLC QUESTS, DAILY QUEST
 #d
-"QEDIT FULLSEARCH" "QUEST FULLSEARCH
+"QEDIT FULLSEARCH" "QUEST FULLSEARCH"
 
 Usage:  .q fullsearch -<field> <argument> <...>
 
@@ -8503,7 +8557,7 @@ Available flags:
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
-"SKILLEDIT FULLSEARCH" "SKILL FULLSEARCH
+"SKILLEDIT FULLSEARCH" "SKILL FULLSEARCH"
 
 Usage:  .skill fullsearch -<field> <argument> <...>
 

@@ -167,7 +167,7 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define IDEA_FILE  LIB_MISC"ideas"	// for the 'idea'-command
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
-#define MESS_FILE  LIB_MISC"messages"	// damage messages
+#define ATTACK_MESSAGES_FILE  LIB_MISC"messages"	// damage messages
 #define TIPS_OF_THE_DAY_FILE  LIB_MISC"tips"	// one-line tips shown on login
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
@@ -532,15 +532,15 @@ void free_faction(faction_data *fct);
 void remove_faction_from_table(faction_data *fct);
 
 // fight messages
-extern attack_message_data *fight_message_table;
+extern attack_message_data *attack_message_table;
 
-void add_fight_message(attack_message_data *add_to, struct attack_message_set *messages);
-attack_message_data *create_fight_message(any_vnum a_type);
+void add_attack_message(attack_message_data *add_to, struct attack_message_set *messages);
+attack_message_data *create_attack_message(any_vnum vnum);
 struct attack_message_set *create_attack_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
-attack_message_data *find_fight_message(any_vnum a_type, bool create_if_missing);
-void free_message_list(attack_message_data *list);
-void free_message_type(struct attack_message_set *type);
+attack_message_data *find_attack_message(any_vnum a_type, bool create_if_missing);
+void free_attack_message(attack_message_data *amd);
 void load_fight_messages();
+attack_message_data *real_attack_message(any_vnum vnum);
 
 // generics
 extern generic_data *generic_table;

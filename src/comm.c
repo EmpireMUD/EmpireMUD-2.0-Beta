@@ -1995,6 +1995,9 @@ void free_descriptor(descriptor_data *desc) {
 	if (desc->olc_archetype) {
 		free_archetype(desc->olc_archetype);
 	}
+	if (desc->olc_attack) {
+		free_attack_message(desc->olc_attack);
+	}
 	if (desc->olc_augment) {
 		free_augment(desc->olc_augment);
 	}

@@ -720,6 +720,31 @@ struct ability_data_list *copy_data_list(struct ability_data_list *input) {
 
 
 /**
+* Finds and removes an entry from an ability data list, by type + vnum + misc.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to remove.
+* @param int misc Which misc value to match.
+* @return bool TRUE if any were removed, FALSE if not found.
+*/
+bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc) {
+	struct ability_data_list *adl, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
+		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
+			LL_DELETE(ABIL_DATA(abil), adl);
+			free(adl);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Finds and removes an entry from an ability data list, by vnum.
 *
 * @param ability_data *abil Which ability.
@@ -811,7 +836,8 @@ ability_data *find_ability_by_vnum(any_vnum vnum) {
 
 
 /**
-* Finds an ability data entry that matches.
+* Finds an ability data entry that matches. This version ignores the 'misc'
+* field.
 *
 * @param ability_data *abil Which ability.
 * @param int type Which ADL_ type.
@@ -823,6 +849,28 @@ struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int ty
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		if (adl->type == type && adl->vnum == vnum) {
+			return adl;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Finds an ability data entry that matches, including the misc field.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to find.
+* @param int misc Which misc to find.
+* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
+*/
+struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, int type, any_vnum vnum, int misc) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
 			return adl;
 		}
 	}

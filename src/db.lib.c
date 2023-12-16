@@ -8573,9 +8573,9 @@ void free_whole_library(void) {
 		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
-	HASH_ITER(hh, fight_message_table, amd, next_amd) {
-		HASH_DEL(fight_message_table, amd);
-		free_message_list(amd);
+	HASH_ITER(hh, attack_message_table, amd, next_amd) {
+		HASH_DEL(attack_message_table, amd);
+		free_attack_message(amd);
 	}
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		remove_morph_from_table(morph);

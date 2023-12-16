@@ -2410,17 +2410,17 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 	if (custom_fight_messages) {
 		amd = custom_fight_messages;
 	}
-	else if (!(amd = find_fight_message(attacktype, FALSE))) {
+	else if (!(amd = find_attack_message(attacktype, FALSE))) {
 		return 0;	// no skill message for this attacktype
 	}
 	
 	// determine a message to send in the set
-	nr = dice(1, amd->num_msgs);
-	for (j = 1, msg = amd->msg_list; (j < nr) && msg && msg->next; j++) {
+	nr = dice(1, ATTACK_NUM_MSGS(amd));
+	for (j = 1, msg = ATTACK_MSG_LIST(amd); (j < nr) && msg && msg->next; j++) {
 		msg = msg->next;
 	}
 	
-	// somehow a fight_message_table entry without messages?
+	// somehow a attack_message_table entry without messages?
 	if (!msg) {
 		return 0;
 	}
