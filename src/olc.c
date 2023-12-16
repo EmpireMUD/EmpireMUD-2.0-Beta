@@ -652,7 +652,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// attacks
 	{ "back", attackedit_back, OLC_ATTACK, OLC_CF_EDITOR },
-	{ "message", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "messages", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
 	// attacks: messages
 	{ "die2char", attackedit_die2char, OLC_ATTACK, OLC_CF_EDITOR },

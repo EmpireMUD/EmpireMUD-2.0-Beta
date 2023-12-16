@@ -1169,7 +1169,7 @@ void olc_show_attack_message(char_data *ch) {
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
 	
-	sprintf(buf + strlen(buf), "Messages: <%smessage #\t0>\r\n", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
+	sprintf(buf + strlen(buf), "Messages: <%smessage\t0>\r\n", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
 	
 	// show list preview
 	count = 0;
@@ -1514,7 +1514,7 @@ OLC_MODULE(attackedit_message) {
 		GET_OLC_ATTACK_NUM(ch->desc) = ATTACK_NUM_MSGS(amd);
 		olc_show_attack_message(ch);
 	}
-	else if (!str_cmp(arg, "remove")) {
+	else if (is_abbrev(arg, "remove")) {
 		skip_spaces(&arg2);
 		if (!*arg2 || !isdigit(*arg2)) {
 			msg_to_char(ch, "Usage:  .message remove <number>\r\n");
