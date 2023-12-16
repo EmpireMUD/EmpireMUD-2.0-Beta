@@ -1082,7 +1082,7 @@ void olc_show_one_message(char_data *ch) {
 	struct attack_message_set *ams;
 	
 	// find message
-	if ((ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc)))) {
+	if (!(ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc)))) {
 		// return to main menu
 		GET_OLC_ATTACK_NUM(ch->desc) = 0;
 		olc_show_attack_message(ch);
@@ -1091,6 +1091,9 @@ void olc_show_one_message(char_data *ch) {
 	
 	// one message view
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s #%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), GET_OLC_ATTACK_NUM(ch->desc));
+	
+	// messages
+	sprintf(buf + strlen(buf), "<%sdie2char\t0> %s\r\n", OLC_LABEL_PTR(ams->msg[MSG_DIE].attacker_msg), ams->msg[MSG_DIE].attacker_msg ? ams->msg[MSG_DIE].attacker_msg : "(none)");
 	
 	sprintf(buf + strlen(buf), "<%sback\t0> to return to the main menu\r\n", OLC_LABEL_UNCHANGED);
 	page_string(ch->desc, buf, TRUE);
@@ -1218,7 +1221,7 @@ OLC_MODULE(attackedit_message) {
 	}
 	else if (isdigit(*argument)) {
 		num = atoi(argument);
-		if (num < 0 || num > ATTACK_NUM_MSGS(amd)) {
+		if (num < 1 || num > ATTACK_NUM_MSGS(amd)) {
 			msg_to_char(ch, "Invalid message number '%s'.\r\n", argument);
 		}
 		else {
