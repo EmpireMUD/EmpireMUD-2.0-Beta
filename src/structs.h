@@ -750,11 +750,16 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_NOT_HERE  24	// cannot target own room
 #define ABIL_LIMIT_CHECK_CITY_FOUND_TIME  25	// check founded-too-recently
 #define ABIL_LIMIT_ITEM_TYPE  26	// requires a specific item type
+#define ABIL_LIMIT_WIELD_ANY_WEAPON  27	// checks for a weapon in the wield slot -- and not disarmed
+#define ABIL_LIMIT_WIELD_ATTACK_TYPE  28	// wielding a weapon with a given attack
+#define ABIL_LIMIT_WIELD_WEAPON_TYPE  29	// wielding a weapon with a given damage type
 
 
-// data needed for ability limits:
-#define ABLIM_NOTHING  0
-#define ABLIM_ITEM_TYPE  1	// requires an ITEM_ const
+// ABLIM_x: data needed for ability limits:
+#define ABLIM_NOTHING		0
+#define ABLIM_ITEM_TYPE		1	// requires an ITEM_ const
+#define ABLIM_ATTACK_TYPE	2	// requires an attack type
+#define ABLIM_WEAPON_TYPE	3	// requires an weapon type (blunt, sharp, magic)
 
 
 // RUN_ABIL_x: modes for activating abilities

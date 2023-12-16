@@ -432,8 +432,11 @@ const char *ability_limitations[] = {
 	"can teleport target",
 	"target not foreign empire npc",
 	"not here",
-	"check city found time",
+	"check city found time",	// 25
 	"item type",
+	"wield any weapon",
+	"wield attack type",
+	"wield weapon type",
 	"\n"
 };
 
@@ -467,6 +470,9 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_HERE
 	ABLIM_NOTHING,	// ABIL_LIMIT_CHECK_CITY_FOUND_TIME
 	ABLIM_ITEM_TYPE,	// ABIL_LIMIT_ITEM_TYPE
+	ABLIM_NOTHING,	// ABIL_LIMIT_WIELD_ANY_WEAPON
+	ABLIM_ATTACK_TYPE,	// ABIL_LIMIT_WIELD_ATTACK_TYPE
+	ABLIM_WEAPON_TYPE,	// ABIL_LIMIT_WIELD_WEAPON_TYPE
 };
 
 

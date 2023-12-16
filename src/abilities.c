@@ -179,9 +179,20 @@ char *ability_data_display(struct ability_data_list *adl) {
 			break;
 		}
 		case ADL_LIMITATION: {
+			// ABLIM_x:
 			switch (ability_limitation_misc[adl->vnum]) {
 				case ABLIM_ITEM_TYPE: {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_ATTACK_TYPE: {
+					sprinttype(adl->misc, (const char**)get_weapon_types_string(), part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_WEAPON_TYPE: {
+					sprinttype(adl->misc, weapon_types, part, sizeof(part), "UNKNOWN");
 					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
@@ -2209,9 +2220,20 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	struct ability_data_list *adl;
 	room_data *any_room, *other_room;
 	
+	// some types just require any match
+	bool want_item_type = FALSE, have_item_type = FALSE;
+	bool want_room_permission = FALSE, have_room_permission = FALSE;
+	bool want_weapon = FALSE, have_weapon = FALSE;
+	char item_type_error[256], room_permission_error[256], weapon_error[256];
+	
 	if (!ch || !abil) {
 		return FALSE;	// no work
 	}
+	
+	// inits
+	*weapon_error = '\0';
+	*item_type_error = '\0';
+	*room_permission_error = '\0';
 	
 	// any_room is the target room IF it targets a room, or else ch's room
 	any_room = room_targ ? room_targ : IN_ROOM(ch);
@@ -2245,23 +2267,35 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_GUEST: {
-				if (!can_use_room(ch, any_room, GUESTS_ALLOWED)) {
-					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
-					return FALSE;
+				want_room_permission = TRUE;
+				
+				if (can_use_room(ch, any_room, GUESTS_ALLOWED)) {
+					have_room_permission = TRUE;
+				}
+				else if (!*room_permission_error) {
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_ALLY: {
-				if (!can_use_room(ch, any_room, MEMBERS_AND_ALLIES)) {
-					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
-					return FALSE;
+				want_room_permission = TRUE;
+				
+				if (can_use_room(ch, any_room, MEMBERS_AND_ALLIES)) {
+					have_room_permission = TRUE;
+				}
+				else if (!*room_permission_error) {
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_MEMBER: {
-				if (!can_use_room(ch, any_room, MEMBERS_ONLY)) {
-					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
-					return FALSE;
+				want_room_permission = TRUE;
+				
+				if (can_use_room(ch, any_room, MEMBERS_ONLY)) {
+					have_room_permission = TRUE;
+				}
+				else if (!*room_permission_error) {
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
 				}
 				break;
 			}
@@ -2429,17 +2463,76 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				break;
 			}
 			case ABIL_LIMIT_ITEM_TYPE: {
-				if (ovict && GET_OBJ_TYPE(ovict) != adl->misc) {
+				want_item_type = TRUE;
+				
+				if (!ovict) {
+					have_item_type = TRUE;	// must target something other than an object
+				}
+				else if (GET_OBJ_TYPE(ovict) == adl->misc) {
+					have_item_type = TRUE;
+				}
+				else if (!*item_type_error) {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					msg_to_char(ch, "You must target %s %s item.\r\n", AN(part), part);
-					return FALSE;
+					snprintf(item_type_error, sizeof(item_type_error), "You must target %s %s item.\r\n", AN(part), part);
+				}
+				break;
+			}
+			case ABIL_LIMIT_WIELD_ANY_WEAPON: {
+				want_weapon = TRUE;
+				
+				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD))) {
+					have_weapon = TRUE;
+				}
+				else if (!*weapon_error) {
+					snprintf(weapon_error, sizeof(weapon_error), "You can't do that while your weapon is disarmed!\r\n");
+				}
+				break;
+			}
+			case ABIL_LIMIT_WIELD_ATTACK_TYPE: {
+				want_weapon = TRUE;
+				
+				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) == adl->misc) {
+					have_weapon = TRUE;
+				}
+				else if (!*weapon_error) {
+					snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", attack_hit_info[adl->misc].name);
+				}
+				break;
+			}
+			case ABIL_LIMIT_WIELD_WEAPON_TYPE: {
+				want_weapon = TRUE;
+				
+				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && attack_hit_info[GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))].weapon_type == adl->misc) {
+					have_weapon = TRUE;
+				}
+				else if (!*weapon_error) {
+					snprintf(weapon_error, sizeof(weapon_error), "You need to be wielding a %s weapon to do that.\r\n", weapon_types[adl->misc]);
 				}
 				break;
 			}
 		}
 	}
 	
-	return TRUE;	// ok
+	// things that can check multiples
+	if (want_room_permission && !have_room_permission) {
+		msg_to_char(ch, "%s", *room_permission_error ? room_permission_error : "You do not have permission to do that here.\r\n");
+		return FALSE;
+	}
+	else if (want_weapon && !have_weapon) {
+		msg_to_char(ch, "%s", *weapon_error ? weapon_error : "You need to be wielding a weapon to do that.\r\n");
+		return FALSE;
+	}
+	else if (want_weapon && have_weapon && AFF_FLAGGED(ch, AFF_DISARMED)) {
+		msg_to_char(ch, "You can't do that while your weapon is disarmed!\r\n");
+		return FALSE;
+	}
+	else if (want_item_type && !have_item_type) {
+		msg_to_char(ch, "%s", *item_type_error ? item_type_error : "You cannot use that ability on that type of item.\r\n");
+		return FALSE;
+	}
+	
+	// otherwise:
+	return TRUE;
 }
 
 
@@ -7334,11 +7427,25 @@ OLC_MODULE(abiledit_data) {
 						}
 					}
 					else if ((val_id = search_block_multi_isname(val_a, ability_limitations)) != NOTHING && ability_limitation_misc[val_id] != ABLIM_NOTHING) {
-						// partial arg: process val_b as limit type
+						// ABLIM_x: partial arg: process val_b as limit type
 						switch (ability_limitation_misc[val_id]) {
 							case ABLIM_ITEM_TYPE: {
 								if ((misc = search_block(val_b, item_types, FALSE)) == NOTHING) {
 									msg_to_char(ch, "Invalid item type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
+									return;
+								}
+								break;
+							}
+							case ABLIM_ATTACK_TYPE: {
+								if ((misc = search_block(val_b, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid attack type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
+									return;
+								}
+								break;
+							}
+							case ABLIM_WEAPON_TYPE: {
+								if ((misc = search_block(val_b, weapon_types, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid weapon type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
 									return;
 								}
 								break;
