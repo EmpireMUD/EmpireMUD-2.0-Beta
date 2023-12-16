@@ -11913,7 +11913,7 @@ ACMD(do_vstat) {
 	obj_data *obj;
 	any_vnum number;
 
-	two_arguments(argument, buf, buf2);
+	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
 		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
