@@ -118,6 +118,7 @@ OLC_MODULE(archedit_type);
 
 // attack modules
 OLC_MODULE(attackedit_back);
+OLC_MODULE(attackedit_clearextended);
 OLC_MODULE(attackedit_damagetype);
 OLC_MODULE(attackedit_firstperson);
 OLC_MODULE(attackedit_flags);
@@ -659,6 +660,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// attacks
 	{ "back", attackedit_back, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "clearextended", attackedit_clearextended, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "damagetype", attackedit_damagetype, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "firstperson", attackedit_firstperson, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "flags", attackedit_flags, OLC_ATTACK, OLC_CF_EDITOR },

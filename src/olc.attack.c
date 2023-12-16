@@ -1360,6 +1360,10 @@ void olc_show_attack_message(char_data *ch) {
 		sprintf(buf + strlen(buf), "%d. %s\r\n", ++count, to_show ? to_show : "(blank)");
 	}
 	
+	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
+		sprintf(buf + strlen(buf), "To clear extended data: <%sclearextended\t0>\r\n", OLC_LABEL_CHANGED);
+	}
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
