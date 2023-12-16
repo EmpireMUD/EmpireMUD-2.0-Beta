@@ -881,6 +881,7 @@ void save_attack_message_file(void) {
 void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 	int iter;
 	struct attack_message_set *ams;
+	bool wrote_extended = FALSE;
 	
 	const int msg_order[] = { MSG_DIE, MSG_MISS, MSG_HIT, MSG_GOD, -1 };	// requires -1 terminator at end
 	#define WAMTF_MSG(pos, mtype)  ((ams->msg[msg_order[(pos)]].mtype && *(ams->msg[msg_order[(pos)]].mtype)) ? ams->msg[msg_order[(pos)]].mtype : "#")
@@ -898,11 +899,14 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), ATTACK_HAS_EXTENDED_DATA(amd) ? "+" : "");	// M# indicates the b5.166 attack message format
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NAME(amd)));
 		
-		if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+		if (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) {
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_THIRD_PERSON(amd)));
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NOUN(amd)));
 			fprintf(fl, "%d %d %.1f %.1f %.1f\n", ATTACK_DAMAGE_TYPE(amd), ATTACK_WEAPON_TYPE(amd), ATTACK_SPEED(amd, SPD_FAST), ATTACK_SPEED(amd, SPD_NORMAL), ATTACK_SPEED(amd, SPD_SLOW));
+			
+			// only need this section once
+			wrote_extended = TRUE;
 		}
 		
 		// print message triplets in order, with '#' in place of blanks.
