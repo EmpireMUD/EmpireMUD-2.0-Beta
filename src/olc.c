@@ -54,7 +54,6 @@ OLC_MODULE(olc_wordcount);
 // ability modules
 OLC_MODULE(abiledit_affects);
 OLC_MODULE(abiledit_affectvnum);
-OLC_MODULE(abiledit_ahook);
 OLC_MODULE(abiledit_apply);
 OLC_MODULE(abiledit_attacktype);
 OLC_MODULE(abiledit_cdtime);
@@ -69,6 +68,7 @@ OLC_MODULE(abiledit_data);
 OLC_MODULE(abiledit_difficulty);
 OLC_MODULE(abiledit_flags);
 OLC_MODULE(abiledit_gainhooks);
+OLC_MODULE(abiledit_hook);
 OLC_MODULE(abiledit_immunities);
 OLC_MODULE(abiledit_interaction);
 OLC_MODULE(abiledit_linkedtrait);
@@ -568,8 +568,6 @@ const struct olc_command_data olc_data[] = {
 	// ability commands
 	{ "affects", abiledit_affects, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "affectvnum", abiledit_affectvnum, OLC_ABILITY, OLC_CF_EDITOR },
-	{ "ahooks", abiledit_ahook, OLC_ABILITY, OLC_CF_EDITOR },
-	{ "abilityhooks", abiledit_ahook, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "apply", abiledit_apply, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "attacktype", abiledit_attacktype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "cdtime", abiledit_cdtime, OLC_ABILITY, OLC_CF_EDITOR },
@@ -584,6 +582,7 @@ const struct olc_command_data olc_data[] = {
 	{ "difficulty", abiledit_difficulty, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "flags", abiledit_flags, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "gainhooks", abiledit_gainhooks, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "hooks", abiledit_hook, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "immunities", abiledit_immunities, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "interaction", abiledit_interaction, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "linkedtrait", abiledit_linkedtrait, OLC_ABILITY, OLC_CF_EDITOR },

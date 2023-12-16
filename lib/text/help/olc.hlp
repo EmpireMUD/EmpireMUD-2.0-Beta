@@ -583,12 +583,12 @@ you have sapped.
 
 See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
-"ABILEDIT AHOOK" "ABILEDIT AHOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS" "HOOKED ABILITIES" "HOOK ABILITIES"
+"ABILEDIT HOOK" "ABILEDIT HOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS" "HOOKED ABILITIES" "HOOK ABILITIES"
 
-Usage:  .ahook add <type> <percent> [value]
-        .ahook remove <number | all>
+Usage:  .hook add <type> <percent> [value]
+        .hook remove <number | all>
 
-The 'ahook' field is for ability hooks -- conditions which can cause this
+The 'hook' field is for ability hooks -- conditions which can cause this
 ability to trigger. A hooked ability can only run once per execution, meaning
 abilities never trigger each other in circles. This also means abilities that
 target multiple things will only trigger a hooked ability once (including

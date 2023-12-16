@@ -6971,7 +6971,7 @@ void olc_show_ability(char_data *ch) {
 	}
 	
 	// hooks
-	sprintf(buf + strlen(buf), "Ability Hooks: <%sahook\t0>\r\n", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
+	sprintf(buf + strlen(buf), "Ability Hooks: <%shook\t0>\r\n", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_hook_display(ahook));
@@ -7059,160 +7059,6 @@ OLC_MODULE(abiledit_affectvnum) {
 			msg_to_char(ch, "Invalid affect generic vnum %d. Old value restored.\r\n", ABIL_AFFECT_VNUM(abil));
 			ABIL_AFFECT_VNUM(abil) = old;
 		}
-	}
-}
-
-
-OLC_MODULE(abiledit_ahook) {
-	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], temp[256];
-	struct ability_hook *ahook, *next_ahook;
-	double percent = 100.0;
-	int iter, num, type_id, val_id, misc = 0;
-	bool found;
-	
-	// arg1 arg2
-	half_chop(argument, arg1, arg2);
-	
-	if (is_abbrev(arg1, "remove")) {
-		if (!*arg2) {
-			msg_to_char(ch, "Remove which ability hook entry (number)?\r\n");
-		}
-		else if (!str_cmp(arg2, "all")) {
-			while ((ahook = ABIL_HOOKS(abil))) {
-				ABIL_HOOKS(abil) = ahook->next;
-				free(ahook);
-			}
-			ABIL_HOOKS(abil) = NULL;
-			msg_to_char(ch, "You remove all the ability hooks.\r\n");
-		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid ability hook number to remove.\r\n");
-		}
-		else {
-			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_HOOKS(abil), ahook, next_ahook) {
-				if (--num == 0) {
-					found = TRUE;
-					msg_to_char(ch, "You remove ability hook #%d: %s\r\n", atoi(arg2), ability_hook_display(ahook));
-					LL_DELETE(ABIL_HOOKS(abil), ahook);
-					free(ahook);
-					ABIL_HOOK_FLAGS(abil) = all_abil_hooks(abil);
-					break;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid ability hook number to remove.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "add")) {
-		half_chop(arg2, type_arg, arg3);
-		half_chop(arg3, prc_arg, val_arg);
-		
-		if (!*type_arg || !*prc_arg) {
-			msg_to_char(ch, "Usage: ahook add <type> <percent> [value]\r\n");
-		}
-		else if ((type_id = search_block(type_arg, ability_hook_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
-		}
-		else if ((percent = atof(prc_arg)) < 0.01 || percent > 100.0) {
-			msg_to_char(ch, "Percent must be between 0.01 and 100.0; '%s' given.\r\n", prc_arg);
-		}
-		else {
-			val_id = NOTHING;
-			
-			// AHOOK_x: determine which one to add
-			switch (BIT(type_id)) {
-				case AHOOK_ABILITY: {
-					ability_data *lookup;
-					
-					if (!*val_arg) {
-						msg_to_char(ch, "No ability given.\r\n");
-						return;
-					}
-					if (!(lookup = find_ability(val_arg))) {
-						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
-						return;
-					}
-					val_id = ABIL_VNUM(lookup);
-					break;
-				}
-				case AHOOK_ATTACK_TYPE: {
-					if (!*val_arg) {
-						msg_to_char(ch, "No attack type given.\r\n");
-						return;
-					}
-					if ((val_id = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown attack type '%s'.\r\n", val_arg);
-						return;
-					}
-					break;
-				}
-				case AHOOK_WEAPON_TYPE: {
-					if (!*val_arg) {
-						msg_to_char(ch, "No weapon type given.\r\n");
-						return;
-					}
-					if ((val_id = search_block(val_arg, weapon_types, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Invalid weapon type '%s'.\r\n", val_arg);
-						return;
-					}
-					break;
-				}
-				case AHOOK_DAMAGE_TYPE: {
-					if (!*val_arg) {
-						msg_to_char(ch, "No damage type given.\r\n");
-						return;
-					}
-					if ((val_id = search_block(val_arg, damage_types, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Invalid damage type '%s'.\r\n", val_arg);
-						return;
-					}
-					break;
-				}
-				
-				// these require no data
-				case AHOOK_ATTACK:
-				case AHOOK_KILL:
-				case AHOOK_MELEE_ATTACK:
-				case AHOOK_RANGED_ATTACK: {
-					val_id = 0;
-					break;
-				}
-			}
-			
-			if (val_id == NOTHING) {
-				msg_to_char(ch, "Invalid ability hook '%s'.\r\n", val_arg);
-			}
-			else {
-				CREATE(ahook, struct ability_hook, 1);
-				ahook->type = BIT(type_id);
-				ahook->percent = percent;
-				ahook->value = val_id;
-				ahook->misc = misc;
-				LL_APPEND(ABIL_HOOKS(abil), ahook);
-				
-				ABIL_HOOK_FLAGS(abil) |= ahook->type;
-				
-				msg_to_char(ch, "You add an ability hook: %s\r\n", ability_hook_display(ahook));
-			}
-		}
-	}
-	else {
-		msg_to_char(ch, "Usage: ahook add <type> <percent> [value]\r\n");
-		msg_to_char(ch, "Usage: ahook remove <number | all>\r\n");
-		
-		found = FALSE;
-		msg_to_char(ch, "Allowed types:");
-		for (iter = 0; *ability_hook_types[iter] != '\n'; ++iter) {
-			prettier_sprintbit(BIT(iter), ability_hook_types, temp);
-			msg_to_char(ch, "%s%s", found ? ", " : " ", temp);
-			found = TRUE;
-		}
-		msg_to_char(ch, "%s\r\n", found ? "" : " none");
 	}
 }
 
@@ -7573,6 +7419,160 @@ OLC_MODULE(abiledit_difficulty) {
 OLC_MODULE(abiledit_gainhooks) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);	
 	ABIL_GAIN_HOOKS(abil) = olc_process_flag(ch, argument, "gain hook", "gainhooks", ability_gain_hooks, ABIL_GAIN_HOOKS(abil));
+}
+
+
+OLC_MODULE(abiledit_hook) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], temp[256];
+	struct ability_hook *ahook, *next_ahook;
+	double percent = 100.0;
+	int iter, num, type_id, val_id, misc = 0;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which ability hook entry (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((ahook = ABIL_HOOKS(abil))) {
+				ABIL_HOOKS(abil) = ahook->next;
+				free(ahook);
+			}
+			ABIL_HOOKS(abil) = NULL;
+			msg_to_char(ch, "You remove all the ability hooks.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid ability hook number to remove.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH_SAFE(ABIL_HOOKS(abil), ahook, next_ahook) {
+				if (--num == 0) {
+					found = TRUE;
+					msg_to_char(ch, "You remove ability hook #%d: %s\r\n", atoi(arg2), ability_hook_display(ahook));
+					LL_DELETE(ABIL_HOOKS(abil), ahook);
+					free(ahook);
+					ABIL_HOOK_FLAGS(abil) = all_abil_hooks(abil);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid ability hook number to remove.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		half_chop(arg2, type_arg, arg3);
+		half_chop(arg3, prc_arg, val_arg);
+		
+		if (!*type_arg || !*prc_arg) {
+			msg_to_char(ch, "Usage: hook add <type> <percent> [value]\r\n");
+		}
+		else if ((type_id = search_block(type_arg, ability_hook_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if ((percent = atof(prc_arg)) < 0.01 || percent > 100.0) {
+			msg_to_char(ch, "Percent must be between 0.01 and 100.0; '%s' given.\r\n", prc_arg);
+		}
+		else {
+			val_id = NOTHING;
+			
+			// AHOOK_x: determine which one to add
+			switch (BIT(type_id)) {
+				case AHOOK_ABILITY: {
+					ability_data *lookup;
+					
+					if (!*val_arg) {
+						msg_to_char(ch, "No ability given.\r\n");
+						return;
+					}
+					if (!(lookup = find_ability(val_arg))) {
+						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
+						return;
+					}
+					val_id = ABIL_VNUM(lookup);
+					break;
+				}
+				case AHOOK_ATTACK_TYPE: {
+					if (!*val_arg) {
+						msg_to_char(ch, "No attack type given.\r\n");
+						return;
+					}
+					if ((val_id = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown attack type '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case AHOOK_WEAPON_TYPE: {
+					if (!*val_arg) {
+						msg_to_char(ch, "No weapon type given.\r\n");
+						return;
+					}
+					if ((val_id = search_block(val_arg, weapon_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid weapon type '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case AHOOK_DAMAGE_TYPE: {
+					if (!*val_arg) {
+						msg_to_char(ch, "No damage type given.\r\n");
+						return;
+					}
+					if ((val_id = search_block(val_arg, damage_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Invalid damage type '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				
+				// these require no data
+				case AHOOK_ATTACK:
+				case AHOOK_KILL:
+				case AHOOK_MELEE_ATTACK:
+				case AHOOK_RANGED_ATTACK: {
+					val_id = 0;
+					break;
+				}
+			}
+			
+			if (val_id == NOTHING) {
+				msg_to_char(ch, "Invalid ability hook '%s'.\r\n", val_arg);
+			}
+			else {
+				CREATE(ahook, struct ability_hook, 1);
+				ahook->type = BIT(type_id);
+				ahook->percent = percent;
+				ahook->value = val_id;
+				ahook->misc = misc;
+				LL_APPEND(ABIL_HOOKS(abil), ahook);
+				
+				ABIL_HOOK_FLAGS(abil) |= ahook->type;
+				
+				msg_to_char(ch, "You add an ability hook: %s\r\n", ability_hook_display(ahook));
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: hook add <type> <percent> [value]\r\n");
+		msg_to_char(ch, "Usage: hook remove <number | all>\r\n");
+		
+		found = FALSE;
+		msg_to_char(ch, "Allowed types:");
+		for (iter = 0; *ability_hook_types[iter] != '\n'; ++iter) {
+			prettier_sprintbit(BIT(iter), ability_hook_types, temp);
+			msg_to_char(ch, "%s%s", found ? ", " : " ", temp);
+			found = TRUE;
+		}
+		msg_to_char(ch, "%s\r\n", found ? "" : " none");
+	}
 }
 
 
