@@ -38,8 +38,14 @@ X f
 S
 #3
 Backstab~
-0 -1 1.00 0 0 0
-T m 0
+agkx -1 2.00 0 0 0
+C
+bckstb 7 bf 1 25 0 2038 9 0 2 2
+D 16 28 4
+D 16 30 0
+T c 1
+X c
+62 0
 S
 #4
 Wolf Form~
@@ -706,19 +712,20 @@ X c
 S
 #97
 Bash~
-agkp -1 1.00 hE 0 0
+agkpx -1 1.00 hE 0 0
 C
 bsh 7 bf 1 15 0 2012 9 0 2 0
+D 16 27 0
 T c 1
 T b 1
 X b
 3047 5 5 t
 X c
-95 0
+55 0
 S
 #98
 Cut Deep~
-ak -1 1.00 h 0 0
+akx -1 1.00 h 0 0
 C
 unknown 7 bfh 0 0 0 -1 0 0 0 0
 H 128 1 10.00 0
