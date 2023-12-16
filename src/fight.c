@@ -2398,7 +2398,6 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 * @return int 1: sent message, 0: no message found
 */
 int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages) {
-	int j, nr;
 	attack_message_data *amd;
 	struct attack_message_set *msg;
 	char message[1024];
@@ -2415,13 +2414,8 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 	}
 	
 	// determine a message to send in the set
-	nr = dice(1, ATTACK_NUM_MSGS(amd));
-	for (j = 1, msg = ATTACK_MSG_LIST(amd); (j < nr) && msg && msg->next; j++) {
-		msg = msg->next;
-	}
-	
-	// somehow a attack_message_table entry without messages?
-	if (!msg) {
+	if (!(msg = get_one_attack_message(amd, NOTHING))) {
+		// somehow a attack_message_table entry without messages?
 		return 0;
 	}
 	

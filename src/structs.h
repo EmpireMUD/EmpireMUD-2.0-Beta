@@ -4629,6 +4629,7 @@ struct descriptor_data {
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
 	attack_message_data *olc_attack;	// attack message being edited
+	int olc_attack_num;		// which message in the attack set is being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	class_data *olc_class;	// class being edited

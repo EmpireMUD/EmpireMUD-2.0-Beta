@@ -73,6 +73,38 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Fetch 1 message set from an attack type, either by number or at random.
+*
+* @param attack_message_data *amd The attack type to get 1 message from.
+* @param int num Which number to get (1-N) or pass NOTHING to get one at random.
+* @return struct attack_message_set* The message, or NULL if none found.
+*/
+struct attack_message_set *get_one_attack_message(attack_message_data *amd, int num) {
+	struct attack_message_set *ams, *found = NULL;
+	
+	// shortcut
+	if (!ATTACK_NUM_MSGS(amd) || !ATTACK_MSG_LIST(amd)) {
+		return NULL;
+	}
+	
+	// random?
+	if (num == NOTHING) {
+		num = number(1, ATTACK_NUM_MSGS(amd));
+	}
+	
+	// find message
+	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
+		if (--num <= 0) {
+			found = ams;
+			break;
+		}
+	}
+	
+	return found;	// if any
+}
+
+
+/**
 * Gets a attack's name by vnum, safely.
 *
 * @param any_vnum vnum The attack vnum to look up -- these are also ATTACK_ or TYPE_ consts.
@@ -1040,6 +1072,32 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 
 
 /**
+* Sub-menu when editing a specific messsage.
+*
+* @param char_data *ch The person who is editing a message and will see its display.
+*/
+void olc_show_one_message(char_data *ch) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	char buf[MAX_STRING_LENGTH * 2];
+	struct attack_message_set *ams;
+	
+	// find message
+	if ((ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc)))) {
+		// return to main menu
+		GET_OLC_ATTACK_NUM(ch->desc) = 0;
+		olc_show_attack_message(ch);
+		return;
+	}
+	
+	// one message view
+	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s #%d\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), GET_OLC_ATTACK_NUM(ch->desc));
+	
+	sprintf(buf + strlen(buf), "<%sback\t0> to return to the main menu\r\n", OLC_LABEL_UNCHANGED);
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
 * This is the main recipe display for attack OLC. It displays the user's
 * currently-edited attack.
 *
@@ -1055,13 +1113,18 @@ void olc_show_attack_message(char_data *ch) {
 	if (!amd) {
 		return;
 	}
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		// show message instead
+		olc_show_one_message(ch);
+		return;
+	}
 	
 	*buf = '\0';
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
 	
-	sprintf(buf + strlen(buf), "Messages: <message #>\r\n");
+	sprintf(buf + strlen(buf), "Messages: <%smessage #\t0>\r\n", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
 	
 	// show list preview
 	count = 0;
@@ -1126,8 +1189,56 @@ int vnum_attack_message(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
-OLC_MODULE(attackedit_name) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	olc_process_string(ch, argument, "name", &ATTACK_NAME(amd));
+OLC_MODULE(attackedit_back) {
+	if (GET_OLC_ATTACK_NUM(ch->desc) == 0) {
+		msg_to_char(ch, "You are already at the main attack message menu.\r\n");
+	}
+	else {
+		GET_OLC_ATTACK_NUM(ch->desc) = 0;
+		olc_show_attack_message(ch);
+	}
 }
 
+
+OLC_MODULE(attackedit_message) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	int num;
+	
+	char *USAGE = "Usage:  .message <number | add | remove>\r\n";
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You are already editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!*argument) {
+		send_to_char(USAGE, ch);
+	}
+	else if (!str_cmp(argument, "add")) {
+	}
+	else if (!str_cmp(argument, "remove")) {
+	}
+	else if (isdigit(*argument)) {
+		num = atoi(argument);
+		if (num < 0 || num > ATTACK_NUM_MSGS(amd)) {
+			msg_to_char(ch, "Invalid message number '%s'.\r\n", argument);
+		}
+		else {
+			GET_OLC_ATTACK_NUM(ch->desc) = num;
+			olc_show_attack_message(ch);
+		}
+	}
+	else {
+		send_to_char(USAGE, ch);
+	}
+}
+
+
+OLC_MODULE(attackedit_name) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the name while editing a message (use .back to return to the menu).\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "name", &ATTACK_NAME(amd));
+	}
+}

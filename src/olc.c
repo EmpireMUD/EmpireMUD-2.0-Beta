@@ -117,6 +117,8 @@ OLC_MODULE(archedit_skill);
 OLC_MODULE(archedit_type);
 
 // attack modules
+OLC_MODULE(attackedit_back);
+OLC_MODULE(attackedit_message);
 OLC_MODULE(attackedit_name);
 
 // augment modules
@@ -637,6 +639,8 @@ const struct olc_command_data olc_data[] = {
 	{ "type", archedit_type, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	
 	// attacks
+	{ "back", attackedit_back, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "message", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
 	
 	// augments
@@ -1209,6 +1213,7 @@ OLC_MODULE(olc_abort) {
 			case OLC_ATTACK: {
 				free_attack_message(GET_OLC_ATTACK(ch->desc));
 				GET_OLC_ATTACK(ch->desc) = NULL;
+				GET_OLC_ATTACK_NUM(ch->desc) = 0;
 				break;
 			}
 			case OLC_AUGMENT: {
@@ -1835,6 +1840,7 @@ OLC_MODULE(olc_copy) {
 		case OLC_ATTACK: {
 			GET_OLC_ATTACK(ch->desc) = setup_olc_attack_message(real_attack_message(from_vnum));
 			GET_OLC_ATTACK(ch->desc)->vnum = vnum;
+			GET_OLC_ATTACK_NUM(ch->desc) = 0;
 			olc_show_attack_message(ch);
 			break;
 		}
@@ -2332,35 +2338,36 @@ OLC_MODULE(olc_edit) {
 		case OLC_ARCHETYPE: {
 			// this will set up from existing OR new automatically
 			GET_OLC_ARCHETYPE(ch->desc) = setup_olc_archetype(archetype_proto(vnum));
-			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;			
+			GET_OLC_ARCHETYPE(ch->desc)->vnum = vnum;
 			olc_show_archetype(ch);
 			break;
 		}
 		case OLC_ATTACK: {
 			// this will set up from existing OR new automatically based on real_attack_message
 			GET_OLC_ATTACK(ch->desc) = setup_olc_attack_message(real_attack_message(vnum));
-			GET_OLC_ATTACK(ch->desc)->vnum = vnum;			
+			GET_OLC_ATTACK(ch->desc)->vnum = vnum;
+			GET_OLC_ATTACK_NUM(ch->desc) = 0;
 			olc_show_attack_message(ch);
 			break;
 		}
 		case OLC_AUGMENT: {
 			// this will set up from existing OR new automatically
 			GET_OLC_AUGMENT(ch->desc) = setup_olc_augment(augment_proto(vnum));
-			GET_OLC_AUGMENT(ch->desc)->vnum = vnum;			
+			GET_OLC_AUGMENT(ch->desc)->vnum = vnum;
 			olc_show_augment(ch);
 			break;
 		}
 		case OLC_BOOK: {
 			// this sets up either new or existing automatically
 			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(vnum));
-			GET_OLC_BOOK(ch->desc)->vnum = vnum;			
+			GET_OLC_BOOK(ch->desc)->vnum = vnum;
 			olc_show_book(ch);
 			break;
 		}
 		case OLC_BUILDING: {
 			// this sets up either new or existing automatically
 			GET_OLC_BUILDING(ch->desc) = setup_olc_building(building_proto(vnum));
-			GET_OLC_BUILDING(ch->desc)->vnum = vnum;			
+			GET_OLC_BUILDING(ch->desc)->vnum = vnum;
 			olc_show_building(ch);
 			break;
 		}
@@ -2374,42 +2381,42 @@ OLC_MODULE(olc_edit) {
 		case OLC_CRAFT: {
 			// this sets up either new or existing automatically
 			GET_OLC_CRAFT(ch->desc) = setup_olc_craft(craft_proto(vnum));
-			GET_OLC_CRAFT(ch->desc)->vnum = vnum;			
+			GET_OLC_CRAFT(ch->desc)->vnum = vnum;
 			olc_show_craft(ch);
 			break;
 		}
 		case OLC_CROP: {
 			// this will set up from existing OR new automatically based on crop_proto
 			GET_OLC_CROP(ch->desc) = setup_olc_crop(crop_proto(vnum));
-			GET_OLC_CROP(ch->desc)->vnum = vnum;			
+			GET_OLC_CROP(ch->desc)->vnum = vnum;
 			olc_show_crop(ch);
 			break;
 		}
 		case OLC_EVENT: {
 			// this will set up from existing OR new automatically based on find_event_by_vnum
 			GET_OLC_EVENT(ch->desc) = setup_olc_event(find_event_by_vnum(vnum));
-			GET_OLC_EVENT(ch->desc)->vnum = vnum;			
+			GET_OLC_EVENT(ch->desc)->vnum = vnum;
 			olc_show_event(ch);
 			break;
 		}
 		case OLC_FACTION: {
 			// this will set up from existing OR new automatically based on find_faction_by_vnum
 			GET_OLC_FACTION(ch->desc) = setup_olc_faction(find_faction_by_vnum(vnum));
-			GET_OLC_FACTION(ch->desc)->vnum = vnum;			
+			GET_OLC_FACTION(ch->desc)->vnum = vnum;
 			olc_show_faction(ch);
 			break;
 		}
 		case OLC_GENERIC: {
 			// this will set up from existing OR new automatically based on real_generic
 			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(real_generic(vnum));
-			GET_OLC_GENERIC(ch->desc)->vnum = vnum;			
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;
 			olc_show_generic(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
 			// this will set up from existing OR new automatically based on global_proto
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
-			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;			
+			GET_OLC_GLOBAL(ch->desc)->vnum = vnum;
 			olc_show_global(ch);
 			break;
 		}
@@ -2423,7 +2430,7 @@ OLC_MODULE(olc_edit) {
 		case OLC_MORPH: {
 			// this will set up from existing OR new automatically
 			GET_OLC_MORPH(ch->desc) = setup_olc_morph(morph_proto(vnum));
-			GET_OLC_MORPH(ch->desc)->vnum = vnum;			
+			GET_OLC_MORPH(ch->desc)->vnum = vnum;
 			olc_show_morph(ch);
 			break;
 		}
@@ -2437,14 +2444,14 @@ OLC_MODULE(olc_edit) {
 		case OLC_PROGRESS: {
 			// this will set up from existing OR new automatically
 			GET_OLC_PROGRESS(ch->desc) = setup_olc_progress(real_progress(vnum));
-			GET_OLC_PROGRESS(ch->desc)->vnum = vnum;			
+			GET_OLC_PROGRESS(ch->desc)->vnum = vnum;
 			olc_show_progress(ch);
 			break;
 		}
 		case OLC_QUEST: {
 			// this will set up from existing OR new automatically
 			GET_OLC_QUEST(ch->desc) = setup_olc_quest(quest_proto(vnum));
-			GET_OLC_QUEST(ch->desc)->vnum = vnum;			
+			GET_OLC_QUEST(ch->desc)->vnum = vnum;
 			olc_show_quest(ch);
 			break;
 		}
@@ -2465,7 +2472,7 @@ OLC_MODULE(olc_edit) {
 		case OLC_SHOP: {
 			// this will set up from existing OR new automatically based on real_shop
 			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(vnum));
-			GET_OLC_SHOP(ch->desc)->vnum = vnum;			
+			GET_OLC_SHOP(ch->desc)->vnum = vnum;
 			olc_show_shop(ch);
 			break;
 		}
@@ -2486,14 +2493,14 @@ OLC_MODULE(olc_edit) {
 		case OLC_TRIGGER: {
 			// this will set up from existing OR new automatically
 			GET_OLC_TRIGGER(ch->desc) = setup_olc_trigger(real_trigger(vnum), &GET_OLC_STORAGE(ch->desc));
-			GET_OLC_TRIGGER(ch->desc)->vnum = vnum;			
+			GET_OLC_TRIGGER(ch->desc)->vnum = vnum;
 			olc_show_trigger(ch);
 			break;
 		}
 		case OLC_VEHICLE: {
 			// this will set up from existing OR new automatically
 			GET_OLC_VEHICLE(ch->desc) = setup_olc_vehicle(vehicle_proto(vnum));
-			GET_OLC_VEHICLE(ch->desc)->vnum = vnum;			
+			GET_OLC_VEHICLE(ch->desc)->vnum = vnum;
 			olc_show_vehicle(ch);
 			break;
 		}
@@ -3627,6 +3634,7 @@ OLC_MODULE(olc_save) {
 				audit_attack_message(GET_OLC_ATTACK(ch->desc), ch);
 				free_attack_message(GET_OLC_ATTACK(ch->desc));
 				GET_OLC_ATTACK(ch->desc) = NULL;
+				GET_OLC_ATTACK_NUM(ch->desc) = 0;
 				break;
 			}
 			case OLC_AUGMENT: {

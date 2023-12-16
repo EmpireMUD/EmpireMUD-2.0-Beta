@@ -536,6 +536,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
 #define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
 #define GET_OLC_ATTACK(desc)  ((desc)->olc_attack)
+#define GET_OLC_ATTACK_NUM(desc)  ((desc)->olc_attack_num)
 #define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
