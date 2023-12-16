@@ -896,7 +896,7 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 		fprintf(fl, "\n");	// records are spaced by blank lines
 		
 		// record begins M#### flags +
-		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), ATTACK_HAS_EXTENDED_DATA(amd) ? "+" : "");	// M# indicates the b5.166 attack message format
+		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) ? "+" : "");	// M# indicates the b5.166 attack message format
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NAME(amd)));
 		
 		if (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) {
