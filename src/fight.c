@@ -2393,14 +2393,14 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 * @param int dam How much damage was done.
 * @param char_data *ch The character dealing the damage.
 * @param char_data *victim The person receiving the damage.
-* @param int w_type The attack type (ATTACK_x)struct message_list *custom_fight_messages
-* @param struct message_list *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
+* @param int w_type The attack type (ATTACK_x)attack_message_data *custom_fight_messages
+* @param attack_message_data *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
 * @return int 1: sent message, 0: no message found
 */
-int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struct message_list *custom_fight_messages) {
+int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages) {
 	int j, nr;
-	struct message_list *msg_set;
-	struct message_type *msg;
+	attack_message_data *amd;
+	struct attack_message_set *msg;
 	char message[1024];
 	bitvector_t hit_flags = NOBITS, miss_flags = NOBITS;
 	
@@ -2408,19 +2408,19 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, struc
 	
 	// determine which messages to use
 	if (custom_fight_messages) {
-		msg_set = custom_fight_messages;
+		amd = custom_fight_messages;
 	}
-	else if (!(msg_set = find_fight_message(attacktype, FALSE))) {
+	else if (!(amd = find_fight_message(attacktype, FALSE))) {
 		return 0;	// no skill message for this attacktype
 	}
 	
 	// determine a message to send in the set
-	nr = dice(1, msg_set->number_of_attacks);
-	for (j = 1, msg = msg_set->msg; (j < nr) && msg && msg->next; j++) {
+	nr = dice(1, amd->num_msgs);
+	for (j = 1, msg = amd->msg_list; (j < nr) && msg && msg->next; j++) {
 		msg = msg->next;
 	}
 	
-	// somehow a fight_messages entry without messages?
+	// somehow a fight_message_table entry without messages?
 	if (!msg) {
 		return 0;
 	}
@@ -3162,10 +3162,10 @@ bool check_combat_position(char_data *ch, double speed) {
 * @param int dam How much damage.
 * @param int attacktype An ATYPE_ const.
 * @param byte damtype A DAM_ const.
-* @param struct message_list *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
+* @param attack_message_data *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
 * @return int Return < 0 if the victim died, 0 for no damage, or > 0 for the amount of damage done.
 */
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, struct message_list *custom_fight_messages) {
+int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, attack_message_data *custom_fight_messages) {
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);

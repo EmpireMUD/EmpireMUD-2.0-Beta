@@ -532,14 +532,14 @@ void free_faction(faction_data *fct);
 void remove_faction_from_table(faction_data *fct);
 
 // fight messages
-extern struct message_list *fight_messages;
+extern attack_message_data *fight_message_table;
 
-void add_fight_message(struct message_list *add_to, struct message_type *messages);
-struct message_list *create_fight_message(int a_type);
-struct message_type *create_fight_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
-struct message_list *find_fight_message(int a_type, bool create_if_missing);
-void free_message_list(struct message_list *list);
-void free_message_type(struct message_type *type);
+void add_fight_message(attack_message_data *add_to, struct attack_message_set *messages);
+attack_message_data *create_fight_message(any_vnum a_type);
+struct attack_message_set *create_attack_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
+attack_message_data *find_fight_message(any_vnum a_type, bool create_if_missing);
+void free_message_list(attack_message_data *list);
+void free_message_type(struct attack_message_set *type);
 void load_fight_messages();
 
 // generics

@@ -8368,7 +8368,7 @@ void free_whole_library(void) {
 	struct global_data *glb, *next_glb;
 	struct int_hash *int_iter, *next_int_iter;
 	struct island_info *island, *next_island;
-	struct message_list *msg_set, *next_msg_set;
+	attack_message_data *amd, *next_amd;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
 	player_index_data *pid, *next_pid;
@@ -8573,9 +8573,9 @@ void free_whole_library(void) {
 		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
-	HASH_ITER(hh, fight_messages, msg_set, next_msg_set) {
-		HASH_DEL(fight_messages, msg_set);
-		free_message_list(msg_set);
+	HASH_ITER(hh, fight_message_table, amd, next_amd) {
+		HASH_DEL(fight_message_table, amd);
+		free_message_list(amd);
 	}
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		remove_morph_from_table(morph);

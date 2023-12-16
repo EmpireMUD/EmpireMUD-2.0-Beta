@@ -266,6 +266,7 @@ typedef struct ability_data ability_data;
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
 typedef struct archetype_data archetype_data;
+typedef struct attack_message_data attack_message_data;
 typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
@@ -5944,14 +5945,6 @@ struct player_faction_data {
  //////////////////////////////////////////////////////////////////////////////
 //// FIGHT STRUCTS ///////////////////////////////////////////////////////////
 
-// part of fight messages
-struct msg_type {
-	char *attacker_msg;	// message to attacker
-	char *victim_msg;	// message to victim
-	char *room_msg;	// message to room
-};
-
-
 // MSG_x: each fight message has these 4 types
 #define MSG_DIE  0	// messages when death
 #define MSG_MISS  1	// messages when miss
@@ -5960,20 +5953,29 @@ struct msg_type {
 #define NUM_MSG_TYPES  4	// total
 
 
-// part of fight messages
-struct message_type {
-	struct msg_type msg[NUM_MSG_TYPES];	// the 4 message types
-	struct message_type *next;	// to next messages of this kind
+// fight message list
+struct attack_message_data {
+	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
+	
+	struct attack_message_set *msg_list;	// Linked list of messages
+	int num_msgs;	// How many attack messages are in the list
+	
+	UT_hash_handle hh;	// fight_message_table hash (by vnum)
 };
 
 
-// fight message list
-struct message_list {
-	int a_type;	// Attack type
-	int number_of_attacks;	// How many attack messages to chose from
-	struct message_type *msg;	// List of messages
-	
-	UT_hash_handle hh;	// fight_messages hash (by a_type)
+// individual trio of fight messages
+struct attack_message_type {
+	char *attacker_msg;	// message to attacker
+	char *victim_msg;	// message to victim
+	char *room_msg;	// message to room
+};
+
+
+// part of fight messages
+struct attack_message_set {
+	struct attack_message_type msg[NUM_MSG_TYPES];	// the 4 message types
+	struct attack_message_set *next;	// to next messages of this kind
 };
 
 

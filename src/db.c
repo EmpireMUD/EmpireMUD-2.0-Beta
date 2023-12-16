@@ -176,7 +176,7 @@ int MAX_REPUTATION = 0;	// highest possible rep value, auto-detected at startup
 int MIN_REPUTATION = 0;	// lowest possible rep value, auto-detected at startup
 
 // fight system
-struct message_list *fight_messages = NULL;	// hash table of fighting messages by a_type/ATTACK_ const
+attack_message_data *fight_message_table = NULL;	// hash table of fighting messages by vnum/ATTACK_ const
 
 // game config
 time_t boot_time = 0;	// time of mud boot
@@ -1468,13 +1468,13 @@ void index_boot_help(void) {
 /**
 * Adds messages to a set of fight messages.
 *
-* @param struct message_list *add_to Which set of messages to add to.
-* @param struct message_type *messages The messages to put in there.
+* @param attack_message_data *add_to Which set of messages to add to.
+* @param struct attack_message_set *messages The messages to put in there.
 */
-void add_fight_message(struct message_list *add_to, struct message_type *messages) {
+void add_fight_message(attack_message_data *add_to, struct attack_message_set *messages) {
 	if (add_to && messages) {
-		add_to->number_of_attacks++;
-		LL_PREPEND(add_to->msg, messages);
+		add_to->num_msgs++;
+		LL_PREPEND(add_to->msg_list, messages);
 	}
 }
 
@@ -1482,13 +1482,13 @@ void add_fight_message(struct message_list *add_to, struct message_type *message
 /**
 * Creates a blank message list for use in the damage() function.
 *
-* @param int a_type Usually an ATTACK_ const.
-* @return struct message_list* The allocated list.
+* @param any_vnum a_type Usually an ATTACK_ const.
+* @return attack_message_data* The allocated list.
 */
-struct message_list *create_fight_message(int a_type) {
-	struct message_list *list;
-	CREATE(list, struct message_list, 1);
-	list->a_type = a_type;
+attack_message_data *create_fight_message(any_vnum a_type) {
+	attack_message_data *list;
+	CREATE(list, attack_message_data, 1);
+	list->vnum = a_type;
 	return list;
 }
 
@@ -1510,10 +1510,10 @@ struct message_list *create_fight_message(int a_type) {
 * @param char *god_to_victim Message shown to the victim when hitting a god (may be NULL).
 * @param char *god_to_room Message shown to the room when hitting a god (may be NULL).
 */
-struct message_type *create_fight_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room) {
-	struct message_type *messages;
+struct attack_message_set *create_attack_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room) {
+	struct attack_message_set *messages;
 	
-	CREATE(messages, struct message_type, 1);
+	CREATE(messages, struct attack_message_set, 1);
 
 	messages->msg[MSG_DIE].attacker_msg = (die_to_attacker && *die_to_attacker) ? (duplicate_strings ? str_dup(die_to_attacker) : die_to_attacker) : NULL;
 	messages->msg[MSG_DIE].victim_msg = (die_to_victim && *die_to_victim) ? (duplicate_strings ? str_dup(die_to_victim) : die_to_victim) : NULL;
@@ -1533,19 +1533,19 @@ struct message_type *create_fight_message_entry(bool duplicate_strings, char *di
 
 
 /**
-* Finds or creates an entry in the fight_messages hash.
+* Finds or creates an entry in the fight_message_table hash.
 *
-* @param int a_type The ATTACK_ const to find the fight message list for.
+* @param any_vnum a_type The vnum or ATTACK_ const to find the fight message list for.
 * @param bool create_if_missing If TRUE, will create the entry for the a_type.
-* @return struct message_list* The fight message list, if any (guaranteed if create_if_missing=TRUE).
+* @return attack_message_data* The fight message list, if any (guaranteed if create_if_missing=TRUE).
 */
-struct message_list *find_fight_message(int a_type, bool create_if_missing) {
-	struct message_list *fmes;
+attack_message_data *find_fight_message(any_vnum a_type, bool create_if_missing) {
+	attack_message_data *fmes;
 	
-	HASH_FIND_INT(fight_messages, &a_type, fmes);
+	HASH_FIND_INT(fight_message_table, &a_type, fmes);
 	if (!fmes && create_if_missing) {
 		fmes = create_fight_message(a_type);
-		HASH_ADD_INT(fight_messages, a_type, fmes);
+		HASH_ADD_INT(fight_message_table, vnum, fmes);
 	}
 	
 	return fmes;	// if any
@@ -1582,18 +1582,18 @@ char *fread_action(FILE *fl, int type, int type_pos) {
 
 
 /**
-* Frees a fight message set (message_list) and any strings it contains.
+* Frees a fight message data and any strings it contains.
 *
-* @param struct message_list *list The list to free.
+* @param attack_message_data *amd The list to free.
 */
-void free_message_list(struct message_list *list) {
-	struct message_type *msg, *next_msg;
+void free_message_list(attack_message_data *amd) {
+	struct attack_message_set *msg, *next_msg;
 	
-	if (list) {
-		LL_FOREACH_SAFE(list->msg, msg, next_msg) {
+	if (amd) {
+		LL_FOREACH_SAFE(amd->msg_list, msg, next_msg) {
 			free_message_type(msg);
 		}
-		free(list);
+		free(amd);
 	}
 }
 
@@ -1601,9 +1601,9 @@ void free_message_list(struct message_list *list) {
 /**
 * Frees a single fight message (message_type) and its strings.
 *
-* @param struct message_type *type The fight message to free.
+* @param struct attack_message_set *type The fight message to free.
 */
-void free_message_type(struct message_type *type) {
+void free_message_type(struct attack_message_set *type) {
 	int iter;
 	if (type) {
 		for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
@@ -1628,9 +1628,9 @@ void free_message_type(struct message_type *type) {
 */
 void load_fight_messages(void) {
 	FILE *fl;
-	int type;
-	struct message_type *messages;
-	struct message_list *msg_set, *next_set;
+	any_vnum type;
+	struct attack_message_set *messages;
+	attack_message_data *amd, *next_amd;
 	char chk[128];
 
 	if (!(fl = fopen(MESS_FILE, "r"))) {
@@ -1639,9 +1639,9 @@ void load_fight_messages(void) {
 	}
 	
 	// free existing messages if any (for reload)
-	HASH_ITER(hh, fight_messages, msg_set, next_set) {
-		HASH_DEL(fight_messages, msg_set);
-		free_message_list(msg_set);
+	HASH_ITER(hh, fight_message_table, amd, next_amd) {
+		HASH_DEL(fight_message_table, amd);
+		free_message_list(amd);
 	}
 
 	fgets(chk, 128, fl);
@@ -1653,25 +1653,25 @@ void load_fight_messages(void) {
 		fgets(chk, 128, fl);
 		sscanf(chk, " %d\n", &type);
 		
-		msg_set = find_fight_message(type, TRUE);
+		amd = find_fight_message(type, TRUE);
 		
-		CREATE(messages, struct message_type, 1);
+		CREATE(messages, struct attack_message_set, 1);
 		
-		// does not use create_fight_message_entry():
-		messages->msg[MSG_DIE].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_DIE].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_DIE].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_MISS].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_MISS].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_MISS].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_HIT].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_HIT].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_HIT].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_GOD].attacker_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_GOD].victim_msg = fread_action(fl, type, msg_set->number_of_attacks);
-		messages->msg[MSG_GOD].room_msg = fread_action(fl, type, msg_set->number_of_attacks);
+		// does not use create_attack_message_entry():
+		messages->msg[MSG_DIE].attacker_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_DIE].victim_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_DIE].room_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_MISS].attacker_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_MISS].victim_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_MISS].room_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_HIT].attacker_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_HIT].victim_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_HIT].room_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_GOD].attacker_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_GOD].victim_msg = fread_action(fl, type, amd->num_msgs);
+		messages->msg[MSG_GOD].room_msg = fread_action(fl, type, amd->num_msgs);
 		
-		add_fight_message(msg_set, messages);
+		add_fight_message(amd, messages);
 		
 		// skip to next real line
 		fgets(chk, 128, fl);

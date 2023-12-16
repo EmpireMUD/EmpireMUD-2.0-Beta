@@ -152,7 +152,7 @@ EVENTFUNC(dot_update_event) {
 	struct over_time_effect_type *dot;
 	char_data *ch, *caster;
 	int type, result;
-	struct message_list *custom_fmessage = NULL;
+	attack_message_data *custom_fmessage = NULL;
 	generic_data *gen;
 	
 	// grab data and free it
@@ -171,7 +171,7 @@ EVENTFUNC(dot_update_event) {
 		// custom messages?
 		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
 			custom_fmessage = create_fight_message(NOTHING);
-			add_fight_message(custom_fmessage, create_fight_message_entry(TRUE,
+			add_fight_message(custom_fmessage, create_attack_message_entry(TRUE,
 				GET_AFFECT_DEATH_TO_ROOM(gen),	// actually death to-attacker
 				GET_AFFECT_DEATH_TO_CHAR(gen),
 				GET_AFFECT_DEATH_TO_ROOM(gen),
