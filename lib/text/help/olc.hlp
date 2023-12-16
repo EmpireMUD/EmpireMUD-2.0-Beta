@@ -1009,6 +1009,7 @@ The following ability flags are available:
  &cREPEAT-OVER-TIME&0 - Over-time ability auto-repeats if successful.
  &cCUMULATIVE-BUFF&0 - Buff can stack its effect.
  &cCUMULATIVE-DURATION&0 - Buff can stack its duration.
+ &cWEAPON-HIT&0 - Counts as a weapon hit (applies poison, etc).
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

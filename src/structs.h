@@ -563,6 +563,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_REPEAT_OVER_TIME  BIT(20)	// u. self-repeats an over-time ability if it succeeds
 #define ABILF_CUMULATIVE_BUFF  BIT(21)	// v. buff stacks effect
 #define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
+#define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

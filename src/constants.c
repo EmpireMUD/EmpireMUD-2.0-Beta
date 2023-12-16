@@ -150,6 +150,7 @@ const char *ability_flags[] = {
 	"REPEAT-OVER-TIME",	// 20
 	"CUMULATIVE-BUFF",
 	"CUMULATIVE-DURATION",
+	"WEAPON-HIT",
 	"\n"
 };
 
@@ -179,6 +180,7 @@ const char *ability_flag_notes[] = {
 	"auto-repeating",
 	"cumulative",
 	"extendable",
+	"hits with weapon",
 	"\n"
 };
 
