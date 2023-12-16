@@ -342,7 +342,7 @@ bool trigger_counterspell(char_data *ch);
 // it's not necessarily quick to convert them.
 // TODO: need to move attack messages into an in-game editor + many of these could be messages on their respective abilities
 #define ATTACK_GUARD_TOWER		(TYPE_SUFFERING + 1)
-#define ATTACK_EXECUTE			(TYPE_SUFFERING + 2)
+#define ATTACK_EXECUTE			(TYPE_SUFFERING + 2)	// used for death logging instead of attack
 #define ATTACK_ARROW			(TYPE_SUFFERING + 3)	// unused
 #define ATTACK_KICK				(TYPE_SUFFERING + 4)
 #define ATTACK_BASH				(TYPE_SUFFERING + 5)

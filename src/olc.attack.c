@@ -199,6 +199,7 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 	bool problem = FALSE;
 	attack_message_data *alt, *next_alt;
 	struct attack_message_set *ams;
+	bool dta, dtv, dtr, mta, mtv, mtr, gta, gtv, gtr;
 	
 	if (!ATTACK_NAME(amd) || !*ATTACK_NAME(amd) || !str_cmp(ATTACK_NAME(amd), default_attack_name)) {
 		olc_audit_msg(ch, ATTACK_VNUM(amd), "No name set");
@@ -210,42 +211,43 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 	}
 	
 	// check my messages
+	dta = dtv = dtr = mta = mtv = mtr = gta = gtv = gtr = FALSE;
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
-		if (!ams->msg[MSG_DIE].attacker_msg) {
+		if (!ams->msg[MSG_DIE].attacker_msg && !dta) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-attacker message.");
-			problem = TRUE;
+			problem = dta = TRUE;
 		}
-		if (!ams->msg[MSG_DIE].victim_msg) {
+		if (!ams->msg[MSG_DIE].victim_msg && !dtv) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-victim message.");
-			problem = TRUE;
+			problem = dtv = TRUE;
 		}
-		if (!ams->msg[MSG_DIE].room_msg) {
+		if (!ams->msg[MSG_DIE].room_msg && !dtr) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die-to-room message.");
-			problem = TRUE;
+			problem = dtr = TRUE;
 		}
-		if (!ams->msg[MSG_MISS].attacker_msg) {
+		if (!ams->msg[MSG_MISS].attacker_msg && !mta) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-attacker message.");
-			problem = TRUE;
+			problem = mta = TRUE;
 		}
-		if (!ams->msg[MSG_MISS].victim_msg) {
+		if (!ams->msg[MSG_MISS].victim_msg && !mtv) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-victim message.");
-			problem = TRUE;
+			problem = mtv = TRUE;
 		}
-		if (!ams->msg[MSG_MISS].room_msg) {
+		if (!ams->msg[MSG_MISS].room_msg && !mtr) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss-to-room message.");
-			problem = TRUE;
+			problem = mtr = TRUE;
 		}
-		if (!ams->msg[MSG_GOD].attacker_msg) {
+		if (!ams->msg[MSG_GOD].attacker_msg && !gta) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-attacker message.");
-			problem = TRUE;
+			problem = gta = TRUE;
 		}
-		if (!ams->msg[MSG_GOD].victim_msg) {
+		if (!ams->msg[MSG_GOD].victim_msg && !gtv) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-victim message.");
-			problem = TRUE;
+			problem = gtv = TRUE;
 		}
-		if (!ams->msg[MSG_GOD].room_msg) {
+		if (!ams->msg[MSG_GOD].room_msg && !gtr) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god-to-room message.");
-			problem = TRUE;
+			problem = gtr = TRUE;
 		}
 	}
 	
