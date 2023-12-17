@@ -944,7 +944,7 @@ void load_fight_messages(void) {
 				}
 				
 				ATTACK_DAMAGE_TYPE(amd) = int_in[0];
-				ATTACK_WEAPON_TYPE(amd) = int_in[0];
+				ATTACK_WEAPON_TYPE(amd) = int_in[1];
 				for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
 					ATTACK_SPEED(amd, iter) = dbl_in[iter];
 				}
