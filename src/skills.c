@@ -1019,7 +1019,6 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 		
 		// update class and progression
 		update_class(ch);
-		assign_class_abilities(ch, NULL, NOTHING);
 		
 		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_SAVE | CDU_MSDP_SKILLS);
 	}
@@ -1556,15 +1555,15 @@ void perform_swap_skill_sets(char_data *ch) {
 		}
 	}
 	
-	// call this at the end just in case
-	assign_class_abilities(ch, NULL, NOTHING);
-	affect_total(ch);
-	
 	// add ability techs -- only if playing
 	if (GET_LOYALTY(ch)) {
 		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 		resort_empires(FALSE);
 	}
+	
+	// call this at the end just in case
+	assign_class_abilities(ch, NULL, NOTHING);
+	affect_total(ch);
 	
 	queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 }
@@ -2168,7 +2167,6 @@ ACMD(do_skills) {
 			check_un_vampire(ch, FALSE);
 			update_class(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
-			assign_class_abilities(ch, NULL, NOTHING);
 			
 			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
 		}
@@ -2615,7 +2613,6 @@ ACMD(do_specialize) {
 
 		// check class and skill levels
 		update_class(ch);
-		assign_class_abilities(ch, NULL, NOTHING);
 	}
 }
 
@@ -4187,7 +4184,6 @@ void save_olc_skill(descriptor_data *desc) {
 	DL_FOREACH_SAFE2(player_character_list, ch_iter, next_ch, next_plr) {
 		update_class(ch_iter);
 		give_level_zero_abilities(ch_iter);
-		assign_class_abilities(ch_iter, NULL, NOTHING);
 	}
 }
 
@@ -4689,6 +4685,9 @@ OLC_MODULE(skilledit_synergy) {
 			msg_to_char(ch, "You can't assign an ability that is already assigned to a skill tree (%s).\r\n", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
 			return;
 		}
+		else if (has_ability_data_any(abil, ADL_PARENT)) {
+			msg_to_char(ch, "You can't assign %s as a synergy ability because it has PARENT data.\r\n", ABIL_NAME(abil));
+		}
 		else if (!isdigit(*lvl_arg) || (level = atoi(lvl_arg)) < 1 || level > SKILL_MAX_LEVEL(other)) {
 			msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", SKILL_MAX_LEVEL(other), lvl_arg);
 			return;
@@ -4870,6 +4869,12 @@ OLC_MODULE(skilledit_tree) {
 		}
 		else if (ABIL_ASSIGNED_SKILL(abil) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)) != SKILL_VNUM(skill)) {
 			msg_to_char(ch, "You can't assign %s to this skill because it's already assigned to [%d] %s.\r\n", ABIL_NAME(abil), SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)));
+		}
+		else if (ABIL_IS_SYNERGY(abil)) {
+			msg_to_char(ch, "You can't assign %s to this skill because it is a synergy ability.\r\n", ABIL_NAME(abil));
+		}
+		else if (has_ability_data_any(abil, ADL_PARENT)) {
+			msg_to_char(ch, "You can't assign %s to this skill because it has PARENT data.\r\n", ABIL_NAME(abil));
 		}
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");

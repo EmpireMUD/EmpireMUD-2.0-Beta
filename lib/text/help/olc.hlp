@@ -5237,7 +5237,7 @@ if it was using a weapon of that type.
 Use ".attack list" or "vnum attack" to find available attack types.
 
 Common attack vnums:
-  Humans with no weapon: [15] hit, [11] kick, [13] vampire claws
+  Humans with no weapon: [15] hit, [11] kick, [13] vampire claws, [37] punch
   Sharp weapons: [1] slash, [2] slice, [3] jab, [4] stab
   Blunt weapons: [5] pound, [6] hammer, [7] whip
   Magic weapons: [16] fire, [20] frost, [21] shock, [22] light, [28] mana blast

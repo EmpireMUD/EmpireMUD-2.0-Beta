@@ -216,6 +216,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
 			break;
 		}
+		case ADL_PARENT: {
+			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s: ???", type_str);
 			break;
@@ -751,7 +755,7 @@ bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum v
 * @param any_vnum vnum Which vnum to remove.
 * @return bool TRUE if any were removed, FALSE if not found.
 */
-bool delete_vnum_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) {
+bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) {
 	struct ability_data_list *adl, *next;
 	bool any = FALSE;
 	
@@ -1212,6 +1216,26 @@ double get_type_modifier(ability_data *abil, bitvector_t type) {
 	}
 	
 	return (double)found / (double)MAX(total, 1);
+}
+
+
+/**
+* Determines if an ability has ANY data entries of a given type.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @return bool TRUE if it has that data type, FALSE if not.
+*/
+bool has_ability_data_any(ability_data *abil, int type) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
 }
 
 
@@ -5404,6 +5428,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = FALSE;
 		any |= (ABIL_MASTERY_ABIL(abiter) == vnum);
 		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
+		any |= find_ability_data_entry_for(abiter, ADL_PARENT, vnum) ? TRUE : FALSE;
 		
 		if (any) {
 			++found;
@@ -6175,6 +6200,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found = TRUE;
 		}
 		found |= delete_from_ability_hooks(abil, AHOOK_ABILITY, vnum);
+		found |= delete_from_ability_data_list(abil, ADL_PARENT, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost related deleted ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
@@ -6300,9 +6326,10 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 			}
 			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_PARENT, vnum);
 			
 			if (found) {
-				msg_to_desc(desc, "The mastery ability has been deleted from the ability you're editing.\r\n");
+				msg_to_desc(desc, "An ability linked to the one you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_AUGMENT(desc)) {
@@ -7276,13 +7303,14 @@ OLC_MODULE(abiledit_data) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], temp[256];
+	ability_data *find_abil;
 	struct ability_data_list *adl, *next_adl;
 	bitvector_t allowed_types = 0;
 	int iter, num, type_id, val_id, misc = 0;
 	bool found;
 	
 	// ADL_x: determine valid types first
-	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE;
+	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
 		allowed_types |= ADL_ACTION;
 	}
@@ -7459,6 +7487,22 @@ OLC_MODULE(abiledit_data) {
 						msg_to_char(ch, "Range must be 'unlimited' or a number. Invalid range '%s' given.\r\n", val_arg);
 						return;
 					}
+				}
+				case ADL_PARENT: {
+					if (ABIL_ASSIGNED_SKILL(abil)) {
+						msg_to_char(ch, "You cannot add a parent ability because this one is already assigned to a skill.\r\n");
+						return;
+					}
+					else if (ABIL_IS_SYNERGY(abil)) {
+						msg_to_char(ch, "You cannot add a parent ability because this one is already assigned as a synergy ability.\r\n");
+						return;
+					}
+					else if (!(find_abil = find_ability(val_arg))) {
+						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
+						return;
+					}
+					val_id = ABIL_VNUM(find_abil);
+					break;
 				}
 			}
 			

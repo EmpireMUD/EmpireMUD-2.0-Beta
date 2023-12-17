@@ -396,7 +396,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		found |= delete_vnum_from_ability_data_list(abil, ADL_SUMMON_MOB, vnum);
+		found |= delete_from_ability_data_list(abil, ADL_SUMMON_MOB, vnum);
 		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_MOB, vnum);
 		
 		if (found) {
@@ -538,7 +538,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			found |= delete_vnum_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUMMON_MOB, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUMMON_MOB, vnum);
 			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_MOB, vnum);
 		
 			if (found) {
@@ -809,7 +809,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	char_data *proto, *mob, *next_mob;
-	struct ability_data_list *adl;
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
@@ -840,11 +839,8 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		any = FALSE;
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (find_ability_data_entry_for(abil, ADL_SUMMON_MOB, vnum)) {
-				any = TRUE;
-				break;
-			}
+		if (find_ability_data_entry_for(abil, ADL_SUMMON_MOB, vnum)) {
+			any = TRUE;
 		}
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
 			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {

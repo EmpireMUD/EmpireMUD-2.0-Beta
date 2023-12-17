@@ -692,6 +692,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_PAINT_COLOR  BIT(5)	// for paint-building, etc
 #define ADL_ACTION  BIT(6)	// has a specific action when successful
 #define ADL_RANGE  BIT(7)	// some abilities can control range
+#define ADL_PARENT  BIT(8)	// indicates this ability comes free with that one
 
 
 // AGH_x: ability gain hooks

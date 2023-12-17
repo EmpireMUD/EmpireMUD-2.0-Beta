@@ -359,6 +359,7 @@ const char *ability_data_types[] = {
 	"PAINT-COLOR",	// 5
 	"ACTION",
 	"RANGE",
+	"PARENT",
 	"\n"
 };
 

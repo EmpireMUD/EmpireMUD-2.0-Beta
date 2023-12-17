@@ -4409,14 +4409,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// remove stale coins
 	cleanup_coins(ch);
 	
-	// verify abils
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, FALSE);
-	}
+	// verify abils}
 	assign_class_abilities(ch, NULL, NOTHING);
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, TRUE);
-	}
 	give_level_zero_abilities(ch);
 
 	// script/trigger stuff

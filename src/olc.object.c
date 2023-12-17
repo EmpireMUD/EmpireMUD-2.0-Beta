@@ -627,7 +627,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		found |= delete_vnum_from_ability_data_list(abil, ADL_READY_WEAPON, vnum);
+		found |= delete_from_ability_data_list(abil, ADL_READY_WEAPON, vnum);
 		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_OBJ, vnum);
 		
 		if (found) {
@@ -880,7 +880,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			found |= delete_vnum_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_READY_WEAPON, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_READY_WEAPON, vnum);
 			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_OBJ, vnum);
 		
 			if (found) {
@@ -1326,7 +1326,6 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	morph_data *morph, *next_morph;
 	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
-	struct ability_data_list *adl;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -1356,11 +1355,8 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		any = FALSE;
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (find_ability_data_entry_for(abil, ADL_READY_WEAPON, vnum)) {
-				any = TRUE;
-				break;
-			}
+		if (find_ability_data_entry_for(abil, ADL_READY_WEAPON, vnum)) {
+			any = TRUE;
 		}
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
 			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {

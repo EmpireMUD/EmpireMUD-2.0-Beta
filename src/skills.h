@@ -286,64 +286,37 @@ bool trigger_counterspell(char_data *ch);
 
 
 // TYPE_x: WEAPON ATTACK TYPES
+// As of b5.166 these are edited with the .attack editor and do not need code
+// consts unless they are special-cased in code.
 #define TYPE_UNDEFINED  -1
 #define TYPE_RESERVED  0
-#define TYPE_SLASH  1	// unused in code
-#define TYPE_SLICE  2	// unused in code
-#define TYPE_JAB  3	// unused in code
 #define TYPE_STAB  4
-#define TYPE_POUND  5	// unused in code
-#define TYPE_HAMMER  6	// unused in code
-#define TYPE_WHIP  7	// unused in code
-#define TYPE_PICK  8	// unused in code
-#define TYPE_BITE  9	// Animal-only, unused in code?
-#define TYPE_CLAW  10	// Animal-only, unused in code
-#define TYPE_KICK  11	// Animal-only, unused in code
-#define TYPE_FIRE  12	// unused in code
 #define TYPE_VAMPIRE_CLAWS  13	// has inherent damage bonus and effects
-#define TYPE_CRUSH  14	// animal-only, unused in code
 #define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16	// disarmable fire blast
 #define TYPE_LIGHTNING_STAFF  17
 #define TYPE_BURN_STAFF  18
 #define TYPE_AGONY_STAFF  19
-#define TYPE_MAGIC_FROST  20	// unused in code
-#define TYPE_MAGIC_SHOCK  21	// unused in code
-#define TYPE_MAGIC_LIGHT  22	// unused in code
-#define TYPE_STING  23	// animal, unused in code
-#define TYPE_SWIPE  24	// animal, unused in code
-#define TYPE_TAIL_SWIPE  25	// animal, unused
-#define TYPE_PECK  26	// animal, unused in code
-#define TYPE_GORE  27	// animal, unused in code
 #define TYPE_MANA_BLAST  28	// default magical
 #define TYPE_BOW  29	// shoot / bow
 #define TYPE_CROSSBOW  30	// shoot / crossbow
 #define TYPE_PISTOL  31	// shoot / pistol
 #define TYPE_MUSKET  32	// shoot / musket
-#define TYPE_FIRE_BREATH  33	// non-disarmable fire blast, unused in code
 #define TYPE_SLING  34	// shoot / sling
 #define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
-#define TYPE_ANIMAL_WHIP  36	// non-disarmable whip variant, unused in code
-
 
 // Special attacks (not available on weapons): these correspond to attack vnums
 #define TYPE_SUFFERING			50	// also used as a special-case for death_log
 #define ATTACK_GUARD_TOWER		51
 #define ATTACK_EXECUTE			52	// used for death logging instead of attack
-// #define ATTACK_ARROW			53	// unused -- deprecate
 #define ATTACK_KICK				54
 #define ATTACK_BASH				55
-// #define ATTACK_SUNBURN			56	// unused?
-// #define ATTACK_POISON			57	// unused?
-// #define ATTACK_CREO_IGNEM		58	// unused -- deprecate
 #define ATTACK_VAMPIRE_BITE		59	// bite command
 #define ATTACK_PHYSICAL_DOT		61
 #define ATTACK_BACKSTAB			62
 #define ATTACK_MAGICAL_DOT		64
 #define ATTACK_FIRE_DOT			65
 #define ATTACK_POISON_DOT		66
-// #define ATTACK_ERODE			74	// unused
-// #define ATTACK_SCOUR			75	// unused
 #define ATTACK_SHADOWLASH		76
 
 

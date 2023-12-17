@@ -65,11 +65,14 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		UT_hash_handle hh;
 	};
 	
+	bool resume_empire = FALSE;
 	struct assign_abil_t *hash = NULL, *aat, *next_aat;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
+	struct ability_data_list *adl;
 	struct synergy_ability *syn;
 	struct class_ability *clab;
+	empire_data *emp = GET_LOYALTY(ch);
 	skill_data *skill;
 	any_vnum vnum;
 
@@ -92,7 +95,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			continue;	// skip skill-purchase abils entirely
 		}
 		
-		// STEAP 1a: find/add an 'aat' entry
+		// STEP 1a: find/add an 'aat' entry
 		vnum = ABIL_VNUM(abil);
 		HASH_FIND_INT(hash, &vnum, aat);
 		if (!aat) {
@@ -102,8 +105,25 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
-		if (cls && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
+		// STEP 1b: determine if a 'parent' type allows it
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_PARENT) {
+				continue;	// not apparent
+			}
+			if (!has_ability(ch, adl->vnum)) {
+				continue;	// missing ability
+			}
+			if (!ability_proto(adl->vnum)) {
+				continue;	// cannot find parent
+			}
+			
+			// if we got here, it's safe to add
+			aat->can_have = TRUE;
+			break;
+		}
+		
+		// STEP 1c: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
+		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
@@ -149,17 +169,35 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {
+			if (emp && !resume_empire) {
+				// remove temporarily
+				adjust_abilities_to_empire(ch, emp, FALSE);
+				resume_empire = TRUE;
+			}
 			remove_ability(ch, aat->ptr, FALSE);
 			check_skill_sell(ch, aat->ptr);
+			qt_change_ability(ch, aat->vnum);
 		}
 		// add if needed
 		if (aat->can_have) {
+			if (emp && !resume_empire) {
+				// remove temporarily
+				adjust_abilities_to_empire(ch, emp, FALSE);
+				resume_empire = TRUE;
+			}
 			add_ability(ch, aat->ptr, FALSE);
+			qt_change_ability(ch, aat->vnum);
 		}
 		
 		// clean up memory
 		HASH_DEL(hash, aat);
 		free(aat);
+	}
+	
+	if (emp && resume_empire) {
+		// back again
+		adjust_abilities_to_empire(ch, emp, TRUE);
+		resort_empires(FALSE);
 	}
 }
 
@@ -442,13 +480,7 @@ void update_class(char_data *ch) {
 	
 	// set class and assign abilities
 	GET_CLASS(ch) = best_class;
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
-	}
 	assign_class_abilities(ch, NULL, NOTHING);
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-	}
 	
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
 		affect_total(ch);
@@ -1079,7 +1111,6 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 			continue;
 		}
 		update_class(chiter);
-		assign_class_abilities(chiter, NULL, NOTHING);
 	}
 
 	// save index and class file now
@@ -1151,7 +1182,6 @@ void save_olc_class(descriptor_data *desc) {
 	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
-			assign_class_abilities(ch_iter, NULL, NOTHING);
 		}
 	}
 }
@@ -1589,7 +1619,6 @@ OLC_MODULE(classedit_role) {
 
 ACMD(do_class) {
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	empire_data *emp = GET_LOYALTY(ch);
 	int found;
 	
 	two_arguments(argument, arg, arg2);
@@ -1616,20 +1645,11 @@ ACMD(do_class) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);
 		}
 		else {
-			// remove old abilities
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, FALSE);
-			}
-			
 			// change role
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
 			assign_class_abilities(ch, NULL, NOTHING);
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires(FALSE);
-			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
@@ -1656,7 +1676,6 @@ ACMD(do_class) {
 ACMD(do_role) {
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
-	empire_data *emp = GET_LOYALTY(ch);
 	struct synergy_ability *syn;
 	size_t sizes[NUM_ROLES+2];
 	int found, iter;
@@ -1686,20 +1705,11 @@ ACMD(do_role) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg);
 		}
 		else {
-			// remove old abilities
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, FALSE);
-			}
-			
 			// change role
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
 			assign_class_abilities(ch, NULL, NOTHING);
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires(FALSE);
-			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);

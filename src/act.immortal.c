@@ -2721,7 +2721,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
-		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("language") {
@@ -10714,7 +10713,6 @@ ACMD(do_restore) {
 			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 		}
 		update_class(vict);
-		assign_class_abilities(vict, NULL, NOTHING);
 		
 		// temporarily remove empire abilities
 		emp = GET_LOYALTY(vict);
