@@ -426,9 +426,11 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 */
 char *list_one_attack_message(attack_message_data *amd, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char lbuf[1024];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s (%d)", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+		sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
+		snprintf(output, sizeof(output), "[%5d] %s (%d) %s", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd), lbuf);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", ATTACK_VNUM(amd), ATTACK_NAME(amd));
