@@ -69,6 +69,7 @@ const char *messages_file_header =
 "* record, regardless of any '#' fields which may be contained in it.\n";
 
 // local funcs
+OLC_MODULE(attackedit_speed);
 void clear_attack_message(attack_message_data *amd);
 void free_attack_message_set(struct attack_message_set *ams);
 void write_attack_message_to_file(FILE *fl, attack_message_data *amd);
@@ -1833,6 +1834,13 @@ OLC_MODULE(attackedit_damagetype) {
 }
 
 
+OLC_MODULE(attackedit_fast) {
+	char arg[MAX_INPUT_LENGTH];
+	snprintf(arg, sizeof(arg), "fast %s", argument);
+	attackedit_speed(ch, type, arg);
+}
+
+
 OLC_MODULE(attackedit_firstperson) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
 	
@@ -1959,6 +1967,13 @@ OLC_MODULE(attackedit_name) {
 }
 
 
+OLC_MODULE(attackedit_normal) {
+	char arg[MAX_INPUT_LENGTH];
+	snprintf(arg, sizeof(arg), "normal %s", argument);
+	attackedit_speed(ch, type, arg);
+}
+
+
 OLC_MODULE(attackedit_noun) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
 	
@@ -1983,6 +1998,13 @@ OLC_MODULE(attackedit_noun) {
 	else {
 		olc_process_string(ch, argument, "noun", &ATTACK_NOUN(amd));
 	}
+}
+
+
+OLC_MODULE(attackedit_slow) {
+	char arg[MAX_INPUT_LENGTH];
+	snprintf(arg, sizeof(arg), "slow %s", argument);
+	attackedit_speed(ch, type, arg);
 }
 
 
