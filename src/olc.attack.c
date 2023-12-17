@@ -345,10 +345,13 @@ struct attack_message_set *create_attack_message_entry(bool duplicate_strings, c
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_attack_message(attack_message_data *amd, char_data *ch) {
-	bool problem = FALSE;
+	bool mob_only, spec_attack, problem = FALSE;
 	attack_message_data *alt, *next_alt;
 	struct attack_message_set *ams;
-	bool dta, dtv, dtr, mta, mtv, mtr, gta, gtv, gtr;
+	bool dta, dtv, dtr, mta, mtv, mtr, hta, htv, htr, gta, gtv, gtr;
+	
+	mob_only = (ATTACK_FLAGGED(amd, AMDF_MOBILE) && !ATTACK_FLAGGED(amd, AMDF_WEAPON));
+	spec_attack = !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA) ? TRUE : FALSE;
 	
 	if (!ATTACK_NAME(amd) || !*ATTACK_NAME(amd) || !str_cmp(ATTACK_NAME(amd), default_attack_name)) {
 		olc_audit_msg(ch, ATTACK_VNUM(amd), "No name set");
@@ -359,10 +362,39 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (ATTACK_FIRST_PERSON(amd) && isupper(*ATTACK_FIRST_PERSON(amd))) {
+		olc_audit_msg(ch, ATTACK_VNUM(amd), "Capitalized first-person string");
+		problem = TRUE;
+	}
+	if (ATTACK_THIRD_PERSON(amd) && isupper(*ATTACK_THIRD_PERSON(amd))) {
+		olc_audit_msg(ch, ATTACK_VNUM(amd), "Capitalized third-person string");
+		problem = TRUE;
+	}
+	if (ATTACK_NOUN(amd) && isupper(*ATTACK_NOUN(amd))) {
+		olc_audit_msg(ch, ATTACK_VNUM(amd), "Capitalized noun string");
+		problem = TRUE;
+	}
+	
+	if (ATTACK_FLAGGED(amd, AMDF_DISARMABLE) && !ATTACK_HAS_EXTENDED_DATA(amd)) {
+		olc_audit_msg(ch, ATTACK_VNUM(amd), "DISARMABLE flag but is not a weapon/mob attack type");
+		problem = TRUE;
+	}
+	
+	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
+		if (ATTACK_SPEED(amd, SPD_SLOW) == ATTACK_SPEED(amd, SPD_NORMAL) || ATTACK_SPEED(amd, SPD_SLOW) == ATTACK_SPEED(amd, SPD_FAST) || ATTACK_SPEED(amd, SPD_FAST) == ATTACK_SPEED(amd, SPD_NORMAL)) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Speeds are the same");
+			problem = TRUE;
+		}
+		if (ATTACK_SPEED(amd, SPD_SLOW) < ATTACK_SPEED(amd, SPD_NORMAL) || ATTACK_SPEED(amd, SPD_SLOW) < ATTACK_SPEED(amd, SPD_FAST) || ATTACK_SPEED(amd, SPD_NORMAL) < ATTACK_SPEED(amd, SPD_FAST)) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Speeds are out of order (lower speed number will be faster in combat)");
+			problem = TRUE;
+		}
+	}
+	
 	// check my messages
-	dta = dtv = dtr = mta = mtv = mtr = gta = gtv = gtr = FALSE;
+	dta = dtv = dtr = mta = mtv = mtr = hta = htv = htr = gta = gtv = gtr = FALSE;
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
-		if (!ams->msg[MSG_DIE].attacker_msg && !dta) {
+		if (!ams->msg[MSG_DIE].attacker_msg && !dta && !mob_only) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2char message.");
 			problem = dta = TRUE;
 		}
@@ -374,7 +406,7 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2room message.");
 			problem = dtr = TRUE;
 		}
-		if (!ams->msg[MSG_MISS].attacker_msg && !mta) {
+		if (!ams->msg[MSG_MISS].attacker_msg && !mta && !mob_only) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss2char message.");
 			problem = mta = TRUE;
 		}
@@ -386,7 +418,19 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty miss2room message.");
 			problem = mtr = TRUE;
 		}
-		if (!ams->msg[MSG_GOD].attacker_msg && !gta) {
+		if (!ams->msg[MSG_HIT].attacker_msg && !hta && spec_attack) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty hit2char message.");
+			problem = hta = TRUE;
+		}
+		if (!ams->msg[MSG_HIT].victim_msg && !htv && spec_attack) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty hit2vict message.");
+			problem = htv = TRUE;
+		}
+		if (!ams->msg[MSG_HIT].room_msg && !htr && spec_attack) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty hit2room message.");
+			problem = htr = TRUE;
+		}
+		if (!ams->msg[MSG_GOD].attacker_msg && !gta && !mob_only) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty god2char message.");
 			problem = gta = TRUE;
 		}
