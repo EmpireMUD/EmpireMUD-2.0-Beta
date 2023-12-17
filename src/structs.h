@@ -4160,6 +4160,7 @@ struct archetype_menu_type {
 #define AMDF_MOBILE			BIT(1)	// allowed on mobiles
 #define AMDF_DISARMABLE		BIT(2)	// can be disarmed
 #define AMDF_APPLY_POISON	BIT(3)	// can trigger poison
+#define AMDF_IGNORE_MISSING	BIT(4)	// auditor won't warn on missing messages
 
 #define AMDF_FLAGS_REQUIRE_EXTENDED_DATA  (AMDF_WEAPON | AMDF_MOBILE)
 

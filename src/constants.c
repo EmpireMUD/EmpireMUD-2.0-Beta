@@ -656,6 +656,7 @@ const char *attack_message_flags[] = {
 	"MOBILE",
 	"DISARMABLE",
 	"APPLY-POISON",
+	"IGNORE-MISSING",
 	"\n"
 };
 

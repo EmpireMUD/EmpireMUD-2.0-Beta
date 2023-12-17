@@ -492,6 +492,10 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 	// check my messages
 	dta = dtv = dtr = mta = mtv = mtr = hta = htv = htr = gta = gtv = gtr = FALSE;
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
+		if (ATTACK_FLAGGED(amd, AMDF_IGNORE_MISSING)) {
+			// just skip whole section
+			break;
+		}
 		if (!ams->msg[MSG_DIE].attacker_msg && !dta && !mob_only) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Empty die2char message.");
 			problem = dta = TRUE;
