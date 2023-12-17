@@ -164,17 +164,21 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if a 'parent' type allows it
+		// STEP 3b: determine if a 'parent' type allows it
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type != ADL_PARENT) {
 				continue;	// not apparent
 			}
 			
 			// check ITS aat
-			HASH_FIND_INT(hash, &(adl->vnum), check);
+			vnum = adl->vnum;
+			HASH_FIND_INT(hash, &vnum, check);
 			
-			if (!has_ability(ch, adl->vnum) && (!check || !check->can_have)) {
-				continue;	// missing ability
+			if (check && !check->can_have) {
+				continue;	// missing synergy/class ability
+			}
+			if (!check && !has_ability(ch, adl->vnum)) {
+				continue;	// missing basic ability
 			}
 			if (!ability_proto(adl->vnum)) {
 				continue;	// cannot find parent
