@@ -1723,11 +1723,9 @@ OLC_MODULE(attackedit_die2char) {
 	attackedit_message_str(ch, "die2char", argument, MSG_DIE, _AMS_TARG_ATTACKER);
 }
 
-
 OLC_MODULE(attackedit_die2vict) {
 	attackedit_message_str(ch, "die2vict", argument, MSG_DIE, _AMS_TARG_VICTIM);
 }
-
 
 OLC_MODULE(attackedit_die2room) {
 	attackedit_message_str(ch, "die2room", argument, MSG_DIE, _AMS_TARG_ROOM);
@@ -1735,182 +1733,41 @@ OLC_MODULE(attackedit_die2room) {
 
 
 OLC_MODULE(attackedit_miss2char) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_MISS].attacker_msg) {
-			free(ams->msg[MSG_MISS].attacker_msg);
-		}
-		ams->msg[MSG_MISS].attacker_msg = NULL;
-		msg_to_char(ch, "You remove the miss2char message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "miss2char", &ams->msg[MSG_MISS].attacker_msg);
-	}
+	attackedit_message_str(ch, "miss2char", argument, MSG_MISS, _AMS_TARG_ATTACKER);
 }
-
 
 OLC_MODULE(attackedit_miss2vict) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_MISS].victim_msg) {
-			free(ams->msg[MSG_MISS].victim_msg);
-		}
-		ams->msg[MSG_MISS].victim_msg = NULL;
-		msg_to_char(ch, "You remove the miss2vict message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "miss2vict", &ams->msg[MSG_MISS].victim_msg);
-	}
+	attackedit_message_str(ch, "miss2vict", argument, MSG_MISS, _AMS_TARG_VICTIM);
 }
 
-
 OLC_MODULE(attackedit_miss2room) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_MISS].room_msg) {
-			free(ams->msg[MSG_MISS].room_msg);
-		}
-		ams->msg[MSG_MISS].room_msg = NULL;
-		msg_to_char(ch, "You remove the miss2room message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "miss2room", &ams->msg[MSG_MISS].room_msg);
-	}
+	attackedit_message_str(ch, "miss2room", argument, MSG_MISS, _AMS_TARG_ROOM);
 }
 
 
 OLC_MODULE(attackedit_hit2char) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_HIT].attacker_msg) {
-			free(ams->msg[MSG_HIT].attacker_msg);
-		}
-		ams->msg[MSG_HIT].attacker_msg = NULL;
-		msg_to_char(ch, "You remove the hit2char message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "hit2char", &ams->msg[MSG_HIT].attacker_msg);
-	}
+	attackedit_message_str(ch, "hit2char", argument, MSG_HIT, _AMS_TARG_ATTACKER);
 }
-
 
 OLC_MODULE(attackedit_hit2vict) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_HIT].victim_msg) {
-			free(ams->msg[MSG_HIT].victim_msg);
-		}
-		ams->msg[MSG_HIT].victim_msg = NULL;
-		msg_to_char(ch, "You remove the hit2vict message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "hit2vict", &ams->msg[MSG_HIT].victim_msg);
-	}
+	attackedit_message_str(ch, "hit2vict", argument, MSG_HIT, _AMS_TARG_VICTIM);
 }
 
-
 OLC_MODULE(attackedit_hit2room) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_HIT].room_msg) {
-			free(ams->msg[MSG_HIT].room_msg);
-		}
-		ams->msg[MSG_HIT].room_msg = NULL;
-		msg_to_char(ch, "You remove the hit2room message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "hit2room", &ams->msg[MSG_HIT].room_msg);
-	}
+	attackedit_message_str(ch, "hit2room", argument, MSG_HIT, _AMS_TARG_ROOM);
 }
 
 
 OLC_MODULE(attackedit_god2char) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_GOD].attacker_msg) {
-			free(ams->msg[MSG_GOD].attacker_msg);
-		}
-		ams->msg[MSG_GOD].attacker_msg = NULL;
-		msg_to_char(ch, "You remove the god2char message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "god2char", &ams->msg[MSG_GOD].attacker_msg);
-	}
+	attackedit_message_str(ch, "god2char", argument, MSG_GOD, _AMS_TARG_ATTACKER);
 }
-
 
 OLC_MODULE(attackedit_god2vict) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_GOD].victim_msg) {
-			free(ams->msg[MSG_GOD].victim_msg);
-		}
-		ams->msg[MSG_GOD].victim_msg = NULL;
-		msg_to_char(ch, "You remove the god2vict message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "god2vict", &ams->msg[MSG_GOD].victim_msg);
-	}
+	attackedit_message_str(ch, "god2vict", argument, MSG_GOD, _AMS_TARG_VICTIM);
 }
 
-
 OLC_MODULE(attackedit_god2room) {
-	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
-	struct attack_message_set *ams = get_one_attack_message(amd, GET_OLC_ATTACK_NUM(ch->desc));
-	
-	if (GET_OLC_ATTACK_NUM(ch->desc) == 0 || !ams) {
-		msg_to_char(ch, "You are not editing an attack message. Selet one with .message <number> before setting this.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
-		if (ams->msg[MSG_GOD].room_msg) {
-			free(ams->msg[MSG_GOD].room_msg);
-		}
-		ams->msg[MSG_GOD].room_msg = NULL;
-		msg_to_char(ch, "You remove the god2room message.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "god2room", &ams->msg[MSG_GOD].room_msg);
-	}
+	attackedit_message_str(ch, "god2room", argument, MSG_GOD, _AMS_TARG_ROOM);
 }
 
 
