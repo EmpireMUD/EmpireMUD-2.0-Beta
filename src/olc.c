@@ -1178,6 +1178,27 @@ ACMD(do_olc) {
 			}
 		}
 	}
+	
+	// possibility of a 'type' trying to mask a field, like .attackmessage and mob's .attack
+	if (pos == NOTHING && *arg2 && GET_OLC_TYPE(ch->desc)) {
+		// try again without a type
+		strcpy(arg3, notype);
+		strcpy(arg2, arg1);
+		type = GET_OLC_TYPE(ch->desc);
+		
+		// TODO: this is a temporary copy of the loop above
+		for (iter = 0; *olc_data[iter].command != '\n' && pos == NOTHING; ++iter) {
+			if (olc_data[iter].valid_types == 0 || IS_SET(olc_data[iter].valid_types, type)) {
+				if (!IS_SET(olc_data[iter].flags, OLC_CF_MAP_EDIT) || GET_ACCESS_LEVEL(ch) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
+					if (!IS_SET(olc_data[iter].flags, OLC_CF_EDITOR) || IS_SET(olc_data[iter].valid_types, GET_OLC_TYPE(ch->desc))) {
+						if (!str_cmp(arg2, olc_data[iter].command) || (!IS_SET(olc_data[iter].flags, OLC_CF_NO_ABBREV) && is_abbrev(arg2, olc_data[iter].command))) {
+							pos = iter;
+						}
+					}
+				}
+			}
+		}	
+	}
 
 	// now: type and pos are set; arg3 is the remaining argument
 	if (pos == NOTHING) {
