@@ -755,13 +755,18 @@ attack_message_data *find_attack_message(any_vnum a_type, bool create_if_missing
 
 
 /**
-* @param char *name The name to search.
+* @param char *name The name or vnum to search.
 * @param bool exact Can only abbreviate if FALSE.
 * @return attack_message_data* The message data, or NULL if it doesn't exist.
 */
-attack_message_data *find_attack_message_by_name(char *name, bool exact) {
+attack_message_data *find_attack_message_by_name_or_vnum(char *name, bool exact) {
 	attack_message_data *amd, *next_amd, *abbrev = FALSE;
 	
+	if (isdigit(*name) && (amd = real_attack_message(atoi(name)))) {
+		return amd;	// vnum shortcut
+	}
+	
+	// otherwise look up by name
 	HASH_ITER(hh, attack_message_table, amd, next_amd) {
 		if (!str_cmp(name, ATTACK_NAME(amd))) {
 			return amd;	// exact match

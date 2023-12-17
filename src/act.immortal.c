@@ -7241,7 +7241,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
+			msg_to_char(ch, "Damage type: %d %s (%s/%s)\r\n", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);

@@ -1133,7 +1133,7 @@ Limitation types:
  &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
  &cwield any weapon&0 - Character is wielding any weapon and is not disarmed.
  &cwield attack type&0 - Wielding a weapon with a specific attack type. See
-   ATTACK TYPES for a list.
+   WEAPON TYPES for a list or use "vnum attack".
  &cwield weapon type&0 - Wielding a weapon with a specific weapon type: blunt,
    sharp, or magic.
  &cwithin range&0 - Compares distance to the target against RANGE data.
@@ -5184,51 +5184,24 @@ See also: FACTION, OLC FACTIONS, SHOPEDIT ITEM, OLC MOBILES, OLC SHOPS
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
-Usage:  .attack <type>
+Usage:  .attack <name | vnum>
 
 This command sets the base attack type of the mobile. It will deal damage as
 if it was using a weapon of that type.
 
-For humans with no weapon, use #16 hit.
+Use ".attack list" or "vnum attack" to find available attack types.
 
-The following attack types are available:
- 1. RESERVED - do not use
- 2. slash - sword
- 3. slice - axe
- 4. jab - rapier
- 5. stab - dagger
- 6. pound - rock
- 7. hammer - hammer
- 8. whip - whip weapon or tentacle-whip
- 9. pick - as for mining
-10. bite - animals
-11. claw - fist weapons; also used by animals
-12. kick - animals
-13. fire - physical fire like a torch
-14. vampire claws
-15. crush - animals or giants
-16. hit - normal punching (no weapon, or disarmed physical weapon)
-17. magic fire - fireball
-18. lightning staff
-19. burn staff
-20. agony staff
-21. magic frost - chill
-22. magic shock - shock
-23. magic light - flash
-24. sting - animals
-25. swipe - animals, giants, etc
-26. tail swipe - animals
-27. peck - animals
-28. gore - animals
-29. mana blast - normal magical attack (e.g. disarmed mage)
-30. bow (shoot) - a normal bow
-31. crossbow (shoot) - a crossbow
-32. pistol (shoot) - a small firearm
-33. musket (shoot) - a large firearm
-34. fire breath - dragons
-35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
-36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
-37. animal whip - animals, non-disarmable whip
+Common attack vnums:
+  Humans with no weapon: [15] hit, [11] kick, [13] vampire claws
+  Sharp weapons: [1] slash, [2] slice, [3] jab, [4] stab
+  Blunt weapons: [5] pound, [6] hammer, [7] whip
+  Magic weapons: [16] fire, [20] frost, [21] shock, [22] light, [28] mana blast
+  Staff weapons: [17] lightning staff, [18] burn staff, [19] agony staff
+  Ranged weapons: [29] bow, [30] crossbow, [31] pistol, [32] musket,
+     [34] sling, [25] spear-thrower
+  Tool types: [2] slice, [8] pick, [12] fire/torch
+  Animal attacks: [9] bite, [10] claw, [11] kick, [23] sting, [24] swipe,
+     [25] tail swipe, [26] peck, [27] gore, [33] fire breath, [36] animal whip
 
 See also: OLC MOBILES
 #d
@@ -5685,7 +5658,8 @@ See also: APPLIES, OLC MORPHS
 
 Usage:  .attack <type>
 
-This command sets the base attack type of the morph, when unarmed.
+This command sets the base attack type of the morph, when unarmed. See
+ATTACK TYPES for the list.
 
 See also: ATTACK TYPES, OLC MORPHS
 #d
@@ -5928,7 +5902,7 @@ Minipet:
  0 - vnum of mob to teach
 
 Missile Weapon:
- 0 - attack type (see ATTACK TYPES)
+ 0 - attack type (see WEAPON TYPES)
  1 - bonus damage (if scalable, this is the weight to scale the damage)
  2 - ammo type (must match type on the ammo object)
 
@@ -5965,7 +5939,7 @@ Wealth:
 
 Weapon:
  1 - bonus damage (if scalable, this is the weight to scale the damage)
- 2 - attack type (see ATTACK TYPES)
+ 2 - attack type (see WEAPON TYPES)
 #d
 "OEDIT AFFECTS"
 
@@ -6862,52 +6836,23 @@ that only people with the correct permission can withdraw it.
 
 See also: OEDIT STORAGE, OLC OBJECTS
 #d
-"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
+"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES"
 
-Usage:  .weapontype <type>
+Usage:  .weapontype <name | vnum>
 
 The weapon type determines which combat messages are sent, how fast the weapon
 attacks in combat, and whether or not it is sharp. Both regular weapons and
 missile weapons share the same set of types.
 
-The following weapon types are available:
- 1. RESERVED - do not use
- 2. slash - sword
- 3. slice - axe (used by the chopping chore)
- 4. jab - rapier
- 5. stab - dagger (used by some Stealth skills)
- 6. pound - rock
- 7. hammer - hammer (used by the forge command)
- 8. whip - whip weapon or tentacle-whip
- 9. pick - used by the mining chore
-10. bite - animals
-11. claw - fist weapons; also used by animals
-12. kick - animals
-13. fire - torch
-14. vampire claws
-15. crush - animals or giants
-16. hit - normal punching (no weapon, or disarmed physical weapon)
-17. magic fire - fireball
-18. lightning staff
-19. burn staff
-20. agony staff
-21. magic frost - chill
-22. magic shock - shock
-23. magic light - flash
-24. sting - animals
-25. swipe - animals, giants, etc
-26. tail swipe - animals
-27. peck - animals
-28. gore - animals
-29. mana blast - normal magical attack (e.g. disarmed mage)
-30. bow (shoot) - a normal bow
-31. crossbow (shoot) - a crossbow
-32. pistol (shoot) - a small firearm
-33. musket (shoot) - a large firearm
-34. fire breath - dragons
-35. sling (shoot) - a primitive ranged weapon that shoots sling bullets
-36. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
-37. animal whip - animals, non-disarmable whip
+Common attack vnums:
+  Sharp weapons: [1] slash, [2] slice, [3] jab, [4] stab
+  Blunt weapons: [5] pound, [6] hammer, [7] whip
+  Magic weapons: [16] fire, [20] frost, [21] shock, [22] light, [28] mana blast
+  Staff weapons: [17] lightning staff, [18] burn staff, [19] agony staff
+  Ranged weapons: [29] bow, [30] crossbow, [31] pistol, [32] musket,
+     [34] sling, [25] spear-thrower
+  Tool types: [2] slice, [8] pick, [12] fire/torch
+  Special types: [13] vampire claws
 
 See also: OLC OBJECTS
 #d

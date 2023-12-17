@@ -2810,28 +2810,6 @@ void check_skills(void) {
 
 
 /**
-* Finds an attack type by name, preferring exact matches.
-*
-* @param char *name The text to look for.
-* @return int One of the TYPE_ attack type consts.
-*/
-int get_attack_type_by_name(char *name) {
-	int iter, abbrev = NOTHING;
-	
-	for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-		if (!str_cmp(name, get_attack_name_by_vnum(iter))) {
-			return iter;	// exact
-		}
-		else if (abbrev == NOTHING && is_abbrev(name, get_attack_name_by_vnum(iter))) {
-			abbrev = iter;
-		}
-	}
-	
-	return abbrev;	// if any
-}
-
-
-/**
 * Finds a particular ability's skill assignment data, if any.
 *
 * @param skill_data *skill The skill whose assignments to check.

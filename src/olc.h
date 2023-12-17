@@ -288,7 +288,6 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 
 // olc helpers
 const char *get_interaction_target(int type, any_vnum vnum);
-char **get_weapon_types_string();
 
 // word count: core functions
 int wordcount_custom_messages(struct custom_message *list);

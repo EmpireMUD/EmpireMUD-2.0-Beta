@@ -404,29 +404,6 @@ obj_data *create_obj_table_entry(obj_vnum vnum) {
 
 
 /**
-* @return char** A "\n"-terminated list of weapon types.
-*/
-char **get_weapon_types_string(void) {
-	static char **wtypes = NULL;
-	int iter;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!wtypes) {
-		CREATE(wtypes, char*, NUM_ATTACK_TYPES+1);
-		
-		for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-			wtypes[iter] = str_dup(get_attack_name_by_vnum(iter));
-		}
-		
-		// must terminate
-		wtypes[NUM_ATTACK_TYPES] = str_dup("\n");
-	}
-	
-	return wtypes;
-}
-
-
-/**
 * For the .list command.
 *
 * @param obj_data *obj The thing to list.
@@ -1107,10 +1084,11 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
+	int vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
+	attack_message_data *only_weapontype = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1160,7 +1138,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
 		FULLSEARCH_BOOL("unstorable", not_storable)
-		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("weapontype", only_weapontype, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
@@ -1255,7 +1233,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
 			continue;
 		}
-		if (only_weapontype != NOTHING && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != only_weapontype)) {
+		if (only_weapontype && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != ATTACK_VNUM(only_weapontype))) {
 			continue;
 		}
 		if (*extra_search && !find_exdesc(extra_search, GET_OBJ_EX_DESCS(obj), NULL)) {
@@ -3533,7 +3511,6 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_WEAPON: {
 				// do not set a default, or it shows as 'changed' in the editor/auditor even if it was missed
-				// set_obj_val(obj, VAL_WEAPON_TYPE, TYPE_SLASH);
 				break;
 			}
 			case ITEM_POTION: {
@@ -3633,6 +3610,7 @@ OLC_MODULE(oedit_wealth) {
 
 OLC_MODULE(oedit_weapontype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	attack_message_data *amd;
 	int pos = 0;
 	
 	switch (GET_OBJ_TYPE(obj)) {
@@ -3650,7 +3628,20 @@ OLC_MODULE(oedit_weapontype) {
 		}
 	}
 	
-	set_obj_val(obj, pos, olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos)));
+	if (!*argument) {
+		msg_to_char(ch, "Set the weapon type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+		msg_to_char(ch, "That attack type is not available on weapons.\r\n");
+	}
+	else {
+		set_obj_val(obj, pos, ATTACK_VNUM(amd));
+		msg_to_char(ch, "Weapon type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
+
 }
 
 

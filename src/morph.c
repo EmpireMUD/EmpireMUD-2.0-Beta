@@ -660,7 +660,6 @@ void clear_morph(morph_data *morph) {
 	MORPH_VNUM(morph) = NOTHING;
 	MORPH_ABILITY(morph) = NO_ABIL;
 	MORPH_REQUIRES_OBJ(morph) = NOTHING;
-	MORPH_ATTACK_TYPE(morph) = TYPE_HIT;
 	MORPH_SIZE(morph) = SIZE_NORMAL;
 }
 
@@ -1225,7 +1224,21 @@ OLC_MODULE(morphedit_apply) {
 
 OLC_MODULE(morphedit_attack) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
-	MORPH_ATTACK_TYPE(morph) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MORPH_ATTACK_TYPE(morph));
+	attack_message_data *amd;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		msg_to_char(ch, "That attack type is not available on morphs.\r\n");
+	}
+	else {
+		MORPH_ATTACK_TYPE(morph) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "Attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
 }
 
 

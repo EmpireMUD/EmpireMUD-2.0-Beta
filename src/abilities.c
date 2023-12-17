@@ -188,8 +188,7 @@ char *ability_data_display(struct ability_data_list *adl) {
 					break;
 				}
 				case ABLIM_ATTACK_TYPE: {
-					sprinttype(adl->misc, (const char**)get_weapon_types_string(), part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
 					break;
 				}
 				case ABLIM_WEAPON_TYPE: {
@@ -6377,13 +6376,14 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts;
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
-	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_attack = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
+	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
 	int only_action = NOTHING, only_effect = NOTHING, only_limit = NOTHING, only_paint = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING;
 	ability_data *abil, *next_abil;
 	struct custom_message *cust;
 	struct apply_data *app;
 	struct interaction_item *inter;
+	attack_message_data *only_attack = NULL;
 	size_t size;
 	
 	if (!*argument) {
@@ -6405,7 +6405,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
 		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
 		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
-		FULLSEARCH_FUNC("attacktype", only_attack, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("attacktype", only_attack, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_LIST("costtype", only_cost_type, pool_types)
 		FULLSEARCH_FLAGS("custom", find_custom, ability_custom_types)
 		FULLSEARCH_LIST("damagetype", only_damage, damage_types)
@@ -6487,7 +6487,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (only_cost_type != NOTHING && ABIL_COST_TYPE(abil) != only_cost_type) {
 			continue;
 		}
-		if (only_attack != NOTHING && ABIL_ATTACK_TYPE(abil) != only_attack) {
+		if (only_attack && ABIL_ATTACK_TYPE(abil) != ATTACK_VNUM(only_attack)) {
 			continue;
 		}
 		if (only_damage != NOTHING && ABIL_DAMAGE_TYPE(abil) != only_damage) {
@@ -7385,9 +7385,18 @@ OLC_MODULE(abiledit_data) {
 								break;
 							}
 							case ABLIM_ATTACK_TYPE: {
-								if ((misc = search_block(val_b, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
-									msg_to_char(ch, "Invalid attack type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
+								attack_message_data *amd;
+								
+								if (!*val_b) {
+									msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
 									return;
+								}
+								else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+									msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+									return;
+								}
+								else {
+									misc = ATTACK_VNUM(amd);
 								}
 								break;
 							}
@@ -7557,13 +7566,18 @@ OLC_MODULE(abiledit_hook) {
 					break;
 				}
 				case AHOOK_ATTACK_TYPE: {
+					attack_message_data *amd;
+					
 					if (!*val_arg) {
 						msg_to_char(ch, "No attack type given.\r\n");
 						return;
 					}
-					if ((val_id = search_block(val_arg, (const char**)get_weapon_types_string(), FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown attack type '%s'.\r\n", val_arg);
+					else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+						msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
 						return;
+					}
+					else {
+						val_id = ATTACK_VNUM(amd);
 					}
 					break;
 				}

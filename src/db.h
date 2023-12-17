@@ -546,6 +546,7 @@ void add_attack_message(attack_message_data *add_to, struct attack_message_set *
 attack_message_data *create_attack_message(any_vnum vnum);
 struct attack_message_set *create_attack_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
 attack_message_data *find_attack_message(any_vnum a_type, bool create_if_missing);
+attack_message_data *find_attack_message_by_name_or_vnum(char *name, bool exact);
 void free_attack_message(attack_message_data *amd);
 struct attack_message_set *get_one_attack_message(attack_message_data *amd, int num);
 void load_fight_messages();

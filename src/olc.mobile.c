@@ -656,9 +656,10 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
-	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
+	int only_move = NOTHING, only_nameset = NOTHING;
 	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
+	attack_message_data *only_attack = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	char_data *mob, *next_mob;
@@ -681,7 +682,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_FUNC("allegiance", only_fct, find_faction(val_arg))
 		FULLSEARCH_FUNC("faction", only_fct, find_faction(val_arg))
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
-		FULLSEARCH_FUNC("attack", only_attack, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("attack", only_attack, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_FLAGS("custom", find_custom, mob_custom_types)
 		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
@@ -732,7 +733,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		if (only_flags != NOBITS && (MOB_FLAGS(mob) & only_flags) != only_flags) {
 			continue;
 		}
-		if (only_attack != NOTHING && MOB_ATTACK_TYPE(mob) != only_attack) {
+		if (only_attack && MOB_ATTACK_TYPE(mob) != ATTACK_VNUM(only_attack)) {
 			continue;
 		}
 		if (only_move != NOTHING && MOB_MOVE_TYPE(mob) != only_move) {
@@ -1217,7 +1218,6 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
 		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
-		MOB_ATTACK_TYPE(new) = TYPE_HIT;
 
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
@@ -1295,7 +1295,7 @@ void olc_show_mobile(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
+	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
 	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
 	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
@@ -1356,7 +1356,21 @@ OLC_MODULE(medit_allegiance) {
 
 OLC_MODULE(medit_attack) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_ATTACK_TYPE(mob) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MOB_ATTACK_TYPE(mob));
+	attack_message_data *amd;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		msg_to_char(ch, "That attack type is not available on mobs.\r\n");
+	}
+	else {
+		MOB_ATTACK_TYPE(mob) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "Attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
 }
 
 

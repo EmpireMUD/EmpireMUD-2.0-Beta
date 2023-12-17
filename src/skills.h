@@ -80,7 +80,6 @@ struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bo
 int get_ability_level(char_data *ch, any_vnum ability);
 int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 int get_approximate_level(char_data *ch);
-int get_attack_type_by_name(char *name);
 struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
 void give_level_zero_abilities(char_data *ch);
 bool has_cooking_fire(char_data *ch);
