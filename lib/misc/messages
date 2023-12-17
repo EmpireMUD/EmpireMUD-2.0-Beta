@@ -40,7 +40,7 @@ Your fist flops as your body refuses to fight the mighty $N.
 $n seems to be having trouble getting $s body to fight you!!
 $n's body rebels against $m when $e tries to punch $N.
 
-M1 abc +
+M1 abcd +
 slash~
 slash~
 slashes~
@@ -59,7 +59,7 @@ Your cunning slash at $N is fruitless.
 You nimbly stop a slash from $n.
 $N stops a cunning slash from $n who looks disappointed.
 
-M1 abc 
+M1 abcd 
 slash~
 Your slash at $N results in a pool of blood and $S immediate death!
 Blood spurts all over as $n slashes at you. You die...
@@ -74,7 +74,7 @@ Come on, what makes you think you can slash at a GOD?!
 You barely register the puny creature before you...
 The great $N seems to ignore $n's slashes.
 
-M1 abc 
+M1 abcd 
 slash~
 $N cries out in agony as you slash $S ribcage open!
 Your ribcage is slashed open by $n -- R.I.P.!
@@ -89,7 +89,7 @@ It's rude to try to slash a GOD, you know.
 $n tries to slash you -- how rude!
 $n tries to slash $N -- how rude!
 
-M1 abc 
+M1 abcd 
 slash~
 Your powerful slash cleanly cuts off $N's head, which rolls away with a look of horror on it.
 You briefly feel the sensation of flight as $n slices your head cleanly off!
@@ -104,7 +104,7 @@ Yeah, right.
 $n tries to slash you... yeah, right.
 $n tries to slash $N... yeah, right.
 
-M2 abc +
+M2 abcd +
 slice~
 slice~
 slices~
@@ -123,7 +123,7 @@ Your cunning slice at $N is fruitless.
 You nimbly stop a slice from $n.
 $N stops a cunning slice from $n who looks disappointed.
 
-M3 abc +
+M3 abcd +
 jab~
 jab~
 jabs~
@@ -142,7 +142,7 @@ Jab -- God... What are you thinking?
 $n tries to jab you, somewhat comical to tell the truth.
 $n jabs at $N, then looks horrified as $N grins at $m!
 
-M3 abc 
+M3 abcd 
 jab~
 You violently jab $N repeatedly, causing $S death!
 You die a horrid death as $n jabs you repeatedly all over your body!
@@ -157,7 +157,7 @@ You jab at $N, and all that happens is that $E slaps himself as if a mosquito bi
 Was that a bee you just felt?  Oh... wait, it was just $n.
 $N begins to slap at $Mself as $n tries to jab $M.
 
-M4 abc +
+M4 abcd +
 stab~
 stab~
 stabs~
@@ -176,7 +176,7 @@ The mighty $N begins to think you a nuisance!!!
 Your patience is almost gone when you stare back at $n.
 The air is loaded when $N angrily wards off a piercing attack from $n.
 
-M4 abc 
+M4 abcd 
 stab~
 You pierce $N's heart, you heartbreaker you...
 $n breaks your heart, goodbye cruel world...
@@ -191,7 +191,7 @@ The great $N sends you a piercing look, OOPS!
 You return $n's pierce with a piercing look, hmmm...
 $N returns $n's pierce with a piercing look, hmmm...
 
-M4 abc 
+M4 abcd 
 stab~
 You stab $N through the heart!  Instant death!
 $n drives a stab at you, it pierces your heart!  RIP!
@@ -206,7 +206,7 @@ You stab at $N!  Too bad $E's a god, huh?
 $n stabs at you!  Lucky for you that you are immune to this kind of thing.
 You watch in pity as $n stabs towards $N missing in the most futile way possible!
 
-M4 abc 
+M4 abcd 
 stab~
 You stab forth towards $N, hitting $M in the abdomen causing a messy but mortal wound!
 $n stabs you in the stomach, and you watch your insides fall out as you die.
@@ -308,7 +308,7 @@ Don't try to whip $N.
 $n is trying to whip you. Yawn.
 $n tries to whip $N - yawn.
 
-M8 abc +
+M8 abcd +
 pick~
 jab~
 jabs~
@@ -327,7 +327,7 @@ Why would you try to jab at $N?
 $n is trying to jab at $N, but can't seem to.
 Silly $n is trying to jab at you!
 
-M9 ab +
+M9 b +
 bite~
 bite~
 bites~
@@ -346,7 +346,7 @@ You attempt to bite $N. Ouch!  That hurt!
 $n tries to bite you, how funny.
 $n tries to bite $N - funny, huh?
 
-M9 ab 
+M9 b 
 bite~
 You bite $N through $S ribcage and into $S heart -- $e falls to the ground in agony.
 $n bites through your ribcage and into your heart -- you fall to the ground writhing in agony...
@@ -361,7 +361,7 @@ Aren't you trying to bite off more than you can chew?
 $n snaps at you but realizes $e is biting off more than $e can chew.
 $n stupidly tries to bite off more than $e can chew by snapping at $N.
 
-M10 ab +
+M10 abd +
 claw~
 claw~
 claws~
@@ -380,7 +380,7 @@ You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
-M10 ab 
+M10 abd 
 claw~
 Your razor-sharp claws rip $N wide open!
 $n's razor-sharp claws rip you wide open!
@@ -395,7 +395,7 @@ You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
-M11 ab +
+M11 b +
 kick~
 kick~
 kicks~
@@ -433,7 +433,7 @@ You try to burn $N, but the fire doesn't seem to hurt $M...
 $n tries to burn you, but the fire mostly just tickles.
 $n tries to burn $N, but the fire doesn't seem to do much.
 
-M13 ab +
+M13 abd +
 vampire claws~
 claw~
 claws~
@@ -452,7 +452,7 @@ You dummy!  Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
-M13 ab 
+M13 abd 
 vampire claws~
 Your razor-sharp claws tear $N wide open!
 $n's razor-sharp claws tear you wide open!
@@ -743,7 +743,7 @@ You try to shoot a flash of light at $N, but $E doesn't seem to mind.
 $n tries to shoot a flash of light at you, but it doesn't seem to affect you!
 $n tries to shoot a flash of light at $N, but $E doesn't seem to mind.
 
-M23 ab +
+M23 abd +
 sting~
 sting~
 stings~
@@ -762,7 +762,7 @@ You try to sting $N, but can't penetrate $S skin!
 $n tries to sting you, but can't seem to penetrate your skin!
 $n tries to sting $N, but can't seem to penetrate $S skin!
 
-M23 ab 
+M23 abd 
 sting~
 You sting $N furiously, over and over, until $E collapses, dead!
 $n stings you furiously, over and over, causing searing pain until you collapse, dead!
@@ -777,7 +777,7 @@ You try to sting $N, but can't penetrate $S skin!
 $n tries to sting you, but can't seem to penetrate your skin!
 $n tries to sting $N, but can't seem to penetrate $S skin!
 
-M24 ab +
+M24 b +
 swipe~
 swipe~
 swipes~
@@ -796,7 +796,7 @@ You swipe at $N, who merely laughs.
 $n swipes at you, but you merely laugh.
 $n swipes at $N, who merely laughs.
 
-M24 ab 
+M24 b 
 swipe~
 You swipe $N's legs out from under $M and as $E falls, $E hits $S head, killing $M!
 $n swipes your legs out from under you. You hit your head as you fall, killing you!
@@ -811,7 +811,7 @@ You swipe at $N, who merely laughs.
 $n swipes at you, but you merely laugh.
 $n swipes at $N, who merely laughs.
 
-M25 ab +
+M25 b +
 tail swipe~
 swipe~
 swipes~
@@ -830,7 +830,7 @@ You swipe with your tail at $N, who merely laughs.
 $n swipes with $s tail at you, but you merely laugh.
 $n swipes with $s tail at $N, who merely laughs.
 
-M25 ab 
+M25 b 
 tail swipe~
 You swipe your tail into $N's head with so much force that it shatters $S skull!
 $n swipes $s tail into your head with so much force that the last thing you feel is your skull shattering!
@@ -845,7 +845,7 @@ You swipe with your tail at $N, who merely laughs.
 $n swipes with $s tail at you, but you merely laugh.
 $n swipes with $s tail at $N, who merely laughs.
 
-M26 ab +
+M26 b +
 peck~
 peck~
 pecks~
@@ -864,7 +864,7 @@ You try to peck at $N, but $E tells you to peck off.
 $n tries to peck at you, but you tell $m to peck off.
 $n tries to peck at $N, but $N tells $m to peck off.
 
-M26 ab 
+M26 b 
 peck~
 You peck at $N over and over, until $E's just a bloody heap!
 $n pecks at you over and over, until you're just a bloody heap!
@@ -879,7 +879,7 @@ You try to peck at $N, but cannot bring yourself to do so.
 $n tries to peck at you, but cannot bring $mself to do so.
 $n tries to peck at $N, but cannot bring $mself to do so.
 
-M27 ab +
+M27 b +
 gore~
 gore~
 gores~
@@ -898,7 +898,7 @@ You go to gore $N, but merely bow your head in worship.
 $n goes to gore you, but merely bows $s head in worship.
 $n goes to gore $N, but merely bows $s head in worship.
 
-M27 ab 
+M27 b 
 gore~
 You gore fiercely at $N, ripping out $S entrails -- $E is dead!
 $n gores fiercely at you, ripping out your entrails -- you are dead!
@@ -1083,7 +1083,7 @@ Your bullet stops in midair before $N.
 A bullet from $n stops in midair before you.
 A bullet from $n stops in midair before $N.
 
-M33 ab +
+M33 b +
 fire breath~
 breathe fire at~
 breathes fire at~
@@ -1170,7 +1170,7 @@ You hurl a dart at $N but it explodes into flower petals.
 $n hurls a dart at you, but it explodes into flower petals.
 $n hurls a dart at $N, but it explodes into flower petals.
 
-M36 ab +
+M36 b +
 animal whip~
 animal whip~
 whip~
@@ -1189,7 +1189,7 @@ You'd better stop before $N whips you.
 $n is trying to whip you... how cute!
 $n tries to whip $N - isn't $e cute?
 
-M36 ab 
+M36 b 
 animal whip~
 Your dextrous whip messily tears $N's torso right off!
 $n's whip messily tears you right in half!
