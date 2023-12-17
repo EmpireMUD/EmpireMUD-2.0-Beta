@@ -3845,6 +3845,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
 		data->no_msg = TRUE;	// prevents success message
+		data->engage_anyway = TRUE;	// allows engage-combat through a data->stop
 	}
 	
 	// main messaging
@@ -3869,7 +3870,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check if should be in combat
-	if (!data->stop && data->should_charge_cost) {
+	if ((!data->stop && data->should_charge_cost) || data->engage_anyway) {
 		if (vict && vict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
 			// auto-assist if we used an ability on someone who is fighting
 			if (!ABIL_IS_VIOLENT(abil) && FIGHTING(vict) && !FIGHTING(ch)) {

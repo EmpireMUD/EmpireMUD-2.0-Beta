@@ -3950,6 +3950,7 @@ struct ability_exec {
 	bool matching_role;	// if FALSE, no bonuses from matching role
 	int cost;	// for types that raise the cost later
 	bool should_charge_cost;	// if TRUE, will charge regardless of success
+	bool engage_anyway;	// we engage combat if !stop || engage_anyway
 	
 	struct ability_exec_type *types;	// LL of type data
 };
