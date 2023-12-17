@@ -21,7 +21,7 @@
 * that, unlike the socials file, all twelve lines must be present for each
 * record, regardless of any '#' fields which may be contained in it.
 
-M0 ab +
+M0 0 +
 RESERVED~
 hit~
 hits~
@@ -45,7 +45,7 @@ slash~
 slash~
 slashes~
 slash~
-0 0 2.6 2.8 3.0
+0 1 2.6 2.8 3.0
 You beautifully slash $N into two parts -- both dead.
 Your upper body is disconnected from your legs as $n slashes at you -- R.I.P.!
 $N is slashed in two by a masterful stroke of $n!
