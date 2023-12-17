@@ -4383,6 +4383,16 @@ You must set 2 properties on currency:
 
 See also: OLC GENERICS, GENEDIT PLURAL
 #d
+"GENEDIT DOTATTACK" "GENEDIT DOT ATTACK"
+
+Usage:  .dotattack <vnum | name | none>
+
+This is used on affect generics that are used for damage-over-time (DoT).
+If this field is set, the DoT will use the specified attack message instead of
+its default.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
 "GENEDIT DOTTOCHAR" "GENEDIT DOT-TO-CHAR" "GENEDIT DOT TO CHAR"
 
 Usage:  .dottochar <message | none>

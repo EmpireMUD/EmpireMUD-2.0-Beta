@@ -169,6 +169,9 @@ EVENTFUNC(dot_update_event) {
 		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
 		
 		// custom messages?
+		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && GET_AFFECT_DOT_ATTACK(gen) > 0 && real_attack_message(GET_AFFECT_DOT_ATTACK(gen))) {
+			type = GET_AFFECT_DOT_ATTACK(gen);
+		}
 		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
 			custom_fmessage = create_attack_message(NOTHING);
 			add_attack_message(custom_fmessage, create_attack_message_entry(TRUE,

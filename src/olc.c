@@ -278,6 +278,7 @@ OLC_MODULE(genedit_lookatchar);
 OLC_MODULE(genedit_lookatroom);
 OLC_MODULE(genedit_deathtochar);
 OLC_MODULE(genedit_deathtoroom);
+OLC_MODULE(genedit_dotattack);
 OLC_MODULE(genedit_dottochar);
 OLC_MODULE(genedit_dottoroom);
 OLC_MODULE(genedit_repair2char);
@@ -823,6 +824,7 @@ const struct olc_command_data olc_data[] = {
 	{ "lookatroom", genedit_lookatroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "deathtochar", genedit_deathtochar, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "deathtoroom", genedit_deathtoroom, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "dotattack", genedit_dotattack, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "dottochar", genedit_dottochar, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "dottoroom", genedit_dottoroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },

@@ -36,6 +36,8 @@
 *   Displays
 *   Generic OLC Modules
 *   Action OLC Modules
+*   Currency OLC Modules
+*   Cooldown/Affect OLC Modules
 *   Component OLC Modules
 *   Liquid OLC Modules
 */
@@ -2029,6 +2031,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 		case GENERIC_AFFECT: {
+			size += snprintf(buf + size, sizeof(buf) - size, "DoT attack type: %d %s\r\n", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-char: %s\r\n", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-room: %s\r\n", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
@@ -2132,6 +2135,7 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%sdottoroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DOT_TO_ROOM), ""), GET_AFFECT_DOT_TO_ROOM(gen) ? GET_AFFECT_DOT_TO_ROOM(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%sdeathtochar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DEATH_TO_CHAR), ""), GET_AFFECT_DEATH_TO_CHAR(gen) ? GET_AFFECT_DEATH_TO_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%sdeathtoroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_DEATH_TO_ROOM), ""), GET_AFFECT_DEATH_TO_ROOM(gen) ? GET_AFFECT_DEATH_TO_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdotattack\t0> %d %s\r\n", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)));
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -2537,6 +2541,39 @@ OLC_MODULE(genedit_deathtoroom) {
 	}
 	else {
 		olc_process_string(ch, argument, "deathtoroom", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_dotattack) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	attack_message_data *amd;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GVAL_AFFECT_DOT_ATTACK;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the custom DoT attack type to what (vnum or name)?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GEN_VALUE(gen, pos) = 0;
+		msg_to_char(ch, "Custom DoT attack type removed.\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else {
+		GEN_VALUE(gen, pos) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "DoT attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
 	}
 }
 
