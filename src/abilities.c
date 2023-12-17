@@ -4304,21 +4304,25 @@ DO_ABIL(do_conjure_vehicle_ability) {
 */
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
+	double reduced_scale;
 	int result, dmg;
 	
 	// fine-tuning ability damage
 	double arbitrary_modifier = 4.0;
+	
+	// smoother scaling, for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
 	
 	dmg = subdata->scale_points * arbitrary_modifier;
 	
 	// bonus damage
 	switch (ABIL_DAMAGE_TYPE(abil)) {
 		case DAM_PHYSICAL: {
-			dmg += GET_BONUS_PHYSICAL(ch);
+			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale;
 			break;
 		}
 		case DAM_MAGICAL: {
-			dmg += GET_BONUS_MAGICAL(ch);
+			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale;
 			break;
 		}
 	}
@@ -4340,11 +4344,14 @@ DO_ABIL(do_damage_ability) {
 */
 DO_ABIL(do_dot_ability) {
 	any_vnum affect_vnum;
-	double points;
+	double points, reduced_scale;
 	int dur, dmg;
 	
 	// fine-tuning ability damage
 	double arbitrary_modifier = 1.5;
+	
+	// smoother scaling, for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
 	
@@ -4367,11 +4374,11 @@ DO_ABIL(do_dot_ability) {
 	// bonus damage
 	switch (ABIL_DAMAGE_TYPE(abil)) {
 		case DAM_PHYSICAL: {
-			dmg += GET_BONUS_PHYSICAL(ch) / MAX(1, dur/DOT_INTERVAL);
+			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
 			break;
 		}
 		case DAM_MAGICAL: {
-			dmg += GET_BONUS_MAGICAL(ch) / MAX(1, dur/DOT_INTERVAL);
+			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
 			break;
 		}
 	}
