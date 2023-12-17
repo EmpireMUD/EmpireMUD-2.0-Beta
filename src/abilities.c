@@ -1802,7 +1802,8 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	}
 	points *= ABIL_SCALE(abil);
 	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
-		points *= 1.0 + get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+		// trait range is 0.75x to 1.25x
+		points *= 0.75 + (get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil)) / 2.0);
 	}
 	
 	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
@@ -4305,7 +4306,10 @@ DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
 	int result, dmg;
 	
-	dmg = subdata->scale_points * (data->matching_role ? 3 : 2);	// could go higher?
+	// fine-tuning ability damage
+	double arbitrary_modifier = 4.0;
+	
+	dmg = subdata->scale_points * arbitrary_modifier;
 	
 	// bonus damage
 	switch (ABIL_DAMAGE_TYPE(abil)) {
@@ -4319,7 +4323,6 @@ DO_ABIL(do_damage_ability) {
 		}
 	}
 	
-	// msg_to_char(ch, "Damage: %d\r\n", dmg);
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
 	data->success = TRUE;
 	
@@ -4340,6 +4343,9 @@ DO_ABIL(do_dot_ability) {
 	double points;
 	int dur, dmg;
 	
+	// fine-tuning ability damage
+	double arbitrary_modifier = 1.5;
+	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
 	
 	points = get_ability_type_data(data, ABILT_DOT)->scale_points;
@@ -4356,7 +4362,7 @@ DO_ABIL(do_dot_ability) {
 	// determine duration
 	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
 	
-	dmg = points * (data->matching_role ? 2 : 1);
+	dmg = points * arbitrary_modifier;
 	
 	// bonus damage
 	switch (ABIL_DAMAGE_TYPE(abil)) {
