@@ -1908,10 +1908,7 @@ OLC_MODULE(attackedit_message) {
 	// arg2 for remove only
 	arg2 = one_argument(argument, arg);
 	
-	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
-		msg_to_char(ch, "You are already editing a message (use .back to return to the menu).\r\n");
-	}
-	else if (!*arg) {
+	if (!*arg) {
 		send_to_char(USAGE, ch);
 	}
 	else if (!str_cmp(arg, "add")) {
