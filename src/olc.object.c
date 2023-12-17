@@ -55,6 +55,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
 	obj_data *obj_iter, *next_obj;
 	bool problem = FALSE, found;
+	attack_message_data *amd = NULL;
 	
 	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), default_obj_keywords)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
@@ -223,8 +224,12 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED) {
+			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED || !(amd = real_attack_message(GET_WEAPON_TYPE(obj)))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type %d is not valid (it is missing WEAPON)", GET_WEAPON_TYPE(obj));
 				problem = TRUE;
 			}
 			if (GET_WEAPON_DAMAGE_BONUS(obj) == 0) {
@@ -255,6 +260,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
+			if (GET_MISSILE_WEAPON_TYPE(obj) == TYPE_RESERVED || !(amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(obj)))) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type %d is not valid (it is missing WEAPON)", GET_MISSILE_WEAPON_TYPE(obj));
+				problem = TRUE;
+			}
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Damage amount not set");
 				problem = TRUE;

@@ -417,6 +417,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	bool problem = FALSE;
+	attack_message_data *amd = NULL;
 	obj_data *obj = NULL;
 	
 	if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
@@ -485,8 +486,12 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Flagged CONSUME-OBJ but no object required");
 		problem = TRUE;
 	}
-	if (MORPH_ATTACK_TYPE(morph) == TYPE_RESERVED) {
+	if (MORPH_ATTACK_TYPE(morph) == TYPE_RESERVED || !(amd = real_attack_message(MORPH_ATTACK_TYPE(morph)))) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid attack type");
+		problem = TRUE;
+	}
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Attack type %d is not valid (it is missing the MOBILE flag)", MORPH_ATTACK_TYPE(morph));
 		problem = TRUE;
 	}
 	

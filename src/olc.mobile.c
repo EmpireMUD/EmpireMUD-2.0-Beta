@@ -51,6 +51,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
+	attack_message_data *amd = NULL;
 
 	if (!str_cmp(GET_PC_NAME(mob), default_mob_keywords)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
@@ -115,8 +116,12 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No maximum scale level on non-adventure mob");
 		problem = TRUE;
 	}
-	if (MOB_ATTACK_TYPE(mob) == TYPE_RESERVED) {
+	if (MOB_ATTACK_TYPE(mob) == TYPE_RESERVED || !(amd = real_attack_message(MOB_ATTACK_TYPE(mob)))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Invalid attack type");
+		problem = TRUE;
+	}
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Attack type %d is not valid (it is missing the MOBILE flag)", MOB_ATTACK_TYPE(mob));
 		problem = TRUE;
 	}
 	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
