@@ -131,6 +131,7 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
 bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+int which_olc_command(char_data *ch, char *command, bitvector_t olc_type);
 
 // olc auditor functions
 bool audit_ability(ability_data *abil, char_data *ch);

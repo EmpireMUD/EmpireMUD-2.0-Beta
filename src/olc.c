@@ -1166,18 +1166,7 @@ ACMD(do_olc) {
 	}
 	
 	// arg2: should be a command
-	pos = NOTHING;
-	for (iter = 0; *olc_data[iter].command != '\n' && pos == NOTHING; ++iter) {
-		if (olc_data[iter].valid_types == 0 || IS_SET(olc_data[iter].valid_types, type)) {
-			if (!IS_SET(olc_data[iter].flags, OLC_CF_MAP_EDIT) || GET_ACCESS_LEVEL(ch) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
-				if (!IS_SET(olc_data[iter].flags, OLC_CF_EDITOR) || IS_SET(olc_data[iter].valid_types, GET_OLC_TYPE(ch->desc))) {
-					if (!str_cmp(arg2, olc_data[iter].command) || (!IS_SET(olc_data[iter].flags, OLC_CF_NO_ABBREV) && is_abbrev(arg2, olc_data[iter].command))) {
-						pos = iter;
-					}
-				}
-			}
-		}
-	}
+	pos = which_olc_command(ch, arg2, type);
 	
 	// possibility of a 'type' trying to mask a field, like .attackmessage and mob's .attack
 	if (pos == NOTHING && *arg2 && GET_OLC_TYPE(ch->desc)) {
@@ -1185,19 +1174,7 @@ ACMD(do_olc) {
 		strcpy(arg3, notype);
 		strcpy(arg2, arg1);
 		type = GET_OLC_TYPE(ch->desc);
-		
-		// TODO: this is a temporary copy of the loop above
-		for (iter = 0; *olc_data[iter].command != '\n' && pos == NOTHING; ++iter) {
-			if (olc_data[iter].valid_types == 0 || IS_SET(olc_data[iter].valid_types, type)) {
-				if (!IS_SET(olc_data[iter].flags, OLC_CF_MAP_EDIT) || GET_ACCESS_LEVEL(ch) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
-					if (!IS_SET(olc_data[iter].flags, OLC_CF_EDITOR) || IS_SET(olc_data[iter].valid_types, GET_OLC_TYPE(ch->desc))) {
-						if (!str_cmp(arg2, olc_data[iter].command) || (!IS_SET(olc_data[iter].flags, OLC_CF_NO_ABBREV) && is_abbrev(arg2, olc_data[iter].command))) {
-							pos = iter;
-						}
-					}
-				}
-			}
-		}	
+		pos = which_olc_command(ch, arg2, type);
 	}
 
 	// now: type and pos are set; arg3 is the remaining argument
@@ -9063,6 +9040,36 @@ bool validate_icon(char *icon) {
 		return TRUE;
 	}
 }
+
+
+/**
+* Look up which OLC command a player is trying to use. This is sometimes run
+* twice to avoid a situation where an editor type (.attackmessage) can mask a
+* field in another editor (mob's .attack).
+*
+* @param char_data *ch The connected player trying to use OLC.
+* @param char *command The name of the (possible) command.
+* @param bitvector_t olc_type Which OLC editor type they are trying to use.
+* @return int A valid command, as a position in the olc_data array, or NOTHING if not found.
+*/
+int which_olc_command(char_data *ch, char *command, bitvector_t olc_type) {
+	int iter, pos = NOTHING;
+	
+	for (iter = 0; *olc_data[iter].command != '\n' && pos == NOTHING; ++iter) {
+		if (olc_data[iter].valid_types == 0 || IS_SET(olc_data[iter].valid_types, olc_type)) {
+			if (!IS_SET(olc_data[iter].flags, OLC_CF_MAP_EDIT) || GET_ACCESS_LEVEL(ch) >= LVL_UNRESTRICTED_BUILDER || OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
+				if (!IS_SET(olc_data[iter].flags, OLC_CF_EDITOR) || IS_SET(olc_data[iter].valid_types, GET_OLC_TYPE(ch->desc))) {
+					if (!str_cmp(command, olc_data[iter].command) || (!IS_SET(olc_data[iter].flags, OLC_CF_NO_ABBREV) && is_abbrev(command, olc_data[iter].command))) {
+						pos = iter;
+					}
+				}
+			}
+		}
+	}
+	
+	return pos;
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// WORD COUNT TOOLS ////////////////////////////////////////////////////////
