@@ -4641,7 +4641,7 @@ OLC_MODULE(skilledit_synergy) {
 	char cmd_arg[MAX_INPUT_LENGTH], role_arg[MAX_INPUT_LENGTH], skl_arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH];
 	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct synergy_ability *syn, *next_syn;
-	int role = ROLE_NONE, level;
+	int role = ROLE_NONE, level = 1;
 	ability_data *abil;
 	bool all, any, all_roles;
 	
