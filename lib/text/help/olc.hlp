@@ -2417,6 +2417,54 @@ individual messages inside the attack message set.
 
 See also: OLC ATTACKS
 #d
+"ATTACKEDIT CLEAREXTENDED" "ATTACKEDIT CLEAR EXTENDED"
+
+Usage:  .clearextended
+
+When you remove the WEAPON and MOB flags from an attack, it no longer needs
+most of the properties that appeared when those flags were added. You can
+quickly remove these extended properties and hide them with the .clearextended
+command.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT DAMAGETYPE" "ATTACKEDIT DAMAGE TYPE"
+
+Usage:  .damagetype <type>
+
+See HELP DAMAGE TYPES for the list.
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT FIRSTPERSON" "ATTACKEDIT FIRST-PERSON" "ATTACKEDIT FIRST PERSON"
+
+Usage:  .firstperson <string>
+
+This is the attack's verb in first-person. For example, a slashing weapon's
+first-person verb is "slash", as in "You slash the rat."
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT THIRD PERSON, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT FLAGS" "ATTACK FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following ability flags are available:
+ &cWEAPON&0 - Available for use as a weapon's type. Has extra properties.
+ &cMOBILE&0 - Available for use on mobs and morphs. Has extra properties.
+ &cDISARMABLE&0 - Vulnerable to DISARM affects.
+
+Note: The WEAPON and MOBILE properties add the following fields to the attack:
+   firstperson, thirdperson, noun, damagetype, weapontype, speed
+
+See also: OLC ATTACKS
+#d
 "ATTACKEDIT FULLSEARCH" "ATTACK FULLSEARCH"
 
 Usage:  .attack fullsearch -<field> <argument> <...>
@@ -2518,6 +2566,73 @@ Usage:  .name <name>
 The name of a attack message is used to identify it. The name should be short
 and concise. These are often lowercase for weapon attacks, but may start with a
 capital letter for special attacks.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT NOUN" "ATTACKEDIT NOUN" "ATTACKEDIT NOUN"
+
+Usage:  .noun <string>
+
+This is the attack type as a noun, used in sentences describing it as your
+attack. For example, a slashing weapon's noun verb is "slash", as in "You
+demolish the rat with your slash" and "Pulcherrima demolishes the rat with her
+slash."
+
+The noun is not necessarily the same as the first-person string or the attack's
+name. For example, slice attacks use "swing".
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT SPEED" "ATTACKEDIT FAST" "ATTACKEDIT SLOW" "ATTACKEDIT NORMAL"
+
+Usage:  .speed fast <time>
+        .speed normal <time>
+        .speed slow <time>
+
+This lets you set the base speed for the attack. The base speed is 4.0 but
+most weapons attack faster than this. Character damage is adjusted for the
+weapon's speed so that overall damage is the same, but slower weapons deal it
+in larger hits while fast ones do a lot of small hits.
+
+A lower time is faster; these times are the number of seconds between auto-
+attacks. When 3 speeds are listed, like on "vstat attack", the order is
+[fast | normal | slow].
+
+Weapons with the SLOW flag and characters with the SLOW affect use the attack's
+slow speed. Weapons with the FAST flag and characters with HASTE similarly use
+the fast speed.
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property because they're used on abilities instead.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT THIRDPERSON" "ATTACKEDIT THIRD-PERSON" "ATTACKEDIT THIRD PERSON"
+
+Usage:  .thirdperson <string>
+
+This is the attack's verb in third-person. For example, a slashing weapon's
+third-person verb is "slashes", as in "Dasylirion slashes the rat."
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT THIRD PERSON, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT WEAPONTYPE" "ATTACKEDIT WEAPON TYPE"
+
+Usage:  .weapontype <type>
+
+The following weapon types are available:
+ &cblunt&0 - dull, not sharp
+ &csharp&0 - cutting, piercing
+ &cmagic&0 - spell
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property.
 
 See also: OLC ATTACKS
 #d
@@ -9090,6 +9205,17 @@ Object values:
  1 - generic currency vnum
 
 See also: GENERIC CURRENCY
+#d
+"DAMAGE TYPES" "DAMAGE TYPE"
+
+The following damage types are available:
+ &cphysical&0
+ &cmagical&0
+ &cfire&0
+ &cpoison&0 - affected by Poison Immunity
+ &cdirect&0 - not resisted by anything
+
+See also: ATTACK TYPES
 #d
 "DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
 
