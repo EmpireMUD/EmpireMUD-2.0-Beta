@@ -450,7 +450,10 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 	int count, iter;
 	struct attack_message_set *ams;
 	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	int only_damage = NOTHING, only_weapon = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING;
+	double speed = 0.0;
 	
 	attack_message_data *amd, *next_amd;
 	size_t size;
@@ -469,10 +472,16 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		if (!strcmp(type_arg, "-")) {
 			continue;	// just skip stray dashes
 		}
-
+		
+		FULLSEARCH_LIST("damagetype", only_damage, damage_types)
+		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
+		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
+		FULLSEARCH_DOUBLE("speed", speed, 0.1, 10.0)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, action_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
-		
+		FULLSEARCH_LIST("weapontype", only_weapon, weapon_types)
+
 		else {	// not sure what to do with it? treat it like a keyword
 			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
@@ -489,6 +498,21 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		if ((vmin != NOTHING && ATTACK_VNUM(amd) < vmin) || (vmax != NOTHING && ATTACK_VNUM(amd) > vmax)) {
 			continue;	// vnum range
 		}
+		if (only_damage != NOTHING && ATTACK_DAMAGE_TYPE(amd) != only_damage) {
+			continue;	// wrong damage
+		}
+		if (only_weapon != NOTHING && ATTACK_WEAPON_TYPE(amd) != only_weapon) {
+			continue;	// wrong damage
+		}
+		if (only_flags != NOBITS && (ATTACK_FLAGS(amd) & only_flags) != only_flags) {
+			continue;
+		}
+		if (not_flagged != NOBITS && ATTACK_FLAGGED(amd, not_flagged)) {
+			continue;
+		}
+		if (speed > 0.0 && (speed < ATTACK_SPEED(amd, SPD_FAST) || speed > ATTACK_SPEED(amd, SPD_SLOW))) {
+			continue;	// speed out of range
+		}
 		
 		// search strings
 		if (*find_keywords) {
@@ -496,8 +520,17 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 			if (multi_isname(find_keywords, ATTACK_NAME(amd))) {
 				any = TRUE;
 			}
+			else if (multi_isname(find_keywords, ATTACK_NOUN(amd))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, ATTACK_FIRST_PERSON(amd))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, ATTACK_THIRD_PERSON(amd))) {
+				any = TRUE;
+			}
 			LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
-				for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
+				for (iter = 0; iter < NUM_MSG_TYPES && !any; ++iter) {
 					if (ams->msg[iter].attacker_msg && multi_isname(find_keywords, ams->msg[iter].attacker_msg)) {
 						any = TRUE;
 					}

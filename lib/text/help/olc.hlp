@@ -2426,9 +2426,14 @@ criteria. You can specify multiple fields if you want. Any arguments that don't
 start with a dash (-) are matched to the attack's name and strings.
 
 Fields:
+  &c-damagetype&0 - See DAMAGE TYPES
+  &c-flagged&0, &c-unflagged&0 - See ATTACKEDIT FLAGS
+  &c-speed&0 - Attacks where this speed is in its range
   &c-vmin&0, &c-vmax&0 - VNUM range limits
+  &c-weapontype&0 - blunt, sharp, or magic
 
 Examples:
+ > .attack fullsearch -flagged sharp -speed 2.0
  > .attack fullsearch slash -vmin 10000 -vmax 10099
 #d
 "ATTACKEDIT HIT2CHAR" "ATTACKEDIT HIT2VICT" "ATTACKEDIT HIT2ROOM"

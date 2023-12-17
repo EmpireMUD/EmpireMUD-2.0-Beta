@@ -344,6 +344,15 @@ bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 		}	\
 	}
 
+#define FULLSEARCH_DOUBLE(string, var, min, max)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if (!isdigit(*val_arg) || (var = atof(val_arg)) < min || var > max) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
 #define FULLSEARCH_INT(string, var, min, max)	\
 	else if (is_abbrev(type_arg, "-"string)) {	\
 		argument = any_one_word(argument, val_arg);	\
