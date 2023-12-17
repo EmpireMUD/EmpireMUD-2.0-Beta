@@ -498,10 +498,10 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		if ((vmin != NOTHING && ATTACK_VNUM(amd) < vmin) || (vmax != NOTHING && ATTACK_VNUM(amd) > vmax)) {
 			continue;	// vnum range
 		}
-		if (only_damage != NOTHING && ATTACK_DAMAGE_TYPE(amd) != only_damage && ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
+		if (only_damage != NOTHING && (ATTACK_DAMAGE_TYPE(amd) != only_damage || !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA))) {
 			continue;	// wrong damage
 		}
-		if (only_weapon != NOTHING && ATTACK_WEAPON_TYPE(amd) != only_weapon && ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
+		if (only_weapon != NOTHING && (ATTACK_WEAPON_TYPE(amd) != only_weapon || !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA))) {
 			continue;	// wrong damage
 		}
 		if (only_flags != NOBITS && (ATTACK_FLAGS(amd) & only_flags) != only_flags) {
@@ -510,7 +510,7 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		if (not_flagged != NOBITS && ATTACK_FLAGGED(amd, not_flagged)) {
 			continue;
 		}
-		if (speed > 0.0 && (speed < ATTACK_SPEED(amd, SPD_FAST) || speed > ATTACK_SPEED(amd, SPD_SLOW)) && ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
+		if (speed > 0.0 && (speed < ATTACK_SPEED(amd, SPD_FAST) || speed > ATTACK_SPEED(amd, SPD_SLOW) || ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA))) {
 			continue;	// speed out of range
 		}
 		
