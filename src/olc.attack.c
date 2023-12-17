@@ -169,13 +169,13 @@ void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack
 			CREATE(ams, struct attack_message_set, 1);
 			for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
 				if (from_ams->msg[iter].attacker_msg) {
-					to_ams->msg[iter].attacker_msg = strdup(from_ams->msg[iter].attacker_msg);
+					ams->msg[iter].attacker_msg = strdup(from_ams->msg[iter].attacker_msg);
 				}
 				if (from_ams->msg[iter].victim_msg) {
-					to_ams->msg[iter].victim_msg = strdup(from_ams->msg[iter].victim_msg);
+					ams->msg[iter].victim_msg = strdup(from_ams->msg[iter].victim_msg);
 				}
 				if (from_ams->msg[iter].room_msg) {
-					to_ams->msg[iter].room_msg = strdup(from_ams->msg[iter].room_msg);
+					ams->msg[iter].room_msg = strdup(from_ams->msg[iter].room_msg);
 				}
 			}
 			
