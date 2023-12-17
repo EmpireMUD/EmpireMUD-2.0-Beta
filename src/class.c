@@ -66,7 +66,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	};
 	
 	bool resume_empire = FALSE;
-	struct assign_abil_t *hash = NULL, *aat, *next_aat;
+	struct assign_abil_t *hash = NULL, *aat, *next_aat, *check;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
 	struct ability_data_list *adl;
@@ -105,24 +105,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if a 'parent' type allows it
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type != ADL_PARENT) {
-				continue;	// not apparent
-			}
-			if (!has_ability(ch, adl->vnum)) {
-				continue;	// missing ability
-			}
-			if (!ability_proto(adl->vnum)) {
-				continue;	// cannot find parent
-			}
-			
-			// if we got here, it's safe to add
-			aat->can_have = TRUE;
-			break;
-		}
-		
-		// STEP 1c: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
 		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
@@ -165,7 +148,45 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		}
 	}
 	
-	// STEP 3: assign/remove abilities
+	// STEP 3: check parent abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (!has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// parentless
+		}
+		
+		// STEP 3a: find/add an 'aat' entry
+		vnum = ABIL_VNUM(abil);
+		HASH_FIND_INT(hash, &vnum, aat);
+		if (!aat) {
+			CREATE(aat, struct assign_abil_t, 1);
+			aat->vnum = vnum;
+			aat->ptr = abil;
+			HASH_ADD_INT(hash, vnum, aat);
+		}
+		
+		// STEP 1b: determine if a 'parent' type allows it
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_PARENT) {
+				continue;	// not apparent
+			}
+			
+			// check ITS aat
+			HASH_FIND_INT(hash, &(adl->vnum), check);
+			
+			if (!has_ability(ch, adl->vnum) && (!check || !check->can_have)) {
+				continue;	// missing ability
+			}
+			if (!ability_proto(adl->vnum)) {
+				continue;	// cannot find parent
+			}
+			
+			// if we got here, it's safe to have
+			aat->can_have = TRUE;
+			break;
+		}
+	}
+	
+	// STEP 4: assign/remove abilities
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {
