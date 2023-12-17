@@ -640,26 +640,10 @@ See also: OLC ABILITIES, BUFF ABILITY
 #d
 "ABILEDIT ATTACKTYPE" "ABILEDIT ATTACK TYPE"
 
-Usage:  .attacktype <number>
+Usage:  .attacktype <name | vnum>
 
-This determines the attack message that a damage ability sends. These are
-numeric values matching the game's attack messages.
-
-In the future, attack messages will be moved to an in-game editor. Until then,
-if you need a new type, ask your game administrator to add one in the
-'messages' file.
-
-Current attack types:
- 52. execute                         53. arrow
- 54. kick                            55. bash
- 60. lightningbolt                   62. backstab
- 63. sunshock                        67. ablate
- 68. acidblast                       69. arclight
- 70. astralclaw                      71. chronoblast
- 72. deathtouch                      73. dispirit
- 74. erode (unused)                  75. scour (unused)
- 76. shadowlash                      77. soulchain
- 78. starstrike                      79. thornlash
+This determines the attack message that a damage ability sends. You can look up
+attacks with "vnum attack <name>" or create them with the .attack editor.
 
 See also: OLC ABILITIES, DAMAGE ABILITY
 #d
@@ -5777,10 +5761,10 @@ See also: APPLIES, OLC MORPHS
 #d
 "MORPHEDIT ATTACK"
 
-Usage:  .attack <type>
+Usage:  .attack <name | vnum>
 
 This command sets the base attack type of the morph, when unarmed. See
-ATTACK TYPES for the list.
+ATTACK TYPES for a list.
 
 See also: ATTACK TYPES, OLC MORPHS
 #d
