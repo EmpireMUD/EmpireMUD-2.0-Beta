@@ -5167,6 +5167,10 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "REPEAT-OVER-TIME flag without OVER-TIME");
 		problem = TRUE;
 	}
+	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "No fail messages");
+		problem = TRUE;
+	}
 	
 	// interactions
 	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
