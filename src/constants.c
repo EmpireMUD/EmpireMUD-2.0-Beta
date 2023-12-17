@@ -4346,8 +4346,8 @@ const char *skill_check_difficulty[] = {
 // DIFF_x (2/2): modifiers to your skill level before a skill check
 double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 	100,	// trivial (always passes)
-	1.5,  // easy
-	1,  // medium
+	2.0,  // easy
+	1.0,  // medium
 	0.66,  // hard
 	0.1  // rarely
 };
