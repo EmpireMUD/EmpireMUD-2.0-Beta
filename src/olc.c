@@ -276,11 +276,7 @@ OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
 OLC_MODULE(genedit_lookatchar);
 OLC_MODULE(genedit_lookatroom);
-OLC_MODULE(genedit_deathtochar);
-OLC_MODULE(genedit_deathtoroom);
 OLC_MODULE(genedit_dotattack);
-OLC_MODULE(genedit_dottochar);
-OLC_MODULE(genedit_dottoroom);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
 OLC_MODULE(genedit_quick_cooldown);
@@ -822,11 +818,7 @@ const struct olc_command_data olc_data[] = {
 	{ "apply2room", genedit_apply2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "lookatchar", genedit_lookatchar, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "lookatroom", genedit_lookatroom, OLC_GENERIC, OLC_CF_EDITOR },
-	{ "deathtochar", genedit_deathtochar, OLC_GENERIC, OLC_CF_EDITOR },
-	{ "deathtoroom", genedit_deathtoroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "dotattack", genedit_dotattack, OLC_GENERIC, OLC_CF_EDITOR },
-	{ "dottochar", genedit_dottochar, OLC_GENERIC, OLC_CF_EDITOR },
-	{ "dottoroom", genedit_dottoroom, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },

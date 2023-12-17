@@ -152,7 +152,6 @@ EVENTFUNC(dot_update_event) {
 	struct over_time_effect_type *dot;
 	char_data *ch, *caster;
 	int type, result;
-	attack_message_data *custom_fmessage = NULL;
 	generic_data *gen;
 	
 	// grab data and free it
@@ -172,30 +171,9 @@ EVENTFUNC(dot_update_event) {
 		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && GET_AFFECT_DOT_ATTACK(gen) > 0 && real_attack_message(GET_AFFECT_DOT_ATTACK(gen))) {
 			type = GET_AFFECT_DOT_ATTACK(gen);
 		}
-		if (dot->type != NOTHING && (gen = real_generic(dot->type)) && (GET_AFFECT_DOT_TO_CHAR(gen) || GET_AFFECT_DOT_TO_ROOM(gen) || GET_AFFECT_DEATH_TO_CHAR(gen) || GET_AFFECT_DEATH_TO_ROOM(gen))) {
-			custom_fmessage = create_attack_message(NOTHING);
-			add_attack_message(custom_fmessage, create_attack_message_entry(TRUE,
-				GET_AFFECT_DEATH_TO_ROOM(gen),	// actually death to-attacker
-				GET_AFFECT_DEATH_TO_CHAR(gen),
-				GET_AFFECT_DEATH_TO_ROOM(gen),
-				NULL,	// miss to-attacker
-				NULL,	// miss to_vict
-				NULL,	// miss to-room
-				GET_AFFECT_DOT_TO_ROOM(gen),	// actually hit to-attacker
-				GET_AFFECT_DOT_TO_CHAR(gen),
-				GET_AFFECT_DOT_TO_ROOM(gen),
-				NULL,	// god to-attacker
-				NULL,	// god to_vict
-				NULL	// god to-room
-			));
-		}
 		
 		// bam! (damage func shows the messaging)
-		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type, custom_fmessage);
-		
-		if (custom_fmessage) {
-			free_attack_message(custom_fmessage);
-		}
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type, NULL);
 		
 		if (result < 0 || IS_DEAD(ch) || EXTRACTED(ch)) {
 			// done here (death and extraction should both remove the DOT themselves)

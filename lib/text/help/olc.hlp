@@ -4269,13 +4269,7 @@ Affects have several properties:
   <&ylookatroom&0> An optional message shown after the character on 'look'.
 
 Optional properties used for damage-over-time effects (DoTs):
-  <&ydottochar&0> Damage shown to the character when taking DoT damage.
-  <&ydottoroom&0> Damage shown to the room when character takes DoT damage.
-  <&ydeathtochar&0> Damage shown to the character when dying from DoT damage.
-  <&ydeathtoroom&0> Damage shown to the room when character dies from DoT damage.
-  Note: If no dot-to or death-to messages are set, this will use the standard
-      DoT messaging. But if any are set, omitted messages won't show at all.
-      DoT and death messages should use uppercase placeholder pronouns like $N.
+  <&ydotattack&0> Custom attack message type.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -4392,78 +4386,6 @@ If this field is set, the DoT will use the specified attack message instead of
 its default.
 
 See also: OLC GENERICS, GENERIC AFFECTS
-#d
-"GENEDIT DOTTOCHAR" "GENEDIT DOT-TO-CHAR" "GENEDIT DOT TO CHAR"
-
-Usage:  .dottochar <message | none>
-
-This message is shown to the character each time they take damage from a DoT
-(damage-over-time) affect.
-
-This message is optional. If any of the dottoroom, deathtochar, or deathtoroom
-message are set but dottochar is not, no message will be displayed. However, if
-all of these messages are omitted, standard DoT messages will appear.
-
-Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
-
-Example:
-"You shiver as you slowly freeze."
-
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
-#d
-"GENEDIT DOTTOROOM" "GENEDIT DOT-TO-ROOM" "GENEDIT DOT TO ROOM"
-
-Usage:  .dottoroom <message | none>
-
-This message is shown to the room each time the character takes damage from a
-DoT (damage-over-time) affect.
-
-This message is optional. If any of the dottochar, deathtochar, or deathtoroom
-message are set but dottoroom is not, no message will be displayed. However, if
-all of these messages are omitted, standard DoT messages will appear.
-
-Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
-
-Example: $N shivers as $E slowly freezes.
-"Paris shivers as he slowly freezes."
-
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
-#d
-"GENEDIT DEATHTOCHAR" "GENEDIT DEATH-TO-CHAR" "GENEDIT DEATH TO CHAR"
-
-Usage:  .deathtochar <message | none>
-
-This message is shown to the character if they are killed by a DoT
-(damage-over-time) affect.
-
-This message is optional. If any of the dottochar, dottoroom, or deathtoroom
-message are set but deathtochar is not, no message will be displayed. However,
-if all of these messages are omitted, standard DoT messages will appear.
-
-Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
-
-Example:
-"Oh no... you froze to death!"
-
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
-#d
-"GENEDIT DEATHTOROOM" "GENEDIT DEATH-TO-ROOM" "GENEDIT DEATH TO ROOM"
-
-Usage:  .deathtoroom <message | none>
-
-This message is shown to the room if a character is killed by a DoT
-(damage-over-time) affect.
-
-This message is optional. If any of the dottochar, dottoroom, or deathtochar
-message are set but deathtoroom is not, no message will be displayed. However,
-if all of these messages are omitted, standard DoT messages will appear.
-
-Can use $N, $E, $S, and $M tokens. Note these should be uppercase.
-
-Example: $N is frozen solid in place as $E dies of the cold!
-"Paris is frozen solid in place as he dies of the cold!"
-
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES, DOT EFFECT
 #d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
