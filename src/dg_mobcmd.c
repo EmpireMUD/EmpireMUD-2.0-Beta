@@ -1569,15 +1569,26 @@ ACMD(do_mdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
-	int type;
+	int type, show_attack_message = NOTHING;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_ORDERED))
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
+	}
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			mob_log(ch, "mdamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
@@ -1623,14 +1634,14 @@ ACMD(do_mdamage) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage(vict, ch, get_approximate_level(ch), type, modifier);
+	script_damage(vict, ch, get_approximate_level(ch), type, modifier, show_attack_message);
 }
 
 
 ACMD(do_maoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
 	char_data *vict, *next_vict;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1638,9 +1649,20 @@ ACMD(do_maoe) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_ORDERED))
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
+	}
 
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			mob_log(ch, "maoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
+	}
+	
 	two_arguments(argument, modarg, typearg);
 	
 	if (*modarg) {
@@ -1672,7 +1694,7 @@ ACMD(do_maoe) {
 			continue;	// out of combat, only hit players
 		}
 		
-		script_damage(vict, ch, level, type, modifier);
+		script_damage(vict, ch, level, type, modifier, show_attack_message);
 	}
 }
 

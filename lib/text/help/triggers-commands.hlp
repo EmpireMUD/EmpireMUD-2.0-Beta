@@ -9,12 +9,15 @@ inside.
 #d
 %AOE% OAOE MAOE VAOE WAOE
 
-%aoe% [modifier] [damage type]
+%aoe% [#attack] [modifier] [damage type]
 
 This does AoE -- Area-of-Effect -- damage to every enemy in the room. The mob
 version only counts combat enemies. The other versions call any player (as well
 as their followers) an enemy. Like %damage%, the damage is scaled, and a
 negative modifier causes healing instead.
+
+This supports an optional first parameter, a hash sign and a vnum, to indicate
+which attack messages to use. Without this, the AoE is silent.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -24,8 +27,9 @@ if the mob is in combat. Otherwise, it will hit all player characters. Non-mob
 versions of %aoe% hit ALL characters.
 
 Examples:
-  %aoe% 100  - group damage
-  %aoe% -20    - group healing
+  %aoe% 100         - group damage
+  %aoe% -20         - group healing
+  %aoe% #11815 100  - sends attack message 11815 on each hit
 
 See also: DEATH, %DAMAGE%, %DOT%
 #d
@@ -169,11 +173,14 @@ See also: REMOTE
 #d
 %DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
 
-%damage% <victim> [modifier] [damage type]
+%damage% [#attack] <victim> [modifier] [damage type]
 
 Cause amount points of damage to victim. Damage is automatically scaled based
 on the mob or adventure level. Modifier is a percent of the scaled damage,
 where 100 is the normal level.
+
+This supports an optional first parameter, a hash sign and a vnum, to indicate
+which attack messages to use. Without this, the damage is silent.
 
 If modifier is negative, the player will be healed, but you should use %heal%
 instead.

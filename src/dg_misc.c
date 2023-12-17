@@ -887,8 +887,9 @@ void run_reboot_triggers(void) {
 * @param int level The level to scale damage to.
 * @param int dam_type The DAM_x type of damage.
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
+* @param int show_attack_message Optional: VNUM of an attack message to show (NOTHING/0 to ignore).
 */
-void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
+void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier, int show_attack_message) {
 	double dam;
 	
 	// no point damaging the dead
@@ -949,6 +950,10 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	}
 	
 	set_health(vict, GET_HEALTH(vict) - dam);
+	
+	if (show_attack_message > 0) {
+		skill_message(dam, killer ? killer : vict, vict, show_attack_message, NULL);
+	}
 
 	update_pos(vict);
 	send_char_pos(vict, dam);

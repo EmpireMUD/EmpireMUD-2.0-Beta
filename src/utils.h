@@ -2337,6 +2337,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 obj_data *player_death(char_data *ch);
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 void reset_combat_meters(char_data *ch);
+int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
