@@ -135,7 +135,7 @@ void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack
 				else if (to_ams->msg[iter].attacker_msg && !from_ams->msg[iter].attacker_msg) {
 					fail = TRUE;	// one has, other doesn't
 				}
-				else if (strcmp(to_ams->msg[iter].attacker_msg, from_ams->msg[iter].attacker_msg)) {
+				else if (!to_ams->msg[iter].attacker_msg || !from_ams->msg[iter].attacker_msg || strcmp(to_ams->msg[iter].attacker_msg, from_ams->msg[iter].attacker_msg)) {
 					fail = TRUE;	// not identical
 				}
 				else if (from_ams->msg[iter].victim_msg && !to_ams->msg[iter].victim_msg) {
@@ -144,7 +144,7 @@ void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack
 				else if (to_ams->msg[iter].victim_msg && !from_ams->msg[iter].victim_msg) {
 					fail = TRUE;	// one has, other doesn't
 				}
-				else if (strcmp(to_ams->msg[iter].victim_msg, from_ams->msg[iter].victim_msg)) {
+				else if (!to_ams->msg[iter].victim_msg || !from_ams->msg[iter].victim_msg || strcmp(to_ams->msg[iter].victim_msg, from_ams->msg[iter].victim_msg)) {
 					fail = TRUE;	// not identical
 				}
 				if (from_ams->msg[iter].room_msg && !to_ams->msg[iter].room_msg) {
@@ -153,7 +153,7 @@ void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack
 				else if (to_ams->msg[iter].room_msg && !from_ams->msg[iter].room_msg) {
 					fail = TRUE;	// one has, other doesn't
 				}
-				else if (strcmp(to_ams->msg[iter].room_msg, from_ams->msg[iter].room_msg)) {
+				else if (!to_ams->msg[iter].room_msg || !from_ams->msg[iter].room_msg || strcmp(to_ams->msg[iter].room_msg, from_ams->msg[iter].room_msg)) {
 					fail = TRUE;	// not identical
 				}
 			}
