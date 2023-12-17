@@ -1287,13 +1287,15 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 *
 * @param char_data *ch The player requesting stats.
 * @param attack_message_data *amd The attack message to display.
+* @param bool full If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
-	char buf[MAX_STRING_LENGTH * 2], lbuf[MAX_STRING_LENGTH];;
+void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) {
+	bool overflow = FALSE;
+	char buf[MAX_STRING_LENGTH * 6], lbuf[MAX_STRING_LENGTH];
 	char *to_show;
 	int count, iter;
 	size_t size;
-	struct attack_message_set *ams;
+	struct attack_message_set *ams, *next_ams;
 	
 	if (!amd) {
 		return;
@@ -1317,43 +1319,116 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd) {
 	}
 
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
-	
-	// message section (abbreviated)
 	count = 0;
-	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
-		if (ams->msg[MSG_HIT].attacker_msg) {
-			to_show = ams->msg[MSG_HIT].attacker_msg;
+	
+	// message section
+	if (full) {
+		// show entire message set (hopefully)
+		LL_FOREACH_SAFE(ATTACK_MSG_LIST(amd), ams, next_ams) {
+			++count;
+			if (overflow) {
+				continue;	// full
+			}
+			for (iter = 0; iter < NUM_MSG_TYPES && !overflow; ++iter) {
+				if (ams->msg[iter].attacker_msg) {
+					if (size + strlen(ams->msg[iter].attacker_msg) + 14 < sizeof(buf)) {
+						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].attacker_msg);
+					}
+					else {
+						overflow = TRUE;
+					}
+				}
+				else if (size + 14 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+				}
+				else {
+					overflow = TRUE;
+				}
+				if (ams->msg[iter].victim_msg) {
+					if (size + strlen(ams->msg[iter].victim_msg) + 14 < sizeof(buf)) {
+						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].victim_msg);
+					}
+					else {
+						overflow = TRUE;
+					}
+				}
+				else if (size + 14 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+				}
+				else {
+					overflow = TRUE;
+				}
+				if (ams->msg[iter].room_msg) {
+					if (size + strlen(ams->msg[iter].room_msg) + 14 < sizeof(buf)) {
+						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].room_msg);
+					}
+					else {
+						overflow = TRUE;
+					}
+				}
+				else if (size + 14 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+				}
+				else {
+					overflow = TRUE;
+				}
+			}
+			
+			// separator
+			if (next_ams && !overflow) {
+				for (iter = 0; iter < 79; ++iter) {
+					lbuf[iter] = '-';
+				}
+				lbuf[iter] = '\0';
+				if (size + strlen(lbuf) + 14 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", lbuf);
+				}
+				else {
+					overflow = TRUE;
+				}
+			}
 		}
-		else if (ams->msg[MSG_DIE].attacker_msg) {
-			to_show = ams->msg[MSG_DIE].attacker_msg;
-		}
-		else if (ams->msg[MSG_MISS].attacker_msg) {
-			to_show = ams->msg[MSG_MISS].attacker_msg;
-		}
-		else if (ams->msg[MSG_GOD].attacker_msg) {
-			to_show = ams->msg[MSG_GOD].attacker_msg;
-		}
-		else if (ams->msg[MSG_HIT].room_msg) {
-			to_show = ams->msg[MSG_HIT].room_msg;
-		}
-		else if (ams->msg[MSG_DIE].room_msg) {
-			to_show = ams->msg[MSG_DIE].room_msg;
-		}
-		else if (ams->msg[MSG_MISS].room_msg) {
-			to_show = ams->msg[MSG_MISS].room_msg;
-		}
-		else if (ams->msg[MSG_GOD].room_msg) {
-			to_show = ams->msg[MSG_GOD].room_msg;
-		}
-		else {
-			to_show = NULL;	// maybe empty
-		}
+	}
+	else {	// abbreviated messages
+		LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
+			if (ams->msg[MSG_HIT].attacker_msg) {
+				to_show = ams->msg[MSG_HIT].attacker_msg;
+			}
+			else if (ams->msg[MSG_DIE].attacker_msg) {
+				to_show = ams->msg[MSG_DIE].attacker_msg;
+			}
+			else if (ams->msg[MSG_MISS].attacker_msg) {
+				to_show = ams->msg[MSG_MISS].attacker_msg;
+			}
+			else if (ams->msg[MSG_GOD].attacker_msg) {
+				to_show = ams->msg[MSG_GOD].attacker_msg;
+			}
+			else if (ams->msg[MSG_HIT].room_msg) {
+				to_show = ams->msg[MSG_HIT].room_msg;
+			}
+			else if (ams->msg[MSG_DIE].room_msg) {
+				to_show = ams->msg[MSG_DIE].room_msg;
+			}
+			else if (ams->msg[MSG_MISS].room_msg) {
+				to_show = ams->msg[MSG_MISS].room_msg;
+			}
+			else if (ams->msg[MSG_GOD].room_msg) {
+				to_show = ams->msg[MSG_GOD].room_msg;
+			}
+			else {
+				to_show = NULL;	// maybe empty
+			}
 		
-		// only show 1 line per message on stat
-		size += snprintf(buf + size, sizeof(buf) - size, "%d. %s\r\n", ++count, to_show ? to_show : "(blank)");
+			// only show 1 line per message on stat
+			size += snprintf(buf + size, sizeof(buf) - size, "%d. %s\r\n", ++count, to_show ? to_show : "(blank)");
+		}
 	}
 	if (!count) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	else if (overflow && size < sizeof(buf)) {
+		// should still be room for this as it was reserved
+		size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
 	}
 	
 	page_string(ch->desc, buf, TRUE);

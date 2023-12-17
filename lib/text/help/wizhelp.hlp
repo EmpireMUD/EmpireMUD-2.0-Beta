@@ -1924,6 +1924,8 @@ Valid types are: adventure, ability, archetype, attack, augment, book,
                  mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
                  skill, social, trigger, vehicle
 
+For attack messages, this supports the -d option to see the full messages.
+
 Examples:
 
   > vstat obj 125
