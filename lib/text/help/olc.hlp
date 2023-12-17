@@ -2532,11 +2532,15 @@ See also: OLC ATTACKS
 
 Usage:  .message <number>
         .message add
+        .message copy <vnum>
         .message remove <number>
 
 Each attack set has multiple messages. In combat, these are chosen at random to
 provide variety. Use the .message command to choose a set to edit. Once inside
 the message menu, use .back to return to the main menu.
+
+The "copy" function will copy any message sets not already on this one, from
+another attack message by vnum.
 
 The main menu only displays a preview of each set. Usually the preview is the
 hit2char or die2char message, if available.

@@ -111,6 +111,88 @@ struct attack_message_set *get_one_attack_message(attack_message_data *amd, int 
 
 
 /**
+* This will copy any messages on 'from' that are not on 'to'.
+*
+* @param char_data *ch The person editing.
+* @param attack_message_data *from Messages to copy from.
+* @param attack_message_data *to Messages to copy to.
+*/
+void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack_message_data *to) {
+	bool fail, has;
+	int iter, copied;
+	struct attack_message_set *from_ams, *to_ams, *ams;
+	
+	copied = 0;
+	
+	LL_FOREACH(ATTACK_MSG_LIST(from), from_ams) {
+		has = FALSE;
+		LL_FOREACH(ATTACK_MSG_LIST(to), to_ams) {
+			fail = FALSE;
+			for (iter = 0; iter < NUM_MSG_TYPES && !has && !fail; ++iter) {
+				if (from_ams->msg[iter].attacker_msg && !to_ams->msg[iter].attacker_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (to_ams->msg[iter].attacker_msg && !from_ams->msg[iter].attacker_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (strcmp(to_ams->msg[iter].attacker_msg, from_ams->msg[iter].attacker_msg)) {
+					fail = TRUE;	// not identical
+				}
+				else if (from_ams->msg[iter].victim_msg && !to_ams->msg[iter].victim_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (to_ams->msg[iter].victim_msg && !from_ams->msg[iter].victim_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (strcmp(to_ams->msg[iter].victim_msg, from_ams->msg[iter].victim_msg)) {
+					fail = TRUE;	// not identical
+				}
+				if (from_ams->msg[iter].room_msg && !to_ams->msg[iter].room_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (to_ams->msg[iter].room_msg && !from_ams->msg[iter].room_msg) {
+					fail = TRUE;	// one has, other doesn't
+				}
+				else if (strcmp(to_ams->msg[iter].room_msg, from_ams->msg[iter].room_msg)) {
+					fail = TRUE;	// not identical
+				}
+			}
+			if (!fail) {
+				has = TRUE;	// looks like we have it
+			}
+		}
+		
+		if (!has) {
+			// didn't find it on the 'to'.. add it now
+			++copied;
+			
+			CREATE(ams, struct attack_message_set, 1);
+			for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
+				if (from_ams->msg[iter].attacker_msg) {
+					to_ams->msg[iter].attacker_msg = strdup(from_ams->msg[iter].attacker_msg);
+				}
+				if (from_ams->msg[iter].victim_msg) {
+					to_ams->msg[iter].victim_msg = strdup(from_ams->msg[iter].victim_msg);
+				}
+				if (from_ams->msg[iter].room_msg) {
+					to_ams->msg[iter].room_msg = strdup(from_ams->msg[iter].room_msg);
+				}
+			}
+			
+			add_attack_message(to, ams);
+		}
+	}
+	
+	if (copied) {
+		msg_to_char(ch, "Copied %d message set%s.\r\n", copied, PLURAL(copied));
+	}
+	else {
+		msg_to_char(ch, "No message sets to copy.\r\n");
+	}
+}
+
+
+/**
 * Counts the words of text in an attack's strings.
 *
 * @param attack_message_data *amd The attack whose strings to count.
@@ -1897,9 +1979,10 @@ OLC_MODULE(attackedit_message) {
 	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
 	char *arg2;
 	int num;
+	attack_message_data *other;
 	struct attack_message_set *ams, *next_ams;
 	
-	char *USAGE = "Usage:  .message <number | add | remove>\r\n";
+	char *USAGE = "Usage:  .message <number | add | copy | remove>\r\n";
 	
 	// arg2 for remove only
 	arg2 = one_argument(argument, arg);
@@ -1915,6 +1998,19 @@ OLC_MODULE(attackedit_message) {
 		// and send to the editor
 		GET_OLC_ATTACK_NUM(ch->desc) = ATTACK_NUM_MSGS(amd);
 		olc_show_attack_message(ch);
+	}
+	else if (!str_cmp(arg, "copy")) {
+		skip_spaces(&arg2);
+		if (!*arg2 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage:  .message copy <vnum>\r\n");
+		}
+		else if (!(other = real_attack_message(atoi(arg2)))) {
+			msg_to_char(ch, "Unknown attack vnum '%s'.\r\n", arg2);
+		}
+		else {
+			// this sends its own messages
+			smart_copy_attack_messages(ch, other, amd);
+		}
 	}
 	else if (is_abbrev(arg, "remove")) {
 		skip_spaces(&arg2);
