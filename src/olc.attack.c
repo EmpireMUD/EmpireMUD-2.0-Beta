@@ -79,6 +79,33 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Copy a single attack message set.
+*
+* @param struct attack_message_set *from_ams The message set to copy.
+* @return struct attack_message_set* The copy.
+*/
+struct attack_message_set *copy_one_attack_message_entry(struct attack_message_set *from_ams) {
+	int iter;
+	struct attack_message_set *ams;
+	
+	CREATE(ams, struct attack_message_set, 1);
+	for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
+		if (from_ams->msg[iter].attacker_msg) {
+			ams->msg[iter].attacker_msg = strdup(from_ams->msg[iter].attacker_msg);
+		}
+		if (from_ams->msg[iter].victim_msg) {
+			ams->msg[iter].victim_msg = strdup(from_ams->msg[iter].victim_msg);
+		}
+		if (from_ams->msg[iter].room_msg) {
+			ams->msg[iter].room_msg = strdup(from_ams->msg[iter].room_msg);
+		}
+	}
+	
+	return ams;
+}
+
+
+/**
 * Fetch 1 message set from an attack type, either by number or at random.
 *
 * @param attack_message_data *amd The attack type to get 1 message from.
@@ -166,28 +193,16 @@ void smart_copy_attack_messages(char_data *ch, attack_message_data *from, attack
 			// didn't find it on the 'to'.. add it now
 			++copied;
 			
-			CREATE(ams, struct attack_message_set, 1);
-			for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
-				if (from_ams->msg[iter].attacker_msg) {
-					ams->msg[iter].attacker_msg = strdup(from_ams->msg[iter].attacker_msg);
-				}
-				if (from_ams->msg[iter].victim_msg) {
-					ams->msg[iter].victim_msg = strdup(from_ams->msg[iter].victim_msg);
-				}
-				if (from_ams->msg[iter].room_msg) {
-					ams->msg[iter].room_msg = strdup(from_ams->msg[iter].room_msg);
-				}
-			}
-			
+			ams = copy_one_attack_message_entry(from_ams);
 			add_attack_message(to, ams);
 		}
 	}
 	
 	if (copied) {
-		msg_to_char(ch, "Copied %d message set%s.\r\n", copied, PLURAL(copied));
+		msg_to_char(ch, "Imported %d message set%s.\r\n", copied, PLURAL(copied));
 	}
 	else {
-		msg_to_char(ch, "No message sets to copy.\r\n");
+		msg_to_char(ch, "No message sets to import.\r\n");
 	}
 }
 
@@ -710,11 +725,14 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 * @param any_vnum vnum The attack message vnum.
 */
 void olc_search_attack_message(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
+	bool any;
+	char buf[MAX_STRING_LENGTH * 4];
+	int size, found;
 	attack_message_data *amd = real_attack_message(vnum);
 	ability_data *abil, *next_abil;
-	int size, found;
-	bool any;
+	char_data *mob, *next_mob;
+	morph_data *morph, *next_morph;
+	obj_data *obj, *next_obj;
 	
 	if (!amd) {
 		msg_to_char(ch, "There is no attack message %d.\r\n", vnum);
@@ -733,6 +751,30 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+	}
+	
+	// mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_ATTACK_TYPE(mob) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		}
+	}
+	
+	// morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_ATTACK_TYPE(morph) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		}
+	}
+	
+	// objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_WEAPON(obj) && GET_WEAPON_TYPE(obj) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
@@ -814,23 +856,12 @@ void clear_attack_message(attack_message_data *amd) {
 * @return struct attack_message_set* The copy.
 */
 struct attack_message_set *copy_attack_msg_list(struct attack_message_set *input_list) {
-	int iter;
 	struct attack_message_set *ams, *new_ams, *list;
 	
 	// copy set in order
 	list = NULL;
 	LL_FOREACH(input_list, ams) {
-		CREATE(new_ams, struct attack_message_set, 1);
-		*new_ams = *ams;
-		
-		// copy messages
-		for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
-			new_ams->msg[iter].attacker_msg = ams->msg[iter].attacker_msg ? strdup(ams->msg[iter].attacker_msg) : NULL;
-			new_ams->msg[iter].victim_msg = ams->msg[iter].victim_msg ? strdup(ams->msg[iter].victim_msg) : NULL;
-			new_ams->msg[iter].room_msg = ams->msg[iter].room_msg ? strdup(ams->msg[iter].room_msg) : NULL;
-		}
-		
-		new_ams->next = NULL;
+		new_ams = copy_one_attack_message_entry(ams);
 		LL_APPEND(list, new_ams);
 	}
 	
@@ -1980,9 +2011,9 @@ OLC_MODULE(attackedit_message) {
 	char *arg2;
 	int num;
 	attack_message_data *other;
-	struct attack_message_set *ams, *next_ams;
+	struct attack_message_set *new_ams, *ams, *next_ams;
 	
-	char *USAGE = "Usage:  .message <number | add | copy | remove>\r\n";
+	char *USAGE = "Usage:  .message <number | add | copy | duplicate | remove>\r\n";
 	
 	// arg2 for remove only
 	arg2 = one_argument(argument, arg);
@@ -2001,7 +2032,10 @@ OLC_MODULE(attackedit_message) {
 	}
 	else if (!str_cmp(arg, "copy")) {
 		skip_spaces(&arg2);
-		if (!*arg2 || !isdigit(*arg2)) {
+		if (GET_OLC_ATTACK_NUM(ch->desc) > 0) {
+			msg_to_char(ch, "You can't do that while editing a message. Go back to the menu first.\r\n");
+		}
+		else if (!*arg2 || !isdigit(*arg2)) {
 			msg_to_char(ch, "Usage:  .message copy <vnum>\r\n");
 		}
 		else if (!(other = real_attack_message(atoi(arg2)))) {
@@ -2012,9 +2046,43 @@ OLC_MODULE(attackedit_message) {
 			smart_copy_attack_messages(ch, other, amd);
 		}
 	}
+	else if (!str_cmp(arg, "duplicate")) {
+		skip_spaces(&arg2);
+		if (GET_OLC_ATTACK_NUM(ch->desc) > 0) {
+			msg_to_char(ch, "You can't do that while editing a message. Go back to the menu first.\r\n");
+		}
+		else if (!*arg2 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage:  .message duplicate <message number>\r\n");
+		}
+		else if ((num = atoi(arg2)) < 1 || num > ATTACK_NUM_MSGS(amd)) {
+			msg_to_char(ch, "Invalid message number to duplicate.\r\n");
+		}
+		else {
+			new_ams = NULL;
+			LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
+				if (--num <= 0) {
+					// found
+					new_ams = copy_one_attack_message_entry(ams);
+					break;	// only copy 1
+				}
+			}
+			
+			if (new_ams) {
+				// success
+				add_attack_message(amd, new_ams);
+				GET_OLC_ATTACK_NUM(ch->desc) = ATTACK_NUM_MSGS(amd);
+			}
+			else {
+				msg_to_char(ch, "Invalid message number to duplicate.\r\n");
+			}
+		}
+	}
 	else if (is_abbrev(arg, "remove")) {
 		skip_spaces(&arg2);
-		if (!*arg2 || !isdigit(*arg2)) {
+		if (GET_OLC_ATTACK_NUM(ch->desc) > 0) {
+			msg_to_char(ch, "You can't do that while editing a message. Go back to the menu first.\r\n");
+		}
+		else if (!*arg2 || !isdigit(*arg2)) {
 			msg_to_char(ch, "Usage:  .message remove <number>\r\n");
 		}
 		else if ((num = atoi(arg2)) < 1 || num > ATTACK_NUM_MSGS(amd)) {
