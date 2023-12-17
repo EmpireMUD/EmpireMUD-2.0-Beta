@@ -288,84 +288,63 @@ bool trigger_counterspell(char_data *ch);
 // TYPE_x: WEAPON ATTACK TYPES
 #define TYPE_UNDEFINED  -1
 #define TYPE_RESERVED  0
-#define TYPE_SLASH  1
-#define TYPE_SLICE  2
-#define TYPE_JAB  3
+#define TYPE_SLASH  1	// unused in code
+#define TYPE_SLICE  2	// unused in code
+#define TYPE_JAB  3	// unused in code
 #define TYPE_STAB  4
-#define TYPE_POUND  5
-#define TYPE_HAMMER  6
-#define TYPE_WHIP  7
-#define TYPE_PICK  8
-#define TYPE_BITE  9	// Animal-only
-#define TYPE_CLAW  10	// Animal-only
-#define TYPE_KICK  11	// Animal-only
-#define TYPE_FIRE  12
-#define TYPE_VAMPIRE_CLAWS  13
-#define TYPE_CRUSH  14	// animal-only
+#define TYPE_POUND  5	// unused in code
+#define TYPE_HAMMER  6	// unused in code
+#define TYPE_WHIP  7	// unused in code
+#define TYPE_PICK  8	// unused in code
+#define TYPE_BITE  9	// Animal-only, unused in code?
+#define TYPE_CLAW  10	// Animal-only, unused in code
+#define TYPE_KICK  11	// Animal-only, unused in code
+#define TYPE_FIRE  12	// unused in code
+#define TYPE_VAMPIRE_CLAWS  13	// has inherent damage bonus and effects
+#define TYPE_CRUSH  14	// animal-only, unused in code
 #define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16	// disarmable fire blast
 #define TYPE_LIGHTNING_STAFF  17
 #define TYPE_BURN_STAFF  18
 #define TYPE_AGONY_STAFF  19
-#define TYPE_MAGIC_FROST  20
-#define TYPE_MAGIC_SHOCK  21
-#define TYPE_MAGIC_LIGHT  22
-#define TYPE_STING  23	// animal
-#define TYPE_SWIPE  24	// animal
-#define TYPE_TAIL_SWIPE  25	// animal
-#define TYPE_PECK  26	// animal
-#define TYPE_GORE  27	// animal
+#define TYPE_MAGIC_FROST  20	// unused in code
+#define TYPE_MAGIC_SHOCK  21	// unused in code
+#define TYPE_MAGIC_LIGHT  22	// unused in code
+#define TYPE_STING  23	// animal, unused in code
+#define TYPE_SWIPE  24	// animal, unused in code
+#define TYPE_TAIL_SWIPE  25	// animal, unused
+#define TYPE_PECK  26	// animal, unused in code
+#define TYPE_GORE  27	// animal, unused in code
 #define TYPE_MANA_BLAST  28	// default magical
 #define TYPE_BOW  29	// shoot / bow
 #define TYPE_CROSSBOW  30	// shoot / crossbow
 #define TYPE_PISTOL  31	// shoot / pistol
 #define TYPE_MUSKET  32	// shoot / musket
-#define TYPE_FIRE_BREATH  33	// non-disarmable fire blast
+#define TYPE_FIRE_BREATH  33	// non-disarmable fire blast, unused in code
 #define TYPE_SLING  34	// shoot / sling
 #define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
-#define TYPE_ANIMAL_WHIP  36	// non-disarmable whip variant
-
-// helpfulment
-#define IS_MAGIC_ATTACK(type)  (get_attack_damage_type_by_vnum((type)) == DAM_MAGICAL)
+#define TYPE_ANIMAL_WHIP  36	// non-disarmable whip variant, unused in code
 
 
-/* new attack types can be added here - up to TYPE_SUFFERING */
-#define TYPE_SUFFERING				50
-
-
-// Non-weapon attacks -- these are defined starting from TYPE_SUFFERING
-// but they actually correspond to numbers in the combat message file, so
-// it's not necessarily quick to convert them.
-// TODO: need to move attack messages into an in-game editor + many of these could be messages on their respective abilities
-#define ATTACK_GUARD_TOWER		(TYPE_SUFFERING + 1)
-#define ATTACK_EXECUTE			(TYPE_SUFFERING + 2)	// used for death logging instead of attack
-#define ATTACK_ARROW			(TYPE_SUFFERING + 3)	// unused
-#define ATTACK_KICK				(TYPE_SUFFERING + 4)
-#define ATTACK_BASH				(TYPE_SUFFERING + 5)
-#define ATTACK_SUNBURN			(TYPE_SUFFERING + 6)
-#define ATTACK_POISON			(TYPE_SUFFERING + 7)
-	#define ATTACK_CREO_IGNEM		(TYPE_SUFFERING + 8)
-#define ATTACK_VAMPIRE_BITE		(TYPE_SUFFERING + 9)
-#define ATTACK_LIGHTNINGBOLT	(TYPE_SUFFERING + 10)	// 60
-#define ATTACK_PHYSICAL_DOT		(TYPE_SUFFERING + 11)
-#define ATTACK_BACKSTAB			(TYPE_SUFFERING + 12)
-#define ATTACK_SUNSHOCK			(TYPE_SUFFERING + 13)
-#define ATTACK_MAGICAL_DOT		(TYPE_SUFFERING + 14)
-#define ATTACK_FIRE_DOT			(TYPE_SUFFERING + 15)
-#define ATTACK_POISON_DOT		(TYPE_SUFFERING + 16)
-#define ATTACK_ABLATE			(TYPE_SUFFERING + 17)
-#define ATTACK_ACIDBLAST		(TYPE_SUFFERING + 18)
-#define ATTACK_ARCLIGHT			(TYPE_SUFFERING + 19)
-#define ATTACK_ASTRALCLAW		(TYPE_SUFFERING + 20)	// 70
-#define ATTACK_CHRONOBLAST		(TYPE_SUFFERING + 21)
-#define ATTACK_DEATHTOUCH		(TYPE_SUFFERING + 22)
-#define ATTACK_DISPIRIT			(TYPE_SUFFERING + 23)
-#define ATTACK_ERODE			(TYPE_SUFFERING + 24)	// currently unused
-#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)	// currently unused
-#define ATTACK_SHADOWLASH		(TYPE_SUFFERING + 26)
-#define ATTACK_SOULCHAIN		(TYPE_SUFFERING + 27)
-#define ATTACK_STARSTRIKE		(TYPE_SUFFERING + 28)
-#define ATTACK_THORNLASH		(TYPE_SUFFERING + 29)
+// Special attacks (not available on weapons): these correspond to attack vnums
+#define TYPE_SUFFERING			50	// also used as a special-case for death_log
+#define ATTACK_GUARD_TOWER		51
+#define ATTACK_EXECUTE			52	// used for death logging instead of attack
+// #define ATTACK_ARROW			53	// unused -- deprecate
+#define ATTACK_KICK				54
+#define ATTACK_BASH				55
+// #define ATTACK_SUNBURN			56	// unused?
+// #define ATTACK_POISON			57	// unused?
+// #define ATTACK_CREO_IGNEM		58	// unused -- deprecate
+#define ATTACK_VAMPIRE_BITE		59	// bite command
+#define ATTACK_PHYSICAL_DOT		61
+#define ATTACK_BACKSTAB			62
+#define ATTACK_MAGICAL_DOT		64
+#define ATTACK_FIRE_DOT			65
+#define ATTACK_POISON_DOT		66
+// #define ATTACK_ERODE			74	// unused
+// #define ATTACK_SCOUR			75	// unused
+#define ATTACK_SHADOWLASH		76
 
 
 // SIEGE_x: types for besiege

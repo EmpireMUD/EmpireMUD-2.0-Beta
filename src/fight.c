@@ -2401,7 +2401,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 * @param int dam How much damage was done.
 * @param char_data *ch The character dealing the damage.
 * @param char_data *victim The person receiving the damage.
-* @param int w_type The attack type (ATTACK_x)attack_message_data *custom_fight_messages
+* @param int w_type The attack type (ATTACK_) attack_message_data *custom_fight_messages
 * @param attack_message_data *custom_fight_messages Optional: Override fight messages and show these instead (or NULL to use regular messages).
 * @return int 1: sent message, 0: no message found
 */
@@ -2427,7 +2427,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		return 0;
 	}
 	
-	if (attacktype < TYPE_SUFFERING) {
+	if (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
 		// is a combat attack
 		hit_flags |= ACT_COMBAT_HIT;
 		miss_flags |= ACT_COMBAT_MISS;
@@ -3171,6 +3171,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
+	attack_message_data *amd = custom_fight_messages ? custom_fight_messages : real_attack_message(attacktype);
 	
 	if (GET_POS(victim) <= POS_DEAD) {
 	    /* This is "normal"-ish now with delayed extraction. -gg 3/15/2001 */
@@ -3273,7 +3274,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	 * death blow, send a skill_message if one exists; if not, default to a
 	 * dam_message. Otherwise, always send a dam_message.
 	 */
-	if (!is_attack_flagged_by_vnum(attacktype, AMDF_WEAPON | AMDF_MOBILE)) {
+	if (!ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
 		skill_message(dam, ch, victim, attacktype, custom_fight_messages);
 	}
 	else {
@@ -3306,11 +3307,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 		default:			/* >= POSITION SLEEPING */
 			if (dam > (GET_MAX_HEALTH(victim) / 10)) {
-				act("&rThat really did HURT!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? ACT_COMBAT_HIT : ACT_ABILITY));
+				act("&rThat really did HURT!&0", FALSE, ch, NULL, victim, TO_VICT | (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE) ? ACT_COMBAT_HIT : ACT_ABILITY));
 			}
 
 			if (GET_HEALTH(victim) <= (GET_MAX_HEALTH(victim) / 20)) {
-				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, victim, TO_VICT | (attacktype < TYPE_SUFFERING ? ACT_COMBAT_HIT : ACT_ABILITY));
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, victim, TO_VICT | (ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE) ? ACT_COMBAT_HIT : ACT_ABILITY));
 			}
 
 			break;
@@ -3849,7 +3850,6 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	bool ok = FALSE;
 	bool revert = TRUE;
 	char_data *m;
-	// obj_data *weapon;
 	bool msg;
 
 	/* stop_fighting() is split around here to help with exp */
@@ -3877,16 +3877,6 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		msg_to_char(victim, "You are knocked unconscious.\r\n");
 		return;
 	}
-
-	/* We will TRY to find a slicing/slashing weapon
-	weapon = GET_EQ(ch, WEAR_WIELD);
-	if ((!weapon || (GET_WEAPON_TYPE(weapon) != TYPE_SLASH && GET_WEAPON_TYPE(weapon) != TYPE_SLICE)) && GET_EQ(ch, WEAR_HOLD)) {
-		weapon = GET_EQ(ch, WEAR_HOLD);
-		if (GET_OBJ_TYPE(weapon) != ITEM_WEAPON || (GET_WEAPON_TYPE(weapon) != TYPE_SLASH && GET_WEAPON_TYPE(weapon) != TYPE_SLICE)) {
-			weapon = GET_EQ(ch, WEAR_WIELD);
-		}
-	}
-	// weapon currently unused */
 
 	if (revert && IS_MORPHED(victim)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));
