@@ -273,6 +273,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 	struct generic_relation *rel, *next_rel;
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
+	attack_message_data *amd;
 	generic_data *alt;
 	obj_data *proto;
 	
@@ -377,6 +378,10 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room should not have a space after the '...'");
 					problem = TRUE;
 				}
+			}
+			if (GET_AFFECT_DOT_ATTACK(gen) >= 0 && !(amd = real_attack_message(GET_AFFECT_DOT_ATTACK(gen)))) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "DoT attack type is invalid.");
+				problem = TRUE;
 			}
 			break;
 		}
