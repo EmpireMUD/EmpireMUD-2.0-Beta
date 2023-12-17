@@ -3273,7 +3273,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	 * death blow, send a skill_message if one exists; if not, default to a
 	 * dam_message. Otherwise, always send a dam_message.
 	 */
-	if (!IS_WEAPON_TYPE(attacktype)) {
+	if (!is_attack_flagged_by_vnum(attacktype, AMDF_WEAPON | AMDF_MOBILE)) {
 		skill_message(dam, ch, victim, attacktype, custom_fight_messages);
 	}
 	else {
@@ -3807,7 +3807,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 			
 			// poison could kill too
-			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_SHARP) {
+			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_POISON) && weapon && amd && ATTACK_FLAGGED(amd, AMDF_APPLY_POISON)) {
 				if (!number(0, 1) && apply_poison(ch, victim) < 0) {
 					// dedz
 					result = -1;
@@ -3860,7 +3860,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	else if (ch == victim) {
 		ok = TRUE;	// Probably sent here by damage()
 	}
-	else if (attacktype > NUM_ATTACK_TYPES || WOULD_EXECUTE(ch, victim)) {
+	else if (WOULD_EXECUTE(ch, victim) || !is_attack_flagged_by_vnum(attacktype, AMDF_WEAPON | AMDF_MOBILE)) {
 		ok = TRUE;	// Sent here by damage()
 	}
 	else if (GET_POS(victim) == POS_INCAP) {

@@ -3916,7 +3916,7 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 	
 	// counts as a weapon hit
 	if (vict && vict != ch && data->success && ABILITY_FLAGGED(abil, ABILF_WEAPON_HIT)) {
-		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))) == WEAPON_SHARP) {
+		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && is_attack_flagged_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), AMDF_APPLY_POISON)) {
 			// chance to poison
 			if (!number(0, 1) && apply_poison(ch, vict) < 0) {
 				// dedz

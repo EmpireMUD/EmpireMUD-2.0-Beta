@@ -325,10 +325,7 @@ bool trigger_counterspell(char_data *ch);
 #define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
 #define TYPE_ANIMAL_WHIP  36	// non-disarmable whip variant
 
-#define NUM_ATTACK_TYPES  37	// total
-
 // helpfulment
-#define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))
 #define IS_MAGIC_ATTACK(type)  (get_attack_damage_type_by_vnum((type)) == DAM_MAGICAL)
 
 
@@ -369,8 +366,6 @@ bool trigger_counterspell(char_data *ch);
 #define ATTACK_SOULCHAIN		(TYPE_SUFFERING + 27)
 #define ATTACK_STARSTRIKE		(TYPE_SUFFERING + 28)
 #define ATTACK_THORNLASH		(TYPE_SUFFERING + 29)
-
-#define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 30)
 
 
 // SIEGE_x: types for besiege

@@ -2459,6 +2459,7 @@ The following ability flags are available:
  &cWEAPON&0 - Available for use as a weapon's type. Has extra properties.
  &cMOBILE&0 - Available for use on mobs and morphs. Has extra properties.
  &cDISARMABLE&0 - Vulnerable to DISARM affects.
+ &cAPPLY-POISON&0 - On a successful hit, can apply character's poison.
 
 Note: The WEAPON and MOBILE properties add the following fields to the attack:
    firstperson, thirdperson, noun, damagetype, weapontype, speed

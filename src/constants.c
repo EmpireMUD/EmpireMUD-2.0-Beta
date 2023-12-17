@@ -655,6 +655,7 @@ const char *attack_message_flags[] = {
 	"WEAPON",	// 0
 	"MOBILE",
 	"DISARMABLE",
+	"APPLY-POISON",
 	"\n"
 };
 
