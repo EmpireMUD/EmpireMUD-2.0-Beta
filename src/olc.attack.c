@@ -734,6 +734,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	int size, found;
 	attack_message_data *amd = real_attack_message(vnum);
 	ability_data *abil, *next_abil;
+	generic_data *gen, *next_gen;
 	char_data *mob, *next_mob;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
@@ -758,6 +759,14 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_AFFECT_DOT_ATTACK(gen) > 0 && GET_AFFECT_DOT_ATTACK(gen) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+		}
+	}
+	
 	// mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_ATTACK_TYPE(mob) == vnum) {
@@ -776,7 +785,10 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	
 	// objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (IS_WEAPON(obj) && GET_WEAPON_TYPE(obj) == vnum) {
+		any = (IS_WEAPON(obj) && GET_WEAPON_TYPE(obj) == vnum);
+		any |= (IS_MISSILE_WEAPON(obj) && GET_MISSILE_WEAPON_TYPE(obj) == vnum);
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
@@ -1272,11 +1284,15 @@ attack_message_data *create_attack_message_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
-	ability_data *abil, *next_abil;
-	descriptor_data *desc;
-	attack_message_data *amd;
 	bool found;
 	char name[256];
+	ability_data *abil, *next_abil;
+	attack_message_data *amd;
+	descriptor_data *desc;
+	generic_data *gen, *next_gen;
+	char_data *mob, *next_mob;
+	morph_data *morph, *next_morph;
+	obj_data *obj, *next_obj;
 	
 	if (!(amd = real_attack_message(vnum))) {
 		msg_to_char(ch, "There is no such attack message %d.\r\n", vnum);
@@ -1307,6 +1323,50 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_AFFECT_DOT_ATTACK(gen) > 0 && GET_AFFECT_DOT_ATTACK(gen) == vnum) {
+			GEN_VALUE(gen, GVAL_AFFECT_DOT_ATTACK) = 0;
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
+		}
+	}
+	
+	// update mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_ATTACK_TYPE(mob) == vnum) {
+			MOB_ATTACK_TYPE(mob) = 0;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted attack type", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
+		}
+	}
+	
+	// update morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_ATTACK_TYPE(morph) == vnum) {
+			MORPH_ATTACK_TYPE(morph) = 0;
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Morph %d %s lost deleted attack type", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
+	// update objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = FALSE;
+		if (IS_WEAPON(obj) && GET_WEAPON_TYPE(obj) == vnum) {
+			set_obj_val(obj, VAL_WEAPON_TYPE, 0);
+			found = TRUE;
+		}
+		else if (IS_MISSILE_WEAPON(obj) && GET_MISSILE_WEAPON_TYPE(obj) == vnum) {
+			set_obj_val(obj, VAL_MISSILE_WEAPON_TYPE, 0);
+			found = TRUE;
+		}
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost deleted weapon type", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_ABILITY(desc)) {
@@ -1319,6 +1379,39 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 			
 			if (found) {
 				msg_to_char(desc->character, "An attack type used by the ability you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_GENERIC(desc)) {
+			if (GET_AFFECT_DOT_ATTACK(GET_OLC_GENERIC(desc)) > 0 && GET_AFFECT_DOT_ATTACK(GET_OLC_GENERIC(desc)) == vnum) {
+				GEN_VALUE(GET_OLC_GENERIC(desc), GVAL_AFFECT_DOT_ATTACK) = 0;
+				msg_to_char(desc->character, "An attack type used by the generic you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_MOBILE(desc)) {
+			if (MOB_ATTACK_TYPE(GET_OLC_MOBILE(desc)) == vnum) {
+				MOB_ATTACK_TYPE(GET_OLC_MOBILE(desc)) = 0;
+				msg_to_char(desc->character, "An attack type used by the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_MORPH(desc)) {
+			if (MORPH_ATTACK_TYPE(GET_OLC_MORPH(desc)) == vnum) {
+				MORPH_ATTACK_TYPE(GET_OLC_MORPH(desc)) = 0;
+				msg_to_char(desc->character, "An attack type used by the morph you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = FALSE;
+			if (IS_WEAPON(GET_OLC_OBJECT(desc)) && GET_WEAPON_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_WEAPON_TYPE, 0);
+				found = TRUE;
+			}
+			else if (IS_MISSILE_WEAPON(GET_OLC_OBJECT(desc)) && GET_MISSILE_WEAPON_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_MISSILE_WEAPON_TYPE, 0);
+				found = TRUE;
+			}
+			
+			if (found) {
+				msg_to_char(desc->character, "An attack type used by the weapon you're editing was deleted.\r\n");
 			}
 		}
 	}
