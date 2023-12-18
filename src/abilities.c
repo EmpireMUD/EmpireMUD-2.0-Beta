@@ -317,6 +317,36 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Affects: %s\r\n", lbuf);
 	}
 	
+	// build duration
+	if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+		strcpy(lbuf, "unlimited");
+	}
+	else if (ABIL_SHORT_DURATION(abil) >= 60) {
+		sprintf(lbuf, "%dm", (ABIL_SHORT_DURATION(abil) / 60));
+	}
+	else if (ABIL_SHORT_DURATION(abil) > 0) {
+		sprintf(lbuf, "%ds", ABIL_SHORT_DURATION(abil));
+	}
+	else {
+		*lbuf = '\0';
+	}
+	
+	if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+		sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
+	}
+	else if (ABIL_LONG_DURATION(abil) >= 60) {
+		snprintf(lbuf, sizeof(lbuf), "%s %dm", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60));
+	}
+	else if (ABIL_LONG_DURATION(abil) > 0) {
+		snprintf(lbuf, sizeof(lbuf), "%s%ds", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil));
+	}
+	// no else for long duration
+	
+	// show duration?
+	if (*lbuf) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
+	}
+	
 	// notes (flags), if parameterized -- LAST
 	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 	if (*lbuf && str_cmp(lbuf, "none")) {

@@ -308,9 +308,9 @@ bool trigger_counterspell(char_data *ch);
 #define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
 
 // Special attacks (not available on weapons): these correspond to attack vnums
-#define TYPE_SUFFERING			50	// also used as a special-case for death_log
+#define TYPE_SUFFERING			50	// used when players die from their wounds
 #define ATTACK_GUARD_TOWER		51
-#define ATTACK_EXECUTE			52	// used for death logging instead of attack
+#define ATTACK_EXECUTE			52	// used for death logging instead of attack type when executing
 #define ATTACK_KICK				54
 #define ATTACK_BASH				55
 #define ATTACK_VAMPIRE_BITE		59	// bite command
