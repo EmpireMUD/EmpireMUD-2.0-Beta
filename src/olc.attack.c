@@ -74,9 +74,12 @@ const char *messages_file_header =
 "*   a. can be used on a weapon            d. can apply poison\n"
 "*   b. can be used on a mob/morph         e. auditor will ignore empty messages\n"
 "*   c. is disarmable\n"
+"* The final number on the M### line can be another attack message number, in\n"
+"* which case this attack counts as the other type, too. This allows custom\n"
+"* attack types that still count as stab for backstabbing, for example.\n"
 "* For even more attack properties, the M### line can end with a + (plus sign):\n"
 "*   ------------------------\n"
-"*   M123 a +\n"
+"*   M123 a 0 +\n"
 "*   name~\n"
 "*   death-log~\n"
 "*   first-person verb~\n"
@@ -1281,7 +1284,7 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 		fprintf(fl, "\n");	// records are spaced by blank lines
 		
 		// record begins M#### flags +
-		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) ? "+" : "");	// M# indicates the b5.166 attack message format
+		fprintf(fl, "M%d %s %d %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), ATTACK_COUNTS_AS(amd), (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) ? "+" : "");	// M# indicates the b5.166 attack message format
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NAME(amd)));
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_DEATH_LOG(amd)));
 		

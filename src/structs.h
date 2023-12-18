@@ -4193,6 +4193,7 @@ struct attack_message_data {
 	char *name;	// for display purposes
 	char *death_log;	// optional message for how death is displayed
 	bitvector_t flags;	// AMDF_ flags
+	any_vnum counts_as;	// if it counts as another attack type, for ability requirements etc
 	
 	// used by attack types:
 	char *first_pers;	// You "slash"
