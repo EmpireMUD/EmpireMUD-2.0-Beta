@@ -43,6 +43,15 @@ C
 bckstb 7 bf 1 25 0 2038 9 0 2 2
 D 16 28 4
 D 16 30 0
+M
+10
+You miss $S back! That could be costly...~
+M
+11
+$n leaps out of nowhere, aiming for your back, but misses!~
+M
+12
+$n leaps out of nowhere, aiming for $N's back, but misses!~
 T c 1
 X c
 62 0

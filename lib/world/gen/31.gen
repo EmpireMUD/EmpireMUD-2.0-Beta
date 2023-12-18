@@ -41,7 +41,7 @@ S
 #3106
 freezing~
 4 0
-0 0 0 0
+3106 0 0 0
 T0
 You finally start to feel warm again.~
 T4
@@ -52,7 +52,7 @@ S
 #3107
 sweltering~
 4 0
-0 0 0 0
+3107 0 0 0
 T0
 You finally start to cool down.~
 T4
@@ -63,7 +63,7 @@ S
 #3108
 chilly~
 4 0
-0 0 0 0
+3106 0 0 0
 T0
 You finally start to feel warm again.~
 T4
@@ -74,7 +74,7 @@ S
 #3109
 warm~
 4 0
-0 0 0 0
+3107 0 0 0
 T0
 You finally feel some relief from that hot weather.~
 T4
