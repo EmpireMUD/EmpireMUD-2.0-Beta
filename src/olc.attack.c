@@ -1866,7 +1866,7 @@ void olc_show_attack_message(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
-	sprintf(buf + strlen(buf), "<%scountsas\t0> %d %s\r\n", OLC_LABEL_VAL(ATTACK_COUNTS_AS(amd), 0), ATTACK_COUNTS_AS(amd), get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)));
+	sprintf(buf + strlen(buf), "<%scountsas\t0> %d %s\r\n", OLC_LABEL_VAL(ATTACK_COUNTS_AS(amd), 0), ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
 	sprintf(buf + strlen(buf), "<%sdeathlog\t0> %s\r\n", OLC_LABEL_PTR(ATTACK_DEATH_LOG(amd)), ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
