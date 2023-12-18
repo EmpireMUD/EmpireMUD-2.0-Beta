@@ -165,6 +165,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	ability_data *abiter, *next_abil;
 	skill_data *skill, *next_skill;
 	struct ability_data_list *adl;
+	struct apply_data *apply;
 	struct synergy_ability *syn;
 	
 	// starting line is based on whether this is the core ability or a sub-ability
@@ -302,7 +303,20 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		}
 	}
 	
-	// purchased/free/can-purchase -- maybe
+	// applies
+	*lbuf = '\0';
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		sprintf(lbuf + strlen(lbuf), "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
+	}
+	if (*lbuf) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Modifies: %s\r\n", lbuf);
+	}
+	
+	// affects
+	if (ABIL_AFFECTS(abil)) {
+		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Affects: %s\r\n", lbuf);
+	}
 	
 	// notes (flags), if parameterized -- LAST
 	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
