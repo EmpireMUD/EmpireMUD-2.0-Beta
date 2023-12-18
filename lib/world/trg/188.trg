@@ -1215,6 +1215,7 @@ return 1
 Halloween: Ectoplasm upgrades items~
 1 c 2
 upgrade~
+set max_level 400
 if !%arg%
   * Pass through to upgrade command
   return 0
@@ -1240,12 +1241,14 @@ end
 %send% %actor% You carefully pour @%self% onto @%target%...
 %echoaround% %actor% ~%actor% pours @%self% onto @%target%...
 %echo% @%target% takes on a spooky glow!
-nop %target.flag(SUPERIOR)%
-if %target.level% > 0
-  %scale% %target% %target.level%
-else
-  %scale% %target% 1
+* determine level
+set level %actor.highest_level%
+if %level% > %max_level%
+  set level %max_level%
 end
+* apply it
+nop %target.flag(SUPERIOR)%
+%scale% %target% %level%
 %purge% %self%
 ~
 #18840

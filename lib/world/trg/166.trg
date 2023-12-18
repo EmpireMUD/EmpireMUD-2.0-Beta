@@ -2640,6 +2640,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Upgrade Glitter: upgrade Winter Wonderland items~
 1 c 2
 upgrade~
+set max_level 400
 if !%arg%
   * Pass through to upgrade command
   return 0
@@ -2665,27 +2666,26 @@ end
 %send% %actor% You sprinkle @%self% onto @%target%...
 %echoaround% %actor% ~%actor% sprinkles @%self% onto @%target%...
 %echo% @%target% begins to shimmer and glow!
+* determine level
+set level %actor.highest_level%
+if %level% > %max_level%
+  * cap for this
+  set level %max_level%
+end
+* apply it
 if %target.vnum% == 16653
   * sweater version: replace item
   %load% obj 16654 %actor% inv
   set sweat %actor.inventory%
   if %sweat% && %sweat.vnum% == 16654
-    if %target.level% > 0
-      %scale% %sweat% %target.level%
-    else
-      %scale% %sweat% 1
-    end
+    %scale% %sweat% %level%
     nop %sweat.bind(%target%)%
   end
   %purge% %target%
 else
   * non-sweater: just make superior
   nop %target.flag(SUPERIOR)%
-  if %target.level% > 0
-    %scale% %target% %target.level%
-  else
-    %scale% %target% 1
-  end
+  %scale% %target% %level%
 end
 %purge% %self%
 ~
