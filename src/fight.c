@@ -3712,7 +3712,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_player_tech_exp(ch, PTECH_TWO_HANDED_MASTERY, 2);
 				}
 			}
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && IS_STAFF(weapon)) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && TOOL_FLAGGED(weapon, TOOL_STAFF)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
