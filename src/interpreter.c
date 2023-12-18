@@ -113,7 +113,6 @@ ACMD(do_create);
 ACMD(do_credits);
 ACMD(do_customize);
 
-ACMD(do_damage_spell);
 ACMD(do_date);
 ACMD(do_dc);
 ACMD(do_deathshroud);
@@ -965,7 +964,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "sew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
-	STANDARD_CMD( "shadowlash", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SHADOWLASH, CTYPE_COMBAT, NOBITS, ABIL_SHADOWLASH ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "ship", POS_SLEEPING, do_ship, NO_MIN, CTYPE_EMPIRE ),

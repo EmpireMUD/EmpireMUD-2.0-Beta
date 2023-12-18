@@ -277,7 +277,7 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_STABLEMASTER  272
 // formerly: #define ABIL_ERODE  280
 // formerly: #define ABIL_SCOUR  281
-#define ABIL_SHADOWLASH  282
+// #define ABIL_SHADOWLASH  282
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_BITE  292
@@ -316,7 +316,6 @@ bool trigger_counterspell(char_data *ch);
 #define ATTACK_MAGICAL_DOT		64
 #define ATTACK_FIRE_DOT			65
 #define ATTACK_POISON_DOT		66
-#define ATTACK_SHADOWLASH		76
 
 
 // SIEGE_x: types for besiege
