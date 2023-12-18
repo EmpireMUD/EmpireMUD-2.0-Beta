@@ -170,7 +170,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	
 	// starting line
 	strcpy(lbuf, " ");
-	count = (60 - strlen(ABIL_NAME(abil)) - 4) / 2;
+	count = (66 - strlen(ABIL_NAME(abil)) - 4) / 2;
 	for (iter = 0; iter < count; ++iter) {
 		strcat(lbuf, "-");
 	}
