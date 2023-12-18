@@ -296,9 +296,6 @@ bool trigger_counterspell(char_data *ch);
 #define TYPE_VAMPIRE_CLAWS  13	// has inherent damage bonus and effects
 #define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16	// disarmable fire blast
-#define TYPE_LIGHTNING_STAFF  17
-#define TYPE_BURN_STAFF  18
-#define TYPE_AGONY_STAFF  19
 #define TYPE_MANA_BLAST  28	// default magical
 #define TYPE_BOW  29	// shoot / bow
 #define TYPE_CROSSBOW  30	// shoot / crossbow
