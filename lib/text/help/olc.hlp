@@ -939,6 +939,8 @@ The 'data' field is used by different types of abilities. Available types are:
  &cLIMITATION&0 - Adds a limitation to the ability. See ABILEDIT LIMITATIONS
  &cPAINT-COLOR&0 - See PAINT ITEM for list of colors.
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
+ &cRANGE&0 - Used by some actions, as noted.
+ &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -1245,6 +1247,33 @@ It always targets the room -- you must set a &gROOM&0 target flag.
 For a list of paint colors, see HELP PAINT ITEM
 
 See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT PARENT" "PARENT ABILITY" "CHILD ABILITY" "CHAINED ABILITIES"
+
+Some abilities are too complex to be handled by just 1 ability entry. Using a
+combination of PARENT data and ABILITY hooks, it is possible to create more
+complex abilities.
+
+When an ability has a parent in its data, players who have that parent ability
+automatically gain the other one. An ability with parents may not be added to
+a skill or synergy -- it is ONLY granted if the player has at least one of its
+parent abilities.
+
+These abilities -- ones granted for free this way -- are not shown to the
+player unless they have a command, in which case they're shown on the "skills"
+command.
+
+Many abilities with parent data will also have an ability hook for the same
+ability as their parent, causing them to trigger whenever the parent ability
+goes off. If so, they will be shown on the "ability info" for the parent, like
+all abilities with hooks.
+
+Possible uses of parent-child abilities:
+- More complex abilities (debuff you, buff me)
+- Proc for more damage with a 2nd ability at higher difficulty
+- Grant a related command with an ability
+
+See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT HOOK
 #d
 "ABILEDIT PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITIES" "PASSIVE BUFF ABILITY"
 
