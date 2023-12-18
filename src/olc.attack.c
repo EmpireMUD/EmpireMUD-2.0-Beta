@@ -166,6 +166,24 @@ struct attack_message_set *get_one_attack_message(attack_message_data *amd, int 
 
 
 /**
+* Determines if one type is equal to another, also checking its counts-as data.
+*
+* @param any_vnum type An attack vnum/type to check.
+* @param any_vnum match_to Another attack vnum/type.
+* @return bool TRUE if type equals match_to, or if type counts-as match_to. FALSE if not.
+*/
+bool match_attack_type(any_vnum type, any_vnum match_to) {
+	if (type == match_to) {
+		return TRUE;	// shortcut
+	}
+	else {
+		attack_message_data *amd = real_attack_message(type);
+		return (amd && ATTACK_COUNTS_AS(amd) == match_to);
+	}
+}
+
+
+/**
 * This will copy any messages on 'from' that are not on 'to'.
 *
 * @param char_data *ch The person editing.

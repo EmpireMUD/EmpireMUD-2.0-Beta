@@ -2469,6 +2469,9 @@ bool morph_affinity_ok(room_data *location, morph_data *morph);
 // olc.c
 bool validate_icon(char *icon);
 
+// olc.attack.c
+bool match_attack_type(any_vnum type, any_vnum match_to);
+
 // olc.building.c
 bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
 bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);

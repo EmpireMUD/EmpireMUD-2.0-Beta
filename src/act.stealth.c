@@ -594,7 +594,7 @@ ACMD(do_backstab) {
 	else if (!IS_NPC(ch) && !GET_EQ(ch, WEAR_WIELD)) {
 		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
 	}
-	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
+	else if (!IS_NPC(ch) && !match_attack_type(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), TYPE_STAB)) {
 		send_to_char("You must use a stabbing weapon to backstab.\r\n", ch);
 	}
 	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {
@@ -1026,7 +1026,7 @@ ACMD(do_jab) {
 	else if (!IS_NPC(ch) && !GET_EQ(ch, WEAR_WIELD)) {
 		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
 	}
-	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
+	else if (!IS_NPC(ch) && !match_attack_type(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), TYPE_STAB)) {
 		send_to_char("You must use a stabbing weapon to jab.\r\n", ch);
 	}
 	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {

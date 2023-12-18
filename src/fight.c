@@ -3376,7 +3376,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 	/* Uh oh.  Victim died. */
 	if (GET_POS(victim) == POS_DEAD) {
-		if (attacktype == ATTACK_VAMPIRE_BITE && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
+		if (match_attack_type(attacktype, ATTACK_VAMPIRE_BITE) && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
 			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
 			start_drinking_blood(ch, victim);
@@ -3697,7 +3697,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				run_ability_gain_hooks(ch, victim, AGH_MELEE);
 			}
 			
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && match_attack_type(GET_WEAPON_TYPE(weapon), TYPE_STAB)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);

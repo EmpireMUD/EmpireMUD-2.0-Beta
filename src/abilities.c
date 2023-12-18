@@ -2868,7 +2868,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_WIELD_ATTACK_TYPE: {
 				want_weapon = TRUE;
 				
-				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) == adl->misc) {
+				if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && match_attack_type(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), adl->misc)) {
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
