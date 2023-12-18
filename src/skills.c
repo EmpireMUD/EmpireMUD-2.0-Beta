@@ -4499,6 +4499,7 @@ OLC_MODULE(skilledit_synergy) {
 		}
 		else if (has_ability_data_any(abil, ADL_PARENT)) {
 			msg_to_char(ch, "You can't assign %s as a synergy ability because it has PARENT data.\r\n", ABIL_NAME(abil));
+			return;
 		}
 		else if (!isdigit(*lvl_arg) || (level = atoi(lvl_arg)) < 1 || level > SKILL_MAX_LEVEL(other)) {
 			msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", SKILL_MAX_LEVEL(other), lvl_arg);

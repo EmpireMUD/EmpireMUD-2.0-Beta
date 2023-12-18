@@ -187,7 +187,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 	}
 	
-	if (ABIL_ASSIGNED_SKILL(abil)) {
+	if (ABIL_ASSIGNED_SKILL(abil) && !dependent) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
 			size += snprintf(outbuf + size, sizeof_outbuf - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
@@ -197,18 +197,16 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		}
 		
 		// check purchased
-		if (!dependent) {
-			any = same = FALSE;
-			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
-				if (has_ability_in_set(ch, ABIL_VNUM(abil), iter)) {
-					any = TRUE;
-					if (iter == GET_CURRENT_SKILL_SET(ch)) {
-						same = TRUE;
-					}
+		any = same = FALSE;
+		for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+			if (has_ability_in_set(ch, ABIL_VNUM(abil), iter)) {
+				any = TRUE;
+				if (iter == GET_CURRENT_SKILL_SET(ch)) {
+					same = TRUE;
 				}
 			}
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
 		}
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
 		
 		// prerequisite ability (chain?) -- maybe?
 	}
