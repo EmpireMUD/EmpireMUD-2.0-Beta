@@ -169,12 +169,12 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	struct synergy_ability *syn;
 	
 	// starting line is based on whether this is the core ability or a sub-ability
-	if (!dependent) {
+	if (FALSE || !dependent) {
 		size = snprintf(outbuf, sizeof_outbuf, "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 	}
 	else {
 		strcpy(lbuf, " ");
-		count = (79 - strlen(ABIL_NAME(abil)) - 4) / 2;
+		count = (60 - strlen(ABIL_NAME(abil)) - 4) / 2;
 		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
 		}
@@ -390,9 +390,11 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		if (!has_ability(ch, ABIL_VNUM(abiter))) {
 			continue;	// must have for this
 		}
+		/*
 		if (!has_ability_data_any(abiter, ADL_PARENT)) {
 			continue;	// nobody's child
 		}
+		*/
 		if (!has_ability_hook(abiter, AHOOK_ABILITY, ABIL_VNUM(abil))) {
 			continue;	// does not hook on me
 		}
