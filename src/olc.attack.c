@@ -1108,12 +1108,12 @@ void load_fight_messages(void) {
 	// load all records
 	while (*chk == 'M') {
 		// determine type/format
-		if (sscanf(chk, "M%d %s %c", &type, str_in, &char_in) == 3 && char_in == '+') {
+		if (sscanf(chk, "M%d %s %d %c", &type, str_in, &int_in[0], &char_in) == 4 && char_in == '+') {
 			// b5.166 format: type was in M line, extended format
 			version = 5166;
 			extended = TRUE;
 		}
-		else if (sscanf(chk, "M%d %s ", &type, str_in) == 2) {
+		else if (sscanf(chk, "M%d %s %d ", &type, str_in, &int_in[0]) == 3) {
 			// b5.166 format: type was in M line; simple format
 			version = 5166;
 			extended = FALSE;
@@ -1126,6 +1126,7 @@ void load_fight_messages(void) {
 			version = 30;	// circle 3.0
 			extended = FALSE;
 			strcpy(str_in, "0");
+			int_in[0] = 0;
 		}
 		
 		// find or create message entry
@@ -1134,6 +1135,7 @@ void load_fight_messages(void) {
 		
 		// header info?
 		ATTACK_FLAGS(amd) = asciiflag_conv(str_in);
+		ATTACK_COUNTS_AS(amd) = int_in[0];
 		
 		if (version >= 5166) {
 			// read: name
