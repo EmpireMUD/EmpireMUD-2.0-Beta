@@ -1802,6 +1802,7 @@ ACMD(do_skills) {
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
+	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *skdata;
 	skill_data *skill, *next_skill, *synergy[2];
 	struct synergy_ability *syn;
@@ -1997,6 +1998,29 @@ ACMD(do_skills) {
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
 		
+		// orphaned abilities (ones with parents), commands only
+		*lbuf = '\0';
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			abil = plab->ptr;
+			
+			// ALWAYS use current set for tehse abilities
+			if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+				continue;
+			}
+			if (!ABIL_COMMAND(abil)) {
+				continue;	// only showing commands here
+			}
+			if (!has_ability_data_any(abil, ADL_PARENT)) {
+				continue;	// only looking for abilities with parents
+			}
+			
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", *lbuf ? ", ": "", ability_color(ch, abil), ABIL_NAME(abil));
+		}
+		if (*lbuf && size + strlen(lbuf) + 20 < sizeof(outbuf)) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Other abilities: %s\r\n", lbuf);
+		}
+		
+		// footer
 		if (!any) {
 			size += snprintf(outbuf + size, sizeof(outbuf) - size, " none\r\n");
 		}
