@@ -272,7 +272,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	}
 	
 	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %d%s %s\r\n", ABIL_COST(abil), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %d%s %s\r\n", (ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil)), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	
 	// Cooldown?
