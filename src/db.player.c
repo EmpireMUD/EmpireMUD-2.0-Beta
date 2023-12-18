@@ -3953,7 +3953,7 @@ void check_skills_and_abilities(char_data *ch) {
 			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
-	update_class(ch);
+	update_class_and_abilities(ch);
 	check_ability_levels(ch, NOTHING);
 }
 
@@ -5000,7 +5000,7 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// set up class/level data
-	update_class(ch);
+	update_class_and_abilities(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
 	set_health(ch, GET_MAX_HEALTH(ch));

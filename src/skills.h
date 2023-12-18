@@ -53,7 +53,7 @@
 // class.c prototypes
 void assign_class_abilities(char_data *ch, class_data *cls, int role);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
-void update_class(char_data *ch);
+void update_class_and_abilities(char_data *ch);
 
 // skills.c prototypes
 // TODO sort this

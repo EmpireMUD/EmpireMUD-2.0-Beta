@@ -1017,7 +1017,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 		}
 		
 		// update class and progression
-		update_class(ch);
+		update_class_and_abilities(ch);
 		
 		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_SAVE | CDU_MSDP_SKILLS);
 	}
@@ -1636,7 +1636,7 @@ bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag) {
 	}
 	
 	if (any) {
-		update_class(ch);
+		update_class_and_abilities(ch);
 	}
 	
 	return any;
@@ -2096,7 +2096,7 @@ ACMD(do_skills) {
 			resort_empires(FALSE);
 		}
 		
-		update_class(ch);
+		update_class_and_abilities(ch);
 	}
 	else if (!str_cmp(arg, "reset")) {
 		// self-clear!
@@ -2137,7 +2137,7 @@ ACMD(do_skills) {
 				skdata->resets = MAX(skdata->resets - 1, 0);
 			}
 			clear_char_abilities(ch, SKILL_VNUM(skill));
-			update_class(ch);
+			update_class_and_abilities(ch);
 			
 			msg_to_char(ch, "You have reset your %s abilities.\r\n", SKILL_NAME(skill));
 			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
@@ -2190,7 +2190,7 @@ ACMD(do_skills) {
 			msg_to_char(ch, "You have dropped your %s skill to %d and reset abilities above that level.\r\n", SKILL_NAME(skill), level);
 			set_skill(ch, SKILL_VNUM(skill), level);
 			check_un_vampire(ch, FALSE);
-			update_class(ch);
+			update_class_and_abilities(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
 			
 			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
@@ -2318,7 +2318,7 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 			resort_empires(FALSE);
 		}
-		update_class(ch);
+		update_class_and_abilities(ch);
 	}
 	else if (!find_skill_or_ability_for_command(arg, arg2, whole_arg, &skill, &abil)) {
 		msg_to_char(ch, "No such skill or ability.\r\n");
@@ -2448,7 +2448,7 @@ ACMD(do_specialize) {
 		msg_to_char(ch, "You have specialized in %s.\r\n", SKILL_NAME(sk));
 
 		// check class and skill levels
-		update_class(ch);
+		update_class_and_abilities(ch);
 	}
 }
 
@@ -4018,7 +4018,7 @@ void save_olc_skill(descriptor_data *desc) {
 	
 	// update all players in case there are new level-0 abilities
 	DL_FOREACH_SAFE2(player_character_list, ch_iter, next_ch, next_plr) {
-		update_class(ch_iter);
+		update_class_and_abilities(ch_iter);
 		give_level_zero_abilities(ch_iter);
 	}
 }

@@ -2718,7 +2718,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 
 		// victory
 		set_skill(vict, SKILL_VNUM(skill), level);
-		update_class(vict);
+		update_class_and_abilities(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
@@ -10729,7 +10729,7 @@ ACMD(do_restore) {
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 		}
-		update_class(vict);
+		update_class_and_abilities(vict);
 		
 		// temporarily remove empire abilities
 		emp = GET_LOYALTY(vict);

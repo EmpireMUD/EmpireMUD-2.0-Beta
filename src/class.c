@@ -365,11 +365,12 @@ class_data *find_class_by_vnum(any_vnum vnum) {
 
 /**
 * This function updates a player's class and skill levelability data based
-* on current skill levels.
+* on current skill levels. It will also update abilities that come from the
+* class, role, synergies, or parent abilities.
 *
 * @param char_data *ch the player
 */
-void update_class(char_data *ch) {
+void update_class_and_abilities(char_data *ch) {
 	#define NUM_BEST  3
 	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
@@ -1135,7 +1136,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 		if (GET_CLASS(chiter) != cls) {
 			continue;
 		}
-		update_class(chiter);
+		update_class_and_abilities(chiter);
 	}
 
 	// save index and class file now
@@ -1206,7 +1207,7 @@ void save_olc_class(descriptor_data *desc) {
 	// update all players in-game
 	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
-			update_class(ch_iter);
+			update_class_and_abilities(ch_iter);
 		}
 	}
 }
