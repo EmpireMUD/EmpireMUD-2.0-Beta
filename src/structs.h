@@ -4191,6 +4191,7 @@ struct archetype_menu_type {
 struct attack_message_data {
 	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
 	char *name;	// for display purposes
+	char *death_log;	// optional message for how death is displayed
 	bitvector_t flags;	// AMDF_ flags
 	
 	// used by attack types:

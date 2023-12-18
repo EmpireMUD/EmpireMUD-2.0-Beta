@@ -3407,9 +3407,9 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 * @param int type An ATTACK_ or TYPE_ damage type that killed ch (e.g. ATTACK_EXECUTE).
 */
 void death_log(char_data *ch, char_data *killer, int type) {
+	char output[MAX_STRING_LENGTH], name[256];
 	char *msg;
-	char output[MAX_STRING_LENGTH];
-	bool has_killer = FALSE;
+	attack_message_data *amd;
 	
 	// nope
 	if (IS_NPC(ch)) {
@@ -3422,35 +3422,26 @@ void death_log(char_data *ch, char_data *killer, int type) {
 	}
 
 	// these messages will all be appened with " (x, y)"
-	switch (type) {
-		case ATTACK_GUARD_TOWER:
-			msg = "%s has been killed by a guard tower at";
-			break;
-		case TYPE_SUFFERING:
-			msg = "%s has died at";
-			break;
-		case ATTACK_EXECUTE:
-			msg = "%s has been killed by %s at";
-			has_killer = TRUE;
-			break;
-		default:
-			msg = "%s has been killed at";
-			break;
+	if ((amd = real_attack_message(type)) && ATTACK_DEATH_LOG(amd)) {
+		msg = ATTACK_DEATH_LOG(amd);
 	}
-
-	if (ch == killer && has_killer) {
-		syslog(SYS_ERROR, 0, TRUE, "Unusual error in death_log(): ch == killer, but combat attack type passed");
+	else {
+		// default
 		msg = "%s has been killed at";
-		has_killer = FALSE;
 	}
-
-	if (has_killer) {
-		strcpy(buf, PERS(killer, killer, 1));
-		sprintf(output, msg, PERS(ch, ch, 1), buf);
+	
+	// build message
+	if (ch != killer && type == ATTACK_EXECUTE) {
+		// there is 1 special override here: ATTACK_EXECUTE
+		strcpy(name, PERS(killer, killer, TRUE));
+		snprintf(output, sizeof(output), "%s has been killed by %s at", PERS(ch, ch, TRUE), name);
 	}
-	else
-		sprintf(output, msg, PERS(ch, ch, 1));
-
+	else {
+		// normal
+		sprintf(output, "%s %s", PERS(ch, ch, TRUE), msg);
+	}
+	
+	// and log it
 	log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s (%d, %d)", output, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	syslog(SYS_DEATH, 0, TRUE, "DEATH: %s %s", output, room_log_identifier(IN_ROOM(ch)));
 }

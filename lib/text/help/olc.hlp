@@ -2452,6 +2452,20 @@ not have this property.
 
 See also: OLC ATTACKS
 #d
+"ATTACKEDIT DEATHLOG" "ATTACKEDIT DEATH LOG"
+
+Usage:  .deathlog <string | default>
+
+This allows you to set a custom log when a character is killed by this type of
+attack.
+
+Death logs automatically start with the player's name and end with the
+location. You cannot override these parts.
+
+The default death log is: has been killed at
+
+See also: OLC ATTACKS
+#d
 "ATTACKEDIT FIRSTPERSON" "ATTACKEDIT FIRST-PERSON" "ATTACKEDIT FIRST PERSON"
 
 Usage:  .firstperson <string>

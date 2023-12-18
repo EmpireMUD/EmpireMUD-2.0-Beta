@@ -709,6 +709,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 // for attack messages
 #define ATTACK_VNUM(amd)			((amd)->vnum)
 #define ATTACK_DAMAGE_TYPE(amd)		((amd)->damage_type)
+#define ATTACK_DEATH_LOG(amd)		((amd)->death_log)
 #define ATTACK_FIRST_PERSON(amd)	((amd)->first_pers)
 #define ATTACK_FLAGS(amd)			((amd)->flags)
 #define ATTACK_MSG_LIST(amd)		((amd)->msg_list)

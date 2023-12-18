@@ -238,6 +238,11 @@ int wordcount_attack_message(attack_message_data *amd) {
 	int count = 0, iter;
 	
 	count += wordcount_string(ATTACK_NAME(amd));
+	count += wordcount_string(ATTACK_DEATH_LOG(amd));
+	
+	count += wordcount_string(ATTACK_FIRST_PERSON(amd));
+	count += wordcount_string(ATTACK_THIRD_PERSON(amd));
+	count += wordcount_string(ATTACK_NOUN(amd));
 	
 	LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
 		for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
@@ -493,6 +498,21 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (ATTACK_DEATH_LOG(amd)) {
+		if (isupper(*ATTACK_DEATH_LOG(amd))) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not start with capital letter");
+			problem = TRUE;
+		}
+		if (ispunct(*(ATTACK_DEATH_LOG(amd) + strlen(ATTACK_DEATH_LOG(amd)) - 1))) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not end with punctuation");
+			problem = TRUE;
+		}
+		if (strchr(ATTACK_DEATH_LOG(amd), '$')) {
+			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not contain dollarsigns");
+			problem = TRUE;
+		}
+	}
+	
 	if (ATTACK_FLAGGED(amd, AMDF_DISARMABLE) && !ATTACK_HAS_EXTENDED_DATA(amd)) {
 		olc_audit_msg(ch, ATTACK_VNUM(amd), "DISARMABLE flag but is not a weapon/mob attack type");
 		problem = TRUE;
@@ -688,13 +708,16 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 			if (multi_isname(find_keywords, ATTACK_NAME(amd))) {
 				any = TRUE;
 			}
-			else if (multi_isname(find_keywords, ATTACK_NOUN(amd))) {
+			if (ATTACK_DEATH_LOG(amd) && multi_isname(find_keywords, ATTACK_DEATH_LOG(amd))) {
 				any = TRUE;
 			}
-			else if (multi_isname(find_keywords, ATTACK_FIRST_PERSON(amd))) {
+			else if (ATTACK_NOUN(amd) && multi_isname(find_keywords, ATTACK_NOUN(amd))) {
 				any = TRUE;
 			}
-			else if (multi_isname(find_keywords, ATTACK_THIRD_PERSON(amd))) {
+			else if (ATTACK_FIRST_PERSON(amd) && multi_isname(find_keywords, ATTACK_FIRST_PERSON(amd))) {
+				any = TRUE;
+			}
+			else if (ATTACK_THIRD_PERSON(amd) && multi_isname(find_keywords, ATTACK_THIRD_PERSON(amd))) {
 				any = TRUE;
 			}
 			LL_FOREACH(ATTACK_MSG_LIST(amd), ams) {
@@ -918,6 +941,9 @@ void free_attack_message(attack_message_data *amd) {
 	
 	if (ATTACK_NAME(amd) && (!proto || ATTACK_NAME(amd) != ATTACK_NAME(proto))) {
 		free(ATTACK_NAME(amd));
+	}
+	if (ATTACK_DEATH_LOG(amd) && (!proto || ATTACK_DEATH_LOG(amd) != ATTACK_DEATH_LOG(proto))) {
+		free(ATTACK_DEATH_LOG(amd));
 	}
 	if (ATTACK_FIRST_PERSON(amd) && (!proto || ATTACK_FIRST_PERSON(amd) != ATTACK_FIRST_PERSON(proto))) {
 		free(ATTACK_FIRST_PERSON(amd));
@@ -1245,6 +1271,7 @@ void write_attack_message_to_file(FILE *fl, attack_message_data *amd) {
 		// record begins M#### flags +
 		fprintf(fl, "M%d %s %s\n", ATTACK_VNUM(amd), bitv_to_alpha(ATTACK_FLAGS(amd)), (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) ? "+" : "");	// M# indicates the b5.166 attack message format
 		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_NAME(amd)));
+		fprintf(fl, "%s~\n", NULLSAFE(ATTACK_DEATH_LOG(amd)));
 		
 		if (ATTACK_HAS_EXTENDED_DATA(amd) && !wrote_extended) {
 			fprintf(fl, "%s~\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)));
@@ -1463,6 +1490,9 @@ void save_olc_attack_message(descriptor_data *desc) {
 	if (ATTACK_NAME(proto)) {
 		free(ATTACK_NAME(proto));
 	}
+	if (ATTACK_DEATH_LOG(proto)) {
+		free(ATTACK_DEATH_LOG(proto));
+	}
 	if (ATTACK_FIRST_PERSON(proto)) {
 		free(ATTACK_FIRST_PERSON(proto));
 	}
@@ -1485,6 +1515,10 @@ void save_olc_attack_message(descriptor_data *desc) {
 	}
 	
 	// these are optional
+	if (ATTACK_DEATH_LOG(amd) && !*ATTACK_DEATH_LOG(amd)) {
+		free(ATTACK_DEATH_LOG(amd));
+		ATTACK_DEATH_LOG(amd) = NULL;
+	}
 	if (ATTACK_FIRST_PERSON(amd) && !*ATTACK_FIRST_PERSON(amd)) {
 		free(ATTACK_FIRST_PERSON(amd));
 		ATTACK_FIRST_PERSON(amd) = NULL;
@@ -1540,6 +1574,7 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 		
 		// copy things that are pointers
 		ATTACK_NAME(dupe) = ATTACK_NAME(input) ? str_dup(ATTACK_NAME(input)) : NULL;
+		ATTACK_DEATH_LOG(dupe) = ATTACK_DEATH_LOG(input) ? str_dup(ATTACK_DEATH_LOG(input)) : NULL;
 		ATTACK_FIRST_PERSON(dupe) = ATTACK_FIRST_PERSON(input) ? str_dup(ATTACK_FIRST_PERSON(input)) : NULL;
 		ATTACK_THIRD_PERSON(dupe) = ATTACK_THIRD_PERSON(input) ? str_dup(ATTACK_THIRD_PERSON(input)) : NULL;
 		ATTACK_NOUN(dupe) = ATTACK_NOUN(input) ? str_dup(ATTACK_NOUN(input)) : NULL;
@@ -1580,7 +1615,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) 
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
-
+	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", lbuf);
 	
@@ -1594,7 +1629,9 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) 
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "]\r\n");
 	}
-
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Death log: %s\r\n", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
+	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	count = 0;
 	
@@ -1808,6 +1845,7 @@ void olc_show_attack_message(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
+	sprintf(buf + strlen(buf), "<%sdeathlog\t0> %s\r\n", OLC_LABEL_PTR(ATTACK_DEATH_LOG(amd)), ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ATTACK_FLAGS(amd), NOBITS), lbuf);
@@ -2060,6 +2098,25 @@ OLC_MODULE(attackedit_damagetype) {
 	}
 	else {
 		ATTACK_DAMAGE_TYPE(amd) = olc_process_type(ch, argument, "damage type", "damagetype", damage_types, ATTACK_DAMAGE_TYPE(amd));
+	}
+}
+
+
+OLC_MODULE(attackedit_deathlog) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't change the death log while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!str_cmp(argument, "none") || !str_cmp(argument, "default")) {
+		if (ATTACK_DEATH_LOG(amd)) {
+			free(ATTACK_DEATH_LOG(amd));
+		}
+		ATTACK_DEATH_LOG(amd) = NULL;
+		msg_to_char(ch, "It will now use the default death log.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "death log", &ATTACK_DEATH_LOG(amd));
 	}
 }
 
