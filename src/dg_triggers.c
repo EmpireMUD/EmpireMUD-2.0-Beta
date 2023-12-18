@@ -3,7 +3,7 @@
 *  Usage: contains all the trigger functions for scripts.                 *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 23:32:08, revision 3.9           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

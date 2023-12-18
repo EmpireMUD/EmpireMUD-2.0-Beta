@@ -2,7 +2,7 @@
 *   File: handler.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

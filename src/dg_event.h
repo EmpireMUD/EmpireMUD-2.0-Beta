@@ -3,7 +3,7 @@
 *  Usage: structures and prototypes for events                            *
 *                                                                         *
 *  DG Scripts code by Eric Green (ejg3@cornell.edu)                       *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
