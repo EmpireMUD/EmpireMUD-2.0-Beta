@@ -174,11 +174,12 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	}
 	else {
 		strcpy(lbuf, " ");
-		for (iter = 0; iter < 79 - strlen(ABIL_NAME(abil)) - 4; ++iter) {
+		count = (79 - strlen(ABIL_NAME(abil)) - 4) / 2;
+		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
 		}
 		sprintf(lbuf + strlen(lbuf), " %s ", ABIL_NAME(abil));
-		for (iter = 0; iter < 79 - strlen(ABIL_NAME(abil)) - 4; ++iter) {
+		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
 		}
 		size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
