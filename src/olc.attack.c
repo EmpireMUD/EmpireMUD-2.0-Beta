@@ -644,15 +644,14 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 	bool any;
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, iter;
+	size_t size;
+	attack_message_data *amd, *next_amd;
 	struct attack_message_set *ams;
 	
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
 	int only_damage = NOTHING, only_weapon = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING;
 	double speed = 0.0;
-	
-	attack_message_data *amd, *next_amd;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP ATTACKEDIT FULLSEARCH for syntax.\r\n");
@@ -784,6 +783,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH * 4];
 	int size, found;
 	attack_message_data *amd = real_attack_message(vnum);
+	attack_message_data *amditer, *next_amd;
 	ability_data *abil, *next_abil;
 	generic_data *gen, *next_gen;
 	char_data *mob, *next_mob;
@@ -807,6 +807,14 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+	}
+	
+	// other attacks
+	HASH_ITER(hh, attack_message_table, amditer, next_amd) {
+		if (ATTACK_COUNTS_AS(amditer) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ATTACK [%5d] %s\r\n", ATTACK_VNUM(amditer), ATTACK_NAME(amditer));
 		}
 	}
 	
@@ -1351,7 +1359,7 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 	bool found;
 	char name[256];
 	ability_data *abil, *next_abil;
-	attack_message_data *amd;
+	attack_message_data *amd, *amditer, *next_amd;
 	descriptor_data *desc;
 	generic_data *gen, *next_gen;
 	char_data *mob, *next_mob;
@@ -1384,6 +1392,14 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 		
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
+		}
+	}
+	
+	// update other attacks
+	HASH_ITER(hh, attack_message_table, amditer, next_amd) {
+		if (ATTACK_COUNTS_AS(amditer) == vnum) {
+			ATTACK_COUNTS_AS(amditer) = 0;
+			save_attack_message_file();
 		}
 	}
 	
@@ -1443,6 +1459,12 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 			
 			if (found) {
 				msg_to_char(desc->character, "An attack type used by the ability you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_ATTACK(desc)) {
+			if (ATTACK_COUNTS_AS(GET_OLC_ATTACK(desc)) == vnum) {
+				ATTACK_COUNTS_AS(GET_OLC_ATTACK(desc)) = 0;
+				msg_to_char(desc->character, "The counts-as attack for the attack you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_GENERIC(desc)) {
