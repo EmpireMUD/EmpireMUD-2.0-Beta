@@ -1633,8 +1633,8 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) 
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
-	if (ATTACK_COUNTS_AS(amd)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Also counts as: [\ty%d\t0] [\ty%s\t0]\r\n", ATTACK_COUNTS_AS(amd), get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)));
+	if (ATTACK_COUNTS_AS(amd) > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Also counts as: [\ty%d\t0] [\ty%s\t0]\r\n", ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
 	}
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
