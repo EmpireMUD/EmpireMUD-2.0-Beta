@@ -367,8 +367,8 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		if (!has_ability(ch, ABIL_VNUM(abiter))) {
 			continue;	// must have for this
 		}
-		if (!find_ability_data_entry_for(abiter, ADL_PARENT, ABIL_VNUM(abil))) {
-			continue;	// not my child
+		if (!has_ability_data_any(abiter, ADL_PARENT)) {
+			continue;	// nobody's child
 		}
 		if (!has_ability_hook(abiter, AHOOK_ABILITY, ABIL_VNUM(abil))) {
 			continue;	// does not hook on me
