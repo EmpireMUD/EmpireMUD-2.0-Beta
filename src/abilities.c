@@ -168,22 +168,20 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	struct apply_data *apply;
 	struct synergy_ability *syn;
 	
-	// starting line is based on whether this is the core ability or a sub-ability
-	if (FALSE && !dependent) {
-		size = snprintf(outbuf, sizeof_outbuf, "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+	// starting line
+	strcpy(lbuf, " ");
+	count = (60 - strlen(ABIL_NAME(abil)) - 4) / 2;
+	for (iter = 0; iter < count; ++iter) {
+		strcat(lbuf, "-");
 	}
-	else {
-		strcpy(lbuf, " ");
-		count = (60 - strlen(ABIL_NAME(abil)) - 4) / 2;
-		for (iter = 0; iter < count; ++iter) {
-			strcat(lbuf, "-");
-		}
-		sprintf(lbuf + strlen(lbuf), " %s ", ABIL_NAME(abil));
-		for (iter = 0; iter < count; ++iter) {
-			strcat(lbuf, "-");
-		}
-		size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
+	sprintf(lbuf + strlen(lbuf), " %s ", ABIL_NAME(abil));
+	count += (strlen(ABIL_NAME(abil)) % 2) ? 1 : 0;	// length fix
+	for (iter = 0; iter < count; ++iter) {
+		strcat(lbuf, "-");
 	}
+	
+	// start of outbuf
+	size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
 	
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
