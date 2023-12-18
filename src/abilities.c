@@ -331,16 +331,18 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		*lbuf = '\0';
 	}
 	
-	if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-		sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
+	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil)) {
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
+		}
+		else if (ABIL_LONG_DURATION(abil) >= 60) {
+			sprintf(lbuf + strlen(lbuf), "%s %dm", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60));
+		}
+		else if (ABIL_LONG_DURATION(abil) > 0) {
+			sprintf(lbuf + strlen(lbuf), "%s%ds", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil));
+		}
+		// no else for long duration
 	}
-	else if (ABIL_LONG_DURATION(abil) >= 60) {
-		snprintf(lbuf, sizeof(lbuf), "%s %dm", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60));
-	}
-	else if (ABIL_LONG_DURATION(abil) > 0) {
-		snprintf(lbuf, sizeof(lbuf), "%s%ds", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil));
-	}
-	// no else for long duration
 	
 	// show duration?
 	if (*lbuf) {
