@@ -322,10 +322,10 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		strcpy(lbuf, "unlimited");
 	}
 	else if (ABIL_SHORT_DURATION(abil) >= 60) {
-		sprintf(lbuf, "%dm", (ABIL_SHORT_DURATION(abil) / 60));
+		sprintf(lbuf, "%d minute%s", (ABIL_SHORT_DURATION(abil) / 60), PLURAL(ABIL_SHORT_DURATION(abil) / 60));
 	}
 	else if (ABIL_SHORT_DURATION(abil) > 0) {
-		sprintf(lbuf, "%ds", ABIL_SHORT_DURATION(abil));
+		sprintf(lbuf, "%d second%s", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
 	}
 	else {
 		*lbuf = '\0';
@@ -336,10 +336,10 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 			sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
 		}
 		else if (ABIL_LONG_DURATION(abil) >= 60) {
-			sprintf(lbuf + strlen(lbuf), "%s %dm", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60));
+			sprintf(lbuf + strlen(lbuf), "%s %d minute%s", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60), PLURAL(ABIL_LONG_DURATION(abil) / 60));
 		}
 		else if (ABIL_LONG_DURATION(abil) > 0) {
-			sprintf(lbuf + strlen(lbuf), "%s%ds", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil));
+			sprintf(lbuf + strlen(lbuf), "%s%d second%s", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 		}
 		// no else for long duration
 	}
