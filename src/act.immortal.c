@@ -4249,10 +4249,28 @@ SHOW(show_skills) {
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
-		if (ABIL_IS_PURCHASE(abil)) {
-			continue;	// only looking for non-skill abilities
+		if (!ABIL_IS_SYNERGY(abil)) {
+			continue;	// only looking for synergy abilities
 		}
 
+		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+		found = TRUE;
+	}
+	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
+	
+	msg_to_char(ch, "&yOther&0: &g");
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		abil = plab->ptr;
+		
+		// ALWAYS use current set for class abilities
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
+			continue;
+		}
+		if (!has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// only looking for abilities with parents
+		}
+		
 		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
 		found = TRUE;
 	}

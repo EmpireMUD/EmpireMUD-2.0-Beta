@@ -2073,6 +2073,8 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, emp, TRUE);
 			resort_empires(FALSE);
 		}
+		
+		update_class(ch);
 	}
 	else if (!str_cmp(arg, "reset")) {
 		// self-clear!
@@ -2113,6 +2115,7 @@ ACMD(do_skills) {
 				skdata->resets = MAX(skdata->resets - 1, 0);
 			}
 			clear_char_abilities(ch, SKILL_VNUM(skill));
+			update_class(ch);
 			
 			msg_to_char(ch, "You have reset your %s abilities.\r\n", SKILL_NAME(skill));
 			queue_delayed_update(ch, CDU_SAVE | CDU_MSDP_SKILLS);
@@ -2293,6 +2296,7 @@ ACMD(do_skills) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 			resort_empires(FALSE);
 		}
+		update_class(ch);
 	}
 	else if (!find_skill_or_ability_for_command(arg, arg2, whole_arg, &skill, &abil)) {
 		msg_to_char(ch, "No such skill or ability.\r\n");

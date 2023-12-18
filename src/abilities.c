@@ -7501,6 +7501,10 @@ OLC_MODULE(abiledit_data) {
 						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
 						return;
 					}
+					else if (has_ability_data_any(find_abil, ADL_PARENT)) {
+						msg_to_char(ch, "You cannot chain parent abilities.\r\n");
+						return;
+					}
 					val_id = ABIL_VNUM(find_abil);
 					break;
 				}
