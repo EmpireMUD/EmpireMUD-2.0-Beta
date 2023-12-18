@@ -1633,6 +1633,10 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) 
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
+	if (ATTACK_COUNTS_AS(amd)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Also counts as: [\ty%d\t0] [\ty%s\t0]\r\n", ATTACK_COUNTS_AS(amd), get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)));
+	}
+	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", lbuf);
 	
@@ -1862,6 +1866,7 @@ void olc_show_attack_message(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
+	sprintf(buf + strlen(buf), "<%scountsas\t0> %d %s\r\n", OLC_LABEL_VAL(ATTACK_COUNTS_AS(amd), 0), ATTACK_COUNTS_AS(amd), get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)));
 	sprintf(buf + strlen(buf), "<%sdeathlog\t0> %s\r\n", OLC_LABEL_PTR(ATTACK_DEATH_LOG(amd)), ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
@@ -2100,6 +2105,27 @@ OLC_MODULE(attackedit_clearextended) {
 	}
 	else {
 		msg_to_char(ch, "Nothing to clear.\r\n");
+	}
+}
+
+
+OLC_MODULE(attackedit_countsas) {
+	attack_message_data *amd = GET_OLC_ATTACK(ch->desc);
+	attack_message_data *find;
+	
+	if (GET_OLC_ATTACK_NUM(ch->desc) != 0) {
+		msg_to_char(ch, "You can't set that while editing a message (use .back to return to the menu).\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		ATTACK_COUNTS_AS(amd) = 0;
+		msg_to_char(ch, "You remove the counts-as type.\r\n");
+	}
+	else if (!(find = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack type '%s'.\r\n", argument);
+	}
+	else {
+		ATTACK_COUNTS_AS(amd) = ATTACK_VNUM(find);
+		msg_to_char(ch, "It now counts as [%d] %s.\r\n", ATTACK_VNUM(find), ATTACK_NAME(find));
 	}
 }
 

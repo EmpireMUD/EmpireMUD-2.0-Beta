@@ -2441,6 +2441,17 @@ command.
 
 See also: OLC ATTACKS
 #d
+"ATTACKEDIT COUNTSAS" "ATTACKEDIT COUNTS AS"
+
+Usage:  .countsas <name | vnum | none>
+
+This allows one attack type to count as another.
+
+For example, Backstab requires a stabbing weapon. This field allows you to
+make custom types that still count as 'stab'.
+
+See also: OLC ATTACKS
+#d
 "ATTACKEDIT DAMAGETYPE" "ATTACKEDIT DAMAGE TYPE"
 
 Usage:  .damagetype <type>
