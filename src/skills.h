@@ -57,10 +57,12 @@ void update_class(char_data *ch);
 
 // skills.c prototypes
 // TODO sort this
+char *ability_color(char_data *ch, ability_data *abil);
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 bool can_gain_exp_from(char_data *ch, char_data *vict);
+bool can_gain_skill_from(char_data *ch, ability_data *abil);
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);

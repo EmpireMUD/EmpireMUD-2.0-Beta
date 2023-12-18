@@ -46,7 +46,6 @@ extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 extern int total_accounts, active_accounts, active_accounts_week;
 
 // external functions
-char *ability_color(char_data *ch, ability_data *abil);
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
 void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);

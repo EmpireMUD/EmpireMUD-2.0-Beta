@@ -29,6 +29,7 @@
 
 /**
 * Contents:
+*   Details screen
 *   Helpers
 *   Ability Actions
 *   Ability Effects and Limits
@@ -140,6 +141,252 @@ struct {
 	{ ABILT_ACTION, prep_action_ability, do_action_ability },
 	{ NOBITS }	// this goes last
 };
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DETAILS SCREEN //////////////////////////////////////////////////////////
+
+/**
+* Details display for an ability. This also chains to any abilities that have
+* this one as both a parent and a hook -- those are multi-part abilities.
+*
+* @param char_data *ch The player viewing the ability.
+* @param ability_data *abil Which ability.
+* @param bool dependent FALSE for the first ability, TRUE down the chain.
+* @param char *outbuf Buffer to save to.
+* @param int sizeof_outbuf Max size of the buffer.
+*/
+void show_ability_details(char_data *ch, ability_data *abil, bool dependent, char *outbuf, int sizeof_outbuf) {
+	bool any, same, has_param_details = FALSE;
+	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
+	char *ptr;
+	int count, iter;
+	size_t size, l_size;
+	ability_data *abiter, *next_abil;
+	skill_data *skill, *next_skill;
+	struct ability_data_list *adl;
+	struct synergy_ability *syn;
+	
+	// starting line is based on whether this is the core ability or a sub-ability
+	if (!dependent) {
+		size = snprintf(outbuf, sizeof_outbuf, "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
+	}
+	else {
+		size = snprintf(outbuf, sizeof_outbuf, " ------------------------------------------------------------------------------\r\n");
+	}
+	
+	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+	}
+	
+	if (ABIL_ASSIGNED_SKILL(abil)) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
+		}
+		else {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
+		}
+		
+		// check purchased
+		if (!dependent) {
+			any = same = FALSE;
+			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+				if (has_ability_in_set(ch, ABIL_VNUM(abil), iter)) {
+					any = TRUE;
+					if (iter == GET_CURRENT_SKILL_SET(ch)) {
+						same = TRUE;
+					}
+				}
+			}
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
+		}
+		
+		// prerequisite ability (chain?) -- maybe?
+	}
+	
+	// assigned roles/synergies
+	count = 0;
+	l_size = 0;
+	*lbuf = '\0';
+	HASH_ITER(hh, skill_table, skill, next_skill) {
+		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+			if (syn->ability == ABIL_VNUM(abil)) {
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
+				}
+				else {
+					snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_abbrev_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
+				}
+				if (strlen(sbuf) > 41) {
+					// too long for half a line
+					l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""), sbuf);
+					if (count % 2) {
+						++count;	// fix columns for the next line, if any
+					}
+				}
+				else {
+					l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, " %-41.41s%s", sbuf, (!(++count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : " "));
+				}
+			}
+		}
+	}
+	if (*lbuf) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""));
+	}
+	
+	// types, if parameterized
+	if (ABIL_TYPE_LIST(abil)) {
+		get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, TRUE);
+		if (*lbuf) {
+			if (strstr(lbuf, "buff") && ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+				// replace "buff" with "debuff"
+				ptr = str_replace("buff", "debuff", lbuf);
+				strcpy(lbuf, ptr);
+				free(ptr);
+			}
+			has_param_details = TRUE;
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+		}
+	}
+	
+	// linked trait, if parameterized
+	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+		has_param_details = TRUE;
+		strcpy(lbuf, apply_types[ABIL_LINKED_TRAIT(abil)]);
+		strtolower(lbuf);
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+	}
+	
+	if (ABIL_REQUIRES_TOOL(abil)) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
+	}
+	
+	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %d%s %s\r\n", ABIL_COST(abil), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
+	}
+	
+	// Cooldown?
+	if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
+	}
+	else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
+	}
+	else if (ABIL_COOLDOWN_SECS(abil) > 0) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	}
+	
+	// data, if parameterized
+	if (ABIL_DATA(abil)) {
+		// techs
+		*lbuf = '\0';
+		l_size = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_PLAYER_TECH) {
+				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", (*lbuf ? ", " : ""), player_tech_types[adl->vnum]);
+			}
+		}
+		if (*lbuf) {
+			has_param_details = TRUE;
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Player tech%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+		}
+	}
+	
+	// purchased/free/can-purchase -- maybe
+	
+	// notes (flags), if parameterized -- LAST
+	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
+	if (*lbuf && str_cmp(lbuf, "none")) {
+		has_param_details = TRUE;
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Notes: %s\r\n", lbuf);
+	}
+/*
+	More things we could show (from vstat ability):
+	
+	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+
+	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
+
+	// command-related portion
+	if (ABIL_COMMAND(abil)) {
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+
+	// type-specific data
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+			strcpy(part, "unlimited");
+		}
+		else {
+			snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
+		}
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			strcpy(part2, "unlimited");
+		}
+		else {
+			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+	
+	}	// end buff/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+	
+		// applies
+		size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+		count = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), app) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+		}
+		if (!ABIL_APPLIES(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "none");
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}	// end buff
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
+	}	// end damage
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
+	}	// end damage/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
+	}	// end dot
+	
+	*/
+	
+	// children?
+	HASH_ITER(hh, ability_table, abiter, next_abil) {
+		if (!has_ability(ch, ABIL_VNUM(abiter))) {
+			continue;	// must have for this
+		}
+		if (!find_ability_data_entry_for(abiter, ADL_PARENT, ABIL_VNUM(abil))) {
+			continue;	// not my child
+		}
+		if (!has_ability_hook(abiter, AHOOK_ABILITY, ABIL_VNUM(abil))) {
+			continue;	// does not hook on me
+		}
+		
+		// seems ok
+		show_ability_details(ch, abiter, TRUE, lbuf, sizeof(lbuf));
+		if (*lbuf && size + strlen(lbuf) < sizeof_outbuf) {
+			has_param_details = TRUE;
+			strcat(outbuf, lbuf);
+			size += strlen(lbuf);
+		}
+	}
+	
+	if (!has_param_details) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
