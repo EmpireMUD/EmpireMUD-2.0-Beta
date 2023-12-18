@@ -1334,7 +1334,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
 		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
-		run_ability_hooks(i, AHOOK_ABILITY, ABIL_CONCEALMENT, ch, NULL, NULL, NULL);
+		run_ability_hooks(i, AHOOK_ABILITY, ABIL_CONCEALMENT, get_ability_level(i, ABIL_CONCEALMENT), ch, NULL, NULL, NULL);
 	}
 
 	if (ch != i) {

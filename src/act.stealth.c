@@ -251,7 +251,7 @@ void perform_escape(char_data *ch) {
 		msdp_update_room(ch);
 		
 		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ESCAPE, ch, NULL, NULL, IN_ROOM(ch));
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ESCAPE, get_ability_level(ch, ABIL_ESCAPE), ch, NULL, NULL, IN_ROOM(ch));
 	}
 	
 	end_action(ch);
@@ -479,7 +479,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
 		}
-		run_ability_hooks(vict, AHOOK_ABILITY, ABIL_RESIST_POISON, vict, NULL, NULL, NULL);
+		run_ability_hooks(vict, AHOOK_ABILITY, ABIL_RESIST_POISON, get_ability_level(vict, ABIL_RESIST_POISON), vict, NULL, NULL, NULL);
 		if (!number(0, 2)) {
 			if (GET_POISON_CHARGES(obj) <= 0) {
 				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
@@ -658,7 +658,7 @@ ACMD(do_backstab) {
 				FIGHT_WAIT(vict) = 0;
 			}
 			
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BACKSTAB, vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BACKSTAB, get_ability_level(ch, ABIL_BACKSTAB), vict, NULL, NULL, NULL);
 		}
 		
 		if (can_gain_exp_from(ch, vict)) {
@@ -716,7 +716,7 @@ ACMD(do_disguise) {
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, get_ability_level(ch, ABIL_DISGUISE), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -869,7 +869,7 @@ ACMD(do_hide) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, ch, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, get_ability_level(ch, ABIL_HIDE), ch, NULL, NULL, NULL);
 }
 
 
@@ -1064,7 +1064,7 @@ ACMD(do_jab) {
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
 			apply_dot_effect(vict, ATYPE_JABBED, 15, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, get_ability_level(ch, ABIL_JAB), vict, NULL, NULL, NULL);
 		}
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_JAB, 15);
@@ -1252,7 +1252,7 @@ ACMD(do_prick) {
 			gain_ability_exp(ch, ABIL_PRICK, 15);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PRICK, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PRICK, get_ability_level(ch, ABIL_PRICK), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1319,7 +1319,7 @@ ACMD(do_sap) {
 		// release other saps here
 		limit_crowd_control(vict, ATYPE_SAP);
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SAP, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SAP, get_ability_level(ch, ABIL_SAP), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1494,7 +1494,7 @@ ACMD(do_sneak) {
 	}
 	
 	if (IN_ROOM(ch) != was_in) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, ch, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, get_ability_level(ch, ABIL_SNEAK), ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1568,7 +1568,7 @@ ACMD(do_steal) {
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, NULL, NULL, NULL, NULL);
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, get_ability_level(ch, ABIL_STEAL), NULL, NULL, NULL, NULL);
 				}
 			}
 		}

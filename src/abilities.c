@@ -2042,7 +2042,9 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
-		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, opponent, NULL, NULL, NULL);
+		
+		// gain hooks mean the ability has fired: hook it now
+		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, get_ability_level(ch, agh->ability), opponent, NULL, NULL, NULL);
 	}
 }
 
@@ -4230,15 +4232,16 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 *
 * @param char_data *ch The player (not supported for NPCS).
 * @param bitvector_t hook_type Which AHOOK_ type is running.
+* @param int level Which level to run it at (this is passed through for some types, may be 0 to auto-detect if possible).
 * @param char_data *vict Optional: Character target (may be NULL).
 * @param obj_data *ovict Optional: Character object (may be NULL).
 * @param vehicle_data *vvict Optional: Character vehicle (may be NULL).
 * @param room_data *room_targ Optional: Character room (may be NULL).
 * @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
 */
-void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	bool any_targ, free_limiter = FALSE;
-	int cap, level;
+	int cap;
 	struct ability_hook *ahook;
 	char_data *use_char;
 	obj_data *use_obj;
@@ -4349,8 +4352,11 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			// mark already run FIRST
 			add_vnum_hash(use_limiter, ABIL_VNUM(plab->ptr), 1);
 			
-			// determine level
-			level = get_approximate_level(ch);
+			// determine level? or, preferably, inherit
+			if (!level) {
+				level = get_approximate_level(ch);
+			}
+			// validate level cap
 			if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(plab->ptr) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(plab->ptr)))) < CLASS_SKILL_CAP) {
 				level = MIN(level, cap);	// constrain by skill level
 			}
@@ -5077,7 +5083,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
 			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), vict, ovict, vvict, room_targ);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ);
 	}
 	
 	// 9. clean up data

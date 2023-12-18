@@ -263,7 +263,7 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 	
 	if (morph && MORPH_ABILITY(morph) != NO_ABIL) {
 		gain_ability_exp(ch, MORPH_ABILITY(morph), 33.4);
-		run_ability_hooks(ch, AHOOK_ABILITY, MORPH_ABILITY(morph), ch, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, MORPH_ABILITY(morph), get_ability_level(ch, MORPH_ABILITY(morph)), ch, NULL, NULL, NULL);
 	}
 
 	// update msdp

@@ -955,7 +955,7 @@ ACMD(do_track) {
 		}
 
 		gain_ability_exp(ch, ABIL_TRACK, 20);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRACK, NULL, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRACK, get_ability_level(ch, ABIL_TRACK), NULL, NULL, NULL, NULL);
 	}
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");

@@ -308,7 +308,7 @@ ACMD(do_flee) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FLEET, NULL, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FLEET, get_ability_level(ch, ABIL_FLEET), NULL, NULL, NULL, NULL);
 			}
 			else {
 				act("$n tries to flee, but can't!", TRUE, ch, 0, 0, TO_ROOM);

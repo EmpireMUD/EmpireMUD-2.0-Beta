@@ -283,7 +283,7 @@ ACMD(do_cleanse) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLEANSE, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLEANSE, get_ability_level(ch, ABIL_CLEANSE), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -574,7 +574,7 @@ ACMD(do_earthmeld) {
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_EARTHMELD, NULL, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_EARTHMELD, get_ability_level(ch, ABIL_EARTHMELD), NULL, NULL, NULL, NULL);
 }
 
 
@@ -725,7 +725,7 @@ ACMD(do_heal) {
 				
 				will_gain |= can_gain_exp_from(ch, ch_iter);
 				
-				run_ability_hooks(ch, AHOOK_ABILITY, abil, ch_iter, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, abil, get_ability_level(ch, abil), ch_iter, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -754,9 +754,9 @@ ACMD(do_heal) {
 		}
 		
 		will_gain = can_gain_exp_from(ch, vict);
-		run_ability_hooks(ch, AHOOK_ABILITY, abil, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, abil, get_ability_level(ch, abil), vict, NULL, NULL, NULL);
 		if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, get_ability_level(ch, ABIL_ANCESTRAL_HEALING), vict, NULL, NULL, NULL);
 		}
 	}
 	
@@ -907,7 +907,7 @@ ACMD(do_purify) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, get_ability_level(ch, ABIL_PURIFY), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1038,9 +1038,9 @@ ACMD(do_rejuvenate) {
 		engage_combat(ch, FIGHTING(vict), FALSE);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, vict, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, get_ability_level(ch, ABIL_REJUVENATE), vict, NULL, NULL, NULL);
 	if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, get_ability_level(ch, ABIL_ANCESTRAL_HEALING), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -1156,6 +1156,6 @@ ACMD(do_soulsight) {
 			gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SOULSIGHT, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SOULSIGHT, get_ability_level(ch, ABIL_SOULSIGHT), vict, NULL, NULL, NULL);
 	}
 }

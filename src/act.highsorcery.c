@@ -313,7 +313,7 @@ ACMD(do_disenchant) {
 			}
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, NULL, obj, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, get_ability_level(ch, ABIL_DISENCHANT), NULL, obj, NULL, NULL);
 	}
 }
 
@@ -383,7 +383,7 @@ ACMD(do_dispel) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISPEL, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISPEL, get_ability_level(ch, ABIL_DISPEL), vict, NULL, NULL, NULL);
 	}
 }
 
@@ -449,7 +449,7 @@ ACMD(do_enervate) {
 		affect_join(ch, af2, 0);
 
 		engage_combat(ch, vict, FALSE);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ENERVATE, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ENERVATE, get_ability_level(ch, ABIL_ENERVATE), vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -650,7 +650,7 @@ ACMD(do_mirrorimage) {
 	
 	add_follower(mob, ch, FALSE);
 	gain_ability_exp(ch, ABIL_MIRRORIMAGE, 15);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MIRRORIMAGE, mob, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MIRRORIMAGE, get_ability_level(ch, ABIL_MIRRORIMAGE), mob, NULL, NULL, NULL);
 	
 	load_mtrigger(mob);
 }
@@ -727,7 +727,7 @@ ACMD(do_siphon) {
 		affect_join(vict, af, 0);
 
 		engage_combat(ch, vict, FALSE);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SIPHON, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SIPHON, get_ability_level(ch, ABIL_SIPHON), vict, NULL, NULL, NULL);
 	}
 	
 	if (can_gain_exp_from(ch, vict)) {
@@ -817,6 +817,6 @@ ACMD(do_vigor) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VIGOR, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VIGOR, get_ability_level(ch, ABIL_VIGOR), vict, NULL, NULL, NULL);
 	}
 }
