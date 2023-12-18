@@ -172,7 +172,15 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		size = snprintf(outbuf, sizeof_outbuf, "Information about %s%s\t0:\r\n", ability_color(ch, abil), ABIL_NAME(abil));
 	}
 	else {
-		size = snprintf(outbuf, sizeof_outbuf, " ------------------------------------------------------------------------------\r\n");
+		strcpy(lbuf, " ");
+		for (iter = 0; iter < 79 - strlen(ABIL_NAME(abil)) - 4; ++iter) {
+			strcat(lbuf, "-");
+		}
+		sprintf(lbuf + strlen(lbuf), " %s ", ABIL_NAME(abil));
+		for (iter = 0; iter < 79 - strlen(ABIL_NAME(abil)) - 4; ++iter) {
+			strcat(lbuf, "-");
+		}
+		size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
 	}
 	
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
