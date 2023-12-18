@@ -56,6 +56,7 @@ const char *messages_file_header =
 "*\n"
 "* All records must start with 'M### 0' (for 'Message') where ### is the vnum.\n"
 "* then the name with a tilde (~)\n"
+"* then an optional death log with a tilde (~)\n"
 "* then the messages (one per line):\n"
 "*   Death Message (damager, damagee, onlookers)\n"
 "*   Miss Message (damager, damagee, onlookers)\n"
@@ -77,6 +78,7 @@ const char *messages_file_header =
 "*   ------------------------\n"
 "*   M123 a +\n"
 "*   name~\n"
+"*   death-log~\n"
 "*   first-person verb~\n"
 "*   third-person verb~\n"
 "*   noun form of the attack~\n"
@@ -86,7 +88,10 @@ const char *messages_file_header =
 "* The final numeric line contains 'damage-type weapon-type fast normal slow'.\n"
 "*   damage-type: 0=physical, 1=magical, 2=fire, 3=poison, 4=direct\n"
 "*   weapon-type: 0=blunt, 1=sharp, 2=magic\n"
-"*   speeds: number of seconds between attacks; lower is better\n";
+"*   speeds: number of seconds between attacks; lower is better\n"
+"* The death log is optional and may just be a tilde (~) on its own line if the\n"
+"* attack uses the default log of 'has been killed at'. Death logs automatically\n"
+"* start with the player's name and end with the location.\n";
 
 // local funcs
 OLC_MODULE(attackedit_speed);
@@ -1134,6 +1139,13 @@ void load_fight_messages(void) {
 				free(ATTACK_NAME(amd));
 			}
 			ATTACK_NAME(amd) = fread_string(fl, error);
+			
+			// read: deathlog
+			if (ATTACK_DEATH_LOG(amd)) {
+				// free first: more than 1 entry can have this
+				free(ATTACK_DEATH_LOG(amd));
+			}
+			ATTACK_DEATH_LOG(amd) = fread_string(fl, error);
 			
 			// had the + indicator
 			if (extended) {
