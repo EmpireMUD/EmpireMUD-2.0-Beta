@@ -2188,7 +2188,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
 		if (!can_fight(ch, vict)) {
 			if (send_msgs) {
-				act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR);
+				act("You can't attack $N!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 			}
 			return FALSE;
 		}
@@ -2774,7 +2774,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_WITHIN_RANGE: {
 				if (compute_distance(IN_ROOM(ch), other_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
 					if (vict) {
-						act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 					}
 					else {
 						msg_to_char(ch, "It's too far away.\r\n");
@@ -3198,13 +3198,13 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			any = TRUE;
 			if ((msg = _AAM_MSG(ABIL_CUSTOM_SELF_TO_CHAR))) {
 				if (*msg != '*') {
-					act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
 			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
 			// to room
@@ -3224,13 +3224,13 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			any = TRUE;
 			if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 				if (*msg != '*') {
-					act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
 			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
 			// to vict
@@ -3263,13 +3263,13 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		any = TRUE;
 		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
 		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
 		// to room
@@ -3289,13 +3289,13 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		any = TRUE;
 		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
+				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 			}
 		}
 		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
+			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		}
 	
 		// to room
@@ -3344,12 +3344,12 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 	// to-char
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR))) {
 		if (*msg != '*') {
-			act(msg, FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
+			act(msg, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
 		}
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
-		act(buf, FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
 	}
 	
 	// to vict
@@ -3412,12 +3412,12 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
 		// to room
@@ -3435,12 +3435,12 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
 		// to vict
@@ -3469,12 +3469,12 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
-				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
-			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 		
 		// to room
@@ -3533,7 +3533,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
-		act(repl, FALSE, ch, NULL, vict, TO_CHAR | act_flags);
+		act(repl, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
 	
 		// mark this now
@@ -3602,7 +3602,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
-		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
 	
 		// mark this now
@@ -3663,7 +3663,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_CHAR)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
-		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | ACT_VEH_VICT | act_flags);
+		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		free(repl);
 	
 		// mark this now
@@ -3731,7 +3731,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 			msg = repl;
 		}
 		
-		act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+		act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 	
 		// mark this now
 		if (data) {
@@ -3801,7 +3801,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) && *msg != '*') {
-			act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
@@ -3813,7 +3813,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	else if (vict) {	// message: ch != vict
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) && *msg != '*') {
-			act(msg, FALSE, ch, ovict, vict, TO_CHAR | act_flags);
+			act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
@@ -3830,7 +3830,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	else if (ovict) {	// message: ovict without vict
 		// to-char
 		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) && *msg != '*') {
-			act(msg, FALSE, ch, ovict, NULL, TO_CHAR | act_flags);
+			act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
@@ -3876,7 +3876,7 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 	// to-char
 	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_TOGGLE_TO_CHAR))) {
 		if (*msg != '*') {
-			act(msg, FALSE, ch, NULL, NULL, TO_CHAR | act_flags);
+			act(msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			if (data) {
 				data->sent_any_msg = TRUE;
 			}
@@ -4539,7 +4539,7 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 		return;
 	}
 	
@@ -4737,7 +4737,7 @@ DO_ABIL(do_dot_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 		return;
 	}
 	
@@ -5100,7 +5100,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		if (!has) {
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR);
+				act(abil_get_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 			}
 			else {
 				msg_to_char(ch, "&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");
@@ -5200,7 +5200,7 @@ PREP_ABIL(prep_buff_ability) {
 			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
 		}
 		else {
-			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | ACT_STR_OBJ);
+			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
 
 		data->stop = TRUE;
@@ -5237,12 +5237,12 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 		return;
 	}
 	if (!IS_DRINK_CONTAINER(ovict)) {
-		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR);
+		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 		CANCEL_ABILITY(data);
 		return;
 	}
 	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
-		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR);
+		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 		CANCEL_ABILITY(data);
 		return;
 	}
@@ -5263,7 +5263,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
 				// 1 is not water, or existing is not basic water
 				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
-				act(buf, FALSE, ch, ovict, NULL, TO_CHAR);
+				act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 				CANCEL_ABILITY(data);
 				return;
 			}
@@ -5318,13 +5318,13 @@ PREP_ABIL(prep_conjure_object_ability) {
 			
 			// oops
 			if (one_ata && has_any) {
-				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR);
+				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
 			}
 		}
 		else {	// no-take
 			any_room = TRUE;
 			if (one_ata && count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
-				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR);
+				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
 				has_any = TRUE;
 			}
 		}
@@ -5372,7 +5372,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
 				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
-					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | ACT_VEH_VICT);
+					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | TO_SLEEP | ACT_VEH_VICT);
 					CANCEL_ABILITY(data);
 					return;
 				}
