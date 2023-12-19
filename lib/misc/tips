@@ -153,4 +153,5 @@ Try the 'directions' command to figure out how to get to a set of coordinates.
 If the weather or temperature messages are overwhelming, try the 'statusmessages' command.
 You can look in the direction of a building to see who owns it and which direction to enter it from.
 Bound items can be stored in your home. See 'help home' for more info.
+You can see more information about an ability by typing 'ability info <name>'.
 $~

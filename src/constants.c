@@ -444,6 +444,7 @@ const char *ability_limitations[] = {
 	"wield attack type",
 	"wield weapon type",
 	"not being attacked",	// 30
+	"disarmable target",
 	"\n"
 };
 
@@ -481,6 +482,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_ATTACK_TYPE,	// ABIL_LIMIT_WIELD_ATTACK_TYPE
 	ABLIM_WEAPON_TYPE,	// ABIL_LIMIT_WIELD_WEAPON_TYPE
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED
+	ABLIM_NOTHING,	// ABIL_LIMIT_DISARMABLE_TARGET
 };
 
 

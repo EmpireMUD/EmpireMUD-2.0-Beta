@@ -2764,6 +2764,29 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_DISARMABLE_TARGET: {
+				if (vict) {
+					if (!GET_EQ(vict, WEAR_WIELD) && (!IS_NPC(vict) || !is_attack_flagged_by_vnum(MOB_ATTACK_TYPE(vict), AMDF_DISARMABLE))) {
+						if (ch == vict) {
+							msg_to_char(ch, "You aren't even using a weapon.\r\n");
+						}
+						else {
+							act("$E isn't even using a weapon.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+						return FALSE;
+					}
+					else if (AFF_FLAGGED(vict, AFF_DISARMED)) {
+						if (ch == vict) {
+							msg_to_char(ch, "You're already disarmed.\r\n");
+						}
+						else {
+							act("$E is already disarmed.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+						return FALSE;
+					}
+				}
+				break;
+			}
 		}
 	}
 	

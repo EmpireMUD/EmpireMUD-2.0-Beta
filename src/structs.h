@@ -728,37 +728,38 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ABIL_LIMIT_x: Limitations when trying to use an ability
-#define ABIL_LIMIT_ON_BARRIER  0	// must be on a barrier
-#define ABIL_LIMIT_OWN_TILE  1	// must own the tile
-#define ABIL_LIMIT_CAN_USE_GUEST  2	// guest permission on tile
-#define ABIL_LIMIT_CAN_USE_ALLY  3	// ally permission on tile
-#define ABIL_LIMIT_CAN_USE_MEMBER  4	// member permission on tile
-#define ABIL_LIMIT_ON_ROAD  5	// must be a road
-#define ABIL_LIMIT_PAINTABLE_BUILDING  6	// building can be painted by a player
-#define ABIL_LIMIT_IN_CITY  7	// must be in a city
-#define ABIL_LIMIT_HAVE_EMPIRE  8	// must be a member of an empire
-#define ABIL_LIMIT_INDOORS  9	// must be inside
-#define ABIL_LIMIT_OUTDOORS  10	// must be outdoors (includes in adventures)
-#define ABIL_LIMIT_ON_MAP  11	// won't work on interiors or adventures, but may include map buildings
-#define ABIL_LIMIT_TERRAFORM_APPROVAL  12	// check player approval
-#define ABIL_LIMIT_VALID_SIEGE_TARGET  13	// validate for siege damage
-#define ABIL_LIMIT_NOT_DISTRACTED  14	// player must not have DISTRACTED aff
-#define ABIL_LIMIT_NOT_IMMOBILIZED  15	// player must not have IMMOBILIZED aff
-#define ABIL_LIMIT_CAN_TELEPORT_HERE  16	// player can teleport here
-#define ABIL_LIMIT_WITHIN_RANGE  17	// enforces RANGE data on target
-#define ABIL_LIMIT_NOT_GOD_TARGET  18	// cannot target gods/immortal
-#define ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET  19	// must have guest permission at the target location
-#define ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET  20	// must have ally permission at the target location
-#define ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET  21	// must have member permission at the target location
-#define ABIL_LIMIT_CAN_TELEPORT_TARGET  22	// target room is teleport-able
-#define ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC  23	// check loyalty of target and forbid npcs from other empires
-#define ABIL_LIMIT_NOT_HERE  24	// cannot target own room
-#define ABIL_LIMIT_CHECK_CITY_FOUND_TIME  25	// check founded-too-recently
-#define ABIL_LIMIT_ITEM_TYPE  26	// requires a specific item type
-#define ABIL_LIMIT_WIELD_ANY_WEAPON  27	// checks for a weapon in the wield slot -- and not disarmed
-#define ABIL_LIMIT_WIELD_ATTACK_TYPE  28	// wielding a weapon with a given attack
-#define ABIL_LIMIT_WIELD_WEAPON_TYPE  29	// wielding a weapon with a given damage type
-#define ABIL_LIMIT_NOT_BEING_ATTACKED  30	// no characters hitting actor
+#define ABIL_LIMIT_ON_BARRIER				0	// must be on a barrier
+#define ABIL_LIMIT_OWN_TILE					1	// must own the tile
+#define ABIL_LIMIT_CAN_USE_GUEST			2	// guest permission on tile
+#define ABIL_LIMIT_CAN_USE_ALLY				3	// ally permission on tile
+#define ABIL_LIMIT_CAN_USE_MEMBER			4	// member permission on tile
+#define ABIL_LIMIT_ON_ROAD					5	// must be a road
+#define ABIL_LIMIT_PAINTABLE_BUILDING		6	// building can be painted by a player
+#define ABIL_LIMIT_IN_CITY					7	// must be in a city
+#define ABIL_LIMIT_HAVE_EMPIRE				8	// must be a member of an empire
+#define ABIL_LIMIT_INDOORS					9	// must be inside
+#define ABIL_LIMIT_OUTDOORS					10	// must be outdoors (includes in adventures)
+#define ABIL_LIMIT_ON_MAP					11	// won't work on interiors or adventures, but may include map buildings
+#define ABIL_LIMIT_TERRAFORM_APPROVAL		12	// check player approval
+#define ABIL_LIMIT_VALID_SIEGE_TARGET		13	// validate for siege damage
+#define ABIL_LIMIT_NOT_DISTRACTED			14	// player must not have DISTRACTED aff
+#define ABIL_LIMIT_NOT_IMMOBILIZED			15	// player must not have IMMOBILIZED aff
+#define ABIL_LIMIT_CAN_TELEPORT_HERE		16	// player can teleport here
+#define ABIL_LIMIT_WITHIN_RANGE				17	// enforces RANGE data on target
+#define ABIL_LIMIT_NOT_GOD_TARGET			18	// cannot target gods/immortal
+#define ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET		19	// must have guest permission at the target location
+#define ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET		20	// must have ally permission at the target location
+#define ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET		21	// must have member permission at the target location
+#define ABIL_LIMIT_CAN_TELEPORT_TARGET				22	// target room is teleport-able
+#define ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC	23	// check loyalty of target and forbid npcs from other empires
+#define ABIL_LIMIT_NOT_HERE					24	// cannot target own room
+#define ABIL_LIMIT_CHECK_CITY_FOUND_TIME	25	// check founded-too-recently
+#define ABIL_LIMIT_ITEM_TYPE				26	// requires a specific item type
+#define ABIL_LIMIT_WIELD_ANY_WEAPON			27	// checks for a weapon in the wield slot -- and not disarmed
+#define ABIL_LIMIT_WIELD_ATTACK_TYPE		28	// wielding a weapon with a given attack
+#define ABIL_LIMIT_WIELD_WEAPON_TYPE		29	// wielding a weapon with a given damage type
+#define ABIL_LIMIT_NOT_BEING_ATTACKED		30	// no characters hitting actor
+#define ABIL_LIMIT_DISARMABLE_TARGET		31	// target must be disarmable
 
 
 // ABLIM_x: data needed for ability limits:
