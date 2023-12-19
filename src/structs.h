@@ -566,7 +566,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_CUMULATIVE_BUFF  BIT(21)	// v. buff stacks effect
 #define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
 #define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
-#define ABILF_DIFFICULTY_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
+#define ABILF_DIFFICULT_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

@@ -4127,7 +4127,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data) {
 	int iter;
 	
-	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULTY_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
+	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
 	if (!ch || !abil) {
 		return;
