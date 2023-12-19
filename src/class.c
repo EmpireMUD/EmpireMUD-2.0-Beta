@@ -364,6 +364,29 @@ class_data *find_class_by_vnum(any_vnum vnum) {
 
 
 /**
+* @param ability_data *abil An ability to check.
+* @return bool TRUE if that ability is assigned to any class, or FALSE if not.
+*/
+bool is_class_ability(ability_data *abil) {
+	class_data *class, *next_class;
+	struct class_ability *clab;
+	
+	if (!abil) {
+		return FALSE;
+	}
+	
+	HASH_ITER(hh, class_table, class, next_class) {
+		LL_SEARCH_SCALAR(CLASS_ABILITIES(class), clab, vnum, ABIL_VNUM(abil));
+		if (clab) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// no match
+}
+
+
+/**
 * This function updates a player's class and skill levelability data based
 * on current skill levels. It will also update abilities that come from the
 * class, role, synergies, or parent abilities.

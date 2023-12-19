@@ -49,9 +49,12 @@
 #define call_do_abil(name)  (name)(ch, abil, level, vict, ovict, vvict, room_targ, data)
 #define call_prep_abil(name)  (name)(ch, abil, level, vict, ovict, vvict, room_targ, data)
 
+// abilities.c prototypes
+int get_ability_duration(char_data *ch, ability_data *abil);
 
 // class.c prototypes
 void assign_class_abilities(char_data *ch, class_data *cls, int role);
+bool is_class_ability(ability_data *abil);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 void update_class_and_abilities(char_data *ch);
 

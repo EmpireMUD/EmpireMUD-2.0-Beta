@@ -922,6 +922,28 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 
 
 /**
+* Returns the ability's long duration unless it is assigned to a skill and the
+* player is below the skill's maximum level.
+*
+* @param char_data *ch The player.
+* @param ability_data *abil Which ability.
+* @return int The duration to use for the ability.
+*
+*/
+int get_ability_duration(char_data *ch, ability_data *abil) {
+	if (!ch || !abil) {
+		return 0;
+	}
+	else if (ABIL_ASSIGNED_SKILL(abil) && get_ability_level(ch, ABIL_VNUM(abil)) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil))) {
+		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
+	}
+	else {
+		return ABIL_LONG_DURATION(abil) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	}
+}
+
+
+/**
 * @param ability_data *abil Which ability.
 * @param int hook_type Which AHOOK_ const to look for.
 * @param int hook_value Which value to match (ability vnum or 0 for many other types).
@@ -1434,29 +1456,6 @@ bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check
 	}
 	
 	return FALSE;	// does not match
-}
-
-
-/**
-* @param ability_data *abil An ability to check.
-* @return bool TRUE if that ability is assigned to any class, or FALSE if not.
-*/
-bool is_class_ability(ability_data *abil) {
-	class_data *class, *next_class;
-	struct class_ability *clab;
-	
-	if (!abil) {
-		return FALSE;
-	}
-	
-	HASH_ITER(hh, class_table, class, next_class) {
-		LL_SEARCH_SCALAR(CLASS_ABILITIES(class), clab, vnum, ABIL_VNUM(abil));
-		if (clab) {
-			return TRUE;
-		}
-	}
-	
-	return FALSE;	// no match
 }
 
 
@@ -4581,7 +4580,7 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	// determine duration (in seconds)
-	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	dur = get_ability_duration(ch, abil);
 	
 	messaged = FALSE;	// to prevent duplicates
 	
@@ -4779,7 +4778,7 @@ DO_ABIL(do_dot_ability) {
 	}
 	
 	// determine duration
-	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	dur = get_ability_duration(ch, abil);
 	
 	dmg = points * arbitrary_modifier;
 	
@@ -4849,7 +4848,7 @@ DO_ABIL(do_room_affect_ability) {
 	}
 	
 	// determine duration (in seconds)
-	dur = IS_CLASS_ABILITY(ch, ABIL_VNUM(abil)) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
+	dur = get_ability_duration(ch, abil);
 	
 	// affect flags? cost == level 100 ability
 	if (room_targ && ABIL_AFFECTS(abil)) {
