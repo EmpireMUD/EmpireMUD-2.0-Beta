@@ -5668,6 +5668,10 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	
 	// buffs and passives
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "ROOM-AFFECT type is not compatible with BUFF or PASSIVE-BUFF; use ability hooks instead");
+			problem = TRUE;
+		}
 		for (bits = ABIL_AFFECTS(abil), iter = 0; bits; bits >>= 1, ++iter) {
 			if (*affected_bits[iter] == '\n' && bits != NOBITS) {
 				olc_audit_msg(ch, ABIL_VNUM(abil), "Invalid affect flags are set");
