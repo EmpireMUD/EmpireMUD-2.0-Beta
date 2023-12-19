@@ -1249,6 +1249,7 @@ const char *player_tech_types[] = {
 	"See-In-Magic-Darkness",
 	"Track-Command",	// 85
 	"Resist-Poison",
+	"Vampire-Bite",
 	"\n"
 };
 

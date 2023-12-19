@@ -2688,7 +2688,7 @@ ACMD(do_portal) {
 	else {
 		gain_player_tech_exp(ch, PTECH_PORTAL, 15);
 		gain_player_tech_exp(ch, PTECH_PORTAL_UPGRADE, 15);
-		run_ability_hooks_by_player_tech(ch, PTECH_PORTAL);
+		run_ability_hooks_by_player_tech(ch, PTECH_PORTAL, NULL, NULL, NULL, NULL);
 	}
 	
 	command_lag(ch, WAIT_OTHER);

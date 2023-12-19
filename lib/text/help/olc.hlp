@@ -1396,6 +1396,7 @@ Available techs are:
  &cSearch-Command&0 *
  &cTrack-Command&0 *
  &cResist-Poison&0 * - Reduced effect from poisons.
+ &cVampire-Bite&0 * - Can use bite for blood, if a vampire, rather than the social.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

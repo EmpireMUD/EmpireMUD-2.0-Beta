@@ -4471,8 +4471,12 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 *
 * @param char_data *ch The player.
 * @param int tech The PTECH_ type that's being used.
+* @param char_data *vict Victim, if any (may be NULL).
+* @param obj_data *ovict Object target, if any (may be NULL).
+* @param vehicle_data *vvict Vehicle target, if any (may be NULL).
+* @param room_data *room_targ Room target, if any (may be NULL).
 */
-void run_ability_hooks_by_player_tech(char_data *ch, int tech) {
+void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	struct player_tech *iter;
 	
 	if (IS_NPC(ch)) {
@@ -4481,7 +4485,7 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech) {
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, get_ability_level(ch, iter->abil), ch, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, get_ability_level(ch, iter->abil), vict ? vict : ch, ovict, vvict, room_targ);
 		}
 	}
 }
@@ -4937,7 +4941,7 @@ DO_ABIL(do_teleport_ability) {
 			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
 			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
-			run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE);
+			run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL, NULL, NULL);
 			add_offense(ROOM_OWNER(to_room), OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(to_room), was_in) ? OFF_SEEN : NOBITS);
 		}
 	}

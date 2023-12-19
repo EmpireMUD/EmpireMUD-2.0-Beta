@@ -1091,7 +1091,7 @@ INTERACTION_FUNC(finish_gathering) {
 		}
 		
 		gain_player_tech_exp(ch, PTECH_GATHER_COMMAND, 10);
-		run_ability_hooks_by_player_tech(ch, PTECH_GATHER_COMMAND);
+		run_ability_hooks_by_player_tech(ch, PTECH_GATHER_COMMAND, NULL, NULL, NULL, NULL);
 		
 		// action does not end normally
 		
@@ -1351,7 +1351,7 @@ void perform_saw(char_data *ch) {
 		
 		if (success && proto) {
 			gain_player_tech_exp(ch, PTECH_SAW_COMMAND, 10);
-			run_ability_hooks_by_player_tech(ch, PTECH_SAW_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_SAW_COMMAND, NULL, NULL, NULL, NULL);
 			
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1485,7 +1485,7 @@ void process_burn_area(char_data *ch) {
 			act("You light some fires!", FALSE, ch, NULL, NULL, TO_CHAR);
 			act("$n lights some fires!", FALSE, ch, NULL, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
-			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL, NULL, NULL);
 		}
 		
 		// alert?
@@ -1551,7 +1551,7 @@ void process_chipping(char_data *ch) {
 
 		if (success) {
 			gain_player_tech_exp(ch, PTECH_CHIP_COMMAND, 25);
-			run_ability_hooks_by_player_tech(ch, PTECH_CHIP_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_CHIP_COMMAND, NULL, NULL, NULL, NULL);
 			
 			// repeat! (no -paul) note: keyword-targeting is hard because "chipped flint" also has "flint" as an alias
 			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1624,7 +1624,7 @@ void process_chop(char_data *ch) {
 		change_chop_territory(IN_ROOM(ch));
 		
 		gain_player_tech_exp(ch, PTECH_CHOP_COMMAND, 15);
-		run_ability_hooks_by_player_tech(ch, PTECH_CHOP_COMMAND);
+		run_ability_hooks_by_player_tech(ch, PTECH_CHOP_COMMAND, NULL, NULL, NULL, NULL);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1664,7 +1664,7 @@ void process_digging(char_data *ch) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG_COMMAND, 10);
-			run_ability_hooks_by_player_tech(ch, PTECH_DIG_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_DIG_COMMAND, NULL, NULL, NULL, NULL);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
@@ -1944,7 +1944,7 @@ void process_fishing(char_data *ch) {
 		}
 		
 		gain_player_tech_exp(ch, PTECH_FISH_COMMAND, 15);
-		run_ability_hooks_by_player_tech(ch, PTECH_FISH_COMMAND);
+		run_ability_hooks_by_player_tech(ch, PTECH_FISH_COMMAND, NULL, NULL, NULL, NULL);
 		
 		// restart action
 		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_EASY) ? 2 : 1));
@@ -1998,12 +1998,12 @@ void process_foraging(char_data *ch) {
 		else {	// success
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, NULL, GUESTS_ALLOWED, finish_foraging)) {
 				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
-				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND);
+				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL, NULL, NULL);
 				found = TRUE;
 			}
 			else if (do_crop_forage(ch)) {
 				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
-				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND);
+				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL, NULL, NULL);
 				found = TRUE;
 			}
 			
@@ -2117,7 +2117,7 @@ void process_harvesting(char_data *ch) {
 			// skillups
 			gain_player_tech_exp(ch, PTECH_HARVEST_COMMAND, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
-			run_ability_hooks_by_player_tech(ch, PTECH_HARVEST_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_HARVEST_COMMAND, NULL, NULL, NULL, NULL);
 		}
 		else {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
@@ -2182,7 +2182,7 @@ void process_hunting(char_data *ch) {
 		
 		end_action(ch);
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
-		run_ability_hooks_by_player_tech(ch, PTECH_HUNT_ANIMALS);
+		run_ability_hooks_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL, NULL);
 		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
 	}
 	else {
@@ -2373,7 +2373,7 @@ void process_minting(char_data *ch) {
 		
 		end_action(ch);
 		gain_player_tech_exp(ch, PTECH_MINT_COMMAND, 30);
-		run_ability_hooks_by_player_tech(ch, PTECH_MINT_COMMAND);
+		run_ability_hooks_by_player_tech(ch, PTECH_MINT_COMMAND, NULL, NULL, NULL, NULL);
 		
 		// repeat?
 		if (*tmp) {
@@ -2564,7 +2564,7 @@ void process_planting(char_data *ch) {
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
 		gain_player_tech_exp(ch, PTECH_PLANT_CROPS, 30);
-		run_ability_hooks_by_player_tech(ch, PTECH_PLANT_CROPS);
+		run_ability_hooks_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL, NULL, NULL);
 		end_action(ch);
 	}
 }
@@ -2751,7 +2751,7 @@ void process_scraping(char_data *ch) {
 		
 		if (success && proto) {
 			gain_player_tech_exp(ch, PTECH_SCRAPE_COMMAND, 10);
-			run_ability_hooks_by_player_tech(ch, PTECH_SCRAPE_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_SCRAPE_COMMAND, NULL, NULL, NULL, NULL);
 			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2888,7 +2888,7 @@ void process_tanning(char_data *ch) {
 		
 		if (success) {
 			gain_player_tech_exp(ch, PTECH_TAN_COMMAND, 20);
-			run_ability_hooks_by_player_tech(ch, PTECH_TAN_COMMAND);
+			run_ability_hooks_by_player_tech(ch, PTECH_TAN_COMMAND, NULL, NULL, NULL, NULL);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -4235,7 +4235,7 @@ void process_gen_interact_room(char_data *ch) {
 			
 			if (data->ptech) {
 				gain_player_tech_exp(ch, data->ptech, 10);
-				run_ability_hooks_by_player_tech(ch, data->ptech);
+				run_ability_hooks_by_player_tech(ch, data->ptech, NULL, NULL, NULL, IN_ROOM(ch));
 			}
 			
 			// character is still there? repeat

@@ -5179,7 +5179,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 							}
 							case INTERACT_RESTRICT_PTECH: {
 								gain_player_tech_exp(ch, res->vnum, 5);
-								run_ability_hooks_by_player_tech(ch, res->vnum);
+								run_ability_hooks_by_player_tech(ch, res->vnum, inter_mob, inter_item, inter_veh, inter_room);
 								break;
 							}
 						}
@@ -10809,7 +10809,7 @@ int find_all_dots(char *arg) {
  * @param char_data *ch This is the person that is trying to "find" something
  * @param char_data **tar_ch Will be NULL if no character was found, otherwise points
  * @param obj_data **tar_obj Will be NULL if no object was found, otherwise points
- * @param veh_data **tar_veh Will be NULL if no vehicle was found, otherwise points
+ * @param vehicle_data **tar_veh Will be NULL if no vehicle was found, otherwise points
  * @return bitvector_t Which type was found, or NOBITS for none
  */
 bitvector_t generic_find(char *arg, int *number, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {

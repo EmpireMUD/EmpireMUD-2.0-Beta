@@ -2359,7 +2359,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
-			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING);
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL, IN_ROOM(ch));
 			set_room_custom_name(IN_ROOM(ch), arg2);
 			
 			// they lose hide-real-name if they rename it themselves
@@ -2387,7 +2387,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
-			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING);
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL, IN_ROOM(ch));
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 			ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);

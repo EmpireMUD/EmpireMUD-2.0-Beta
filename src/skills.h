@@ -97,6 +97,7 @@ bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum
 void set_skill(char_data *ch, any_vnum skill, int level);
 bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
+bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech);
 
 // spells.c prototypes
 bool trigger_counterspell(char_data *ch, char_data *triggered_by);
@@ -280,7 +281,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 // #define ABIL_SHADOWLASH  282
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
-#define ABIL_BITE  292
+// #define ABIL_BITE  292
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_TRICK_SHOTS  296

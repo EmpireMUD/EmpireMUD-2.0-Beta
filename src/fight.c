@@ -709,8 +709,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			gain_player_tech_exp(victim, PTECH_NO_POISON, 2);
 			gain_player_tech_exp(victim, PTECH_RESIST_POISON, 5);
 		}
-		run_ability_hooks_by_player_tech(victim, PTECH_RESIST_POISON);
-		run_ability_hooks_by_player_tech(victim, PTECH_NO_POISON);
+		run_ability_hooks_by_player_tech(victim, PTECH_RESIST_POISON, attacker, NULL, NULL, NULL);
+		run_ability_hooks_by_player_tech(victim, PTECH_NO_POISON, attacker, NULL, NULL, NULL);
 	}
 	
 	return dam;

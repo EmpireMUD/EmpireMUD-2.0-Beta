@@ -823,7 +823,7 @@ void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_player_tech_exp(ch, tech, amount);
-				run_ability_hooks_by_player_tech(ch, tech);
+				run_ability_hooks_by_player_tech(ch, tech, NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -1754,6 +1754,39 @@ bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
 	else {
 		return FALSE;	// no abil
 	}
+}
+
+
+/**
+* Runs a skill check based on a tech (when you don't know the actual ability).
+* This uses the ability's own difficulty setting.
+*
+* @param char_data *ch The person doing the skill check.
+* @param int tech Which PTECH_ type.
+* @return bool TRUE if passed, FALSE if failed.
+*/
+bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech) {
+	ability_data *abil;
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id != tech) {
+			continue;	// wrong tech
+		}
+		if (!(abil = ability_proto(iter->abil))) {
+			continue;	// no data?
+		}
+		
+		if (skill_check(ch, iter->abil, ABIL_DIFFICULTY(abil))) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// no abil or no success
 }
 
 

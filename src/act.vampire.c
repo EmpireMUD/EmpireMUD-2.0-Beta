@@ -765,9 +765,9 @@ void update_biting_char(char_data *ch) {
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
-	gain_ability_exp(ch, ABIL_BITE, 5);
+	gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 5);
 	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SANGUINE_RESTORATION, get_ability_level(ch, ABIL_SANGUINE_RESTORATION), ch, NULL, NULL, NULL);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BITE, get_ability_level(ch, ABIL_BITE), victim, NULL, NULL, NULL);
+	run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL, NULL);
 }
 
 
@@ -945,7 +945,7 @@ ACMD(do_bite) {
 	else if (GET_FEEDING_FROM(ch)) {
 		msg_to_char(ch, "You are already biting someone!\r\n");
 	}
-	else if (!IS_VAMPIRE(ch)) {
+	else if (!IS_VAMPIRE(ch) || !has_player_tech(ch, PTECH_VAMPIRE_BITE)) {
 		if ((soc = find_social(ch, "bite", TRUE))) {
 			// perform a bite social if possible (pass through args)
 			perform_social(ch, soc, argument);
@@ -996,7 +996,7 @@ ACMD(do_bite) {
 	else if (NOT_MELEE_RANGE(ch, victim)) {
 		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_BITE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL)) {
 		return;
 	}
 	else {
@@ -1041,7 +1041,7 @@ ACMD(do_bite) {
 			melee = (has_player_tech(ch, PTECH_BITE_MELEE_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			tank = (has_player_tech(ch, PTECH_BITE_TANK_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			attacked = TRUE;
-			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
+			success = player_tech_skill_check_by_ability_difficulty(ch, PTECH_VAMPIRE_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
 			
 			// only cools down if it's an attack bite
 			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
@@ -1077,7 +1077,7 @@ ACMD(do_bite) {
 			}
 			
 			if (can_gain_exp_from(ch, victim)) {
-				gain_ability_exp(ch, ABIL_BITE, 10);
+				gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 10);
 				if (melee) {
 					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
 				}
@@ -1085,12 +1085,12 @@ ACMD(do_bite) {
 					gain_player_tech_exp(ch, PTECH_BITE_TANK_UPGRADE, 10);
 				}
 			}
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BITE, get_ability_level(ch, ABIL_BITE), victim, NULL, NULL, NULL);
+			run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL, NULL);
 			if (melee) {
-				run_ability_hooks_by_player_tech(ch, PTECH_BITE_MELEE_UPGRADE);
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_MELEE_UPGRADE, victim, NULL, NULL, NULL);
 			}
 			if (tank) {
-				run_ability_hooks_by_player_tech(ch, PTECH_BITE_TANK_UPGRADE);
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_TANK_UPGRADE, victim, NULL, NULL, NULL);
 			}
 		}
 		

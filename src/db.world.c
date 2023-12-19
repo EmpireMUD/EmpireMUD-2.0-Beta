@@ -791,7 +791,7 @@ GLB_FUNCTION(run_global_mine_data) {
 		multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 		if (ch) {
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
-			run_ability_hooks_by_player_tech(ch, PTECH_DEEP_MINES);
+			run_ability_hooks_by_player_tech(ch, PTECH_DEEP_MINES, NULL, NULL, NULL, IN_ROOM(ch));
 		}
 	}
 	

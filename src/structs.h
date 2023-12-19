@@ -2729,6 +2729,7 @@ typedef enum {
 #define PTECH_SEE_IN_MAGIC_DARKNESS  84	// sees through darkness room affect
 #define PTECH_TRACK_COMMAND  85	// can use 'track'
 #define PTECH_RESIST_POISON  86	// minor resistance
+#define PTECH_VAMPIRE_BITE  87	// can use 'bite' for blood instead of the social
 
 
 // SM_x: status messages
