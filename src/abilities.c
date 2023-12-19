@@ -107,41 +107,41 @@ struct {
 	bitvector_t type;	// ABILT_ const
 	PREP_ABIL(*prep_func);	// does the cost setup
 	DO_ABIL(*do_func);	// runs the ability
-	// bitvector_t menus;	// what shows in the menu
+	bitvector_t fields;	// what shows in the menu/stats
 } do_ability_data[] = {
 	
 	// ABILT_x: setup by type; they run in this order:
 	
 	// types that don't run functions
-	{ ABILT_CRAFT, NULL, NULL },
-	{ ABILT_PLAYER_TECH, NULL, NULL },
-	{ ABILT_PASSIVE_BUFF, NULL, NULL },
-	{ ABILT_READY_WEAPONS, NULL, NULL },
-	{ ABILT_COMPANION, NULL, NULL },
-	{ ABILT_SUMMON_ANY, NULL, NULL },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL },
-	{ ABILT_MORPH, NULL, NULL },
-	{ ABILT_AUGMENT, NULL, NULL },
-	{ ABILT_CUSTOM, NULL, NULL },
+	{ ABILT_CRAFT, NULL, NULL, NOBITS },
+	{ ABILT_PLAYER_TECH, NULL, NULL, NOBITS },
+	{ ABILT_PASSIVE_BUFF, NULL, NULL, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
+	{ ABILT_READY_WEAPONS, NULL, NULL, ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT },
+	{ ABILT_COMPANION, NULL, NULL, ABILEDIT_COST | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_ANY, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_MORPH, NULL, NULL, NOBITS },
+	{ ABILT_AUGMENT, NULL, NULL, NOBITS },
+	{ ABILT_CUSTOM, NULL, NULL, NOBITS },
 	
 	// ones that should run early
-	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability },
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, ABILEDIT_COMMAND },
 	
-	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability },
-	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability },
-	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability },
+	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
 	
 	// run these late
-	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability },
-	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability },
-	{ ABILT_BUFF, prep_buff_ability, do_buff_ability },
-	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
-	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability },
+	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability, ABILEDIT_COMMAND },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
+	{ ABILT_DOT, prep_dot_ability, do_dot_ability, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES },
+	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, ABILEDIT_COMMAND },
 	
 	// alaways run actions last
-	{ ABILT_ACTION, prep_action_ability, do_action_ability },
-	{ NOBITS }	// this goes last
+	{ ABILT_ACTION, prep_action_ability, do_action_ability, ABILEDIT_COMMAND },
+	{ NOBITS, NULL, NULL, NOBITS }	// this goes last
 };
 
 
@@ -7191,6 +7191,93 @@ ability_data *setup_olc_ability(ability_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* Determines what fields can appear in the ability menu, stat ability, etc.
+*
+* @param ability_data *abil The ability to check.
+* @return bitvector_t ABILEDIT_ flags indicating what fields to show.
+*/
+bitvector_t ability_shows_fields(ability_data *abil) {
+	bitvector_t fields = NOBITS;
+	int iter;
+	
+	// types
+	for (iter = 0; do_ability_data[iter].type != NOBITS; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type)) {
+			fields |= do_ability_data[iter].fields;
+		}
+	}
+	
+	// flags
+	if (ABILITY_FLAGGED(abil, ABILF_DIFFICULT_ANYWAY)) {
+		fields |= ABILEDIT_DIFFICULTY;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
+		fields |= ABILEDIT_COMMAND;
+	}
+	
+	// properties
+	if (ABIL_COMMAND(abil)) {
+		fields |= ABILEDIT_TARGETS | ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_MIN_POS | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY | ABILEDIT_IMMUNITIES | ABILEDIT_TOOL;
+	}
+	if (ABIL_HOOKS(abil)) {
+		fields |= ABILEDIT_DIFFICULTY | ABILEDIT_IMMUNITIES | ABILEDIT_MIN_POS | ABILEDIT_TARGETS | ABILEDIT_COST | ABILEDIT_COOLDOWN | ABILEDIT_TOOL;
+	}
+	
+	// and also show fields it somehow set when it shouldn't have
+	if (ABIL_IMMUNITIES(abil)) {
+		fields |= ABILEDIT_IMMUNITIES;
+	}
+	if (ABIL_TARGETS(abil)) {
+		fields |= ABILEDIT_TARGETS;
+	}
+	if (ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_RESOURCE_COST(abil)) {
+		fields |= ABILEDIT_COST;
+	}
+	if (ABIL_MIN_POS(abil) != POS_STANDING) {
+		fields |= ABILEDIT_MIN_POS;
+	}
+	if (ABIL_WAIT_TYPE(abil)) {
+		fields |= ABILEDIT_WAIT;
+	}
+	if (ABIL_SHORT_DURATION(abil) || ABIL_LONG_DURATION(abil)) {
+		fields |= ABILEDIT_DURATION;
+	}
+	if (ABIL_AFFECTS(abil)) {
+		fields |= ABILEDIT_AFFECTS;
+	}
+	if (ABIL_APPLIES(abil)) {
+		fields |= ABILEDIT_APPLIES;
+	}
+	if (ABIL_AFFECT_VNUM(abil) != NOTHING) {
+		fields |= ABILEDIT_AFFECT_VNUM;
+	}
+	if (ABIL_ATTACK_TYPE(abil) > 0) {
+		fields |= ABILEDIT_ATTACK_TYPE;
+	}
+	if (ABIL_DAMAGE_TYPE(abil) != 0) {
+		fields |= ABILEDIT_DAMAGE_TYPE;
+	}
+	if (ABIL_MAX_STACKS(abil) > 1) {
+		fields |= ABILEDIT_MAX_STACKS;
+	}
+	if (ABIL_INTERACTIONS(abil)) {
+		fields |= ABILEDIT_INTERACTIONS;
+	}
+	if (ABIL_COOLDOWN_SECS(abil) > 0) {
+		fields |= ABILEDIT_COOLDOWN;
+	}
+	if (ABIL_DIFFICULTY(abil) > 0) {
+		fields |= ABILEDIT_DIFFICULTY;
+	}
+	if (ABIL_REQUIRES_TOOL(abil)) {
+		fields |= ABILEDIT_TOOL;
+	}
+	
+	return fields;
+}
+
+
+/**
 * For vstat.
 *
 * @param char_data *ch The player requesting stats.
@@ -7202,12 +7289,15 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	struct ability_hook *ahook;
 	struct custom_message *custm;
 	struct apply_data *app;
+	bitvector_t fields;
 	size_t size;
 	int count;
 	
 	if (!abil) {
 		return;
 	}
+	
+	fields = ability_shows_fields(abil);
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -7220,35 +7310,47 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
-	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
+		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
 	
-	// command-related portion
-	sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-	if (!ABIL_COMMAND(abil)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0], Targets: \tg%s\t0\r\n", part);
+	if (IS_SET(fields, ABILEDIT_COMMAND)) {
+		if (!ABIL_COMMAND(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0]\r\n", ABIL_COMMAND(abil));
+		}
 	}
-	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
+	if (IS_SET(fields, ABILEDIT_TARGETS)) {
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COOLDOWN)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	}
+	if (IS_SET(fields, ABILEDIT_COST)) {
+		get_resource_display(ABIL_RESOURCE_COST(abil), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+	}
+	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)]);
+	}
 	
-	// resources
-	get_resource_display(ABIL_RESOURCE_COST(abil), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+	size += snprintf(buf + size, sizeof(buf) - size, "Linked trait: [\ty%s\t0]\r\n", apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
-	
-	prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Requires tool: &g%s&0\r\n", part);
-	
-	size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
-	
-	// ABILT_x: type-specific data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
+	if (IS_SET(fields, ABILEDIT_TOOL)) {
+		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Requires tool: &g%s&0\r\n", part);
+	}
+	if (IS_SET(fields, ABILEDIT_DIFFICULTY | ABILEDIT_WAIT)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
+	}
+	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 			strcpy(part, "unlimited");
 		}
@@ -7262,18 +7364,21 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
-		
-		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-	}	// end buff/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
-		sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Room affect flags: \tg%s\t0\r\n", part);
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-		sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
-		
-		// applies
+	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+	}
+	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Room affect flags: \tg%s\t0\r\n", part);
+		}
+		else {
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+		}
+	}
+	if (IS_SET(fields, ABILEDIT_APPLIES)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), app) {
@@ -7283,17 +7388,18 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			size += snprintf(buf + size, sizeof(buf) - size, "none");
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-	}	// end buff
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d %s\t0]\r\n", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}	// end damage
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+	}
+	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}	// end damage/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+	}
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
-	}	// end dot
+	}
 	
+	// custom messages
 	if (ABIL_CUSTOM_MSGS(abil)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
 		
@@ -7311,7 +7417,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		}
 	}
 	
-	if (ABIL_INTERACTIONS(abil)) {
+	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
 		get_interaction_display(ABIL_INTERACTIONS(abil), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Interactions:\r\n%s", part);
 	}
@@ -7342,12 +7448,14 @@ void olc_show_ability(char_data *ch) {
 	struct ability_hook *ahook;
 	struct custom_message *custm;
 	struct apply_data *apply;
+	bitvector_t fields;
 	int count;
 	
 	if (!abil) {
 		return;
 	}
 	
+	fields = ability_shows_fields(abil);
 	*buf = '\0';
 	
 	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
@@ -7362,36 +7470,55 @@ void olc_show_ability(char_data *ch) {
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
 	
-	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%simmunities\t0> %s\r\n", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
+	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
+		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<%simmunities\t0> %s\r\n", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
+	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sgainhooks\t0> %s\r\n", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
-	// command-related portion
-	sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-	if (!ABIL_COMMAND(abil)) {
-		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command), <%stargets\t0> %s\r\n", OLC_LABEL_UNCHANGED, OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+	if (IS_SET(fields, ABILEDIT_COMMAND)) {
+		if (!ABIL_COMMAND(abil)) {
+			sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)\r\n", OLC_LABEL_UNCHANGED);
+		}
+		else {
+			sprintf(buf + strlen(buf), "<%scommand\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+		}
 	}
-	else {
-		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%stargets\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+	if (IS_SET(fields, ABILEDIT_TARGETS)) {
+		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<%stargets\t0> %s\r\n", OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
-	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	if (IS_SET(fields, ABILEDIT_COST)) {
+		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
+	}
+	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
+		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	}
 
 	// resources
-	get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
-	sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
-
-	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	if (IS_SET(fields, ABILEDIT_COST)) {
+		get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
+		sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
+	}
+	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
+		sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)]);
+	}
 	
-	sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
-	sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
-	
-	// type-specific data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
+	if (IS_SET(fields, ABILEDIT_TOOL)) {
+		sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
+	}
+	if (IS_SET(fields, ABILEDIT_DIFFICULTY)) {
+		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+	}
+	if (IS_SET(fields, ABILEDIT_WAIT)) {
+		sprintf(buf + strlen(buf), "<%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
+	}
+	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
 			sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
 		}
@@ -7405,33 +7532,36 @@ void olc_show_ability(char_data *ch) {
 		else {
 			sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 		}
-	}	// end buff/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
-		
+	}
+	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+		}
+		else {
+			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+		}
+	}
+	if (IS_SET(fields, ABILEDIT_APPLIES)) {
 		sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
 			sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
 		}
-	}	// end buff
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
-		sprintbit(ABIL_AFFECTS(abil), room_aff_bits, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
-	}	// end room affect
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT)) {
+	}
+	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
 		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-	}	// end buff/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
 		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}	// end damage
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+	}
+	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
 		sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}	// end damage/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+	}
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
 		sprintf(buf + strlen(buf), "<%smaxstacks\t0> %d\r\n", OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
-	}	// end dot
+	}
 	
 	// custom messages
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
@@ -7448,10 +7578,12 @@ void olc_show_ability(char_data *ch) {
 	}
 	
 	// interactions
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
-	if (ABIL_INTERACTIONS(abil)) {
-		get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
-		strcat(buf, lbuf);
+	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
+		sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
+		if (ABIL_INTERACTIONS(abil)) {
+			get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
+			strcat(buf, lbuf);
+		}
 	}
 	
 	// data
@@ -7492,14 +7624,14 @@ int vnum_ability(char *searchname, char_data *ch) {
 OLC_MODULE(abiledit_affects) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
-	}
-	else if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", room_aff_bits, ABIL_AFFECTS(abil));
 	}
+	else if (IS_SET(ability_shows_fields(abil), ABILEDIT_AFFECTS)) {
+		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
+	}
 	else {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 }
 
@@ -7509,10 +7641,8 @@ OLC_MODULE(abiledit_affectvnum) {
 	generic_data *gen;
 	any_vnum old;
 	
-	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_AFFECT_VNUM)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
 		ABIL_AFFECT_VNUM(abil) = NOTHING;
@@ -7535,7 +7665,13 @@ OLC_MODULE(abiledit_affectvnum) {
 
 OLC_MODULE(abiledit_apply) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_APPLIES)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
+	}
 }
 
 
@@ -7544,10 +7680,8 @@ OLC_MODULE(abiledit_attacktype) {
 	int old = ABIL_ATTACK_TYPE(abil);
 	attack_message_data *amd;
 	
-	bitvector_t allowed_types = ABILT_DAMAGE;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_ATTACK_TYPE)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else {
 		ABIL_ATTACK_TYPE(abil) = olc_process_number(ch, argument, "attack type", "attacktype", 0, MAX_VNUM, ABIL_ATTACK_TYPE(abil));
@@ -7565,7 +7699,10 @@ OLC_MODULE(abiledit_attacktype) {
 OLC_MODULE(abiledit_cdtime) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (ABIL_COOLDOWN(abil) == NOTHING) {
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COOLDOWN)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else if (ABIL_COOLDOWN(abil) == NOTHING) {
 		msg_to_char(ch, "Set a cooldown vnum first.\r\n");
 	}
 	else {
@@ -7577,7 +7714,10 @@ OLC_MODULE(abiledit_cdtime) {
 OLC_MODULE(abiledit_command) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!str_cmp(argument, "none")) {
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COMMAND)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
 		if (ABIL_COMMAND(abil)) {
 			free(ABIL_COMMAND(abil));
 		}
@@ -7606,7 +7746,10 @@ OLC_MODULE(abiledit_cooldown) {
 	any_vnum old;
 	char arg2[MAX_INPUT_LENGTH];
 	
-	if (!str_cmp(argument, "none")) {
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COOLDOWN)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
 		ABIL_COOLDOWN(abil) = NOTHING;
 		ABIL_COOLDOWN_SECS(abil) = 0;
 		msg_to_char(ch, "It no longer has a cooldown.\r\n");
@@ -7633,25 +7776,42 @@ OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	char arg2[MAX_INPUT_LENGTH];
 	
-	two_arguments(argument, arg, arg2);
-	ABIL_COST(abil) = olc_process_number(ch, arg, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		two_arguments(argument, arg, arg2);
+		ABIL_COST(abil) = olc_process_number(ch, arg, "cost", "cost", 0, INT_MAX, ABIL_COST(abil));
 	
-	// optional cost type: pass through
-	if (*arg2) {
-		abiledit_costtype(ch, type, arg2);
+		// optional cost type: pass through
+		if (*arg2) {
+			abiledit_costtype(ch, type, arg2);
+		}
 	}
 }
 
 
 OLC_MODULE(abiledit_costperscalepoint) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
+	}
 }
 
 
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
+	}
 }
 
 
@@ -7665,10 +7825,8 @@ OLC_MODULE(abiledit_custom) {
 OLC_MODULE(abiledit_damagetype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_DAMAGE | ABILT_DOT;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DAMAGE_TYPE)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else {
 		ABIL_DAMAGE_TYPE(abil) = olc_process_type(ch, argument, "damage type", "damagetype", damage_types, ABIL_DAMAGE_TYPE(abil));
@@ -7921,7 +8079,13 @@ OLC_MODULE(abiledit_data) {
 
 OLC_MODULE(abiledit_difficulty) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DIFFICULTY)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
+	}
 }
 
 
@@ -8098,13 +8262,25 @@ OLC_MODULE(abiledit_flags) {
 
 OLC_MODULE(abiledit_immunities) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_IMMUNITIES(abil) = olc_process_flag(ch, argument, "immunity", "immunities", affected_bits, ABIL_IMMUNITIES(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_IMMUNITIES)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_IMMUNITIES(abil) = olc_process_flag(ch, argument, "immunity", "immunities", affected_bits, ABIL_IMMUNITIES(abil));
+	}
 }
 
 
 OLC_MODULE(abiledit_interaction) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	olc_process_interactions(ch, argument, &ABIL_INTERACTIONS(abil), TYPE_ABIL);
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_INTERACTIONS)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		olc_process_interactions(ch, argument, &ABIL_INTERACTIONS(abil), TYPE_ABIL);
+	}
 }
 
 
@@ -8112,7 +8288,7 @@ OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_DAMAGE | ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else {
 		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
@@ -8123,10 +8299,8 @@ OLC_MODULE(abiledit_linkedtrait) {
 OLC_MODULE(abiledit_longduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DURATION)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
@@ -8173,10 +8347,8 @@ OLC_MODULE(abiledit_masteryability) {
 OLC_MODULE(abiledit_maxstacks) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_DOT;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_MAX_STACKS)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else {
 		ABIL_MAX_STACKS(abil) = olc_process_number(ch, argument, "max stacks", "maxstacks", 1, 1000, ABIL_MAX_STACKS(abil));
@@ -8186,7 +8358,13 @@ OLC_MODULE(abiledit_maxstacks) {
 
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_MIN_POS)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
+	}
 }
 
 
@@ -8198,7 +8376,13 @@ OLC_MODULE(abiledit_name) {
 
 OLC_MODULE(abiledit_resourcecost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	olc_process_resources(ch, argument, &ABIL_RESOURCE_COST(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		olc_process_resources(ch, argument, &ABIL_RESOURCE_COST(abil));
+	}
 }
 
 
@@ -8214,10 +8398,8 @@ OLC_MODULE(abiledit_scale) {
 OLC_MODULE(abiledit_shortduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF | ABILT_DOT | ABILT_ROOM_AFFECT;
-	
-	if (!IS_SET(ABIL_TYPES(abil), allowed_types)) {
-		msg_to_char(ch, "This type of ability does not have this property.\r\n");
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DURATION)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
@@ -8236,13 +8418,25 @@ OLC_MODULE(abiledit_shortduration) {
 
 OLC_MODULE(abiledit_targets) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_TARGETS)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
+	}
 }
 
 
 OLC_MODULE(abiledit_tools) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_REQUIRES_TOOL(abil) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, ABIL_REQUIRES_TOOL(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_TOOL)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_REQUIRES_TOOL(abil) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, ABIL_REQUIRES_TOOL(abil));
+	}
 }
 
 
@@ -8355,5 +8549,11 @@ OLC_MODULE(abiledit_types) {
 
 OLC_MODULE(abiledit_waittype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_WAIT)) {
+		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+	}
+	else {
+		ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
+	}
 }

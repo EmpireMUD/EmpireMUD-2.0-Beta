@@ -111,6 +111,7 @@
 #define ABILEDIT_COOLDOWN		BIT(13)
 #define ABILEDIT_DIFFICULTY		BIT(14)
 #define ABILEDIT_TOOL			BIT(15)
+#define ABILEDIT_DAMAGE_TYPE	BIT(16)
 
 
 // TRIG_ARG_x: for trigger editing
