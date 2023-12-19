@@ -751,6 +751,9 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
 		return;
 	}
+	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL)) {
+		return;
+	}
 	
 	// build lists: vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {

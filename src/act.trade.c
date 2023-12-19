@@ -2915,6 +2915,9 @@ ACMD(do_tame) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME, mob, NULL)) {
+		// triggered
+	}
 	else {
 		act("You try to tame $N...", FALSE, ch, NULL, mob, TO_CHAR);
 		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);

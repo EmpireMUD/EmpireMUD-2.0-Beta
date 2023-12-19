@@ -2952,6 +2952,9 @@ ACMD(do_herd) {
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD, victim, NULL)) {
+		// triggered
+	}
 	
 	// herd out of vehicle:
 	else if (!str_cmp(dir_arg, "out") || !str_cmp(dir_arg, "exit") || !str_cmp(dir_arg, "outside")) {
@@ -3208,6 +3211,9 @@ ACMD(do_milk) {
 		msg_to_char(ch, "It's already full of something else.\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) >= GET_DRINK_CONTAINER_CAPACITY(cont))
 		msg_to_char(ch, "It's already full.\r\n");
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK, mob, cont)) {
+		// triggered
+	}
 	else {
 		act("You milk $N into $p.", FALSE, ch, cont, mob, TO_CHAR);
 		act("$n milks $N into $p.", FALSE, ch, cont, mob, TO_ROOM);
@@ -3959,6 +3965,9 @@ ACMD(do_shear) {
 	}
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR, mob, NULL)) {
+		// triggered
 	}
 	else {
 		check_scaling(mob, ch);	// ensure mob is scaled -- this matters for global interactions

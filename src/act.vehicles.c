@@ -888,6 +888,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize that.\r\n");
 	}
+	else if (!VEH_FLAGGED(veh, VEH_BUILDING) && run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE, NULL, NULL)) {
+		// triggered
+	}
+	else if (VEH_FLAGGED(veh, VEH_BUILDING) && run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+		// triggered
+	}
 	
 	// types:
 	else if (is_abbrev(type_arg, "name")) {

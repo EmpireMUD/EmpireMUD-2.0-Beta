@@ -2331,6 +2331,9 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You are not allowed to customize.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+		// triggered
+	}
 	else if (is_abbrev(arg, "name")) {
 		if (!*arg2) {
 			msg_to_char(ch, "What would you like to name this room (or \"none\")?\r\n");
