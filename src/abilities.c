@@ -107,6 +107,7 @@ struct {
 	bitvector_t type;	// ABILT_ const
 	PREP_ABIL(*prep_func);	// does the cost setup
 	DO_ABIL(*do_func);	// runs the ability
+	// bitvector_t menus;	// what shows in the menu
 } do_ability_data[] = {
 	
 	// ABILT_x: setup by type; they run in this order:
@@ -4545,7 +4546,12 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		if (ch == vict) {
+			msg_to_char(ch, "You're immune!\r\n");
+		}
+		else {
+			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		}
 		return;
 	}
 	
