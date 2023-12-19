@@ -5179,6 +5179,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 							}
 							case INTERACT_RESTRICT_PTECH: {
 								gain_player_tech_exp(ch, res->vnum, 5);
+								run_ability_hooks_by_player_tech(ch, res->vnum);
 								break;
 							}
 						}

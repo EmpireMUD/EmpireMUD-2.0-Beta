@@ -4463,7 +4463,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (has_ability(c, ABIL_RESIST_POISON)) {
+						if (has_player_tech(c, PTECH_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {

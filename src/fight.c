@@ -660,7 +660,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			max_resist = get_approximate_level(attacker) / 2;
 			use_resist = 0;
 			
-			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && has_ability(victim, ABIL_RESIST_POISON))) {
+			if (damtype == DAM_PHYSICAL || damtype == DAM_FIRE || (damtype == DAM_POISON && has_player_tech(victim, PTECH_RESIST_POISON))) {
 				use_resist = GET_RESIST_PHYSICAL(victim);
 			}
 			else if (damtype == DAM_MAGICAL) {
@@ -707,9 +707,10 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		}
 		if (can_gain_exp_from(victim, attacker)) {
 			gain_player_tech_exp(victim, PTECH_NO_POISON, 2);
-			gain_ability_exp(victim, ABIL_RESIST_POISON, 5);
+			gain_player_tech_exp(victim, PTECH_RESIST_POISON, 5);
 		}
-		run_ability_hooks(victim, AHOOK_ABILITY, ABIL_RESIST_POISON, get_ability_level(victim, ABIL_RESIST_POISON), attacker, NULL, NULL, NULL);
+		run_ability_hooks_by_player_tech(victim, PTECH_RESIST_POISON);
+		run_ability_hooks_by_player_tech(victim, PTECH_NO_POISON);
 	}
 	
 	return dam;

@@ -6686,6 +6686,7 @@ ACMD(do_light) {
 			act("You light $p!", FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n lights $p!", FALSE, ch, obj, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE);
 		}
 		else if (lighter) {
 			// obj message to char
@@ -7558,6 +7559,7 @@ ACMD(do_roadsign) {
 		}
 
 		gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
+		run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING);
 		extract_obj(sign);
 	}
 }

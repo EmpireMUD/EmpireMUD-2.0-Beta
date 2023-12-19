@@ -823,6 +823,7 @@ void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_player_tech_exp(ch, tech, amount);
+				run_ability_hooks_by_player_tech(ch, tech);
 			}
 		}
 	}

@@ -1187,6 +1187,7 @@ void finish_gen_craft(char_data *ch) {
 	
 		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && has_player_tech(ch, PTECH_MILL_UPGRADE)) {
 			gain_player_tech_exp(ch, PTECH_MILL_UPGRADE, 10);
+			run_ability_hooks_by_player_tech(ch, PTECH_MILL_UPGRADE);
 			amt *= 2;
 		}
 
@@ -2928,6 +2929,7 @@ ACMD(do_tame) {
 		if (any) {
 			gain_player_tech_exp(ch, PTECH_TAME_ANIMALS, 50);
 			add_cooldown(ch, COOLDOWN_TAME, 3 * SECS_PER_REAL_MIN);
+			run_ability_hooks_by_player_tech(ch, PTECH_TAME_ANIMALS);
 			
 			// remove the original
 			extract_char(mob);

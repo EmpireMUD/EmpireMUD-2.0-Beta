@@ -451,6 +451,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	if (can_gain_exp_from(ch, vict)) {
 		gain_player_tech_exp(ch, PTECH_POISON, 2);
 		gain_player_tech_exp(ch, PTECH_POISON_UPGRADE, 2);
+		run_ability_hooks_by_player_tech(ch, PTECH_POISON);
 	}
 	
 	// skill check!
@@ -468,6 +469,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		if (can_gain_exp_from(vict, ch)) {
 			gain_player_tech_exp(vict, PTECH_NO_POISON, 10);
 		}
+		run_ability_hooks_by_player_tech(vict, PTECH_NO_POISON);
 		
 		if (GET_POISON_CHARGES(obj) <= 0) {
 			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
@@ -475,11 +477,11 @@ int apply_poison(char_data *ch, char_data *vict) {
 		}
 		return 0;
 	}
-	if (has_ability(vict, ABIL_RESIST_POISON)) {
+	if (has_player_tech(vict, PTECH_RESIST_POISON)) {
 		if (can_gain_exp_from(vict, ch)) {
-			gain_ability_exp(vict, ABIL_RESIST_POISON, 10);
+			gain_player_tech_exp(vict, PTECH_RESIST_POISON, 10);
 		}
-		run_ability_hooks(vict, AHOOK_ABILITY, ABIL_RESIST_POISON, get_ability_level(vict, ABIL_RESIST_POISON), vict, NULL, NULL, NULL);
+		run_ability_hooks_by_player_tech(vict, PTECH_RESIST_POISON);
 		if (!number(0, 2)) {
 			if (GET_POISON_CHARGES(obj) <= 0) {
 				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
@@ -874,6 +876,7 @@ ACMD(do_infiltrate) {
 		
 		gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
 		gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+		run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE);
 		
 		if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, (emp && EMPIRE_HAS_TECH(emp, TECH_LOCKS)) ? DIFF_RARELY : DIFF_HARD)) {
 			msg_to_char(ch, "You fail.\r\n");
@@ -1094,6 +1097,7 @@ ACMD(do_pickpocket) {
 		if (can_gain_exp_from(ch, vict) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 			gain_player_tech_exp(ch, PTECH_PICKPOCKET, 25);
 		}
+		run_ability_hooks_by_player_tech(ch, PTECH_PICKPOCKET);
 		command_lag(ch, WAIT_ABILITY);
 	}
 }
@@ -1257,6 +1261,7 @@ ACMD(do_search) {
 			
 				if (has_player_tech(targ, PTECH_HIDE_UPGRADE)) {
 					gain_player_tech_exp(targ, PTECH_HIDE_UPGRADE, 20);
+					run_ability_hooks_by_player_tech(targ, PTECH_HIDE_UPGRADE);
 					continue;
 				}
 
@@ -1286,6 +1291,7 @@ ACMD(do_search) {
 
 		charge_ability_cost(ch, NOTHING, 0, COOLDOWN_SEARCH, 10, WAIT_ABILITY);
 		gain_player_tech_exp(ch, PTECH_SEARCH_COMMAND, 20);
+		run_ability_hooks_by_player_tech(ch, PTECH_SEARCH_COMMAND);
 	}
 }
 

@@ -1086,6 +1086,12 @@ ACMD(do_bite) {
 				}
 			}
 			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BITE, get_ability_level(ch, ABIL_BITE), victim, NULL, NULL, NULL);
+			if (melee) {
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_MELEE_UPGRADE);
+			}
+			if (tank) {
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_TANK_UPGRADE);
+			}
 		}
 		
 		// if this attack would kill them, need to go into blood drinking instead

@@ -3840,6 +3840,7 @@ ACMD(do_barde) {
 			if (!IS_NPC(ch)) {
 				extract_resources(ch, res, TRUE, NULL);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_BARDE);
 		}
 		else {
 			act("You can't barde $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3914,6 +3915,7 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 		}
 		else {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE);
 		}
 	
 		// and an offense

@@ -2671,6 +2671,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				msg_to_char(ch, "%s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (*dir_str ? dir_str : "away"));
 			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
+			run_ability_hooks_by_player_tech(ch, PTECH_WHERE_UPGRADE);
 		}
 		else {
 			send_to_char("No-one around by that name.\r\n", ch);

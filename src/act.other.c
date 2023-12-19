@@ -699,6 +699,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 				char_to_room(mob, IN_ROOM(ch));
 			}
 			gain_player_tech_exp(ch, PTECH_HERD_COMMAND, 5);
+			run_ability_hooks_by_player_tech(ch, PTECH_HERD_COMMAND);
 		}
 		else {
 			act("You try to herd $N, but $E refuses to move!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3224,6 +3225,7 @@ ACMD(do_milk) {
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		schedule_obj_timer_update(cont, FALSE);
 		gain_player_tech_exp(ch, PTECH_MILK_COMMAND, 33);
+		run_ability_hooks_by_player_tech(ch, PTECH_MILK_COMMAND);
 		request_obj_save_in_world(cont);
 	}
 }
@@ -3978,6 +3980,7 @@ ACMD(do_shear) {
 		if (any) {
 			gain_player_tech_exp(ch, PTECH_SHEAR_COMMAND, 33);
 			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 33);
+			run_ability_hooks_by_player_tech(ch, PTECH_SHEAR_COMMAND);
 		}
 		else {
 			act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -4031,6 +4034,7 @@ ACMD(do_skin) {
 		}
 		else {
 			gain_player_tech_exp(ch, PTECH_SKINNING_UPGRADE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_SKINNING_UPGRADE);
 		}
 		
 		set_obj_val(obj, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(obj) | CORPSE_SKINNED);

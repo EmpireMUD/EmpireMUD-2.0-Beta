@@ -1426,6 +1426,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				if (can_gain_exp_from(ch, i)) {
 					gain_player_tech_exp(ch, PTECH_SEE_INVENTORY, 5);
 				}
+				run_ability_hooks_by_player_tech(ch, PTECH_SEE_INVENTORY);
 				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
 		}

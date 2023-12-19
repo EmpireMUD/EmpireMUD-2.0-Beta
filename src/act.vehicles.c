@@ -929,6 +929,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			if (proto && VEH_SHORT_DESC(veh) == VEH_SHORT_DESC(proto)) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE);
 			set_vehicle_short_desc(veh, argument);
 			
 			// change keywords
@@ -965,6 +966,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			if (proto && VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto)) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE);
 			
 			set_vehicle_long_desc(veh, argument);
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
@@ -999,6 +1001,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 				
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
+				run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE);
 			}
 			
 			act("$n begins editing a description.", TRUE, ch, 0, 0, TO_ROOM);

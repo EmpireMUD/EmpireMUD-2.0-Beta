@@ -2728,6 +2728,7 @@ typedef enum {
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
 #define PTECH_SEE_IN_MAGIC_DARKNESS  84	// sees through darkness room affect
 #define PTECH_TRACK_COMMAND  85	// can use 'track'
+#define PTECH_RESIST_POISON  86	// minor resistance
 
 
 // SM_x: status messages

@@ -580,6 +580,7 @@ ACMD(do_butcher) {
 		if (!IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_NO_LOOT) && run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, NULL, butcher_interact)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_BUTCHER_UPGRADE);
 		}
 		else {
 			act("You butcher $p but get no useful meat.", FALSE, ch, corpse, NULL, TO_CHAR);
@@ -959,6 +960,7 @@ ACMD(do_track) {
 		}
 		
 		gain_player_tech_exp(ch, PTECH_TRACK_COMMAND, 20);
+		run_ability_hooks_by_player_tech(ch, PTECH_TRACK_COMMAND);
 	}
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");

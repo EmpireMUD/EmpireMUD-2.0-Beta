@@ -4467,6 +4467,27 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 
 
 /**
+* Runs any abiliy hooks for a given tech, IF the player has it.
+*
+* @param char_data *ch The player.
+* @param int tech The PTECH_ type that's being used.
+*/
+void run_ability_hooks_by_player_tech(char_data *ch, int tech) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, get_ability_level(ch, iter->abil), ch, NULL, NULL, NULL);
+		}
+	}
+}
+
+
+/**
 * Performs an ability action.
 *
 * DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
@@ -4916,6 +4937,7 @@ DO_ABIL(do_teleport_ability) {
 			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
 			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
 			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+			run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE);
 			add_offense(ROOM_OWNER(to_room), OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(to_room), was_in) ? OFF_SEEN : NOBITS);
 		}
 	}
