@@ -3333,13 +3333,18 @@ PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
 }
 
 
-// updates with the new required affect on phoenix rite
-PLAYER_UPDATE_FUNC(b5_166_phoenix_rite_update) {
+// updates with the new required affect on counterspell and phoenix rite
+PLAYER_UPDATE_FUNC(b5_166_affect_update) {
 	struct affected_type *hjp;
 	
-	int PHOENIX_RITE = 3017;
+	any_vnum COUNTERSPELL = 3021;
+	any_vnum PHOENIX_RITE = 3017;
 	
 	LL_FOREACH(ch->affected, hjp) {
+		if (hjp->type == COUNTERSPELL && hjp->bitvector == NOBITS) {
+			hjp->bitvector = AFF_COUNTERSPELL;
+		}
+	
 		if (hjp->type == PHOENIX_RITE && hjp->bitvector == NOBITS) {
 			hjp->bitvector = AFF_AUTO_RESURRECT;
 		}
@@ -3458,7 +3463,7 @@ const struct {
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
-	{ "b5.166", b5_166_barrier_magentafication, b5_166_phoenix_rite_update, "Updating enchanted walls and phoenix rites" },
+	{ "b5.166", b5_166_barrier_magentafication, b5_166_affect_update, "Updating enchanted walls and affects" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
