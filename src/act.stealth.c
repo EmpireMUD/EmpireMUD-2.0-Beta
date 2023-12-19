@@ -455,7 +455,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	run_ability_hooks_by_player_tech(ch, PTECH_POISON, vict, NULL, NULL, NULL);
 	
 	// skill check!
-	if (!player_tech_skill_check(ch, PTECH_POISON, DIFF_HARD)) {
+	if (!player_tech_skill_check_by_ability_difficulty(ch, PTECH_POISON)) {
 		return 0;
 	}
 	
@@ -1039,7 +1039,7 @@ ACMD(do_pickpocket) {
 		
 		low_level = (get_approximate_level(ch) + 50 < get_approximate_level(vict));
 		
-		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED) || player_tech_skill_check(ch, PTECH_PICKPOCKET, DIFF_EASY))) {
+		if (!low_level && (!CAN_SEE(vict, ch) || !AWAKE(vict) || AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED) || player_tech_skill_check_by_ability_difficulty(ch, PTECH_PICKPOCKET))) {
 			// success!
 			set_mob_flags(vict, MOB_PICKPOCKETED);
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1252,13 +1252,12 @@ ACMD(do_search) {
 		act("$n begins searching around!", TRUE, ch, NULL, NULL, TO_ROOM);
 		
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
-			if (ch == targ)
+			if (ch == targ) {
 				continue;
+			}
 			
 			// hidden targets
 			if (AFF_FLAGGED(targ, AFF_HIDE)) {
-					continue;
-			
 				if (has_player_tech(targ, PTECH_HIDE_UPGRADE)) {
 					gain_player_tech_exp(targ, PTECH_HIDE_UPGRADE, 20);
 					run_ability_hooks_by_player_tech(targ, PTECH_HIDE_UPGRADE, ch, NULL, NULL, NULL);
@@ -1267,7 +1266,7 @@ ACMD(do_search) {
 
 				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
-				if (player_tech_skill_check(ch, PTECH_SEARCH_COMMAND, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				if (player_tech_skill_check_by_ability_difficulty(ch, PTECH_SEARCH_COMMAND) && CAN_SEE(ch, targ)) {
 					act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
 					msg_to_char(targ, "You are discovered!\r\n");
 					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
@@ -1279,7 +1278,7 @@ ACMD(do_search) {
 			}
 			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
 				// earthmelded targets (only do once)
-				if (player_tech_skill_check(ch, PTECH_SEARCH_COMMAND, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				if (player_tech_skill_check_by_ability_difficulty(ch, PTECH_SEARCH_COMMAND) && CAN_SEE(ch, targ)) {
 					act("You find signs that someone is earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
 					found = earthmeld = TRUE;
 				}

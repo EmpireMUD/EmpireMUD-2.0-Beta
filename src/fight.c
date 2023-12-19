@@ -1969,7 +1969,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	// cloak of darkness
 	if (!IS_NPC(vict) && has_player_tech(vict, PTECH_MAP_INVIS)) {
 		gain_player_tech_exp(vict, PTECH_MAP_INVIS, 15);
-		if (player_tech_skill_check(vict, PTECH_MAP_INVIS, DIFF_HARD)) {
+		if (player_tech_skill_check_by_ability_difficulty(vict, PTECH_MAP_INVIS)) {
 			return FALSE;
 		}
 	}

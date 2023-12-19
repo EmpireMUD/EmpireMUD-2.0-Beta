@@ -1332,7 +1332,7 @@ Available techs are:
  &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
  &cLarger-Light-Radius&0 - +1 light radius (prefer NIGHT-VISION apply instead).
  &cLight-Fire&0 * - Can light torches/fires without any tools.
- &cMap-Invis&0 * - Can't be seen at a distance on the map.
+ &cMap-Invis&0 *^ - Can't be seen at a distance on the map.
  &cMill-Upgrade&0 * - Increases the number of items received from mill.
  &cNavigation&0 * - Orients the map and directions correctly.
  &c!Hunger&0 - Will not get hungry.
@@ -1340,8 +1340,8 @@ Available techs are:
  &c!Thirst&0 - Will not get thirsty.
  &c!Track-City&0 * - Leaves no tracks in the city or indoors.
  &c!Track-Wild&0 * - Leaves no tracks in the wild, outside of cities.
- &cPickpocket&0 * - Can use the pickpocket command/interaction.
- &cPoison&0 * - Can use poisons in combat.
+ &cPickpocket&0 *^ - Can use the pickpocket command/interaction.
+ &cPoison&0 *^ - Can use poisons in combat.
  &cPoison-Upgrade&0 * - Improves the effect of all poisons (requires Poison).
  &cPortal&0 * - Can open normal portals at the correct buildings.
  &cPortal-Upgrade&0 * - Can open longer-range portals (requires Portal).
@@ -1393,12 +1393,13 @@ Available techs are:
  &cSaw-Command&0 *
  &cScrape-Command&0 *
  &cMap-Memory&0 * - Remembers blocked/dark tiles on look/scan.
- &cSearch-Command&0 *
+ &cSearch-Command&0 *^
  &cTrack-Command&0 *
  &cResist-Poison&0 * - Reduced effect from poisons.
- &cVampire-Bite&0 * - Can use bite for blood, if a vampire, rather than the social.
+ &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
 
-* Marked techs trigger ability gains on their own without gain hooks.
+* Techs marked with an asterisk trigger ability gains on their own without gain hooks.
+^ Techs marked with a carat support difficulty settings on the ability.
 
 See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
 #d
