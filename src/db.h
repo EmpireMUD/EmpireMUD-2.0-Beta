@@ -287,16 +287,18 @@ extern byte y_coord_to_season[MAP_HEIGHT];
 extern ability_data *ability_table;
 extern ability_data *sorted_abilities;
 
-ability_data *find_ability(char *argument);
-ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev);
-#define find_ability_by_name(name)  find_ability_by_name_exact(name, TRUE)
-ability_data *find_ability_by_vnum(any_vnum vnum);
 #define ability_proto  find_ability_by_vnum	// why don't all the types have "type_proto()" functions?
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
 void remove_ability_from_table(ability_data *abil);
 
 // ability lookups
+ability_data *find_ability(char *argument);
+ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev);
+#define find_ability_by_name(name)  find_ability_by_name_exact(name, TRUE)
+ability_data *find_ability_by_vnum(any_vnum vnum);
+ability_data *find_ability_on_skill(char *name, skill_data *skill);
+ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
 ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvector_t aff_flag, any_vnum aff_vnum);
 
 // accounts

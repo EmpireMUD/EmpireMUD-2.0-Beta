@@ -1080,73 +1080,6 @@ bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) 
 
 
 /**
-* Finds an ability by ambiguous argument, which may be a vnum or a name.
-* Names are matched by exact match first, or by multi-abbrev.
-*
-* @param char *argument The user input.
-* @return ability_data* The ability, or NULL if it doesn't exist.
-*/
-ability_data *find_ability(char *argument) {
-	ability_data *abil;
-	any_vnum vnum;
-	
-	if (isdigit(*argument) && (vnum = atoi(argument)) >= 0 && (abil = find_ability_by_vnum(vnum))) {
-		return abil;
-	}
-	else {
-		return find_ability_by_name(argument);
-	}
-}
-
-
-/**
-* Look up an ability by multi-abbrev, preferring exact matches.
-*
-* @param char *name The ability name to look up.
-* @param bool allow_abbrev If true, allows abbreviations.
-* @return ability_data* The ability, or NULL if it doesn't exist.
-*/
-ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev) {
-	ability_data *abil, *next_abil, *partial = NULL;
-	
-	if (!*name) {
-		return NULL;	// shortcut
-	}
-	
-	HASH_ITER(sorted_hh, sorted_abilities, abil, next_abil) {
-		// matches:
-		if (!str_cmp(name, ABIL_NAME(abil))) {
-			// perfect match
-			return abil;
-		}
-		if (allow_abbrev && !partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
-			// probable match
-			partial = abil;
-		}
-	}
-	
-	// no exact match...
-	return partial;
-}
-
-
-/**
-* @param any_vnum vnum Any ability vnum
-* @return ability_data* The ability, or NULL if it doesn't exist
-*/
-ability_data *find_ability_by_vnum(any_vnum vnum) {
-	ability_data *abil;
-	
-	if (vnum < 0 || vnum == NOTHING) {
-		return NULL;
-	}
-	
-	HASH_FIND_INT(ability_table, &vnum, abil);
-	return abil;
-}
-
-
-/**
 * Finds an ability data entry that matches. This version ignores the 'misc'
 * field.
 *
@@ -1187,78 +1120,6 @@ struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, i
 	}
 	
 	return NULL;
-}
-
-
-/**
-* Finds an ability that is attached to a skill -- this works similar to the
-* find_ability() function except that it ignores partial matches that aren't
-* attached to the skill.
-*
-* @param char *name The name to look up.
-* @param skill_data *skill The skill to search on.
-* @return ability_data* The found ability, if any.
-*/
-ability_data *find_ability_on_skill(char *name, skill_data *skill) {
-	ability_data *abil, *partial = NULL;
-	struct skill_ability *skab;
-	any_vnum vnum = NOTHING;
-	
-	if (!skill || !*name) {
-		return NULL;	// shortcut
-	}
-	
-	if (isdigit(*name)) {
-		vnum = atoi(name);
-	}
-	
-	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
-		if (!(abil = find_ability_by_vnum(skab->vnum))) {
-			continue;
-		}
-		
-		if (vnum == ABIL_VNUM(abil) || !str_cmp(name, ABIL_NAME(abil))) {
-			return abil;	// exact
-		}
-		else if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
-			partial = abil;
-		}
-	}
-	
-	return partial;	// if any
-}
-
-
-/**
-* Finds which ability a player has that's giving them a ptech. If there's more
-* than one, it returns the first one it finds.
-*
-* @param char_data *ch The player.
-* @param int ptech Any PTECH_ const.
-* @return ability_data* Which ability the player has that grants that ptech, or NULL if none.
-*/
-ability_data *find_player_ability_by_tech(char_data *ch, int ptech) {
-	struct player_ability_data *plab, *next_plab;
-	struct ability_data_list *adl;
-	ability_data *abil;
-	
-	if (!ch || IS_NPC(ch)) {
-		return NULL;
-	}
-	
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		abil = plab->ptr;
-		
-		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
-			LL_FOREACH(ABIL_DATA(abil), adl) {
-				if (adl->type == ADL_PLAYER_TECH && adl->vnum == ptech) {
-					return abil;
-				}
-			}
-		}
-	}
-	
-	return NULL;	// if we got here
 }
 
 
@@ -3116,6 +2977,145 @@ INTERACTION_FUNC(devastate_trees) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY LOOKUPS /////////////////////////////////////////////////////////
+
+/**
+* Finds an ability by ambiguous argument, which may be a vnum or a name.
+* Names are matched by exact match first, or by multi-abbrev.
+*
+* @param char *argument The user input.
+* @return ability_data* The ability, or NULL if it doesn't exist.
+*/
+ability_data *find_ability(char *argument) {
+	ability_data *abil;
+	any_vnum vnum;
+	
+	if (isdigit(*argument) && (vnum = atoi(argument)) >= 0 && (abil = find_ability_by_vnum(vnum))) {
+		return abil;
+	}
+	else {
+		return find_ability_by_name(argument);
+	}
+}
+
+
+/**
+* Look up an ability by multi-abbrev, preferring exact matches.
+*
+* @param char *name The ability name to look up.
+* @param bool allow_abbrev If true, allows abbreviations.
+* @return ability_data* The ability, or NULL if it doesn't exist.
+*/
+ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev) {
+	ability_data *abil, *next_abil, *partial = NULL;
+	
+	if (!*name) {
+		return NULL;	// shortcut
+	}
+	
+	HASH_ITER(sorted_hh, sorted_abilities, abil, next_abil) {
+		// matches:
+		if (!str_cmp(name, ABIL_NAME(abil))) {
+			// perfect match
+			return abil;
+		}
+		if (allow_abbrev && !partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
+			// probable match
+			partial = abil;
+		}
+	}
+	
+	// no exact match...
+	return partial;
+}
+
+
+/**
+* @param any_vnum vnum Any ability vnum
+* @return ability_data* The ability, or NULL if it doesn't exist
+*/
+ability_data *find_ability_by_vnum(any_vnum vnum) {
+	ability_data *abil;
+	
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(ability_table, &vnum, abil);
+	return abil;
+}
+
+
+/**
+* Finds an ability that is attached to a skill -- this works similar to the
+* find_ability() function except that it ignores partial matches that aren't
+* attached to the skill.
+*
+* @param char *name The name to look up.
+* @param skill_data *skill The skill to search on.
+* @return ability_data* The found ability, if any.
+*/
+ability_data *find_ability_on_skill(char *name, skill_data *skill) {
+	ability_data *abil, *partial = NULL;
+	struct skill_ability *skab;
+	any_vnum vnum = NOTHING;
+	
+	if (!skill || !*name) {
+		return NULL;	// shortcut
+	}
+	
+	if (isdigit(*name)) {
+		vnum = atoi(name);
+	}
+	
+	LL_FOREACH(SKILL_ABILITIES(skill), skab) {
+		if (!(abil = find_ability_by_vnum(skab->vnum))) {
+			continue;
+		}
+		
+		if (vnum == ABIL_VNUM(abil) || !str_cmp(name, ABIL_NAME(abil))) {
+			return abil;	// exact
+		}
+		else if (!partial && is_multiword_abbrev(name, ABIL_NAME(abil))) {
+			partial = abil;
+		}
+	}
+	
+	return partial;	// if any
+}
+
+
+/**
+* Finds which ability a player has that's giving them a ptech. If there's more
+* than one, it returns the first one it finds.
+*
+* @param char_data *ch The player.
+* @param int ptech Any PTECH_ const.
+* @return ability_data* Which ability the player has that grants that ptech, or NULL if none.
+*/
+ability_data *find_player_ability_by_tech(char_data *ch, int ptech) {
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	ability_data *abil;
+	
+	if (!ch || IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_PLAYER_TECH && adl->vnum == ptech) {
+					return abil;
+				}
+			}
+		}
+	}
+	
+	return NULL;	// if we got here
+}
+
 
 /**
 * Checks if a character has a buff ability that gives a specific affect flag
