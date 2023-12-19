@@ -447,9 +447,8 @@ Usage:  kick [victim]
 Cooldown:  6 seconds
 Cost:  10 move
 
-Kick is a special attack that does bonus damage (based on your Strength) outside
-of the combat round. As a specialty ability, it cannot miss. At Battle 100,
-it does increased damage.
+Kick is a special attack that does bonus damage (based on your Strength)
+outside of the combat round.
 
 Gain experience when you try to kick something.
 
