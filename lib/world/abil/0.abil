@@ -213,6 +213,8 @@ S
 #18
 Search~
 0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0 -1 0 0 0 3
 D 1 49 0
 T e 1
 S
@@ -590,7 +592,8 @@ S
 #73
 Track~
 0 -1 1.00 0 0 0
-T m 0
+D 1 85 0
+T e 1
 S
 #74
 Master Tracker~
@@ -734,7 +737,7 @@ S
 Kick~
 ak -1 1.00 0 0 0
 C
-kck 7 bf 1 10 0 2011 6 1 2 1
+kick 7 bf 1 10 0 2011 6 1 2 1
 T c 1
 X c
 54 0
@@ -743,7 +746,7 @@ S
 Bash~
 agkpx -1 1.00 hE 0 0
 C
-bsh 7 bf 1 15 0 2012 9 0 2 0
+bash 7 bf 1 15 0 2012 9 0 2 1
 D 16 27 0
 T c 1
 T b 1
