@@ -597,6 +597,10 @@ target multiple things will only trigger a hooked ability once (including
 an ability with multiple summons). Hooked abilities may never use the OVER-TIME
 flag.
 
+Hooked abilities may have their own costs and cooldowns; they will generally
+be skipped if you don't meet those requirements. Without costs or cooldowns,
+the ability runs for free when its hook occurs.
+
 Available types of hooks are:
  &cAbility&0 - Triggered by an ability successfully executing, targeting the same
    targets if possible.
