@@ -350,6 +350,10 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
 	}
 	
+	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Difficulty: %s\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+	}
+	
 	// notes (flags), if parameterized -- LAST
 	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 	if (*lbuf && str_cmp(lbuf, "none")) {
