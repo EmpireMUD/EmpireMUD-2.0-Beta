@@ -2284,7 +2284,7 @@ ACMD(do_conjure) {
 	
 	bitvector_t my_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 	
-	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && (!ABIL_COMMAND(abil) || !*ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "conjure")))
+	#define VALID_CONJURE_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), my_types) && ABIL_COMMAND(abil) && !str_cmp(ABIL_COMMAND(abil), "conjure"))
 	
 	quoted_arg_or_all(argument, whole_arg);	// keep whole arg
 	arg2 = one_word(argument, arg);	// also split first arg: conjure type

@@ -720,8 +720,8 @@ This ability supports both the 'conjure' command and its own command. In both
 cases, it must be set to target an object.
 
 Conjure-liquid abilities have the following properties:
- <&ycommand&0> Optional command to create the liquid. If you do not set a
-    command, it will automatically be added to the "conjure" command instead.
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
  <&yinteractions&0> Determine which liquid will be conjured. You must set at
     least 1 LIQUID-CONJURE interaction, and only 1 should succeed.
  <&ytargets&0> Must target an object.
@@ -745,8 +745,8 @@ This ability supports both the 'conjure' command and its own command. It does
 not have a target -- you must set the &gIGNORE&0 target.
 
 Conjure-object abilities have the following properties:
- <&ycommand&0> Optional command to create the object(s). If you do not set a
-    command, it will automatically be added to the "conjure" command instead.
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
  <&yinteractions&0> Determine which object(s) will be conjured. You must set at
     least 1 OBJECT-CONJURE interaction.
 
@@ -769,8 +769,8 @@ not require or use a target. It does not have a target -- you must set the
 &gIGNORE&0 target.
 
 Conjure-vehicle abilities have the following properties:
- <&ycommand&0> Optional command to create the vehicle. If you do not set a
-    command, it will automatically be added to the "conjure" command instead.
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
  <&yinteractions&0> Determine which vehicle(s) will be conjured. You must set at
     least 1 VEHICLE-CONJURE interaction.
 
