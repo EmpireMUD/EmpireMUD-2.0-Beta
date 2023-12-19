@@ -1241,7 +1241,7 @@ ACMD(do_search) {
 		act("$n begins searching around!", TRUE, ch, NULL, NULL, TO_ROOM);
 		msg_to_char(ch, "You search, but find nobody.\r\n");
 	}
-	else if (ability_triggers_by_ptech(ch, NULL, NULL, PTECH_SEARCH_COMMAND)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SEARCH_COMMAND, NULL, NULL)) {
 		// failed trigger
 	}
 	else {

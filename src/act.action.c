@@ -647,6 +647,9 @@ bool validate_burn_area(char_data *ch) {
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
 		msg_to_char(ch, "You must be at war to burn someone else's territory!\r\n");
 	}
+	else if (objless && run_ability_triggers_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL)) {
+		// triggered
+	}
 	else { // safe!
 		return TRUE;
 	}
@@ -2975,6 +2978,9 @@ ACMD(do_chip) {
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHIP_COMMAND, NULL, target)) {
+		// triggered
+	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
 		
@@ -3030,6 +3036,9 @@ ACMD(do_chop) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHOP, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		start_chopping(ch);
 	}
@@ -3064,6 +3073,9 @@ ACMD(do_dig) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to dig here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_DIG, NULL, NULL)) {
+		// triggered
 	}
 	else {
 		start_digging(ch);
@@ -3279,6 +3291,9 @@ ACMD(do_forage) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		start_foraging(ch);
 	}
@@ -3310,6 +3325,9 @@ ACMD(do_gather) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to gather here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_GATHER, NULL, NULL)) {
+		// triggered
 	}
 	else {
 		start_action(ch, ACT_GATHERING, gather_base_timer);
@@ -3361,6 +3379,9 @@ ACMD(do_harvest) {
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HARVEST, NULL, NULL)) {
+		// triggered
 	}
 	else {
 		start_action(ch, ACT_HARVESTING, 0);
@@ -3467,6 +3488,9 @@ ACMD(do_mint) {
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MINT, NULL, NULL)) {
+		// triggered
 	}
 	else {
 		act("You melt down $p and pour it into the coin mill...", FALSE, ch, obj, NULL, TO_CHAR);
@@ -3626,6 +3650,9 @@ ACMD(do_plant) {
 			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
 		}
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		original = SECT(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), evo->becomes, GET_SECT_VNUM(original));
@@ -3756,6 +3783,9 @@ ACMD(do_saw) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SAW_COMMAND, NULL, obj)) {
+		// triggered
+	}
 	else {
 		// TODO: move the timer here to a config; timer is halved if there's a
 		// SAW function or TOOL_SAW, and halves again if there's a ptech
@@ -3811,6 +3841,9 @@ ACMD(do_scrape) {
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to scrape anything here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SCRAPE_COMMAND, NULL, obj)) {
+		// triggered
 	}
 	else {
 		start_action(ch, ACT_SCRAPING, 6);
@@ -3881,6 +3914,9 @@ ACMD(do_tan) {
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to tan anything here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAN, NULL, obj)) {
+		// triggered
 	}
 	else {
 		start_action(ch, ACT_TANNING, tan_timer);
@@ -4035,6 +4071,9 @@ bool validate_gen_interact_room(char_data *ch, const struct gen_interact_data_t 
 	}
 	else if (!can_gen_interact_room(ch, IN_ROOM(ch), data)) {
 		// sends own messages
+	}
+	else if (data->ptech != NOTHING && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL)) {
+		// triggered
 	}
 	else {
 		return TRUE;	// safe!

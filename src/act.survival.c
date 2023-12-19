@@ -908,7 +908,7 @@ ACMD(do_track) {
 		msg_to_char(ch, "Track whom? Or what?\r\n");
 		return;
 	}
-	else if (ability_triggers_by_ptech(ch, NULL, NULL, PTECH_TRACK_COMMAND)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL)) {
 		return;
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {

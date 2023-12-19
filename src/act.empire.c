@@ -3787,6 +3787,9 @@ ACMD(do_barde) {
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		// find interact
 		found = FALSE;
