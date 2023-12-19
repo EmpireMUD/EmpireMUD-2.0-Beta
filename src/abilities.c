@@ -5195,6 +5195,20 @@ PREP_ABIL(prep_buff_ability) {
 		return;
 	}
 	
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		if (vict == ch) {
+			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
+		}
+		else {
+			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | ACT_STR_OBJ);
+		}
+
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
+		data->success = FALSE;
+		return;
+	}
+	
 	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
 }
 
