@@ -431,7 +431,7 @@ ACMD(do_enervate) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
+	if (trigger_counterspell(vict, ch) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You attempt to hex $N with enervate, but it fails!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
 		act("$n attempts to hex you with enervate, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 		act("$n attempts to hex $N with enervate, but it fails!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
@@ -708,7 +708,7 @@ ACMD(do_siphon) {
 	}
 	
 	// counterspell??
-	if (trigger_counterspell(vict) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
+	if (trigger_counterspell(vict, ch) || AFF_FLAGGED(vict, AFF_IMMUNE_MAGICAL_DEBUFFS)) {
 		act("You try to siphon mana from $N, but are deflected by a counterspell!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
 		act("$n tries to siphon mana from you, but it's deflected by your counterspell!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 		act("$n tries to siphon mana from $N, but it fails!", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);

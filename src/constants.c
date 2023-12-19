@@ -1595,6 +1595,7 @@ const char *affected_bits[] = {
 	"THIRSTIER",
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
+	"COUNTERSPELL",		// 45
 	"\n"
 };
 
@@ -1644,7 +1645,8 @@ const char *affected_bits_consider[] = {
 	"",	// hungrier
 	"",	// thirstier
 	"",	// immune-temperature
-	"",	// AUTO-RESURRECT
+	"",	// auto-resurrect
+	"",	// counterspell
 	"\n"
 };
 
@@ -1695,6 +1697,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,
 	FALSE,
+	FALSE,	// 45 - counterspell
 };
 
 

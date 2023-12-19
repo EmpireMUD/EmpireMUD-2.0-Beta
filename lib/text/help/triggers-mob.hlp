@@ -619,8 +619,9 @@ When using field  - The variable returns:
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.
 &ctohit&0 - The player's to-hit rating.
 &ctool(type)&0 - Finds an equipped tool of the given type, if present.
-&ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if
-   so, or returns 0 if there was no counterspell.
+&ctrigger_counterspell(by_person)&0 - Fires any counterspell on character, with
+   optional 'by_person' who triggered it; returns 1 if a counterspell worked, or
+   returns 0 if there was no counterspell.
 &cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
    it will not be cleaned up when the instance closes (e.g. player gets to keep
    a mob that was loaded inside an instance).

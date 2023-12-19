@@ -1042,7 +1042,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         dg_affect #11841 %targ% BLIND on 5
       break
       case 3
-        if %targ.trigger_counterspell%
+        if %targ.trigger_counterspell(%self%)%
           %send% %targ% &&mYour counterspell prevents %obj% from draining your energy.&&0
           %echo% &&m%obj% bounces harmlessly off ~%targ%.&&0
         else
@@ -1446,7 +1446,7 @@ elseif %move% == 2
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&mThe blinding barrage blows back in Venjer's face as it hits |%ch% counterspell!&&0
             dg_affect #11823 %self% BLIND on 10
             set broke 1
@@ -1561,7 +1561,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
     elseif %targ.var(did_sfinterrupt)%
       %send% %targ% &&mYou knock Venjer's staff sideways and luminous bolts fly every which way, crashing all around you, but they all miss!&&0
       %echoaround% %targ% &&m~%targ% knocks Venjer's staff sideways and luminous bolts fly every which way, crashing around ~%targ%, but they all miss!&&0
-    elseif %targ.trigger_counterspell%
+    elseif %targ.trigger_counterspell(%self%)%
       %echo% &&mVenjer's luminous bolt explodes against |%targ% counterspell!&&0
       set broke 1
     else
@@ -1681,7 +1681,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% blasts ~%targ% with a rainbow beam... it picks *%targ% right up off the ground...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe rainbow beam cascades off of |%targ% counterspell and ricochets back at ~%self%!&&0
     end
@@ -1770,7 +1770,7 @@ elseif %move% == 3
       dg_affect #11856 %targ% TO-HIT 25 20
     end
     dg_affect #11841 %self% BLIND on 5
-  elseif %targ.trigger_counterspell%
+  elseif %targ.trigger_counterspell(%self%)%
     %echo% &&mA shimmering beam of light from ~%self% ricochets off |%targ% counterspell and zaps the queen in the face!&&0
     dg_affect #11841 %self% BLIND on 10
   else
@@ -3828,7 +3828,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       dg_affect #11873 %self% TO-HIT -15 20
     end
     %damage% %self% 50 magical
-  elseif %targ.trigger_counterspell%
+  elseif %targ.trigger_counterspell(%self%)%
     %echo% A vortex of smoke swirls briefly around |%targ% arm as ^%targ% counterspell breaks the magic.
   else
     * hit
@@ -4489,7 +4489,7 @@ if %move% == 1
               dg_affect #11856 %ch% off
               dg_affect #11856 %ch% TO-HIT 25 20
             end
-          elseif %ch.trigger_counterspell%
+          elseif %ch.trigger_counterspell(%self%)%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning back at Lady Virduke!&&0
             eval amt 200 / %diff%
             %damage% %self% %amt% magical
@@ -5698,7 +5698,7 @@ elseif %move% == 3
               dg_affect #11856 %ch% off
               dg_affect #11856 %ch% TO-HIT 25 20
             end
-          elseif %ch.trigger_counterspell%
+          elseif %ch.trigger_counterspell(%self%)%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning toward ~%self%!&&0
             if %diff% == 1
               %damage% %self% 100 magical
@@ -5851,7 +5851,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% waves her hands as an eerie green light casts out over the tower...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe green light rebounds and smacks ~%self% in the face -- she looks stunned!&&0
     end
@@ -5908,7 +5908,7 @@ elseif %move% == 2
         set next_ch %ch.next_in_room%
         eval skip %%skip_%ch.id%%%
         if !%skip% && %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             set skip_%ch.id% 1
             %send% %ch% &&mA shield forms in front of you as you masterfully counterspell the blinding light of dawn!&&0
             %echoaround% %ch% &&mA shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!&&0
@@ -6072,7 +6072,7 @@ if %move% == 1
   if %self.fighting% == %targ% && %diff% < 4
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
-  if %targ.trigger_counterspell%
+  if %targ.trigger_counterspell(%self%)%
     %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
     dg_affect #11864 %self% BONUS-MAGICAL 10 -1
   end
@@ -6165,7 +6165,7 @@ elseif %move% == 2
               dg_affect #11856 %ch% TO-HIT 25 20
             end
           else
-            if %ch.trigger_counterspell%
+            if %ch.trigger_counterspell(%self%)%
               %echo% &&mThe Shadow Ascendant sparks with primordial energy as it consumes |%ch% counterspell!&&0
               dg_affect #11864 %self% BONUS-MAGICAL 10 -1
             end
@@ -6219,7 +6219,7 @@ elseif %move% == 3
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
             dg_affect #11864 %self% BONUS-MAGICAL 10 -1
           end
@@ -6249,7 +6249,7 @@ elseif %move% == 4
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
       if !%ch.var(did_sfdodge)%
-        if %ch.trigger_counterspell%
+        if %ch.trigger_counterspell(%self%)%
           %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
           dg_affect #11864 %self% BONUS-MAGICAL 10 -1
         end
@@ -6733,7 +6733,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% stamps his staff three times...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe spell rebounds off of |%targ% counterspell and smacks ~%self% in the face -- he looks stunned!&&0
     end
@@ -6780,7 +6780,7 @@ elseif %move% == 2
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&mA shield forms in front of ~%ch% to block the devastation ritual!&&0
           else
             %echo% &&mThe wave cuts through ~%ch%!&&0
@@ -6820,7 +6820,7 @@ elseif %move% == 3
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
-        if %ch.trigger_counterspell%
+        if %ch.trigger_counterspell(%self%)%
           %echo% &&mA shield forms in front of ~%ch% to block the wave!&&0
         else
           %send% %ch% &&mYou feel a wave of guilt as it passes through you!&&0

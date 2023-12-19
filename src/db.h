@@ -296,6 +296,9 @@ void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
 void remove_ability_from_table(ability_data *abil);
 
+// ability lookups
+ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvector_t aff_flag, any_vnum aff_vnum);
+
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
 account_data *create_account_for_player(char_data *ch);

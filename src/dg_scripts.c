@@ -4597,7 +4597,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
-						if (trigger_counterspell(c)) {
+						// optional target
+						char *trig_by = NULL;
+						if (subfield && *subfield) {
+							trig_by = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
+						}
+						
+						// trigger it with or without a valid target; that arg can be NULL
+						if (trigger_counterspell(c, trig_by)) {
 							snprintf(str, slen, "1");
 						}
 						else {

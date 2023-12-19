@@ -406,7 +406,7 @@ switch %random.3%
       %echo% The comet crashes to the ground, hitting nobody.
       halt
     end
-    if %actor.trigger_counterspell%
+    if %actor.trigger_counterspell(%self%)%
       set counterspell 1
     end
     if %heroic_mode%

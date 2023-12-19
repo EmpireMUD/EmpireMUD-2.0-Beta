@@ -309,7 +309,7 @@ if !%self.affect(counterspell)%
 else
   switch %random.4%
     case 1
-      if %actor.trigger_counterspell%
+      if %actor.trigger_counterspell(%self%)%
         %send% %actor% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
         %echoaround% %actor% ~%self% shoots a bolt of violet energy at ~%actor%, but it breaks on ^%actor% counterspell!
       else
@@ -333,7 +333,7 @@ else
     case 4
       set target %random.enemy%
       if (%target%)
-        if %target.trigger_counterspell%
+        if %target.trigger_counterspell(%self%)%
           %send% %target% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
           %echoaround% %target% ~%self% shoots a bolt of violet energy at ~%target%, but it breaks on ^%target% counterspell!
         else
@@ -388,7 +388,7 @@ if !%self.affect(counterspell)%
 else
   switch %random.3%
     case 1
-      if %actor.trigger_counterspell%
+      if %actor.trigger_counterspell(%self%)%
         %send% %actor% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
         %echoaround% %actor% ~%self% hurls a flaming meteor at ~%actor%, but it fizzles on ^%actor% counterspell!
       else
@@ -407,7 +407,7 @@ else
     case 3
       set target %random.enemy%
       if (%target%)
-        if %target.trigger_counterspell%
+        if %target.trigger_counterspell(%self%)%
           %send% %target% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
           %echoaround% %target% ~%self% hurls a flaming meteor at ~%target%, but it fizzles on ^%target% counterspell!
         else

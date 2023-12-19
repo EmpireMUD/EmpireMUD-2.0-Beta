@@ -857,7 +857,7 @@ end
 if %ally%
   set target %ally.fighting%
   if %target%
-    if %target.trigger_counterspell%
+    if %target.trigger_counterspell(%self%)%
       %send% %target% A bolt of lightning flies out of nowhere and explodes against your counterspell!
       %send% %target% &&rThe bolt's explosion burns you!
       %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of ~%target%!

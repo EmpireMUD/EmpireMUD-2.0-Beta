@@ -34,6 +34,7 @@
 *   Ability Actions
 *   Ability Effects and Limits
 *   Ability Interaction Funcs
+*   Ability Lookups
 *   Ability Messaging
 *   Abilities Over Time
 *   Ability Commands
@@ -3109,6 +3110,48 @@ INTERACTION_FUNC(devastate_trees) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ABILITY LOOKUPS /////////////////////////////////////////////////////////
+
+/**
+* Checks if a character has a buff ability that gives a specific affect flag
+* and affect vnum combination. This is used e.g. to look up which counterspell
+* ability a player has, for experience gain.
+*
+* @param char_data *ch Player who might have the ability.
+* @param bitvector_t aff_flag Specific AFF_ flag to look for.
+* @param any_vnum aff_vnum Specific generic affect vnum to find.
+*/
+ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvector_t aff_flag, any_vnum aff_vnum) {
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// do not have this property
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;	// not purchased
+		}
+		if (!IS_SET(ABIL_AFFECTS(abil), aff_flag)) {
+			continue;	// missing required flag
+		}
+		if (aff_vnum != NOTHING && ABIL_AFFECT_VNUM(abil) != aff_vnum) {
+			continue;	// wrong affect type
+		}
+		
+		// looks like a match
+		return abil;
+	}
+	
+	// no?
+	return NULL;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ABILITY MESSAGING ///////////////////////////////////////////////////////
 
 /**
@@ -4160,7 +4203,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// counterspell?
-	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict)) {
+	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict, ch)) {
 		send_ability_counterspell_messages(ch, vict, abil, data);
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use

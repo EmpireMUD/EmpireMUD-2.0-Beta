@@ -168,7 +168,7 @@ switch %random.4%
     set keep_going 1
     while %person% && %keep_going%
       if %self.is_enemy(%person%)%
-        if !%person.trigger_counterspell%
+        if !%person.trigger_counterspell(%self%)%
           %send% %person% You fall to your knees as your body stops responding to your commands!
           %echoaround% %person% ~%person% falls to ^%person% knees, stunned.
           dg_affect #18506 %person% DODGE -50 10
@@ -421,7 +421,7 @@ switch %random.3%
         halt
       end
     end
-    if %target.trigger_counterspell%
+    if %target.trigger_counterspell(%self%)%
       %send% %target% &&r~%self% shoots a bolt of crackling emerald light at you, but it hits your counterspell and explodes!
       %echoaround% %target% ~%self% shoots a bolt of crackling emerald light at ~%target%, but it explodes in mid flight!
     else
