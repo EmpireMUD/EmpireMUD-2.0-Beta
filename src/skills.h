@@ -167,8 +167,8 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
 // #define ABIL_SPARRING  95
-#define ABIL_KICK  96
-#define ABIL_BASH  97
+// #define ABIL_KICK  96
+// #define ABIL_BASH  97
 // #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
 #define ABIL_QUICK_DRAW  102
@@ -309,8 +309,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define TYPE_SUFFERING			50	// used when players die from their wounds
 #define ATTACK_GUARD_TOWER		51
 #define ATTACK_EXECUTE			52	// used for death logging instead of attack type when executing
-#define ATTACK_KICK				54
-#define ATTACK_BASH				55
 #define ATTACK_VAMPIRE_BITE		59	// bite command
 #define ATTACK_PHYSICAL_DOT		61
 #define ATTACK_BACKSTAB			62
