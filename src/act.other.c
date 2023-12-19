@@ -698,7 +698,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, to_room, (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 				char_to_room(mob, IN_ROOM(ch));
 			}
-			gain_player_tech_exp(ch, PTECH_HERD, 5);
+			gain_player_tech_exp(ch, PTECH_HERD_COMMAND, 5);
 		}
 		else {
 			act("You try to herd $N, but $E refuses to move!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -2915,7 +2915,7 @@ ACMD(do_herd) {
 
 	if (IS_NPC(ch))
 		return;
-	else if (!has_player_tech(ch, PTECH_HERD)) {
+	else if (!has_player_tech(ch, PTECH_HERD_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to herd animals.\r\n");
 	}
 	else if (!*mob_arg || !*dir_arg) {
@@ -2952,7 +2952,7 @@ ACMD(do_herd) {
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD, victim, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL)) {
 		// triggered
 	}
 	
@@ -3185,7 +3185,7 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!has_player_tech(ch, PTECH_MILK)) {
+	if (!has_player_tech(ch, PTECH_MILK_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to milk animals.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE))
@@ -3211,7 +3211,7 @@ ACMD(do_milk) {
 		msg_to_char(ch, "It's already full of something else.\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) >= GET_DRINK_CONTAINER_CAPACITY(cont))
 		msg_to_char(ch, "It's already full.\r\n");
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK, mob, cont)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont)) {
 		// triggered
 	}
 	else {
@@ -3223,7 +3223,7 @@ ACMD(do_milk) {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		schedule_obj_timer_update(cont, FALSE);
-		gain_player_tech_exp(ch, PTECH_MILK, 33);
+		gain_player_tech_exp(ch, PTECH_MILK_COMMAND, 33);
 		request_obj_save_in_world(cont);
 	}
 }
@@ -3936,7 +3936,7 @@ ACMD(do_shear) {
 	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_player_tech(ch, PTECH_SHEAR)) {
+	else if (!has_player_tech(ch, PTECH_SHEAR_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to shear animals.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
@@ -3966,7 +3966,7 @@ ACMD(do_shear) {
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL)) {
 		// triggered
 	}
 	else {
@@ -3976,7 +3976,7 @@ ACMD(do_shear) {
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
-			gain_player_tech_exp(ch, PTECH_SHEAR, 33);
+			gain_player_tech_exp(ch, PTECH_SHEAR_COMMAND, 33);
 			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 33);
 		}
 		else {

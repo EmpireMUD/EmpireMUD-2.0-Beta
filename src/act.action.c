@@ -171,7 +171,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	#define NO_RANDOM_TICK_MSGS  { END_RANDOM_TICK_MSGS }
 	
 	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", 4,
-		PTECH_PICK, DPLTN_PICK, "gather_approval",
+		PTECH_PICK_COMMAND, DPLTN_PICK, "gather_approval",
 		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
 		/* finish msg */ { "You find $p!", "$n finds $p!" },
 		/* empty msg */ "You can't find anything here left to pick.",
@@ -181,7 +181,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		}}
 	},
 	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", 12,
-		PTECH_QUARRY, DPLTN_QUARRY, "gather_approval",
+		PTECH_QUARRY_COMMAND, DPLTN_QUARRY, "gather_approval",
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
 		/* finish msg */ { "You give the plug drill one final swing and pry loose $p!", "$n hits the plug drill hard with a hammer and pries loose $p!" },
 		/* empty msg */ "You don't seem to find anything of use.",
@@ -1090,7 +1090,7 @@ INTERACTION_FUNC(finish_gathering) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
-		gain_player_tech_exp(ch, PTECH_GATHER, 10);
+		gain_player_tech_exp(ch, PTECH_GATHER_COMMAND, 10);
 		
 		// action does not end normally
 		
@@ -1619,7 +1619,7 @@ void process_chop(char_data *ch) {
 		// attempt to change terrain
 		change_chop_territory(IN_ROOM(ch));
 		
-		gain_player_tech_exp(ch, PTECH_CHOP, 15);
+		gain_player_tech_exp(ch, PTECH_CHOP_COMMAND, 15);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1658,7 +1658,7 @@ void process_digging(char_data *ch) {
 		
 		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
 			// success
-			gain_player_tech_exp(ch, PTECH_DIG, 10);
+			gain_player_tech_exp(ch, PTECH_DIG_COMMAND, 10);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
@@ -1896,7 +1896,7 @@ void process_fishing(char_data *ch) {
 		return;
 	}
 	
-	amt = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20) + (player_tech_skill_check(ch, PTECH_FISH, DIFF_MEDIUM) ? 2 : 0);
+	amt = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20) + (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_MEDIUM) ? 2 : 0);
 	GET_ACTION_TIMER(ch) -= MAX(1, amt);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
@@ -1937,10 +1937,10 @@ void process_fishing(char_data *ch) {
 			msg_to_char(ch, "You can't seem to catch anything.\r\n");
 		}
 		
-		gain_player_tech_exp(ch, PTECH_FISH, 15);
+		gain_player_tech_exp(ch, PTECH_FISH_COMMAND, 15);
 		
 		// restart action
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
@@ -1980,7 +1980,7 @@ void process_foraging(char_data *ch) {
 		end_action(ch);
 		
 		// forage triggers
-		if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
+		if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL)) {
 			return;
 		}
 		
@@ -1990,11 +1990,11 @@ void process_foraging(char_data *ch) {
 		}
 		else {	// success
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, NULL, GUESTS_ALLOWED, finish_foraging)) {
-				gain_player_tech_exp(ch, PTECH_FORAGE, 10);
+				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
 				found = TRUE;
 			}
 			else if (do_crop_forage(ch)) {
-				gain_player_tech_exp(ch, PTECH_FORAGE, 10);
+				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
 				found = TRUE;
 			}
 			
@@ -2106,7 +2106,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, NULL, GUESTS_ALLOWED, finish_harvesting)) {
 			// skillups
-			gain_player_tech_exp(ch, PTECH_HARVEST, 30);
+			gain_player_tech_exp(ch, PTECH_HARVEST_COMMAND, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
@@ -2361,7 +2361,7 @@ void process_minting(char_data *ch) {
 		}
 		
 		end_action(ch);
-		gain_player_tech_exp(ch, PTECH_MINT, 30);
+		gain_player_tech_exp(ch, PTECH_MINT_COMMAND, 30);
 		
 		// repeat?
 		if (*tmp) {
@@ -2873,7 +2873,7 @@ void process_tanning(char_data *ch) {
 		end_action(ch);
 		
 		if (success) {
-			gain_player_tech_exp(ch, PTECH_TAN, 20);
+			gain_player_tech_exp(ch, PTECH_TAN_COMMAND, 20);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -3005,7 +3005,7 @@ ACMD(do_chop) {
 		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (!has_player_tech(ch, PTECH_CHOP)) {
+	else if (!has_player_tech(ch, PTECH_CHOP_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to chop anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
@@ -3036,7 +3036,7 @@ ACMD(do_chop) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHOP, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHOP_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3059,7 +3059,7 @@ ACMD(do_dig) {
 		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (!has_player_tech(ch, PTECH_DIG)) {
+	else if (!has_player_tech(ch, PTECH_DIG_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to dig anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
@@ -3074,7 +3074,7 @@ ACMD(do_dig) {
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to dig here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_DIG, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_DIG_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3270,7 +3270,7 @@ ACMD(do_forage) {
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (!has_player_tech(ch, PTECH_FORAGE)) {
+	else if (!has_player_tech(ch, PTECH_FORAGE_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to forage for anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
@@ -3291,7 +3291,7 @@ ACMD(do_forage) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3311,7 +3311,7 @@ ACMD(do_gather) {
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (!has_player_tech(ch, PTECH_GATHER)) {
+	else if (!has_player_tech(ch, PTECH_GATHER_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to gather anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
@@ -3326,7 +3326,7 @@ ACMD(do_gather) {
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to gather here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_GATHER, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_GATHER_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3353,7 +3353,7 @@ ACMD(do_harvest) {
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (!has_player_tech(ch, PTECH_HARVEST)) {
+	else if (!has_player_tech(ch, PTECH_HARVEST_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to harvest anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
@@ -3380,7 +3380,7 @@ ACMD(do_harvest) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_HARVEST, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HARVEST_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3459,7 +3459,7 @@ ACMD(do_mint) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_player_tech(ch, PTECH_MINT)) {
+	else if (!has_player_tech(ch, PTECH_MINT_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to mint anything.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -3489,7 +3489,7 @@ ACMD(do_mint) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_MINT, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MINT_COMMAND, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3894,7 +3894,7 @@ ACMD(do_tan) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_player_tech(ch, PTECH_TAN)) {
+	else if (!has_player_tech(ch, PTECH_TAN_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to tan anything.\r\n");
 	}
 	else if (!*argptr) {
@@ -3915,7 +3915,7 @@ ACMD(do_tan) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to tan anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAN, NULL, obj)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAN_COMMAND, NULL, obj)) {
 		// triggered
 	}
 	else {

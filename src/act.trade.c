@@ -2894,7 +2894,7 @@ ACMD(do_tame) {
 	
 	one_argument(argument, arg);
 
-	if (!has_player_tech(ch, PTECH_TAME)) {
+	if (!has_player_tech(ch, PTECH_TAME_ANIMALS)) {
 		msg_to_char(ch, "You don't have the correct ability to tame animals.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_TAME) > 0) {
@@ -2915,7 +2915,7 @@ ACMD(do_tame) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL)) {
 		// triggered
 	}
 	else {
@@ -2926,7 +2926,7 @@ ACMD(do_tame) {
 		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
 		
 		if (any) {
-			gain_player_tech_exp(ch, PTECH_TAME, 50);
+			gain_player_tech_exp(ch, PTECH_TAME_ANIMALS, 50);
 			add_cooldown(ch, COOLDOWN_TAME, 3 * SECS_PER_REAL_MIN);
 			
 			// remove the original

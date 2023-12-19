@@ -633,7 +633,7 @@ ACMD(do_fish) {
 	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't do that now!\r\n");
 	}
-	else if (!has_player_tech(ch, PTECH_FISH)) {
+	else if (!has_player_tech(ch, PTECH_FISH_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to fish for anything.\r\n");
 	}
 	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
@@ -660,7 +660,7 @@ ACMD(do_fish) {
 	else if (!has_tool(ch, TOOL_FISHING)) {
 		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH_COMMAND, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -674,7 +674,7 @@ ACMD(do_fish) {
 		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
 		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }

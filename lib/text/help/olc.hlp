@@ -1324,8 +1324,8 @@ Available techs are:
  &cFastcasting&0 - Wits reduces lag from non-combat abilities rather than
     improving combat speed.
  &cFast-Find&0 * - Dig, gather, and pick are faster.
- &cFish&0 * - Can use the fish command/interaction.
- &cForage&0 * - Can use the forage command/interaction.
+ &cFish-Command&0 * - Can use the fish command/interaction.
+ &cForage-Command&0 * - Can use the forage command/interaction.
  &cHarvest-Upgrade&0 * - Increases the number of items received from harvest.
  &cHealing-Boost&0 - Improves all healing abilities.
  &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
@@ -1362,10 +1362,10 @@ Available techs are:
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
  &cSkinning-Upgrade&0 - Skinning always succeeds.
  &cBarde&0 - Can barde animals.
- &cHerd&0 - Can herd animals.
- &cMilk&0 - Can milk animals (in a stable).
- &cShear&0 - Can shear animals (in a stable).
- &cTame&0 - Can tame animals.
+ &cHerd-Command&0 - Can herd animals.
+ &cMilk-Command&0 - Can milk animals (in a stable).
+ &cShear-Command&0 - Can shear animals (in a stable).
+ &cTame-Command&0 - Can tame animals.
  &cBite-Melee-Upgrade&0 - Bite lowers cooldown, doesn't taunt, and has a Dot, 
     if in Melee/Solo roles.
  &cBite-Tank-Upgrade&0 - Bite loses the dodge penalty in Tank/Solo and always
@@ -1375,16 +1375,16 @@ Available techs are:
  &cHunt-Animals&0 * - Can use the 'hunt' command, on animals.
  &cClock&0 * - Can tell the time.
  &cCalendar&0 * - Knows the date.
- &cMint&0 * - Can mint coins.
- &cTan&0 * - Can use the 'tan' command.
+ &cMint-Command&0 * - Can mint coins.
+ &cTan-Command&0 * - Can use the 'tan' command.
  &cNo-Purify&0 - Player cannot be purified.
  &cVampire-Sun-Immunity&0 * - Vampire powers now work in the sun.
- &cGather&0 * - Can 'gather'.
- &cChop&0 * - Can 'chop'.
- &cDig&0 * - Can 'dig'.
- &cHarvest&0 * - Can 'harvest'.
- &cPick&0 * - Can 'pick'.
- &cQuarry&0 * - Can 'quarry'.
+ &cGather-Command&0 * - Can 'gather'.
+ &cChop-Command&0 * - Can 'chop'.
+ &cDig-Command&0 * - Can 'dig'.
+ &cHarvest-Command&0 * - Can 'harvest'.
+ &cPick-Command&0 * - Can 'pick'.
+ &cQuarry-Command&0 * - Can 'quarry'.
  &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.

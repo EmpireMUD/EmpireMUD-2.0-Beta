@@ -2658,8 +2658,8 @@ typedef enum {
 #define PTECH_FAST_WOOD_PROCESSING  13	// saw/scrape go faster
 #define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
 #define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
-#define PTECH_FISH  16	// can use the 'fish' command/interaction
-#define PTECH_FORAGE  17	// can use the 'forage' command/interaction
+#define PTECH_FISH_COMMAND  16	// can use the 'fish' command/interaction
+#define PTECH_FORAGE_COMMAND  17	// can use the 'forage' command/interaction
 #define PTECH_HARVEST_UPGRADE  18	// more results from harvest
 #define PTECH_HEALING_BOOST  19	// increases healing effects
 #define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
@@ -2697,10 +2697,10 @@ typedef enum {
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
 #define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
 #define PTECH_BARDE  54	// can barde animals
-#define PTECH_HERD  55	// can herd animals
-#define PTECH_MILK  56	// can milk animals (at a stable)
-#define PTECH_SHEAR  57	// can shear animals (at a stable)
-#define PTECH_TAME  58	// can tame animals
+#define PTECH_HERD_COMMAND  55	// can herd animals
+#define PTECH_MILK_COMMAND  56	// can milk animals (at a stable)
+#define PTECH_SHEAR_COMMAND  57	// can shear animals (at a stable)
+#define PTECH_TAME_ANIMALS  58	// can tame animals
 #define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
@@ -2708,16 +2708,16 @@ typedef enum {
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 #define PTECH_CLOCK  64	// can tell time
 #define PTECH_CALENDAR  65	// can tell the date
-#define PTECH_MINT  66	// can mint coins
-#define PTECH_TAN  67	// can use the 'tan' command
+#define PTECH_MINT_COMMAND  66	// can mint coins
+#define PTECH_TAN_COMMAND  67	// can use the 'tan' command
 #define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
 #define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
-#define PTECH_GATHER  70	// can 'gather'
-#define PTECH_CHOP  71	// can 'chop'
-#define PTECH_DIG  72	// can 'dig'
-#define PTECH_HARVEST  73	// can 'harvest'
-#define PTECH_PICK  74	// can 'pick'
-#define PTECH_QUARRY  75	// can 'quarry'
+#define PTECH_GATHER_COMMAND  70	// can 'gather'
+#define PTECH_CHOP_COMMAND  71	// can 'chop'
+#define PTECH_DIG_COMMAND  72	// can 'dig'
+#define PTECH_HARVEST_COMMAND  73	// can 'harvest'
+#define PTECH_PICK_COMMAND  74	// can 'pick'
+#define PTECH_QUARRY_COMMAND  75	// can 'quarry'
 #define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
 #define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 #define PTECH_CUSTOMIZE_VEHICLE  78	// can use 'customize vehicle'

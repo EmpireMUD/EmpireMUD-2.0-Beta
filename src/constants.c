@@ -1178,8 +1178,8 @@ const char *player_tech_types[] = {
 	"Fast-Wood-Processing",
 	"Fastcasting",
 	"Fast-Find",	// 15
-	"Fish",
-	"Forage",
+	"Fish-Command",
+	"Forage-Command",
 	"Harvest-Upgrade",
 	"Healing-Boost",
 	"Hide-Upgrade",	// 20
@@ -1217,10 +1217,10 @@ const char *player_tech_types[] = {
 	"Dodge-Cap",
 	"Skinning-Upgrade",
 	"Barde",
-	"Herd",	// 55
-	"Milk",
-	"Shear",
-	"Tame",
+	"Herd-Command",	// 55
+	"Milk-Command",
+	"Shear-Command",
+	"Tame-Command",
 	"Bite-Melee-Upgrade",
 	"Bite-Tank-Upgrade",	// 60
 	"Bite-Steal-Blood",
@@ -1228,16 +1228,16 @@ const char *player_tech_types[] = {
 	"Hunt-Animals",
 	"Clock",
 	"Calendar",	// 65
-	"Mint",
-	"Tan",
+	"Mint-Command",
+	"Tan-Command",
 	"No-Purify",
 	"Vampire-Sun-Immunity",
-	"Gather",	// 70
-	"Chop",
-	"Dig",
-	"Harvest",
-	"Pick",
-	"Quarry",	// 75
+	"Gather-Command",	// 70
+	"Chop-Command",
+	"Dig-Command",
+	"Harvest-Command",
+	"Pick-Command",
+	"Quarry-Command",	// 75
 	"Drink-Blood-Faster",
 	"Summon-Materials",
 	"Customize-Vehicle",

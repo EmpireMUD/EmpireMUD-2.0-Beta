@@ -411,7 +411,7 @@ if %cmd% == feed
   halt
 end
 * Check target and tech
-if (!%actor.has_tech(Tame)% || %actor.char_target(%arg%)% != %self%)
+if (!%actor.has_tech(Tame-Command)% || %actor.char_target(%arg%)% != %self%)
   return 0
   halt
 end

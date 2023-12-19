@@ -157,7 +157,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
-				case PTECH_FISH: {
+				case PTECH_FISH_COMMAND: {
 					if (GET_ACTION(ch) == ACT_FISHING) {
 						cancel_action(ch);
 					}
