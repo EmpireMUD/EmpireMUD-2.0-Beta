@@ -951,6 +951,9 @@ Usage:  .difficulty <type>
 Some abilities have a chance to fail. This setting determines how hard the
 ability is. If an ability can fail, you should set custom fail messages.
 
+For targeted abilities, they do not fail if the target is asleep or can't see
+you.
+
 See also: ABILEDIT CUSTOM, OLC ABILITIES
 #d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
