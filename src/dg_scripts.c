@@ -4598,7 +4598,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
 						// optional target
-						char *trig_by = NULL;
+						char_data *trig_by = NULL;
 						if (subfield && *subfield) {
 							trig_by = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
 						}
