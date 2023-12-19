@@ -2,7 +2,7 @@
 *   File: olc.h                                           EmpireMUD 2.0b5 *
 *  Usage: On-Line Creation header file                                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -94,7 +94,27 @@
 #define OLC_FLAG_NO_ATTACKS  BIT(27)	// cannot edit attacks
 
 
-// for trigger editing
+// ABILEDIT_x: Which parts of the ability menu and stats to show
+#define ABILEDIT_IMMUNITIES		BIT(0)
+#define ABILEDIT_COMMAND		BIT(1)
+#define ABILEDIT_TARGETS		BIT(2)
+#define ABILEDIT_COST			BIT(3)
+#define ABILEDIT_MIN_POS		BIT(4)
+#define ABILEDIT_WAIT			BIT(5)
+#define ABILEDIT_DURATION		BIT(6)
+#define ABILEDIT_AFFECTS		BIT(7)
+#define ABILEDIT_APPLIES		BIT(8)
+#define ABILEDIT_AFFECT_VNUM	BIT(9)
+#define ABILEDIT_ATTACK_TYPE	BIT(10)
+#define ABILEDIT_MAX_STACKS		BIT(11)
+#define ABILEDIT_INTERACTIONS	BIT(12)
+#define ABILEDIT_COOLDOWN		BIT(13)
+#define ABILEDIT_DIFFICULTY		BIT(14)
+#define ABILEDIT_TOOL			BIT(15)
+#define ABILEDIT_DAMAGE_TYPE	BIT(16)
+
+
+// TRIG_ARG_x: for trigger editing
 #define TRIG_ARG_PERCENT  BIT(0)
 #define TRIG_ARG_COMMAND  BIT(1)
 #define TRIG_ARG_PHRASE_OR_WORDLIST  BIT(2)	// 0 = phrase, 1 = wordlist

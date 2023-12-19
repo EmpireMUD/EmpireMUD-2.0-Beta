@@ -2,7 +2,7 @@
 *   File: vnums.h                                         EmpireMUD 2.0b5 *
 *  Usage: stores commonly-used virtual numbers                            *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -153,7 +153,6 @@
 #define ATYPE_MUMMIFY  3011
 #define ATYPE_HEARTSTOP  3016
 #define ATYPE_DISARM  3018
-#define ATYPE_COUNTERSPELL  3021
 #define ATYPE_REJUVENATE  3023
 #define ATYPE_BITE_PENALTY  3025	// called "biting" / ATYPE_BITING (search hint)
 #define ATYPE_INSPIRE  3026

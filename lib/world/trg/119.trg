@@ -6036,7 +6036,7 @@ elseif %move% == 2
               dg_affect #11856 %ch% TO-HIT 25 20
             end
           else
-            if %ch.trigger_counterspell%
+            if %ch.trigger_counterspell(%self%)%
               %send% %ch% Your counterspell does nothing against the Iskip!
             end
             * hit
@@ -6669,7 +6669,7 @@ elseif %move% == 4
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %send% %ch% &&m... your counterspell does nothing against the scalding air!&&0
           end
           * hit!

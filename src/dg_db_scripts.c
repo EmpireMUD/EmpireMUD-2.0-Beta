@@ -3,7 +3,7 @@
 *  Usage: Contains routines to handle db functions for scripts and trigs  *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/30 21:27:54, revision 3.7           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

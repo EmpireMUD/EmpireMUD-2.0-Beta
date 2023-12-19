@@ -2,7 +2,7 @@
 *   File: constants.c                                     EmpireMUD 2.0b5 *
 *  Usage: Numeric and string contants used by the MUD                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -152,6 +152,7 @@ const char *ability_flags[] = {
 	"CUMULATIVE-BUFF",
 	"CUMULATIVE-DURATION",
 	"WEAPON-HIT",
+	"DIFFICULT-ANYWAY",
 	"\n"
 };
 
@@ -182,6 +183,7 @@ const char *ability_flag_notes[] = {
 	"cumulative",
 	"extendable",
 	"hits with weapon",
+	"",	// ABILF_DIFFICULT_ANYWAY
 	"\n"
 };
 
@@ -1595,6 +1597,7 @@ const char *affected_bits[] = {
 	"THIRSTIER",
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
+	"COUNTERSPELL",		// 45
 	"\n"
 };
 
@@ -1644,7 +1647,8 @@ const char *affected_bits_consider[] = {
 	"",	// hungrier
 	"",	// thirstier
 	"",	// immune-temperature
-	"",	// AUTO-RESURRECT
+	"",	// auto-resurrect
+	"",	// counterspell
 	"\n"
 };
 
@@ -1695,6 +1699,7 @@ const bool aff_is_bad[] = {
 	TRUE,
 	FALSE,
 	FALSE,
+	FALSE,	// 45 - counterspell
 };
 
 

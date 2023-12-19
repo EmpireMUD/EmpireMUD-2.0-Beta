@@ -2,7 +2,7 @@
 *   File: db.h                                            EmpireMUD 2.0b5 *
 *  Usage: header file for database handling                               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -295,6 +295,9 @@ ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
 void remove_ability_from_table(ability_data *abil);
+
+// ability lookups
+ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvector_t aff_flag, any_vnum aff_vnum);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);

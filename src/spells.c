@@ -2,7 +2,7 @@
 *   File: spells.c                                        EmpireMUD 2.0b5 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -29,8 +29,7 @@
 /**
 * Contents:
 *   Utilities
-*   Chants
-*   Readies
+*   Ready
 */
 
  //////////////////////////////////////////////////////////////////////////////
@@ -40,15 +39,51 @@
 * This function checks if the character has a counterspell available and
 * pops it if so.
 *
-* @param char_data *ch
-* @return bool TRUE if a counterspell fired, FALSE if the spell can proceed
+* @param char_data *ch The player who might have a counterspell.
+* @param char_data *triggered_by Optional: the person who caused the counterspell, for ability hook targets (may be NULL).
+* @return bool TRUE if a counterspell fired, FALSE if the spell can proceed.
 */
-bool trigger_counterspell(char_data *ch) {
-	if (affected_by_spell(ch, ATYPE_COUNTERSPELL)) {
+bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
+	bool removed = FALSE;
+	ability_data *abil = NULL;
+	struct affected_type *aff;
+	
+	if (AFF_FLAGGED(ch, AFF_COUNTERSPELL)) {
 		msg_to_char(ch, "Your counterspell goes off!\r\n");
-		affect_from_char(ch, ATYPE_COUNTERSPELL, FALSE);
-		gain_ability_exp(ch, ABIL_COUNTERSPELL, 100);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_COUNTERSPELL, get_ability_level(ch, ABIL_COUNTERSPELL), NULL, NULL, NULL, NULL);
+		
+		// find first counterspell aff
+		LL_FOREACH(ch->affected, aff) {
+			if (IS_SET(aff->bitvector, AFF_COUNTERSPELL)) {
+				removed = TRUE;
+				
+				// store ability for later
+				abil = has_buff_ability_by_affect_and_affect_vnum(ch, AFF_COUNTERSPELL, aff->type);
+				
+				if (aff->type == ATYPE_BUFF || aff->type == ATYPE_DG_AFFECT) {
+					// basic buff: only remove this one
+					affect_remove(ch, aff);
+					affect_total(ch);
+				}
+				else {
+					// other types: remove ALL affs of the type
+					affect_from_char(ch, aff->type, FALSE);
+				}
+				
+				// done either way: only removing 1
+				break;
+			}
+		}
+		
+		if (!removed) {
+			// has a counterspell aff flag that's not from an affect
+			REMOVE_BIT(AFF_FLAGS(ch), AFF_COUNTERSPELL);
+		}
+		
+		// did we find an ability that caused it?
+		if (abil) {
+			gain_ability_exp(ch, ABIL_VNUM(abil), 100);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), get_ability_level(ch, ABIL_VNUM(abil)), triggered_by, NULL, NULL, NULL);
+		}
 		return TRUE;
 	}
 	
@@ -57,7 +92,7 @@ bool trigger_counterspell(char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// READIES /////////////////////////////////////////////////////////////////
+//// READY ///////////////////////////////////////////////////////////////////
 
 ACMD(do_ready) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;

@@ -5,7 +5,7 @@
 *  Note: ITEM_CART is deprecated but this will still put items inside of  *
 *  one so that the 2.0 b3.8 auto-converter will move them to vehicles.    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

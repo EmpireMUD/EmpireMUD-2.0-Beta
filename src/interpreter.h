@@ -2,7 +2,7 @@
 *   File: interpreter.h                                   EmpireMUD 2.0b5 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

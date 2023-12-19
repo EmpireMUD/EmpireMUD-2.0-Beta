@@ -2,7 +2,7 @@
 *   File: skills.c                                        EmpireMUD 2.0b5 *
 *  Usage: code related to skills, including DB and OLC                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -198,10 +198,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_CLAWS: {
 			retract_claws(ch);
 			need_affect_total = TRUE;
-			break;
-		}
-		case ABIL_COUNTERSPELL: {
-			affect_from_char(ch, ATYPE_COUNTERSPELL, TRUE);
 			break;
 		}
 		case ABIL_DEATHSHROUD: {

@@ -2,7 +2,7 @@
 *   File: structs.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -566,6 +566,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_CUMULATIVE_BUFF  BIT(21)	// v. buff stacks effect
 #define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
 #define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
+#define ABILF_DIFFICULT_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -1153,6 +1154,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
 #define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
 #define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
+#define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
 
 
 // Injury flags -- IS_INJURED

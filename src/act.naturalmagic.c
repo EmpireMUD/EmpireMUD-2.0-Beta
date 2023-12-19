@@ -2,7 +2,7 @@
 *   File: act.naturalmagic.c                              EmpireMUD 2.0b5 *
 *  Usage: implementation for natural magic abilities                      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -465,31 +465,6 @@ ACMD(do_confer) {
 			affect_to_char(ch, aff);
 			free(aff);
 		}
-	}
-}
-
-
-ACMD(do_counterspell) {
-	struct affected_type *af;
-	int cost = 15;
-	
-	if (!can_use_ability(ch, ABIL_COUNTERSPELL, MANA, cost, NOTHING)) {
-		return;
-	}
-	else if (affected_by_spell(ch, ATYPE_COUNTERSPELL)) {
-		msg_to_char(ch, "You already have a counterspell ready.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_COUNTERSPELL)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		
-		act("You ready a counterspell.", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
-		act("$n flickers momentarily with a blue-white aura.", TRUE, ch, NULL, NULL, TO_ROOM | ACT_BUFF);
-		
-		af = create_flag_aff(ATYPE_COUNTERSPELL, 30 * SECS_PER_REAL_MIN, 0, ch);
-		affect_join(ch, af, 0);
 	}
 }
 

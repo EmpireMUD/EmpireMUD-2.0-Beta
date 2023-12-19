@@ -3,7 +3,7 @@
 *  Usage: string and messaging functions for DG Scripts                   *
 *                                                                         *
 *  DG Scripts code had no header info in this file                        *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *

@@ -2,7 +2,7 @@
 *   File: skills.h                                        EmpireMUD 2.0b5 *
 *  Usage: header file for classes, skills, and combat                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -99,7 +99,7 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 // spells.c prototypes
-bool trigger_counterspell(char_data *ch);
+bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 
 
 // DIFF_x: skill_check difficulties
@@ -183,8 +183,8 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
 // #define ABIL_READY_FIREBALL  117
-#define ABIL_COUNTERSPELL  120
-#define ABIL_ENTANGLE  121
+// #define ABIL_COUNTERSPELL  120
+// #define ABIL_ENTANGLE  121
 // #define ABIL_FAMILIAR  122
 // #define ABIL_SKYBRAND  125
 // #define ABIL_CHANT_OF_NATURE  126

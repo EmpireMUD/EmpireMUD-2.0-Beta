@@ -2,7 +2,7 @@
 *   File: act.stealth.c                                   EmpireMUD 2.0b5 *
 *  Usage: code related to non-offensive skills and abilities              *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -572,101 +572,6 @@ void use_poison(char_data *ch, obj_data *obj) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
-
-
-ACMD(do_backstab) {
-	char_data *vict;
-	int dam, cost = 15;
-	bool success = FALSE, fighting_me = FALSE;
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-		if (FIGHTING(vict) == ch) {
-			fighting_me = TRUE;
-			break;
-		}
-	}
-
-	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_BACKSTAB, MOVE, cost, COOLDOWN_BACKSTAB)) {
-		// sends own messages
-	}
-	else if (!IS_NPC(ch) && !GET_EQ(ch, WEAR_WIELD)) {
-		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
-	}
-	else if (!IS_NPC(ch) && !match_attack_type(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), TYPE_STAB)) {
-		send_to_char("You must use a stabbing weapon to backstab.\r\n", ch);
-	}
-	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {
-		msg_to_char(ch, "You can't do that while disarmed!\r\n");
-	}
-	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
-		send_to_char("Backstab whom?\r\n", ch);
-	}
-	else if (FIGHTING(vict) == ch) {
-		act("It's hard to get at $N's back when $E is attacking you.", FALSE, ch, NULL, vict, TO_CHAR);
-	}
-	else if (fighting_me) {
-		msg_to_char(ch, "You can't backstab while someone is attacking you.\r\n");
-	}
-	else if (vict == ch) {
-		send_to_char("You can't backstab yourself!\r\n", ch);
-	}
-	else if (!can_fight(ch, vict)) {
-		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_BACKSTAB)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
-	
-		// start meters now, to track direct damage()
-		check_start_combat_meters(ch);
-		check_start_combat_meters(vict);
-
-		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
-
-		if (!success) {
-			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL);
-		}
-		else {
-			dam = GET_STRENGTH(ch) + (!IS_NPC(ch) ? GET_WEAPON_DAMAGE_BONUS(GET_EQ(ch, WEAR_WIELD)) : MOB_DAMAGE(ch));
-			dam += GET_BONUS_PHYSICAL(ch);
-			dam *= 2;
-		
-			// 2nd skill check for more damage
-			if (skill_check(ch, ABIL_BACKSTAB, DIFF_MEDIUM)) {
-				dam *= 2;
-			}
-
-			if (damage(ch, vict, dam, ATTACK_BACKSTAB, DAM_PHYSICAL, NULL) > 0) {
-				if (has_player_tech(ch, PTECH_POISON)) {
-					if (!number(0, 1) && apply_poison(ch, vict) < 0) {
-						// dedz
-					}
-				}
-			}
-			
-			// force melee
-			if (FIGHTING(ch) == vict) {
-				FIGHT_MODE(ch) = FMODE_MELEE;
-				FIGHT_WAIT(ch) = 0;
-			}
-			if (FIGHTING(vict) == ch) {
-				FIGHT_MODE(vict) = FMODE_MELEE;
-				FIGHT_WAIT(vict) = 0;
-			}
-			
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BACKSTAB, get_ability_level(ch, ABIL_BACKSTAB), vict, NULL, NULL, NULL);
-		}
-		
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_BACKSTAB, 15);
-		}
-	}
-}
-
 
 ACMD(do_disguise) {
 	char_data *vict;
