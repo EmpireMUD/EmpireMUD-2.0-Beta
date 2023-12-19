@@ -1977,6 +1977,22 @@ You send a thornlash at $N, who skips rope with it.
 You skip rope with $n's thornlash.
 $n sends a thornlash at $N, who merely skips rope with it.
 
+M80 e 0 
+Critical Backstab~
+~
+... you stab straight into $S heart!
+... you feel the dagger go straight into your heart... and then, nothing.
+... that backstab must have hit something vital because $E keeps over and dies!
+#
+#
+#
+... it looks like you hit an organ!
+... it feels lie $e hit an organ!
+#
+#
+#
+#
+
 M3106 e 0 
 Freezing DoT~
 ~

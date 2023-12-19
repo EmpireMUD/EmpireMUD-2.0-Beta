@@ -171,8 +171,18 @@ X b
 S
 #120
 Counterspell~
-0 -1 1.00 0 0 0
-T m 0
+dr -1 1.00 0 0 0
+C
+counterspell 7 bg 2 15 0 -1 0 0 3 0
+M
+0
+You ready a counterspell.~
+M
+1
+$n flickers momentarily with a blue-white aura.~
+T b 1
+X b
+3021 1800 1800 T
 S
 #121
 Entangle~

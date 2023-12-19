@@ -38,9 +38,9 @@ X f
 S
 #3
 Backstab~
-agkx -1 2.00 0 0 0
+agkx -1 5.00 0 0 0
 C
-bckstb 7 bf 1 25 0 2038 9 0 2 2
+backstab 7 bf 1 25 0 2038 9 1 2 2
 D 16 28 4
 D 16 30 0
 M
@@ -421,6 +421,26 @@ S
 Blood Fortitude~
 0 -1 1.00 0 0 0
 T m 0
+S
+#39
+Critical Backstab~
+aky -1 4.00 0 0 0
+C
+unknown 7 bfh 0 0 0 -1 0 1 0 4
+D 256 3 0
+H 1 3 100.00 0
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T c 1
+X c
+80 0
 S
 #51
 Forge~
