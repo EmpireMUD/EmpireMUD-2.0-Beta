@@ -952,9 +952,9 @@ Some abilities have a chance to fail. This setting determines how hard the
 ability is. If an ability can fail, you should set custom fail messages.
 
 For targeted abilities, they do not fail if the target is asleep or can't see
-you.
+you (unless it has the DIFFICULTY-ANYWAY flag).
 
-See also: ABILEDIT CUSTOM, OLC ABILITIES
+See also: ABILEDIT CUSTOM, OLC ABILITIES, ABILEDIT FLAGS
 #d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
 
@@ -1001,6 +1001,7 @@ The following ability flags are available:
  &cCUMULATIVE-BUFF&0 - Buff can stack its effect.
  &cCUMULATIVE-DURATION&0 - Buff can stack its duration.
  &cWEAPON-HIT&0 - Counts as a weapon hit (applies poison, etc).
+ &cDIFFICULTY-ANYWAY&0 - Checks difficulty even if the target can't see you.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

@@ -152,6 +152,7 @@ const char *ability_flags[] = {
 	"CUMULATIVE-BUFF",
 	"CUMULATIVE-DURATION",
 	"WEAPON-HIT",
+	"DIFFICULTY-ANYWAY",
 	"\n"
 };
 
@@ -182,6 +183,7 @@ const char *ability_flag_notes[] = {
 	"cumulative",
 	"extendable",
 	"hits with weapon",
+	"",	// ABILF_DIFFICULTY_ANYWAY
 	"\n"
 };
 

@@ -4127,7 +4127,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data) {
 	int iter;
 	
-	#define _ABIL_VICT_CAN_SEE(vict, ch)  ((ch) == (vict) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
+	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULTY_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
 	if (!ch || !abil) {
 		return;
@@ -4217,7 +4217,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check for FAILURE:
-	if (!data->stop && _ABIL_VICT_CAN_SEE(vict, ch) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+	if (!data->stop && _ABIL_VICT_CAN_SEE(vict, ch, abil) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		send_ability_fail_messages(ch, vict, ovict, abil, data);
 		
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
