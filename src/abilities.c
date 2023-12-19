@@ -6133,7 +6133,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	struct ability_hook *ahook;
 	ability_data *abil, *find;
 	bitvector_t type;
-	int int_in[10];
+	int int_in[10], xtype;
 	double dbl_in;
 	
 	CREATE(abil, ability_data, 1);
@@ -6284,68 +6284,140 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'X': {	// extended data (type-based)
-				type = asciiflag_conv(line+2);
-				// ABILT_x: parsing ability data
-				switch (type) {
-					case ABILT_BUFF: {
-						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
-							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
-							exit(1);
-						}
-						
-						ABIL_AFFECT_VNUM(abil) = int_in[0];
-						ABIL_SHORT_DURATION(abil) = int_in[1];
-						ABIL_LONG_DURATION(abil) = int_in[2];
-						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
-						break;
-					}
-					case ABILT_DAMAGE: {
-						if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
-							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
-							exit(1);
-						}
-						
-						ABIL_ATTACK_TYPE(abil) = int_in[0];
-						ABIL_DAMAGE_TYPE(abil) = int_in[1];
-						break;
-					}
-					case ABILT_DOT: {
-						if (!get_line(fl, line) || sscanf(line, "%d %d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 5) {
-							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
-							exit(1);
-						}
-						
-						ABIL_AFFECT_VNUM(abil) = int_in[0];
-						ABIL_SHORT_DURATION(abil) = int_in[1];
-						ABIL_LONG_DURATION(abil) = int_in[2];
-						ABIL_DAMAGE_TYPE(abil) = int_in[3];
-						ABIL_MAX_STACKS(abil) = int_in[4];
-						break;
-					}
-					case ABILT_PASSIVE_BUFF: {
-						if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
-							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
-							exit(1);
-						}
-						
-						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
-						break;
-					}
-					case ABILT_ROOM_AFFECT: {
-						if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
-							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
-							exit(1);
-						}
-						
-						ABIL_AFFECT_VNUM(abil) = int_in[0];
-						ABIL_SHORT_DURATION(abil) = int_in[1];
-						ABIL_LONG_DURATION(abil) = int_in[2];
-						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
-						break;
-					}
-					default: {
-						log("SYSERR: Unknown flag X%llu in %s", type, error);
+				if (*(line+1) == '+') {
+					// newer X+ format
+					if (sscanf(line, "X+ %d ", &xtype) != 1) {
+						log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 						exit(1);
+					}
+					switch (xtype) {
+						case 0: {	// X+ 0: affects
+							if (sscanf(line, "X+ 0 %s", str_in) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+							break;
+						}
+						case 1: {	// X+ 1: affect vnum
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_AFFECT_VNUM(abil) = int_in[0];
+							break;
+						}
+						case 2: {	// X+ 2: short duration
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_SHORT_DURATION(abil) = int_in[0];
+							break;
+						}
+						case 3: {	// X+ 3: long duration
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_LONG_DURATION(abil) = int_in[0];
+							break;
+						}
+						case 4: {	// X+ 4: attack type
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_ATTACK_TYPE(abil) = int_in[0];
+							break;
+						}
+						case 5: {	// X+ 5: damage type
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_DAMAGE_TYPE(abil) = int_in[0];
+							break;
+						}
+						case 6: {	// X+ 6: max stacks
+							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_MAX_STACKS(abil) = int_in[0];
+							break;
+						}
+						default: {
+							log("SYSERR: Unknown 'X+' type %d in %s", xtype, error);
+							exit(1);
+							break;
+						}
+					}
+				}
+				else {
+					// regular X format (for backwards compatibility)
+					type = asciiflag_conv(line+2);
+					switch (type) {
+						case ABILT_BUFF: {
+							if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+								log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+								exit(1);
+							}
+						
+							ABIL_AFFECT_VNUM(abil) = int_in[0];
+							ABIL_SHORT_DURATION(abil) = int_in[1];
+							ABIL_LONG_DURATION(abil) = int_in[2];
+							ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+							break;
+						}
+						case ABILT_DAMAGE: {
+							if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+								log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+								exit(1);
+							}
+						
+							ABIL_ATTACK_TYPE(abil) = int_in[0];
+							ABIL_DAMAGE_TYPE(abil) = int_in[1];
+							break;
+						}
+						case ABILT_DOT: {
+							if (!get_line(fl, line) || sscanf(line, "%d %d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 5) {
+								log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+								exit(1);
+							}
+						
+							ABIL_AFFECT_VNUM(abil) = int_in[0];
+							ABIL_SHORT_DURATION(abil) = int_in[1];
+							ABIL_LONG_DURATION(abil) = int_in[2];
+							ABIL_DAMAGE_TYPE(abil) = int_in[3];
+							ABIL_MAX_STACKS(abil) = int_in[4];
+							break;
+						}
+						case ABILT_PASSIVE_BUFF: {
+							if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
+								log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+								exit(1);
+							}
+						
+							ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+							break;
+						}
+						case ABILT_ROOM_AFFECT: {
+							if (!get_line(fl, line) || sscanf(line, "%d %d %d %s", &int_in[0], &int_in[1], &int_in[2], str_in) != 4) {
+								log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+								exit(1);
+							}
+						
+							ABIL_AFFECT_VNUM(abil) = int_in[0];
+							ABIL_SHORT_DURATION(abil) = int_in[1];
+							ABIL_LONG_DURATION(abil) = int_in[2];
+							ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+							break;
+						}
+						default: {
+							log("SYSERR: Unknown flag X%llu in %s", type, error);
+							exit(1);
+						}
 					}
 				}
 				break;
@@ -6506,28 +6578,29 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		fprintf(fl, "T %s %d\n", bitv_to_alpha(at->type), at->weight);
 	}
 	
-	// 'X' ABILT_x: type-based data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		strcpy(temp, bitv_to_alpha(ABILT_BUFF));
-		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
-		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
+	// 'X+' additional data that used to be type-based
+	if (ABIL_AFFECTS(abil)) {
+		fprintf(fl, "X+ 0 %s\n", bitv_to_alpha(ABIL_AFFECTS(abil)));
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-		fprintf(fl, "X %s\n%d %d\n", bitv_to_alpha(ABILT_DAMAGE), ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil));
+	if (ABIL_AFFECT_VNUM(abil)) {
+		fprintf(fl, "X+ 1 %d\n", ABIL_AFFECT_VNUM(abil));
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
-		fprintf(fl, "X %s\n%d %d %d %d %d\n", bitv_to_alpha(ABILT_DOT), ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), ABIL_DAMAGE_TYPE(abil), ABIL_MAX_STACKS(abil));
+	if (ABIL_SHORT_DURATION(abil)) {
+		fprintf(fl, "X+ 2 %d\n", ABIL_SHORT_DURATION(abil));
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
-		strcpy(temp, bitv_to_alpha(ABILT_PASSIVE_BUFF));
-		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
-		fprintf(fl, "X %s\n%s\n", temp, temp2);
+	if (ABIL_LONG_DURATION(abil)) {
+		fprintf(fl, "X+ 3 %d\n", ABIL_LONG_DURATION(abil));
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
-		strcpy(temp, bitv_to_alpha(ABILT_ROOM_AFFECT));
-		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
-		fprintf(fl, "X %s\n%d %d %d %s\n", temp, ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), temp2);
+	if (ABIL_ATTACK_TYPE(abil)) {
+		fprintf(fl, "X+ 4 %d\n", ABIL_ATTACK_TYPE(abil));
 	}
+	if (ABIL_DAMAGE_TYPE(abil)) {
+		fprintf(fl, "X+ 5 %d\n", ABIL_DAMAGE_TYPE(abil));
+	}
+	if (ABIL_MAX_STACKS(abil)) {
+		fprintf(fl, "X+ 6 %d\n", ABIL_MAX_STACKS(abil));
+	}
+	// former 'X' type is no longer used; replaced by X+
 	
 	// end
 	fprintf(fl, "S\n");
