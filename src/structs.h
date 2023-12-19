@@ -2727,6 +2727,7 @@ typedef enum {
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
 #define PTECH_SEE_IN_MAGIC_DARKNESS  84	// sees through darkness room affect
+#define PTECH_TRACK_COMMAND  85	// can use 'track'
 
 
 // SM_x: status messages

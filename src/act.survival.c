@@ -896,7 +896,8 @@ ACMD(do_track) {
 	
 	one_argument(argument, arg);
 	
-	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
+	if (!has_player_tech(ch, PTECH_TRACK_COMMAND)) {
+		msg_to_char(ch, "You don't know how to follow tracks.\r\n");
 		return;
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
@@ -907,7 +908,7 @@ ACMD(do_track) {
 		msg_to_char(ch, "Track whom? Or what?\r\n");
 		return;
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_TRACK)) {
+	else if (ability_triggers_by_ptech(ch, NULL, NULL, PTECH_TRACK_COMMAND)) {
 		return;
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {
@@ -953,9 +954,8 @@ ACMD(do_track) {
 			snprintf(buf, sizeof(buf), "You find a trail heading %s of $V!", VEH_FLAGGED(veh, VEH_IN) ? "out" : "off");
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
-
-		gain_ability_exp(ch, ABIL_TRACK, 20);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRACK, get_ability_level(ch, ABIL_TRACK), NULL, NULL, NULL, NULL);
+		
+		gain_player_tech_exp(ch, PTECH_TRACK_COMMAND, 20);
 	}
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");

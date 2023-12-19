@@ -2256,6 +2256,36 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum 
 
 
 /**
+* Runs ability triggers on abilities giving the player a tech.
+*
+* @param char_data *ch The actor.
+* @param char_data *vict The vicitm, if any (may be NULL).
+* @param obj_data *obj The object target, if any (may be NULL).
+* @param int tech Which PTECH_ flag.
+* @return bool TRUE to stop execution, FALSE to continue.
+*/
+bool ability_triggers_by_ptech(char_data *ch, char_data *vict, obj_data *obj, int tech) {
+	struct player_tech *iter;
+	bool stop = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			stop |= ABILITY_TRIGGERS(ch, vict, obj, iter->abil);
+			if (stop) {
+				break;
+			}
+		}
+	}
+	
+	return stop;
+}
+
+
+/**
 * @param room_data *room The room the person is trying to leave.
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).

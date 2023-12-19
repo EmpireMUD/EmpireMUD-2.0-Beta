@@ -1395,6 +1395,7 @@ Available techs are:
  &cScrape-Command&0 * - Can use the 'scrape' command.
  &cMap-Memory&0 * - Remembers blocked/dark tiles on look/scan.
  &cSearch-Command&0 * - Allows the 'search' command to find things.
+ &cTrack-Command&0 * - Allows the 'track' command.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

@@ -156,7 +156,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 // formerly: #define ABIL_ROADS  49
 // #define ABIL_STAMINA  66
 #define ABIL_FISH  72
-#define ABIL_TRACK  73
+//#define ABIL_TRACK  73
 #define ABIL_RESIST_POISON  77
 #define ABIL_PATHFINDING  83
 // #define ABIL_REFLEXES  84

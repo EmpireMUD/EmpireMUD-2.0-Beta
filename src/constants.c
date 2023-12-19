@@ -1247,6 +1247,7 @@ const char *player_tech_types[] = {
 	"Scrape-Command",
 	"Map-Memory",
 	"See-In-Magic-Darkness",
+	"Track-Command",	// 85
 	"\n"
 };
 
