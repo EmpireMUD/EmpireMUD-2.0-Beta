@@ -800,7 +800,8 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	if (ABIL_AFFECTS(abil)) {
 		if (!unscaled) {
 			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-			remaining_points = MAX(0, remaining_points);
+			// also reset total_points as it's used for weights below
+			total_points = remaining_points = MAX(0, remaining_points);
 		}
 		
 		af = create_flag_aff(ABIL_VNUM(abil), UNLIMITED, ABIL_AFFECTS(abil), ch);
@@ -820,6 +821,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		// unscaled buff?
 		if (apply_never_scales[apply->location] || unscaled) {
 			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
@@ -827,14 +829,19 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			continue;
 		}
 		
+		// scaled version: determine share
 		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
 		if (share > remaining_points) {
 			share = MIN(share, remaining_points);
 		}
+		
+		// determine amount
 		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		
+		// and apply?
 		if (share > 0 && amt != 0) {
 			remaining_points -= share;
-			remaining_points = MAX(0, total_points);
+			remaining_points = MAX(0, remaining_points);
 			
 			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, amt, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
