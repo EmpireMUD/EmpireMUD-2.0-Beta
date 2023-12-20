@@ -275,11 +275,9 @@ Usage:  manashield
 Cost:  25 mana*
 
 By armoring herself with a manashield, a sorcerer sacrifices part of her mana
-pool for reduced combat damage.
+pool for increased resistance to damage.
 
-Mana Shield reduces your mana by 25.
-
-Gain skill by taking damage while manashielded, not by reapplying it.
+Gain skill by taking damage while manashielded.
 #
 MIRRORIMAGE "MIRROR IMAGE"
 
