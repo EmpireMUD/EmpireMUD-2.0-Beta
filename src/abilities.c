@@ -2087,7 +2087,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 	}
 	if (room_targ && room_targ == IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_NOT_HERE)) {
 		if (send_msgs) {
-			msg_to_char(ch, "You can't use that on the room you're in.\r\n");
+			msg_to_char(ch, "You can't do that here.\r\n");
 		}
 		return FALSE;
 	}
