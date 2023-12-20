@@ -168,7 +168,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
 #define ABIL_STAFF_MASTERY  171
-#define ABIL_SIPHON  176
 #define ABIL_MIRRORIMAGE  177
 #define ABIL_DISENCHANT  180
 #define ABIL_VIGOR  183

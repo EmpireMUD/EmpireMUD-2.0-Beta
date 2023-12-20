@@ -361,7 +361,6 @@ ACMD(do_sheathe);
 ACMD(do_ship);
 ACMD(do_shoot);
 ACMD(do_show);
-ACMD(do_siphon);
 ACMD(do_sire);
 ACMD(do_sit);
 ACMD(do_skills);
@@ -955,7 +954,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "show", POS_DEAD, do_show, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "shutdown", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_SHUTDOWN, SCMD_SHUTDOWN, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	SCMD_CMD( "sip", POS_RESTING, do_drink, NO_MIN, CTYPE_UTIL, SCMD_SIP ),
-	ABILITY_CMD( "siphon", POS_FIGHTING, do_siphon, NO_MIN, CTYPE_COMBAT, ABIL_SIPHON ),
 	SIMPLE_CMD( "sire", POS_STANDING, do_sire, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "sit", POS_RESTING, do_sit, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "skills", POS_DEAD, do_skills, NO_MIN, CTYPE_UTIL ),

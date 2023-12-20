@@ -243,11 +243,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_SIPHON: {
-			affect_from_char(ch, ATYPE_SIPHON, TRUE);
-			need_affect_total = TRUE;
-			break;
-		}
 	}
 	
 	determine_gear_level(ch);

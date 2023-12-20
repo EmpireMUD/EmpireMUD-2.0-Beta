@@ -1125,6 +1125,7 @@ Limitation types:
  &coutdoors&0 - Must be used outdoors (including some adventure rooms).
  &cown the tile&0 - Your empire must own the location.
  &cpaintable building&0 - Must be used on a building the player can paint.
+ &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
  &cvalid siege target&0 - Any vehicle or room target must be ok to attack.

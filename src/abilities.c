@@ -2822,6 +2822,18 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_TARGET_HAS_MANA: {
+				if (vict && GET_MANA(vict) < 1) {
+					if (ch == vict) {
+						msg_to_char(ch, "You can't do that when you don't have any mana.\r\n");
+					}
+					else {
+						msg_to_char(ch, "You can't use that one someone without any mana.\r\n");
+					}
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
