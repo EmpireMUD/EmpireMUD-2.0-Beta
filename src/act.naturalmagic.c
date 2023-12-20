@@ -201,10 +201,8 @@ void apply_potion(obj_data *obj, char_data *ch) {
 ACMD(do_cleanse) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *aff, *next_aff;
-	bitvector_t bitv;
 	char_data *vict = ch;
-	int pos, cost = 30;
-	bool done_aff;
+	int cost = 30;
 	
 	one_argument(argument, arg);
 	
@@ -231,28 +229,16 @@ ACMD(do_cleanse) {
 		}
 
 		// remove bad effects
-		for (aff = vict->affected; aff; aff = next_aff) {
-			next_aff = aff->next;
-			
-			// can't cleanse penalties (things cast by self)
+		LL_FOREACH_SAFE(vict->affected, aff, next_aff) {
 			if (aff->cast_by == CAST_BY_ID(vict)) {
-				continue;
+				continue; // can't cleanse penalties (things cast by self)
+			}
+			if (affect_is_beneficial(aff)) {
+				continue;	// not bad, not bad
 			}
 			
-			done_aff = FALSE;
-			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
-				affect_remove(vict, aff);
-				done_aff = TRUE;
-			}
-			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
-				// check each bit
-				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
-					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
-						affect_remove(vict, aff);
-						done_aff = TRUE;
-					}
-				}
-			}
+			// bad!
+			affect_remove(vict, aff);
 		}
 		
 		// remove DoTs

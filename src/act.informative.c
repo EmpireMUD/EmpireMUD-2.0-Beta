@@ -1501,8 +1501,8 @@ void show_character_affects(char_data *ch, char_data *to) {
 * @param char_data *to Who to send to
 */
 void show_character_affects_simple(char_data *ch, char_data *to) {
-	bool details;
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
+	bool is_ally, details;
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], good_color[8], bad_color[8];
 	char *temp;
 	int duration;
 	size_t size;
@@ -1514,8 +1514,19 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		return;	// nobody to show to
 	}
 	
+	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
 	// TODO add ptech here:
-	details = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
+	details = is_ally || FALSE;
+	
+	// determine colors
+	if (is_ally) {
+		strcpy(good_color, "\tc");
+		strcpy(bad_color, "\tr");
+	}
+	else {
+		strcpy(good_color, "\tr");
+		strcpy(bad_color, "\tc");
+	}
 	
 	// build affects
 	LL_FOREACH(ch->affected, aff) {
@@ -1536,7 +1547,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			
 			// main entry
-			snprintf(line, sizeof(line), "%s (%s)", get_generic_name_by_vnum(aff->type), lbuf);
+			snprintf(line, sizeof(line), "%s%s\t0 (%s)", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), lbuf);
 			
 			if (aff->modifier) {
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1556,7 +1567,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		else {
 			// simple version
-			snprintf(line, sizeof(line), "%s%s", get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			snprintf(line, sizeof(line), "%s%s\t0%s", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
 			add_string_hash(&str_hash, line, 1);
 		}
 	}
@@ -1574,7 +1585,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			snprintf(line, sizeof(line), "%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
 		}
 		else {	// simple version
-			snprintf(line, sizeof(line), "%s%s", get_generic_name_by_vnum(dot->type), lbuf);
+			snprintf(line, sizeof(line), "%s%s\t0%s", bad_color, get_generic_name_by_vnum(dot->type), lbuf);
 		}
 		
 		// caster?
@@ -1586,7 +1597,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	
 	// build display
-	size = snprintf(output, sizeof(output), "Affects on %s:%s", PERS(ch, to, FALSE), details ? "\r\n" : "");
+	size = snprintf(output, sizeof(output), "Affects on %s:%s%s", PERS(ch, to, FALSE), details ? "\r\n" : "", (str_hash ? "" : " none"));
 	HASH_ITER(hh, str_hash, str_iter, next_str) {
 		if (details) {
 			if (size + strlen(str_iter->str) + 3 < sizeof(output)) {

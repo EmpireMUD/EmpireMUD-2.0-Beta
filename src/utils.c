@@ -3037,6 +3037,33 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if an effect appears to be bad for you or not.
+*
+* @param struct affected_type *aff Which aff.
+* @return bool TRUE if it's a good aff, FALSE if it's a bad one.
+*/
+bool affect_is_beneficial(struct affected_type *aff) {
+	bitvector_t bitv;
+	int pos;
+	
+	if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+		return FALSE;	// bad apply
+	}
+	if ((bitv = aff->bitvector) != NOBITS) {
+		// check each bit
+		for (pos = 0; bitv; ++pos, bitv >>= 1) {
+			if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+				return FALSE;
+			}
+		}
+	}
+	
+	// otherwise default to TRUE
+	return TRUE;
+}
+
+
+/**
 * Player's carry limit. This was formerly a macro.
 *
 * @param char_data *ch The player/character.

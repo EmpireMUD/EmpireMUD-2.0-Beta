@@ -1933,6 +1933,7 @@ double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
+bool affect_is_beneficial(struct affected_type *aff);
 bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light);
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
