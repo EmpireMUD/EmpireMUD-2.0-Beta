@@ -207,58 +207,6 @@ INTERACTION_FUNC(pickpocket_interact) {
 }
 
 
-// for do_escape
-void perform_escape(char_data *ch) {
-	room_data *to_room = NULL;
-	
-	// on a boat?
-	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (to_room = IN_VEHICLE_IN_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
-		if (VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
-			act("You dive out of $V!", FALSE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_CHAR | ACT_VEH_VICT);
-			act("$n dives out of $V!", TRUE, ch, NULL, GET_ROOM_VEHICLE(IN_ROOM(ch)), TO_ROOM | ACT_VEH_VICT);
-		}
-		else {	// not an IN vehicle
-			msg_to_char(ch, "You dive off the side!\r\n");
-			act("$n dives off the side!", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-	}
-	else {
-		msg_to_char(ch, "You dive out the window!\r\n");
-		act("$n dives out the window!", TRUE, ch, NULL, NULL, TO_ROOM);
-		to_room = get_exit_room(IN_ROOM(ch));
-	}
-
-	if (!to_room) {
-		msg_to_char(ch, "But you can't seem to escape from here...\r\n");
-	}
-	else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
-		return;
-	}
-	else {
-		char_to_room(ch, to_room);
-		qt_visit_room(ch, IN_ROOM(ch));
-		look_at_room(ch);
-		
-		GET_LAST_DIR(ch) = NO_DIR;
-		
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
-		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR, "ability");
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR, "ability");
-				
-		RESET_LAST_MESSAGED_TEMPERATURE(ch);
-		msdp_update_room(ch);
-		
-		act("$n dives out a window and lands before you!", TRUE, ch, NULL, NULL, TO_ROOM);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ESCAPE, get_ability_level(ch, ABIL_ESCAPE), ch, NULL, NULL, IN_ROOM(ch));
-	}
-	
-	end_action(ch);
-	gain_ability_exp(ch, ABIL_ESCAPE, 50);
-}
-
-
 /**
 * Sets up a player's disguise.
 *
@@ -686,41 +634,6 @@ ACMD(do_diversion) {
 				engage_combat(ch, victim, TRUE);
 			}
 		}
-	}
-}
-
-
-ACMD(do_escape) {
-	int cost = 10;
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use escape.\r\n");
-	}
-	else if (!can_use_ability(ch, ABIL_ESCAPE, MOVE, cost, NOTHING)) {
-		// sends own messages
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_ESCAPE)) {
-		return;
-	}
-	else if (!IS_INSIDE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You don't need to escape from here.\r\n");
-	}
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to try to escape from here.\r\n");
-	}
-	else {
-		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
-			msg_to_char(ch, "You run for the edge to escape!\r\n");
-			act("$n runs toward the edge to escape!", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {	// this handles buildings and IN-vehicles
-			msg_to_char(ch, "You run for the window to escape!\r\n");
-			act("$n runs toward the window!", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		start_action(ch, ACT_ESCAPING, 1);
-		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 	}
 }
 

@@ -156,7 +156,6 @@ ACMD(do_enroll);
 ACMD(do_enter);
 ACMD(do_equipment);
 ACMD(do_esay);
-ACMD(do_escape);
 ACMD(do_estats);
 ACMD(do_events);
 ACMD(do_examine);
@@ -696,7 +695,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "equipment", POS_DEAD, do_equipment, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "esay", POS_DEAD, do_esay, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "etalk", POS_DEAD, do_esay, NO_MIN, CTYPE_EMPIRE ),
-	ABILITY_CMD( "escape", POS_STANDING, do_escape, NO_MIN, CTYPE_MOVE, ABIL_ESCAPE ),
 	SIMPLE_CMD( "estats", POS_DEAD, do_estats, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "events", POS_DEAD, do_events, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "examine", POS_SITTING, do_examine, NO_MIN, CTYPE_UTIL ),

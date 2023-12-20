@@ -58,7 +58,6 @@ void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
-void process_escaping(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
 void process_fishing(char_data *ch);
@@ -98,7 +97,6 @@ ACMD(do_saw);
 ACMD(do_mint);
 ACMD(do_scrape);
 ACMD(do_tan);
-void perform_escape(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -128,13 +126,13 @@ const struct action_data_struct action_data[] = {
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
-	{ "chanting", "is chanting a strange song.", NOBITS, cancel_action, NULL },	// ACT_CHANTING
+		{ "chanting", "is chanting a strange song.", NOBITS, cancel_action, NULL },	// no longer used
 	{ "prospecting", "is prospecting.", ACTF_FAST_PROSPECT, process_prospecting, NULL },	// ACT_PROSPECTING
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming the area!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
-	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
+		{ "escaping", "is running toward the window!", NOBITS, cancel_action, NULL },	// no longer used
 	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, NULL },	// ACT_RUNNING
-	{ "ritual", "is performing an arcane ritual.", NOBITS, cancel_action, NULL },	// ACT_RITUAL
+		{ "ritual", "is performing an arcane ritual.", NOBITS, cancel_action, NULL },	// no longer used
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
@@ -1717,24 +1715,6 @@ void process_dismantle_action(char_data *ch) {
 	total = 1;	// number of mats to dismantle at once (add things that speed up dismantle)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_DISMANTLING; ++count) {
 		process_dismantling(ch, IN_ROOM(ch));
-	}
-}
-
-
-/**
-* Tick update for escape action.
-*
-* @param char_data *ch The escapist.
-*/
-void process_escaping(char_data *ch) {
-	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to find your way out!\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	if (--GET_ACTION_TIMER(ch) <= 0) {
-		perform_escape(ch);
 	}
 }
 

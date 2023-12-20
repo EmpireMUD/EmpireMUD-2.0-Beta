@@ -204,7 +204,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 // formerly: #define ABIL_BARDE  139
 // formerly: #define ABIL_CITY_LIGHTS  140
 #define ABIL_STEAL  143
-#define ABIL_ESCAPE  146
+// #define ABIL_ESCAPE  146
 #define ABIL_CONCEALMENT  148
 // #define ABIL_SHADOWSTEP  153
 #define ABIL_JAB  155
