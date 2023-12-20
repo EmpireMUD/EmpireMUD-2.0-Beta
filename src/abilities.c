@@ -7819,7 +7819,7 @@ OLC_MODULE(abiledit_affects) {
 		ABIL_AFFECTS(abil) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, ABIL_AFFECTS(abil));
 	}
 	else {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a BUFF or PASSIVE-BUFF type to use it.\r\n");
 	}
 }
 
@@ -7830,7 +7830,7 @@ OLC_MODULE(abiledit_affectvnum) {
 	any_vnum old;
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_AFFECT_VNUM)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a BUFF or PASSIVE-BUFF type to use it.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
 		ABIL_AFFECT_VNUM(abil) = NOTHING;
@@ -7855,7 +7855,7 @@ OLC_MODULE(abiledit_apply) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_APPLIES)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a BUFF or PASSIVE-BUFF type to use it.\r\n");
 	}
 	else {
 		olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
@@ -7869,7 +7869,7 @@ OLC_MODULE(abiledit_attacktype) {
 	attack_message_data *amd;
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_ATTACK_TYPE)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add the DAMAGE type to use it.\r\n");
 	}
 	else {
 		ABIL_ATTACK_TYPE(abil) = olc_process_number(ch, argument, "attack type", "attacktype", 0, MAX_VNUM, ABIL_ATTACK_TYPE(abil));
@@ -7888,7 +7888,7 @@ OLC_MODULE(abiledit_cdtime) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COOLDOWN)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else if (ABIL_COOLDOWN(abil) == NOTHING) {
 		msg_to_char(ch, "Set a cooldown vnum first.\r\n");
@@ -7903,7 +7903,7 @@ OLC_MODULE(abiledit_command) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COMMAND)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add an ability type to use it.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
 		if (ABIL_COMMAND(abil)) {
@@ -7935,7 +7935,7 @@ OLC_MODULE(abiledit_cooldown) {
 	char arg2[MAX_INPUT_LENGTH];
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COOLDOWN)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else if (!str_cmp(argument, "none")) {
 		ABIL_COOLDOWN(abil) = NOTHING;
@@ -7965,7 +7965,7 @@ OLC_MODULE(abiledit_cost) {
 	char arg2[MAX_INPUT_LENGTH];
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		two_arguments(argument, arg, arg2);
@@ -7983,7 +7983,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
@@ -7995,7 +7995,7 @@ OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_COST_TYPE(abil) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, ABIL_COST_TYPE(abil));
@@ -8014,7 +8014,7 @@ OLC_MODULE(abiledit_damagetype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DAMAGE_TYPE)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a DAMAGE or DOT type to use it.\r\n");
 	}
 	else {
 		ABIL_DAMAGE_TYPE(abil) = olc_process_type(ch, argument, "damage type", "damagetype", damage_types, ABIL_DAMAGE_TYPE(abil));
@@ -8270,7 +8270,7 @@ OLC_MODULE(abiledit_difficulty) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DIFFICULTY)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
@@ -8453,7 +8453,7 @@ OLC_MODULE(abiledit_immunities) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_IMMUNITIES)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a type to use it.\r\n");
 	}
 	else {
 		ABIL_IMMUNITIES(abil) = olc_process_flag(ch, argument, "immunity", "immunities", affected_bits, ABIL_IMMUNITIES(abil));
@@ -8465,7 +8465,7 @@ OLC_MODULE(abiledit_interaction) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_INTERACTIONS)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add an appropriate ability type to use it.\r\n");
 	}
 	else {
 		olc_process_interactions(ch, argument, &ABIL_INTERACTIONS(abil), TYPE_ABIL);
@@ -8475,13 +8475,7 @@ OLC_MODULE(abiledit_interaction) {
 
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT | ABILT_DAMAGE | ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
-	}
-	else {
-		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
-	}
+	ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
 }
 
 
@@ -8489,7 +8483,7 @@ OLC_MODULE(abiledit_longduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DURATION)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add a BUFF or DOT type to use it.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
@@ -8537,7 +8531,7 @@ OLC_MODULE(abiledit_maxstacks) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_MAX_STACKS)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Add the DOT type to use it.\r\n");
 	}
 	else {
 		ABIL_MAX_STACKS(abil) = olc_process_number(ch, argument, "max stacks", "maxstacks", 1, 1000, ABIL_MAX_STACKS(abil));
@@ -8549,7 +8543,7 @@ OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_MIN_POS)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
@@ -8567,7 +8561,7 @@ OLC_MODULE(abiledit_resourcecost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		olc_process_resources(ch, argument, &ABIL_RESOURCE_COST(abil));
@@ -8588,7 +8582,7 @@ OLC_MODULE(abiledit_shortduration) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_DURATION)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else if (is_abbrev(argument, "unlimited")) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
@@ -8609,7 +8603,7 @@ OLC_MODULE(abiledit_targets) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_TARGETS)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_TARGETS(abil) = olc_process_flag(ch, argument, "target", "targets", ability_target_flags, ABIL_TARGETS(abil));
@@ -8621,7 +8615,7 @@ OLC_MODULE(abiledit_tools) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_TOOL)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
 		ABIL_REQUIRES_TOOL(abil) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, ABIL_REQUIRES_TOOL(abil));
@@ -8740,7 +8734,7 @@ OLC_MODULE(abiledit_waittype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_WAIT)) {
-		msg_to_char(ch, "This type of ability does not have that property.\r\n");
+		msg_to_char(ch, "This type of ability does not have that property. Set a command to use it.\r\n");
 	}
 	else {
 		ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
