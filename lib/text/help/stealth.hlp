@@ -169,6 +169,7 @@ Time:  5 seconds
 
 Escape lets you run for the nearest window and quickly exit the building or
 ship you're in, making a quick getaway from even the most confusing castles.
+This will also work in adventures only from indoor rooms that allow "look out".
 
 Gains experience when you escape.
 #
