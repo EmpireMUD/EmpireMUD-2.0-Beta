@@ -168,7 +168,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_REFORGE  87
 // #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
-#define ABIL_DISARM  94
+// #define ABIL_DISARM  94
 // #define ABIL_SPARRING  95
 // #define ABIL_KICK  96
 // #define ABIL_BASH  97
