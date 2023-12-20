@@ -930,7 +930,7 @@ it.
 
 See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 #d
-"ABILEDIT DATA"
+"ABILEDIT DATA" "ABILEDIT READY-WEAPON" "ABILEDIT SUMMON-MOB" "ABILEDIT PAINT-COLOR" "ABILEDIT RANGE"
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
@@ -1262,6 +1262,8 @@ See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT PARENT" "PARENT ABILITY" "CHILD ABILITY" "CHAINED ABILITIES"
 
+Usage:  .data add parent <ability>
+
 Some abilities are too complex to be handled by just 1 ability entry. Using a
 combination of PARENT data and ABILITY hooks, it is possible to create more
 complex abilities.
@@ -1302,7 +1304,7 @@ on being alone; they will remain active.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, PASSIVES
 #d
-"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
+"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH "ABILEDIT PTECH"
 
 Usage:  .data add ptech <type>
 
@@ -1648,6 +1650,8 @@ Choose the wait type that best fits your ability:
 See also: COMMAND LAG, OLC ABILITIES
 #d
 "ABILITY EFFECTS" "ABILEDIT EFFECTS"
+
+Usage:  .data add effect <type>
 
 Some abilities have 'effects' which happen when the ability is activated. These
 happen at the beginning of the ability.
