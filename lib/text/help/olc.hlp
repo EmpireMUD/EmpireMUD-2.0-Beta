@@ -1007,6 +1007,7 @@ The following ability flags are available:
  &cWEAPON-HIT&0 - Counts as a weapon hit (applies poison, etc).
  &cDIFFICULT-ANYWAY&0 - Checks difficulty even if the target can't see you.
  &cNOT-IN-DARK&0 - Cannot be used in the dark unless you can see.
+ &cUNSCALED-PENALTY&0 - Negative buff attributes do not scale; positives do.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

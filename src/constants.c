@@ -154,6 +154,7 @@ const char *ability_flags[] = {
 	"WEAPON-HIT",
 	"DIFFICULT-ANYWAY",
 	"NOT-IN-DARK",	// 25
+	"UNSCALED-PENALTY",	// 26
 	"\n"
 };
 
@@ -186,6 +187,7 @@ const char *ability_flag_notes[] = {
 	"hits with weapon",
 	"",	// ABILF_DIFFICULT_ANYWAY
 	"",	// 25 - ABILF_NOT_IN_DARK
+	"",	// ABILF_UNSCALED_PENALTY
 	"\n"
 };
 

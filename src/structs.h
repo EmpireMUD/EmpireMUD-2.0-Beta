@@ -568,6 +568,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
 #define ABILF_DIFFICULT_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
 #define ABILF_NOT_IN_DARK  BIT(25)	// z. must be able to see
+#define ABILF_UNSCALED_PENALTY  BIT(26)	// A. negative buffs are unscaled; positive ones still scale
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

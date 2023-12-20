@@ -766,7 +766,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	struct affected_type *af;
 	struct apply_data *apply;
 	int cap, level, total_w = 0;
-	bool unscaled;
+	bool unscaled, unscaled_penalty;
 	
 	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
 		return;	// safety first
@@ -779,6 +779,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	data->abil = abil;
 	data->matching_role = has_matching_role(ch, abil, FALSE);
 	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
+	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// things only needed for scaled buffs
@@ -814,7 +815,14 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 		total_w = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
 			if (!apply_never_scales[apply->location]) {
-				total_w += ABSOLUTE(apply->weight);
+				if (unscaled_penalty && apply->weight < 0) {
+					// give actual value of penalty, rounded up
+					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
+				}
+				else {
+					// apply directly as weight
+					total_w += ABSOLUTE(apply->weight);
+				}
 			}
 		}
 	}
@@ -822,7 +830,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		// unscaled buff?
-		if (apply_never_scales[apply->location] || unscaled) {
+		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
 			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -4604,12 +4612,14 @@ DO_ABIL(do_buff_ability) {
 	any_vnum affect_vnum;
 	double total_points = 1, remaining_points = 1, share, amt;
 	int dur, total_w = 1;
-	bool messaged, unscaled;
+	bool messaged, unscaled, unscaled_penalty;
 	bitvector_t aff_options;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
 	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
+	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
+	
 	if (!unscaled) {
 		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
 		remaining_points = total_points;
@@ -4654,7 +4664,14 @@ DO_ABIL(do_buff_ability) {
 		total_w = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
 			if (!apply_never_scales[apply->location]) {
-				total_w += ABSOLUTE(apply->weight);
+				if (unscaled_penalty && apply->weight < 0) {
+					// give actual value of penalty, rounded up
+					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
+				}
+				else {
+					// apply directly as weight
+					total_w += ABSOLUTE(apply->weight);
+				}
 			}
 		}
 	}
@@ -4662,7 +4679,7 @@ DO_ABIL(do_buff_ability) {
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		// unscaled version?
-		if (apply_never_scales[apply->location] || unscaled) {
+		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
 			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(vict, af, aff_options);
