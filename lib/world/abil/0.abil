@@ -312,7 +312,8 @@ S
 #31
 Soulsight~
 0 -1 1.00 0 0 0
-T m 0
+D 1 88 0
+T e 1
 S
 #32
 Soulmask~

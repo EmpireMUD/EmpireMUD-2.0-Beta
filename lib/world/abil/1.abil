@@ -668,8 +668,31 @@ T a 0
 S
 #165
 Manashield~
-0 -1 1.00 0 0 0
-T m 0
+c -1 1.00 0 af 0
+A
+16 -1
+A
+12 1
+A
+24 1
+C
+manashield 5 beg 2 25 0 -1 0 8 5 0
+M
+23
+You wipe the symbols off your arm and cancel your mana shield.~
+M
+24
+$n wipes the arcane symbols off $s arm.~
+M
+0
+You pull out a grease pencil and draw a series of arcane symbols down your left arm...~
+M
+1
+$n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.~
+T b 1
+X+ 1 3008
+X+ 2 1800
+X+ 3 1800
 S
 #166
 Foresight~
@@ -877,7 +900,7 @@ T t 1
 S
 #173
 Colorburst~
-ab -1 0.50 o 0 0
+abf -1 0.50 o 0 0
 A
 17 -1
 C
@@ -907,12 +930,36 @@ X+ 3 30
 S
 #174
 Enervate~
-0 -1 1.00 0 0 0
-T m 0
+afi -1 1.00 o 0 0
+A
+6 -1
+A
+11 -1
+C
+enervate 7 bfh 2 20 0 2014 75 8 3 0
+M
+6
+$n attempts to hex you with enervate, but it's deflected by your counterspell!~
+M
+7
+$n attempts to hex $N with enervate, but it fails!~
+M
+2
+$N starts to glow red as you shout the enervate hex at $M! You feel your own stamina grow as you drain $S.~
+M
+3
+$n shouts something at you... The world takes on a reddish hue and you feel your stamina drain.~
+M
+4
+$n shouts some kind of hex at $N, who starts to glow red and seems weakened!~
+T b 1
+X+ 1 3032
+X+ 2 75
+X+ 3 75
 S
 #175
 Slow~
-ab -1 1.00 o 0 0
+abf -1 1.00 o 0 0
 C
 slow 7 bfh 2 20 0 2015 75 0 5 0
 M
@@ -940,8 +987,34 @@ X+ 3 75
 S
 #176
 Siphon~
-0 -1 1.00 0 0 0
-T m 0
+abf -1 1.00 o 0 0
+A
+7 -1
+C
+siphon 7 bfh 2 10 0 2016 20 0 3 0
+D 16 32 0
+M
+2
+$N starts to glow violet as you shout the mana siphon hex at $M! You feel your own mana grow as you drain $S.~
+M
+3
+$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.~
+M
+4
+$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!~
+M
+5
+You try to siphon mana from $N, but are deflected by a counterspell!~
+M
+6
+$n tries to siphon mana from you, but it's deflected by your counterspell!~
+M
+7
+$n tries to siphon mana from $N, but it fails!~
+T b 1
+X+ 1 3038
+X+ 2 20
+X+ 3 20
 S
 #177
 Mirrorimage~
