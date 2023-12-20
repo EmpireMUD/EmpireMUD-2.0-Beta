@@ -4631,7 +4631,8 @@ DO_ABIL(do_buff_ability) {
 	if (ABIL_AFFECTS(abil)) {
 		if (!unscaled) {
 			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-			remaining_points = MAX(0, remaining_points);
+			// reset total_points now, too, as it's used for the weighted share below
+			total_points = remaining_points = MAX(0, remaining_points);
 		}
 		
 		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
@@ -4653,6 +4654,7 @@ DO_ABIL(do_buff_ability) {
 	
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		// unscaled version?
 		if (apply_never_scales[apply->location] || unscaled) {
 			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
@@ -4660,15 +4662,20 @@ DO_ABIL(do_buff_ability) {
 			messaged = TRUE;
 			continue;
 		}
-
+		
+		// scaled version: determine share of points
 		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
 		if (share > remaining_points) {
 			share = MIN(share, remaining_points);
 		}
+		
+		// determine value of apply
 		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		
+		// and apply it
 		if (share > 0 && amt != 0) {
 			remaining_points -= share;
-			remaining_points = MAX(0, total_points);
+			remaining_points = MAX(0, remaining_points);
 			
 			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
