@@ -1520,12 +1520,12 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	
 	// determine colors
 	if (is_ally) {
-		strcpy(good_color, "\tc");
-		strcpy(bad_color, "\tr");
+		strcpy(good_color, "&c");
+		strcpy(bad_color, "&r");
 	}
 	else {
-		strcpy(good_color, "\tr");
-		strcpy(bad_color, "\tc");
+		strcpy(good_color, "&r");
+		strcpy(bad_color, "&c");
 	}
 	
 	// build affects
@@ -1547,7 +1547,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			
 			// main entry
-			snprintf(line, sizeof(line), "%s%s\t0 (%s)", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), lbuf);
+			snprintf(line, sizeof(line), "%s%s&0 (%s)", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), lbuf);
 			
 			if (aff->modifier) {
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1567,7 +1567,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		else {
 			// simple version
-			snprintf(line, sizeof(line), "%s%s\t0%s", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			snprintf(line, sizeof(line), "%s%s&0%s", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
 			add_string_hash(&str_hash, line, 1);
 		}
 	}
@@ -1585,7 +1585,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			snprintf(line, sizeof(line), "%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
 		}
 		else {	// simple version
-			snprintf(line, sizeof(line), "%s%s\t0%s", bad_color, get_generic_name_by_vnum(dot->type), lbuf);
+			snprintf(line, sizeof(line), "%s%s&0%s", bad_color, get_generic_name_by_vnum(dot->type), lbuf);
 		}
 		
 		// caster?
