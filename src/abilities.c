@@ -6322,7 +6322,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 1: {	// X+ 1: affect vnum
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 1 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
@@ -6330,7 +6330,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 2: {	// X+ 2: short duration
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 2 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
@@ -6338,7 +6338,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 3: {	// X+ 3: long duration
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 3 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
@@ -6346,7 +6346,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 4: {	// X+ 4: attack type
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 4 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
@@ -6354,7 +6354,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 5: {	// X+ 5: damage type
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 5 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
@@ -6362,7 +6362,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							break;
 						}
 						case 6: {	// X+ 6: max stacks
-							if (sscanf(line, "X+ 0 %d", &int_in[0]) != 1) {
+							if (sscanf(line, "X+ 6 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
