@@ -1554,12 +1554,12 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			if (aff->bitvector) {
 				prettier_sprintbit(aff->bitvector, affected_bits, lbuf);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : ""), lbuf);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : " -"), lbuf);
 			}
 			
 			// caster?
-			if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you");
+			if (aff->cast_by == CAST_BY_ID(to)) {
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 			}
 			
 			// add to hash
