@@ -223,21 +223,23 @@ ENERVATE
 
 Enervate (High Sorcery ability)
 
-Usage:  enervate <victim>
+Usage:  enervate [victim]
 Cooldown:  75 seconds
 Duration:  75 seconds
+Linked trait:  intelligence
 Cost:  20 mana
 Debuff type:  magical
 
-Your victim is enervated: he loses move regen. You are able to leech some
-of this for yourself, and your move regeneration receive a temporary boost.
+Your victim is enervated: he loses move regen and move points. You are able to
+leech some of this for yourself and your move regeneration receives a temporary
+boost.
 
-The amount of move regen your victim loses is based on your Intelligence, and
-the amount you gain is based on your High Sorcery level.
-
-In combat, enervate will automatically target your opponent.
+This ability is more effective in the caster role. In combat, enervate will
+automatically target your opponent.
 
 Gain experience by casting this spell.
+
+See also: CASTER ROLL
 #
 FORESIGHT
 
