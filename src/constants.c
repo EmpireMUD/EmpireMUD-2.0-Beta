@@ -153,6 +153,7 @@ const char *ability_flags[] = {
 	"CUMULATIVE-DURATION",
 	"WEAPON-HIT",
 	"DIFFICULT-ANYWAY",
+	"NOT-IN-DARK",	// 25
 	"\n"
 };
 
@@ -174,16 +175,17 @@ const char *ability_flag_notes[] = {
 	"can only be used at range",
 	"unaffected by sun",
 	"",	// UNSCALED-BUFF
-	"limited crowd control",
+	"limited crowd control",	// 15
 	"",	// NOT-IN-COMBAT
 	"",	// ONE-AT-A-TIME
 	"long action",
 	"spoken aloud",
-	"auto-repeating",
+	"auto-repeating",	// 20
 	"cumulative",
 	"extendable",
 	"hits with weapon",
 	"",	// ABILF_DIFFICULT_ANYWAY
+	"",	// 25 - ABILF_NOT_IN_DARK
 	"\n"
 };
 
@@ -289,6 +291,7 @@ const char *ability_target_flags[] = {
 	"ROOM-RANDOM",
 	"ROOM-CITY",
 	"ROOM-COORDS",	// 20
+	"ROOM-NOT-HERE",
 	"\n"
 };
 
@@ -5281,5 +5284,7 @@ const char *wait_types[] = {
 	"MOVEMENT",
 	"SPELL",	// 5
 	"OTHER",
+	"LONG",
+	"VERY-LONG",
 	"\n"
 };

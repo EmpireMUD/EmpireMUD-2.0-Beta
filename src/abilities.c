@@ -861,6 +861,10 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		// sent its own error message
 		return FALSE;
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_DARK) && !!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "It's too dark %s here to do that.\r\n", IS_OUTDOORS(ch) ? "out" : "in");
+		return FALSE;
+	}
 	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(ch)) {
 		send_to_char("No way! You're fighting for your life!\r\n", ch);
 		return FALSE;
@@ -1708,6 +1712,11 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 				match = TRUE;	// ok: random and within range
 			}
 			
+			// override all of those
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_NOT_HERE) && *room_targ == IN_ROOM(ch)) {
+				match = FALSE;	// not-here but here
+			}
+			
 			if (!match) {
 				return FALSE;	// bad room
 			}
@@ -2070,9 +2079,15 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 			return FALSE;
 		}
 	}
-	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
+	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), (ROOM_ATARS & ~ATAR_ROOM_HERE))) {
 		if (send_msgs) {
 			msg_to_char(ch, "You have to use it on the room you're in.\r\n");
+		}
+		return FALSE;
+	}
+	if (room_targ && room_targ == IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_NOT_HERE)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on the room you're in.\r\n");
 		}
 		return FALSE;
 	}

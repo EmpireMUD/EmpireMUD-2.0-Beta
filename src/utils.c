@@ -3156,6 +3156,7 @@ void command_lag(char_data *ch, int wait_type) {
 	// base
 	wait = universal_wait;
 	
+	// WAIT_x: functionality for wait states
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
 			if (has_player_tech(ch, PTECH_FASTCASTING)) {
@@ -3185,6 +3186,14 @@ void command_lag(char_data *ch, int wait_type) {
 			else {
 				wait = 0;	// indoors
 			}
+			break;
+		}
+		case WAIT_LONG: {
+			wait = 2 RL_SEC;
+			break;
+		}
+		case WAIT_VERY_LONG: {
+			wait = 4 RL_SEC;
 			break;
 		}
 	}

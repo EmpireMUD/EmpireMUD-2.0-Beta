@@ -567,6 +567,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
 #define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
 #define ABILF_DIFFICULT_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
+#define ABILF_NOT_IN_DARK  BIT(25)	// z. must be able to see
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -627,6 +628,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_ROOM_RANDOM  BIT(18)	// targets a random room (combine with a RANGE limit)
 #define ATAR_ROOM_CITY  BIT(19)	// targets a city from one's own empire
 #define ATAR_ROOM_COORDS  BIT(20)	// targets a room by coordinates
+#define ATAR_ROOM_NOT_HERE  BIT(21)	// modifier ensures it's not the current room
 
 #define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
@@ -2785,6 +2787,8 @@ typedef enum {
 #define WAIT_MOVEMENT  4	// normal move lag
 #define WAIT_SPELL  5	// general spells
 #define WAIT_OTHER  6	// not covered by other categories
+#define WAIT_LONG  7	// longer than the others
+#define WAIT_VERY_LONG  8	// longest wait
 
 
  //////////////////////////////////////////////////////////////////////////////
