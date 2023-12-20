@@ -65,12 +65,13 @@ See also: TOGGLE
 #
 AFFECTS
 
-Usage:  affects
+Usage:  affects [person]
 
 This command shows a list of spells and abilities that are currently affecting
-you, along with their durations and a short summary of what they modify.
+you, along with their durations and a short summary of what they modify. Or,
+if you use it on someone else, you will see a simpler view of their affects.
 
-Affects are automatically shown at the bottom of the score.
+Your affects are also automatically shown at the bottom of the score.
 
 See also: SCORE
 #

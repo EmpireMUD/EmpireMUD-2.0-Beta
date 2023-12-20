@@ -1493,6 +1493,135 @@ void show_character_affects(char_data *ch, char_data *to) {
 }
 
 
+/**
+* Mortal view of other people's affects. This shows very little; it shows a
+* little more if you have the right ptech.
+* 
+* @param char_data *ch Whose effects
+* @param char_data *to Who to send to
+*/
+void show_character_affects_simple(char_data *ch, char_data *to) {
+	bool details;
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
+	char *temp;
+	int duration;
+	size_t size;
+	struct affected_type *aff;
+	struct over_time_effect_type *dot;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	
+	if (IS_NPC(to) || !to->desc) {
+		return;	// nobody to show to
+	}
+	
+	// TODO add ptech here:
+	details = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
+	
+	// build affects
+	LL_FOREACH(ch->affected, aff) {
+		if (details) {
+			// duration setup
+			if (aff->expire_time == UNLIMITED) {
+				strcpy(lbuf, "infinite");
+			}
+			else {
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				if (duration >= 60 * 60) {
+					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+				}
+				else {
+					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
+				}
+			}
+			
+			// main entry
+			snprintf(line, sizeof(line), "%s (%s)", get_generic_name_by_vnum(aff->type), lbuf);
+			
+			if (aff->modifier) {
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
+			}
+			if (aff->bitvector) {
+				prettier_sprintbit(aff->bitvector, affected_bits, lbuf);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : ""), lbuf);
+			}
+			
+			// caster?
+			if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you");
+			}
+			
+			// add to hash
+			add_string_hash(&str_hash, line, 1);
+		}
+		else {
+			// simple version
+			snprintf(line, sizeof(line), "%s%s", get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			add_string_hash(&str_hash, line, 1);
+		}
+	}
+	
+	// build DoTs
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->max_stack > 1) {
+			snprintf(lbuf, sizeof(lbuf), " (%d/%d)", dot->stack, dot->max_stack);
+		}
+		else {
+			*lbuf = '\0';
+		}
+		
+		if (details) {
+			snprintf(line, sizeof(line), "%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+		}
+		else {	// simple version
+			snprintf(line, sizeof(line), "%s%s", get_generic_name_by_vnum(dot->type), lbuf);
+		}
+		
+		// caster?
+		if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
+			snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you");
+		}
+		
+		add_string_hash(&str_hash, line, 1);
+	}
+	
+	// build display
+	size = snprintf(output, sizeof(output), "Affects on %s:%s", PERS(ch, to, FALSE), details ? "\r\n" : "");
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		if (details) {
+			if (size + strlen(str_iter->str) + 3 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, " %s\r\n", str_iter->str);
+			}
+		}
+		else {	// simple version
+			if (size + strlen(str_iter->str) + 4 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s %s", (str_iter != str_hash ? "," : ""), str_iter->str);
+			}
+			else {
+				// full
+				break;
+			}
+		}
+	}
+	
+	free_string_hash(&str_hash);
+	
+	if (details) {
+		// just show it
+		page_string(to->desc, output, TRUE);
+	}
+	else {
+		// formatting for simple view:
+		strcat(output, "\r\n");	// space reserved
+		
+		temp = strdup(output);
+		format_text(&temp, 0, to->desc, MAX_STRING_LENGTH);
+		page_string(to->desc, temp, TRUE);
+		free(temp);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT DISPLAY FUNCTIONS ////////////////////////////////////////////////
 
@@ -2248,11 +2377,28 @@ ACMD(do_adventure) {
 }
 
 
-ACMD(do_affects) {	
+ACMD(do_affects) {
+	char_data *vict;
 	int i;
 	
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
+	
+	// targeted version?
+	one_argument(argument, arg);
+	if (*arg) {
+		if (!generic_find(arg, NULL, FIND_CHAR_ROOM | (IS_IMMORTAL(ch) ? FIND_CHAR_WORLD : NOBITS), ch, &vict, NULL, NULL)) {
+			send_config_msg(ch, "no_person");
+		}
+		else if (IS_IMMORTAL(ch)) {
+			show_character_affects(vict, ch);
+		}
+		else {
+			show_character_affects_simple(vict, ch);
+		}
+		return;
+	}
 
 	msg_to_char(ch, "  Affects:\r\n");
 
