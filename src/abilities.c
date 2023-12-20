@@ -6604,7 +6604,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	if (ABIL_AFFECTS(abil)) {
 		fprintf(fl, "X+ 0 %s\n", bitv_to_alpha(ABIL_AFFECTS(abil)));
 	}
-	if (ABIL_AFFECT_VNUM(abil)) {
+	if (ABIL_AFFECT_VNUM(abil) != NOTHING) {
 		fprintf(fl, "X+ 1 %d\n", ABIL_AFFECT_VNUM(abil));
 	}
 	if (ABIL_SHORT_DURATION(abil)) {
@@ -6619,7 +6619,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	if (ABIL_DAMAGE_TYPE(abil)) {
 		fprintf(fl, "X+ 5 %d\n", ABIL_DAMAGE_TYPE(abil));
 	}
-	if (ABIL_MAX_STACKS(abil)) {
+	if (ABIL_MAX_STACKS(abil) > 1) {
 		fprintf(fl, "X+ 6 %d\n", ABIL_MAX_STACKS(abil));
 	}
 	// former 'X' type is no longer used; replaced by X+
