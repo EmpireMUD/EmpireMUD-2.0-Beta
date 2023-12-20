@@ -14,8 +14,9 @@ M
 1
 $n works $mself into a frenzy!~
 T b 1
-X b
-3083 30 -1 0
+X+ 1 3083
+X+ 2 30
+X+ 3 -1
 S
 #1002
 Defend~
@@ -33,8 +34,9 @@ M
 1
 $n digs in to defend!~
 T b 1
-X b
-3084 30 -1 0
+X+ 1 3084
+X+ 2 30
+X+ 3 -1
 S
 #1003
 Intensify~
@@ -50,8 +52,9 @@ M
 1
 $n focuses $s rage and intensifies $s magic!~
 T b 1
-X b
-3086 9 9 0
+X+ 1 3086
+X+ 2 9
+X+ 3 9
 S
 #1004
 Abate~
@@ -70,8 +73,9 @@ M
 4
 $n suddenly lunges toward $N and hits $M in the head!~
 T b 1
-X b
-3087 9 9 0
+X+ 1 3087
+X+ 2 9
+X+ 3 9
 S
 #1005
 Amplify~
@@ -87,8 +91,9 @@ M
 1
 $n stops to focus for a moment.~
 T b 1
-X b
-3088 6 6 0
+X+ 1 3088
+X+ 2 6
+X+ 3 6
 S
 #1006
 Beguile~
@@ -107,8 +112,9 @@ M
 4
 $n stares straight at $N...~
 T b 1
-X b
-3089 9 9 0
+X+ 1 3089
+X+ 2 9
+X+ 3 9
 S
 #1007
 Undermine~
@@ -127,8 +133,9 @@ M
 3
 $n stabs repeatedly at your armor...~
 T b 1
-X b
-3090 30 30 0
+X+ 1 3090
+X+ 2 30
+X+ 3 30
 S
 #1008
 Exhaust~
@@ -147,8 +154,9 @@ M
 4
 $n dodges in and out of combat around $N!~
 T b 1
-X b
-3091 9 9 0
+X+ 1 3091
+X+ 2 9
+X+ 3 9
 S
 #1009
 Withstand~
@@ -164,8 +172,9 @@ M
 1
 $n hunkers down and prepares to withstand the worst attacks.~
 T b 1
-X b
-3092 12 12 0
+X+ 1 3092
+X+ 2 12
+X+ 3 12
 S
 #1010
 Hinder~
@@ -184,8 +193,9 @@ M
 4
 $n seems to distract $N and hinder $S attacks.~
 T b 1
-X b
-3093 6 6 0
+X+ 1 3093
+X+ 2 6
+X+ 3 6
 S
 #1011
 Hobble~
@@ -204,8 +214,9 @@ M
 4
 $n hobbles $N with a blow to the leg!~
 T b 1
-X b
-3094 6 6 0
+X+ 1 3094
+X+ 2 6
+X+ 3 6
 S
 #1012
 Adapt~
@@ -223,8 +234,9 @@ M
 1
 $n seems to focus for a moment.~
 T b 1
-X b
-3095 6 6 0
+X+ 1 3095
+X+ 2 6
+X+ 3 6
 S
 #1013
 Lacerate~
@@ -243,8 +255,9 @@ M
 3
 $n swirls around you, cutting open dozens of tiny lacerations!~
 T b 1
-X b
-3096 9 9 0
+X+ 1 3096
+X+ 2 9
+X+ 3 9
 S
 #1014
 Infect~
@@ -263,8 +276,9 @@ M
 2
 You jab $N with a drop of your blood on your fingernail!~
 T b 1
-X b
-3097 9 9 0
+X+ 1 3097
+X+ 2 9
+X+ 3 9
 S
 #1015
 Prepared~
@@ -280,8 +294,9 @@ M
 1
 $n seems prepared for this.~
 T b 1
-X b
-3098 12 12 0
+X+ 1 3098
+X+ 2 12
+X+ 3 12
 S
 #1016
 Gleam~
@@ -299,8 +314,9 @@ M
 1
 $n's polished armor gleams in the light!~
 T b 1
-X b
-3099 30 30 0
+X+ 1 3099
+X+ 2 30
+X+ 3 30
 S
 #1017
 Sunder~
@@ -319,8 +335,9 @@ M
 4
 $n grabs $N's armor and sunders it!~
 T b 1
-X b
-3100 9 9 0
+X+ 1 3100
+X+ 2 9
+X+ 3 9
 S
 #1018
 Shimmering Anvil~

@@ -55,8 +55,10 @@ M
 12
 *~
 T b 1
-X b
-3049 5 10 t
+X+ 0 t
+X+ 1 3049
+X+ 2 5
+X+ 3 10
 S
 #107
 Veintap~
@@ -82,8 +84,9 @@ M
 4
 $n spreads some of $s blood on $N...~
 T b 1
-X b
-3014 75 75 0
+X+ 1 3014
+X+ 2 75
+X+ 3 75
 S
 #109
 Heal~
@@ -140,10 +143,11 @@ C
 lightningbolt 7 bf 2 10 3 2023 9 8 3 0
 T c 8
 T d 2
-X c
-60 1
-X d
-3019 15 15 1 1
+X+ 1 3019
+X+ 2 15
+X+ 3 15
+X+ 4 60
+X+ 5 1
 S
 #119
 Hasten~
@@ -166,8 +170,10 @@ M
 4
 $n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.~
 T b 1
-X b
-3022 450 1800 q
+X+ 0 q
+X+ 1 3022
+X+ 2 450
+X+ 3 1800
 S
 #120
 Counterspell~
@@ -181,8 +187,10 @@ M
 1
 $n flickers momentarily with a blue-white aura.~
 T b 1
-X b
-3021 1800 1800 T
+X+ 0 T
+X+ 1 3021
+X+ 2 1800
+X+ 3 1800
 S
 #121
 Entangle~
@@ -210,8 +218,10 @@ M
 7
 $n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.~
 T b 1
-X b
-3024 20 20 r
+X+ 0 r
+X+ 1 3024
+X+ 2 20
+X+ 3 20
 S
 #122
 Familiar~
@@ -264,8 +274,11 @@ M
 4
 $n marks $N with a glowing blue skybrand!~
 T d 1
-X d
-3020 30 30 1 3
+X+ 1 3020
+X+ 2 30
+X+ 3 30
+X+ 5 1
+X+ 6 3
 S
 #126
 Chant of Nature~
@@ -356,8 +369,7 @@ M
 12
 *~
 T c 1
-X c
-81 0
+X+ 4 81
 S
 #136
 Inspire~
@@ -405,8 +417,42 @@ T e 1
 S
 #146
 Escape~
-0 -1 1.00 0 0 0
-T m 0
+sz -1 1.00 0 0 0
+C
+escape 8 qv 1 10 0 -1 0 0 8 0
+D 16 9 0
+D 128 1 0
+M
+0
+You run for the nearest exit...~
+M
+0
+You dive out!~
+M
+1
+$n runs toward the nearest exit...~
+M
+1
+$n dives out the exit!~
+M
+8
+You can't seem to escape!~
+M
+9
+*~
+M
+22
+$n is running for the exit!~
+M
+28
+*~
+M
+30
+$n dives in out of nowhere, sweating!~
+M
+31
+There's nothing to escape here.~
+T u 1
 S
 #147
 Appraisal~
@@ -547,8 +593,10 @@ M
 12
 $n tosses a handful of sand but misses $N's eyes!~
 T b 1
-X b
-3028 5 10 a
+X+ 0 a
+X+ 1 3028
+X+ 2 5
+X+ 3 10
 S
 #157
 Sap~
@@ -609,8 +657,9 @@ M
 22
 $n is whispering something into the air.~
 T b 1
-X b
-3052 1800 1800 0
+X+ 1 3052
+X+ 2 1800
+X+ 3 1800
 S
 #164
 Staffmaking~
@@ -645,8 +694,9 @@ M
 4
 $n pulls out a grease pencil and marks each of $N's eyelids with an X.~
 T b 1
-X b
-3009 900 900 0
+X+ 1 3009
+X+ 2 900
+X+ 3 900
 S
 #167
 Enchant Weapons~
@@ -851,8 +901,9 @@ M
 4
 $n whips $s hand forward and fires a burst of color at $N!~
 T b 1
-X b
-3015 30 30 0
+X+ 1 3015
+X+ 2 30
+X+ 3 30
 S
 #174
 Enervate~
@@ -883,8 +934,9 @@ M
 7
 $n tries to hex $N, but $E deflects it.~
 T b 1
-X b
--1 35 75 s
+X+ 0 s
+X+ 2 35
+X+ 3 75
 S
 #176
 Siphon~
@@ -903,10 +955,12 @@ C
 sunshock 7 bf 2 11 4 2018 9 8 3 0
 T c 3
 T b 2
-X b
-3036 5 5 a
-X c
-63 1
+X+ 0 a
+X+ 1 3036
+X+ 2 5
+X+ 3 5
+X+ 4 63
+X+ 5 1
 S
 #179
 Phoenix Rite~
@@ -959,8 +1013,10 @@ M
 22
 $n is sitting in a circle of candles.~
 T b 1
-X b
-3017 -1 -1 S
+X+ 0 S
+X+ 1 3017
+X+ 2 -1
+X+ 3 -1
 S
 #180
 Disenchant~
@@ -1045,8 +1101,9 @@ R
 104 1 0 0
 T q 1
 T r 1
-X q
--1 -1 -1 jA
+X+ 0 jA
+X+ 2 -1
+X+ 3 -1
 S
 #187
 Ritual of Teleportation~
