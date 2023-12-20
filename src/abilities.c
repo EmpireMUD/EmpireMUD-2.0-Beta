@@ -7326,7 +7326,7 @@ void save_olc_ability(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
 	read_ability_requirements();	// may have lost/changed its skill assignment
 	
-	// apply passive buffs
+	// apply passive buffs and reset class abils?
 	if (IS_SET(ABIL_TYPES(proto), ABILT_PASSIVE_BUFF)) {
 		DL_FOREACH2(player_character_list, chiter, next_plr) {
 			if ((abd = get_ability_data(chiter, vnum, FALSE))) {
@@ -7334,6 +7334,8 @@ void save_olc_ability(descriptor_data *desc) {
 					apply_one_passive_buff(chiter, proto);
 				}
 			}
+			
+			update_class_and_abilities(chiter);
 		}
 	}
 }
@@ -8554,6 +8556,15 @@ OLC_MODULE(abiledit_minposition) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_ptech) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
+	abiledit_data(ch, type, arg);
 }
 
 
