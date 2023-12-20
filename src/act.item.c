@@ -3082,7 +3082,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			total_share += ABSOLUTE(val); \
 		} \
 		else if ((val) < 0) { \
-			bonus += -1 * (val); \
+			bonus += ceil(ABSOLUTE(val) * apply_values[(int)apply->location]); \
 		} \
 	}
 	// end helper
