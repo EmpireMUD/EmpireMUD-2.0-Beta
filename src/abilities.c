@@ -42,7 +42,8 @@
 *   Database
 *   OLC Handlers
 *   Displays
-*   Edit Modules
+*   Shortcut Data Modules
+*   OLC Modules
 */
 
 // local data
@@ -51,6 +52,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 
 // local protos
 OLC_MODULE(abiledit_costtype);
+OLC_MODULE(abiledit_data);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
@@ -7809,7 +7811,139 @@ int vnum_ability(char *searchname, char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// OLC MODULES /////////////////////////////////////////////////////////////
+//// SHORTCUT DATA MODULES ///////////////////////////////////////////////////
+
+OLC_MODULE(abiledit_ptech) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_effect) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s effect %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_ready_weapon) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_summon_mob) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s summon-mob %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_limitation) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s limitation %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_paint_color) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s paint-color %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_action) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s action %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_range) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s range %s", arg1, arg2);
+	}
+	else if (isdigit(*argument)) {
+		snprintf(arg, sizeof(arg), "add range %s", argument);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+OLC_MODULE(abiledit_parent) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s parent %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(abiledit_affects) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
@@ -8556,15 +8690,6 @@ OLC_MODULE(abiledit_minposition) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
-}
-
-
-OLC_MODULE(abiledit_ptech) {
-	// pass-thru to .data: must rearrrange args
-	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	half_chop(argument, arg1, arg2);
-	snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
-	abiledit_data(ch, type, arg);
 }
 
 

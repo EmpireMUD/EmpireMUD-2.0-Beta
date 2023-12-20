@@ -77,7 +77,6 @@ OLC_MODULE(abiledit_masteryability);
 OLC_MODULE(abiledit_maxstacks);
 OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_name);
-OLC_MODULE(abiledit_ptech);
 OLC_MODULE(abiledit_resourcecost);
 OLC_MODULE(abiledit_scale);
 OLC_MODULE(abiledit_shortduration);
@@ -85,6 +84,16 @@ OLC_MODULE(abiledit_targets);
 OLC_MODULE(abiledit_tools);
 OLC_MODULE(abiledit_types);
 OLC_MODULE(abiledit_waittype);
+// shortcut ability modules
+OLC_MODULE(abiledit_ptech);
+OLC_MODULE(abiledit_effect);
+OLC_MODULE(abiledit_ready_weapon);
+OLC_MODULE(abiledit_summon_mob);
+OLC_MODULE(abiledit_limitation);
+OLC_MODULE(abiledit_paint_color);
+OLC_MODULE(abiledit_action);
+OLC_MODULE(abiledit_range);
+OLC_MODULE(abiledit_parent);
 
 // adventure zone modules
 OLC_MODULE(advedit_author);
@@ -619,7 +628,6 @@ const struct olc_command_data olc_data[] = {
 	{ "maxstacks", abiledit_maxstacks, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
-	{ "ptech", abiledit_ptech, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "resourcecost", abiledit_resourcecost, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "shortduration", abiledit_shortduration, OLC_ABILITY, OLC_CF_EDITOR },
@@ -628,6 +636,16 @@ const struct olc_command_data olc_data[] = {
 	{ "types", abiledit_types, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "waittype", abiledit_waittype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
+	// shortcut ability modules:
+	{ "ptech", abiledit_ptech, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "effect", abiledit_effect, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "ready-weapon", abiledit_ready_weapon, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "summon-mob", abiledit_summon_mob, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "limitation", abiledit_limitation, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "paint-color", abiledit_paint_color, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "action", abiledit_action, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "range", abiledit_range, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "parent", abiledit_parent, OLC_ABILITY, OLC_CF_EDITOR },
 	
 	// adventure zones
 	{ "author", advedit_author, OLC_ADVENTURE, OLC_CF_EDITOR },
