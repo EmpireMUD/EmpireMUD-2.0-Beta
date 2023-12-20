@@ -2577,21 +2577,21 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				break;
 			}
 			case ABIL_LIMIT_INDOORS: {
-				if (IS_OUTDOOR_TILE(any_room)) {
+				if (IS_OUTDOOR_TILE(IN_ROOM(ch))) {
 					msg_to_char(ch, "You need to be indoors to do that.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_OUTDOORS: {
-				if (!IS_OUTDOOR_TILE(any_room)) {
+				if (!IS_OUTDOOR_TILE(IN_ROOM(ch))) {
 					msg_to_char(ch, "You need to be outdoors to do that.\r\n");
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_ON_MAP: {
-				if (GET_ROOM_VNUM(any_room) >= MAP_SIZE) {
+				if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
 					msg_to_char(ch, "You need to be on the map to do that.\r\n");
 					return FALSE;
 				}
