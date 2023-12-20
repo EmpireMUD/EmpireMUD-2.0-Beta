@@ -861,7 +861,7 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		// sent its own error message
 		return FALSE;
 	}
-	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_DARK) && !!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_DARK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark %s here to do that.\r\n", IS_OUTDOORS(ch) ? "out" : "in");
 		return FALSE;
 	}
