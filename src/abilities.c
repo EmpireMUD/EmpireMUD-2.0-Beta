@@ -7460,7 +7460,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Resources cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+		size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
 	}
 	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)]);
