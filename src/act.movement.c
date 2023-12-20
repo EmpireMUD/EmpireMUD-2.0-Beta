@@ -606,6 +606,11 @@ obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *f
 * are currently in. This does not validate if you CAN exit from a room; it
 * returns a room if possible anyway.
 *
+* Possible exits are:
+* - if in a vehicle, the vehicle the room is in
+* - if in a building, the exit of the home room
+* - if in an adventure, must have look-out and not be no-teleport
+*
 * @param room_data *from_room The room to exit from.
 * @return room_data* The room to exit to, if any.
 */
@@ -624,6 +629,17 @@ room_data *get_exit_room(room_data *from_room) {
 		else if (BUILDING_ENTRANCE(home) != NO_DIR) {
 			// regular building exits out the front
 			return real_shift(home, shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][0], shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][1]);
+		}
+	}
+	else if (IS_ADVENTURE_ROOM(from_room) && ROOM_INSTANCE(from_room) && RMT_FLAGGED(from_room, RMT_LOOK_OUT) && !RMT_FLAGGED(from_room, RMT_NO_TELEPORT) && !ROOM_AFF_FLAGGED(from_room, ROOM_AFF_NO_TELEPORT)) {
+		// seems to be a valid exit
+		home = HOME_ROOM(INST_FAKE_LOC(ROOM_INSTANCE(from_room)));
+		if (ROOM_IS_CLOSED(home) && BUILDING_ENTRANCE(home) != NO_DIR) {
+			// regular building exits out the front
+			return real_shift(home, shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][0], shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][1]);
+		}
+		else {
+			return home;	// close enough
 		}
 	}
 	
