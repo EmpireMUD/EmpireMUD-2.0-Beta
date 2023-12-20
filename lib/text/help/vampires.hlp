@@ -427,11 +427,11 @@ Soulmask (Vampire ability)
 Usage:  soulmask
 
 The soulmask protects the vampire from certain spells and abilities, such as
-Soulsight.
+Soulsight, which would show details about the vampire's affects and status.
 
 Soulmask gains experience when you turn it on.
 
-See also: SOULSIGHT
+See also: AFFECTS, SOULSIGHT
 #
 STAKE UNSTAKE
 

@@ -863,18 +863,12 @@ SOULSIGHT "SOUL SIGHT"
 
 Soulsight (Natural Magic ability)
 
-Usage:  soulsight <target>
-Cost:  5 mana
+This ability allows you to see more details about the affects on enemies with
+the 'affects' command.
 
-By looking into a person's soul, a nature mage can learn more about them. This
-will reveal if the target has any spells affecting him.
+Gain experience when you view affects on others.
 
-Soulsight can be blocked by Soulmask. In this case, it will not show affects,
-or whether the target is a vampire.
-
-Gains experience when you use it on someone.
-
-See also: SOULMASK
+See also: AFFECTS, SOULMASK
 #
 "SPIRIT WOLF FAMILIAR"
 

@@ -1259,6 +1259,7 @@ const char *player_tech_types[] = {
 	"Track-Command",	// 85
 	"Resist-Poison",
 	"Vampire-Bite",
+	"Enemy-Buff-Details",
 	"\n"
 };
 

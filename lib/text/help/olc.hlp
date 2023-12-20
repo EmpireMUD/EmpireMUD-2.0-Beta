@@ -1304,7 +1304,7 @@ on being alone; they will remain active.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, PASSIVES
 #d
-"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH "ABILEDIT PTECH"
+"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH "ABILEDIT PTECH" PTECHS
 
 Usage:  .data add ptech <type>
 
@@ -1403,6 +1403,7 @@ Available techs are:
  &cTrack-Command&0 *
  &cResist-Poison&0 * - Reduced effect from poisons.
  &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
+ &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
@@ -2230,7 +2231,7 @@ The following affect flags are available:
  &cDEATHSHROUD&0 - Appears as a corpse and cannot act -- do not use this on items.
  &cEARTHMELD&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
  &cMUMMIFY&0 - Immune to attack and cannot act -- do not use this on items.
- &cSOULMASK&0 - Immune to soulsight.
+ &cSOULMASK&0 - Players cannot see affect details on character.
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.

@@ -1515,8 +1515,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	
 	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
-	// TODO add ptech here:
-	details = is_ally || FALSE;
+	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_SOULMASK));
 	
 	// determine colors
 	if (is_ally) {
@@ -1596,6 +1595,22 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		add_string_hash(&str_hash, line, 1);
 	}
 	
+	// extra info?
+	if (details) {
+		if (MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+			snprintf(line, sizeof(line), "%sanimal\t0", good_color);
+			add_string_hash(&str_hash, line, 1);
+		}
+		if (IS_MAGE(ch)) {
+			snprintf(line, sizeof(line), "%scaster\t0", good_color);
+			add_string_hash(&str_hash, line, 1);
+		}
+		if (IS_VAMPIRE(ch)) {
+			snprintf(line, sizeof(line), "%svampire\t0", good_color);
+			add_string_hash(&str_hash, line, 1);
+		}
+	}
+	
 	// build display
 	size = snprintf(output, sizeof(output), "Affects on %s:%s%s", PERS(ch, to, FALSE), details ? "\r\n" : "", (str_hash ? "" : " none"));
 	HASH_ITER(hh, str_hash, str_iter, next_str) {
@@ -1630,6 +1645,8 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		page_string(to->desc, temp, TRUE);
 		free(temp);
 	}
+	
+	gain_player_tech_exp(to, PTECH_ENEMY_BUFF_DETAILS, 15);
 }
 
 
@@ -2399,7 +2416,10 @@ ACMD(do_affects) {
 	// targeted version?
 	one_argument(argument, arg);
 	if (*arg) {
-		if (!generic_find(arg, NULL, FIND_CHAR_ROOM | (IS_IMMORTAL(ch) ? FIND_CHAR_WORLD : NOBITS), ch, &vict, NULL, NULL)) {
+		if (GET_POS(ch) < POS_RESTING) {
+			send_low_pos_msg(ch);
+		}
+		else if (!generic_find(arg, NULL, FIND_CHAR_ROOM | (IS_IMMORTAL(ch) ? FIND_CHAR_WORLD : NOBITS), ch, &vict, NULL, NULL)) {
 			send_config_msg(ch, "no_person");
 		}
 		else if (IS_IMMORTAL(ch)) {

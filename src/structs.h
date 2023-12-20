@@ -1140,7 +1140,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
 #define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFY  BIT(25)	// z. mummified
-#define AFF_SOULMASK  BIT(26)	// A. soulmask
+#define AFF_SOULMASK  BIT(26)	// A. shows no details to others on 'affects'
 #define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
@@ -2735,6 +2735,7 @@ typedef enum {
 #define PTECH_TRACK_COMMAND  85	// can use 'track'
 #define PTECH_RESIST_POISON  86	// minor resistance
 #define PTECH_VAMPIRE_BITE  87	// can use 'bite' for blood instead of the social
+#define PTECH_ENEMY_BUFF_DETAILS  88	// can see details when using 'affects' on others
 
 
 // SM_x: status messages
