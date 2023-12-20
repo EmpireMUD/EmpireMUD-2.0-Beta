@@ -389,52 +389,6 @@ ACMD(do_dispel) {
 }
 
 
-ACMD(do_manashield) {
-	struct affected_type *af1, *af2, *af3;
-	int cost = 25;
-	int amt;
-	
-	int levels[] = { 2, 4, 6 };
-
-	if (affected_by_spell(ch, ATYPE_MANASHIELD)) {
-		msg_to_char(ch, "You wipe the symbols off your arm and cancel your mana shield.\r\n");
-		act("$n wipes the arcane symbols off $s arm.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_MANASHIELD, FALSE);
-	}
-	else if (!can_use_ability(ch, ABIL_MANASHIELD, MANA, cost, NOTHING)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MANASHIELD)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		
-		msg_to_char(ch, "You pull out a grease pencil and draw a series of arcane symbols down your left arm...\r\nYou feel yourself shielded by your mana!\r\n");
-		act("$n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.", TRUE, ch, NULL, NULL, TO_ROOM);
-		
-		amt = CHOOSE_BY_ABILITY_LEVEL(levels, ch, ABIL_MANASHIELD) + (GET_INTELLIGENCE(ch) / 3);
-		
-		af1 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_MANA, -25, ch);
-		affect_to_char(ch, af1);
-		free(af1);
-		
-		af2 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_PHYSICAL, amt, ch);
-		affect_to_char(ch, af2);
-		free(af2);
-		
-		af3 = create_mod_aff(ATYPE_MANASHIELD, 30 * SECS_PER_REAL_MIN, APPLY_RESIST_MAGICAL, amt, ch);
-		affect_to_char(ch, af3);
-		free(af3);
-		
-		// possible to go negative here
-		if (GET_MANA(ch) < 0) {
-			set_mana(ch, 0);
-		}
-	}
-}
-
-
 ACMD(do_mirrorimage) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;

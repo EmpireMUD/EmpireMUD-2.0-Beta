@@ -3353,11 +3353,6 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 				}
 			}
 		}
-	
-		if (affected_by_spell(victim, ATYPE_MANASHIELD) && can_gain_exp_from(victim, ch)) {
-			gain_ability_exp(victim, ABIL_MANASHIELD, 2);
-			run_ability_hooks(victim, AHOOK_ABILITY, ABIL_MANASHIELD, get_ability_level(victim, ABIL_MANASHIELD), victim, NULL, NULL, NULL);
-		}
 	}
 	
 	// chained abilities?

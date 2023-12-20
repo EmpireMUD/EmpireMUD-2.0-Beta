@@ -226,11 +226,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			need_affect_total = TRUE;
 			break;
 		}
-		case ABIL_MANASHIELD: {
-			affect_from_char(ch, ATYPE_MANASHIELD, TRUE);
-			need_affect_total = TRUE;
-			break;
-		}
 		case ABIL_MIRRORIMAGE: {
 			DL_FOREACH_SAFE(character_list, mob, next_mob) {
 				if (GET_LEADER(mob) == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
