@@ -1589,7 +1589,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		
 		// caster?
 		if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
-			snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you");
+			snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 		}
 		
 		add_string_hash(&str_hash, line, 1);
