@@ -125,60 +125,34 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 
 
 // ABIL_x: ability vnums
-// #define ABIL_GIFT_OF_NATURE  0
-// #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
-// #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
-// #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
 #define ABIL_VAMP_COMMAND  9
-// #define ABIL_DARKNESS  11
 #define ABIL_DEATHSHROUD  12
 #define ABIL_DISGUISE  13
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
-// #define ABIL_SEARCH  18
-// #define ABIL_DAYWALKING  19
 #define ABIL_HIDE  20
-// #define ABIL_HORRID_FORM  21
 #define ABIL_DISPEL  22
-// #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
-// #define ABIL_SUMMON_THUG  28
 #define ABIL_SNEAK  29
 #define ABIL_SOLAR_POWER  30
 #define ABIL_SOULSIGHT  31
-// #define ABIL_SUMMON_ANIMALS  34
-// #define ABIL_SUMMON_HUMANS  35
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
-// formerly: #define ABIL_LOCKS  41
-// formerly: #define ABIL_ROADS  49
-// #define ABIL_STAMINA  66
 #define ABIL_FISH  72
-//#define ABIL_TRACK  73
-//#define ABIL_RESIST_POISON  77
 #define ABIL_PATHFINDING  83
-// #define ABIL_REFLEXES  84
-// #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
-// #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
-// #define ABIL_DISARM  94
-// #define ABIL_SPARRING  95
-// #define ABIL_KICK  96
-// #define ABIL_BASH  97
-// #define ABIL_CUT_DEEP  98
 #define ABIL_BIG_GAME_HUNTER  99
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
 #define ABIL_FLEET  104
 #define ABIL_FINESSE  105
-// #define ABIL_STUNNING_BLOW  106
 #define ABIL_VEINTAP  107
 #define ABIL_HEAL  109
 #define ABIL_HEAL_FRIEND  110
@@ -186,105 +160,37 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_REJUVENATE  114
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
-// #define ABIL_READY_FIREBALL  117
-// #define ABIL_COUNTERSPELL  120
-// #define ABIL_ENTANGLE  121
-// #define ABIL_FAMILIAR  122
-// #define ABIL_SKYBRAND  125
-// #define ABIL_CHANT_OF_NATURE  126
-// formerly: #define ABIL_REWARD  127
-// formerly: #define ABIL_SUMMON_GUARDS  128
-// formerly: #define ABIL_PROSPECT  130
-// formerly: #define ABIL_WORKFORCE  131
-// formerly: #define ABIL_RARE_METALS  133
-// formerly: #define ABIL_COMMERCE  134
-// formerly: #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
-// #define ABIL_SUMMON_BODYGUARD  138
-// formerly: #define ABIL_BARDE  139
-// formerly: #define ABIL_CITY_LIGHTS  140
 #define ABIL_STEAL  143
-// #define ABIL_ESCAPE  146
 #define ABIL_CONCEALMENT  148
-// #define ABIL_SHADOWSTEP  153
 #define ABIL_JAB  155
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
-// #define ABIL_BAT_FORM  162
-// #define ABIL_RITUAL_OF_BURDENS  163
-#define ABIL_MANASHIELD  165
-// #define ABIL_SUMMON_SWIFT  168
-// #define ABIL_SUMMON_MATERIALS  169
 #define ABIL_STAFF_MASTERY  171
-// #define ABIL_SIEGE_RITUAL  172
-// #define ABIL_COLORBURST  173
-// #define ABIL_ENERVATE  174
-// #define ABIL_SLOW  175
 #define ABIL_SIPHON  176
 #define ABIL_MIRRORIMAGE  177
-// #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
 #define ABIL_VIGOR  183
-// #define ABIL_RITUAL_OF_DEFENSE  186
-// #define ABIL_RITUAL_OF_TELEPORTATION  187
 #define ABIL_PORTAL_MAGIC  189
 #define ABIL_PORTAL_MASTER  190
-// #define ABIL_DEVASTATION_RITUAL  191
-// #define ABIL_SENSE_LIFE_RITUAL  192
-// #define ABIL_RITUAL_OF_DETECTION  193
-// #define ABIL_BASIC_CRAFTS  198	// no longer used in code
-// formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
-// formerly: #define ABIL_TUNNEL  206
-// #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
-// #define ABIL_DREAD_BLOOD_FORM  211
-// #define ABIL_SAVAGE_WEREWOLF_FORM  212
-// #define ABIL_TOWERING_WEREWOLF_FORM  213
-// #define ABIL_SAGE_WEREWOLF_FORM  214
-// #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
-// formerly: #define ABIL_TRADE_ROUTES  217
 #define ABIL_RESURRECT  219
 #define ABIL_MOONRISE  220
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_BLOODSWEAT  229
-// #define ABIL_SHADOW_KICK  231
-// #define ABIL_STAGGER_JAB  232
 #define ABIL_SHADOWCAGE  233
 #define ABIL_HOWL  234
-// #define ABIL_CRUCIAL_JAB  235
 #define ABIL_DIVERSION  236
-// #define ABIL_SHADOW_JAB  237
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
-// #define ABIL_EXARCH_CRAFTS  248
-// #define ABIL_GRIFFIN  250
-// #define ABIL_DIRE_WOLF  251
-// #define ABIL_MOON_RABBIT  252
-// #define ABIL_SPIRIT_WOLF  253
-// #define ABIL_MANTICORE  254
-// #define ABIL_PHOENIX  255
-// #define ABIL_SCORPION_SHADOW  256
-// #define ABIL_OWL_SHADOW  257
-// #define ABIL_BASILISK  258
-// #define ABIL_SALAMANDER  259
-// #define ABIL_SKELETAL_HULK  260
-// #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
-// #define ABIL_CHANT_OF_ILLUSIONS  265
-// #define ABIL_ASTRAL_WEREWOLF_FORM  267
-// #define ABIL_WHISPERSTRIDE 268
-// #define ABIL_WEREWOLF_FORM  269
 #define ABIL_STABLEMASTER  272
-// formerly: #define ABIL_ERODE  280
-// formerly: #define ABIL_SCOUR  281
-// #define ABIL_SHADOWLASH  282
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
-// #define ABIL_BITE  292
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_TRICK_SHOTS  296
