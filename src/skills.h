@@ -276,7 +276,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_HONE  262
 // #define ABIL_CHANT_OF_ILLUSIONS  265
 // #define ABIL_ASTRAL_WEREWOLF_FORM  267
-#define ABIL_WHISPERSTRIDE 268
+// #define ABIL_WHISPERSTRIDE 268
 // #define ABIL_WEREWOLF_FORM  269
 #define ABIL_STABLEMASTER  272
 // formerly: #define ABIL_ERODE  280

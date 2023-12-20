@@ -1493,32 +1493,3 @@ ACMD(do_steal) {
 	}
 }
 
-
-ACMD(do_whisperstride) {
-	struct affected_type *af;
-	int cost = 100;
-	if (!can_use_ability(ch, ABIL_WHISPERSTRIDE, MOVE, cost, COOLDOWN_WHISPERSTRIDE)) {
-		return;
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_WHISPERSTRIDE)) {
-		return;
-	}
-	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-		msg_to_char(ch, "You can't use Whisperstride while mounted!\r\n");
-		return;
-	}
-	else {
-		// auto-dismount
-		if (IS_RIDING(ch)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
-		
-		act("You cloak yourself with dark whispers, muffling your movement...", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
-		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM | ACT_BUFF);
-		
-		af = create_flag_aff(ATYPE_WHISPERSTRIDE, 30, AFF_SNEAK, ch);
-		affect_join(ch, af, 0);
-	}
-}
