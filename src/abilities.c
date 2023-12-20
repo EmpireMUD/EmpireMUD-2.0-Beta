@@ -8147,6 +8147,7 @@ OLC_MODULE(abiledit_data) {
 						msg_to_char(ch, "Range must be 'unlimited' or a number. Invalid range '%s' given.\r\n", val_arg);
 						return;
 					}
+					break;
 				}
 				case ADL_PARENT: {
 					if (ABIL_ASSIGNED_SKILL(abil)) {
