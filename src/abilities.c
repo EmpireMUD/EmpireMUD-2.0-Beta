@@ -2616,6 +2616,9 @@ DO_ABIL(abil_rescue_all) {
 	if (vict && vict != ch) {
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(vict)), attacker, next, next_in_room) {
 			if (FIGHTING(attacker) == vict && can_fight(ch, attacker)) {
+				if (SHOULD_APPEAR(ch)) {
+					appear(ch);
+				}
 				perform_rescue(ch, vict, attacker, first ? RESCUE_RESCUE : RESCUE_NO_MSG);
 				first = FALSE;
 				data->success = TRUE;
@@ -2637,6 +2640,9 @@ DO_ABIL(abil_rescue_one) {
 		}
 		
 		if (attacker && can_fight(ch, attacker)) {
+			if (SHOULD_APPEAR(ch)) {
+				appear(ch);
+			}
 			perform_rescue(ch, vict, attacker, RESCUE_RESCUE);
 			data->success = TRUE;
 		}
