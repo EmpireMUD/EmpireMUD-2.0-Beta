@@ -307,7 +307,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		}
 		if (*lbuf) {
 			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Player tech%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Grants: %s\r\n", lbuf);
 		}
 	}
 	
