@@ -1016,69 +1016,6 @@ ACMD(do_pickpocket) {
 }
 
 
-ACMD(do_prick) {
-	char_data *vict = FIGHTING(ch);
-	int cost = 10;
-	
-	one_argument(argument, arg);
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use this ability.\r\n");
-	}
-	else if (!can_use_ability(ch, ABIL_PRICK, MOVE, cost, COOLDOWN_PRICK)) {
-		// sends own messages
-	}
-	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
-		send_to_char("Prick whom?\r\n", ch);
-	}
-	else if (vict == ch) {
-		send_to_char("You can't prick yourself!\r\n", ch);
-	}
-	else if (!can_fight(ch, vict)) {
-		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
-	}
-	else if (!find_poison_by_vnum(ch->carrying, USING_POISON(ch))) {
-		msg_to_char(ch, "You seem to be out of poison.\r\n");
-	}
-	else if (GET_MOVE(ch) < cost) {
-		msg_to_char(ch, "You need %d move points to prick.\r\n", cost);
-	}
-	else if (NOT_MELEE_RANGE(ch, vict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PRICK)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_PRICK, 9, WAIT_COMBAT_ABILITY);
-		
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-
-		act("You quickly prick $N with poison!", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
-		act("$n pricks you with poison!", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
-		act("$n pricks $N with poison!", TRUE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
-
-		// possibly fatal
-		if (apply_poison(ch, vict) == 0) {
-			act("It seems to have no effect.", FALSE, ch, NULL, NULL, TO_CHAR | ACT_ABILITY);
-		}
-		
-		// apply_poison could have killed vict -- check location, etc
-		if (!EXTRACTED(vict) && !IS_DEAD(vict) && CAN_SEE(vict, ch)) {
-			engage_combat(ch, vict, TRUE);
-		}
-		
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_PRICK, 15);
-		}
-		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PRICK, get_ability_level(ch, ABIL_PRICK), vict, NULL, NULL, NULL);
-	}
-}
-
-
 ACMD(do_sap) {
 	char_data *vict = NULL;
 	struct affected_type *af;
