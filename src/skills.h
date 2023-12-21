@@ -158,7 +158,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_HEAL_PARTY  111
 #define ABIL_REJUVENATE  114
 #define ABIL_PURIFY  115
-#define ABIL_CLEANSE  116
 #define ABIL_INSPIRE  136
 #define ABIL_STEAL  143
 #define ABIL_CONCEALMENT  148
@@ -178,7 +177,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_MOONRISE  220
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_NOBLE_BEARING  228
-#define ABIL_BLOODSWEAT  229
 #define ABIL_SHADOWCAGE  233
 #define ABIL_HOWL  234
 #define ABIL_DIVERSION  236

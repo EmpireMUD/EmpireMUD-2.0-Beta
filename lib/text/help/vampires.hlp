@@ -108,10 +108,11 @@ BLOODSWEAT "BLOOD SWEAT"
 Bloodsweat
 Vampire Synergy Ability: 100 Battle
 Usage:  bloodsweat
-Cost:  50 blood
+Cost:  20 blood
 Cooldown:  30 seconds
 
-This power purges a vampire's blood of any poisons, by sweating them out.
+This power purges a vampire's blood of any poisons, including alcohol, by
+sweating them out.
 #
 "READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF
 

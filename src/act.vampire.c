@@ -1108,46 +1108,6 @@ ACMD(do_bite) {
 }
 
 
-ACMD(do_bloodsweat) {
-	struct over_time_effect_type *dot, *next_dot;
-	bool any = FALSE;
-	int cost = 50;
-	
-	if (!can_use_ability(ch, ABIL_BLOODSWEAT, BLOOD, cost, COOLDOWN_BLOODSWEAT)) {
-		return;
-	}
-	else if (!check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
-	}
-	else {
-		// remove first (to ensure there are some
-		for (dot = ch->over_time_effects; dot; dot = next_dot) {
-			next_dot = dot->next;
-
-			if (dot->damage_type == DAM_POISON) {
-				dot_remove(ch, dot);
-				any = TRUE;
-			}
-		}
-		
-		if (affected_by_spell(ch, ATYPE_POISON)) {
-			affect_from_char(ch, ATYPE_POISON, FALSE);
-			any = TRUE;
-		}
-		
-		if (!any) {
-			msg_to_char(ch, "You are not even poisoned!\r\n");
-			return;
-		}
-		
-		// ok go
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_BLOODSWEAT, 30, WAIT_ABILITY);
-		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
-		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
-	}
-}
-
-
 ACMD(do_boost) {
 	struct affected_type *af;
 	int iter, pos = NOTHING, cost = 10;
