@@ -70,8 +70,21 @@ T e 1
 S
 #205
 Master Survivalist~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 1.00 0 q 0
+C
+unknown 0 0 0 0 0 -1 0 0 0 0
+H 256 0 33.33 0
+M
+0
+You bear down and prepare to survive this...~
+M
+1
+$n bears down and prepares to survive this...~
+T b 1
+X+ 0 S
+X+ 1 3111
+X+ 2 5
+X+ 3 5
 S
 #207
 Arcane Power~
@@ -914,13 +927,11 @@ X+ 6 3
 S
 #286
 Evasion~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 1.00 0 df 0
 S
 #287
 Weapon Proficiency~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 1.00 0 bc 0
 S
 #288
 Primitive Crafts~
