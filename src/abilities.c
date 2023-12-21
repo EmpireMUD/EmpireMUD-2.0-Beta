@@ -380,6 +380,9 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
 			continue;	// in-dev
 		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
+			continue;	// requires-obj
+		}
 		if (CRAFT_FLAGGED(craft, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 			more_learned = TRUE;
 			continue;	// has not learned
