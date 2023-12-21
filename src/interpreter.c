@@ -336,7 +336,6 @@ ACMD(do_roster);
 ACMD(do_run);
 
 ACMD(do_sacrifice);
-ACMD(do_sap);
 ACMD(do_save);
 ACMD(do_saw);
 ACMD(do_say);
@@ -920,7 +919,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SIMPLE_CMD( "sacrifice", POS_STANDING, do_sacrifice, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "sail", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_SAIL, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "sap", POS_STANDING, do_sap, NO_MIN, CTYPE_COMBAT, ABIL_SAP ),
 	SIMPLE_CMD( "save", POS_STUNNED, do_save, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "saw", POS_STANDING, do_saw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "sayhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_SAY_HISTORY ),
