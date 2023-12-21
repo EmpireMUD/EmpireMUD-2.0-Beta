@@ -126,7 +126,43 @@ S
 #116
 Cleanse~
 0 -1 1.00 0 0 0
-T m 0
+C
+cleanse 7 be 2 30 0 2022 9 0 5 0
+D 64 13 0
+D 64 8 0
+D 64 11 0
+D 64 14 0
+M
+0
+You shine brightly as your mana cleanses you.~
+M
+1
+$n shines brightly for a moment as $s mana cleanses $m.~
+M
+2
+You shoot a bolt of white mana at $N, cleansing $M.~
+M
+3
+$n shoots a bolt of white mana at you, cleansing you.~
+M
+4
+$n shoots a bolt of white mana at $N, cleansing $M.~
+M
+8
+You shine brightly as your mana cleanses you.~
+M
+9
+$n shines brightly for a moment as $s mana cleanses $m.~
+M
+10
+You shoot a bolt of white mana at $N, cleansing $M.~
+M
+11
+$n shoots a bolt of white mana at you, cleansing you.~
+M
+12
+$n shoots a bolt of white mana at $N, cleansing $M.~
+T s 1
 S
 #117
 Ready Fireball~
@@ -600,8 +636,32 @@ X+ 3 10
 S
 #157
 Sap~
-0 -1 1.00 0 0 0
-T m 0
+aekpq -1 1.00 hE 0 0
+C
+sap 8 b 1 15 0 2041 9 0 1 2
+M
+2
+You sap $N in the back of the head.~
+M
+3
+$n saps you in the back of the head. That hurt!~
+M
+4
+$n saps $N in the back of the head.~
+M
+10
+You sap $N in the back of the head.~
+M
+11
+$n saps you in the back of the head. That hurt!~
+M
+12
+$n saps $N in the back of the head.~
+T b 1
+X+ 0 t
+X+ 1 3007
+X+ 2 60
+X+ 3 60
 S
 #158
 Dagger Mastery~
@@ -626,8 +686,30 @@ T e 0
 S
 #161
 Prick~
-0 -1 1.00 0 0 0
-T m 0
+a -1 1.00 C 0 0
+C
+prick 7 bfh 1 10 0 2042 9 0 2 0
+D 16 33 0
+D 64 7 0
+M
+2
+You quickly prick $N with poison!~
+M
+3
+$n pricks you with poison!~
+M
+4
+$n pricks $N with poison!~
+M
+10
+You quickly prick $N but it doesn't seem to have any effect.~
+M
+11
+$n pricks you!~
+M
+12
+$n pricks $N!~
+T s 1
 S
 #162
 Bat Form~
