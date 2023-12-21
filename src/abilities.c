@@ -57,6 +57,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
+char *estimate_ability_cost(char_data *ch, ability_data *abil);
 void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
@@ -309,23 +310,28 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	
 	if (ABIL_REQUIRES_TOOL(abil)) {
+		has_param_details = TRUE;
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 	}
 	
 	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %d%s %s\r\n", (ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil)), (ABIL_COST_PER_SCALE_POINT(abil) > 0 ? "+" : ""), pool_types[ABIL_COST_TYPE(abil)]);
+		has_param_details = TRUE;
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s\r\n", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	
 	// Cooldown?
 	if (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent)) {
 		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
+			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
 		}
 		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
+			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
 		}
 		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
+			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		}
 	}
@@ -352,11 +358,13 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		sprintf(lbuf + strlen(lbuf), "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
 	}
 	if (*lbuf) {
+		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Modifies: %s\r\n", lbuf);
 	}
 	
 	// affects
 	if (ABIL_AFFECTS(abil)) {
+		has_param_details = TRUE;
 		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Affects: %s\r\n", lbuf);
 	}
@@ -390,11 +398,18 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	// show duration?
 	if (*lbuf && (!parent || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent) || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent))) {
+		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
 	}
 	
 	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
+		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Difficulty: %s\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+	}
+	
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil)) {
+		has_param_details = TRUE;
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "DoT stacks to: %d\r\n", ABIL_MAX_STACKS(abil));
 	}
 	
 	// notes (flags), if parameterized -- LAST
@@ -463,6 +478,9 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes recipes you have not learned.\r\n");
 		}
 	}
+	if (count > 0 || more_learned) {
+		has_param_details = TRUE;
+	}
 /*
 	More things we could show (from vstat ability):
 	
@@ -472,67 +490,23 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
 
-	// command-related portion
-	if (ABIL_COMMAND(abil)) {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
-	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-
-	// type-specific data
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
-		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			strcpy(part, "unlimited");
-		}
-		else {
-			snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
-		}
-		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			strcpy(part2, "unlimited");
-		}
-		else {
-			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
-		}
-		size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
-	
-	}	// end buff/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-		sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
-	
-		// applies
-		size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
-		count = 0;
-		LL_FOREACH(ABIL_APPLIES(abil), app) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
-		}
-		if (!ABIL_APPLIES(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "none");
-		}
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-	}	// end buff
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
 	}	// end damage
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
 	}	// end damage/dot
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
-	}	// end dot
-	
 	*/
 	
-	// children?
+	if (!has_param_details) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
+	}
+	
+	// hookers?
 	HASH_ITER(hh, ability_table, abiter, next_abil) {
 		if (!has_ability(ch, ABIL_VNUM(abiter))) {
 			continue;	// must have for this
 		}
-		/*
-		if (!has_ability_data_any(abiter, ADL_PARENT)) {
-			continue;	// nobody's child
-		}
-		*/
 		if (!has_ability_hook(abiter, AHOOK_ABILITY, ABIL_VNUM(abil))) {
 			continue;	// does not hook on me
 		}
@@ -544,10 +518,6 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 			strcat(outbuf, lbuf);
 			size += strlen(lbuf);
 		}
-	}
-	
-	if (!has_param_details) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
 	}
 }
 
@@ -1056,6 +1026,38 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 		}
 	}
 	return any;
+}
+
+
+/**
+* Estimates how much an ability will cost the player right now.
+*
+* @param char_data *ch The player.
+* @param ability_data *abil The ability.
+* @return char* The cost as a string, such as "15" or "27 (estimated)".
+*/
+char *estimate_ability_cost(char_data *ch, ability_data *abil) {
+	static char output[1024];
+	double scale = 1.0;
+	int cost = ABIL_COST(abil);
+	struct ability_exec *data;
+	
+	if (ABIL_COST_PER_SCALE_POINT(abil)) {
+		// need a temporary data bean for this:
+		CREATE(data, struct ability_exec, 1);
+		data->abil = abil;
+		data->matching_role = has_matching_role(ch, abil, FALSE);
+		
+		scale = standard_ability_scale(ch, abil, get_ability_level(ch, ABIL_VNUM(abil)), NOBITS, data);
+		
+		// free this up now
+		free_ability_exec(data);
+		
+		cost += scale * ABIL_COST_PER_SCALE_POINT(abil);
+	}
+	
+	snprintf(output, sizeof(output), "%d%s", cost, (ABIL_COST_PER_SCALE_POINT(abil) ? " (estimated)" : ""));
+	return output;
 }
 
 
