@@ -736,7 +736,26 @@ S
 #93
 Rescue~
 0 -1 1.00 0 0 0
-T m 0
+C
+rescue 7 b 1 20 0 2010 6 0 2 0
+D 64 16 0
+D 16 36 0
+M
+2
+You move to rescue $n...~
+M
+3
+*~
+M
+4
+*~
+M
+10
+... but fail.~
+M
+12
+*~
+T s 1
 S
 #94
 Disarm~
