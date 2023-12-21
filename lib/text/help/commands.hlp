@@ -73,6 +73,14 @@ if you use it on someone else, you will see a simpler view of their affects.
 
 Your affects are also automatically shown at the bottom of the score.
 
+Buffs are shown in cyan for users with color displays. Debuffs are shown in red
+and, for screen-reader users, will also say (debuff) after the name. DoTs are
+similarly marked.
+
+When using this on another person, affects caused by you are marked with a
+(you) tag so that you can tell which are yours and which came from someone
+else.
+
 See also: SCORE
 #
 AFK "AFK TOGGLE"

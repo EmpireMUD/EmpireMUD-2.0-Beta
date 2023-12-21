@@ -1443,12 +1443,14 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 void show_character_affects(char_data *ch, char_data *to) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
+	bool beneficial;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], lbuf[MAX_INPUT_LENGTH];
 	int duration;
 
 	/* Routine to show what spells a char is affected by */
 	for (aff = ch->affected; aff; aff = aff->next) {
 		*buf2 = '\0';
+		beneficial = affect_is_beneficial(aff);
 
 		// duration setup
 		if (aff->expire_time == UNLIMITED) {
@@ -1466,7 +1468,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main entry
-		sprintf(buf, "   \t%c%s\t0 (%s) ", affect_is_beneficial(aff) ? 'c' : 'r', get_generic_name_by_vnum(aff->type), lbuf);
+		sprintf(buf, "   \t%c%s\t0%s (%s) ", beneficial ? 'c' : 'r', get_generic_name_by_vnum(aff->type), (!beneficial && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
 
 		if (aff->modifier) {
 			sprintf(buf2, "- %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1501,8 +1503,8 @@ void show_character_affects(char_data *ch, char_data *to) {
 * @param char_data *to Who to send to
 */
 void show_character_affects_simple(char_data *ch, char_data *to) {
-	bool is_ally, details;
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], good_color[8], bad_color[8];
+	bool good, is_ally, details;
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
 	char *temp;
 	int duration;
 	size_t size;
@@ -1516,19 +1518,11 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	
 	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
 	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_SOULMASK));
-	
-	// determine colors
-	if (is_ally) {
-		strcpy(good_color, "&c");
-		strcpy(bad_color, "&r");
-	}
-	else {
-		strcpy(good_color, "&r");
-		strcpy(bad_color, "&c");
-	}
-	
+		
 	// build affects
 	LL_FOREACH(ch->affected, aff) {
+		good = affect_is_beneficial(aff);
+		
 		if (details) {
 			// duration setup
 			if (aff->expire_time == UNLIMITED) {
@@ -1546,7 +1540,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			
 			// main entry
-			snprintf(line, sizeof(line), "%s%s&0 (%s)", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), lbuf);
+			snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "\tc" : "\tr"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
 			
 			if (aff->modifier) {
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1566,7 +1560,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		else {
 			// simple version
-			snprintf(line, sizeof(line), "%s%s&0%s", (affect_is_beneficial(aff) ? good_color : bad_color), get_generic_name_by_vnum(aff->type), (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "\tc" : "\tr"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
 			add_string_hash(&str_hash, line, 1);
 		}
 	}
@@ -1581,10 +1575,10 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		if (details) {
-			snprintf(line, sizeof(line), "%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+			snprintf(line, sizeof(line), "\tr%s\t0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
 		}
 		else {	// simple version
-			snprintf(line, sizeof(line), "%s%s&0%s", bad_color, get_generic_name_by_vnum(dot->type), lbuf);
+			snprintf(line, sizeof(line), "\tr%s\t0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
 		}
 		
 		// caster?
@@ -1598,16 +1592,13 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	// extra info?
 	if (details) {
 		if (MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
-			snprintf(line, sizeof(line), "%sanimal\t0", good_color);
-			add_string_hash(&str_hash, line, 1);
+			add_string_hash(&str_hash, "\tcanimal\t0", 1);
 		}
 		if (IS_MAGE(ch)) {
-			snprintf(line, sizeof(line), "%scaster\t0", good_color);
-			add_string_hash(&str_hash, line, 1);
+			add_string_hash(&str_hash, "\tccaster\t0", 1);
 		}
 		if (IS_VAMPIRE(ch)) {
-			snprintf(line, sizeof(line), "%svampire\t0", good_color);
-			add_string_hash(&str_hash, line, 1);
+			add_string_hash(&str_hash, "\tcvampire\t0", 1);
 		}
 	}
 	
