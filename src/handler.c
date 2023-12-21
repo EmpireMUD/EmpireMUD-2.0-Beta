@@ -1390,6 +1390,50 @@ void free_freeable_dots(void) {
 
 
 /**
+* Removes the first affect a character has that gives them a certain aff flag.
+* If this affect isn't a basic "buff" or script "affect", it will also remove
+* other affects on the character with the same affect type. If it cannot find
+* an affect granting the aff flag, it will remove the aff from the character's
+* base affects (e.g. a mob who had the aff built in).
+*
+* @param char_data *ch The character to remove from.
+* @param bitvector_t aff_flag Which AFF_ flag to remove.
+* @param bool show_msg If TRUE, will show any affect wear-off message.
+*/
+void remove_first_aff_flag_from_char(char_data *ch, bitvector_t aff_flag, bool show_msg) {
+	struct affected_type *aff;
+	bool removed = FALSE;
+	
+	LL_FOREACH(ch->affected, aff) {
+		if (IS_SET(aff->bitvector, AFF_COUNTERSPELL)) {
+			removed = TRUE;
+			
+			if (aff->type == ATYPE_BUFF || aff->type == ATYPE_DG_AFFECT) {
+				// basic buff: only remove this one
+				if (show_msg) {
+					show_wear_off_msg(ch, aff->type);
+				}
+				affect_remove(ch, aff);
+				affect_total(ch);
+			}
+			else {
+				// other types: remove ALL affs of the type
+				affect_from_char(ch, aff->type, show_msg);
+			}
+			
+			// done either way: only removing 1
+			break;
+		}
+	}
+	
+	if (!removed) {
+		// has a aff flag that's not from an affect?
+		REMOVE_BIT(AFF_FLAGS(ch), aff_flag);
+	}
+}
+
+
+/**
 * @param room_data *room The room to check
 * @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if the room is affected by the spell

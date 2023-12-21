@@ -90,6 +90,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int
 void cancel_permanent_affects_room(room_data *room);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 void free_freeable_dots();
+void remove_first_aff_flag_from_char(char_data *ch, bitvector_t aff_flag, bool show_msg);
 bool room_affected_by_spell(room_data *room, any_vnum type);
 bool room_affected_by_spell_from_caster(room_data *room, any_vnum type, char_data *caster);
 void schedule_affect_expire(char_data *ch, struct affected_type *af);

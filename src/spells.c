@@ -44,40 +44,22 @@
 * @return bool TRUE if a counterspell fired, FALSE if the spell can proceed.
 */
 bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
-	bool removed = FALSE;
 	ability_data *abil = NULL;
 	struct affected_type *aff;
 	
 	if (AFF_FLAGGED(ch, AFF_COUNTERSPELL)) {
 		msg_to_char(ch, "Your counterspell goes off!\r\n");
 		
-		// find first counterspell aff
+		// find first counterspell aff for later
 		LL_FOREACH(ch->affected, aff) {
 			if (IS_SET(aff->bitvector, AFF_COUNTERSPELL)) {
-				removed = TRUE;
-				
-				// store ability for later
 				abil = has_buff_ability_by_affect_and_affect_vnum(ch, AFF_COUNTERSPELL, aff->type);
-				
-				if (aff->type == ATYPE_BUFF || aff->type == ATYPE_DG_AFFECT) {
-					// basic buff: only remove this one
-					affect_remove(ch, aff);
-					affect_total(ch);
-				}
-				else {
-					// other types: remove ALL affs of the type
-					affect_from_char(ch, aff->type, FALSE);
-				}
-				
-				// done either way: only removing 1
 				break;
 			}
 		}
 		
-		if (!removed) {
-			// has a counterspell aff flag that's not from an affect
-			REMOVE_BIT(AFF_FLAGS(ch), AFF_COUNTERSPELL);
-		}
+		// remove first one
+		remove_first_aff_flag_from_char(ch, AFF_COUNTERSPELL, FALSE);
 		
 		// did we find an ability that caused it?
 		if (abil) {
