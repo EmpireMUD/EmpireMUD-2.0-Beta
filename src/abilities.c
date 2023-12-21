@@ -164,18 +164,32 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
+	double chain_prc = 100.0;
 	int count, iter;
 	size_t size, l_size;
 	ability_data *abiter, *next_abil;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
 	struct ability_data_list *adl;
+	struct ability_hook *ahook;
 	struct apply_data *apply;
 	struct synergy_ability *syn;
 	
+	// detect chain
+	if (parent) {
+		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
+			if (ahook->type == AHOOK_ABILITY && ahook->value == ABIL_VNUM(parent)) {
+				chain_prc = ahook->percent;
+			}
+		}
+	}
+	
 	// starting line
 	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-		strcpy(lbuf, ABIL_NAME(abil));
+		sprintf(lbuf, "%s%s", (parent ? "Chains to: " : ""), ABIL_NAME(abil));
+		if (parent && chain_prc < 100.0) {
+			sprintf(lbuf + strlen(lbuf), " (%.*f%%)", (floor(chain_prc) != chain_prc) ? 1 : 0, chain_prc);
+		}
 	}
 	else {
 		strcpy(lbuf, " ");
@@ -184,6 +198,9 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 			strcat(lbuf, "-");
 		}
 		sprintf(lbuf + strlen(lbuf), " %s ", ABIL_NAME(abil));
+		if (parent && chain_prc < 100.0) {
+			sprintf(lbuf + strlen(lbuf), " (%.*f%%)", (floor(chain_prc) != chain_prc) ? 1 : 0, chain_prc);
+		}
 		count += (strlen(ABIL_NAME(abil)) % 2) ? 1 : 0;	// length fix
 		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
