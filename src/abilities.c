@@ -421,12 +421,12 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	if (count > 0 && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");	// missing crlf
 	}
-	if (more_learned) {
+	if (more_learned && size + 25 < sizeof_outbuf) {
 		if (count > 0) {
-			msg_to_char(ch, " (with more to learn)\r\n");
+			size += snprintf(outbuf + size, sizeof_outbuf - size, " (with more to learn)\r\n");
 		}
 		else {
-			msg_to_char(ch, "Makes recipes you have not learned.\r\n");
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes recipes you have not learned.\r\n");
 		}
 	}
 /*
