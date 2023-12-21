@@ -511,6 +511,11 @@ char *ability_data_display(struct ability_data_list *adl) {
 					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
+				case ABLIM_DAMAGE_TYPE: {
+					sprinttype(adl->misc, damage_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
 				case ABLIM_NOTHING:
 				default: {
 					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
@@ -2430,6 +2435,68 @@ DO_ABIL(abil_action_magic_growth) {
 }
 
 
+/**
+* Helper func for remove-dots ability actions.
+*
+* @param char_data *ch The person doing it.
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The person having it done (may be self).
+* @param struct ability_exec *data Running ability data object.
+* @param int dam_type May be DAM_ type or NOTHING for "all".
+*/
+void abil_remove_dots_by_type(char_data *ch, ability_data *abil, char_data *vict, struct ability_exec *data, int dam_type) {
+	struct over_time_effect_type *dot, *next_dot;
+	
+	if (vict) {
+		LL_FOREACH_SAFE(vict->over_time_effects, dot, next_dot) {
+			if (dam_type == NOTHING || dot->damage_type == dam_type) {
+				dot_remove(vict, dot);
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_physical_dots) {
+	if (vict) {
+		abil_remove_dots_by_type(ch, abil, vict, data, DAM_PHYSICAL);
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_magical_dots) {
+	if (vict) {
+		abil_remove_dots_by_type(ch, abil, vict, data, DAM_MAGICAL);
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_fire_dots) {
+	if (vict) {
+		abil_remove_dots_by_type(ch, abil, vict, data, DAM_FIRE);
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_poison_dots) {
+	if (vict) {
+		abil_remove_dots_by_type(ch, abil, vict, data, DAM_POISON);
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_all_dots) {
+	if (vict) {
+		abil_remove_dots_by_type(ch, abil, vict, data, NOTHING);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
@@ -2509,16 +2576,18 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	room_data *any_room, *other_room;
 	
 	// some types just require any match
+	bool want_dot = FALSE, have_dot = FALSE;
 	bool want_item_type = FALSE, have_item_type = FALSE;
 	bool want_room_permission = FALSE, have_room_permission = FALSE;
 	bool want_weapon = FALSE, have_weapon = FALSE;
-	char item_type_error[256], room_permission_error[256], weapon_error[256];
+	char dot_error[256], item_type_error[256], room_permission_error[256], weapon_error[256];
 	
 	if (!ch || !abil) {
 		return FALSE;	// no work
 	}
 	
 	// inits
+	*dot_error = '\0';
 	*weapon_error = '\0';
 	*item_type_error = '\0';
 	*room_permission_error = '\0';
@@ -2855,6 +2924,38 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_TARGET_HAS_ANY_DOT: {
+				if (vict && !vict->over_time_effects) {
+					if (ch == vict) {
+						msg_to_char(ch, "You aren't afflicted by any damage-over-time effects.\r\n");
+						return FALSE;
+					}
+					else {
+						act("$N is not afflicted by any damage-over-time effects.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						return FALSE;
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_TARGET_HAS_DOT_TYPE: {
+				struct over_time_effect_type *dot;
+				if (vict) {
+					want_dot = TRUE;
+					
+					LL_FOREACH(vict->over_time_effects, dot) {
+						if (dot->damage_type == adl->misc) {
+							have_dot = TRUE;
+							break;	// only need 1
+						}
+					}
+					
+					// save an error?
+					if (!have_dot && !*dot_error) {
+						sprinttype(adl->misc, damage_types, dot_error, sizeof(dot_error), "UNKNOWN");
+					}
+				}
+				break;
+			}
 		}
 	}
 	
@@ -2874,6 +2975,16 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	else if (want_item_type && !have_item_type) {
 		msg_to_char(ch, "%s", *item_type_error ? item_type_error : "You cannot use that ability on that type of item.\r\n");
 		return FALSE;
+	}
+	else if (want_dot && !have_dot) {
+		if (ch == vict) {
+			msg_to_char(ch, "You aren't afflicted by a %s damage-over-time effect.\r\n", dot_error);
+			return FALSE;
+		}
+		else {
+			act("$N is not afflicted by a $t damage-over-time effect.", FALSE, ch, dot_error, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+			return FALSE;
+		}
 	}
 	
 	// otherwise:
@@ -4630,6 +4741,26 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_APPLY_POISON: {
 				call_do_abil(abil_apply_poison);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_PHYSICAL_DOTS: {
+				call_do_abil(abil_remove_physical_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_MAGICAL_DOTS: {
+				call_do_abil(abil_remove_magical_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_FIRE_DOTS: {
+				call_do_abil(abil_remove_fire_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_POISON_DOTS: {
+				call_do_abil(abil_remove_poison_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_ALL_DOTS: {
+				call_do_abil(abil_remove_all_dots);
 				break;
 			}
 		}
@@ -8331,6 +8462,13 @@ OLC_MODULE(abiledit_data) {
 							case ABLIM_WEAPON_TYPE: {
 								if ((misc = search_block(val_b, weapon_types, FALSE)) == NOTHING) {
 									msg_to_char(ch, "Invalid weapon type '%s'. See HELP OEDIT TYPES.\r\n", val_b);
+									return;
+								}
+								break;
+							}
+							case ABLIM_DAMAGE_TYPE: {
+								if ((misc = search_block(val_b, damage_types, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid damage type '%s'. See HELP DAMAGE TYPES.\r\n", val_b);
 									return;
 								}
 								break;

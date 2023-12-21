@@ -646,6 +646,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_MAGIC_GROWTH  5	// triggers a magic growth evolution
 #define ABIL_ACTION_CLOSE_PORTAL  6	// if item target is portal, closes it
 #define ABIL_ACTION_APPLY_POISON  7	// applies your current poison to the target
+#define ABIL_ACTION_REMOVE_PHYSICAL_DOTS  8	// removes physical-type DoT effects
+#define ABIL_ACTION_REMOVE_MAGICAL_DOTS  9	// removes magical-type DoT effects
+#define ABIL_ACTION_REMOVE_FIRE_DOTS  10	// removes fire-type DoT effects
+#define ABIL_ACTION_REMOVE_POISON_DOTS  11	// removes poison-type DoT effects
+#define ABIL_ACTION_REMOVE_ALL_DOTS  12	// removes all types or DoT effects
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -766,6 +771,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_DISARMABLE_TARGET		31	// target must be disarmable
 #define ABIL_LIMIT_TARGET_HAS_MANA			32	// target must have a mana pool (non-caster mobs don't count)
 #define ABIL_LIMIT_USING_ANY_POISON			33	// must have poison available
+#define ABIL_LIMIT_TARGET_HAS_ANY_DOT		34	// must be afflicted by a DoT
+#define ABIL_LIMIT_TARGET_HAS_DOT_TYPE		35	// must be afflicted by a specific DoT type
 
 
 // ABLIM_x: data needed for ability limits:
@@ -773,6 +780,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABLIM_ITEM_TYPE		1	// requires an ITEM_ const
 #define ABLIM_ATTACK_TYPE	2	// requires an attack type
 #define ABLIM_WEAPON_TYPE	3	// requires an weapon type (blunt, sharp, magic)
+#define ABLIM_DAMAGE_TYPE	4	// requires a damage type (physical, magical, etc)
 
 
 // RUN_ABIL_x: modes for activating abilities

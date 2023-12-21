@@ -123,6 +123,11 @@ const char *ability_actions[] = {
 	"magic growth",	// 5
 	"close portal",
 	"apply poison",
+	"remove physical DoTs",
+	"remove magical DoTs",
+	"remove fire DoTs",	// 10
+	"remove poison DoTs",
+	"remove all DoTs",
 	"\n"
 };
 
@@ -215,7 +220,7 @@ const char *ability_type_flags[] = {
 	"PAINT-BUILDING",
 	"ACTION",
 	"BUILDING-DAMAGE",
-	"TELEPORT",
+	"TELEPORT",		// 20
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -237,7 +242,7 @@ const char *ability_type_notes[] = {
 	"crafting",	// 0
 	"buff",
 	"damage",
-	"damage-over-time",
+	"DoT",
 	"player tech",
 	"passive buff",	// 5
 	"ready weapon",
@@ -453,6 +458,8 @@ const char *ability_limitations[] = {
 	"disarmable target",
 	"target has mana",
 	"using any poison",
+	"target has any DoT",
+	"target has DoT type",	// 35
 	"\n"
 };
 
@@ -493,6 +500,8 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_DISARMABLE_TARGET
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_MANA
 	ABLIM_NOTHING,	// ABIL_LIMIT_USING_ANY_POISON
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_ANY_DOT
+	ABLIM_DAMAGE_TYPE,	// ABIL_LIMIT_TARGET_HAS_DOT_TYPE
 };
 
 

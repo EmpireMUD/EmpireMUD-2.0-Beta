@@ -540,6 +540,8 @@ Usage:  .data add action <type>
 These are things that happen when the ability is successful.
 
 Action types:
+ &capply poison&0 - If using a poison, applies it to the target (separate from
+   the chance to apply when using the WEAPON-HIT flag).
  &cclose portal&0 - Will close both sides of a targeted portal.
  &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends
    per-char messages for each hidden character.
@@ -555,9 +557,11 @@ Action types:
    name in per-item messages. Uses RANGE data, default 3 if not given.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
    the evolution works with $1 as the old sector name and $2 as the new one.
- &cclose portal&0 - If target is a portal, closes both sides.
- &capply poison&0 - If using a poison, applies it to the target (separate from
-   the chance to apply when using the WEAPON-HIT flag).
+ &cremove all DoTs&0 - Remove damage-over-time effects.
+ &cremove physical DoTs&0
+ &cremove magical DoTs&0
+ &cremove fire DoTs&0
+ &cremove poison DoTs&0
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
@@ -1127,6 +1131,8 @@ Limitation types:
  &coutdoors&0 - Must be used outdoors (including some adventure rooms).
  &cown the tile&0 - Your empire must own the location.
  &cpaintable building&0 - Must be used on a building the player can paint.
+ &ctarget has any DoT&0 - Target must be afflicted by a DoT.
+ &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
