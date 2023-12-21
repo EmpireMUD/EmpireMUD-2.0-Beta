@@ -686,7 +686,10 @@ char *ability_hook_display(struct ability_hook *ahook) {
 		case AHOOK_ATTACK:
 		case AHOOK_KILL:
 		case AHOOK_MELEE_ATTACK:
-		case AHOOK_RANGED_ATTACK: {
+		case AHOOK_RANGED_ATTACK:
+		case AHOOK_DYING:
+		case AHOOK_RESPAWN:
+		case AHOOK_RESURRECT: {
 			snprintf(output, sizeof(output), "%s", label);
 			break;
 		}
@@ -8969,7 +8972,11 @@ OLC_MODULE(abiledit_hook) {
 				case AHOOK_ATTACK:
 				case AHOOK_KILL:
 				case AHOOK_MELEE_ATTACK:
-				case AHOOK_RANGED_ATTACK: {
+				case AHOOK_RANGED_ATTACK:
+				case AHOOK_DYING:
+				case AHOOK_RESPAWN:
+				case AHOOK_RESURRECT:
+				default: {
 					val_id = 0;
 					break;
 				}

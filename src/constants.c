@@ -423,6 +423,9 @@ const char *ability_hook_types[] = {
 	"Melee-Attack",	// 5
 	"Ranged-Attack",
 	"Weapon-Type",
+	"Dying",
+	"Respawn",
+	"Resurrect",	// 10
 	"\n"
 };
 

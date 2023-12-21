@@ -11075,6 +11075,7 @@ ACMD(do_slay) {
 
 			// this would prevent the death
 			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {
+				// remove ALL (unlike normal auto-rez)
 				affects_from_char_by_aff_flag(vict, AFF_AUTO_RESURRECT, FALSE);
 				REMOVE_BIT(AFF_FLAGS(vict), AFF_AUTO_RESURRECT);
 			}

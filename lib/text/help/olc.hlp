@@ -619,9 +619,12 @@ Available types of hooks are:
  &cAttack-Type&0 - Triggered by an attack, targeting its target. See ATTACK TYPES.
  &cDamage-Type&0 - Triggered by dealing damage, targeting the damage's victim.
    Types are &yphysical&0, &ymagical&0, &yfire&0, &ypoison&0, &ydirect&0.
+ &cDying&0 - Triggered when the character begins to die.
  &cKill&0 - Triggered by any kill, targeting self (e.g. buff on kill).
  &cMelee-Attack&0 - Triggered by any melee attack, targeting the attack's target.
  &cRanged-Attack&0 - By any ranged attack, targeting the attack's target.
+ &cRespawn&0 - Triggered after the character respawns from death.
+ &cResurrect&0 - Triggered after the character is resurrected.
  &cWeapon-Type&0 - Triggered by any &yblunt&0, &ysharp&0, or &ymagic&0 attack,
    targeting the attack's target.
 

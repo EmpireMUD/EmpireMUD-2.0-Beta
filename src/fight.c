@@ -1261,8 +1261,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// somebody saaaaaaave meeeeeeeee
 	if (AFF_FLAGGED(ch, AFF_AUTO_RESURRECT)) {
-		affects_from_char_by_aff_flag(ch, AFF_AUTO_RESURRECT, FALSE);
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_AUTO_RESURRECT);	// in case of mobs
+		remove_first_aff_flag_from_char(ch, AFF_AUTO_RESURRECT, FALSE);
 		set_health(ch, GET_MAX_HEALTH(ch) / 4);
 		if (!IS_VAMPIRE(ch)) {
 			set_blood(ch, GET_MAX_BLOOD(ch));
@@ -1275,6 +1274,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 		msg_to_char(ch, "You come back to life and leap back to your feet!\r\n");
 		act("$n suddenly comes back to life and leaps to $s feet!", FALSE, ch, NULL, NULL, TO_ROOM);
+		run_ability_hooks(ch, AHOOK_RESURRECT, 0, 0, ch, NULL, NULL, NULL);
 		return NULL;
 	}
 	
@@ -1755,6 +1755,8 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 		gain_ability_exp(rez_by, ability, exp);
 		run_ability_hooks(rez_by, AHOOK_ABILITY, ability, get_ability_level(rez_by, ability), ch, NULL, NULL, NULL);
 	}
+	
+	run_ability_hooks(ch, AHOOK_RESURRECT, 0, 0, rez_by, NULL, NULL, NULL);
 }
 
 
@@ -3238,18 +3240,9 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		
 	dam = reduce_damage_from_skills(dam, victim, ch, damtype);
 	
-	// lethal damage?? check Master Survivalist
-	if ((ch != victim) && dam >= GET_HEALTH(victim) && !IS_NPC(victim) && AWAKE(victim) && has_ability(victim, ABIL_MASTER_SURVIVALIST)) {
-		if (!number(0, 2)) {
-			msg_to_char(victim, "You dive out of the way at the last second!\r\n");
-			act("$n dives out of the way at the last second!", FALSE, victim, NULL, NULL, TO_ROOM);
-			dam = 0;
-			// wait is based on % of max dexterity, where it's longest when you have 1 dex and shortest at max
-			GET_WAIT_STATE(victim) = (3 RL_SEC * (1.0 - ((double) GET_DEXTERITY(victim) / (att_max(victim) + 1))));
-		}
-		
-		gain_ability_exp(victim, ABIL_MASTER_SURVIVALIST, 33.4);
-		run_ability_hooks(victim, AHOOK_ABILITY, ABIL_MASTER_SURVIVALIST, get_ability_level(victim, ABIL_MASTER_SURVIVALIST), victim, NULL, NULL, NULL);
+	// lethal damage?? check abilities like Master Survivalist
+	if ((ch != victim) && dam >= GET_HEALTH(victim)) {
+		run_ability_hooks(victim, AHOOK_DYING, 0, 0, ch, NULL, NULL, NULL);
 	}
 
 	/* Minimum damage of 0.. can't do negative */

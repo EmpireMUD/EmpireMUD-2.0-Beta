@@ -739,6 +739,9 @@ typedef struct vehicle_data vehicle_data;
 #define AHOOK_MELEE_ATTACK		BIT(5)	// after any melee attack
 #define AHOOK_RANGED_ATTACK		BIT(6)	// after any ranged attack
 #define AHOOK_WEAPON_TYPE		BIT(7)	// blunt/sharp/etc
+#define AHOOK_DYING				BIT(8)	// right before death
+#define AHOOK_RESPAWN			BIT(9)	// character respawned
+#define AHOOK_RESURRECT			BIT(10)	// character was resurrected
 
 
 // ABIL_LIMIT_x: Limitations when trying to use an ability
