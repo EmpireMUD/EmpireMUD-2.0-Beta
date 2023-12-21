@@ -586,7 +586,7 @@ RESCUE
 
 Rescue (Battle ability)
 
-Usage:  rescue [victim]
+Usage:  rescue <person>
 Cooldown:  6 seconds
 Cost:  20 move
 
@@ -595,10 +595,7 @@ of your poor friend who is being pummeled. You can only 'turn' one enemy for
 each rescue attempt. This is very useful when working in hunting parties, of
 course.
 
-Typing "rescue" with no argument will attempt to rescue the first group member
-who needs it.
-
-Gain experience when you successfully rescue someone.
+Gain experience when you rescue someone.
 
 Example:
   > rescue Ranger
