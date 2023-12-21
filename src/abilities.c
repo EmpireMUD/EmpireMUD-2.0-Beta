@@ -161,12 +161,13 @@ struct {
 * @param int sizeof_outbuf Max size of the buffer.
 */
 void show_ability_details(char_data *ch, ability_data *abil, bool dependent, char *outbuf, int sizeof_outbuf) {
-	bool any, same, has_param_details = FALSE;
+	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	int count, iter;
 	size_t size, l_size;
 	ability_data *abiter, *next_abil;
+	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
 	struct ability_data_list *adl;
 	struct apply_data *apply;
@@ -367,6 +368,63 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	if (*lbuf && str_cmp(lbuf, "none")) {
 		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Notes: %s\r\n", lbuf);
+	}
+
+	// crafting ability?
+	count = 0;
+	more_learned = FALSE;
+	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
+		if (GET_CRAFT_ABILITY(craft) != ABIL_VNUM(abil)) {
+			continue;	// wrong ability
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+			more_learned = TRUE;
+			continue;	// has not learned
+		}
+		
+		// build craft display:
+		snprintf(sbuf, sizeof(sbuf), "%s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
+		
+		// needs header?
+		if (count == 0) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes:\r\n");
+		}
+		
+		// increment now
+		++count;
+		
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			if (size + strlen(sbuf) + 3 < sizeof_outbuf) {
+				size += snprintf(outbuf + size, sizeof_outbuf - size, "%s\r\n", sbuf);
+			}
+			else {
+				break;	// overflow?
+			}
+		}
+		else {	// not screenreader
+			snprintf(lbuf, sizeof(lbuf), " %-35.35s%s", sbuf, (count % 2 ? "" : "\r\n"));
+			if (size + strlen(lbuf) + 3 < sizeof_outbuf) {
+				strcat(outbuf, lbuf);
+				size += strlen(lbuf);
+			}
+			else {
+				break;	// overflow?
+			}
+		}
+	}
+	if (count > 0 && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");	// missing crlf
+	}
+	if (more_learned) {
+		if (count > 0) {
+			msg_to_char(ch, " (with more to learn)\r\n");
+		}
+		else {
+			msg_to_char(ch, "Makes recipes you have not learned.\r\n");
+		}
 	}
 /*
 	More things we could show (from vstat ability):
