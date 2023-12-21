@@ -2414,6 +2414,7 @@ ACMD(do_affects) {
 			send_config_msg(ch, "no_person");
 		}
 		else if (IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "Affects on %s:\r\n", PERS(vict, ch, FALSE));
 			show_character_affects(vict, ch);
 		}
 		else {
