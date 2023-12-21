@@ -954,6 +954,10 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		// sent its own error message
 		return FALSE;
 	}
+	if (ABIL_IS_SYNERGY(abil) && GET_CLASS_ROLE(ch) == ROLE_SOLO && !check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
+		return FALSE;
+	}
 	if (ABILITY_FLAGGED(abil, ABILF_NOT_IN_DARK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark %s here to do that.\r\n", IS_OUTDOORS(ch) ? "out" : "in");
 		return FALSE;
