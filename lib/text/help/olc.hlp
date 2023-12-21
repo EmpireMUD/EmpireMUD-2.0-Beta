@@ -1298,6 +1298,12 @@ ability as their parent, causing them to trigger whenever the parent ability
 goes off. If so, they will be shown on the "ability info" for the parent, like
 all abilities with hooks.
 
+Abilities can have more than one type, so you only need to use a 2nd ability
+with a parent relationship if the two effects are incompatible -- if they have
+different targets, different durations, or different limitations. If those
+things are the same, for example an ability that damages someone and gives them
+a debuff, it can be accomplished with one ability instead of two.
+
 Possible uses of parent-child abilities:
 - More complex abilities (debuff you, buff me)
 - Proc for more damage with a 2nd ability at higher difficulty
