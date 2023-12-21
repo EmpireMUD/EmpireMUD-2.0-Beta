@@ -460,8 +460,8 @@ const char *ability_limitations[] = {
 	"disarmable target",
 	"target has mana",
 	"using any poison",
-	"target has any DoT",
-	"target has DoT type",	// 35
+	"target has DoT type",
+	"target has any DoT",	// 35
 	"\n"
 };
 
