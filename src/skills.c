@@ -2396,8 +2396,8 @@ ACMD(do_skills) {
 	}
 	else if (abil) {
 		// ability details
-		void show_ability_details(char_data *ch, ability_data *abil, bool dependent, char *outbuf, int sizeof_outbuf);
-		show_ability_details(ch, abil, FALSE, outbuf, sizeof(outbuf));
+		void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf);
+		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);
 		}

@@ -156,11 +156,11 @@ struct {
 *
 * @param char_data *ch The player viewing the ability.
 * @param ability_data *abil Which ability.
-* @param bool dependent FALSE for the first ability, TRUE down the chain.
+* @param ability_data *parent Which ability chained to this one, if any (usually NULL).
 * @param char *outbuf Buffer to save to.
 * @param int sizeof_outbuf Max size of the buffer.
 */
-void show_ability_details(char_data *ch, ability_data *abil, bool dependent, char *outbuf, int sizeof_outbuf) {
+void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf) {
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
@@ -197,7 +197,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 	}
 	
-	if (ABIL_ASSIGNED_SKILL(abil) && !dependent) {
+	if (ABIL_ASSIGNED_SKILL(abil) && !parent) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
 			size += snprintf(outbuf + size, sizeof_outbuf - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
@@ -222,7 +222,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	}
 	
 	// assigned roles/synergies
-	if (!dependent) {
+	if (!parent) {
 		count = 0;
 		l_size = 0;
 		*lbuf = '\0';
@@ -286,14 +286,16 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	}
 	
 	// Cooldown?
-	if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
-	}
-	else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
-	}
-	else if (ABIL_COOLDOWN_SECS(abil) > 0) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	if (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent)) {
+		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
+		}
+		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
+		}
+		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		}
 	}
 	
 	// data, if parameterized
@@ -355,7 +357,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 	}
 	
 	// show duration?
-	if (*lbuf) {
+	if (*lbuf && (!parent || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent) || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent))) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
 	}
 	
@@ -504,7 +506,7 @@ void show_ability_details(char_data *ch, ability_data *abil, bool dependent, cha
 		}
 		
 		// seems ok
-		show_ability_details(ch, abiter, TRUE, lbuf, sizeof(lbuf));
+		show_ability_info(ch, abiter, abil, lbuf, sizeof(lbuf));
 		if (*lbuf && size + strlen(lbuf) < sizeof_outbuf) {
 			has_param_details = TRUE;
 			strcat(outbuf, lbuf);
