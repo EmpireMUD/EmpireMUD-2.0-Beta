@@ -564,6 +564,9 @@ Action types:
  &cremove magical DoTs&0
  &cremove fire DoTs&0
  &cremove poison DoTs&0
+ &crescue all&0 - People hitting the target will hit the actor instead.
+ &crescue one&0 - One person hitting the target will hit the actor instead.
+ &ctaunt&0 - Target will switch combat focus to the actor.
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
@@ -1119,6 +1122,7 @@ Limitation types:
  &cguest permission at target&0 - Has guest (or better) access at the target location.
  &chave an empire&0 - Must be a member of any empire.
  &cin a city&0 - Must be in any city (tile must also be claimed).
+ &cin role&0 - Actor must be in a certain role.
  &cindoors&0 - Must be used indoors (including inside buildings on the map).
  &citem type <TYPE>&0 - Obj target must be a specific type.
  &cmember permission at target&0 - Has member access at the target location.
@@ -1133,6 +1137,7 @@ Limitation types:
  &coutdoors&0 - Must be used outdoors (including some adventure rooms).
  &cown the tile&0 - Your empire must own the location.
  &cpaintable building&0 - Must be used on a building the player can paint.
+ &ctarget being attacked&0 - Target must have someone hitting them.
  &ctarget has any DoT&0 - Target must be afflicted by a DoT.
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).

@@ -577,6 +577,11 @@ char *ability_data_display(struct ability_data_list *adl) {
 					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
+				case ABLIM_ROLE: {
+					sprinttype(adl->misc, class_role, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
 				case ABLIM_NOTHING:
 				default: {
 					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
@@ -2599,6 +2604,57 @@ DO_ABIL(abil_remove_all_dots) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_rescue_all) {
+	char_data *attacker, *next;
+	bool first = TRUE;
+	
+	if (vict && vict != ch) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(vict)), attacker, next, next_in_room) {
+			if (FIGHTING(attacker) == vict && can_fight(ch, attacker)) {
+				perform_rescue(ch, vict, attacker, first ? RESCUE_RESCUE : RESCUE_NO_MSG);
+				first = FALSE;
+				data->success = TRUE;
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_rescue_one) {
+	char_data *attacker = NULL;
+	
+	if (vict && vict != ch) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict)), attacker, next_in_room) {
+			if (FIGHTING(attacker) == vict) {
+				break;	// found!
+			}
+		}
+		
+		if (attacker && can_fight(ch, attacker)) {
+			perform_rescue(ch, vict, attacker, RESCUE_RESCUE);
+			data->success = TRUE;
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_taunt) {
+	if (vict && can_fight(ch, vict) && FIGHTING(vict) != ch) {
+		if (FIGHTING(vict)) {
+			perform_rescue(ch, FIGHTING(vict), vict, RESCUE_FOCUS);
+			data->success = TRUE;
+		}
+		else if (AWAKE(vict)) {
+			engage_combat(vict, vict, FALSE);
+			data->success = TRUE;
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
@@ -2680,9 +2736,10 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	// some types just require any match
 	bool want_dot = FALSE, have_dot = FALSE;
 	bool want_item_type = FALSE, have_item_type = FALSE;
+	bool want_role = FALSE, have_role = FALSE;
 	bool want_room_permission = FALSE, have_room_permission = FALSE;
 	bool want_weapon = FALSE, have_weapon = FALSE;
-	char dot_error[256], item_type_error[256], room_permission_error[256], weapon_error[256];
+	char dot_error[256], item_type_error[256], role_error[256], room_permission_error[256], weapon_error[256];
 	
 	if (!ch || !abil) {
 		return FALSE;	// no work
@@ -2692,6 +2749,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	*dot_error = '\0';
 	*weapon_error = '\0';
 	*item_type_error = '\0';
+	*role_error = '\0';
 	*room_permission_error = '\0';
 	
 	// any_room is the target room IF it targets a room, or else ch's room
@@ -3058,6 +3116,39 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_TARGET_BEING_ATTACKED: {
+				char_data *ch_iter;
+				bool any = FALSE;
+				
+				if (vict) {
+					DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+						if (FIGHTING(ch_iter) == vict) {
+							any = TRUE;
+							break;
+						}
+					}
+					
+					if (!any) {
+						if (ch == vict) {
+							msg_to_char(ch, "Nobody is attacking you.\r\n");
+						}
+						else {
+							act("Nothing is attacking $M.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_IN_ROLE: {
+				want_role = TRUE;
+				if (GET_CLASS_ROLE(ch) == adl->misc || GET_CLASS_ROLE(ch) == ROLE_SOLO) {
+					have_role = TRUE;
+				}
+				else {
+					strcpy(role_error, class_role[adl->misc]);
+				}
+				break;
+			}
 		}
 	}
 	
@@ -3087,6 +3178,10 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			act("$N is not afflicted by a $t damage-over-time effect.", FALSE, ch, dot_error, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 			return FALSE;
 		}
+	}
+	else if (want_role && !have_role) {
+		msg_to_char(ch, "You must be in the %s role to do that.\r\n", *role_error ? role_error : "UNKNOWN");
+		return FALSE;
 	}
 	
 	// otherwise:
@@ -4871,6 +4966,18 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_REMOVE_DRUNK: {
 				call_do_abil(abil_remove_drunk);
+				break;
+			}
+			case ABIL_ACTION_TAUNT: {
+				call_do_abil(abil_taunt);
+				break;
+			}
+			case ABIL_ACTION_RESCUE_ONE: {
+				call_do_abil(abil_rescue_one);
+				break;
+			}
+			case ABIL_ACTION_RESCUE_ALL: {
+				call_do_abil(abil_rescue_all);
 				break;
 			}
 		}
@@ -8579,6 +8686,13 @@ OLC_MODULE(abiledit_data) {
 							case ABLIM_DAMAGE_TYPE: {
 								if ((misc = search_block(val_b, damage_types, FALSE)) == NOTHING) {
 									msg_to_char(ch, "Invalid damage type '%s'. See HELP DAMAGE TYPES.\r\n", val_b);
+									return;
+								}
+								break;
+							}
+							case ABLIM_ROLE: {
+								if ((misc = search_block(val_b, class_role, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid role '%s'. See HELP ROLE.\r\n", val_b);
 									return;
 								}
 								break;

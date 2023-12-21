@@ -653,6 +653,9 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_REMOVE_ALL_DOTS  12	// removes all types or DoT effects
 #define ABIL_ACTION_REMOVE_DEBUFFS  13	// removes debuffs
 #define ABIL_ACTION_REMOVE_DRUNK  14	// removes drunk effects
+#define ABIL_ACTION_TAUNT  15	// taunts the target to hit you
+#define ABIL_ACTION_RESCUE_ONE  16	// rescues the target
+#define ABIL_ACTION_RESCUE_ALL  17	// rescues the target
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -775,6 +778,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_USING_ANY_POISON			33	// must have poison available
 #define ABIL_LIMIT_TARGET_HAS_DOT_TYPE		34	// must be afflicted by a specific DoT type
 #define ABIL_LIMIT_TARGET_HAS_ANY_DOT		35	// must be afflicted by a DoT
+#define ABIL_LIMIT_TARGET_BEING_ATTACKED	36	// target has someone hitting them
+#define ABIL_LIMIT_IN_ROLE					37	// char must be in a certain role (or solo)
 
 
 // ABLIM_x: data needed for ability limits:
@@ -783,6 +788,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABLIM_ATTACK_TYPE	2	// requires an attack type
 #define ABLIM_WEAPON_TYPE	3	// requires an weapon type (blunt, sharp, magic)
 #define ABLIM_DAMAGE_TYPE	4	// requires a damage type (physical, magical, etc)
+#define ABLIM_ROLE			5	// requires a role
 
 
 // RUN_ABIL_x: modes for activating abilities

@@ -130,6 +130,9 @@ const char *ability_actions[] = {
 	"remove all DoTs",
 	"remove debuffs",
 	"remove drunk",
+	"taunt",	// 15
+	"rescue one",
+	"rescue all",
 	"\n"
 };
 
@@ -462,6 +465,8 @@ const char *ability_limitations[] = {
 	"using any poison",
 	"target has DoT type",
 	"target has any DoT",	// 35
+	"target being attacked",
+	"in role",
 	"\n"
 };
 
@@ -504,6 +509,8 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_USING_ANY_POISON
 	ABLIM_DAMAGE_TYPE,	// ABIL_LIMIT_TARGET_HAS_DOT_TYPE
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_ANY_DOT
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_BEING_ATTACKED
+	ABLIM_ROLE,	// ABIL_LIMIT_IN_ROLE
 };
 
 
