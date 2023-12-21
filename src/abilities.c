@@ -2435,6 +2435,41 @@ DO_ABIL(abil_action_magic_growth) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_debuffs) {
+	struct affected_type *aff, *next_aff;
+	bool any = FALSE;
+	
+	if (vict) {
+		LL_FOREACH_SAFE(vict->affected, aff, next_aff) {
+			if (aff->cast_by == CAST_BY_ID(vict)) {
+				continue; // can't cleanse penalties (things cast by self)
+			}
+			if (affect_is_beneficial(aff)) {
+				continue;	// not bad, not bad
+			}
+			
+			// bad!
+			affect_remove(vict, aff);
+			any = TRUE;
+		}
+	}
+	
+	if (any) {
+		data->success = TRUE;
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_remove_drunk) {
+	if (vict && !IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
+		gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
+		data->success = TRUE;
+	}
+}
+
+
 /**
 * Helper func for remove-dots ability actions.
 *
@@ -2446,13 +2481,19 @@ DO_ABIL(abil_action_magic_growth) {
 */
 void abil_remove_dots_by_type(char_data *ch, ability_data *abil, char_data *vict, struct ability_exec *data, int dam_type) {
 	struct over_time_effect_type *dot, *next_dot;
+	bool any = FALSE;
 	
 	if (vict) {
 		LL_FOREACH_SAFE(vict->over_time_effects, dot, next_dot) {
 			if (dam_type == NOTHING || dot->damage_type == dam_type) {
 				dot_remove(vict, dot);
+				any = TRUE;
 			}
 		}
+	}
+	
+	if (any) {
+		data->success = TRUE;
 	}
 }
 
@@ -4761,6 +4802,14 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_REMOVE_ALL_DOTS: {
 				call_do_abil(abil_remove_all_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_DEBUFFS: {
+				call_do_abil(abil_remove_debuffs);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_DRUNK: {
+				call_do_abil(abil_remove_drunk);
 				break;
 			}
 		}

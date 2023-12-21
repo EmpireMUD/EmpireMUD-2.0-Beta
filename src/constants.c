@@ -128,6 +128,8 @@ const char *ability_actions[] = {
 	"remove fire DoTs",	// 10
 	"remove poison DoTs",
 	"remove all DoTs",
+	"remove debuffs",
+	"remove drunk",
 	"\n"
 };
 

@@ -651,6 +651,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_REMOVE_FIRE_DOTS  10	// removes fire-type DoT effects
 #define ABIL_ACTION_REMOVE_POISON_DOTS  11	// removes poison-type DoT effects
 #define ABIL_ACTION_REMOVE_ALL_DOTS  12	// removes all types or DoT effects
+#define ABIL_ACTION_REMOVE_DEBUFFS  13	// removes debuffs
+#define ABIL_ACTION_REMOVE_DRUNK  14	// removes drunk effects
 
 
 // ABIL_CUSTOM_x: custom message types
