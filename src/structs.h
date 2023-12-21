@@ -542,33 +542,33 @@ typedef struct vehicle_data vehicle_data;
 //// ABILITY DEFINES /////////////////////////////////////////////////////////
 
 // ABILF_x: ability flags
-#define ABILF_VIOLENT  BIT(0)	// a. hostile ability (can't target self, etc)
-#define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
-#define ABILF_TOGGLE  BIT(2)	// c. can be toggled off by re-using (buffs)
-#define ABILF_INVISIBLE  BIT(3)	// d. act messages don't show if char can't be seen
-#define ABILF_NO_ENGAGE  BIT(4)	// e. won't cause you to enter combat
-#define ABILF_RANGED  BIT(5)	// f. allows use in ranged combat
-#define ABILF_NO_ANIMAL  BIT(6)	// g. can't be used in animal form
-#define ABILF_NO_INVULNERABLE  BIT(7)	// h. can't be used in invulnerable form
-#define ABILF_CASTER_ROLE  BIT(8)	// i. bonus if in 'caster' role
-#define ABILF_HEALER_ROLE  BIT(9)	// j. bonus if in 'healer' role
-#define ABILF_MELEE_ROLE  BIT(10)	// k. bonus if in 'melee' role
-#define ABILF_TANK_ROLE  BIT(11)	// l. bonus if in 'tank' role
-#define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
-#define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
-#define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
-#define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
-#define ABILF_NOT_IN_COMBAT  BIT(16)	// q. prevents use in combat despite min-position
-#define ABILF_ONE_AT_A_TIME  BIT(17)	// r. for some types, prevents them from being used while already active
-#define ABILF_OVER_TIME  BIT(18)	// s. takes multiple turns, like a chant or ritual
-#define ABILF_SPOKEN  BIT(19)	// t. ability is said out loud (blocked by the SILENT room affect)
-#define ABILF_REPEAT_OVER_TIME  BIT(20)	// u. self-repeats an over-time ability if it succeeds
-#define ABILF_CUMULATIVE_BUFF  BIT(21)	// v. buff stacks effect
-#define ABILF_CUMULATIVE_DURATION  BIT(22)	// w. buff stacks duration
-#define ABILF_WEAPON_HIT  BIT(23)	// x. involves a weapon hit (can poison)
-#define ABILF_DIFFICULT_ANYWAY  BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
-#define ABILF_NOT_IN_DARK  BIT(25)	// z. must be able to see
-#define ABILF_UNSCALED_PENALTY  BIT(26)	// A. negative buffs are unscaled; positive ones still scale
+#define ABILF_VIOLENT			BIT(0)	// a. hostile ability (can't target self, etc)
+#define ABILF_COUNTERSPELLABLE	BIT(1)	// b. can be counterspelled
+#define ABILF_TOGGLE			BIT(2)	// c. can be toggled off by re-using (buffs)
+#define ABILF_INVISIBLE			BIT(3)	// d. act messages don't show if char can't be seen
+#define ABILF_NO_ENGAGE			BIT(4)	// e. won't cause you to enter combat
+#define ABILF_RANGED			BIT(5)	// f. allows use in ranged combat
+#define ABILF_NO_ANIMAL			BIT(6)	// g. can't be used in animal form
+#define ABILF_NO_INVULNERABLE	BIT(7)	// h. can't be used in invulnerable form
+#define ABILF_CASTER_ROLE		BIT(8)	// i. bonus if in 'caster' role
+#define ABILF_HEALER_ROLE		BIT(9)	// j. bonus if in 'healer' role
+#define ABILF_MELEE_ROLE		BIT(10)	// k. bonus if in 'melee' role
+#define ABILF_TANK_ROLE			BIT(11)	// l. bonus if in 'tank' role
+#define ABILF_RANGED_ONLY		BIT(12)	// m. requires ranged combat
+#define ABILF_IGNORE_SUN		BIT(13)	// n. vampire ability ignores sunlight
+#define ABILF_UNSCALED_BUFF		BIT(14)	// o. buff does not scale at all (fixed values)
+#define ABILF_LIMIT_CROWD_CONTROL	BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
+#define ABILF_NOT_IN_COMBAT		BIT(16)	// q. prevents use in combat despite min-position
+#define ABILF_ONE_AT_A_TIME		BIT(17)	// r. for some types, prevents them from being used while already active
+#define ABILF_OVER_TIME			BIT(18)	// s. takes multiple turns, like a chant or ritual
+#define ABILF_SPOKEN			BIT(19)	// t. ability is said out loud (blocked by the SILENT room affect)
+#define ABILF_REPEAT_OVER_TIME	BIT(20)	// u. self-repeats an over-time ability if it succeeds
+#define ABILF_CUMULATIVE_BUFF	BIT(21)	// v. buff stacks effect
+#define ABILF_CUMULATIVE_DURATION	BIT(22)	// w. buff stacks duration
+#define ABILF_WEAPON_HIT		BIT(23)	// x. involves a weapon hit (can poison)
+#define ABILF_DIFFICULT_ANYWAY	BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
+#define ABILF_NOT_IN_DARK		BIT(25)	// z. must be able to see
+#define ABILF_UNSCALED_PENALTY	BIT(26)	// A. negative buffs are unscaled; positive ones still scale
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
