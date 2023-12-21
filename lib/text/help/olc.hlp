@@ -1130,6 +1130,7 @@ Limitation types:
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
+ &cusing any poison&0 - Player must have poison ready.
  &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
  &cwield any weapon&0 - Character is wielding any weapon and is not disarmed.
  &cwield attack type&0 - Wielding a weapon with a specific attack type. See

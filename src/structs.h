@@ -765,6 +765,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_NOT_BEING_ATTACKED		30	// no characters hitting actor
 #define ABIL_LIMIT_DISARMABLE_TARGET		31	// target must be disarmable
 #define ABIL_LIMIT_TARGET_HAS_MANA			32	// target must have a mana pool (non-caster mobs don't count)
+#define ABIL_LIMIT_USING_ANY_POISON			33	// must have poison available
 
 
 // ABLIM_x: data needed for ability limits:

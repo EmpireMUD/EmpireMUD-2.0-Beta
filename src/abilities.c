@@ -2844,6 +2844,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_USING_ANY_POISON: {
+				if (USING_POISON(ch) == NOTHING) {
+					msg_to_char(ch, "You need to be using poison.\r\n");
+					return FALSE;
+				}
+				if (!find_poison_by_vnum(ch->carrying, USING_POISON(ch))) {
+					msg_to_char(ch, "You seem to be out of poison.\r\n");
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

@@ -452,6 +452,7 @@ const char *ability_limitations[] = {
 	"not being attacked",	// 30
 	"disarmable target",
 	"target has mana",
+	"using any poison",
 	"\n"
 };
 
@@ -491,6 +492,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED
 	ABLIM_NOTHING,	// ABIL_LIMIT_DISARMABLE_TARGET
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_MANA
+	ABLIM_NOTHING,	// ABIL_LIMIT_USING_ANY_POISON
 };
 
 
