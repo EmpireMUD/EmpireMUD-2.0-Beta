@@ -2150,6 +2150,14 @@ int wordcount_ability(ability_data *abil) {
 //// ABILITY ACTIONS /////////////////////////////////////////////////////////
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_apply_poison) {
+	if (vict && (apply_poison(ch, vict) != 0 || IS_DEAD(vict) || EXTRACTED(vict))) {
+		data->success = TRUE;
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_close_portal) {
 	obj_data *obj, *reverse = NULL;
 	room_data *to_room;
@@ -4607,6 +4615,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_CLOSE_PORTAL: {
 				call_do_abil(abil_action_close_portal);
+				break;
+			}
+			case ABIL_ACTION_APPLY_POISON: {
+				call_do_abil(abil_apply_poison);
 				break;
 			}
 		}

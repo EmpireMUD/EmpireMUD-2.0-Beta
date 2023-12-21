@@ -553,9 +553,11 @@ Action types:
    messages. Uses RANGE data, defaults to normal "nearby" range.
  &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
    name in per-item messages. Uses RANGE data, default 3 if not given.
- &cmagic growth evolution&0 - Triggers this map evolution, if possible. Use
-   spec-to messages when the evolution works with $1 as the old sector name and
-   $2 as the new one.
+ &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
+   the evolution works with $1 as the old sector name and $2 as the new one.
+ &cclose portal&0 - If target is a portal, closes both sides.
+ &capply poison&0 - If using a poison, applies it to the target (separate from
+   the chance to apply when using the WEAPON-HIT flag).
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d

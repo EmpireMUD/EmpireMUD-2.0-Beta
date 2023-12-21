@@ -120,8 +120,9 @@ const char *ability_actions[] = {
 	"detect players around",
 	"detect adventures around",
 	"devastate area",
-	"magic growth evolution",
+	"magic growth",	// 5
 	"close portal",
+	"apply poison",
 	"\n"
 };
 

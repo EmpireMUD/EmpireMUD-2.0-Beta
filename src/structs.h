@@ -645,6 +645,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_DEVASTATE_AREA  4	// collects a chop or crop resource within 3 tiles
 #define ABIL_ACTION_MAGIC_GROWTH  5	// triggers a magic growth evolution
 #define ABIL_ACTION_CLOSE_PORTAL  6	// if item target is portal, closes it
+#define ABIL_ACTION_APPLY_POISON  7	// applies your current poison to the target
 
 
 // ABIL_CUSTOM_x: custom message types
