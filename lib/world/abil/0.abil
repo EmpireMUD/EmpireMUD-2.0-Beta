@@ -236,8 +236,29 @@ T k 1
 S
 #22
 Dispel~
-0 -1 1.00 0 0 0
-T m 0
+t -1 1.00 0 0 0
+C
+dispel 7 be 2 30 0 2046 9 0 5 0
+D 64 9 0
+D 64 10 0
+D 16 34 1
+D 16 34 2
+M
+0
+You shout 'KA!' and dispel your afflictions.~
+M
+1
+$n shouts 'KA!' and dispels $s afflictions.~
+M
+2
+You shout 'KA!' and dispel $N's afflictions.~
+M
+3
+$n shouts 'KA!' and dispels your afflictions.~
+M
+4
+$n shouts 'KA!' and dispels $N's afflictions.~
+T s 1
 S
 #23
 Majesty~
@@ -619,7 +640,8 @@ S
 #77
 Resist Poison~
 0 -1 1.00 0 0 0
-T m 0
+D 1 86 0
+T e 1
 S
 #78
 Poison Immunity~

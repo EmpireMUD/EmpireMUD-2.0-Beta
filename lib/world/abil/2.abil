@@ -187,8 +187,24 @@ T m 0
 S
 #229
 Bloodsweat~
-0 -1 1.00 0 0 0
-T m 0
+d -1 1.00 0 0 0
+C
+bloodsweat 4 beg 3 20 0 2047 30 0 1 0
+D 64 11 0
+D 64 14 0
+M
+0
+You sweat blood through your pores, and poison with it!~
+M
+1
+$n begins sweating blood.~
+M
+8
+You're not even poisoned!~
+M
+9
+*~
+T s 1
 S
 #230
 Improved Reflexes~
