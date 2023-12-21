@@ -3749,12 +3749,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// exp gain
 		if (combat_round) {
 			if (!IS_NPC(ch)) {
-				if (amd && ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) {
-					if (can_gain_skill && can_gain_exp_from(ch, victim)) {
-						gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
-					}
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_WEAPON_PROFICIENCY, get_ability_level(ch, ABIL_WEAPON_PROFICIENCY), victim, NULL, NULL, NULL);
-				}
 				if (can_gain_skill && can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_FINESSE, 2);
 				}
@@ -3762,12 +3756,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		}
 		if (has_ability(ch, ABIL_FINESSE)) {
 			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FINESSE, get_ability_level(ch, ABIL_FINESSE), victim, NULL, NULL, NULL);
-		}
-		if (result >= 0 && combat_round && !IS_NPC(victim)) {
-			if (can_gain_skill && can_gain_exp_from(victim, ch)) {
-				gain_ability_exp(victim, ABIL_EVASION, 5);
-			}
-			run_ability_hooks(victim, AHOOK_ABILITY, ABIL_EVASION, get_ability_level(victim, ABIL_EVASION), ch, NULL, NULL, NULL);
 		}
 		
 		/* check if the victim has a hitprcnt trigger */
