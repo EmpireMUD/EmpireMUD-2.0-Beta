@@ -1466,7 +1466,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main entry
-		sprintf(buf, "   &c%s&0 (%s) ", get_generic_name_by_vnum(aff->type), lbuf);
+		sprintf(buf, "   \t%c%s\t0 (%s) ", affect_is_beneficial(aff) ? 'c' : 'r', get_generic_name_by_vnum(aff->type), lbuf);
 
 		if (aff->modifier) {
 			sprintf(buf2, "- %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1488,7 +1488,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
 		
 		// main body
-		msg_to_char(to, "   &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 }
 
