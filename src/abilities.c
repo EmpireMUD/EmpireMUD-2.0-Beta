@@ -280,6 +280,21 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 				strcpy(lbuf, ptr);
 				free(ptr);
 			}
+			if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
+				// replace action with actual actions
+				*sbuf = '\0';
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (adl->type == ADL_ACTION) {
+						sprintf(sbuf + strlen(sbuf), "%s%s", (*sbuf ? ", " : ""), ability_actions[adl->vnum]);
+					}
+				}
+				
+				if (*sbuf) {
+					ptr = str_replace("action", sbuf, lbuf);
+					strcpy(lbuf, ptr);
+					free(ptr);
+				}
+			}
 			has_param_details = TRUE;
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 		}
