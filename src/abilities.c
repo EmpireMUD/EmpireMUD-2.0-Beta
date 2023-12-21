@@ -4492,7 +4492,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check if should be in combat
 	if ((!data->stop && data->should_charge_cost) || data->engage_anyway) {
-		if (vict && vict != ch && !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
+		if (vict && vict != ch && (!data->success || !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE)) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
 			// auto-assist if we used an ability on someone who is fighting
 			if (!ABIL_IS_VIOLENT(abil) && FIGHTING(vict) && !FIGHTING(ch)) {
 				engage_combat(ch, FIGHTING(vict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);

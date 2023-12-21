@@ -993,7 +993,7 @@ The following ability flags are available:
  &cCOUNTERSPELLABLE&0 - Can trigger an opponent's counterspell (used for magic).
  &cTOGGLE&0 - Using this ability on twice  yourself will end its affect (for free).
  &cINVISIBLE&0 - Shows no message if the actor can't be seen, instead of 'Someone'.
- &c!ENGAGE&0 - Will not automatically add you to combat when used.
+ &c!ENGAGE&0 - Will not automatically add you to combat when used, if it succeeds.
  &cRANGED&0 - Can be used during ranged combat without giving a melee error.
  &c!ANIMAL&0 - Cannot be used in animal form.
  &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
