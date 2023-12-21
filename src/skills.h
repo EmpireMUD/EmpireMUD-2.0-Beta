@@ -135,7 +135,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
 #define ABIL_HIDE  20
-#define ABIL_DISPEL  22
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
 #define ABIL_SNEAK  29
