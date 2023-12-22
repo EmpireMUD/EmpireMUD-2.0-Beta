@@ -9,7 +9,7 @@ S
 Fly~
 cd -1 1.00 0 am 0
 C
-fly 8 bg 2 50 0 -1 0 0 5 0
+fly 8 bg 2 50 0.00 -1 0 0 5 0
 D 1 40 0
 D 2 0 0
 M
@@ -38,7 +38,7 @@ S
 Backstab~
 agkx -1 5.00 0 0 0
 C
-backstab 7 bf 1 25 0 2038 9 1 2 2
+backstab 7 bf 1 25 0.00 2038 9 1 2 2
 D 16 28 4
 D 16 30 0
 M
@@ -67,7 +67,7 @@ S
 Ready Blood Weapons~
 0 -1 1.00 0 bcn 0
 C
-unknown 5 0 3 40 0 -1 0 0 2 0
+unknown 5 0 3 40 0.00 -1 0 0 2 0
 D 4 1101 0
 D 4 1102 0
 D 4 1103 0
@@ -107,7 +107,7 @@ S
 Darkness~
 c -1 1.00 0 0 0
 C
-darkness 8 o 1 15 0 2036 15 0 1 0
+darkness 8 o 1 15 0.00 2036 15 0 1 0
 D 1 84 0
 M
 0
@@ -151,7 +151,7 @@ A
 A
 24 1
 C
-eartharmor 5 be 2 10 1 -1 0 8 5 0
+eartharmor 5 be 2 10 1.00 -1 0 8 5 0
 M
 0
 You form a thick layer of mana over your body, and it hardens to solid earth!~
@@ -185,7 +185,7 @@ A
 A
 22 -1
 C
-terrify 7 bf 1 10 1 2035 15 4 2 2
+terrify 7 bf 1 10 1.00 2035 15 4 2 2
 M
 2
 Shadows creep up around you and then strike out at $N!~
@@ -213,7 +213,7 @@ S
 Search~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 0 0 0 -1 0 0 0 3
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 49 0
 T e 1
 S
@@ -238,7 +238,7 @@ S
 Dispel~
 t -1 1.00 0 0 0
 C
-dispel 7 be 2 30 0 2046 9 0 5 0
+dispel 7 be 2 30 0.00 2046 9 0 5 0
 D 64 9 0
 D 64 10 0
 D 16 34 1
@@ -266,7 +266,7 @@ cd -1 1.00 0 ah 0
 A
 26 3
 C
-majesty 5 bg 3 0 0 -1 0 0 1 0
+majesty 5 bg 3 0 0.00 -1 0 0 1 0
 M
 0
 You create a sense of supernatural majesty about yourself.~
@@ -304,7 +304,7 @@ S
 Summon Thug~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 1 50 0 2031 30 0 1 2
+unknown 8 0 1 50 0.00 2031 30 0 1 2
 D 8 230 0
 M
 2
@@ -340,7 +340,7 @@ S
 Soulmask~
 cd -1 1.00 0 ag 0
 C
-soulmask 5 bg 3 0 0 -1 0 0 1 0
+soulmask 5 bg 3 0 0.00 -1 0 0 1 0
 M
 0
 You conceal your magical aura!~
@@ -359,7 +359,7 @@ cd -1 1.00 0 abc 0
 A
 26 3
 C
-alacrity 5 bg 3 10 0 -1 0 0 1 0
+alacrity 5 bg 3 10 0.00 -1 0 0 1 0
 M
 0
 You focus your blood into your lithe muscles...~
@@ -376,7 +376,7 @@ S
 Summon Animals~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0 2028 30 4 5 2
+unknown 8 0 2 10 0.00 2028 30 4 5 2
 D 8 530 0
 D 8 531 0
 D 8 532 0
@@ -411,7 +411,7 @@ S
 Summon Humans~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 3 10 0 2027 60 4 1 2
+unknown 8 0 3 10 0.00 2027 60 4 1 2
 D 8 9029 0
 D 8 9030 0
 D 8 9031 0
@@ -455,7 +455,7 @@ S
 Critical Backstab~
 aky -1 4.00 0 0 0
 C
-unknown 7 bfh 0 0 0 -1 0 1 0 4
+unknown 7 bfh 0 0 0.00 -1 0 1 0 4
 D 256 3 0
 H 1 3 100.00 0
 M
@@ -572,7 +572,7 @@ S
 Nightsight~
 cd -1 1.00 0 ag 0
 C
-nightsight 5 bg 0 0 0 -1 0 0 1 0
+nightsight 5 bg 0 0 0.00 -1 0 0 1 0
 D 1 23 0
 M
 0
@@ -596,7 +596,7 @@ S
 #70
 Find Herbs~
 0 -1 1.00 0 0 0
-T m 0
+T w 1
 S
 #71
 Huntsman~
@@ -737,7 +737,7 @@ S
 Rescue~
 0 -1 1.00 0 0 0
 C
-rescue 7 b 1 20 0 2010 6 0 2 0
+rescue 7 b 1 20 0.00 2010 6 0 2 0
 D 64 16 0
 D 16 36 0
 M
@@ -761,7 +761,7 @@ S
 Disarm~
 a -1 1.00 h 0 0
 C
-disarm 7 bfh 1 15 0 2008 30 0 2 3
+disarm 7 bfh 1 15 0.00 2008 30 0 2 3
 D 16 31 0
 M
 2
@@ -798,7 +798,7 @@ S
 Kick~
 ak -1 1.00 0 0 0
 C
-kick 7 bf 1 10 0 2011 6 1 2 1
+kick 7 bf 1 10 0.00 2011 6 1 2 1
 T c 1
 X+ 4 54
 S
@@ -806,7 +806,7 @@ S
 Bash~
 agkpx -1 1.00 hE 0 0
 C
-bash 7 bf 1 15 0 2012 9 0 2 1
+bash 7 bf 1 15 0.00 2012 9 0 2 1
 D 16 27 0
 T c 1
 T b 1
@@ -820,7 +820,7 @@ S
 Cut Deep~
 akx -1 1.00 h 0 0
 C
-unknown 7 bfh 0 0 0 -1 0 0 0 0
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
 H 128 1 10.00 0
 M
 2

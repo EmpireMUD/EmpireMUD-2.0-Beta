@@ -23,7 +23,8 @@ S
 #104
 Fleet~
 0 -1 1.00 0 0 0
-T m 0
+D 1 91 0
+T e 1
 S
 #105
 Finesse~
@@ -34,7 +35,7 @@ S
 Stunning Blow~
 av -1 1.00 hE 0 0
 C
-unknown 7 bfh 0 0 0 -1 0 0 0 0
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
 H 128 0 10.00 0
 M
 2
@@ -73,7 +74,7 @@ A
 A
 8 -1
 C
-weaken 0 bf 3 50 0 2043 75 0 2 0
+weaken 0 bf 3 50 0.00 2043 75 0 2 0
 M
 2
 You spread your dead blood on $N...~
@@ -127,7 +128,7 @@ S
 Cleanse~
 0 -1 1.00 0 0 0
 C
-cleanse 7 be 2 30 0 2022 9 0 5 0
+cleanse 7 be 2 30 0.00 2022 9 0 5 0
 D 64 13 0
 D 64 8 0
 D 64 11 0
@@ -168,7 +169,7 @@ S
 Ready Fireball~
 0 -1 1.00 0 bcn 0
 C
-unknown 5 0 2 30 0 -1 0 0 3 0
+unknown 5 0 2 30 0.00 -1 0 0 3 0
 D 4 1105 0
 T g 1
 S
@@ -176,7 +177,7 @@ S
 Lightningbolt~
 abi -1 1.00 o 0 0
 C
-lightningbolt 7 bf 2 10 3 2023 9 8 3 0
+lightningbolt 7 bf 2 10 3.00 2023 9 8 3 0
 T c 8
 T d 2
 X+ 1 3019
@@ -189,7 +190,7 @@ S
 Hasten~
 d -1 1.00 0 abc 0
 C
-hasten 5 be 2 15 0 -1 0 0 5 0
+hasten 5 be 2 15 0.00 -1 0 0 5 0
 M
 0
 You concentrate and veins of red mana streak down your skin.~
@@ -215,7 +216,7 @@ S
 Counterspell~
 dr -1 1.00 0 0 0
 C
-counterspell 7 bg 2 15 0 -1 0 0 3 0
+counterspell 7 bg 2 15 0.00 -1 0 0 3 0
 M
 0
 You ready a counterspell.~
@@ -234,7 +235,7 @@ abfop -1 1.00 o 0 0
 A
 2 -1
 C
-entangle 7 bf 2 20 0 2025 30 0 3 0
+entangle 7 bf 2 20 0.00 2025 30 0 3 0
 M
 2
 You shoot out vines of green mana, which entangle $N!~
@@ -263,7 +264,7 @@ S
 Familiar~
 0 -1 1.00 0 o 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 500 0
 D 8 501 0
 D 8 502 0
@@ -290,7 +291,7 @@ S
 Skybrand~
 abi -1 1.00 o 0 0
 C
-skybrand 7 bf 2 13 1 2024 6 8 1 0
+skybrand 7 bf 2 13 1.00 2024 6 8 1 0
 M
 5
 You can't seem to mark $N with the skybrand!~
@@ -320,7 +321,7 @@ S
 Chant of Nature~
 stu -1 1.00 0 0 0
 C
-chant 8 o 2 0 0 -1 0 0 5 0
+chant 8 o 2 0 0.00 -1 0 0 5 0
 D 16 12 0
 D 64 5 0
 M
@@ -392,7 +393,7 @@ S
 Heavy Bash~
 aky -1 1.00 0 0 0
 C
-unknown 7 bfh 0 0 0 -1 0 1 0 3
+unknown 7 bfh 0 0 0.00 -1 0 1 0 3
 D 256 97 0
 H 1 97 100.00 0
 M
@@ -422,7 +423,7 @@ S
 Bodyguard~
 0 -1 1.00 0 ho 0
 C
-unknown 8 0 1 25 0 2030 0 0 1 0
+unknown 8 0 1 25 0.00 2030 0 0 1 0
 D 8 205 0
 T h 0
 S
@@ -430,7 +431,7 @@ S
 Pickpocket~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 0 0 0 -1 0 0 0 1
+unknown 8 0 0 0 0.00 -1 0 0 0 1
 D 1 33 0
 T e 1
 S
@@ -455,7 +456,7 @@ S
 Escape~
 sz -1 1.00 0 0 0
 C
-escape 8 qv 1 10 0 -1 0 0 8 0
+escape 8 qv 1 10 0.00 -1 0 0 8 0
 D 16 9 0
 D 128 1 0
 M
@@ -499,7 +500,9 @@ S
 #148
 Concealment~
 0 -1 1.00 0 0 0
-T m 0
+D 1 89 0
+D 1 90 0
+T e 1
 S
 #149
 Secret Cache~
@@ -522,7 +525,7 @@ S
 Cloak of Darkness~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 0 0 0 -1 0 0 0 3
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 25 0
 T e 1
 S
@@ -530,7 +533,7 @@ S
 Shadowstep~
 s -1 1.00 0 0 0
 C
-shadowstep 8 dh 1 50 0 2037 60 0 1 0
+shadowstep 8 dh 1 50 0.00 2037 60 0 1 0
 D 2 0 0
 D 128 7 0
 D 16 16 0
@@ -609,7 +612,7 @@ S
 Blind~
 a -1 1.00 h 0 0
 C
-blind 7 bf 1 15 0 2040 10 0 2 2
+blind 7 bf 1 15 0.00 2040 10 0 2 2
 M
 2
 You toss a handful of sand into $N's eyes!~
@@ -638,7 +641,7 @@ S
 Sap~
 aekpq -1 1.00 hE 0 0
 C
-sap 8 b 1 15 0 2041 9 0 1 2
+sap 8 b 1 15 0.00 2041 9 0 1 2
 M
 2
 You sap $N in the back of the head.~
@@ -672,7 +675,7 @@ S
 Poisons~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 0 0 0 -1 0 0 0 3
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 34 0
 T a 1
 T e 0
@@ -688,7 +691,7 @@ S
 Prick~
 a -1 1.00 C 0 0
 C
-prick 7 bfh 1 10 0 2042 9 0 2 0
+prick 7 bfh 1 10 0.00 2042 9 0 2 0
 D 16 33 0
 D 64 7 0
 M
@@ -722,7 +725,7 @@ st -1 0.68 0 0 0
 A
 19 1
 C
-ritual 8 bg 2 5 0 -1 0 0 5 0
+ritual 8 bg 2 5 0.00 -1 0 0 5 0
 M
 0
 You whisper your burdens into the air...~
@@ -758,7 +761,7 @@ A
 A
 24 1
 C
-manashield 5 beg 2 25 0 -1 0 8 5 0
+manashield 5 beg 2 25 0.00 -1 0 8 5 0
 M
 23
 You wipe the symbols off your arm and cancel your mana shield.~
@@ -782,7 +785,7 @@ Foresight~
 A
 18 1
 C
-foresight 5 be 2 30 0 -1 0 8 5 0
+foresight 5 be 2 30 0.00 -1 0 8 5 0
 M
 0
 You pull out a grease pencil and mark each of your eyelids with an X...~
@@ -812,7 +815,7 @@ S
 Summon Swift~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0 2032 60 0 5 2
+unknown 8 0 2 10 0.00 2032 60 0 5 2
 D 8 400 0
 D 8 401 0
 D 8 402 0
@@ -852,7 +855,7 @@ S
 Siege Ritual~
 as -1 1.00 0 0 0
 C
-ritual 8 mp 2 30 0 -1 0 0 3 0
+ritual 8 mp 2 30 0.00 -1 0 0 3 0
 D 16 13 0
 D 2 1 0
 M
@@ -986,7 +989,7 @@ abf -1 0.50 o 0 0
 A
 17 -1
 C
-colorburst 7 bf 2 13 2 2013 30 8 3 0
+colorburst 7 bf 2 13 2.00 2013 30 8 3 0
 M
 5
 You fire a burst of color at $N, but $E deflects it!~
@@ -1018,7 +1021,7 @@ A
 A
 11 -1
 C
-enervate 7 bfh 2 20 0 2014 75 8 3 0
+enervate 7 bfh 2 20 0.00 2014 75 8 3 0
 M
 6
 $n attempts to hex you with enervate, but it's deflected by your counterspell!~
@@ -1043,7 +1046,7 @@ S
 Slow~
 abf -1 1.00 o 0 0
 C
-slow 7 bfh 2 20 0 2015 75 0 5 0
+slow 7 bfh 2 20 0.00 2015 75 0 5 0
 M
 2
 $N grows lethargic and starts to glow gray as you shout the slow hex at $M!~
@@ -1073,7 +1076,7 @@ abf -1 1.00 o 0 0
 A
 7 -1
 C
-siphon 7 bfh 2 10 0 2016 20 0 3 0
+siphon 7 bfh 2 10 0.00 2016 20 0 3 0
 D 16 32 0
 M
 2
@@ -1107,7 +1110,7 @@ S
 Sunshock~
 abi -1 1.00 o 0 0
 C
-sunshock 7 bf 2 11 4 2018 9 8 3 0
+sunshock 7 bf 2 11 4.00 2018 9 8 3 0
 T c 3
 T b 2
 X+ 0 a
@@ -1121,7 +1124,7 @@ S
 Phoenix Rite~
 s -1 1.00 0 aq 0
 C
-ritual 8 bg 0 0 0 -1 0 0 5 0
+ritual 8 bg 0 0 0.00 -1 0 0 5 0
 M
 0
 You light some candles and begin the Phoenix Rite.~
@@ -1207,7 +1210,7 @@ S
 Ritual of Defense~
 rst -1 1.00 0 0 0
 C
-ritual 8 o 2 50 0 -1 0 0 5 0
+ritual 8 o 2 50 0.00 -1 0 0 5 0
 D 16 0 0
 D 16 1 0
 D 32 11 0
@@ -1264,7 +1267,7 @@ S
 Ritual of Teleportation~
 s -1 1.00 0 0 0
 C
-ritual 8 rs 2 25 0 2019 600 0 5 0
+ritual 8 rs 2 25 0.00 2019 600 0 5 0
 D 16 3 0
 D 16 16 0
 D 16 22 0
@@ -1308,7 +1311,7 @@ S
 City Teleportation~
 s -1 1.00 0 0 0
 C
-ritual 8 t 2 15 0 2020 900 0 5 0
+ritual 8 t 2 15 0.00 2020 900 0 5 0
 D 16 3 0
 D 16 16 0
 D 16 22 0
@@ -1364,7 +1367,7 @@ S
 Devastation Ritual~
 su -1 1.00 0 0 0
 C
-ritual 8 o 2 15 0 -1 0 0 5 0
+ritual 8 o 2 15 0.00 -1 0 0 5 0
 D 16 10 0
 D 16 4 0
 D 16 11 0
@@ -1421,7 +1424,7 @@ S
 Sense Life Ritual~
 s -1 1.00 0 0 0
 C
-ritual 8 o 2 15 0 -1 0 0 5 2
+ritual 8 o 2 15 0.00 -1 0 0 5 2
 D 64 0 0
 D 64 1 0
 M
@@ -1457,7 +1460,7 @@ S
 Ritual of Detection~
 s -1 1.00 0 0 0
 C
-ritual 8 o 2 15 0 -1 0 0 5 0
+ritual 8 o 2 15 0.00 -1 0 0 5 0
 D 16 1 0
 D 16 7 0
 D 16 8 0
