@@ -8031,7 +8031,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "%sTargets: \tg%s\t0", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), part);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}
 	
 	// Minpos, Linked trait line
 	size += snprintf(buf + size, sizeof(buf) - size, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
@@ -8075,7 +8077,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s seconds\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}
 	
 	// Attack Type, Damage Type, Max Stacks line
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
