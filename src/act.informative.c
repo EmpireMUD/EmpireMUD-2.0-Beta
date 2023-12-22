@@ -1319,7 +1319,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
-	bool disguise;
+	bool disguise, show_inv = show_eq, conceal_eq = FALSE, conceal_inv = FALSE;
 	int j, found;
 	struct affected_type *aff;
 	generic_data *gen;
@@ -1331,10 +1331,16 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	
 	disguise = !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
-	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
-		show_eq = FALSE;
-		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
-		run_ability_hooks(i, AHOOK_ABILITY, ABIL_CONCEALMENT, 0, ch, NULL, NULL, NULL);
+	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i)) {
+		if (has_player_tech(i, PTECH_CONCEAL_EQUIPMENT)) {
+			show_eq = FALSE;
+			conceal_eq = TRUE;
+		}
+		if (has_player_tech(i, PTECH_CONCEAL_INVENTORY)) {
+			show_inv = FALSE;
+			conceal_inv = TRUE;
+		}
+	
 	}
 
 	if (ch != i) {
@@ -1405,7 +1411,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				found = TRUE;
 			}
 		}
-	
+		
 		// show eq
 		if (found) {
 			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
@@ -1416,7 +1422,8 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				}
 			}
 		}
-	
+	}
+	if (show_inv && !disguise) {
 		// show inventory
 		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying && !run_ability_triggers_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL)) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
@@ -1430,6 +1437,16 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
 		}
+	}
+	
+	// tech gains and hooks
+	if (conceal_eq) {
+		gain_player_tech_exp(i, PTECH_CONCEAL_EQUIPMENT, 5);
+		run_ability_hooks_by_player_tech(i, PTECH_CONCEAL_EQUIPMENT, ch, NULL, NULL, NULL);
+	}
+	if (conceal_inv) {
+		gain_player_tech_exp(i, PTECH_CONCEAL_INVENTORY, 5);
+		run_ability_hooks_by_player_tech(i, PTECH_CONCEAL_INVENTORY, ch, NULL, NULL, NULL);
 	}
 }
 

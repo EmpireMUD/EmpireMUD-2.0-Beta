@@ -2758,6 +2758,8 @@ typedef enum {
 #define PTECH_RESIST_POISON  86	// minor resistance
 #define PTECH_VAMPIRE_BITE  87	// can use 'bite' for blood instead of the social
 #define PTECH_ENEMY_BUFF_DETAILS  88	// can see details when using 'affects' on others
+#define PTECH_CONCEAL_EQUIPMENT  89	// others can't see your equipment
+#define PTECH_CONCEAL_INVENTORY  90	// others can't see your inventory
 
 
 // SM_x: status messages

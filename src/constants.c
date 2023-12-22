@@ -1286,6 +1286,8 @@ const char *player_tech_types[] = {
 	"Resist-Poison",
 	"Vampire-Bite",
 	"Enemy-Buff-Details",
+	"Conceal-Equipment",
+	"Conceal-Inventory",	// 90
 	"\n"
 };
 

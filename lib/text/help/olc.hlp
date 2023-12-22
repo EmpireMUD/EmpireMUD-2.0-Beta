@@ -1429,6 +1429,8 @@ Available techs are:
  &cResist-Poison&0 * - Reduced effect from poisons.
  &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
+ &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
+ &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
