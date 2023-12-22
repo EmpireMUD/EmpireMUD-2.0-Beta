@@ -165,7 +165,8 @@ const char *ability_flags[] = {
 	"WEAPON-HIT",
 	"DIFFICULT-ANYWAY",
 	"NOT-IN-DARK",	// 25
-	"UNSCALED-PENALTY",	// 26
+	"UNSCALED-PENALTY",
+	"STOP-ON-MISS",
 	"\n"
 };
 
@@ -199,6 +200,7 @@ const char *ability_flag_notes[] = {
 	"",	// ABILF_DIFFICULT_ANYWAY
 	"",	// 25 - ABILF_NOT_IN_DARK
 	"",	// ABILF_UNSCALED_PENALTY
+	"",	// ABILF_STOP_ON_MISS
 	"\n"
 };
 
@@ -228,6 +230,7 @@ const char *ability_type_flags[] = {
 	"TELEPORT",		// 20
 	"RESURRECT",
 	"RESOURCE",
+	"ATTACK",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -269,6 +272,7 @@ const char *ability_type_notes[] = {
 	"teleportation",	// 20
 	"resurrection",
 	"resource gathering",
+	"attack",
 /*
 	"UNAFFECTS",
 	"POINTS",

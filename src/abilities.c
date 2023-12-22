@@ -73,6 +73,9 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 DO_ABIL(do_action_ability);
 PREP_ABIL(prep_action_ability);
 
+DO_ABIL(do_attack_ability);
+PREP_ABIL(prep_attack_ability);
+
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
 
@@ -122,10 +125,7 @@ struct {
 	{ ABILT_RESOURCE, NULL, NULL, NOBITS },
 	{ ABILT_PLAYER_TECH, NULL, NULL, ABILEDIT_DIFFICULTY },
 	{ ABILT_PASSIVE_BUFF, NULL, NULL, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
-	{ ABILT_READY_WEAPONS, NULL, NULL, ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT },
 	{ ABILT_COMPANION, NULL, NULL, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
-	{ ABILT_SUMMON_ANY, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	{ ABILT_MORPH, NULL, NULL, NOBITS },
 	{ ABILT_AUGMENT, NULL, NULL, NOBITS },
 	{ ABILT_CUSTOM, NULL, NULL, NOBITS },
@@ -133,22 +133,28 @@ struct {
 	// ones that should run early
 	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, ABILEDIT_COMMAND },
 	
+	// attack/damage: some abilities stop here if they miss
+	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, ABILEDIT_COMMAND },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES },
+	
+	// things that run after an attack/damage, in case of STOP-ON-MISS
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
 	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	
-	// run these late
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability, ABILEDIT_COMMAND },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
 	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES },
 	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, ABILEDIT_COMMAND },
 	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, ABILEDIT_COMMAND },
+	{ ABILT_READY_WEAPONS, NULL, NULL, ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_ANY, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
 	// alaways run actions last
 	{ ABILT_ACTION, prep_action_ability, do_action_ability, ABILEDIT_COMMAND },
-	{ NOBITS, NULL, NULL, NOBITS }	// this goes last
+	
+	{ NOBITS, NULL, NULL, NOBITS }	// list terminator
 };
 
 
@@ -5039,6 +5045,28 @@ DO_ABIL(do_action_ability) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_attack_ability) {
+	int result;
+	
+	if (vict && vict != ch) {
+		result = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+		
+		if (result != 0) {
+			// anything other than a miss is a success
+			data->success = TRUE;
+		}
+		if (result == 0 || IS_DEAD(vict)) {
+			// died?
+			data->stop = TRUE;
+		}
+		if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
+			data->stop = TRUE;
+		}
+	}
+}
+
+
 /**
 * All buff-type abilities come through here. This handles scaling and buff
 * maintenance/replacement.
@@ -5253,9 +5281,16 @@ DO_ABIL(do_damage_ability) {
 	}
 	
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
-	data->success = TRUE;
 	
-	if (result < 0) {	// dedz
+	if (result != 0) {
+		// anything other than a miss is a hit
+		data->success = TRUE;
+	}	
+	if (result < 0 || IS_DEAD(vict)) {
+		// dedz
+		data->stop = TRUE;
+	}
+	if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
 		data->stop = TRUE;
 	}
 }
@@ -5746,6 +5781,14 @@ PREP_ABIL(prep_action_ability) {
 
 
 /**
+* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_attack_ability) {
+	get_ability_type_data(data, ABILT_ATTACK)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ATTACK, data);
+}
+
+
+/**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
 * PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
@@ -6001,6 +6044,8 @@ PREP_ABIL(prep_paint_building_ability) {
 // PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_resurrect_ability) {
 	char_data *targ;
+	
+	get_ability_type_data(data, ABILT_RESURRECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESURRECT, data);
 	
 	if (vict) {
 		if (!IS_DEAD(vict)) {

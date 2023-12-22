@@ -569,6 +569,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_DIFFICULT_ANYWAY	BIT(24)	// y. ignores sleep/can't-see and checks difficulty anyway
 #define ABILF_NOT_IN_DARK		BIT(25)	// z. must be able to see
 #define ABILF_UNSCALED_PENALTY	BIT(26)	// A. negative buffs are unscaled; positive ones still scale
+#define ABILF_STOP_ON_MISS		BIT(27)	// B. attack/damage miss will prevent buff and DoT types
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -596,6 +597,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_TELEPORT			BIT(20)	// relocates the player
 #define ABILT_RESURRECT			BIT(21)	// resurrects a player
 #define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
+#define ABILT_ATTACK			BIT(23)	// hits the target with one's own weapon attack
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
