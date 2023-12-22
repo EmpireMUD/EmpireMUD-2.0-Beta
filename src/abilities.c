@@ -5344,7 +5344,11 @@ DO_ABIL(do_paint_building_ability) {
 DO_ABIL(do_resurrect_ability) {
 	char_data *targ;
 	
-	if (vict) {
+	if (ch == vict) {
+		perform_resurrection(ch, ch, IN_ROOM(ch), ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	else if (vict) {
 		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
 		add_offer(vict, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
 		data->success = TRUE;
