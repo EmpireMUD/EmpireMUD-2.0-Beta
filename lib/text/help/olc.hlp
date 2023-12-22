@@ -555,7 +555,8 @@ Action types:
    messages. Uses RANGE data, defaults to normal "nearby" range.
  &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
    name in per-item messages. Uses RANGE data, default 3 if not given.
- &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech.
+ &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech. Has its own
+   medium difficulty check without the ptech.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
    the evolution works with $1 as the old sector name and $2 as the new one.
  &cremove debuffs&0 - Removes debuffs (except self-debuffs and penalties).
