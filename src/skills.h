@@ -43,11 +43,11 @@
 #define CHECK_MAJESTY(ch)  (AFF_FLAGGED((ch), AFF_MAJESTY) && number(0, GET_CHARISMA(ch)))
 
 // ability utils
-#define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data)
-#define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data)
+#define PREP_ABIL(name)  void (name)(char_data *ch, ability_data *abil, char *argument, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data)
+#define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, char *argument, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data)
 
-#define call_do_abil(name)  (name)(ch, abil, level, vict, ovict, vvict, room_targ, data)
-#define call_prep_abil(name)  (name)(ch, abil, level, vict, ovict, vvict, room_targ, data)
+#define call_prep_abil(name)  (name)(ch, abil, argument, level, vict, ovict, vvict, room_targ, data)
+#define call_do_abil(name)  (name)(ch, abil, argument, level, vict, ovict, vvict, room_targ, data)
 
 // abilities.c prototypes
 int get_ability_duration(char_data *ch, ability_data *abil);

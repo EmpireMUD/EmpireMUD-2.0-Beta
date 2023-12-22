@@ -2266,7 +2266,7 @@ int wordcount_ability(ability_data *abil) {
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY ACTIONS /////////////////////////////////////////////////////////
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_apply_poison) {
 	if (vict && (apply_poison(ch, vict) != 0 || IS_DEAD(vict) || EXTRACTED(vict))) {
 		data->success = TRUE;
@@ -2274,7 +2274,7 @@ DO_ABIL(abil_action_apply_poison) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_close_portal) {
 	obj_data *obj, *reverse = NULL;
 	room_data *to_room;
@@ -2305,7 +2305,7 @@ DO_ABIL(abil_action_close_portal) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
@@ -2350,7 +2350,7 @@ DO_ABIL(abil_action_detect_adventures_around) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_earthmeld) {
 	char_data *targ;
 	
@@ -2373,7 +2373,7 @@ DO_ABIL(abil_action_detect_earthmeld) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_hide) {
 	char_data *targ;
 	bool had_sense;
@@ -2408,7 +2408,7 @@ DO_ABIL(abil_action_detect_hide) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_players_around) {
 	bool wait;
 	char where_str[256];
@@ -2446,7 +2446,7 @@ DO_ABIL(abil_action_detect_players_around) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_devastate_area) {
 	room_data *rand_room, *to_room = NULL;
 	crop_data *cp;
@@ -2520,7 +2520,7 @@ DO_ABIL(abil_action_devastate_area) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_hide) {
 	// hide uses a simple bit, not an affect
 	if (IS_NPC(ch) || has_player_tech(ch, PTECH_HIDE_UPGRADE) || difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_MEDIUM)) {
@@ -2534,7 +2534,7 @@ DO_ABIL(abil_action_hide) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_magic_growth) {
 	char was_name[256];
 	char *repl_array[2];
@@ -2561,7 +2561,7 @@ DO_ABIL(abil_action_magic_growth) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_debuffs) {
 	struct affected_type *aff, *next_aff;
 	bool any = FALSE;
@@ -2587,7 +2587,7 @@ DO_ABIL(abil_action_remove_debuffs) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_drunk) {
 	if (vict && !IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
 		gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
@@ -2624,7 +2624,7 @@ void abil_remove_dots_by_type(char_data *ch, ability_data *abil, char_data *vict
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_physical_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_PHYSICAL);
@@ -2632,7 +2632,7 @@ DO_ABIL(abil_action_remove_physical_dots) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_magical_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_MAGICAL);
@@ -2640,7 +2640,7 @@ DO_ABIL(abil_action_remove_magical_dots) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_fire_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_FIRE);
@@ -2648,7 +2648,7 @@ DO_ABIL(abil_action_remove_fire_dots) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_poison_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_POISON);
@@ -2656,7 +2656,7 @@ DO_ABIL(abil_action_remove_poison_dots) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_all_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, NOTHING);
@@ -2664,7 +2664,7 @@ DO_ABIL(abil_action_remove_all_dots) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_rescue_all) {
 	char_data *attacker, *next;
 	bool first = TRUE;
@@ -2684,7 +2684,7 @@ DO_ABIL(abil_action_rescue_all) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_rescue_one) {
 	char_data *attacker = NULL;
 	
@@ -2706,7 +2706,7 @@ DO_ABIL(abil_action_rescue_one) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_taunt) {
 	if (vict && can_fight(ch, vict) && FIGHTING(vict) != ch) {
 		if (FIGHTING(vict)) {
@@ -4985,7 +4985,7 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, 
 /**
 * Performs an ability action.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_action_ability) {
 	struct ability_data_list *adl;
@@ -5082,7 +5082,7 @@ DO_ABIL(do_action_ability) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_attack_ability) {
 	int result;
 	
@@ -5108,7 +5108,7 @@ DO_ABIL(do_attack_ability) {
 * All buff-type abilities come through here. This handles scaling and buff
 * maintenance/replacement.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_buff_ability) {
 	struct affected_type *af;
@@ -5226,7 +5226,7 @@ DO_ABIL(do_buff_ability) {
 /**
 * Deals siege damage to the targeted vehicle or room.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_building_damage_ability) {
 	int dam = 1 + GET_INTELLIGENCE(ch);
@@ -5255,7 +5255,7 @@ DO_ABIL(do_building_damage_ability) {
 /**
 * Handler for conjure-liquid abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_liquid_ability) {
 	if (!ovict) {
@@ -5270,7 +5270,7 @@ DO_ABIL(do_conjure_liquid_ability) {
 /**
 * Handler for conjure-object abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_object_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
@@ -5280,7 +5280,7 @@ DO_ABIL(do_conjure_object_ability) {
 /**
 * Handler for conjure-vehicle abilities.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_conjure_vehicle_ability) {
 	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
@@ -5290,7 +5290,7 @@ DO_ABIL(do_conjure_vehicle_ability) {
 /**
 * All damage abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
@@ -5337,7 +5337,7 @@ DO_ABIL(do_damage_ability) {
 * All damage-over-time abilities come through here. This handles scaling and
 * stacking.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_dot_ability) {
 	any_vnum affect_vnum;
@@ -5389,7 +5389,7 @@ DO_ABIL(do_dot_ability) {
 /**
 * Applies color to the building.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_paint_building_ability) {
 	struct ability_data_list *adl;
@@ -5413,14 +5413,14 @@ DO_ABIL(do_paint_building_ability) {
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_ready_weapon_ability) {
 	int count, pos;
 	struct ability_data_list *adl;
 	obj_data *obj, *proto;
 	
-	// TODO could pre-determine this in prep_ready_weapon_ability
-	any_vnum obj_vnum = NOTHING;
+	// did we inherit one?
+	any_vnum obj_vnum = data->ready_weapon_val;
 	
 	// pick at random
 	if (obj_vnum == NOTHING) {
@@ -5476,10 +5476,11 @@ DO_ABIL(do_ready_weapon_ability) {
 	// this goes directly to equipment so a GET trigger does not fire
 	
 	determine_gear_level(ch);
+	data->success = TRUE;
 }
 
 
-// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_resurrect_ability) {
 	char_data *targ;
 	
@@ -5504,7 +5505,7 @@ DO_ABIL(do_resurrect_ability) {
 /**
 * All room-affect abilities come through here.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_room_affect_ability) {
 	struct affected_type *af;
@@ -5541,7 +5542,7 @@ DO_ABIL(do_room_affect_ability) {
 /**
 * Various types of teleportation.
 *
-* DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 DO_ABIL(do_teleport_ability) {
 	room_data *was_in = IN_ROOM(ch), *to_room;
@@ -5876,7 +5877,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_action_ability) {
 	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
@@ -5884,7 +5885,7 @@ PREP_ABIL(prep_action_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_attack_ability) {
 	get_ability_type_data(data, ABILT_ATTACK)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ATTACK, data);
@@ -5894,7 +5895,7 @@ PREP_ABIL(prep_attack_ability) {
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
@@ -5929,7 +5930,7 @@ PREP_ABIL(prep_buff_ability) {
 }
 
 
-// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_building_damage_ability) {
 	get_ability_type_data(data, ABILT_BUILDING_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUILDING_DAMAGE, data);
 }
@@ -5938,7 +5939,7 @@ PREP_ABIL(prep_building_damage_ability) {
 /**
 * Determines if ovict is a valid target for creating the liquid.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_liquid_ability) {
 	char buf[256];
@@ -5993,7 +5994,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 /**
 * Determines if player can conjure objects.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_object_ability) {
 	bool has_any, one_ata, any_inv, any_room;
@@ -6067,7 +6068,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 /**
 * Determines if player can conjure vehicles.
 * 
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_vehicle_ability) {
 	struct interaction_item *interact;
@@ -6121,7 +6122,7 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_damage_ability) {
 	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
@@ -6129,7 +6130,7 @@ PREP_ABIL(prep_damage_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_dot_ability) {
 	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
@@ -6137,19 +6138,91 @@ PREP_ABIL(prep_dot_ability) {
 
 
 /**
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_paint_building_ability) {
 	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
 }
 
 
-// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_ready_weapon_ability) {
+	bool found;
+	int iter;
+	obj_data *obj;
+	struct ability_data_list *adl;
+	
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch) {
+		// look for equipped item to toggle
+		found = FALSE;
+		for (iter = 0; iter < NUM_WEARS; ++iter) {
+			if (!(obj = GET_EQ(ch, iter))) {
+				continue;	// no obj
+			}
+			
+			// check for match
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_READY_WEAPON && adl->vnum == GET_OBJ_VNUM(obj)) {
+					if (!found) {
+						// only message once
+						send_ability_toggle_messages(ch, abil, data);
+					}
+					found = TRUE;
+					
+					// char message
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+					}
+					else {
+						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+					}
+	
+					// room message
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+					}
+					else {
+						act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					}
+				
+					// this may extract it
+					unequip_char_to_inventory(ch, iter);
+				}
+			}
+		}
+		
+		if (found) {
+			determine_gear_level(ch);
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;	// free cancel
+			data->success = TRUE;	// I think this is a success?
+		}
+		return;
+	}	// end toggle
+	
+	// determine what they want to ready?
+	data->ready_weapon_val = NOTHING;
+	
+	if (*argument) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && (obj = obj_proto(adl->vnum))) {
+				if (multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+					data->ready_weapon_val = adl->vnum;
+					break;
+				}
+			}
+		}
+		
+		if (data->ready_weapon_val == NOTHING) {
+			msg_to_char(ch, "What do you mean, '%s'?\r\n", argument);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
 }
 
 
-// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_resurrect_ability) {
 	char_data *targ;
 	
@@ -6217,7 +6290,7 @@ PREP_ABIL(prep_resurrect_ability) {
 /**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_room_affect_ability) {
 	any_vnum affect_vnum;
@@ -6245,7 +6318,7 @@ PREP_ABIL(prep_room_affect_ability) {
 }
 
 
-// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_teleport_ability) {
 	room_data *to_room;
 	

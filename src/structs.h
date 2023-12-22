@@ -3999,6 +3999,9 @@ struct ability_exec {
 	bool should_charge_cost;	// if TRUE, will charge regardless of success
 	bool engage_anyway;	// we engage combat if !stop || engage_anyway
 	
+	// data passed by types
+	any_vnum ready_weapon_val;
+	
 	struct ability_exec_type *types;	// LL of type data
 };
 
