@@ -227,6 +227,7 @@ const char *ability_type_flags[] = {
 	"BUILDING-DAMAGE",
 	"TELEPORT",		// 20
 	"RESURRECT",
+	"RESOURCE",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -267,6 +268,7 @@ const char *ability_type_notes[] = {
 	"building damage",
 	"teleportation",	// 20
 	"resurrection",
+	"resource gathering",
 /*
 	"UNAFFECTS",
 	"POINTS",

@@ -1680,6 +1680,7 @@ The following types are available (each has its own help file):
  &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
  &cTELEPORT&0 - Teleports the player; see ABILEDIT TELEPORT.
  &rRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
+ &cRESOURCE&0 - Used for resources, e.g. on interaction restrictions.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.

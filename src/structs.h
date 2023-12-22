@@ -595,6 +595,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_BUILDING_DAMAGE	BIT(19)	// blasts a building or vehicle
 #define ABILT_TELEPORT			BIT(20)	// relocates the player
 #define ABILT_RESURRECT			BIT(21)	// resurrects a player
+#define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
