@@ -5061,13 +5061,14 @@ DO_ABIL(do_buff_ability) {
 	
 	if (!unscaled) {
 		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
-		remaining_points = total_points;
 		
-		if (total_points <= 0) {
-			return;
-		}
+		// guarantee at least 1 point in here
+		total_points = MAX(1.0, total_points);
+		
+		remaining_points = total_points;
 	}
 	
+	// TODO is this the correct place to check immunities?
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
 		if (ch == vict) {
 			msg_to_char(ch, "You're immune!\r\n");
