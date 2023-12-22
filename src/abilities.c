@@ -5423,10 +5423,10 @@ DO_ABIL(do_ready_weapon_ability) {
 	any_vnum obj_vnum = data->ready_weapon_val;
 	
 	// pick at random
-	if (obj_vnum == NOTHING) {
+	if (obj_vnum == NOTHING || obj_vnum == 0) {
 		count = 0;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && !number(0, count)) {
+			if (adl->type == ADL_READY_WEAPON && !number(0, count++)) {
 				obj_vnum = adl->vnum;
 			}
 		}
