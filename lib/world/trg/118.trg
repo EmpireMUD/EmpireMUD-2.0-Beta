@@ -5198,7 +5198,7 @@ switch %self.vnum%
     end
     %send% %actor% You seem to have broken @%self% but not before it protects you with some kind of counterspell!
     %echoaround% %actor% ~%actor% breaks @%self% and starts to glow, slightly.
-    dg_affect #3021 %actor% MANA-REGEN -1 1800
+    dg_affect #3021 %actor% COUNTERSPELL on 1800
     %purge% %self%
     * do not fall through
     halt

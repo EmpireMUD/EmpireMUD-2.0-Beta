@@ -1000,7 +1000,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %verify_target% != %actor.id%
@@ -1052,7 +1052,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %verify_target% != %actor.id%
@@ -1083,7 +1083,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 %echo% ~%self% begins drawing mana to *%self%self...
@@ -1140,7 +1140,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 wait 1 sec
 if !%self.morph%
   set current %self.name%
@@ -1167,7 +1167,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %self.morph%
@@ -1216,7 +1216,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 wait 1 sec
 if %self.morph%
   set current %self.name%
@@ -1256,7 +1256,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 say Don't think of this as ruining your chances for a date. Think of it as your only chance to kiss a princess!
@@ -1300,7 +1300,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 if !%actor% || %actor.id% != %id% || !%self.fighting%
@@ -1330,7 +1330,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 if !%actor% || %actor.id% != %id%
