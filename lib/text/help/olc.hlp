@@ -1459,22 +1459,43 @@ See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
 #d
 "ABILEDIT READY-WEAPONS ABILITY" "READY-WEAPONS ABILITY" "READY-WEAPONS ABILITIES" "READY WEAPONS ABILITY" "READY-WEAPON ABILITY" "READY WEAPON ABILITIES"
 
-The READY-WEAPONS ability type adds weapons to the player's 'ready' command.
-These are temporary weapons that the player can summon directly to their
-wield/ranged slots.
+The READY-WEAPONS ability type enables the player to summon items directly to
+their wield, hold, or ranged slot. These are temporary weapons and should be
+set to disappear when removed.
 
-Ready-Weapons abilities have the following properties:
+Ready-weapon abilities may have their own command, or the can add to the
+player's 'ready' command. This type supports the TOGGLE flag, which removes
+the weapon from the equipment slot if the command is typed again while still
+using it.
+
+Ready-Weapons abilities have the following:
+ <&ycommand&0> If the ability is adding options to the 'ready' command, set its
+   command to 'ready' (or leave it blank). If it has its own command, use that
+   instead.
  <&ydata&0> Add the READY-WEAPON data type to grant weapons.
-            - You should usually set the 1-USE flag on the weapon.
-            - Only weapons and ranged weapons can be used.
-            - If a weapon has HOLD but not WIELD, it will equip to the hold
-              slot. Otherwise, it will only equip to the wield slot.
+   - You should usually set the 1-USE flag on the weapon.
+   - Only weapons and ranged weapons can be used.
+   - If a weapon has HOLD but not WIELD, it will equip to the hold slot.
+     Otherwise, it will only equip to the wield slot.
+ <&ygainhooks&0> This set of gain hooks gives experience when fighting with
+   the weapons from this ability: MELEE RANGED ONLY-USING-READY-WEAPON
+ <&yminposition&0> Determine if they can ready a new weapon in combat.
+ <&ytargets&0> If there's only one weapon in the data, or it will pick at
+   random from the data, set the IGNORE target. If they choose from the list,
+   set the STRING target instead.
 
-Notes:
+Messages:
 - The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
-  messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
-  For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0. For pre-
-  ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
+  messages.
+- For pre-ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
+- For the actual summoning of the item, it uses &cper-item-to-char&0 and
+  &cper-item-to-room. &y$n&0 represents the player and &y&p&0 represents the
+  weapon.
+- For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0.
+- With the TOGGLE flag, you may set &ctoggle-to-char&0 and &ctoggle-to-room&0,
+  but it may be better to set &gremove-to-char&0 and &gremove-to-room&0 on the
+  weapon itself because they are also displayed if the player removes the
+  weapon.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
