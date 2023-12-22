@@ -6573,8 +6573,12 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
 		found = FALSE;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_READY_WEAPON) {
+				continue;
+			}
 			found = TRUE;
-			if (adl->type == ADL_READY_WEAPON && !(obj = obj_proto(adl->vnum))) {
+			
+			if (!(obj = obj_proto(adl->vnum))) {
 				olc_audit_msg(ch, ABIL_VNUM(abil), "Invalid ready-weapon item set in ability data");
 				problem = TRUE;
 			}
