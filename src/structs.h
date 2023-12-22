@@ -2760,6 +2760,7 @@ typedef enum {
 #define PTECH_ENEMY_BUFF_DETAILS  88	// can see details when using 'affects' on others
 #define PTECH_CONCEAL_EQUIPMENT  89	// others can't see your equipment
 #define PTECH_CONCEAL_INVENTORY  90	// others can't see your inventory
+#define PTECH_FLEE_UPGRADE  91	// increased chance to flee
 
 
 // SM_x: status messages

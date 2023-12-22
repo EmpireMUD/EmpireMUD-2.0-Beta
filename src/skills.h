@@ -125,7 +125,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 
 
 // ABIL_x: ability vnums
-#define ABIL_BACKSTAB  3
 #define ABIL_NULL_MANA  5
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
@@ -149,7 +148,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_BIG_GAME_HUNTER  99
 #define ABIL_QUICK_DRAW  102
 #define ABIL_FIRSTAID  103
-#define ABIL_FLEET  104
 #define ABIL_FINESSE  105
 #define ABIL_VEINTAP  107
 #define ABIL_HEAL  109

@@ -1288,6 +1288,7 @@ const char *player_tech_types[] = {
 	"Enemy-Buff-Details",
 	"Conceal-Equipment",
 	"Conceal-Inventory",	// 90
+	"Flee-Upgrade",
 	"\n"
 };
 

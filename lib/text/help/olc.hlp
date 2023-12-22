@@ -1431,6 +1431,7 @@ Available techs are:
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
+ &cFlee-Upgrade&0 * - Increased chance to flee.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
