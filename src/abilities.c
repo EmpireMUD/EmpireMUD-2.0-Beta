@@ -491,22 +491,6 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	if (count > 0 || more_learned) {
 		has_param_details = TRUE;
 	}
-/*
-	More things we could show (from vstat ability):
-	
-	sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
-
-	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
-
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
-	}	// end damage
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}	// end damage/dot
-	*/
 	
 	if (!has_param_details) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
@@ -3669,7 +3653,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -3681,7 +3665,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
@@ -3695,7 +3679,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -3707,7 +3691,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
@@ -3719,7 +3703,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+			else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 				// don't message if it's damage + there's an attack type
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
@@ -3734,7 +3718,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
@@ -3746,7 +3730,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
@@ -3760,7 +3744,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
@@ -3772,7 +3756,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE) || ABIL_ATTACK_TYPE(abil) <= 0)) {
+		else if (use_pos == NOTHING && (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0)) {
 			// don't message if it's damage + there's an attack type
 			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
@@ -3883,7 +3867,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
@@ -3894,7 +3879,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
 		}
-		else {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
@@ -3906,7 +3892,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
@@ -3917,7 +3904,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		}
-		else {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
@@ -3928,7 +3916,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
 		}
-		else {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABIL_ATTACK_TYPE(abil) <= 0) {
+			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 		}
@@ -6301,7 +6290,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	}
 	
 	// violent types?
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT | ABILT_BUILDING_DAMAGE) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_DOT | ABILT_BUILDING_DAMAGE) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "Missing VIOLENT flag");
 		problem = TRUE;
 	}
