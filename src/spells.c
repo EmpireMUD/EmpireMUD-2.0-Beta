@@ -64,7 +64,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
 		// did we find an ability that caused it?
 		if (abil) {
 			gain_ability_exp(ch, ABIL_VNUM(abil), 100);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), get_ability_level(ch, ABIL_VNUM(abil)), triggered_by, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, triggered_by, NULL, NULL, NULL);
 		}
 		return TRUE;
 	}
@@ -289,5 +289,5 @@ ACMD(do_ready) {
 	obj_ok = load_otrigger(obj);
 	// this goes directly to equipment so a GET trigger does not fire
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(found_abil), get_ability_level(ch, ABIL_VNUM(found_abil)), NULL, (obj_ok ? obj : NULL), NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(found_abil), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL);
 }

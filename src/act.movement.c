@@ -3159,7 +3159,7 @@ ACMD(do_worm) {
 		// on top of any wait from the move itself
 		GET_WAIT_STATE(ch) += 1 RL_SEC;
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_WORM, get_ability_level(ch, ABIL_WORM), NULL, NULL, NULL, to_room);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_WORM, 0, NULL, NULL, NULL, to_room);
 	}
 }
 

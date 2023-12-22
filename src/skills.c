@@ -791,7 +791,7 @@ void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_ability_exp(ch, ability, amount);
-				run_ability_hooks(ch, AHOOK_ABILITY, ability, get_ability_level(ch, ability), NULL, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ability, 0, NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -908,7 +908,7 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
 			gain_ability_exp(ch, iter->abil, amount);
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, get_ability_level(ch, iter->abil), ch, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, ch, NULL, NULL, NULL);
 		}
 	}
 }
@@ -1110,7 +1110,7 @@ struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bo
 * @param int Any ABIL_x const.
 * @return int A skill level of 0 to 100.
 */
-int get_ability_level(char_data *ch, any_vnum ability) {
+int get_ability_skill_level(char_data *ch, any_vnum ability) {
 	ability_data *abd;
 	
 	if (IS_NPC(ch)) {
@@ -1688,7 +1688,7 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 * @return bool TRUE for success, FALSE for fail
 */
 bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
-	int chance = get_ability_level(ch, ability);
+	int chance = get_ability_skill_level(ch, ability);
 	
 	// always succeeds
 	if (difficulty == DIFF_TRIVIAL) {
@@ -1730,7 +1730,7 @@ bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
 			continue;	// wrong tech
 		}
 		
-		lev = get_ability_level(ch, iter->abil);
+		lev = get_ability_skill_level(ch, iter->abil);
 		
 		if (lev > best_level) {
 			best_level = lev;

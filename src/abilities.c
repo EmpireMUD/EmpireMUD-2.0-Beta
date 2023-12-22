@@ -1039,7 +1039,7 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 	static char output[1024];
 	bool estimate = FALSE;
-	int cost, iter;
+	int cost, iter, level;
 	struct ability_exec *data;
 	
 	cost = ABIL_COST(abil);
@@ -1049,10 +1049,11 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		CREATE(data, struct ability_exec, 1);
 		data->abil = abil;
 		data->matching_role = has_matching_role(ch, abil, FALSE);
+		level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 		
 		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-				cost += standard_ability_scale(ch, abil, get_ability_level(ch, ABIL_VNUM(abil)), do_ability_data[iter].type, data) * ABIL_COST_PER_SCALE_POINT(abil);
+				cost += standard_ability_scale(ch, abil, level, do_ability_data[iter].type, data) * ABIL_COST_PER_SCALE_POINT(abil);
 			}
 		}
 		
@@ -1080,7 +1081,7 @@ int get_ability_duration(char_data *ch, ability_data *abil) {
 	if (!ch || !abil) {
 		return 0;
 	}
-	else if (ABIL_ASSIGNED_SKILL(abil) && get_ability_level(ch, ABIL_VNUM(abil)) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil))) {
+	else if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil))) {
 		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
 	}
 	else {
@@ -1405,18 +1406,17 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 	// start here
 	level = get_approximate_level(ch);
 	
-	if (abil_vnum == NO_ABIL || !(abil = find_ability_by_vnum(abil_vnum))) {
-		return level;	// no abil = no adjustment
-	}
-	if (!(skl = ABIL_ASSIGNED_SKILL(abil)) || ABIL_IS_SYNERGY(abil)) {
-		return level;	// no limit here either
-	}
-	
-	skill_level = get_skill_level(ch, SKILL_VNUM(skl));
-	
-	// constrain only if player hasn't maxed this skill
-	if (skill_level < SKILL_MAX_LEVEL(skl)) {
-		level = MIN(level, skill_level);
+	// adjust for ability?
+	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum))) {
+		if ((skl = ABIL_ASSIGNED_SKILL(abil))) {
+			// adjust based on level in the assigned skill
+			skill_level = get_skill_level(ch, SKILL_VNUM(skl));
+			
+			// constrain only if player hasn't maxed this skill
+			if (skill_level < SKILL_MAX_LEVEL(skl)) {
+				level = MIN(level, skill_level);
+			}
+		}
 	}
 	
 	return level;
@@ -2093,7 +2093,7 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		gain_ability_exp(ch, agh->ability, amount);
 		
 		// gain hooks mean the ability has fired: hook it now
-		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, get_ability_level(ch, agh->ability), opponent, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, 0, opponent, NULL, NULL, NULL);
 	}
 }
 
@@ -3272,7 +3272,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 	ability_data *abil = data->abil;
 	obj_data *obj = NULL;
 	
-	level = get_ability_level(ch, ABIL_VNUM(abil));
+	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
@@ -3313,7 +3313,7 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 	ability_data *abil = data->abil;
 	vehicle_data *veh = NULL;
 	
-	level = get_ability_level(ch, ABIL_VNUM(abil));
+	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 	
 	for (num = 0; num < interaction->quantity; ++num) {
 		veh = read_vehicle(interaction->vnum, TRUE);
@@ -4776,7 +4776,6 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 */
 void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	bool any_targ, free_limiter = FALSE;
-	int cap;
 	struct ability_hook *ahook;
 	char_data *use_char;
 	obj_data *use_obj;
@@ -4889,11 +4888,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			
 			// determine level? or, preferably, inherit
 			if (!level) {
-				level = get_approximate_level(ch);
-			}
-			// validate level cap
-			if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(plab->ptr) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(plab->ptr)))) < CLASS_SKILL_CAP) {
-				level = MIN(level, cap);	// constrain by skill level
+				level = get_player_level_for_ability(ch, ABIL_VNUM(plab->ptr));
 			}
 			
 			// construct data
@@ -4938,7 +4933,7 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, 
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, get_ability_level(ch, iter->abil), vict ? vict : ch, ovict, vvict, room_targ);
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ);
 		}
 	}
 }
@@ -5478,7 +5473,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	obj_data *ovict = NULL;
 	room_data *room_targ = NULL, *to_room, *find_room;
 	bool has = FALSE;
-	int cap, find_dir, iter, level, number;
+	int find_dir, iter, level, number;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -5676,10 +5671,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	// 4. determine correct level (sometimes limited by skill level)
-	level = get_approximate_level(ch);
-	if (!IS_NPC(ch) && ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
-		level = MIN(level, cap);	// constrain by skill level
-	}
+	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 	
 	// 5. exec data to pass through
 	CREATE(data, struct ability_exec, 1);

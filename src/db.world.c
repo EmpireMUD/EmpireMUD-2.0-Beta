@@ -797,7 +797,7 @@ GLB_FUNCTION(run_global_mine_data) {
 	
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
-		run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), get_ability_level(ch, GET_GLOBAL_ABILITY(glb)), NULL, NULL, NULL, room);
+		run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, room);
 	}
 	
 	return TRUE;

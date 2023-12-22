@@ -459,7 +459,7 @@ ACMD(do_earthmeld) {
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_EARTHMELD, get_ability_level(ch, ABIL_EARTHMELD), NULL, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_EARTHMELD, 0, NULL, NULL, NULL, NULL);
 }
 
 
@@ -610,7 +610,7 @@ ACMD(do_heal) {
 				
 				will_gain |= can_gain_exp_from(ch, ch_iter);
 				
-				run_ability_hooks(ch, AHOOK_ABILITY, abil, get_ability_level(ch, abil), ch_iter, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, abil, 0, ch_iter, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -639,9 +639,9 @@ ACMD(do_heal) {
 		}
 		
 		will_gain = can_gain_exp_from(ch, vict);
-		run_ability_hooks(ch, AHOOK_ABILITY, abil, get_ability_level(ch, abil), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, abil, 0, vict, NULL, NULL, NULL);
 		if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, get_ability_level(ch, ABIL_ANCESTRAL_HEALING), vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, 0, vict, NULL, NULL, NULL);
 		}
 	}
 	
@@ -792,7 +792,7 @@ ACMD(do_purify) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, get_ability_level(ch, ABIL_PURIFY), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, 0, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -923,9 +923,9 @@ ACMD(do_rejuvenate) {
 		engage_combat(ch, FIGHTING(vict), FALSE);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, get_ability_level(ch, ABIL_REJUVENATE), vict, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, 0, vict, NULL, NULL, NULL);
 	if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, get_ability_level(ch, ABIL_ANCESTRAL_HEALING), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, 0, vict, NULL, NULL, NULL);
 	}
 }
 

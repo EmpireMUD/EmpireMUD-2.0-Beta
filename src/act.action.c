@@ -2285,7 +2285,7 @@ void process_mining(char_data *ch) {
 				// skillups
 				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 10);
-					run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), get_ability_level(ch, GET_GLOBAL_ABILITY(glb)), NULL, NULL, NULL, IN_ROOM(ch));
+					run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, IN_ROOM(ch));
 				}
 				
 				// go again! (if ch is still there)

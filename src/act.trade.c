@@ -1249,13 +1249,13 @@ void finish_gen_craft(char_data *ch) {
 	
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);
-		run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), get_ability_level(ch, GET_CRAFT_ABILITY(type)), NULL, (obj_ok ? obj : NULL), NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL);
 	}
 	
 	// master?
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(cft_abil), get_ability_level(ch, ABIL_MASTERY_ABIL(cft_abil)), NULL, (obj_ok ? obj : NULL), NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(cft_abil), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL);
 	}
 	
 	// remove 'produced' amounts from the empire now, if applicable
@@ -1342,7 +1342,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
-			run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), get_ability_level(ch, GET_CRAFT_ABILITY(type)), NULL, NULL, veh, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, NULL, veh, NULL);
 		}
 		
 		found = TRUE;
@@ -1754,11 +1754,11 @@ ACMD(do_gen_augment) {
 		
 		if (GET_AUG_ABILITY(aug) != NO_ABIL) {
 			gain_ability_exp(ch, GET_AUG_ABILITY(aug), 50);
-			run_ability_hooks(ch, AHOOK_ABILITY, GET_AUG_ABILITY(aug), get_ability_level(ch, GET_AUG_ABILITY(aug)), NULL, obj, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, GET_AUG_ABILITY(aug), 0, NULL, obj, NULL, NULL);
 		}
 		if (abil && is_master) {
 			gain_ability_exp(ch, ABIL_MASTERY_ABIL(abil), 50);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(abil), get_ability_level(ch, ABIL_MASTERY_ABIL(abil)), NULL, obj, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(abil), 0, NULL, obj, NULL, NULL);
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
@@ -2738,7 +2738,7 @@ ACMD(do_reforge) {
 			
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, get_ability_level(ch, reforge_data[subcmd].ability), NULL, obj, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, 0, NULL, obj, NULL, NULL);
 			}
 		}
 	}
@@ -2792,7 +2792,7 @@ ACMD(do_reforge) {
 			
 			if (reforge_data[subcmd].ability != NO_ABIL) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, get_ability_level(ch, reforge_data[subcmd].ability), NULL, obj, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, 0, NULL, obj, NULL, NULL);
 			}
 			
 			// this seems like it should not be running a load trigger
@@ -2874,7 +2874,7 @@ ACMD(do_reforge) {
 
 			if (reforge_data[subcmd].ability != NOTHING) {
 				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, get_ability_level(ch, reforge_data[subcmd].ability), NULL, obj, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, reforge_data[subcmd].ability, 0, NULL, obj, NULL, NULL);
 			}
 		}
 	}

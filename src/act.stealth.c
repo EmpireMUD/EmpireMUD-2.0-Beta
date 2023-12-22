@@ -571,7 +571,7 @@ ACMD(do_disguise) {
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, get_ability_level(ch, ABIL_DISGUISE), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, 0, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -689,7 +689,7 @@ ACMD(do_hide) {
 		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, get_ability_level(ch, ABIL_HIDE), ch, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, 0, ch, NULL, NULL, NULL);
 }
 
 
@@ -884,8 +884,8 @@ ACMD(do_jab) {
 		}
 		
 		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
-			apply_dot_effect(vict, ATYPE_JABBED, 15, DAM_PHYSICAL, get_ability_level(ch, ABIL_JAB) / 24, 2, ch);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, get_ability_level(ch, ABIL_JAB), vict, NULL, NULL, NULL);
+			apply_dot_effect(vict, ATYPE_JABBED, 15, DAM_PHYSICAL, get_player_level_for_ability(ch, ABIL_JAB) / 24, 2, ch);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, 0, vict, NULL, NULL, NULL);
 		}
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_JAB, 15);
@@ -1190,7 +1190,7 @@ ACMD(do_sneak) {
 	}
 	
 	if (IN_ROOM(ch) != was_in) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, get_ability_level(ch, ABIL_SNEAK), ch, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, 0, ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1264,7 +1264,7 @@ ACMD(do_steal) {
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, get_ability_level(ch, ABIL_STEAL), NULL, NULL, NULL, NULL);
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL);
 				}
 			}
 		}

@@ -3036,7 +3036,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 		msg_to_char(vict, "You feel inspired!\r\n");
 		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_INSPIRE, get_ability_level(ch, ABIL_INSPIRE), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_INSPIRE, 0, vict, NULL, NULL, NULL);
 	}
 }
 

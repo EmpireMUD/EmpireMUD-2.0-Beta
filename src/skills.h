@@ -23,11 +23,11 @@
 
 // skill > basic level
 #define IS_SPECIALTY_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > BASIC_SKILL_CAP)
-#define IS_SPECIALTY_ABILITY(ch, abil)	(get_ability_level((ch), (abil)) > BASIC_SKILL_CAP)
+#define IS_SPECIALTY_ABILITY(ch, abil)	(get_ability_skill_level((ch), (abil)) > BASIC_SKILL_CAP)
 
 // skill > specialty level
 #define IS_CLASS_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > SPECIALTY_SKILL_CAP)
-#define IS_CLASS_ABILITY(ch, abil)	(get_ability_level((ch), (abil)) > SPECIALTY_SKILL_CAP)
+#define IS_CLASS_ABILITY(ch, abil)	(get_ability_skill_level((ch), (abil)) > SPECIALTY_SKILL_CAP)
 
 #define CHOOSE_BY_SKILL_LEVEL(arr, ch, skill)	(IS_CLASS_SKILL((ch), (skill)) ? (arr)[2] : (IS_SPECIALTY_SKILL((ch), (skill)) ? (arr)[1] : (arr)[0]))
 #define CHOOSE_BY_ABILITY_LEVEL(arr, ch, abil)	(IS_CLASS_ABILITY((ch), (abil)) ? (arr)[2] : (IS_SPECIALTY_ABILITY((ch), (abil)) ? (arr)[1] : (arr)[0]))
@@ -82,7 +82,7 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount);
 bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from_abil);
 bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount, ability_data *from_abil);
 struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
-int get_ability_level(char_data *ch, any_vnum ability);
+int get_ability_skill_level(char_data *ch, any_vnum ability);
 int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 int get_approximate_level(char_data *ch);
 struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);

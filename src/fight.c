@@ -652,7 +652,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
 			dam -= GET_GREATNESS(victim);
 			gain_ability_exp(victim, ABIL_NOBLE_BEARING, 15);
-			run_ability_hooks(victim, AHOOK_ABILITY, ABIL_NOBLE_BEARING, get_ability_level(victim, ABIL_NOBLE_BEARING), victim, NULL, NULL, NULL);
+			run_ability_hooks(victim, AHOOK_ABILITY, ABIL_NOBLE_BEARING, 0, victim, NULL, NULL, NULL);
 		}
 		
 		// damage reduction (usually from armor/spells)
@@ -696,7 +696,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 				if (can_gain_exp_from(victim, attacker)) {
 					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
 				}
-				run_ability_hooks(victim, AHOOK_ABILITY, ABIL_NULL_MANA, get_ability_level(victim, ABIL_NULL_MANA), attacker, NULL, NULL, NULL);
+				run_ability_hooks(victim, AHOOK_ABILITY, ABIL_NULL_MANA, 0, attacker, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -1753,7 +1753,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	// skillups?
 	if (rez_by && ability != NO_ABIL) {
 		gain_ability_exp(rez_by, ability, exp);
-		run_ability_hooks(rez_by, AHOOK_ABILITY, ability, get_ability_level(rez_by, ability), ch, NULL, NULL, NULL);
+		run_ability_hooks(rez_by, AHOOK_ABILITY, ability, 0, ch, NULL, NULL, NULL);
 	}
 	
 	run_ability_hooks(ch, AHOOK_RESURRECT, 0, 0, rez_by, NULL, NULL, NULL);
@@ -3691,7 +3691,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DAGGER_MASTERY, get_ability_level(ch, ABIL_DAGGER_MASTERY), victim, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DAGGER_MASTERY, 0, victim, NULL, NULL, NULL);
 			}
 			if (!IS_NPC(ch) && has_player_tech(ch, PTECH_TWO_HANDED_MASTERY) && weapon && OBJ_FLAGGED(weapon, OBJ_TWO_HANDED)) {
 				// it could be considered a bug that this checks solo under the _assumption_ that the ptech comes from a synergy ability
@@ -3706,13 +3706,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAFF_MASTERY, get_ability_level(ch, ABIL_STAFF_MASTERY), victim, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAFF_MASTERY, 0, victim, NULL, NULL, NULL);
 			}	
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_CLAWS, 2);
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLAWS, get_ability_level(ch, ABIL_CLAWS), victim, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLAWS, 0, victim, NULL, NULL, NULL);
 			}
 			
 			// raw damage modified by hunt
@@ -3725,7 +3725,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BIG_GAME_HUNTER, get_ability_level(ch, ABIL_BIG_GAME_HUNTER), victim, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BIG_GAME_HUNTER, 0, victim, NULL, NULL, NULL);
 		
 				if (skill_check(ch, ABIL_BIG_GAME_HUNTER, DIFF_MEDIUM)) {
 					dam = (int) (CHOOSE_BY_ABILITY_LEVEL(big_game_hunter, ch, ABIL_BIG_GAME_HUNTER) * dam);
@@ -3748,7 +3748,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			}
 		}
 		if (has_ability(ch, ABIL_FINESSE)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FINESSE, get_ability_level(ch, ABIL_FINESSE), victim, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FINESSE, 0, victim, NULL, NULL, NULL);
 		}
 		
 		/* check if the victim has a hitprcnt trigger */
@@ -4175,7 +4175,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			if (can_gain_exp_from(ch, vict)) {
 				gain_ability_exp(ch, ABIL_BOWMASTER, 2);
 			}
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOWMASTER, get_ability_level(ch, ABIL_BOWMASTER), vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOWMASTER, 0, vict, NULL, NULL, NULL);
 		}
 		
 		// damage last! it's sometimes fatal for vict
@@ -4272,10 +4272,10 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 		if (has_ability(ch, ABIL_QUICK_DRAW)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_QUICK_DRAW, get_ability_level(ch, ABIL_QUICK_DRAW), vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_QUICK_DRAW, 0, vict, NULL, NULL, NULL);
 		}
 		if (has_ability(ch, ABIL_TRICK_SHOTS)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRICK_SHOTS, get_ability_level(ch, ABIL_TRICK_SHOTS), vict, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRICK_SHOTS, 0, vict, NULL, NULL, NULL);
 		}
 	}
 	

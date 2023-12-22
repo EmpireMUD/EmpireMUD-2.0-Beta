@@ -160,7 +160,7 @@ ACMD(do_charge) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_CHARGE, 15);
 		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CHARGE, get_ability_level(ch, ABIL_CHARGE), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CHARGE, 0, vict, NULL, NULL, NULL);
 	}
 }
 
@@ -248,7 +248,7 @@ ACMD(do_firstaid) {
 		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);
 	}
 	GET_WAIT_STATE(ch) += 2 RL_SEC;	// plus normal command_lag
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FIRSTAID, get_ability_level(ch, ABIL_FIRSTAID), vict, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_FIRSTAID, 0, vict, NULL, NULL, NULL);
 }
 
 
@@ -312,7 +312,7 @@ ACMD(do_heartstop) {
 		if (!FIGHTING(victim)) {
 			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
 		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HEARTSTOP, get_ability_level(ch, ABIL_HEARTSTOP), victim, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HEARTSTOP, 0, victim, NULL, NULL, NULL);
 	}
 }
 
@@ -381,7 +381,7 @@ ACMD(do_kite) {
 		}
 		act("You successfully kite $N!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n successfully kites you!", FALSE, ch, NULL, vict, TO_VICT);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_KITE, get_ability_level(ch, ABIL_KITE), vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_KITE, 0, vict, NULL, NULL, NULL);
 	}
 	
 	if (kitable > 0) {
@@ -444,10 +444,10 @@ ACMD(do_outrage) {
 					if (can_gain_exp_from(ch, victim)) {
 						gain_ability_exp(ch, ABIL_RESCUE, 15);
 					}
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_RESCUE, get_ability_level(ch, ABIL_RESCUE), FIGHTING(victim), NULL, NULL, NULL);
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_RESCUE, 0, FIGHTING(victim), NULL, NULL, NULL);
 				}
 				
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_OUTRAGE, get_ability_level(ch, ABIL_OUTRAGE), victim, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_OUTRAGE, 0, victim, NULL, NULL, NULL);
 				
 				// check if we could add any more, exit early if not
 				if (GET_MOVE(ch) < add_cost) {
