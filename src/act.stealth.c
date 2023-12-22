@@ -835,65 +835,6 @@ ACMD(do_infiltrate) {
 }
 
 
-ACMD(do_jab) {
-	char_data *vict;
-	int cost = 15;
-
-	one_argument(argument, arg);
-
-	if (!can_use_ability(ch, ABIL_JAB, MOVE, cost, COOLDOWN_JAB)) {
-		// sends own messages
-	}
-	else if (!IS_NPC(ch) && !GET_EQ(ch, WEAR_WIELD)) {
-		send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
-	}
-	else if (!IS_NPC(ch) && !match_attack_type(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), TYPE_STAB)) {
-		send_to_char("You must use a stabbing weapon to jab.\r\n", ch);
-	}
-	else if (AFF_FLAGGED(ch, AFF_DISARMED)) {
-		msg_to_char(ch, "You can't do that while disarmed!\r\n");
-	}
-	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
-		send_to_char("Jab whom?\r\n", ch);
-	}
-	else if (vict == ch) {
-		send_to_char("You can't jab yourself!\r\n", ch);
-	}
-	else if (!can_fight(ch, vict)) {
-		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
-	}
-	else if (NOT_MELEE_RANGE(ch, vict)) {
-		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_JAB)) {
-		return;
-	}
-	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_JAB, 9, WAIT_COMBAT_ABILITY);
-
-		if (IS_NPC(ch)) {
-			// NPC has no weapon
-			act("You move close to jab $N with your weapon...", FALSE, ch, NULL, vict, TO_CHAR | ACT_ABILITY);
-			act("$n moves in close to jab you with $s weapon...", FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
-			act("$n moves in close to jab $N with $s weapon...", FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
-		}
-		else {
-			act("You move close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_CHAR | ACT_ABILITY);
-			act("$n moves in close to jab you with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_VICT | ACT_ABILITY);
-			act("$n moves in close to jab $N with $p...", FALSE, ch, GET_EQ(ch, WEAR_WIELD), vict, TO_NOTVICT | ACT_ABILITY);
-		}
-		
-		if (hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE) > 0 && !IS_DEAD(vict)) {
-			apply_dot_effect(vict, ATYPE_JABBED, 15, DAM_PHYSICAL, get_player_level_for_ability(ch, ABIL_JAB) / 24, 2, ch);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_JAB, 0, vict, NULL, NULL, NULL);
-		}
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_JAB, 15);
-		}
-	}
-}
-
-
 ACMD(do_pickpocket) {
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
 	bool any, low_level;

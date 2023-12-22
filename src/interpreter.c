@@ -224,8 +224,6 @@ ACMD(do_invis);
 ACMD(do_island);
 ACMD(do_islands);
 
-ACMD(do_jab);
-
 ACMD(do_keep);
 ACMD(do_kite);
 
@@ -766,7 +764,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "island", POS_DEAD, do_island, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ISLAND ),
 	SIMPLE_CMD( "islands", POS_DEAD, do_islands, NO_MIN, CTYPE_EMPIRE ),
 
-	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	STANDARD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, NO_GRANTS, SCMD_JUNK, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	STANDARD_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
