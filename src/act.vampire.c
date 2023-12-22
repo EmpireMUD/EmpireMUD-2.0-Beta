@@ -135,8 +135,22 @@ void cancel_blood_upkeeps(char_data *ch) {
 					messaged = TRUE;
 				}
 				
-				act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				// char message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				else {
+					act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				}
+	
+				// room message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				else {
+					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				
 				// this may extract it
 				unequip_char_to_inventory(ch, iter);
 				determine_gear_level(ch);
@@ -761,19 +775,14 @@ void update_biting_char(char_data *ch) {
 
 void update_vampire_sun(char_data *ch) {
 	bool repeat, found = FALSE;
+	int iter;
+	obj_data *obj;
 	struct affected_type *af;
+	struct obj_apply *app;
 	
 	// only applies if vampire and not an NPC
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch) || check_vampire_sun(ch, FALSE)) {
 		return;
-	}
-	
-	if (affected_by_spell(ch, ATYPE_CLAWS)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		retract_claws(ch);
 	}
 	
 	// look for things that cause blood upkeep and remove them
@@ -792,6 +801,43 @@ void update_vampire_sun(char_data *ch) {
 			}
 		}
 	} while (repeat);
+	
+	// gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!wear_data[iter].count_stats || !(obj = GET_EQ(ch, iter))) {
+			continue;	// skippable
+		}
+
+		LL_FOREACH(obj->applies, app) {
+			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
+				if (!found) {
+					sun_message(ch);
+					found = TRUE;
+				}
+
+				// char message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				else {
+					act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				}
+	
+				// room message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				else {
+					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				
+				// this may extract it
+				unequip_char_to_inventory(ch, iter);
+				determine_gear_level(ch);
+			}
+		}
+	}
+	
 	
 	// revert vampire morphs
 	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {

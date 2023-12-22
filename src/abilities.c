@@ -100,6 +100,9 @@ PREP_ABIL(prep_dot_ability);
 DO_ABIL(do_paint_building_ability);
 PREP_ABIL(prep_paint_building_ability);
 
+DO_ABIL(do_ready_weapon_ability);
+PREP_ABIL(prep_ready_weapon_ability);
+
 DO_ABIL(do_resurrect_ability);
 PREP_ABIL(prep_resurrect_ability);
 
@@ -147,7 +150,7 @@ struct {
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
 	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, ABILEDIT_COMMAND },
 	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, ABILEDIT_COMMAND },
-	{ ABILT_READY_WEAPONS, NULL, NULL, ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT },
+	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT },
 	{ ABILT_SUMMON_ANY, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	{ ABILT_SUMMON_RANDOM, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
@@ -5411,6 +5414,72 @@ DO_ABIL(do_paint_building_ability) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_ready_weapon_ability) {
+	int count, pos;
+	struct ability_data_list *adl;
+	obj_data *obj, *proto;
+	
+	// TODO could pre-determine this in prep_ready_weapon_ability
+	any_vnum obj_vnum = NOTHING;
+	
+	// pick at random
+	if (obj_vnum == NOTHING) {
+		count = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && !number(0, count)) {
+				obj_vnum = adl->vnum;
+			}
+		}
+	}
+	
+	// did we find one?
+	if (obj_vnum == NOTHING || !(proto = obj_proto(obj_vnum))) {
+		// no success
+		return;
+	}
+	
+	// determine wear position
+	if (CAN_WEAR(proto, ITEM_WEAR_WIELD)) {
+		pos = WEAR_WIELD;
+	}
+	else if (CAN_WEAR(proto, ITEM_WEAR_HOLD)) {
+		pos = WEAR_HOLD;	// ONLY if they can't wield it
+	}
+	else if (CAN_WEAR(proto, ITEM_WEAR_RANGED)) {
+		pos = WEAR_RANGED;
+	}
+	else {
+		log("SYSERR: %s trying to ready %d %s with no valid wear bits (Ability %d %s)", GET_NAME(ch), GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), ABIL_VNUM(abil), ABIL_NAME(abil));
+		// fail / no success
+		return;
+	}
+	
+	// attempt to remove existing item
+	if (GET_EQ(ch, pos)) {
+		perform_remove(ch, pos);
+		
+		// did it work? if not, player got an error
+		if (GET_EQ(ch, pos)) {
+			return;
+		}
+	}
+	
+	// load the object
+	obj = read_object(obj_vnum, TRUE);
+	scale_item_to_level(obj, level);
+	equip_char(ch, obj, pos);
+	
+	send_ability_per_item_messages(ch, obj, 1, abil, data, NULL);
+	
+	// after messaging (objs may purge on load trig)
+	load_otrigger(obj);
+	// this goes directly to equipment so a GET trigger does not fire
+	
+	determine_gear_level(ch);
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_resurrect_ability) {
 	char_data *targ;
 	
@@ -6072,6 +6141,11 @@ PREP_ABIL(prep_dot_ability) {
 */
 PREP_ABIL(prep_paint_building_ability) {
 	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
+}
+
+
+// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_ready_weapon_ability) {
 }
 
 
