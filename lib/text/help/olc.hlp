@@ -1621,6 +1621,7 @@ modify each other. They are:
  &cROOM-RANDOM&0 - Targets a random room up to the RANGE data.
  &cROOM-CITY&0 - Targets a city (center) in the player's empire by city name.
  &cROOM-COORDS&0 - Targets a room by coordinates.
+ &cSTRING&0 - Argument is required, but not a traditional target.
 
 See also: OLC ABILITIES
 #d

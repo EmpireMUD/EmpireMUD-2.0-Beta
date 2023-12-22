@@ -314,6 +314,7 @@ const char *ability_target_flags[] = {
 	"ROOM-CITY",
 	"ROOM-COORDS",	// 20
 	"ROOM-NOT-HERE",
+	"STRING",
 	"\n"
 };
 

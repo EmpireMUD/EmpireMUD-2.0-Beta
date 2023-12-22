@@ -571,7 +571,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_UNSCALED_PENALTY	BIT(26)	// A. negative buffs are unscaled; positive ones still scale
 #define ABILF_STOP_ON_MISS		BIT(27)	// B. attack/damage miss will prevent buff and DoT types
 
-#define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
+#define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
 // ABILT_x: ability type flags
 #define ABILT_CRAFT				BIT(0)	// related to crafting/building
@@ -599,46 +599,47 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
 #define ABILT_ATTACK			BIT(23)	// hits the target with one's own weapon attack
 /*
-#define ABILT_UNAFFECTS  BIT(2)
-#define ABILT_POINTS  BIT(3)	// e.g. heal?
-#define ABILT_ALTER_OBJS  BIT(4)
-#define ABILT_GROUPS  BIT(5)
-#define ABILT_MASSES  BIT(6)
-#define ABILT_AREAS  BIT(7)
-#define ABILT_CREATIONS  BIT(9)
-#define ABILT_MANUAL  BIT(10)
-#define ABILT_ROOMS  BIT(11)
+#define ABILT_UNAFFECTS	BIT(2)
+#define ABILT_POINTS	BIT(3)	// e.g. heal?
+#define ABILT_ALTER_OBJS	BIT(4)
+#define ABILT_GROUPS	BIT(5)
+#define ABILT_MASSES	BIT(6)
+#define ABILT_AREAS	BIT(7)
+#define ABILT_CREATIONS	BIT(9)
+#define ABILT_MANUAL	BIT(10)
+#define ABILT_ROOMS	BIT(11)
 */
 
 
 // ATAR_x: ability targeting flags
-#define ATAR_IGNORE	BIT(0)	// ignore target
-#define ATAR_CHAR_ROOM	BIT(1)	// pc/npc in room
-#define ATAR_CHAR_WORLD  BIT(2)	// pc/npc in the world
-#define ATAR_CHAR_CLOSEST  BIT(3)	// closest pc/npc in the world
-#define ATAR_FIGHT_SELF  BIT(4)	// if fighting and no arg, targets self
-#define ATAR_FIGHT_VICT  BIT(5)	// if fighting and no arg, targets opponent
-#define ATAR_SELF_ONLY  BIT(6)	// targets self if no arg, and only allows self
-#define ATAR_NOT_SELF  BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
-#define ATAR_OBJ_INV  BIT(8)	// object in inventory
-#define ATAR_OBJ_ROOM  BIT(9)	// object in the room
-#define ATAR_OBJ_WORLD  BIT(10)	// object in the world
-#define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
-#define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
-#define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
-#define ATAR_ROOM_HERE  BIT(14)	// targets the room you're in
-#define ATAR_ROOM_ADJACENT  BIT(15)	// targets in a direction
-#define ATAR_ROOM_EXIT  BIT(16)	// targets the outside of the current place
-#define ATAR_ROOM_HOME  BIT(17)	// targets the player's home room
-#define ATAR_ROOM_RANDOM  BIT(18)	// targets a random room (combine with a RANGE limit)
-#define ATAR_ROOM_CITY  BIT(19)	// targets a city from one's own empire
-#define ATAR_ROOM_COORDS  BIT(20)	// targets a room by coordinates
-#define ATAR_ROOM_NOT_HERE  BIT(21)	// modifier ensures it's not the current room
+#define ATAR_IGNORE			BIT(0)	// ignore target
+#define ATAR_CHAR_ROOM		BIT(1)	// pc/npc in room
+#define ATAR_CHAR_WORLD		BIT(2)	// pc/npc in the world
+#define ATAR_CHAR_CLOSEST	BIT(3)	// closest pc/npc in the world
+#define ATAR_FIGHT_SELF		BIT(4)	// if fighting and no arg, targets self
+#define ATAR_FIGHT_VICT		BIT(5)	// if fighting and no arg, targets opponent
+#define ATAR_SELF_ONLY		BIT(6)	// targets self if no arg, and only allows self
+#define ATAR_NOT_SELF		BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
+#define ATAR_OBJ_INV		BIT(8)	// object in inventory
+#define ATAR_OBJ_ROOM		BIT(9)	// object in the room
+#define ATAR_OBJ_WORLD		BIT(10)	// object in the world
+#define ATAR_OBJ_EQUIP		BIT(11)	// object held/equipped
+#define ATAR_VEH_ROOM		BIT(12)	// vehicle in the room
+#define ATAR_VEH_WORLD		BIT(13)	// vehicle in the world
+#define ATAR_ROOM_HERE		BIT(14)	// targets the room you're in
+#define ATAR_ROOM_ADJACENT	BIT(15)	// targets in a direction
+#define ATAR_ROOM_EXIT		BIT(16)	// targets the outside of the current place
+#define ATAR_ROOM_HOME		BIT(17)	// targets the player's home room
+#define ATAR_ROOM_RANDOM	BIT(18)	// targets a random room (combine with a RANGE limit)
+#define ATAR_ROOM_CITY		BIT(19)	// targets a city from one's own empire
+#define ATAR_ROOM_COORDS	BIT(20)	// targets a room by coordinates
+#define ATAR_ROOM_NOT_HERE	BIT(21)	// modifier ensures it's not the current room
+#define ATAR_STRING			BIT(22)	// string is expected and arg cannot be empty
 
-#define CHAR_ATARS  (ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
-#define OBJ_ATARS  (ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
-#define VEH_ATARS  (ATAR_VEH_ROOM | ATAR_VEH_WORLD)
-#define ROOM_ATARS  (ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
+#define CHAR_ATARS	(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
+#define OBJ_ATARS	(ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
+#define VEH_ATARS	(ATAR_VEH_ROOM | ATAR_VEH_WORLD)
+#define ROOM_ATARS	(ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
 
 
 // ABIL_ACTION_x: ability actions
@@ -664,75 +665,75 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ABIL_CUSTOM_x: custom message types
-#define ABIL_CUSTOM_SELF_TO_CHAR  0
-#define ABIL_CUSTOM_SELF_TO_ROOM  1
-#define ABIL_CUSTOM_TARGETED_TO_CHAR  2
-#define ABIL_CUSTOM_TARGETED_TO_VICT  3
-#define ABIL_CUSTOM_TARGETED_TO_ROOM  4
-#define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
-#define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
-#define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
-#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR  8
-#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM  9
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
-#define ABIL_CUSTOM_PRE_SELF_TO_CHAR  13
-#define ABIL_CUSTOM_PRE_SELF_TO_ROOM  14
-#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
-#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
-#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
-#define ABIL_CUSTOM_PER_VEH_TO_CHAR  18
-#define ABIL_CUSTOM_PER_VEH_TO_ROOM  19
-#define ABIL_CUSTOM_PER_ITEM_TO_CHAR  20
-#define ABIL_CUSTOM_PER_ITEM_TO_ROOM  21
-#define ABIL_CUSTOM_OVER_TIME_LONGDESC  22
-#define ABIL_CUSTOM_TOGGLE_TO_CHAR  23
-#define ABIL_CUSTOM_TOGGLE_TO_ROOM  24
-#define ABIL_CUSTOM_PER_CHAR_TO_CHAR  25
-#define ABIL_CUSTOM_PER_CHAR_TO_VICT  26
-#define ABIL_CUSTOM_PER_CHAR_TO_ROOM  27
-#define ABIL_CUSTOM_SPEC_TO_CHAR  28
-#define ABIL_CUSTOM_SPEC_TO_VICT  29
-#define ABIL_CUSTOM_SPEC_TO_ROOM  30
-#define ABIL_CUSTOM_NO_ARGUMENT  31
+#define ABIL_CUSTOM_SELF_TO_CHAR			0
+#define ABIL_CUSTOM_SELF_TO_ROOM			1
+#define ABIL_CUSTOM_TARGETED_TO_CHAR		2
+#define ABIL_CUSTOM_TARGETED_TO_VICT		3
+#define ABIL_CUSTOM_TARGETED_TO_ROOM		4
+#define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR	5
+#define ABIL_CUSTOM_COUNTERSPELL_TO_VICT	6
+#define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM	7
+#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR		8
+#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM		9
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR	10
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT	11
+#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM	12
+#define ABIL_CUSTOM_PRE_SELF_TO_CHAR		13
+#define ABIL_CUSTOM_PRE_SELF_TO_ROOM		14
+#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR	15
+#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT	16
+#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM	17
+#define ABIL_CUSTOM_PER_VEH_TO_CHAR			18
+#define ABIL_CUSTOM_PER_VEH_TO_ROOM			19
+#define ABIL_CUSTOM_PER_ITEM_TO_CHAR		20
+#define ABIL_CUSTOM_PER_ITEM_TO_ROOM		21
+#define ABIL_CUSTOM_OVER_TIME_LONGDESC		22
+#define ABIL_CUSTOM_TOGGLE_TO_CHAR			23
+#define ABIL_CUSTOM_TOGGLE_TO_ROOM			24
+#define ABIL_CUSTOM_PER_CHAR_TO_CHAR		25
+#define ABIL_CUSTOM_PER_CHAR_TO_VICT		26
+#define ABIL_CUSTOM_PER_CHAR_TO_ROOM		27
+#define ABIL_CUSTOM_SPEC_TO_CHAR			28
+#define ABIL_CUSTOM_SPEC_TO_VICT			29
+#define ABIL_CUSTOM_SPEC_TO_ROOM			30
+#define ABIL_CUSTOM_NO_ARGUMENT				31
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used
-#define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
-#define ABIL_EFFECT_DISTRUST_FROM_HOSTILE  1	// causes a distrust state with the target
+#define ABIL_EFFECT_DISMOUNT				0	// player is dismounted
+#define ABIL_EFFECT_DISTRUST_FROM_HOSTILE	1	// causes a distrust state with the target
 
 
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
-#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
-#define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
-#define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
-#define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
-#define ADL_LIMITATION  BIT(4)	// special checks on the ability
-#define ADL_PAINT_COLOR  BIT(5)	// for paint-building, etc
-#define ADL_ACTION  BIT(6)	// has a specific action when successful
-#define ADL_RANGE  BIT(7)	// some abilities can control range
-#define ADL_PARENT  BIT(8)	// indicates this ability comes free with that one
+#define ADL_PLAYER_TECH		BIT(0)	// vnum will be PTECH_ types
+#define ADL_EFFECT			BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
+#define ADL_READY_WEAPON	BIT(2)	// adds to the "ready"
+#define ADL_SUMMON_MOB		BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
+#define ADL_LIMITATION		BIT(4)	// special checks on the ability
+#define ADL_PAINT_COLOR		BIT(5)	// for paint-building, etc
+#define ADL_ACTION			BIT(6)	// has a specific action when successful
+#define ADL_RANGE			BIT(7)	// some abilities can control range
+#define ADL_PARENT			BIT(8)	// indicates this ability comes free with that one
 
 
 // AGH_x: ability gain hooks
-#define AGH_ONLY_WHEN_AFFECTED  BIT(0)	// modifies other types: only when affected by this abil
-#define AGH_MELEE  BIT(1)	// gains when actor hits in melee
-#define AGH_RANGED  BIT(2)	// gains when actor hits at range
-#define AGH_DODGE  BIT(3)	// gains when actor dodges
-#define AGH_BLOCK  BIT(4)	// gains when actor blocks
-#define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
-#define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
-#define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
-#define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
-#define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
-#define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
-#define AGH_MOVING  BIT(12)	// gain when moving
-#define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
-#define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
-#define AGH_NOT_WHILE_ASLEEP  BIT(15)	// prevent gains while sleeping (or dying)
-#define AGH_DYING  BIT(16)	// calledwhen the player dies (before auto-resurrect)
+#define AGH_ONLY_WHEN_AFFECTED	BIT(0)	// modifies other types: only when affected by this abil
+#define AGH_MELEE				BIT(1)	// gains when actor hits in melee
+#define AGH_RANGED				BIT(2)	// gains when actor hits at range
+#define AGH_DODGE				BIT(3)	// gains when actor dodges
+#define AGH_BLOCK				BIT(4)	// gains when actor blocks
+#define AGH_TAKE_DAMAGE			BIT(5)	// gains when hit in melee
+#define AGH_PASSIVE_FREQUENT	BIT(6)	// gains every "real update"
+#define AGH_PASSIVE_HOURLY		BIT(7)	// gains every game hour
+#define AGH_ONLY_DARK			BIT(8)	// only gains if it's dark
+#define AGH_ONLY_LIGHT			BIT(9)	// only gains if it's light
+#define AGH_ONLY_VS_ANIMAL		BIT(10)	// only if the target was an animal
+#define AGH_VAMPIRE_FEEDING		BIT(11)	// gains when feeding
+#define AGH_MOVING				BIT(12)	// gain when moving
+#define AGH_ONLY_USING_READY_WEAPON		BIT(13)	// only gains if a ready-weapon is equipped
+#define AGH_ONLY_USING_COMPANION		BIT(14)	// only if the player is using a companion from this ability
+#define AGH_NOT_WHILE_ASLEEP	BIT(15)	// prevent gains while sleeping (or dying)
+#define AGH_DYING				BIT(16)	// calledwhen the player dies (before auto-resurrect)
 
 
 // AHOOK_x: Ability hooks (things that cause an ability to run itself)
@@ -802,9 +803,9 @@ typedef struct vehicle_data vehicle_data;
 
 
 // RUN_ABIL_x: modes for activating abilities
-#define RUN_ABIL_NORMAL  0	// normal command activation
-#define RUN_ABIL_OVER_TIME  1	// an over-time ability running its final code
-#define RUN_ABIL_HOOKED  2	// called from a hook (triggered) ability
+#define RUN_ABIL_NORMAL		0	// normal command activation
+#define RUN_ABIL_OVER_TIME	1	// an over-time ability running its final code
+#define RUN_ABIL_HOOKED		2	// called from a hook (triggered) ability
 
 
  //////////////////////////////////////////////////////////////////////////////
