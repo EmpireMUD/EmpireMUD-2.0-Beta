@@ -6152,7 +6152,7 @@ PREP_ABIL(prep_ready_weapon_ability) {
 	obj_data *obj;
 	struct ability_data_list *adl;
 	
-	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch) {
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE)) {
 		// look for equipped item to toggle
 		found = FALSE;
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
