@@ -8882,8 +8882,8 @@ OLC_MODULE(abiledit_data) {
 									msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
 									return;
 								}
-								else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
-									msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+								else if (!(amd = find_attack_message_by_name_or_vnum(val_b, FALSE))) {
+									msg_to_char(ch, "Unknown attack message '%s'.\r\n", val_b);
 									return;
 								}
 								else {
