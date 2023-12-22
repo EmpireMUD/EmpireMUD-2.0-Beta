@@ -279,15 +279,12 @@ FINESSE
 
 Finesse (Battle ability)
 
-With finesse, your close-combat (non-Archery) automatic attacks happen faster,
-leading to more damage overall. As a basic ability, attacks are 10% faster. As a
-specialty ability, they are 15% faster. At Battle 100, they are 20% faster.
-
-The ranged (Archery) version of this ability is Quick Draw.
+With finesse, your close-combat (non-Archery) attacks happen faster, leading to
+more damage overall.
 
 Gain experience when you hit a combat opponent.
 
-See also: SPEED
+See also: QUICK DRAW, SPEED
 #
 FIRE CATAPULT CANNONS
 
@@ -536,15 +533,12 @@ See also: BLOCK, PASSIVES, ROLE
 Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
-quickly, leading to more damage per second. This improves your ranged combat
-speed by 25% (or 35% at Battle 100).
-
-The close-combat version of this ability is Finesse. It works on all ranged
-weapons, not just arrows.
+quickly, leading to more damage per second. It works on all ranged weapons, not
+just arrows.
 
 Gain experience when you successfully hit with a ranged weapon.
 
-See also: ARCHERY, SHOOT
+See also: ARCHERY, FINESSE, SHOOT
 #
 PREPARED
 
