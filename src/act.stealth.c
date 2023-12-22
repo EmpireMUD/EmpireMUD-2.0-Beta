@@ -638,61 +638,6 @@ ACMD(do_diversion) {
 }
 
 
-ACMD(do_hide) {
-	bool npc_access = IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_ORDERED);
-	char_data *c;
-	
-	if (!npc_access && !can_use_ability(ch, ABIL_HIDE, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	
-	if (GET_POS(ch) == POS_FIGHTING || is_fighting(ch)) {
-		msg_to_char(ch, "You can't hide in combat!\r\n");
-		return;
-	}
-	
-	if (!npc_access && IS_RIDING(ch)) {
-		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		else {
-			msg_to_char(ch, "You can't hide while mounted!\r\n");
-			return;
-		}
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HIDE)) {
-		return;
-	}
-
-	msg_to_char(ch, "You attempt to hide yourself.\r\n");
-
-	if (AFF_FLAGGED(ch, AFF_HIDE)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-	}
-
-	command_lag(ch, WAIT_ABILITY);
-	
-	if (!npc_access) {	// npcs ignore people present
-		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
-			if (c != ch && (GET_LEADER(c) != ch || !AFF_FLAGGED(c, AFF_CHARM)) && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
-				msg_to_char(ch, "You can't hide with somebody watching!\r\n");
-				return;
-			}
-		}
-	}
-
-	gain_ability_exp(ch, ABIL_HIDE, 33.4);
-	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 10);
-
-	if (npc_access || has_player_tech(ch, PTECH_HIDE_UPGRADE) || skill_check(ch, ABIL_HIDE, DIFF_MEDIUM)) {
-		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
-	}
-	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_HIDE, 0, ch, NULL, NULL, NULL);
-}
-
-
 ACMD(do_howl) {
 	char_data *victim, *next_vict;
 	struct affected_type *af;

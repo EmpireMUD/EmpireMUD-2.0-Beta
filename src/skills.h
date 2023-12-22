@@ -75,6 +75,7 @@ void check_skill_sell(char_data *ch, ability_data *abil);
 bool check_solo_role(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 int compute_bonus_exp_per_day(char_data *ch);
+bool difficulty_check(int level, int difficulty);
 void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
@@ -133,7 +134,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_DISGUISE  13
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
-#define ABIL_HIDE  20
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
 #define ABIL_SNEAK  29
@@ -141,7 +141,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
-#define ABIL_FISH  72
 #define ABIL_PATHFINDING  83
 #define ABIL_REFORGE  87
 #define ABIL_RESCUE  93

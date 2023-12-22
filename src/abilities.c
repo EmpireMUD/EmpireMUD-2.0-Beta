@@ -2264,7 +2264,7 @@ int wordcount_ability(ability_data *abil) {
 //// ABILITY ACTIONS /////////////////////////////////////////////////////////
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_apply_poison) {
+DO_ABIL(abil_action_apply_poison) {
 	if (vict && (apply_poison(ch, vict) != 0 || IS_DEAD(vict) || EXTRACTED(vict))) {
 		data->success = TRUE;
 	}
@@ -2518,6 +2518,20 @@ DO_ABIL(abil_action_devastate_area) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_hide) {
+	// hide uses a simple bit, not an affect
+	if (IS_NPC(ch) || has_player_tech(ch, PTECH_HIDE_UPGRADE) || difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_MEDIUM)) {
+		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
+	}
+	
+	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 15);
+	
+	// and always marks itself successful
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_magic_growth) {
 	char was_name[256];
 	char *repl_array[2];
@@ -2545,7 +2559,7 @@ DO_ABIL(abil_action_magic_growth) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_debuffs) {
+DO_ABIL(abil_action_remove_debuffs) {
 	struct affected_type *aff, *next_aff;
 	bool any = FALSE;
 	
@@ -2571,7 +2585,7 @@ DO_ABIL(abil_remove_debuffs) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_drunk) {
+DO_ABIL(abil_action_remove_drunk) {
 	if (vict && !IS_NPC(vict) && GET_COND(vict, DRUNK) > 0) {
 		gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		data->success = TRUE;
@@ -2608,7 +2622,7 @@ void abil_remove_dots_by_type(char_data *ch, ability_data *abil, char_data *vict
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_physical_dots) {
+DO_ABIL(abil_action_remove_physical_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_PHYSICAL);
 	}
@@ -2616,7 +2630,7 @@ DO_ABIL(abil_remove_physical_dots) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_magical_dots) {
+DO_ABIL(abil_action_remove_magical_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_MAGICAL);
 	}
@@ -2624,7 +2638,7 @@ DO_ABIL(abil_remove_magical_dots) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_fire_dots) {
+DO_ABIL(abil_action_remove_fire_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_FIRE);
 	}
@@ -2632,7 +2646,7 @@ DO_ABIL(abil_remove_fire_dots) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_poison_dots) {
+DO_ABIL(abil_action_remove_poison_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, DAM_POISON);
 	}
@@ -2640,7 +2654,7 @@ DO_ABIL(abil_remove_poison_dots) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_remove_all_dots) {
+DO_ABIL(abil_action_remove_all_dots) {
 	if (vict) {
 		abil_remove_dots_by_type(ch, abil, vict, data, NOTHING);
 	}
@@ -2648,7 +2662,7 @@ DO_ABIL(abil_remove_all_dots) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_rescue_all) {
+DO_ABIL(abil_action_rescue_all) {
 	char_data *attacker, *next;
 	bool first = TRUE;
 	
@@ -2668,7 +2682,7 @@ DO_ABIL(abil_rescue_all) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_rescue_one) {
+DO_ABIL(abil_action_rescue_one) {
 	char_data *attacker = NULL;
 	
 	if (vict && vict != ch) {
@@ -2690,7 +2704,7 @@ DO_ABIL(abil_rescue_one) {
 
 
 // DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(abil_taunt) {
+DO_ABIL(abil_action_taunt) {
 	if (vict && can_fight(ch, vict) && FIGHTING(vict) != ch) {
 		if (FIGHTING(vict)) {
 			perform_rescue(ch, FIGHTING(vict), vict, RESCUE_FOCUS);
@@ -2780,6 +2794,7 @@ void apply_ability_effects(ability_data *abil, char_data *ch, char_data *vict, o
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
 	char part[256];
 	struct ability_data_list *adl;
+	char_data *ch_iter;
 	room_data *any_room, *other_room;
 	
 	// some types just require any match
@@ -3195,6 +3210,32 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				else {
 					strcpy(role_error, class_role[adl->misc]);
+				}
+				break;
+			}
+			case ABIL_LIMIT_NO_WITNESSES: {
+				if (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_ORDERED)) {
+					continue;	// npc: ok
+				}
+				
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL)) {
+						msg_to_char(ch, "You can't do that with somebody watching!\r\n");
+						return FALSE;
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_NO_WITNESSES_HIDE: {
+				if (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_ORDERED)) {
+					continue;	// npc: ok
+				}
+				
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
+						msg_to_char(ch, "You can't do that with somebody watching!\r\n");
+						return FALSE;
+					}
 				}
 				break;
 			}
@@ -4986,47 +5027,51 @@ DO_ABIL(do_action_ability) {
 				break;
 			}
 			case ABIL_ACTION_APPLY_POISON: {
-				call_do_abil(abil_apply_poison);
+				call_do_abil(abil_action_apply_poison);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_PHYSICAL_DOTS: {
-				call_do_abil(abil_remove_physical_dots);
+				call_do_abil(abil_action_remove_physical_dots);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_MAGICAL_DOTS: {
-				call_do_abil(abil_remove_magical_dots);
+				call_do_abil(abil_action_remove_magical_dots);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_FIRE_DOTS: {
-				call_do_abil(abil_remove_fire_dots);
+				call_do_abil(abil_action_remove_fire_dots);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_POISON_DOTS: {
-				call_do_abil(abil_remove_poison_dots);
+				call_do_abil(abil_action_remove_poison_dots);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_ALL_DOTS: {
-				call_do_abil(abil_remove_all_dots);
+				call_do_abil(abil_action_remove_all_dots);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_DEBUFFS: {
-				call_do_abil(abil_remove_debuffs);
+				call_do_abil(abil_action_remove_debuffs);
 				break;
 			}
 			case ABIL_ACTION_REMOVE_DRUNK: {
-				call_do_abil(abil_remove_drunk);
+				call_do_abil(abil_action_remove_drunk);
 				break;
 			}
 			case ABIL_ACTION_TAUNT: {
-				call_do_abil(abil_taunt);
+				call_do_abil(abil_action_taunt);
 				break;
 			}
 			case ABIL_ACTION_RESCUE_ONE: {
-				call_do_abil(abil_rescue_one);
+				call_do_abil(abil_action_rescue_one);
 				break;
 			}
 			case ABIL_ACTION_RESCUE_ALL: {
-				call_do_abil(abil_rescue_all);
+				call_do_abil(abil_action_rescue_all);
+				break;
+			}
+			case ABIL_ACTION_HIDE: {
+				call_do_abil(abil_action_hide);
 				break;
 			}
 		}

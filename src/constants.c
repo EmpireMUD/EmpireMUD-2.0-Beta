@@ -133,6 +133,7 @@ const char *ability_actions[] = {
 	"taunt",	// 15
 	"rescue one",
 	"rescue all",
+	"hide",
 	"\n"
 };
 
@@ -478,6 +479,8 @@ const char *ability_limitations[] = {
 	"target has any DoT",	// 35
 	"target being attacked",
 	"in role",
+	"no witnesses",
+	"no witnesses hide",
 	"\n"
 };
 
@@ -522,6 +525,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_ANY_DOT
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_BEING_ATTACKED
 	ABLIM_ROLE,	// ABIL_LIMIT_IN_ROLE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NO_WITNESSES
 };
 
 

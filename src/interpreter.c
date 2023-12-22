@@ -202,7 +202,6 @@ ACMD(do_heartstop);
 ACMD(do_help);
 ACMD(do_helpsearch);
 ACMD(do_herd);
-ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
@@ -736,7 +735,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "herd", POS_STANDING, do_herd, NO_MIN, CTYPE_MOVE ),
 	ABILITY_CMD( "heartstop", POS_FIGHTING, do_heartstop, NO_MIN, CTYPE_COMBAT, ABIL_HEARTSTOP ),
 	SIMPLE_CMD( "helpsearch", POS_DEAD, do_helpsearch, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "hide", POS_RESTING, do_hide, NO_MIN, CTYPE_MOVE, ABIL_HIDE ),
 	SIMPLE_CMD( "hint", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "history", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_HISTORY ),
 	STANDARD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_HIT, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),

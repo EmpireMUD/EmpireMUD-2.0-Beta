@@ -642,24 +642,25 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ABIL_ACTION_x: ability actions
-#define ABIL_ACTION_DETECT_HIDE  0	// finds hidden characters
-#define ABIL_ACTION_DETECT_EARTHMELD  1	// finds earthmelded characters
-#define ABIL_ACTION_DETECT_PLAYERS_AROUND  2	// finds other players in/near the city
-#define ABIL_ACTION_DETECT_ADVENTURES_AROUND  3	// finds detectable adventures near the player
-#define ABIL_ACTION_DEVASTATE_AREA  4	// collects a chop or crop resource within 3 tiles
-#define ABIL_ACTION_MAGIC_GROWTH  5	// triggers a magic growth evolution
-#define ABIL_ACTION_CLOSE_PORTAL  6	// if item target is portal, closes it
-#define ABIL_ACTION_APPLY_POISON  7	// applies your current poison to the target
-#define ABIL_ACTION_REMOVE_PHYSICAL_DOTS  8	// removes physical-type DoT effects
-#define ABIL_ACTION_REMOVE_MAGICAL_DOTS  9	// removes magical-type DoT effects
-#define ABIL_ACTION_REMOVE_FIRE_DOTS  10	// removes fire-type DoT effects
-#define ABIL_ACTION_REMOVE_POISON_DOTS  11	// removes poison-type DoT effects
-#define ABIL_ACTION_REMOVE_ALL_DOTS  12	// removes all types or DoT effects
-#define ABIL_ACTION_REMOVE_DEBUFFS  13	// removes debuffs
-#define ABIL_ACTION_REMOVE_DRUNK  14	// removes drunk effects
-#define ABIL_ACTION_TAUNT  15	// taunts the target to hit you
-#define ABIL_ACTION_RESCUE_ONE  16	// rescues the target
-#define ABIL_ACTION_RESCUE_ALL  17	// rescues the target
+#define ABIL_ACTION_DETECT_HIDE				0	// finds hidden characters
+#define ABIL_ACTION_DETECT_EARTHMELD		1	// finds earthmelded characters
+#define ABIL_ACTION_DETECT_PLAYERS_AROUND	2	// finds other players in/near the city
+#define ABIL_ACTION_DETECT_ADVENTURES_AROUND	3	// finds detectable adventures near the player
+#define ABIL_ACTION_DEVASTATE_AREA			4	// collects a chop or crop resource within 3 tiles
+#define ABIL_ACTION_MAGIC_GROWTH			5	// triggers a magic growth evolution
+#define ABIL_ACTION_CLOSE_PORTAL			6	// if item target is portal, closes it
+#define ABIL_ACTION_APPLY_POISON			7	// applies your current poison to the target
+#define ABIL_ACTION_REMOVE_PHYSICAL_DOTS	8	// removes physical-type DoT effects
+#define ABIL_ACTION_REMOVE_MAGICAL_DOTS		9	// removes magical-type DoT effects
+#define ABIL_ACTION_REMOVE_FIRE_DOTS		10	// removes fire-type DoT effects
+#define ABIL_ACTION_REMOVE_POISON_DOTS		11	// removes poison-type DoT effects
+#define ABIL_ACTION_REMOVE_ALL_DOTS			12	// removes all types or DoT effects
+#define ABIL_ACTION_REMOVE_DEBUFFS			13	// removes debuffs
+#define ABIL_ACTION_REMOVE_DRUNK			14	// removes drunk effects
+#define ABIL_ACTION_TAUNT					15	// taunts the target to hit you
+#define ABIL_ACTION_RESCUE_ONE				16	// rescues the target
+#define ABIL_ACTION_RESCUE_ALL				17	// rescues the target
+#define ABIL_ACTION_HIDE					18	// attempts a hide
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -787,6 +788,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_TARGET_HAS_ANY_DOT		35	// must be afflicted by a DoT
 #define ABIL_LIMIT_TARGET_BEING_ATTACKED	36	// target has someone hitting them
 #define ABIL_LIMIT_IN_ROLE					37	// char must be in a certain role (or solo)
+#define ABIL_LIMIT_NO_WITNESSES				38	// nobody is watching
+#define ABIL_LIMIT_NO_WITNESSES_HIDE		39	// nobody is watching, unless you're good at hiding
 
 
 // ABLIM_x: data needed for ability limits:

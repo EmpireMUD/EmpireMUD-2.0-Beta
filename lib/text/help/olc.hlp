@@ -555,6 +555,7 @@ Action types:
    messages. Uses RANGE data, defaults to normal "nearby" range.
  &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
    name in per-item messages. Uses RANGE data, default 3 if not given.
+ &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
    the evolution works with $1 as the old sector name and $2 as the new one.
  &cremove debuffs&0 - Removes debuffs (except self-debuffs and penalties).
@@ -1142,6 +1143,8 @@ Limitation types:
  &cindoors&0 - Must be used indoors (including inside buildings on the map).
  &citem type <TYPE>&0 - Obj target must be a specific type.
  &cmember permission at target&0 - Has member access at the target location.
+ &cno witnesses&0 - Nobody is watching.
+ &cno witnesses hide&0 - Nobody is watching unless you're good at hiding.
  &cnot being attacked&0 - No characters in combat are targeting the actor.
  &cnot distracted&0 - User does not have DISTRACTED affect.
  &cnot god target&0 - Target player must not be a god or immortal.

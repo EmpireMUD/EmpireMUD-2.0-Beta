@@ -777,6 +777,25 @@ int compute_bonus_exp_per_day(char_data *ch) {
 
 
 /**
+* Basic difficulty roll.
+*
+* @param int level Skill level 0-100.
+* @param int difficulty Any DIFF_ const.
+* @return bool TRUE for success, FALSE for failure.
+*/
+bool difficulty_check(int level, int difficulty) {
+	int chance = (int) (skill_check_difficulty_modifier[difficulty] * (double) level);
+	
+	// always succeeds
+	if (difficulty == DIFF_TRIVIAL) {
+		return TRUE;
+	}
+	
+	return (number(1, 100) <= chance);
+}
+
+
+/**
 * Gives a skillup for anybody in the empire with the ability.
 *
 * @param empire_data *emp the empire to skillup
@@ -1700,11 +1719,7 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 		chance = 0;
 	}
 	
-	// modify chance based on diff
-	chance = (int) (skill_check_difficulty_modifier[difficulty] * (double) chance);
-	
-	// roll
-	return (number(1, 100) <= chance);
+	return difficulty_check(chance, difficulty);
 }
 
 
