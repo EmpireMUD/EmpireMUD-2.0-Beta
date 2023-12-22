@@ -1039,8 +1039,7 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 	static char output[1024];
 	bool estimate = FALSE;
-	double scale = 1.0;
-	int cost;
+	int cost, iter;
 	struct ability_exec *data;
 	
 	cost = ABIL_COST(abil);
@@ -1051,12 +1050,15 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		data->abil = abil;
 		data->matching_role = has_matching_role(ch, abil, FALSE);
 		
-		scale = standard_ability_scale(ch, abil, get_ability_level(ch, ABIL_VNUM(abil)), NOBITS, data);
+		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+				cost += standard_ability_scale(ch, abil, get_ability_level(ch, ABIL_VNUM(abil)), do_ability_data[iter].type, data) * ABIL_COST_PER_SCALE_POINT(abil);
+			}
+		}
 		
 		// free this up now
 		free_ability_exec(data);
 		
-		cost += scale * ABIL_COST_PER_SCALE_POINT(abil);
 		estimate = TRUE;
 	}
 	
