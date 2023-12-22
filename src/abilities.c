@@ -1862,7 +1862,7 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 		}
 		
 		// Lastly: did we need a targ but lack one?
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE)) {
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING)) {
 			return TRUE;
 		}
 		else if (!any_targ && (!IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) || !vict || !*vict) && (!IS_SET(ABIL_TARGETS(abil), OBJ_ATARS) || !ovict || !*ovict) && (!IS_SET(ABIL_TARGETS(abil), VEH_ATARS) || !vvict || !*vvict) && (!IS_SET(ABIL_TARGETS(abil), ROOM_ATARS) || !room_targ || !*room_targ)) {
@@ -4905,7 +4905,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			}
 			
 			// do we have any mandatory targets left?
-			if (!IS_SET(ABIL_TARGETS(plab->ptr), ATAR_IGNORE)) {
+			if (!IS_SET(ABIL_TARGETS(plab->ptr), ATAR_IGNORE | ATAR_STRING)) {
 				any_targ = FALSE;
 				if (IS_SET(ABIL_TARGETS(plab->ptr), CHAR_ATARS) && use_char) {
 					any_targ = TRUE;
@@ -5667,6 +5667,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	skip_spaces(&argument);
 	if (ABIL_TARGETS(abil) == ATAR_IGNORE) {
 		// if it has _only_ ATAR_IGNORE, skip argument entirely
+		has = TRUE;
+	}
+	else if (*argument && IS_SET(ABIL_TARGETS(abil), ATAR_STRING)) {
 		has = TRUE;
 	}
 	else if (*argument) {
