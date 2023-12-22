@@ -2764,6 +2764,8 @@ typedef enum {
 #define PTECH_CONCEAL_EQUIPMENT  89	// others can't see your equipment
 #define PTECH_CONCEAL_INVENTORY  90	// others can't see your inventory
 #define PTECH_FLEE_UPGRADE  91	// increased chance to flee
+#define PTECH_FASTER_MELEE_COMBAT  92	// slight speed boost in melee
+#define PTECH_FASTER_RANGED_COMBAT  93	// slight speed boost in ranged combat
 
 
 // SM_x: status messages
