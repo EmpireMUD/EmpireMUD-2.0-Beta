@@ -211,6 +211,21 @@ Gains experience passively while you're outdoors during the day.
 
 See also: PURIFY
 #
+DEATHRISE
+
+Deathrise (Vampire ability)
+
+Usage:  deathrise
+Cost:  50 blood and 1 grave cloth
+Cooldown:  10 minutes
+
+This ability allows a vampire to rise from the dead. It must be used before
+respawning.
+
+It also allows you to weave a grave cloth, which is required for resurrection.
+
+See also: WEAVE
+#
 DEATHSHROUD "DEATH SHROUD"
 
 Deathshroud (Vampire ability)
