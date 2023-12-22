@@ -315,7 +315,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 	}
 	
-	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) > 0) {
+	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
 		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s\r\n", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
 	}
@@ -1038,11 +1038,14 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 */
 char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 	static char output[1024];
+	bool estimate = FALSE;
 	double scale = 1.0;
-	int cost = ABIL_COST(abil);
+	int cost;
 	struct ability_exec *data;
 	
-	if (ABIL_COST_PER_SCALE_POINT(abil)) {
+	cost = ABIL_COST(abil);
+	
+	if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
 		// need a temporary data bean for this:
 		CREATE(data, struct ability_exec, 1);
 		data->abil = abil;
@@ -1054,9 +1057,10 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		free_ability_exec(data);
 		
 		cost += scale * ABIL_COST_PER_SCALE_POINT(abil);
+		estimate = TRUE;
 	}
 	
-	snprintf(output, sizeof(output), "%d%s", cost, (ABIL_COST_PER_SCALE_POINT(abil) ? " (estimated)" : ""));
+	snprintf(output, sizeof(output), "%d%s", cost, (estimate ? " (estimated)" : ""));
 	return output;
 }
 
@@ -4592,7 +4596,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			call_prep_abil(do_ability_data[iter].prep_func);
 			
 			// adjust cost
-			if (ABIL_COST_PER_SCALE_POINT(abil)) {
+			if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
 				data->cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
 			}
 		}
@@ -6641,7 +6645,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	ability_data *abil, *find;
 	bitvector_t type;
 	int int_in[10], xtype;
-	double dbl_in;
+	double dbl_in[4];
 	
 	CREATE(abil, ability_data, 1);
 	clear_ability(abil);
@@ -6667,12 +6671,12 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	}
 	
 	// line 2 is backwards-compatible with previous versions
-	if (sscanf(line, "%s %d %lf %s %s %s", str_in, &int_in[0], &dbl_in, str_in2, str_in3, str_in4) != 6) {
+	if (sscanf(line, "%s %d %lf %s %s %s", str_in, &int_in[0], &dbl_in[1], str_in2, str_in3, str_in4) != 6) {
 		strcpy(str_in4, "0");	// default requires-tool
-		if (sscanf(line, "%s %d %lf %s %s", str_in, &int_in[0], &dbl_in, str_in2, str_in3) != 5) {
+		if (sscanf(line, "%s %d %lf %s %s", str_in, &int_in[0], &dbl_in[1], str_in2, str_in3) != 5) {
 			strcpy(str_in3, "0");	// default gain hooks
-			if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in, str_in2) != 4) {
-				dbl_in = 1.0;	// default scale
+			if (sscanf(line, "%s %d %lf %s", str_in, &int_in[0], &dbl_in[1], str_in2) != 4) {
+				dbl_in[1] = 1.0;	// default scale
 				strcpy(str_in2, "0");	// default immunities
 				if (sscanf(line, "%s %d", str_in, &int_in[0]) != 2) {
 					log("SYSERR: Format error in line 2 of %s", error);
@@ -6684,7 +6688,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	
 	ABIL_FLAGS(abil) = asciiflag_conv(str_in);
 	ABIL_MASTERY_ABIL(abil) = int_in[0];
-	ABIL_SCALE(abil) = dbl_in;
+	ABIL_SCALE(abil) = dbl_in[1];
 	ABIL_IMMUNITIES(abil) = asciiflag_conv(str_in2);
 	ABIL_GAIN_HOOKS(abil) = asciiflag_conv(str_in3);
 	ABIL_REQUIRES_TOOL(abil) = asciiflag_conv(str_in4);
@@ -6708,10 +6712,10 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				}
 				
 				// backwards-compatible with older versions
-				if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7], &int_in[8]) != 11) {
+				if (sscanf(line, "%s %d %s %d %d %lf %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &dbl_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7], &int_in[8]) != 11) {
 					int_in[8] = DIFF_TRIVIAL;
-					if (sscanf(line, "%s %d %s %d %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
-						int_in[3] = 0;	// default cost-per-scale-point
+					if (sscanf(line, "%s %d %s %d %d %lf %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &dbl_in[3], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 10) {
+						dbl_in[3] = 0.0;	// default cost-per-scale-point
 						if (sscanf(line, "%s %d %s %d %d %d %d %d %d", str_in, &int_in[0], str_in2, &int_in[1], &int_in[2], &int_in[4], &int_in[5], &int_in[6], &int_in[7]) != 9) {
 							log("SYSERR: Format error in C line of %s", error);
 							exit(1);
@@ -6727,7 +6731,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				ABIL_TARGETS(abil) = asciiflag_conv(str_in2);
 				ABIL_COST_TYPE(abil) = int_in[1];
 				ABIL_COST(abil) = int_in[2];
-				ABIL_COST_PER_SCALE_POINT(abil) = int_in[3];
+				ABIL_COST_PER_SCALE_POINT(abil) = dbl_in[3];
 				ABIL_COOLDOWN(abil) = int_in[4];
 				ABIL_COOLDOWN_SECS(abil) = int_in[5];
 				ABIL_LINKED_TRAIT(abil) = int_in[6];
@@ -6751,7 +6755,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			case 'H': {	// ability hook
-				if (sscanf(line, "H %llu %d %lf %d", &type, &int_in[1], &dbl_in, &int_in[3]) != 4) {
+				if (sscanf(line, "H %llu %d %lf %d", &type, &int_in[1], &dbl_in[2], &int_in[3]) != 4) {
 					log("SYSERR: Format error in H line of %s", error);
 					exit(1);
 				}
@@ -6759,7 +6763,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				CREATE(ahook, struct ability_hook, 1);
 				ahook->type = type;
 				ahook->value = int_in[1];
-				ahook->percent = dbl_in;
+				ahook->percent = dbl_in[2];
 				ahook->misc = int_in[3];
 				
 				LL_APPEND(ABIL_HOOKS(abil), ahook);
@@ -7057,8 +7061,8 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
-		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
+	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
+		fprintf(fl, "C\n%s %d %s %d %d %.2f %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
 	}
 	
 	// 'D' data
@@ -7406,8 +7410,9 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS, only_room_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts;
+	double min_cost_per = -100.0, max_cost_per = 100.0;
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
-	int min_cost = NOTHING, max_cost = NOTHING, min_cost_per = NOTHING, max_cost_per = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
+	int min_cost = NOTHING, max_cost = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
 	int only_action = NOTHING, only_effect = NOTHING, only_limit = NOTHING, only_paint = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING;
@@ -7457,8 +7462,8 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_INT("mincooldowntime", min_cd, 0, INT_MAX)
 		FULLSEARCH_INT("maxcost", max_cost, 0, INT_MAX)
 		FULLSEARCH_INT("mincost", min_cost, 0, INT_MAX)
-		FULLSEARCH_INT("maxcostperscalepoint", max_cost_per, 0, INT_MAX)
-		FULLSEARCH_INT("mincostperscalepoint", min_cost_per, 0, INT_MAX)
+		FULLSEARCH_DOUBLE("maxcostperscalepoint", max_cost_per, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("mincostperscalepoint", min_cost_per, -100.0, 100.0)
 		FULLSEARCH_LIST("maxposition", max_pos, position_types)
 		FULLSEARCH_LIST("minposition", min_pos, position_types)
 		FULLSEARCH_LIST("paintcolor", only_paint, paint_names)
@@ -7546,10 +7551,10 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (min_cost != NOTHING && ABIL_COST(abil) < min_cost) {
 			continue;
 		}
-		if (max_cost_per != NOTHING && ABIL_COST_PER_SCALE_POINT(abil) > max_cost_per) {
+		if (ABIL_COST_PER_SCALE_POINT(abil) > max_cost_per) {
 			continue;
 		}
-		if (min_cost_per != NOTHING && ABIL_COST_PER_SCALE_POINT(abil) < min_cost_per) {
+		if (ABIL_COST_PER_SCALE_POINT(abil) < min_cost_per) {
 			continue;
 		}
 		if (max_dur != FAKE_DUR && ABIL_SHORT_DURATION(abil) > max_dur && ABIL_LONG_DURATION(abil) > max_dur) {
@@ -7842,7 +7847,7 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 	if (ABIL_TARGETS(abil)) {
 		fields |= ABILEDIT_TARGETS;
 	}
-	if (ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_RESOURCE_COST(abil)) {
+	if (ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_RESOURCE_COST(abil)) {
 		fields |= ABILEDIT_COST;
 	}
 	if (ABIL_MIN_POS(abil) != POS_STANDING) {
@@ -7943,7 +7948,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
 	}
 	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COOLDOWN)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%.2f/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
@@ -8103,7 +8108,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%stargets\t0> %s\r\n", OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
 		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
@@ -8542,7 +8547,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
 	}
 	else {
-		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_number(ch, argument, "cost per scale point", "costperscalepoint", 0, INT_MAX, ABIL_COST_PER_SCALE_POINT(abil));
+		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_double(ch, argument, "cost per scale point", "costperscalepoint", -100.0, 100.0, ABIL_COST_PER_SCALE_POINT(abil));
 	}
 }
 
