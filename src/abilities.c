@@ -8018,18 +8018,28 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
 	
+	// Command, Targets line
 	if (IS_SET(fields, ABILEDIT_COMMAND)) {
 		if (!ABIL_COMMAND(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]");
 		}
 		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0]\r\n", ABIL_COMMAND(abil));
+			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0]", ABIL_COMMAND(abil));
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_TARGETS)) {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sTargets: \tg%s\t0", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), part);
 	}
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	
+	// Minpos, Linked trait line
+	size += snprintf(buf + size, sizeof(buf) - size, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
+	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, ", Min position: [\tc%s\t0]", position_types[ABIL_MIN_POS(abil)]);
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	
 	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COOLDOWN)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%.2f/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	}
@@ -8037,11 +8047,6 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
 	}
-	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)]);
-	}
-	
-	size += snprintf(buf + size, sizeof(buf) - size, "Linked trait: [\ty%s\t0]\r\n", apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
@@ -8049,6 +8054,11 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	}
 	if (IS_SET(fields, ABILEDIT_DIFFICULTY | ABILEDIT_WAIT)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
+	}
+	
+	// Custom affect, Duration line
+	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
@@ -8063,11 +8073,24 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		else {
 			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s seconds\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
 	}
-	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	
+	// Attack Type, Damage Type, Max Stacks line
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d %s\t0]", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
 	}
+	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sDamage type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+	}
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}
+	
 	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
@@ -8088,15 +8111,6 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			size += snprintf(buf + size, sizeof(buf) - size, "none");
 		}
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d %s\t0]\r\n", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}
-	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
 	}
 	
 	// custom messages
