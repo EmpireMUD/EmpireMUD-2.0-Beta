@@ -178,6 +178,11 @@ ACMD(do_ready) {
 	if (!char_can_act(ch, ABIL_MIN_POS(found_abil), !ABILITY_FLAGGED(found_abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(found_abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		return;
 	}
+	
+	// pass through to ready-weapon ability
+	perform_ability_command(ch, found_abil, argument);
+	return;
+	
 	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {
 		return;
 	}
