@@ -6381,14 +6381,15 @@ PREP_ABIL(prep_teleport_ability) {
 */
 bool audit_ability(ability_data *abil, char_data *ch) {
 	ability_data *abiter, *next_abiter;
+	obj_data *obj;
 	struct ability_data_list *adl;
 	struct interaction_item *interact;
 	bitvector_t bits;
-	bool problem = FALSE;
+	bool found, problem = FALSE;
 	int iter;
 	
 	const char *ignore_same_command[] = {
-		"chant", "conjure", "ritual",
+		"chant", "conjure", "ready", "ritual",
 		"\n"
 	};
 	
@@ -6564,6 +6565,30 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Unlimited long duration not supported on DOTs");
+			problem = TRUE;
+		}
+	}
+	
+	// ready-weapon
+	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+		found = FALSE;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			found = TRUE;
+			if (adl->type == ADL_READY_WEAPON && !(obj = obj_proto(adl->vnum))) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Invalid ready-weapon item set in ability data");
+				problem = TRUE;
+			}
+			else if (!CAN_WEAR(obj, ITEM_WEAR_WIELD | ITEM_WEAR_HOLD | ITEM_WEAR_RANGED)) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Ready-weapon item in ability data has invalid wear flags");
+				problem = TRUE;
+			}
+			else if (!OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Ready-weapon item in ability data is not 1-USE");
+				problem = TRUE;
+			}
+		}
+		if (!found) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "No ready-weapon items set in ability data");
 			problem = TRUE;
 		}
 	}
