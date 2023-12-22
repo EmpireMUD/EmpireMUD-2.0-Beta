@@ -155,6 +155,12 @@ M
 M
 4
 $n glows with white light as $e begins to channel $s mana to resurrect $O...~
+M
+28
+A strange force lifts you up from the ground, and you seem to float back to your feet... You feel a rush of blood as your heart starts beating again.~
+M
+30
+A brilliant light bursts forth from $n's chest as $e floats up from the ground and comes back to life!~
 T v 1
 S
 #220
@@ -171,6 +177,12 @@ $n lets out a bone-chilling howl...~
 M
 4
 $n lets out a bone-chilling howl...~
+M
+28
+A strange force lifts you up from the ground, and you seem to float back to your feet... You feel a rush of blood as your heart starts beating again.~
+M
+30
+An eerie light bursts forth from $n's chest as $e floats up from the ground and comes back to life!~
 T v 1
 S
 #221
