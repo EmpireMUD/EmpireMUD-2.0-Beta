@@ -128,7 +128,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 // ABIL_x: ability vnums
 #define ABIL_NULL_MANA  5
 #define ABIL_BOOST  7
-#define ABIL_CLAWS  8
 #define ABIL_VAMP_COMMAND  9
 #define ABIL_DEATHSHROUD  12
 #define ABIL_DISGUISE  13
@@ -184,7 +183,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define TYPE_UNDEFINED  -1
 #define TYPE_RESERVED  0
 #define TYPE_STAB  4
-#define TYPE_VAMPIRE_CLAWS  13	// has inherent damage bonus and effects
 #define TYPE_HIT  15	// default physical
 #define TYPE_MAGIC_FIRE  16	// disarmable fire blast
 #define TYPE_MANA_BLAST  28	// default magical

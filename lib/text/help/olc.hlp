@@ -2304,7 +2304,6 @@ The following affect flags are available:
  &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
  &cSTONED&0 - Sees the world in strange, trippy colors.
  &c!BLOOD&0 - Cannot spend blood points.
- &cCLAWS&0 - Boosted vampire claws as barehand melee attack.
  &cDEATHSHROUD&0 - Appears as a corpse and cannot act -- do not use this on items.
  &cEARTHMELD&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
  &cMUMMIFY&0 - Immune to attack and cannot act -- do not use this on items.

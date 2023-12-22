@@ -212,10 +212,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 	}
 	else {
 		// in order of priority
-		if (AFF_FLAGGED(ch, AFF_CLAWS)) {
-			w_type = TYPE_VAMPIRE_CLAWS;
-		}
-		else if (IS_MORPHED(ch)) {
+		if (IS_MORPHED(ch)) {
 			w_type = MORPH_ATTACK_TYPE(GET_MORPH(ch));
 		}
 		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
@@ -3644,11 +3641,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// bonus add is based on speeds
 		dam += bonus * (attack_speed / basic_speed) * (attack_speed / cur_speed);
 		
-		// TODO this is probably WAY overpowered. WAY WAY. Consider changing it to a 'ready' weapon.
-		if (w_type == TYPE_VAMPIRE_CLAWS) {
-			dam *= 2;
-		}
-		
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
 			if (can_gain_exp_from(ch, victim)) {
@@ -3676,12 +3668,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
 				}
 				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAFF_MASTERY, 0, victim, NULL, NULL, NULL);
-			}	
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS) {
-				if (can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_CLAWS, 2);
-				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLAWS, 0, victim, NULL, NULL, NULL);
 			}
 			
 			// raw damage modified by hunt

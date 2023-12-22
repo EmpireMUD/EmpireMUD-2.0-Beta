@@ -312,18 +312,6 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 }
 
 
-// for do_claws
-void retract_claws(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_CLAWS)) {
-			msg_to_char(ch, "Your claws meld back into your fingers!\r\n");
-			act("$n's claws meld back into $s fingers!", TRUE, ch, 0, 0, TO_ROOM);
-		}
-	}
-}
-
-
 // for do_sire
 void sire_char(char_data *ch, char_data *victim) {
 	struct player_skill_data *plsk, *next_plsk;
@@ -1210,54 +1198,6 @@ ACMD(do_boost) {
 	
 	gain_ability_exp(ch, ABIL_BOOST, 20);
 	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOOST, 0, ch, NULL, NULL, NULL);
-}
-
-
-ACMD(do_claws) {
-	struct affected_type *af;
-	int cost = 10;
-	
-	if (affected_by_spell(ch, ATYPE_CLAWS)) {
-		retract_claws(ch);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	
-	if (!check_vampire_ability(ch, ABIL_CLAWS, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_CLAWS)) {
-		return;
-	}
-
-	// attempt to remove existing wield
-	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			return;
-		}
-	}
-
-	act("You focus your blood into your hands...", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
-	act("Your fingers grow into grotesque claws!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
-	act("$n's fingers grow into giant claws!", TRUE, ch, NULL, NULL, TO_ROOM | ACT_BUFF);
-	
-	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
-	affect_join(ch, af, 0);
-			
-	af = create_mod_aff(ATYPE_CLAWS, UNLIMITED, APPLY_BLOOD_UPKEEP, 2, ch);
-	affect_to_char(ch, af);
-	free(af);
-
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	gain_ability_exp(ch, ABIL_CLAWS, 20);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_CLAWS, 0, ch, NULL, NULL, NULL);
 }
 
 

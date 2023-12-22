@@ -87,7 +87,6 @@ ACMD(do_circle);
 ACMD(do_city);
 ACMD(do_claim);
 ACMD(do_class);
-ACMD(do_claws);
 ACMD(do_clearabilities);
 ACMD(do_clearmeters);
 ACMD(do_climb);
@@ -595,7 +594,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "claim", POS_RESTING, do_claim, NO_MIN, CTYPE_EMPIRE ),
 	// uncomment this if you use the old class system
 	// SIMPLE_CMD( "class", POS_DEAD, do_class, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "claws", POS_RESTING, do_claws, NO_MIN, CTYPE_SKILL, ABIL_CLAWS ),
 	SCMD_CMD( "clear", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
 	SIMPLE_CMD( "clearmeters", POS_DEAD, do_clearmeters, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "clearabilities", POS_DEAD, do_clearabilities, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_CLEARABILITIES ),

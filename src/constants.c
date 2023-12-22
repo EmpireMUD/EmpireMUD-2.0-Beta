@@ -1629,7 +1629,7 @@ const char *affected_bits[] = {
 	"STUNNED",
 	"STONED",
 	"!BLOOD",
-	"CLAWS",
+	"*",	// formerly CLAWS
 	"DEATHSHROUD",
 	"EARTHMELD",
 	"MUMMIFY",
@@ -1680,7 +1680,7 @@ const char *affected_bits_consider[] = {
 	"",	// stunned
 	"",	// 20 - stoned
 	"",	// can't spend blood
-	"",	// claws
+	"",	// unused
 	"",	// deathshroud
 	"",	// earthmeld
 	"",	// 25 - mummify

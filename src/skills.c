@@ -195,11 +195,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			need_affect_total = TRUE;
 			break;
 		}
-		case ABIL_CLAWS: {
-			retract_claws(ch);
-			need_affect_total = TRUE;
-			break;
-		}
 		case ABIL_DEATHSHROUD: {
 			if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
 				un_deathshroud(ch);
