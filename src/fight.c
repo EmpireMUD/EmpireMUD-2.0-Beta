@@ -1645,6 +1645,8 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 		return;
 	}
 	
+	abil = ability_proto(ability);
+	
 	if (IN_ROOM(ch) != loc) {
 		act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 		GET_LAST_DIR(ch) = NO_DIR;
@@ -1698,13 +1700,20 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	}
 	
 	// if they resurrect themselves, try to refund the cost because it is probably about to charge it
-	if (ch == rez_by && (abil = ability_proto(ability)) && ABIL_COST(abil) > 0) {
+	if (ch == rez_by && abil && ABIL_COST(abil) > 0) {
 		set_current_pool(ch, ABIL_COST_TYPE(abil), GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) + ABIL_COST(abil));
 	}
 	
 	// messaging
-	msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
-	msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
+	if (abil) {
+		send_ability_special_messages(ch, NULL, NULL, abil, NULL, NULL, 0);
+	}
+	else {
+		msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
+		msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
+	}
+	
+	// final message
 	if (rez_by && rez_by != ch) {
 		act("You have been resurrected by $N!", FALSE, ch, NULL, rez_by, TO_CHAR);
 	}

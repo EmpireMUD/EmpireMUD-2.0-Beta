@@ -1480,13 +1480,19 @@ For vampires, blood is reduced to 20% after resurrection.
 If the ability can target the character themselves while dead, the offer step
 is skipped.
 
-Messages:
+Targeted resurrection messages:
  &ctarg-to-char&0 - Send to the caster when starting to resurrect.
- &ctarg-to-vict&0 - Sent to the target no matter where they are.
+ &ctarg-to-vict&0 - Sent to the target, no matter where they are.
  &ctarg-to-room&0 - Sent to the room the caster is in.
 
-Custom messages when the target accepts resurrection are not currently
-supported.
+Self-resurrection messages:
+ &cself-to-char&0 - Sent to the caster when resurrecting.
+ &cself-to-room&0 - Sent to teh room the caster is in when resurrecting.
+
+When the resurrection completes, it also sends:
+ &cspec-to-char&0 - Sent to the person being resurrected.
+ &cspec-to-room&0 - Sent ot the room the person resurrects in with $n as the
+   person being resurrected (not the caster).
 
 See also: OLC ABILITIES, OFFERS
 #d
