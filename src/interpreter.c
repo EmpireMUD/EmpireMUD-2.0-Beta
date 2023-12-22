@@ -258,7 +258,6 @@ ACMD(do_minipets);
 ACMD(do_mint);
 ACMD(do_mirrorimage);
 ACMD(do_missing_help_files);
-ACMD(do_moonrise);
 ACMD(do_morph);
 ACMD(do_mount);
 ACMD(do_move);
@@ -324,7 +323,6 @@ ACMD(do_respawn);
 ACMD(do_respond);
 ACMD(do_rest);
 ACMD(do_restore);
-ACMD(do_resurrect);
 ACMD(do_retrieve);
 ACMD(do_return);
 ACMD(do_ritual);
@@ -812,7 +810,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "mirrorimage", POS_FIGHTING, do_mirrorimage, NO_MIN, CTYPE_COMBAT, ABIL_MIRRORIMAGE ),
 	SIMPLE_CMD( "missinghelp", POS_DEAD, do_missing_help_files, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "mix", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MIX, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "moonrise", POS_FIGHTING, do_moonrise, NO_MIN, CTYPE_COMBAT, ABIL_MOONRISE ),
 	SCMD_CMD( "morph", POS_FIGHTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_MORPH ),
 	SCMD_CMD( "motd", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_MOTD ),
 	GRANT_CMD( "moveeinv", POS_DEAD, do_moveeinv, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
@@ -898,7 +895,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "respond", POS_RESTING, do_respond, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "rest", POS_RESTING, do_rest, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "restore", POS_DEAD, do_restore, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESTORE ),
-	ABILITY_CMD( "resurrect", POS_STANDING, do_resurrect, NO_MIN, CTYPE_SKILL, ABIL_RESURRECT ),
 	SIMPLE_CMD( "retrieve", POS_STANDING, do_retrieve, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "return", POS_DEAD, do_return, NO_MIN, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "ride", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),

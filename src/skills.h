@@ -170,8 +170,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_PORTAL_MASTER  190
 #define ABIL_OUTRAGE  209
 #define ABIL_REFASHION  216
-#define ABIL_RESURRECT  219
-#define ABIL_MOONRISE  220
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_SHADOWCAGE  233

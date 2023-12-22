@@ -1649,6 +1649,8 @@ The following types are available (each has its own help file):
  &cACTION&0 - Executes and action; see ABILEDIT ACTIONS.
  &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
  &cTELEPORT&0 - Teleports the player; see ABILEDIT TELEPORT.
+ &rRESURRECT&0 - Offers resurrection to a dead player or corpse target. If the
+   caster is in combat, the resurrected player will receive a boost.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.

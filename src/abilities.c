@@ -98,6 +98,9 @@ PREP_ABIL(prep_dot_ability);
 DO_ABIL(do_paint_building_ability);
 PREP_ABIL(prep_paint_building_ability);
 
+DO_ABIL(do_resurrect_ability);
+PREP_ABIL(prep_resurrect_ability);
+
 DO_ABIL(do_room_affect_ability);
 PREP_ABIL(prep_room_affect_ability);
 
@@ -141,6 +144,7 @@ struct {
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
 	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES },
 	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, ABILEDIT_COMMAND },
+	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, ABILEDIT_COMMAND },
 	
 	// alaways run actions last
 	{ ABILT_ACTION, prep_action_ability, do_action_ability, ABILEDIT_COMMAND },
@@ -5336,6 +5340,24 @@ DO_ABIL(do_paint_building_ability) {
 }
 
 
+// DO_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_resurrect_ability) {
+	char_data *targ;
+	
+	if (vict) {
+		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
+		add_offer(vict, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	else if (ovict && (targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
+		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, targ, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
+		add_offer(targ, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	// otherwise no success
+}
+
+
 /**
 * All room-affect abilities come through here.
 *
@@ -5968,6 +5990,64 @@ PREP_ABIL(prep_dot_ability) {
 */
 PREP_ABIL(prep_paint_building_ability) {
 	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
+}
+
+
+// PREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, dataPREP_ABIL provides: ch, abil, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_resurrect_ability) {
+	char_data *targ;
+	
+	if (vict) {
+		if (!IS_DEAD(vict)) {
+			msg_to_char(ch, "You can only resurrect a dead person.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (IS_NPC(vict)) {
+			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (ch != vict && GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		// otherwise probably ok
+	}
+	else if (ovict) {
+		if (!IS_CORPSE(ovict)) {
+			msg_to_char(ch, "That's not a corpse.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (!IS_PC_CORPSE(ovict)) {
+			msg_to_char(ch, "You can only use that on player corpses.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (!(targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
+			msg_to_char(ch, "You can resurrect the corpse of someone who is still playing.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (targ == ch) {
+			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(targ)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (IS_DEAD(targ) || ovict != find_obj(GET_LAST_CORPSE_ID(targ)) || !IS_CORPSE(ovict)) {
+			// victim has died AGAIN
+			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, targ, TO_CHAR | TO_NODARK | TO_SLEEP);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
 }
 
 

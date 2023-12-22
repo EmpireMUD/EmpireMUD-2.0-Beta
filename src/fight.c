@@ -1638,7 +1638,6 @@ obj_data *make_corpse(char_data *ch) {
 */
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
 	obj_data *corpse;
-	int exp = 15;	// overridden by some abilities
 	
 	// sanity
 	if (!ch || !loc) {
@@ -1674,85 +1673,43 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	}
 	affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);	// in case
 	remove_offers_by_type(ch, OFFER_RESURRECTION);
-
+	
 	// log
 	syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has been resurrected by %s at %s", GET_NAME(ch), rez_by ? GET_NAME(rez_by) : "(unknown)", room_log_identifier(loc));
-
-	// abil-specific
-	switch (ability) {
-		case ABIL_RESURRECT: {
-			// custom restore stats: 10% (death_restore puts it at 25%)
-			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 10));
-			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 10));
-			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 10));
-			if (!IS_VAMPIRE(ch)) {
-				set_blood(ch, GET_MAX_BLOOD(ch));
-			}
-			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 10) {
-				set_blood(ch, GET_MAX_BLOOD(ch) / 10);
-			}
-
-			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
-			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
-			if (rez_by && rez_by != ch) {
-				act("You have been resurrected by $N!", FALSE, ch, NULL, rez_by, TO_CHAR);
-			}
-			else {
-				act("You have been resurrected!", FALSE, ch, NULL, NULL, TO_CHAR);
-			}
-			act("A brilliant light bursts forth from $n's chest as $e floats up from the ground and comes back to life!", FALSE, ch, NULL, NULL, TO_ROOM);
-
-			exp = 15;
-			break;
+	
+	// modify pools
+	if (rez_by && IN_ROOM(ch) == IN_ROOM(rez_by) && FIGHTING(rez_by)) {
+		// combat rez: higher stats
+		set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
+		set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
+		set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
+		
+		// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
+		if (GET_COND(ch, FULL) >= 0) {
+			GET_COND(ch, FULL) =  MAX_CONDITION / 4;
 		}
-		case ABIL_MOONRISE: {
-			// custom restore stats: 50% (death_restore puts it at 25%)
-			set_health(ch, MAX(1, GET_MAX_HEALTH(ch) / 2));
-			set_move(ch, MAX(1, GET_MAX_MOVE(ch) / 2));
-			set_mana(ch, MAX(1, GET_MAX_MANA(ch) / 2));
-			if (!IS_VAMPIRE(ch)) {
-				set_blood(ch, GET_MAX_BLOOD(ch));
-			}
-			else if (GET_BLOOD(ch) < GET_MAX_BLOOD(ch) / 5) {
-				set_blood(ch, GET_MAX_BLOOD(ch) / 5);
-			}
-			
-			// custom restore conditions: less hungry/thirsty (won't incur a penalty yet)
-			if (GET_COND(ch, FULL) >= 0) {
-				GET_COND(ch, FULL) =  MAX_CONDITION / 4;
-			}
-			if (GET_COND(ch, THIRST) >= 0) {
-				GET_COND(ch, THIRST) = MAX_CONDITION / 4;
-			}
-			
-			msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
-			msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
-			if (rez_by && rez_by != ch) {
-				act("You have been resurrected by $N!", FALSE, ch, NULL, rez_by, TO_CHAR);
-			}
-			else {
-				act("You have been resurrected!", FALSE, ch, NULL, NULL, TO_CHAR);
-			}
-			act("An eerie light bursts forth from $n's chest as $e floats up from the ground and comes back to life!", FALSE, ch, NULL, NULL, TO_ROOM);
-
-			exp = 50;
-			break;
-		}
-		default: {
-			if (rez_by && rez_by != ch) {
-				act("You have been resurrected by $N!", FALSE, ch, NULL, rez_by, TO_CHAR);
-			}
-			else {
-				act("You have been resurrected!", FALSE, ch, NULL, NULL, TO_CHAR);
-			}
-			act("$n has been resurrected!", TRUE, ch, NULL, NULL, TO_ROOM);
-			break;
+		if (GET_COND(ch, THIRST) >= 0) {
+			GET_COND(ch, THIRST) = MAX_CONDITION / 4;
 		}
 	}
-
+	if (IS_VAMPIRE(ch)) {
+		set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+	}
+	
+	// messaging
+	msg_to_char(ch, "A strange force lifts you up from the ground, and you seem to float back to your feet...\r\n");
+	msg_to_char(ch, "You feel a rush of blood as your heart starts beating again...\r\n");
+	if (rez_by && rez_by != ch) {
+		act("You have been resurrected by $N!", FALSE, ch, NULL, rez_by, TO_CHAR);
+	}
+	else {
+		act("You have been resurrected!", FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	act("$n has been resurrected!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
 	// skillups?
 	if (rez_by && ability != NO_ABIL) {
-		gain_ability_exp(rez_by, ability, exp);
+		gain_ability_exp(rez_by, ability, 100);
 		run_ability_hooks(rez_by, AHOOK_ABILITY, ability, 0, ch, NULL, NULL, NULL);
 	}
 	

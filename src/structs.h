@@ -573,27 +573,28 @@ typedef struct vehicle_data vehicle_data;
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
 // ABILT_x: ability type flags
-#define ABILT_CRAFT  BIT(0)	// related to crafting/building
-#define ABILT_BUFF  BIT(1)	// applies an affect
-#define ABILT_DAMAGE  BIT(2)	// deals damage
-#define ABILT_DOT  BIT(3)	// damage over time effect
-#define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
-#define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
-#define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
-#define ABILT_COMPANION  BIT(7)	// grants companions
-#define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
-#define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
-#define ABILT_MORPH  BIT(10)	// ability has morphs that require it
-#define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
-#define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
-#define ABILT_CONJURE_OBJECT  BIT(13)	// creates 1 or more items
-#define ABILT_CONJURE_LIQUID  BIT(14)	// puts liquid in a drink container
-#define ABILT_CONJURE_VEHICLE  BIT(15)	// creates a vehicle in the room
-#define ABILT_ROOM_AFFECT  BIT(16)	// puts an affect on a room
-#define ABILT_PAINT_BUILDING  BIT(17)	// applies color to the building
-#define ABILT_ACTION  BIT(18)	// performs an action (from data list)
-#define ABILT_BUILDING_DAMAGE  BIT(19)	// blasts a building or vehicle
-#define ABILT_TELEPORT  BIT(20)	// relocates the player
+#define ABILT_CRAFT				BIT(0)	// related to crafting/building
+#define ABILT_BUFF				BIT(1)	// applies an affect
+#define ABILT_DAMAGE			BIT(2)	// deals damage
+#define ABILT_DOT				BIT(3)	// damage over time effect
+#define ABILT_PLAYER_TECH		BIT(4)	// some player tech feature
+#define ABILT_PASSIVE_BUFF		BIT(5)	// similar to a buff except always on
+#define ABILT_READY_WEAPONS		BIT(6)	// use READY-WEAPON data to add to a player's ready list
+#define ABILT_COMPANION			BIT(7)	// grants companions
+#define ABILT_SUMMON_ANY		BIT(8)	// player can summon from a list of mobs
+#define ABILT_SUMMON_RANDOM		BIT(9)	// player can summon a mob at random from a list
+#define ABILT_MORPH				BIT(10)	// ability has morphs that require it
+#define ABILT_AUGMENT			BIT(11)	// related to augments/enchants
+#define ABILT_CUSTOM			BIT(12)	// ability is hard-coded
+#define ABILT_CONJURE_OBJECT	BIT(13)	// creates 1 or more items
+#define ABILT_CONJURE_LIQUID	BIT(14)	// puts liquid in a drink container
+#define ABILT_CONJURE_VEHICLE	BIT(15)	// creates a vehicle in the room
+#define ABILT_ROOM_AFFECT		BIT(16)	// puts an affect on a room
+#define ABILT_PAINT_BUILDING	BIT(17)	// applies color to the building
+#define ABILT_ACTION			BIT(18)	// performs an action (from data list)
+#define ABILT_BUILDING_DAMAGE	BIT(19)	// blasts a building or vehicle
+#define ABILT_TELEPORT			BIT(20)	// relocates the player
+#define ABILT_RESURRECT			BIT(21)	// resurrects a player
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)	// e.g. heal?
