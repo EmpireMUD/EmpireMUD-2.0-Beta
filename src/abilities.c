@@ -3654,7 +3654,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				}
 			}
 			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-				// don't message if it's damage + there's an attack type
+				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -3666,7 +3666,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				}
 			}
 			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-				// don't message if it's damage + there's an attack type
+				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
@@ -3680,7 +3680,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				}
 			}
 			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-				// don't message if it's damage + there's an attack type
+				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -3692,7 +3692,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				}
 			}
 			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-				// don't message if it's damage + there's an attack type
+				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
@@ -3704,7 +3704,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				}
 			}
 			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-				// don't message if it's damage + there's an attack type
+				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
@@ -3719,7 +3719,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		}
 		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-			// don't message if it's damage + there's an attack type
+			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
@@ -3731,7 +3731,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		}
 		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-			// don't message if it's damage + there's an attack type
+			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
@@ -3745,7 +3745,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		}
 		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-			// don't message if it's damage + there's an attack type
+			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		}
@@ -3757,7 +3757,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		}
 		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
-			// don't message if it's damage + there's an attack type
+			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		}
