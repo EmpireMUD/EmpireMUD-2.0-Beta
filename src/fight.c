@@ -1637,6 +1637,7 @@ obj_data *make_corpse(char_data *ch) {
 * @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
+	ability_data *abil;
 	obj_data *corpse;
 	
 	// sanity
@@ -1694,6 +1695,11 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	}
 	if (IS_VAMPIRE(ch)) {
 		set_blood(ch, GET_MAX_BLOOD(ch) / 5);
+	}
+	
+	// if they resurrect themselves, try to refund the cost because it is probably about to charge it
+	if (ch == rez_by && (abil = ability_proto(ability)) && ABIL_COST(abil) > 0) {
+		set_current_pool(ch, ABIL_COST_TYPE(abil), GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) + ABIL_COST(abil));
 	}
 	
 	// messaging
