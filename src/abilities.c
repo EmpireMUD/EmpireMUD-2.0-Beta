@@ -5662,7 +5662,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		// if no target specified, and the spell isn't violent, default to self
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !ABIL_IS_VIOLENT(abil)) {
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && !ABIL_IS_VIOLENT(abil)) {
 			vict = ch;
 			has = TRUE;
 		}
@@ -5999,7 +5999,12 @@ PREP_ABIL(prep_resurrect_ability) {
 	
 	if (vict) {
 		if (!IS_DEAD(vict)) {
-			msg_to_char(ch, "You can only resurrect a dead person.\r\n");
+			if (ch == vict) {
+				msg_to_char(ch, "You're not dead yet.\r\n");
+			}
+			else {
+				msg_to_char(ch, "You can only resurrect a dead person.\r\n");
+			}
 			CANCEL_ABILITY(data);
 			return;
 		}
