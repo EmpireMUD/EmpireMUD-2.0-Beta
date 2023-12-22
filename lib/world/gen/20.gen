@@ -619,4 +619,18 @@ conjure fruit~
 T0
 Your cooldown for conjuring fruit has ended.~
 S
+#2090
+master survivalist~
+3 0
+0 0 0 0
+T0
+Your master survivalist cooldown has ended.~
+S
+#2091
+deathrise~
+3 0
+0 0 0 0
+T0
+Your deathrise cooldown has ended.~
+S
 $

@@ -267,6 +267,20 @@ still use it as a hammer in the forge.
 A
 17 1 0
 S
+#1121
+cloth grave~
+a grave cloth~
+A flowing grave cloth is lying here.~
+   The flowing grave cloth is long enough to wrap a body several times over. A
+blood stain in the corner suggests it has already been used or, at least, that
+it was bound to someone in particular.
+~
+3 p a 0 0 1
+0 0 0
+11 0
+C
+1 1
+S
 #1122
 mattock bloodmattock~
 a bloodmattock~
