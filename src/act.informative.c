@@ -1540,7 +1540,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			
 			// main entry
-			snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "\tc" : "\tr"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
+			snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
 			
 			if (aff->modifier) {
 				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1560,7 +1560,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		else {
 			// simple version
-			snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "\tc" : "\tr"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
 			add_string_hash(&str_hash, line, 1);
 		}
 	}
@@ -1575,10 +1575,10 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		if (details) {
-			snprintf(line, sizeof(line), "\tr%s\t0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+			snprintf(line, sizeof(line), "&r%s&0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
 		}
 		else {	// simple version
-			snprintf(line, sizeof(line), "\tr%s\t0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
+			snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
 		}
 		
 		// caster?
@@ -1592,13 +1592,13 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	// extra info?
 	if (details) {
 		if (MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
-			add_string_hash(&str_hash, "\tcanimal\t0", 1);
+			add_string_hash(&str_hash, "&canimal&0", 1);
 		}
 		if (IS_MAGE(ch)) {
-			add_string_hash(&str_hash, "\tccaster\t0", 1);
+			add_string_hash(&str_hash, "&ccaster&0", 1);
 		}
 		if (IS_VAMPIRE(ch)) {
-			add_string_hash(&str_hash, "\tcvampire\t0", 1);
+			add_string_hash(&str_hash, "&cvampire&0", 1);
 		}
 	}
 	
