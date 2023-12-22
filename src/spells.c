@@ -77,14 +77,13 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
 //// READY ///////////////////////////////////////////////////////////////////
 
 ACMD(do_ready) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
-	struct player_ability_data *plab, *next_plab;
-	int scale_level, ch_level = 0, pos, obj_ok;
-	ability_data *abil, *found_abil;
-	bool found, full, later = TRUE;
-	struct ability_data_list *adl;
-	obj_data *obj, *proto;
+	bool found, full;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	size_t size, lsize;
+	ability_data *abil, *found_abil;
+	obj_data *proto;
+	struct ability_data_list *adl;
+	struct player_ability_data *plab, *next_plab;
 	
 	skip_spaces(&argument);
 	
@@ -93,7 +92,7 @@ ACMD(do_ready) {
 		return;
 	}
 	
-	#define VALID_READY_ABIL(ch, plab, abil)  ((abil) && (plab) && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS))
+	#define VALID_READY_ABIL(ch, plab, abil)  ((abil) && (plab) && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS) && (!ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "ready")))
 	
 	if (!*argument) {
 		size = snprintf(buf, sizeof(buf), "You know how to ready the following weapons:\r\n");
@@ -181,118 +180,4 @@ ACMD(do_ready) {
 	
 	// pass through to ready-weapon ability
 	perform_ability_command(ch, found_abil, argument);
-	return;
-	
-	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {
-		return;
-	}
-	if (!ABILITY_FLAGGED(found_abil, ABILF_IGNORE_SUN) && ABIL_COST(found_abil) > 0 && ABIL_COST_TYPE(found_abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(found_abil))) {
-		return;
-	}
-	
-	// determine wear position
-	if (CAN_WEAR(proto, ITEM_WEAR_WIELD)) {
-		pos = WEAR_WIELD;
-	}
-	else if (CAN_WEAR(proto, ITEM_WEAR_HOLD)) {
-		pos = WEAR_HOLD;	// ONLY if they can't wield it
-	}
-	else if (CAN_WEAR(proto, ITEM_WEAR_RANGED)) {
-		pos = WEAR_RANGED;
-	}
-	else {
-		log("SYSERR: %s trying to ready %d %s with no valid wear bits (Ability %d %s)", GET_NAME(ch), GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), ABIL_VNUM(found_abil), ABIL_NAME(found_abil));
-		msg_to_char(ch, "You can't seem to ready that item.\r\n");
-		return;
-	}
-	
-	// if they are using a NON-1-use item, determine level now
-	if (GET_EQ(ch, pos) && !OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_SINGLE_USE)) {
-		ch_level = get_approximate_level(ch);
-		later = FALSE;
-	}
-	
-	// attempt to remove existing item
-	if (GET_EQ(ch, pos)) {
-		perform_remove(ch, pos);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, pos)) {
-			return;
-		}
-	}
-		
-	if (SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	// if they are using a 1-use item, determine level at the end here
-	if (later) {
-		ch_level = get_approximate_level(ch);
-	}
-	
-	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-	send_pre_ability_messages(ch, NULL, NULL, found_abil, NULL);
-	
-	if (!skill_check(ch, ABIL_VNUM(found_abil), ABIL_DIFFICULTY(found_abil))) {
-		send_ability_fail_messages(ch, NULL, NULL, found_abil, NULL);
-		return;
-	}
-	
-	// load the object
-	obj = read_object(GET_OBJ_VNUM(proto), TRUE);
-	if (IS_CLASS_ABILITY(ch, ABIL_VNUM(found_abil)) || ABIL_ASSIGNED_SKILL(found_abil) == NULL) {
-		scale_level = ch_level;	// class-level
-	}
-	else {
-		scale_level = MIN(ch_level, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(found_abil))));
-	}
-	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {	// ensure they'll be able to use the final item
-		scale_level = MIN(scale_level, GET_SKILL_LEVEL(ch));
-	}
-	scale_item_to_level(obj, scale_level);
-	
-	// non-custom messages
-	switch (ABIL_COST_TYPE(found_abil)) {
-		case MANA: {
-			to_char = "Mana twists and swirls around your hand and becomes $p!";
-			to_room = "Mana twists and swirls around $n's hand and becomes $p!";
-			break;
-		}
-		case BLOOD: {
-			to_char = "You drain blood from your wrist and mold it into $p!";
-			to_room = "$n twists and molds $s own blood into $p!";
-			break;
-		}
-		// HEALTH, MOVE (these could have their own messages if they were used)
-		default: {
-			to_char = "You pull $p from the ether!";
-			to_room = "$n pulls $p from the ether!";
-			break;
-		}
-	}
-	
-	// custom overrides
-	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
-		to_char = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR);
-	}
-	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
-		to_room = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM);
-	}
-	
-	act(to_char, FALSE, ch, obj, NULL, TO_CHAR);
-	act(to_room, ABILITY_FLAGGED(found_abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, obj, NULL, TO_ROOM);
-	
-	equip_char(ch, obj, pos);
-	determine_gear_level(ch);
-	
-	gain_ability_exp(ch, ABIL_VNUM(found_abil), 15);
-	
-	obj_ok = load_otrigger(obj);
-	// this goes directly to equipment so a GET trigger does not fire
-	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(found_abil), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL);
 }
