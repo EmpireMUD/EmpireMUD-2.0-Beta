@@ -1173,6 +1173,91 @@ bool has_ability_hook(ability_data *abil, int hook_type, int hook_value) {
 
 
 /**
+* Determines if two people could be considered allies for the purposes of
+* ability targeting.
+*
+* @param char_data *ch The person using the ability.
+* @param char_data *vict The other person.
+* @return bool TRUE if they are allies for abilities, FALSE if not.
+*/
+bool is_ability_ally(char_data *ch, char_data *vict) {
+	if (ch == vict) {
+		return TRUE;
+	}
+	if (AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_NO_TARGET_IN_ROOM)) {
+		return FALSE;	// exception: can't see/target
+	}
+	if (FIGHTING(ch) == vict || FIGHTING(vict) == ch) {
+		return FALSE;	// exception: fighting
+	}
+	if (GET_COMPANION(ch) == vict) {
+		return TRUE;
+	}
+	if (in_same_group(ch, vict)) {
+		return TRUE;
+	}
+	if (is_fight_ally(ch, vict)) {
+		return TRUE;
+	}
+	if (GET_LOYALTY(ch)) {
+		if (GET_LOYALTY(ch) == GET_LOYALTY(vict)) {
+			return TRUE;
+		}
+		if (GET_LOYALTY(vict) && has_relationship(GET_LOYALTY(ch), GET_LOYALTY(vict), DIPL_NONAGGR | DIPL_ALLIED)) {
+			return TRUE;
+		}
+	}
+	// no? default to false
+	return FALSE;
+}
+
+
+/**
+* Determines if two people could be considered enemies for the purposes of
+* ability targeting. This defaults to TRUE for neutral targets.
+*
+* @param char_data *ch The person using the ability.
+* @param char_data *vict The other person.
+* @return bool TRUE if they are enemies for abilities, FALSE if not.
+*/
+bool is_ability_enemy(char_data *ch, char_data *vict) {
+	if (ch == vict) {
+		return FALSE;	// never
+	}
+	if (FIGHTING(ch) == vict || FIGHTING(vict) == ch) {
+		return TRUE;
+	}
+	if (AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_NO_TARGET_IN_ROOM)) {
+		return FALSE;	// exception: can't see/target
+	}
+	if (IS_IMMORTAL(vict)) {
+		return FALSE;	// immortal 
+	}
+	if (GET_COMPANION(ch) == vict) {
+		return FALSE;	// nope
+	}
+	if (in_same_group(ch, vict)) {
+		return FALSE;	// nope
+	}
+	if (!can_fight(ch, vict)) {
+		return FALSE;
+	}
+	
+	return TRUE;
+	/* // skipping these because it defaults to TRUE:
+	if (is_fight_enemy(ch, vict)) {
+		return TRUE;
+	}
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != GET_LOYALTY(vict)) {
+		if (GET_LOYALTY(vict) && has_relationship(GET_LOYALTY(ch), GET_LOYALTY(vict), DIPL_WAR)) {
+			return TRUE;
+		}
+	}
+	*/
+}
+
+
+/**
 * Runs simple checks, silently, to see if the ability is likely to be valid.
 * Some of these will be checked again, with messages, later.
 *
@@ -2262,7 +2347,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 	if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI)) {
 		any = FALSE;
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-			if (ch_iter != ch && is_fight_enemy(ch, ch_iter) && can_fight(ch, ch_iter) && CAN_SEE(ch, ch_iter)) {
+			if (ch_iter != ch && is_ability_enemy(ch, ch_iter) && CAN_SEE(ch, ch_iter)) {
 				any = TRUE;
 				break;
 			}
@@ -4927,10 +5012,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group
 		}
-		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
+		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_ability_ally(ch_iter, ch)) {
 			continue;	// not ally
 		}
-		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
+		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && !is_ability_enemy(ch_iter, ch)) {
 			continue;	// not ally
 		}
 		
