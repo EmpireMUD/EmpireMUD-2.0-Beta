@@ -5805,11 +5805,11 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		number = get_number(&argptr);
 		
 		// multi targets, explicitly
-		if (!has && !str_cmp(argptr, "party") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+		if (!has && (!str_cmp(argptr, "party") || !str_cmp(argptr, "group")) && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
 			has = TRUE;
 			multi_targ = ATAR_MULTI_CHAR_GROUP;
 		}
-		if (!has && !str_cmp(argptr, "allies") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+		if (!has && (!str_cmp(argptr, "allies") || !str_cmp(argptr, "ally")) && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
 			has = TRUE;
 			multi_targ = ATAR_MULTI_CHAR_ALLIES;
 		}
