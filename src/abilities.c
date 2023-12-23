@@ -4914,7 +4914,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// locked in now -- increment targets
 	data->total_targets += 1;
 	
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
 		// check costs and cooldowns now -- not on over-time
 		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
@@ -5096,6 +5096,11 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		
 		// run it!
 		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
+		
+		// in case no_msg was triggered by call_ability:
+		if (data->no_msg && !no_msg) {
+			data->no_msg = FALSE;
+		}
 		
 		// check for things that stop 1 but not all?
 		data->stop = FALSE;
