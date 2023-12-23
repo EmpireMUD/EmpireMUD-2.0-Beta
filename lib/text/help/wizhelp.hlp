@@ -946,6 +946,9 @@ If a full restore (all) is performed on an immortal, it also sets all skill
 levels to 100, gives all abilities (on the main skill set only), and grants
 all languages.
 
+Restoring a player will remove deathshroud and mummify effects. This helps
+prevent an immortal from being stuck in those states.
+
 This command is grantable.
 
 See also: GRANT, SKILL SWAP
