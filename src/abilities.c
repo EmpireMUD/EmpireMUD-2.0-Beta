@@ -5063,8 +5063,8 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			data->stop = TRUE;
 			break;
 		}
-		if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
-			continue;	// skip immortals other than self
+		if (GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// skip invisible imms
 		}
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group
@@ -5104,6 +5104,11 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	// debug section
 	if (should_charge_cost != data->should_charge_cost) {
 		log("%s: should_charge_cost changed", ABIL_NAME(abil));
+	}
+	
+	// fail message in here because it is generally suppressed in multi-targs
+	if (!data->success && !data->no_msg) {
+		send_ability_fail_messages(ch, NULL, NULL, abil, data);
 	}
 }
 
