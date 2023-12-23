@@ -3999,9 +3999,13 @@ struct ability_exec {
 	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
 	bool no_msg;	// indicates you shouldn't send messages
 	bool matching_role;	// if FALSE, no bonuses from matching role
+	bool engage_anyway;	// we engage combat if !stop || engage_anyway
+	
+	// costs
 	int cost;	// for types that raise the cost later
 	bool should_charge_cost;	// if TRUE, will charge regardless of success
-	bool engage_anyway;	// we engage combat if !stop || engage_anyway
+	int total_amount;	// for cost-per-amount
+	int total_targets;	// for cost-per-target
 	
 	// data passed by types
 	any_vnum ready_weapon_val;

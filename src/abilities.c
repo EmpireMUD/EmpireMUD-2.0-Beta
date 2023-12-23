@@ -58,6 +58,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
 char *estimate_ability_cost(char_data *ch, ability_data *abil);
+struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type);
 void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
@@ -1005,6 +1006,64 @@ void check_abilities(void) {
 			log("- Ability [%d] %s has invalid mastery ability %d", ABIL_VNUM(abil), ABIL_NAME(abil), ABIL_MASTERY_ABIL(abil));
 			ABIL_MASTERY_ABIL(abil) = NOTHING;
 		}
+	}
+}
+
+
+/**
+* Determine how much mana/move/blood/etc is available for abilities with a
+* cost-per-amount or cost-per-target value.
+*
+* @param char_data *ch The person performing an ability.
+* @param ability_data *abil The ability being performed.
+* @param struct ability_exec *data The execution data for the runnin ability.
+* @param int *afford_amount A variable to set to how much more 'amount' we can afford (may be NULL to skip).
+* @param int *afford_targets A variable to set to how many more targets we can afford (may be NULL to skip).
+*/
+void check_available_ability_cost(char_data *ch, ability_data *abil, struct ability_exec *data, int *afford_amount, int *afford_targets) {
+	int cost, iter, left;
+	
+	// init
+	if (afford_amount) {
+		*afford_targets = 0;
+	}
+	if (afford_amount) {
+		*afford_targets = 0;
+	}
+	
+	// base
+	cost = ABIL_COST(abil);
+	
+	// per scale
+	if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
+		for (iter = 0; do_ability_data[iter].type != NOBITS; ++iter) {
+			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+				cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
+			}
+		}
+	}
+	
+	// existing amounts
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
+	}
+	
+	// existing targets
+	if (ABIL_COST_PER_TARGET(abil) != 0.0) {
+		cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
+	}
+	
+	// calculate
+	left = GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) - cost;
+	if (ABIL_COST_TYPE(abil) == HEALTH || ABIL_COST_TYPE(abil) == BLOOD) {
+		left -= 1;	// don't go to zero
+	}
+	
+	if (left > 0 && afford_amount) {
+		*afford_amount = floor((double) left / ABIL_COST_PER_AMOUNT(abil));
+	}
+	if (left > 0 && afford_targets) {
+		*afford_targets = floor((double) left / ABIL_COST_PER_TARGET(abil));
 	}
 }
 
@@ -4660,6 +4719,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
+	// locked in now -- increment targets
+	data->total_targets += 1;
+	
 	if (run_mode != RUN_ABIL_OVER_TIME) {
 		// check costs and cooldowns now -- not on over-time
 		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
@@ -5303,7 +5365,7 @@ DO_ABIL(do_conjure_vehicle_ability) {
 DO_ABIL(do_damage_ability) {
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
 	double reduced_scale;
-	int result, dmg;
+	int result, avail, dmg;
 	
 	// fine-tuning ability damage
 	double arbitrary_modifier = 4.0;
@@ -5311,9 +5373,19 @@ DO_ABIL(do_damage_ability) {
 	// smoother scaling, for bonuses, averaged toward 1.0
 	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
 	
+	// 1. calculate damage
 	dmg = subdata->scale_points * arbitrary_modifier;
 	
-	// bonus damage
+	// 2. check costs and reduce by available mana/etc
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		check_available_ability_cost(ch, abil, data, &avail, NULL);
+		dmg = MIN(dmg, avail);
+	}
+	
+	// 3. store amount of damage now -- before bonus-physical
+	data->total_amount += dmg;
+	
+	// 4. bonus damage
 	switch (ABIL_DAMAGE_TYPE(abil)) {
 		case DAM_PHYSICAL: {
 			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale;
@@ -5325,6 +5397,7 @@ DO_ABIL(do_damage_ability) {
 		}
 	}
 	
+	// 5. do it
 	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
 	
 	if (result != 0) {
@@ -5863,6 +5936,16 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 7. costs and consequences
 	if (data->should_charge_cost) {
+		// additional costs: amount
+		if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+			data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
+		}
+	
+		// additional costs: targets
+		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
+			data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
+		}
+		
 		// charge costs and cooldown unless the ability stopped itself -- regardless of success
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
 		if (ABIL_RESOURCE_COST(abil)) {
