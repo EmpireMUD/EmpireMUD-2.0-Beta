@@ -5049,7 +5049,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool should_charge_cost, fatal_error = FALSE;
+	bool should_charge_cost, no_msg, fatal_error = FALSE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -5058,6 +5058,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	
 	// save for later
 	should_charge_cost = data->should_charge_cost;
+	no_msg = data->no_msg;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 		if (fatal_error) {	// from the previous loop
@@ -5074,7 +5075,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			continue;	// not ally
 		}
 		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && (ch_iter == ch || !is_ability_enemy(ch, ch_iter))) {
-			continue;	// not ally
+			continue;	// not enemy
 		}
 		
 		// check cost
@@ -5086,6 +5087,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		
 		// final validation?
 		if (!validate_ability_target(ch, abil, ch_iter, NULL, NULL, NULL, NOBITS, FALSE, &fatal_error)) {
+			if (data->no_msg && !no_msg) {
+				// turn messaging back on
+				data->no_msg = FALSE;
+			}
 			continue;
 		}
 		
