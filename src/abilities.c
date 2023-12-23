@@ -8754,7 +8754,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
-		sprintf(buf + strlen(buf), "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_TARGET) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		sprintf(buf + strlen(buf), "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
 		sprintf(buf + strlen(buf), "\r\n");
