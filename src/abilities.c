@@ -5055,14 +5055,19 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	if (data->stop) {
 		return;	// don't start
 	}
-
-	// check cooldowns and cost up front on multis
-	// TODO: cost checking here does not account for cost-per-scale
-	if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
-		// sends own message
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
-		return;
+	
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+		// check cooldowns and cost up front on multis, unless running over-time
+		// TODO: cost checking here does not account for cost-per-scale
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
+		
+		// send pre-messages now
+		send_pre_ability_messages(ch, NULL, NULL, abil, data);
 	}
 	
 	// save for later
@@ -6287,7 +6292,6 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 6. ** run the ability **
 	if (multi_targ != NOBITS) {
-		send_pre_ability_messages(ch, vict, ovict, abil, data);
 		call_multi_target_ability(ch, abil, argument, multi_targ, level, RUN_ABIL_NORMAL, data);
 	}
 	else {
