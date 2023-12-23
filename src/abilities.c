@@ -138,7 +138,7 @@ struct {
 	
 	// attack/damage: some abilities stop here if they miss
 	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, ABILEDIT_COMMAND },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
@@ -328,9 +328,16 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 	}
 	
-	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
+	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_AMOUNT(abil) != 0.0 || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COST_PER_TARGET(abil) != 0.0) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s\r\n", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
+		if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/amount", ABIL_COST_PER_AMOUNT(abil));
+		}
+		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
+			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/target", ABIL_COST_PER_TARGET(abil));
+		}
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
 	}
 	
 	// Cooldown?
@@ -1027,7 +1034,8 @@ bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value
 
 
 /**
-* Estimates how much an ability will cost the player right now.
+* Estimates how much an ability will cost the player right now. Does not
+* account for per-amount or per-target costs because they vary by situation.
 *
 * @param char_data *ch The player.
 * @param ability_data *abil The ability.
@@ -7200,6 +7208,22 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							ABIL_MAX_STACKS(abil) = int_in[0];
 							break;
 						}
+						case 7: {	// X+ 7: cost per amount
+							if (sscanf(line, "X+ 7 %lf", &dbl_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_COST_PER_AMOUNT(abil) = dbl_in[0];
+							break;
+						}
+						case 8: {	// X+ 8: cost per target
+							if (sscanf(line, "X+ 8 %lf", &dbl_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_COST_PER_TARGET(abil) = dbl_in[0];
+							break;
+						}
 						default: {
 							log("SYSERR: Unknown 'X+' type %d in %s", xtype, error);
 							exit(1);
@@ -7452,6 +7476,12 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	if (ABIL_MAX_STACKS(abil) > 1) {
 		fprintf(fl, "X+ 6 %d\n", ABIL_MAX_STACKS(abil));
+	}
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		fprintf(fl, "X+ 7 %.2f\n", ABIL_COST_PER_AMOUNT(abil));
+	}
+	if (ABIL_COST_PER_TARGET(abil) != 0.0) {
+		fprintf(fl, "X+ 8 %.2f\n", ABIL_COST_PER_TARGET(abil));
 	}
 	// former 'X' type is no longer used; replaced by X+
 	
@@ -7752,7 +7782,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS, only_room_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts;
-	double min_cost_per = -100.0, max_cost_per = 100.0;
+	double min_per_amount = -100.0, max_per_amount = 100.0, min_per_scale = -100.0, max_per_scale = 100.0, min_per_target = -100.0, max_per_target = 100.0;
 	int count, only_cost_type = NOTHING, only_type = NOTHING, only_scale = NOTHING, scale_over = NOTHING, scale_under = NOTHING, min_pos = POS_DEAD, max_pos = POS_STANDING;
 	int min_cost = NOTHING, max_cost = NOTHING, min_cd = NOTHING, max_cd = NOTHING, min_dur = FAKE_DUR, max_dur = FAKE_DUR;
 	int only_wait = NOTHING, only_linked = NOTHING, only_diff = NOTHING, only_damage = NOTHING, only_ptech = NOTHING;
@@ -7804,8 +7834,12 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		FULLSEARCH_INT("mincooldowntime", min_cd, 0, INT_MAX)
 		FULLSEARCH_INT("maxcost", max_cost, 0, INT_MAX)
 		FULLSEARCH_INT("mincost", min_cost, 0, INT_MAX)
-		FULLSEARCH_DOUBLE("maxcostperscalepoint", max_cost_per, -100.0, 100.0)
-		FULLSEARCH_DOUBLE("mincostperscalepoint", min_cost_per, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("maxcostperscalepoint", max_per_scale, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("mincostperscalepoint", min_per_scale, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("maxcostperamount", max_per_amount, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("mincostperamount", min_per_amount, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("maxcostpertarget", max_per_target, -100.0, 100.0)
+		FULLSEARCH_DOUBLE("mincostpertarget", min_per_target, -100.0, 100.0)
 		FULLSEARCH_LIST("maxposition", max_pos, position_types)
 		FULLSEARCH_LIST("minposition", min_pos, position_types)
 		FULLSEARCH_LIST("paintcolor", only_paint, paint_names)
@@ -7893,10 +7927,22 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		if (min_cost != NOTHING && ABIL_COST(abil) < min_cost) {
 			continue;
 		}
-		if (ABIL_COST_PER_SCALE_POINT(abil) > max_cost_per) {
+		if (ABIL_COST_PER_SCALE_POINT(abil) > max_per_scale) {
 			continue;
 		}
-		if (ABIL_COST_PER_SCALE_POINT(abil) < min_cost_per) {
+		if (ABIL_COST_PER_SCALE_POINT(abil) < min_per_scale) {
+			continue;
+		}
+		if (ABIL_COST_PER_AMOUNT(abil) > max_per_amount) {
+			continue;
+		}
+		if (ABIL_COST_PER_AMOUNT(abil) < min_per_amount) {
+			continue;
+		}
+		if (ABIL_COST_PER_TARGET(abil) > max_per_target) {
+			continue;
+		}
+		if (ABIL_COST_PER_TARGET(abil) < min_per_target) {
 			continue;
 		}
 		if (max_dur != FAKE_DUR && ABIL_SHORT_DURATION(abil) > max_dur && ABIL_LONG_DURATION(abil) > max_dur) {
@@ -8192,6 +8238,12 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 	if (ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_RESOURCE_COST(abil)) {
 		fields |= ABILEDIT_COST;
 	}
+	if (ABIL_COST_PER_AMOUNT(abil)) {
+		fields |= ABILEDIT_COST_PER_AMOUNT;
+	}
+	if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS) || ABIL_COST_PER_TARGET(abil)) {
+		fields |= ABILEDIT_COST_PER_TARGET;
+	}
 	if (ABIL_MIN_POS(abil) != POS_STANDING) {
 		fields |= ABILEDIT_MIN_POS;
 	}
@@ -8301,8 +8353,19 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	
-	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COOLDOWN)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%.2f/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%.2f/scale)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil));
+		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
+			size += snprintf(buf + size, sizeof(buf) - size, " (+%.2f/amount)", ABIL_COST_PER_AMOUNT(abil));
+		}
+		if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
+			size += snprintf(buf + size, sizeof(buf) - size, " (+%.2f/target)", ABIL_COST_PER_TARGET(abil));
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\t0]\r\n");
+	}
+	
+	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
@@ -8482,7 +8545,17 @@ void olc_show_ability(char_data *ch) {
 	// Costs line
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-		
+	}
+	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
+		sprintf(buf + strlen(buf), "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
+		sprintf(buf + strlen(buf), "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_TARGET) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
+		sprintf(buf + strlen(buf), "\r\n");
+	}
+	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
 		sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
 	}
@@ -8914,6 +8987,18 @@ OLC_MODULE(abiledit_cost) {
 }
 
 
+OLC_MODULE(abiledit_costperamount) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST_PER_AMOUNT)) {
+		msg_to_char(ch, "This type of ability does not have that property. Set a healing or damage type to use it.\r\n");
+	}
+	else {
+		ABIL_COST_PER_AMOUNT(abil) = olc_process_double(ch, argument, "cost per amount", "costperamount", -100.0, 100.0, ABIL_COST_PER_AMOUNT(abil));
+	}
+}
+
+
 OLC_MODULE(abiledit_costperscalepoint) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
@@ -8922,6 +9007,18 @@ OLC_MODULE(abiledit_costperscalepoint) {
 	}
 	else {
 		ABIL_COST_PER_SCALE_POINT(abil) = olc_process_double(ch, argument, "cost per scale point", "costperscalepoint", -100.0, 100.0, ABIL_COST_PER_SCALE_POINT(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_costpertarget) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COST_PER_TARGET)) {
+		msg_to_char(ch, "This type of ability does not have that property. Set any multi-target flag to use it.\r\n");
+	}
+	else {
+		ABIL_COST_PER_TARGET(abil) = olc_process_double(ch, argument, "cost per target", "costpertarget", -100.0, 100.0, ABIL_COST_PER_TARGET(abil));
 	}
 }
 

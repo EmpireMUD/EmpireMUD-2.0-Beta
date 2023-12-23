@@ -636,10 +636,11 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_ROOM_NOT_HERE	BIT(21)	// modifier ensures it's not the current room
 #define ATAR_STRING			BIT(22)	// string is expected and arg cannot be empty
 
-#define CHAR_ATARS	(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
-#define OBJ_ATARS	(ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
-#define VEH_ATARS	(ATAR_VEH_ROOM | ATAR_VEH_WORLD)
-#define ROOM_ATARS	(ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
+#define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
+#define MULTI_CHAR_ATARS	(NOBITS)
+#define OBJ_ATARS			(ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
+#define VEH_ATARS			(ATAR_VEH_ROOM | ATAR_VEH_WORLD)
+#define ROOM_ATARS			(ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
 
 
 // ABIL_ACTION_x: ability actions
@@ -3917,7 +3918,9 @@ struct ability_data {
 	bitvector_t targets;	// ATAR_ flags
 	int cost_type;	// HEALTH, MANA, etc.
 	int cost;	// amount of h/v/m
+	double cost_per_amount;		// cost modifier for healing/damage
 	double cost_per_scale_point;	// cost modifier when scaled
+	double cost_per_target;		// cost modifier with multiple targets
 	struct resource_data *resource_cost;	// additional costs
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any

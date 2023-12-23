@@ -866,6 +866,30 @@ higher cost.
 
 See also: OLC ABILITIES
 #d
+"ABILEDIT COSTPERAMOUNT" "ABILEDIT COST PER AMOUNT"
+
+Usage:  .costperamount <amount>
+
+Some types ability support a 'cost per amount' modifier. This generally the
+amount of damage, healing, etc.
+
+For example, if the cost per amount is 0.1 and the ability will deal 100
+damage, it costs an extra 10.
+
+See also: OLC ABILITIES, ABILEDIT COST
+#d
+"ABILEDIT COSTPERTARGET" "ABILEDIT COST PER TARGET"
+
+Usage:  .costpertarget <amount>
+
+When an ability can target multiple characters, it supports an optional 'cost
+per target' modifier, so extra targets will cost more.
+
+For example, if the cost per target is 15 and the ability affects two
+characters, it costs an extra 30.
+
+See also: OLC ABILITIES, ABILEDIT COST
+#d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY"
 
 The CRAFT ability type indicates that it is used for crafting/building items.
@@ -1066,6 +1090,8 @@ Fields:
   &c-mincooldown&0, &c-maxcooldown&0 - cooldown time within these limits
   &c-mincost&0, &c-maxcost&0 - base cost within these limits
   &c-mincostperscalepoint&0, &c-maxcostperscalepoint&0 - scaled cost limits
+  &c-mincostperamount&0, &c-maxcostperamount&0 - cost per amount limits
+  &c-mincostpertarget&0, &c-maxcostpertarget&0 - cost per target limits
   &c-minduration&0, &c-maxduration&0 - short/long duration within these limits
   &c-minposition&0, &c-maxposition&0 - required position within these limits
   &c-paintcolor&0 - Search a specific paint color in ability data (PAINT ITEM has the list)
