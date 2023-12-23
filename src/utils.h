@@ -147,6 +147,7 @@
 #define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
 #define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
 #define ABIL_IS_VIOLENT(abil)  (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT))
+#define ABIL_TOTAL_COST(abil)	(ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil))
 #define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "the ability")
 
 

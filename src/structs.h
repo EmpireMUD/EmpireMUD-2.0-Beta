@@ -4013,7 +4013,7 @@ struct ability_exec {
 	bool should_charge_cost;	// if TRUE, will charge regardless of success
 	int total_amount;	// for cost-per-amount
 	int total_targets;	// for cost-per-target
-	int max_scale;	// for cost-per-scale-point
+	double max_scale;	// for cost-per-scale-point
 	
 	// data passed by types
 	any_vnum ready_weapon_val;

@@ -983,7 +983,7 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 		msg_to_char(ch, "You can't %s%s here.\r\n", ABIL_COMMAND(abil) ? "use " : "", SAFE_ABIL_COMMAND(abil));
 		return FALSE;
 	}
-	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_TOTAL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, TRUE)) {
 		return FALSE;	// sun fail
 	}
 	if (ABILITY_FLAGGED(abil, ABILF_SPOKEN) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
@@ -1032,14 +1032,24 @@ void check_available_ability_cost(char_data *ch, ability_data *abil, struct abil
 		*afford_targets = 0;
 	}
 	
-	// base
-	cost = ABIL_COST(abil);
+	// determine base amount
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION_VNUM(ch, 2)) {
+		// over-time abilities already charged the base, per-scale, and 1 target
+		cost = 0 - ABIL_COST_PER_TARGET(abil);
+	}
+	else {
+		// not over-time
+		cost = ABIL_COST(abil);
 	
-	// per scale
-	if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
-		for (iter = 0; do_ability_data[iter].type != NOBITS; ++iter) {
-			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-				cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
+		// per scale
+		if (data->max_scale > 0) {
+			cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
+		}
+		else if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
+			for (iter = 0; do_ability_data[iter].type != NOBITS; ++iter) {
+				if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+					cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
+				}
 			}
 		}
 	}
@@ -1279,10 +1289,10 @@ bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_PEACEFUL) && ABIL_IS_VIOLENT(abil)) {
 		return FALSE;	// peaceful
 	}
-	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, FALSE)) {
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_TOTAL_COST(abil) > 0 && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && !check_vampire_sun(ch, FALSE)) {
 		return FALSE;	// sun fail
 	}
-	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_COST(abil) > 0 && !CAN_SPEND_BLOOD(ch)) {
+	if (ABIL_COST_TYPE(abil) == BLOOD && ABIL_TOTAL_COST(abil) > 0 && !CAN_SPEND_BLOOD(ch)) {
 		return FALSE;	// can't spend blood
 	}
 	if (ABILITY_FLAGGED(abil, ABILF_SPOKEN) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
@@ -1296,7 +1306,7 @@ bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
 	}
 	
 	// other checks similar to what will be called with messages in call_ability():
-	if (ABIL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < (ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil))) {
+	if (ABIL_TOTAL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < ABIL_TOTAL_COST(abil)) {
 		return FALSE;	// unlikely to afford cost
 	}
 	if (ABIL_COOLDOWN(abil) != NOTHING && get_cooldown_time(ch, ABIL_COOLDOWN(abil)) > 0) {
@@ -4762,6 +4772,9 @@ void perform_over_time_ability(char_data *ch) {
 * Begins an over-time ability and sends the first message. It will also charge
 * any costs. Everything else should be pre-validated here.
 *
+* Note: cost is stored BEFORE scale/amount are added, and with an estimate of 1
+* target.
+*
 * @param char_data *ch The person doing the ability (must be a player, not NPC).
 * @param ability_data *abil The ability being used.
 * @param char *argument The remaining arguments.
@@ -4782,7 +4795,7 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
 	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
 	GET_ACTION_VNUM(ch, 1) = level;
-	GET_ACTION_VNUM(ch, 2) = data->cost;
+	GET_ACTION_VNUM(ch, 2) = data->cost + (data->max_scale * ABIL_COST_PER_SCALE_POINT(abil)) + ABIL_COST_PER_TARGET(abil);
 	GET_ACTION_CHAR_TARG(ch) = vict;
 	GET_ACTION_MULTI_TARG(ch) = multi_targ;
 	GET_ACTION_OBJ_TARG(ch) = ovict;
@@ -4881,7 +4894,8 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
-	int iter, scale = 0;
+	double total_scale = 0.0;
+	int iter;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
@@ -4899,13 +4913,11 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
 			call_prep_abil(do_ability_data[iter].prep_func);
 			
-			// adjust cost
-			if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
-				scale = get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
-				data->max_scale = MAX(scale, data->max_scale);
-			}
+			// for cost later
+			total_scale += get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
 		}
 	}
+	data->max_scale = MAX(total_scale, data->max_scale);
 	
 	// early exit?
 	if (data->stop) {
@@ -5059,8 +5071,8 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	
 	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 		// check cooldowns and cost up front on multis, unless running over-time
-		// TODO: cost checking here does not account for cost-per-scale
-		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
+		// TODO: cost checking here does not account for cost-per-scale, which could be estimated from base scale funcs like in estimate_cost
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_TOTAL_COST(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
 			data->stop = TRUE;
 			data->should_charge_cost = FALSE;
@@ -5111,6 +5123,11 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		
 		// run it!
 		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
+		
+		// were costs higher than estimated?
+		if ((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0)) {
+			charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
+		}
 		
 		// in case no_msg was triggered by call_ability:
 		if (data->no_msg && !no_msg) {
@@ -6292,7 +6309,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
-	if (multi_targ != NOBITS) {
+	if (multi_targ != NOBITS && !ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
 		call_multi_target_ability(ch, abil, argument, multi_targ, level, RUN_ABIL_NORMAL, data);
 	}
 	else {
