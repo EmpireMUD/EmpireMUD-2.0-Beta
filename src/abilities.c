@@ -55,7 +55,7 @@ OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
-bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
+bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room, bool send_msgs, bool *fatal_error);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
 char *estimate_ability_cost(char_data *ch, ability_data *abil);
@@ -2328,9 +2328,10 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 * @param room_data *room_targ Optional: The room target (may be NULL if not used).
 * @param bitvector_t multi_targ Optional: Targeting multiple things: which type (NOBITS if not used).
 * @param bool send_msgs If TRUE, sends a message on failure. If FALSE, is silent.
+* @param bool *fatal_error Detects if an error is worth breaking out of a multi-target loop, in which case it also overrode send_msgs. (May be NULL if you don't need to detect this.)
 * @return bool TRUE if ok, FALSE if failed.
 */
-bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, bool send_msgs) {
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, bool send_msgs, bool *fatal_error) {
 	char_data *ch_iter;
 	bool any;
 	
@@ -2416,16 +2417,10 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
-	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ)) {
+	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ, send_msgs, fatal_error)) {
 		// sends own message when false
 		return FALSE;
 	}
-	/* TODO: if group abilities are added
-	if (IS_SET(ABIL_TYPES(abil), ABILT_GROUPS) && !GROUP(ch)) {
-		msg_to_char(ch, "You can't do that if you're not in a group!\r\n");
-		return;
-	}
-	*/
 	
 	// looks ok
 	return TRUE;
@@ -2989,9 +2984,11 @@ void apply_ability_effects(ability_data *abil, char_data *ch, char_data *vict, o
 * @param obj_data *ovict Optional: Object target (may be NULL).
 * @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
 * @param room_data *room_targ Optional: For room-targeting abilities, must provide the room (may be NULL).
+* @param bool send_msgs If TRUE, sends error messages. If FALSE, suppresses them if possible (fatal errors are not suppressed).
+* @param bool *fatal_error Detects if an error is worth breaking out of a multi-target loop, in which case it also overrode send_msgs. (May be NULL if you don't need to detect this.)
 * @return bool TRUE if ok, FALSE if there was a problem. Only sends a message if it was false.
 */
-bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bool send_msgs, bool *fatal_error) {
 	char part[256];
 	struct ability_data_list *adl;
 	char_data *ch_iter;
@@ -3004,6 +3001,9 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	bool want_room_permission = FALSE, have_room_permission = FALSE;
 	bool want_weapon = FALSE, have_weapon = FALSE;
 	char dot_error[256], item_type_error[256], role_error[256], room_permission_error[256], weapon_error[256];
+	
+	#define _set_fatal_error(val)		if (fatal_error) { *fatal_error = (val); }
+	_set_fatal_error(FALSE);
 	
 	if (!ch || !abil) {
 		return FALSE;	// no work
@@ -3032,10 +3032,12 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_ON_BARRIER: {
 				if (!ROOM_BLD_FLAGGED(any_room, BLD_BARRIER)) {
 					msg_to_char(ch, "You need to do that on a barrier or wall of some kind.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				else if (!IS_COMPLETE(any_room)) {
 					msg_to_char(ch, "You need to finish building the barrier first.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3043,6 +3045,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_OWN_TILE: {
 				if (!GET_LOYALTY(ch) || ROOM_OWNER(any_room) != GET_LOYALTY(ch)) {
 					msg_to_char(ch, "You need to do that at a location you own.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3083,10 +3086,12 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_ON_ROAD: {
 				if (!IS_ROAD(any_room)) {
 					msg_to_char(ch, "You need to do that on a road.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				else if (!IS_COMPLETE(any_room)) {
 					msg_to_char(ch, "You need to finish building first.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3095,6 +3100,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				room_data *home = any_room ? HOME_ROOM(any_room) : NULL;
 				if (!home || !IS_ANY_BUILDING(home) || ROOM_AFF_FLAGGED(home, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(home, BLD_NO_PAINT)) {
 					msg_to_char(ch, "You can't do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3103,6 +3109,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				bool wait = FALSE;
 				if (!ROOM_OWNER(any_room) && !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
 					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3110,6 +3117,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_HAVE_EMPIRE: {
 				if (!GET_LOYALTY(ch)) {
 					msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3117,6 +3125,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_INDOORS: {
 				if (IS_OUTDOOR_TILE(IN_ROOM(ch))) {
 					msg_to_char(ch, "You need to be indoors to do that.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3124,6 +3133,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_OUTDOORS: {
 				if (!IS_OUTDOOR_TILE(IN_ROOM(ch))) {
 					msg_to_char(ch, "You need to be outdoors to do that.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3131,6 +3141,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_ON_MAP: {
 				if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
 					msg_to_char(ch, "You need to be on the map to do that.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3138,6 +3149,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_TERRAFORM_APPROVAL: {
 				if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
 					send_config_msg(ch, "need_approval_string");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3145,10 +3157,12 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_VALID_SIEGE_TARGET: {
 				if (room_targ && !validate_siege_target_room(ch, NULL, room_targ)) {
 					// sends own messages
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				if (vvict && !validate_siege_target_vehicle(ch, NULL, vvict)) {
 					// sends own messages
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3156,6 +3170,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_NOT_DISTRACTED: {
 				if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
 					msg_to_char(ch, "You're too distracted to do that.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3163,6 +3178,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_NOT_IMMOBILIZED: {
 				if (AFF_FLAGGED(ch, AFF_IMMOBILIZED)) {
 					msg_to_char(ch, "You can't do that while immobilized.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3170,17 +3186,20 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_CAN_TELEPORT_HERE: {
 				if (!can_teleport_to(ch, IN_ROOM(ch), FALSE)) {
 					msg_to_char(ch, "You can't do that here.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_WITHIN_RANGE: {
 				if (compute_distance(IN_ROOM(ch), other_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
-					if (vict) {
-						act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-					}
-					else {
-						msg_to_char(ch, "It's too far away.\r\n");
+					if (send_msgs) {
+						if (vict) {
+							act("$E is too far away.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+						else {
+							msg_to_char(ch, "It's too far away.\r\n");
+						}
 					}
 					return FALSE;
 				}
@@ -3188,7 +3207,9 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			}
 			case ABIL_LIMIT_NOT_GOD_TARGET: {
 				if (vict && vict != ch && (IS_GOD(vict) || IS_IMMORTAL(vict))) {
-					msg_to_char(ch, "You can't target a god!\r\n");
+					if (send_msgs) {
+						msg_to_char(ch, "You can't target a god!\r\n");
+					}
 					return FALSE;
 				}
 				break;
@@ -3196,6 +3217,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET: {
 				if (!can_use_room(ch, other_room, GUESTS_ALLOWED)) {
 					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3203,6 +3225,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET: {
 				if (!can_use_room(ch, other_room, MEMBERS_AND_ALLIES)) {
 					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3210,6 +3233,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET: {
 				if (!can_use_room(ch, other_room, MEMBERS_ONLY)) {
 					msg_to_char(ch, "You don't have permission to do that %s.\r\n", (other_room == IN_ROOM(ch) ? "here" : "there"));
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3217,13 +3241,16 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_CAN_TELEPORT_TARGET: {
 				if (!can_teleport_to(ch, other_room, FALSE)) {
 					msg_to_char(ch, "You can't teleport there.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC: {
 				if (vict && IS_NPC(vict) && ((GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch)) || !can_use_room(ch, IN_ROOM(vict), GUESTS_ALLOWED))) {
-					msg_to_char(ch, "You can't target an NPC in another empire.\r\n");
+					if (send_msgs) {
+						msg_to_char(ch, "You can't target an NPC in another empire.\r\n");
+					}
 					return FALSE;
 				}
 				break;
@@ -3231,6 +3258,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_NOT_HERE: {
 				if (other_room && other_room == IN_ROOM(ch)) {
 					msg_to_char(ch, "You can't target this location.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3239,6 +3267,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				bool wait;
 				if (ROOM_OWNER(other_room) && !is_in_city_for_empire(other_room, ROOM_OWNER(other_room), TRUE, &wait)) {
 					msg_to_char(ch, "%s city was founded too recently; you'll have to wait.\r\n", (other_room == IN_ROOM(ch) ? "This" : "That"));
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
@@ -3297,6 +3326,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 					if (FIGHTING(ch_iter) == ch) {
 						msg_to_char(ch, "You can't do that someone is attacking you!\r\n");
+						_set_fatal_error(TRUE);
 						return FALSE;
 					}
 				}
@@ -3305,20 +3335,24 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_DISARMABLE_TARGET: {
 				if (vict) {
 					if (!GET_EQ(vict, WEAR_WIELD) && (!IS_NPC(vict) || !is_attack_flagged_by_vnum(MOB_ATTACK_TYPE(vict), AMDF_DISARMABLE))) {
-						if (ch == vict) {
-							msg_to_char(ch, "You aren't even using a weapon.\r\n");
-						}
-						else {
-							act("$E isn't even using a weapon.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						if (send_msgs) {
+							if (ch == vict) {
+								msg_to_char(ch, "You aren't even using a weapon.\r\n");
+							}
+							else {
+								act("$E isn't even using a weapon.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							}
 						}
 						return FALSE;
 					}
 					else if (AFF_FLAGGED(vict, AFF_DISARMED)) {
-						if (ch == vict) {
-							msg_to_char(ch, "You're already disarmed.\r\n");
-						}
-						else {
-							act("$E is already disarmed.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						if (send_msgs) {
+							if (ch == vict) {
+								msg_to_char(ch, "You're already disarmed.\r\n");
+							}
+							else {
+								act("$E is already disarmed.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							}
 						}
 						return FALSE;
 					}
@@ -3327,11 +3361,13 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			}
 			case ABIL_LIMIT_TARGET_HAS_MANA: {
 				if (vict && GET_MANA(vict) < 1) {
-					if (ch == vict) {
-						msg_to_char(ch, "You can't do that when you don't have any mana.\r\n");
-					}
-					else {
-						msg_to_char(ch, "You can't use that one someone without any mana.\r\n");
+					if (send_msgs) {
+						if (ch == vict) {
+							msg_to_char(ch, "You can't do that when you don't have any mana.\r\n");
+						}
+						else {
+							msg_to_char(ch, "You can't use that one someone without any mana.\r\n");
+						}
 					}
 					return FALSE;
 				}
@@ -3340,23 +3376,27 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_USING_ANY_POISON: {
 				if (USING_POISON(ch) == NOTHING) {
 					msg_to_char(ch, "You need to be using poison.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				if (!find_poison_by_vnum(ch->carrying, USING_POISON(ch))) {
 					msg_to_char(ch, "You seem to be out of poison.\r\n");
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;
 			}
 			case ABIL_LIMIT_TARGET_HAS_ANY_DOT: {
 				if (vict && !vict->over_time_effects) {
-					if (ch == vict) {
-						msg_to_char(ch, "You aren't afflicted by any damage-over-time effects.\r\n");
-						return FALSE;
-					}
-					else {
-						act("$N is not afflicted by any damage-over-time effects.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-						return FALSE;
+					if (send_msgs) {
+						if (ch == vict) {
+							msg_to_char(ch, "You aren't afflicted by any damage-over-time effects.\r\n");
+							return FALSE;
+						}
+						else {
+							act("$N is not afflicted by any damage-over-time effects.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							return FALSE;
+						}
 					}
 				}
 				break;
@@ -3393,12 +3433,15 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					}
 					
 					if (!any) {
-						if (ch == vict) {
-							msg_to_char(ch, "Nobody is attacking you.\r\n");
+						if (send_msgs) {
+							if (ch == vict) {
+								msg_to_char(ch, "Nobody is attacking you.\r\n");
+							}
+							else {
+								act("Nothing is attacking $M.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							}
 						}
-						else {
-							act("Nothing is attacking $M.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-						}
+						return FALSE;
 					}
 				}
 				break;
@@ -3421,6 +3464,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL)) {
 						msg_to_char(ch, "You can't do that with somebody watching!\r\n");
+						_set_fatal_error(TRUE);
 						return FALSE;
 					}
 				}
@@ -3434,6 +3478,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
 						msg_to_char(ch, "You can't do that with somebody watching!\r\n");
+						_set_fatal_error(TRUE);
 						return FALSE;
 					}
 				}
@@ -3445,32 +3490,40 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	// things that can check multiples
 	if (want_room_permission && !have_room_permission) {
 		msg_to_char(ch, "%s", *room_permission_error ? room_permission_error : "You do not have permission to do that here.\r\n");
+		_set_fatal_error(TRUE);
 		return FALSE;
 	}
 	else if (want_weapon && !have_weapon) {
 		msg_to_char(ch, "%s", *weapon_error ? weapon_error : "You need to be wielding a weapon to do that.\r\n");
+		_set_fatal_error(TRUE);
 		return FALSE;
 	}
 	else if (want_weapon && have_weapon && AFF_FLAGGED(ch, AFF_DISARMED)) {
 		msg_to_char(ch, "You can't do that while your weapon is disarmed!\r\n");
+		_set_fatal_error(TRUE);
 		return FALSE;
 	}
 	else if (want_item_type && !have_item_type) {
-		msg_to_char(ch, "%s", *item_type_error ? item_type_error : "You cannot use that ability on that type of item.\r\n");
+		if (send_msgs) {
+			msg_to_char(ch, "%s", *item_type_error ? item_type_error : "You cannot use that ability on that type of item.\r\n");
+		}
 		return FALSE;
 	}
 	else if (want_dot && !have_dot) {
-		if (ch == vict) {
-			msg_to_char(ch, "You aren't afflicted by a %s damage-over-time effect.\r\n", dot_error);
-			return FALSE;
-		}
-		else {
-			act("$N is not afflicted by a $t damage-over-time effect.", FALSE, ch, dot_error, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
-			return FALSE;
+		if (send_msgs) {
+			if (ch == vict) {
+				msg_to_char(ch, "You aren't afflicted by a %s damage-over-time effect.\r\n", dot_error);
+				return FALSE;
+			}
+			else {
+				act("$N is not afflicted by a $t damage-over-time effect.", FALSE, ch, dot_error, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+				return FALSE;
+			}
 		}
 	}
 	else if (want_role && !have_role) {
 		msg_to_char(ch, "You must be in the %s role to do that.\r\n", *role_error ? role_error : "UNKNOWN");
+		_set_fatal_error(TRUE);
 		return FALSE;
 	}
 	
@@ -4654,7 +4707,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ, &multi_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE)) {
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ, &multi_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE, NULL)) {
 		cancel_action(ch);
 		return;
 	}
@@ -4995,7 +5048,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool should_charge_cost;
+	bool should_charge_cost, fatal_error = FALSE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -5006,6 +5059,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	should_charge_cost = data->should_charge_cost;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
+		if (fatal_error) {	// from the previous loop
+			data->stop = TRUE;
+			break;
+		}
 		if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
 			continue;	// skip immortals other than self
 		}
@@ -5024,6 +5081,11 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		if (more_targets < 1) {
 			// out of cost
 			break;
+		}
+		
+		// final validation?
+		if (!validate_ability_target(ch, abil, ch_iter, NULL, NULL, NULL, NOBITS, FALSE, &fatal_error)) {
+			continue;
 		}
 		
 		// run it!
@@ -5198,7 +5260,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 						multi_targ = ABIL_TARGETS(plab->ptr) & MULTI_CHAR_ATARS;
 					}
 				}
-				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, multi_targ, FALSE)) {
+				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
 					continue;	// no apparent targets
 				}
 			}
@@ -6182,7 +6244,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE)) {
+	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE, NULL)) {
 		// sent own message
 		return;
 	}
