@@ -5064,7 +5064,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			data->stop = TRUE;
 			break;
 		}
-		if (GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
+		if (!IS_NPC(ch_iter) && GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
 			continue;	// skip invisible imms
 		}
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
