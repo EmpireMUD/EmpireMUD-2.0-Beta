@@ -5256,6 +5256,11 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			use_veh = vvict;
 			use_room = room_targ;
 			
+			// cancel multi if not allowed?
+			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(plab->ptr), MULTI_CHAR_ATARS)) {
+				multi_targ = NOBITS;
+			}
+			
 			// compare targets
 			if (IS_SET(ABIL_TARGETS(plab->ptr), ATAR_SELF_ONLY)) {
 				use_char = ch;	// convert to self

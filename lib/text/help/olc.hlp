@@ -884,7 +884,8 @@ See also: OLC ABILITIES, ABILEDIT COST
 Usage:  .costpertarget <amount>
 
 When an ability can target multiple characters, it supports an optional 'cost
-per target' modifier, so extra targets will cost more.
+per target' modifier, so each target will cost more, including the first
+target.
 
 For example, if the cost per target is 15 and the ability affects two
 characters, it costs an extra 30.
