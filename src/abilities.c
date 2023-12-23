@@ -5362,6 +5362,14 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 				}
 			}
 			
+			if (data->success) {
+				// only if successful
+				if (ABILITY_FLAGGED(plab->ptr, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(plab->ptr) != NOTHING) {
+					limit_crowd_control(vict, ABIL_AFFECT_VNUM(plab->ptr));
+				}
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(plab->ptr), level, vict, ovict, vvict, room_targ, multi_targ);
+			}
+			
 			// clean up data
 			GET_RUNNING_ABILITY_DATA(ch) = NULL;
 			free_ability_exec(data);
