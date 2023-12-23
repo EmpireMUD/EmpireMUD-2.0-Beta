@@ -10717,6 +10717,12 @@ ACMD(do_restore) {
 		reset_player_temperature(vict);
 		sprintf(types + strlen(types), "%s temperature", *types ? "," : "");
 	}
+	
+	// affects that could get a person stuck
+	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUD | AFF_MUMMIFY)) {
+		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUD, TRUE);
+		affects_from_char_by_aff_flag(vict, AFF_MUMMIFY, TRUE);
+	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
 		for (i = 0; i < NUM_CONDS; i++)
