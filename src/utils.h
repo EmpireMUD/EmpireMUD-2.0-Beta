@@ -2238,7 +2238,6 @@ void sire_char(char_data *ch, char_data *victim);
 void start_drinking_blood(char_data *ch, char_data *victim);
 bool starving_vampire_aggro(char_data *ch);
 void taste_blood(char_data *ch, char_data *vict);
-void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
 bool vampire_kill_feeding_target(char_data *ch, char *argument);

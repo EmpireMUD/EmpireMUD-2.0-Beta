@@ -258,7 +258,6 @@ ACMD(do_mount);
 ACMD(do_move);
 ACMD(do_moveeinv);
 ACMD(do_mudstats);
-ACMD(do_mummify);
 ACMD(do_mydescription);
 
 ACMD(do_nearby);
@@ -805,7 +804,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "motd", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_MOTD ),
 	GRANT_CMD( "moveeinv", POS_DEAD, do_moveeinv, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	SIMPLE_CMD( "mudstats", POS_DEAD, do_mudstats, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "mummify", POS_STUNNED, do_mummify, NO_MIN, CTYPE_MOVE, ABIL_MUMMIFY ),
 	STANDARD_CMD( "murder", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SIMPLE_CMD( "mail", POS_STANDING, do_mail, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "mute", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_MUTE, SCMD_MUTE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),

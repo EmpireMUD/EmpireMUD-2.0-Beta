@@ -606,23 +606,6 @@ void taste_blood(char_data *ch, char_data *vict) {
 
 
 /**
-* Ends the mummify affect.
-*
-* @param char_data *ch The mummified person.
-*/
-void un_mummify(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-			msg_to_char(ch, "Your flesh softens and the mummified layers flake off!\r\n");
-			act("$n sheds a layer of skin and appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_STANDING;
-		}
-	}
-}
-
-
-/**
 * Checks if a person is not a vampire and, if not, clears certain vampire
 * traits and restores the player's blood (since non-vampires cannot drink
 * blood).
@@ -1347,53 +1330,6 @@ ACMD(do_feed) {
 		// mve the blood
 		set_blood(ch, GET_BLOOD(ch) - amt);
 		set_blood(victim, GET_BLOOD(victim) + amt);
-	}
-}
-
-
-ACMD(do_mummify) {
-	int cost = 20;
-	struct affected_type *af;
-
-	if (GET_POS(ch) < POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
-		un_mummify(ch);
-		command_lag(ch, WAIT_OTHER);
-	}
-	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot mummify.\r\n");
-	}
-	else if (!check_vampire_ability(ch, ABIL_MUMMIFY, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (FIGHTING(ch) || GET_POS(ch) < POS_RESTING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING)
-		msg_to_char(ch, "You can't mummify yourself while fighting!\r\n");
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MUMMIFY)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "Your flesh hardens as you mummify yourself!\r\n");
-		act("$n's flesh hardens and $e falls to the ground!", TRUE, ch, 0, 0, TO_ROOM);
-		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-
-		af = create_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
-		affect_to_char(ch, af);
-		free(af);
-		
-		gain_ability_exp(ch, ABIL_MUMMIFY, 50);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MUMMIFY, 0, ch, NULL, NULL, NULL, NOBITS);
 	}
 }
 

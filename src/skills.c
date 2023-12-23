@@ -223,14 +223,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_MUMMIFY: {
-			if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
-				void un_mummify(char_data *ch);
-				un_mummify(ch);
-				need_affect_total = TRUE;
-			}
-			break;
-		}
 	}
 	
 	determine_gear_level(ch);
