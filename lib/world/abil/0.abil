@@ -157,8 +157,30 @@ X+ 3 75
 S
 #12
 Deathshroud~
-0 -1 1.00 0 0 0
-T m 0
+cq -1 1.00 0 ag 0
+A
+26 1
+C
+deathshroud 3 bg 3 20 0.00 -1 0 0 1 0
+D 64 19 0
+M
+0
+You fall to the ground, dead!~
+M
+1
+$n falls to the ground, dead!~
+M
+23
+Your flesh returns to normal!~
+M
+24
+$n appears normal again!~
+T b 1
+T s 0
+X+ 0 x
+X+ 1 3041
+X+ 2 -1
+X+ 3 -1
 S
 #13
 Disguise~
@@ -324,8 +346,30 @@ T k 1
 S
 #25
 Mummify~
-0 -1 1.00 0 0 0
-T m 0
+cq -1 1.00 0 ag 0
+A
+26 1
+C
+mummify 3 bg 3 20 0.00 -1 0 0 1 0
+D 64 19 0
+M
+0
+Your flesh hardens as you mummify yourself!~
+M
+1
+$n's flesh hardens and $e falls to the ground!~
+M
+23
+Your flesh softens and the mummified layers flake off!~
+M
+24
+$n sheds a layer of skin and appears normal again!~
+T b 1
+T s 0
+X+ 0 jnz
+X+ 1 3011
+X+ 2 -1
+X+ 3 -1
 S
 #26
 Two-Handed Weapon Mastery~
