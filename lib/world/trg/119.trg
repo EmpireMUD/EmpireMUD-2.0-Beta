@@ -4211,7 +4211,7 @@ switch %line%
     %force% %mob% say Please, great Queen, anything.
   break
   case 10
-    %echo% ~%self% turns to guard, who bends down and turns his ear to her.
+    %echo% ~%self% turns to the guard, who bends down and turns his ear to her.
     wait 9 sec
     %echo% The royal guard and ~%self% exchange hushed whispers for a few moments.
     wait 9 sec
