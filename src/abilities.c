@@ -4881,7 +4881,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
-	int iter;
+	int iter, scale = 0;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
@@ -4901,7 +4901,8 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			
 			// adjust cost
 			if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
-				data->cost += get_ability_type_data(data, do_ability_data[iter].type)->scale_points * ABIL_COST_PER_SCALE_POINT(abil);
+				scale = get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
+				data->max_scale = MAX(scale, data->max_scale);
 			}
 		}
 	}
@@ -4916,7 +4917,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
 		// check costs and cooldowns now -- not on over-time/multi
-		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + (data->max_scale * ABIL_COST_PER_SCALE_POINT(abil)) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
 			data->stop = TRUE;
 			data->should_charge_cost = FALSE;
@@ -6301,15 +6302,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 7. costs and consequences
 	if (data->should_charge_cost) {
-		// additional costs: amount
-		if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
-			data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
-		}
-	
-		// additional costs: targets
-		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
-			data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
-		}
+		// additional costs:
+		data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
+		data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
+		data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
 		
 		// charge costs and cooldown unless the ability stopped itself -- regardless of success
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
