@@ -54,7 +54,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
-void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, struct ability_exec *data);
+void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
@@ -4594,7 +4594,12 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	else {
 		// done!
-		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		if (multi_targ != NOBITS) {
+			call_multi_target_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		}
+		else {
+			call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		}
 		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
@@ -4900,9 +4905,10 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 * @param char *argument Any remaining args.
 * @param bitvector_t multi_targ Which target flag we're using.
 * @param int level What level we're doing the thing at.
+* @param bitvector_t run_mode Any run_mode flags to pass through.
 * @param struct ability_exec *data Data for the running ability.
 */
-void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, struct ability_exec *data) {
+void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
 	bool should_charge_cost;
 	int more_targets;
@@ -4936,7 +4942,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		
 		// run it!
-		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL | RUN_ABIL_MULTI, data);
+		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
 		
 		// check for things that stop 1 but not all?
 		data->stop = FALSE;
@@ -5130,7 +5136,12 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
 			
 			// the big GO
-			call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+			if (multi_targ != NOBITS) {
+				call_multi_target_ability(ch, plab->ptr, "", multi_targ, level, RUN_ABIL_HOOKED, data);
+			}
+			else {
+				call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+			}
 			
 			// clean up data
 			GET_RUNNING_ABILITY_DATA(ch) = NULL;
@@ -6105,7 +6116,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// 6. ** run the ability **
 	if (multi_targ != NOBITS) {
 		send_pre_ability_messages(ch, vict, ovict, abil, data);
-		call_multi_target_ability(ch, abil, argument, multi_targ, level, data);
+		call_multi_target_ability(ch, abil, argument, multi_targ, level, RUN_ABIL_NORMAL, data);
 	}
 	else {
 		// single-target
