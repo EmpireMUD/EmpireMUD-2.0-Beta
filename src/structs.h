@@ -809,9 +809,10 @@ typedef struct vehicle_data vehicle_data;
 
 
 // RUN_ABIL_x: modes for activating abilities
-#define RUN_ABIL_NORMAL		0	// normal command activation
-#define RUN_ABIL_OVER_TIME	1	// an over-time ability running its final code
-#define RUN_ABIL_HOOKED		2	// called from a hook (triggered) ability
+#define RUN_ABIL_NORMAL		BIT(0)	// normal command activation
+#define RUN_ABIL_OVER_TIME	BIT(1)	// an over-time ability running its final code
+#define RUN_ABIL_HOOKED		BIT(2)	// called from a hook (triggered) ability
+#define RUN_ABIL_MULTI		BIT(3)	// running with multiple targets
 
 
  //////////////////////////////////////////////////////////////////////////////

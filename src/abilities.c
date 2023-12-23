@@ -53,7 +53,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 // local protos
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, int run_mode, struct ability_exec *data);
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
@@ -4732,10 +4732,10 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param room_data *room_targ For room target, if any (may be NULL).
 * @param bitvector_t multi_targ For multiple targests, the target type (may be NOBITS).
 * @param int level The level to use the ability at.
-* @param int run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
+* @param bitvector_t run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, int run_mode, struct ability_exec *data) {
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	int iter;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
@@ -4744,7 +4744,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		return;
 	}
 	
-	if (run_mode == RUN_ABIL_OVER_TIME) {
+	if (IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 		// ability is being called at the end of an over-time action (already charged)
 		data->should_charge_cost = FALSE;
 	}
@@ -4769,7 +4769,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// locked in now -- increment targets
 	data->total_targets += 1;
 	
-	if (run_mode != RUN_ABIL_OVER_TIME) {
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 		// check costs and cooldowns now -- not on over-time
 		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
@@ -4778,7 +4778,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			return;
 		}
 	}
-	if (run_mode == RUN_ABIL_NORMAL) {
+	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
 		// resource cost check -- normal ONLY
 		if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, TRUE, ABIL_NAME(abil))) {
 			// sends own message
@@ -4804,12 +4804,12 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
 	
 	// pre-messages if any (skip on over-time: already sent)
-	if (run_mode != RUN_ABIL_OVER_TIME) {
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
 		send_pre_ability_messages(ch, vict, ovict, abil, data);
 	}
 	
 	// WAIT! Over-time abilities stop here
-	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && IS_SET(run_mode, RUN_ABIL_NORMAL)) {
 		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, data);
 		return;
 	}
@@ -4841,7 +4841,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// main messaging
-	if (run_mode != RUN_ABIL_OVER_TIME) {
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 		send_ability_activation_messages(ch, vict, ovict, vvict, abil, NOTHING, data);
 	}
 	
@@ -6040,6 +6040,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 6. ** run the ability **
 	if (multi_targ != NOBITS) {
+		send_pre_ability_messages(ch, vict, ovict, abil, data);
+		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 			if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
 				continue;	// skip immortals other than self
@@ -6062,7 +6064,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 			
 			// run it!
-			call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL, data);
+			call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL | RUN_ABIL_MULTI, data);
 		}
 	}
 	else {
