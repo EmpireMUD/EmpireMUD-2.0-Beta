@@ -1199,7 +1199,7 @@ Usage:  diplomacy trade <empire>
 Trade relations are required in order to import and export goods from/to
 another empire.
 
-Trade also allows you to store and withdrawl your empire's items from the other
+Trade also allows you to store and retrieve your empire's items from the other
 empire's buildings (if you also have permission to use that building, for
 example due to an alliance or if it's a public building). These resources still
 go to/from your own empire's storage.
