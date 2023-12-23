@@ -960,10 +960,12 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 	int use_min_pos = ABIL_MIN_POS(abil);
 	
 	// prepare
+	/*
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && ABIL_AFFECT_VNUM(abil) != NOTHING && affected_by_spell(ch, ABIL_AFFECT_VNUM(abil))) {
 		// allows toggles to bypass min-pos when toggling off
 		use_min_pos = POS_INCAP;
 	}
+	*/
 	
 	// actual checks
 	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
@@ -6140,7 +6142,7 @@ PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
 	bool was_sleep_aff;
 	
-	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY;
+	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY | AFF_EARTHMELD;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	

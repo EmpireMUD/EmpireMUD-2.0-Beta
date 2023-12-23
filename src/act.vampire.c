@@ -623,23 +623,6 @@ void un_mummify(char_data *ch) {
 
 
 /**
-* Ends the deathshroud effect.
-*
-* @param char_data *ch The deathshrouded player.
-*/
-void un_deathshroud(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-			msg_to_char(ch, "Your flesh returns to normal!\r\n");
-			act("$n appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_STANDING;
-		}
-	}
-}
-
-
-/**
 * Checks if a person is not a vampire and, if not, clears certain vampire
 * traits and restores the player's blood (since non-vampires cannot drink
 * blood).
@@ -1326,53 +1309,6 @@ ACMD(do_command) {
 		
 		command_lag(ch, WAIT_ABILITY);
 		free(to_do);
-	}
-}
-
-
-ACMD(do_deathshroud) {
-	struct affected_type *af;
-	int cost = 20;
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot deathshroud.\r\n");
-	}
-	else if (GET_POS(ch) < POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
-		un_deathshroud(ch);
-		command_lag(ch, WAIT_OTHER);
-	}
-	else if (!check_vampire_ability(ch, ABIL_DEATHSHROUD, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (FIGHTING(ch) || GET_POS(ch) < POS_RESTING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING)
-		msg_to_char(ch, "You can't use deathshroud while fighting!\r\n");
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DEATHSHROUD)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You fall to the ground, dead!\r\n");
-		act("$n falls to the ground, dead!", TRUE, ch, 0, 0, TO_ROOM);
-
-		af = create_flag_aff(ATYPE_DEATHSHROUD, UNLIMITED, AFF_DEATHSHROUD, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_DEATHSHROUD, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
-		affect_to_char(ch, af);
-		free(af);
-
-		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_DEATHSHROUD, 50);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DEATHSHROUD, 0, ch, NULL, NULL, NULL, NOBITS);
 	}
 }
 
