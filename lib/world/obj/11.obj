@@ -400,4 +400,25 @@ M
 $p turns to glowing goo and evaporates.~
 O+ 1 6121
 S
+#1127
+claws~
+claws~
+Some claws are lying here.~
+   The tips of your fingers have melded with your fingernails, turning to long
+claws that look capable of delivering grievous wounds!
+~
+1 gmp an f 0 6
+0 1 13
+14 0
+A
+21 1 0
+A
+26 2 0
+M
+10
+Your claws meld back into your fingers.~
+M
+11
+$n's claws meld back into $s fingers.~
+S
 $

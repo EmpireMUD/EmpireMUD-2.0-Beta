@@ -13,7 +13,8 @@ S
 #102
 Quick Draw~
 0 -1 1.00 0 0 0
-T m 0
+D 1 93 0
+T e 1
 S
 #103
 Firstaid~
@@ -29,7 +30,8 @@ S
 #105
 Finesse~
 0 -1 1.00 0 0 0
-T m 0
+D 1 92 0
+T e 1
 S
 #106
 Stunning Blow~
@@ -169,8 +171,20 @@ S
 Ready Fireball~
 0 -1 1.00 0 bcn 0
 C
-unknown 5 0 2 30 0.00 -1 0 0 3 0
+unknown 5 a 2 30 0.00 -1 0 0 3 0
 D 4 1105 0
+M
+0
+*~
+M
+1
+*~
+M
+20
+Mana twists and swirls around your hand and becomes $p!~
+M
+21
+Mana twists and swirls around $n's hand and becomes $p!~
 T g 1
 S
 #118
@@ -605,8 +619,25 @@ T e 1
 S
 #155
 Jab~
-0 -1 1.00 0 0 0
-T m 0
+akB -1 1.00 0 0 0
+C
+jab 8 bfh 1 15 0.00 2039 9 0 2 0
+D 16 28 4
+M
+15
+You move close to jab $N with your weapon...~
+M
+16
+$n moves in close to jab you with $s weapon...~
+M
+17
+$n moves in close to jab $N with $s weapon...~
+T x 1
+T d 3
+X+ 1 3027
+X+ 2 15
+X+ 3 15
+X+ 6 2
 S
 #156
 Blind~

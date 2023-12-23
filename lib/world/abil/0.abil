@@ -67,7 +67,7 @@ S
 Ready Blood Weapons~
 0 -1 1.00 0 bcn 0
 C
-unknown 5 0 3 40 0.00 -1 0 0 2 0
+unknown 5 w 3 40 0.00 -1 0 0 2 0
 D 4 1101 0
 D 4 1102 0
 D 4 1103 0
@@ -77,6 +77,18 @@ D 4 1117 0
 D 4 1118 0
 D 4 1120 0
 D 4 1122 0
+M
+0
+*~
+M
+1
+*~
+M
+20
+You drain blood from your wrist and mold it into $p!~
+M
+21
+$n twists and molds $s own blood into $p!~
 T g 0
 S
 #7
@@ -89,8 +101,23 @@ T m 0
 S
 #8
 Claws~
-0 -1 1.00 0 0 0
-T m 0
+c -1 1.00 0 bn 0
+C
+claws 5 a 3 10 0.00 -1 0 0 2 0
+D 4 1127 0
+M
+0
+You focus your blood into your hands...~
+M
+1
+*~
+M
+20
+Your fingers grow into grotesque claws!~
+M
+21
+$n's fingers grow into grotesque claws!~
+T g 1
 S
 #9
 Command~
@@ -226,8 +253,19 @@ T e 1
 S
 #20
 Hide~
-0 -1 1.00 0 0 0
-T m 0
+q -1 1.00 0 0 0
+C
+hide 5 a 0 0 0.00 -1 0 0 1 0
+D 16 39 0
+D 64 18 0
+D 2 0 0
+M
+0
+You attempt to hide yourself.~
+M
+1
+*~
+T s 1
 S
 #21
 Horrid Form~
