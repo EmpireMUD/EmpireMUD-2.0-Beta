@@ -4750,6 +4750,11 @@ void perform_over_time_ability(char_data *ch) {
 			call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
 		}
 		
+		// were costs higher than estimated?
+		if ((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0)) {
+			charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
+		}
+		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
 			strcpy(arg, NULLSAFE(GET_ACTION_STRING(ch)));
@@ -5123,11 +5128,6 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		
 		// run it!
 		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
-		
-		// were costs higher than estimated?
-		if ((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0)) {
-			charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
-		}
 		
 		// in case no_msg was triggered by call_ability:
 		if (data->no_msg && !no_msg) {
