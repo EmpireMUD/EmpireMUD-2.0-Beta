@@ -4003,6 +4003,7 @@ struct ability_exec {
 	bool stop;	// indicates no further types should process
 	bool success;	// indicates the player should be charged
 	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
+	bool sent_fail_msg;	// if TRUE, it sent at least one fail
 	bool no_msg;	// indicates you shouldn't send messages
 	bool matching_role;	// if FALSE, no bonuses from matching role
 	bool engage_anyway;	// we engage combat if !stop || engage_anyway

@@ -4152,6 +4152,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	// mark this now
 	if (data) {
 		data->sent_any_msg = TRUE;	// guaranteed
+		data->sent_fail_msg = TRUE;
 	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
@@ -5021,7 +5022,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	}
 	
 	// check for a no-effect/fail message
-	if (!data->success && !data->no_msg) {
+	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
 		/* currently always showing the whole fail message
 		if (data->sent_any_msg) {
 			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
@@ -5107,7 +5108,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	}
 	
 	// fail message in here because it is generally suppressed in multi-targs
-	if (!data->success && !data->no_msg) {
+	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
 		send_ability_fail_messages(ch, NULL, NULL, abil, data);
 	}
 }
