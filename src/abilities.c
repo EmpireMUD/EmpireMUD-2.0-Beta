@@ -5209,6 +5209,7 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ) {
 	bool any_targ, free_limiter = FALSE;
 	struct ability_hook *ahook;
+	ability_data *abil;
 	char_data *use_char;
 	obj_data *use_obj;
 	room_data *use_room;
@@ -5232,17 +5233,17 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 	}
 	
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		if (!plab->ptr || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+		if (!(abil = plab->ptr) || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
 			continue;
 		}
-		if (!ABIL_HAS_HOOK(plab->ptr, hook_type)) {
+		if (!ABIL_HAS_HOOK(abil, hook_type)) {
 			continue;	// shortcut
 		}
-		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(plab->ptr))) {
+		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(abil))) {
 			continue;	// already ran
 		}
 		
-		LL_FOREACH(ABIL_HOOKS(plab->ptr), ahook) {
+		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
 			if (!IS_SET(ahook->type, hook_type)) {
 				continue;	// wrong type
 			}
@@ -5252,7 +5253,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			if (number(1, 10000) > ahook->percent * 100) {
 				continue;	// failed percent check
 			}
-			if (!pre_check_hooked_ability(ch, plab->ptr)) {
+			if (!pre_check_hooked_ability(ch, abil)) {
 				continue;	// unlikely to succeed
 			}
 			
@@ -5263,35 +5264,35 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			use_room = room_targ;
 			
 			// cancel multi if not allowed?
-			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(plab->ptr), MULTI_CHAR_ATARS)) {
+			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
 				multi_targ = NOBITS;
 			}
 			
 			// compare targets
-			if (IS_SET(ABIL_TARGETS(plab->ptr), ATAR_SELF_ONLY)) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
 				use_char = ch;	// convert to self
 			}
-			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_FIGHT_VICT)) {
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT)) {
 				use_char = FIGHTING(ch);	// set to self
 			}
-			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_FIGHT_SELF)) {
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
 				use_char = ch;	// set to self
 			}
-			if (IS_SET(ABIL_TARGETS(plab->ptr), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
 				use_room = IN_ROOM(ch);	// convert to this room
 			}
 				
 			// validation of targets
-			if (use_char == ch && (ABIL_IS_VIOLENT(plab->ptr) || IS_SET(ABIL_TARGETS(plab->ptr), ATAR_NOT_SELF))) {
+			if (use_char == ch && (ABIL_IS_VIOLENT(abil) || IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF))) {
 				use_char = NULL;	// can't target self
 			}
-			if (use_char && use_char != ch && IN_ROOM(use_char) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)) {
+			if (use_char && use_char != ch && IN_ROOM(use_char) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)) {
 				use_char = NULL;	// char in wrong room
 			}
 			if (use_char && (IS_DEAD(use_char) || EXTRACTED(use_char))) {
 				use_char = NULL;	// gone
 			}
-			if (use_veh && IN_ROOM(use_veh) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(plab->ptr), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(plab->ptr), ATAR_VEH_WORLD)) {
+			if (use_veh && IN_ROOM(use_veh) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
 				use_veh = NULL;	// veh in wrong room
 			}
 			if (use_veh && VEH_IS_EXTRACTED(use_veh)) {
@@ -5299,27 +5300,27 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			}
 			
 			// do we have any mandatory targets left?
-			if (!IS_SET(ABIL_TARGETS(plab->ptr), ATAR_IGNORE | ATAR_STRING)) {
+			if (!IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING)) {
 				any_targ = FALSE;
-				if (IS_SET(ABIL_TARGETS(plab->ptr), CHAR_ATARS) && use_char) {
+				if (IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) && use_char) {
 					any_targ = TRUE;
 				}
-				else if (IS_SET(ABIL_TARGETS(plab->ptr), OBJ_ATARS) && use_obj) {
+				else if (IS_SET(ABIL_TARGETS(abil), OBJ_ATARS) && use_obj) {
 					any_targ = TRUE;
 				}
-				else if (IS_SET(ABIL_TARGETS(plab->ptr), VEH_ATARS) && use_veh) {
+				else if (IS_SET(ABIL_TARGETS(abil), VEH_ATARS) && use_veh) {
 					any_targ = TRUE;
 				}
-				else if (IS_SET(ABIL_TARGETS(plab->ptr), ROOM_ATARS) && use_room) {
+				else if (IS_SET(ABIL_TARGETS(abil), ROOM_ATARS) && use_room) {
 					any_targ = TRUE;
 				}
-				else if (IS_SET(ABIL_TARGETS(plab->ptr), MULTI_CHAR_ATARS)) {
+				else if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
 					any_targ = TRUE;
 					if (multi_targ == NOBITS) {
-						multi_targ = ABIL_TARGETS(plab->ptr) & MULTI_CHAR_ATARS;
+						multi_targ = ABIL_TARGETS(abil) & MULTI_CHAR_ATARS;
 					}
 				}
-				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
+				if (!any_targ || !validate_ability_target(ch, abil, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
 					continue;	// no apparent targets
 				}
 			}
@@ -5327,47 +5328,47 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			// match!
 			
 			// mark already run FIRST
-			add_vnum_hash(use_limiter, ABIL_VNUM(plab->ptr), 1);
+			add_vnum_hash(use_limiter, ABIL_VNUM(abil), 1);
 			
 			// determine level? or, preferably, inherit
 			if (!level) {
-				level = get_player_level_for_ability(ch, ABIL_VNUM(plab->ptr));
+				level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 			}
 			
 			// construct data
 			CREATE(data, struct ability_exec, 1);
-			data->abil = plab->ptr;
+			data->abil = abil;
 			data->should_charge_cost = TRUE;	// may still charge
-			data->matching_role = has_matching_role(ch, plab->ptr, TRUE);
+			data->matching_role = has_matching_role(ch, abil, TRUE);
 			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
 			
 			// the big GO
 			if (multi_targ != NOBITS) {
-				call_multi_target_ability(ch, plab->ptr, "", multi_targ, level, RUN_ABIL_HOOKED, data);
+				call_multi_target_ability(ch, abil, "", multi_targ, level, RUN_ABIL_HOOKED, data);
 			}
 			else {
-				call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+				call_ability(ch, abil, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
 			}
 			
 			// charge if needed
 			if (data->should_charge_cost) {
 				// additional costs:
-				data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(plab->ptr);
-				data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(plab->ptr);
-				data->cost += data->total_targets * ABIL_COST_PER_TARGET(plab->ptr);
+				data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
+				data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
+				data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
 				
-				charge_ability_cost(ch, ABIL_COST_TYPE(plab->ptr), data->cost, ABIL_COOLDOWN(plab->ptr), ABIL_COOLDOWN_SECS(plab->ptr), WAIT_NONE);
-				if (ABIL_RESOURCE_COST(plab->ptr)) {
-					extract_resources(ch, ABIL_RESOURCE_COST(plab->ptr), FALSE, NULL);
+				charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_NONE);
+				if (ABIL_RESOURCE_COST(abil)) {
+					extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, NULL);
 				}
 			}
 			
 			if (data->success) {
 				// only if successful
-				if (ABILITY_FLAGGED(plab->ptr, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(plab->ptr) != NOTHING) {
-					limit_crowd_control(vict, ABIL_AFFECT_VNUM(plab->ptr));
+				if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
+					limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(plab->ptr), level, vict, ovict, vvict, room_targ, multi_targ);
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
 			}
 			
 			// clean up data
