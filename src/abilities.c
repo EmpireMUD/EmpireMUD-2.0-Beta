@@ -6138,13 +6138,24 @@ PREP_ABIL(prep_attack_ability) {
 */
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
+	bool was_sleep_aff;
+	
+	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
 	// toggle off?
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		was_sleep_aff = AFF_FLAGGED(vict, SLEEP_AFFS) ? TRUE : FALSE;
+		
 		send_ability_toggle_messages(vict, abil, data);
 		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
+		
+		// some affs come with forced sleep; toggling them updates player to resting
+		if (was_sleep_aff && GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(vict, SLEEP_AFFS)) {
+			GET_POS(ch) = POS_RESTING;
+		}
+		
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;	// free cancel
 		data->success = TRUE;	// I think this is a success?
