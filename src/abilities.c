@@ -54,6 +54,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
+void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
@@ -4892,6 +4893,69 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 
 
 /**
+* Calls a multi-target ability on all valid targets.
+*
+* @param char_data *ch The actor.
+* @param ability_data *abil Which ability they're using.
+* @param char *argument Any remaining args.
+* @param bitvector_t multi_targ Which target flag we're using.
+* @param int level What level we're doing the thing at.
+* @param struct ability_exec *data Data for the running ability.
+*/
+void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, struct ability_exec *data) {
+	char_data *ch_iter, *next_ch;
+	bool should_charge_cost;
+	int more_targets;
+	
+	if (data->stop) {
+		return;	// don't start
+	}
+	
+	// save for later
+	should_charge_cost = data->should_charge_cost;
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
+		if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
+			continue;	// skip immortals other than self
+		}
+		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
+			continue;	// wrong group
+		}
+		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
+			continue;	// not ally
+		}
+		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
+			continue;	// not ally
+		}
+		
+		// check cost
+		check_available_ability_cost(ch, abil, data, NULL, &more_targets);
+		if (more_targets < 1) {
+			// out of cost
+			break;
+		}
+		
+		// run it!
+		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL | RUN_ABIL_MULTI, data);
+		
+		// check for things that stop 1 but not all?
+		data->stop = FALSE;
+		
+		// did we die tho
+		if (IS_DEAD(ch)) {
+			data->stop = TRUE;
+			break;
+		}
+	}
+	
+	// debug section
+	if (should_charge_cost != data->should_charge_cost) {
+		log("%s: should_charge_cost changed", ABIL_NAME(abil));
+	}
+}
+
+
+/**
 * Things that proc right after an ability runs.
 *
 * @param char_data *ch The person performing the ability.
@@ -5774,12 +5838,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	vehicle_data *vvict = NULL;
-	char_data *ch_iter, *next_ch, *vict = NULL;
+	char_data *vict = NULL;
 	obj_data *ovict = NULL;
 	room_data *room_targ = NULL, *to_room, *find_room;
 	bitvector_t multi_targ = NOBITS;
 	bool has = FALSE;
-	int find_dir, iter, level, more_targets, number;
+	int find_dir, iter, level, number;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -6041,31 +6105,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// 6. ** run the ability **
 	if (multi_targ != NOBITS) {
 		send_pre_ability_messages(ch, vict, ovict, abil, data);
-		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
-			if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
-				continue;	// skip immortals other than self
-			}
-			if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
-				continue;	// wrong group
-			}
-			if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
-				continue;	// not ally
-			}
-			if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
-				continue;	// not ally
-			}
-			
-			// check cost
-			check_available_ability_cost(ch, abil, data, NULL, &more_targets);
-			if (more_targets < 1) {
-				// out of cost
-				break;
-			}
-			
-			// run it!
-			call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL | RUN_ABIL_MULTI, data);
-		}
+		call_multi_target_ability(ch, abil, argument, multi_targ, level, data);
 	}
 	else {
 		// single-target
