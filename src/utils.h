@@ -1210,6 +1210,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
 #define GET_ACTION_RESOURCES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_resources))
 #define GET_ACTION_CHAR_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_char))
+#define GET_ACTION_MULTI_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_multi))
 #define GET_ACTION_OBJ_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_obj))
 #define GET_ACTION_VEH_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_veh))
 #define GET_ACTION_ROOM_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_room))
@@ -2067,7 +2068,7 @@ void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
-void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ);
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ);
 void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ);
 void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data);
 void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);

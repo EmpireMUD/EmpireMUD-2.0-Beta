@@ -314,7 +314,7 @@ ACMD(do_disenchant) {
 			}
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, 0, NULL, obj, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, 0, NULL, obj, NULL, NULL, NOBITS);
 	}
 }
 
@@ -465,7 +465,7 @@ ACMD(do_mirrorimage) {
 	
 	add_follower(mob, ch, FALSE);
 	gain_ability_exp(ch, ABIL_MIRRORIMAGE, 15);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MIRRORIMAGE, 0, mob, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MIRRORIMAGE, 0, mob, NULL, NULL, NULL, NOBITS);
 	
 	load_mtrigger(mob);
 }
@@ -552,6 +552,6 @@ ACMD(do_vigor) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VIGOR, 0, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VIGOR, 0, vict, NULL, NULL, NULL, NOBITS);
 	}
 }

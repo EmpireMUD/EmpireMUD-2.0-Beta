@@ -571,7 +571,7 @@ ACMD(do_disguise) {
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, 0, vict, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISGUISE, 0, vict, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -1076,7 +1076,7 @@ ACMD(do_sneak) {
 	}
 	
 	if (IN_ROOM(ch) != was_in) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, 0, ch, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SNEAK, 0, ch, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -1150,7 +1150,7 @@ ACMD(do_steal) {
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL);
+					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL, NOBITS);
 				}
 			}
 		}

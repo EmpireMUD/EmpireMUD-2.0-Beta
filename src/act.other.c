@@ -796,7 +796,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
 	
 	return TRUE;
 }
@@ -2240,7 +2240,7 @@ ACMD(do_companions) {
 		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 	}
 	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
 }
 
 

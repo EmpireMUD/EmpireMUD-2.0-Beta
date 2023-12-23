@@ -635,9 +635,13 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_ROOM_COORDS	BIT(20)	// targets a room by coordinates
 #define ATAR_ROOM_NOT_HERE	BIT(21)	// modifier ensures it's not the current room
 #define ATAR_STRING			BIT(22)	// string is expected and arg cannot be empty
+#define ATAR_MULTI_CHAR_ALLIES		BIT(23)	// all allies
+#define ATAR_MULTI_CHAR_GROUP		BIT(24)	// whole group
+#define ATAR_MULTI_CHAR_ROOM		BIT(25)	// everyone in the room
+#define ATAR_MULTI_CHAR_ENEMIES		BIT(26)	// all enemies
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
-#define MULTI_CHAR_ATARS	(NOBITS)
+#define MULTI_CHAR_ATARS	(ATAR_MULTI_CHAR_ALLIES | ATAR_MULTI_CHAR_GROUP | ATAR_MULTI_CHAR_ROOM | ATAR_MULTI_CHAR_ENEMIES)
 #define OBJ_ATARS			(ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
 #define VEH_ATARS			(ATAR_VEH_ROOM | ATAR_VEH_WORLD)
 #define ROOM_ATARS			(ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)
@@ -5015,6 +5019,7 @@ struct player_special_data {
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
 	char *action_string;	// for run, abilities, etc
 	char_data *action_targ_char;	// unsaved: action targets this char
+	bitvector_t action_targ_multi;	// unsaved: action targets group/etc
 	obj_data *action_targ_obj;	// unsaved: action targets this object
 	vehicle_data *action_targ_veh;	// unsaved: action targets this vehicle
 	room_vnum action_targ_room;	// unsaved: action targets this room

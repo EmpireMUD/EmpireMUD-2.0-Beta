@@ -239,6 +239,7 @@ void end_action(char_data *ch) {
 		
 		// clear targets
 		GET_ACTION_CHAR_TARG(ch) = NULL;
+		GET_ACTION_MULTI_TARG(ch) = NOBITS;
 		GET_ACTION_OBJ_TARG(ch) = NULL;
 		GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 		GET_ACTION_VEH_TARG(ch) = NULL;
@@ -275,6 +276,7 @@ void start_action(char_data *ch, int type, int timer) {
 	
 	// clear targets, in case
 	GET_ACTION_CHAR_TARG(ch) = NULL;
+	GET_ACTION_MULTI_TARG(ch) = NOBITS;
 	GET_ACTION_OBJ_TARG(ch) = NULL;
 	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 	GET_ACTION_VEH_TARG(ch) = NULL;
@@ -2285,7 +2287,7 @@ void process_mining(char_data *ch) {
 				// skillups
 				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 10);
-					run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, IN_ROOM(ch));
+					run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, IN_ROOM(ch), NOBITS);
 				}
 				
 				// go again! (if ch is still there)

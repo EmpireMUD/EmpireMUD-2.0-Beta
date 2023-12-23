@@ -951,7 +951,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	
 	// lethal damage?? check abilities like Master Survivalist
 	if ((vict != killer) && dam >= GET_HEALTH(vict)) {
-		run_ability_hooks(vict, AHOOK_DYING, 0, 0, killer, NULL, NULL, NULL);
+		run_ability_hooks(vict, AHOOK_DYING, 0, 0, killer, NULL, NULL, NULL, NOBITS);
 	}
 	
 	set_health(vict, GET_HEALTH(vict) - dam);

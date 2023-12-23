@@ -64,7 +64,7 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
 		// did we find an ability that caused it?
 		if (abil) {
 			gain_ability_exp(ch, ABIL_VNUM(abil), 100);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, triggered_by, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, triggered_by, NULL, NULL, NULL, NOBITS);
 		}
 		return TRUE;
 	}

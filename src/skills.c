@@ -805,7 +805,7 @@ void empire_skillup(empire_data *emp, any_vnum ability, double amount) {
 		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			if (GET_LOYALTY(ch) == emp) {
 				gain_ability_exp(ch, ability, amount);
-				run_ability_hooks(ch, AHOOK_ABILITY, ability, 0, NULL, NULL, NULL, NULL);
+				run_ability_hooks(ch, AHOOK_ABILITY, ability, 0, NULL, NULL, NULL, NULL, NOBITS);
 			}
 		}
 	}
@@ -922,7 +922,7 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
 			gain_ability_exp(ch, iter->abil, amount);
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, ch, NULL, NULL, NULL);
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, ch, NULL, NULL, NULL, NOBITS);
 		}
 	}
 }

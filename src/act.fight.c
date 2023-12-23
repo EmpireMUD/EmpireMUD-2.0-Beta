@@ -499,7 +499,7 @@ ACMD(do_respawn) {
 		RESET_LAST_MESSAGED_TEMPERATURE(ch);
 		
 		msdp_update_room(ch);
-		run_ability_hooks(ch, AHOOK_RESPAWN, 0, 0, NULL, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_RESPAWN, 0, 0, NULL, NULL, NULL, NULL, NOBITS);
 	}
 }
 

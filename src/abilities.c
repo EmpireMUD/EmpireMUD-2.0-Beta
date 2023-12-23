@@ -53,7 +53,7 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 // local protos
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data);
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, int run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
@@ -67,7 +67,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
-void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data);
+void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, struct ability_exec *data);
 
 
 // ability function prototypes
@@ -1813,9 +1813,10 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 * @param obj_data **ovict Will bind an object target here, if any. (Optional)
 * @param vehicle_data **vvict Will bind a vehicle target here, if any. (Optional)
 * @param room_data **room_targ Will bind a room target here, if any. (Optional)
+* @param bitvector_t *multi_targ Will bind a multi_targ here, if any. (Optional)
 * @return bool TRUE if targets were ok, FALSE if they are invalid.
 */
-bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vict, obj_data **ovict, vehicle_data **vvict, room_data **room_targ) {
+bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vict, obj_data **ovict, vehicle_data **vvict, room_data **room_targ, bitvector_t *multi_targ) {
 	bool any_targ = FALSE, match;
 	
 	// init these first
@@ -1830,6 +1831,9 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	}
 	if (room_targ) {
 		*room_targ = NULL;
+	}
+	if (multi_targ) {
+		*multi_targ = NOBITS;
 	}
 	
 	// validate character first
@@ -1849,6 +1853,9 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	}
 	if (room_targ) {
 		*room_targ = real_room(GET_ACTION_ROOM_TARG(ch));
+	}
+	if (multi_targ) {
+		*multi_targ = GET_ACTION_MULTI_TARG(ch);
 	}
 	
 	// ATAR_x: attempt to validate
@@ -1929,7 +1936,7 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 		}
 		
 		// Lastly: did we need a targ but lack one?
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING)) {
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING | MULTI_CHAR_ATARS)) {
 			return TRUE;
 		}
 		else if (!any_targ && (!IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) || !vict || !*vict) && (!IS_SET(ABIL_TARGETS(abil), OBJ_ATARS) || !ovict || !*ovict) && (!IS_SET(ABIL_TARGETS(abil), VEH_ATARS) || !vvict || !*vvict) && (!IS_SET(ABIL_TARGETS(abil), ROOM_ATARS) || !room_targ || !*room_targ)) {
@@ -2157,7 +2164,7 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		gain_ability_exp(ch, agh->ability, amount);
 		
 		// gain hooks mean the ability has fired: hook it now
-		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, 0, opponent, NULL, NULL, NULL);
+		run_ability_hooks(ch, AHOOK_ABILITY, agh->ability, 0, opponent, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -2233,12 +2240,38 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 * @param obj_data *ovict Optional: Object target (may be NULL).
 * @param vehicle_data *vvict Optional: Vehicle target (may be NULL).
 * @param room_data *room_targ Optional: The room target (may be NULL if not used).
+* @param bitvector_t multi_targ Optional: Targeting multiple things: which type (NOBITS if not used).
 * @param bool send_msgs If TRUE, sends a message on failure. If FALSE, is silent.
 * @return bool TRUE if ok, FALSE if failed.
 */
-bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bool send_msgs) {
+bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, bool send_msgs) {
+	char_data *ch_iter;
+	bool any;
+	
 	if (!ch || !abil) {
 		return FALSE;	// missing abil
+	}
+	
+	if (IS_SET(multi_targ, ATAR_MULTI_CHAR_GROUP) && !GROUP(ch)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You aren't even in a group.\r\n");
+		}
+		return FALSE;
+	}
+	if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ENEMIES)) {
+		any = FALSE;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter != ch && is_fight_enemy(ch, ch_iter) && can_fight(ch, ch_iter) && CAN_SEE(ch, ch_iter)) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (!any) {
+			if (send_msgs) {
+				msg_to_char(ch, "There's no one here to use it on.\r\n");
+			}
+			return FALSE;
+		}
 	}
 	
 	if ((vict == ch) && ABIL_IS_VIOLENT(abil)) {
@@ -4507,6 +4540,7 @@ void cancel_over_time_ability(char_data *ch) {
 */
 void perform_over_time_ability(char_data *ch) {
 	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
+	bitvector_t multi_targ = NOBITS;
 	char arg[MAX_INPUT_LENGTH];
 	ability_data *abil;
 	char_data *vict;
@@ -4523,7 +4557,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// re-validate target
-	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, TRUE)) {
+	if (!redetect_ability_targets(ch, abil, &vict, &ovict, &vvict, &room_targ, &multi_targ) || !validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE)) {
 		cancel_action(ch);
 		return;
 	}
@@ -4548,13 +4582,13 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	else {
 		// done!
-		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
 		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
 			strcpy(arg, NULLSAFE(GET_ACTION_STRING(ch)));
 			end_action(ch);
-			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, room_targ, GET_ACTION_VNUM(ch, 1), data);
+			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), data);
 		}
 		else {
 			// end
@@ -4582,7 +4616,7 @@ void perform_over_time_ability(char_data *ch) {
 * @param int level Pre-determined ability level.
 * @param struct ability_exec *data The execution data for the ability.
 */
-void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, struct ability_exec *data) {
+void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, struct ability_exec *data) {
 	if (!ch || IS_NPC(ch) || !abil) {
 		return;	// nothing to see here
 	}
@@ -4594,6 +4628,7 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 	GET_ACTION_VNUM(ch, 1) = level;
 	GET_ACTION_VNUM(ch, 2) = data->cost;
 	GET_ACTION_CHAR_TARG(ch) = vict;
+	GET_ACTION_MULTI_TARG(ch) = multi_targ;
 	GET_ACTION_OBJ_TARG(ch) = ovict;
 	GET_ACTION_VEH_TARG(ch) = vvict;
 	GET_ACTION_ROOM_TARG(ch) = room_targ ? GET_ROOM_VNUM(room_targ) : NOWHERE;
@@ -4684,11 +4719,12 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param obj_data *ovict The object target, if any (may be NULL).
 * @param vehicle_data *vvict The vehicle target, if any (may be NULL).
 * @param room_data *room_targ For room target, if any (may be NULL).
+* @param bitvector_t multi_targ For multiple targests, the target type (may be NOBITS).
 * @param int level The level to use the ability at.
 * @param int run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, int level, int run_mode, struct ability_exec *data) {
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, int run_mode, struct ability_exec *data) {
 	int iter;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
@@ -4763,7 +4799,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// WAIT! Over-time abilities stop here
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && run_mode == RUN_ABIL_NORMAL) {
-		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, level, data);
+		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, data);
 		return;
 	}
 	
@@ -4885,9 +4921,10 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 * @param obj_data *ovict Optional: Character object (may be NULL).
 * @param vehicle_data *vvict Optional: Character vehicle (may be NULL).
 * @param room_data *room_targ Optional: Character room (may be NULL).
+* @param bitvector_t multi_targ Optional: Multiple target type (may be NOBITS).
 * @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
 */
-void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ) {
 	bool any_targ, free_limiter = FALSE;
 	struct ability_hook *ahook;
 	char_data *use_char;
@@ -4989,7 +5026,13 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 				else if (IS_SET(ABIL_TARGETS(plab->ptr), ROOM_ATARS) && use_room) {
 					any_targ = TRUE;
 				}
-				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, FALSE)) {
+				else if (IS_SET(ABIL_TARGETS(plab->ptr), MULTI_CHAR_ATARS)) {
+					any_targ = TRUE;
+					if (multi_targ == NOBITS) {
+						multi_targ = ABIL_TARGETS(plab->ptr) & MULTI_CHAR_ATARS;
+					}
+				}
+				if (!any_targ || !validate_ability_target(ch, plab->ptr, use_char, use_obj, use_veh, use_room, multi_targ, FALSE)) {
 					continue;	// no apparent targets
 				}
 			}
@@ -5012,7 +5055,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
 			
 			// the big GO
-			call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, level, RUN_ABIL_HOOKED, data);
+			call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
 			
 			// clean up data
 			GET_RUNNING_ABILITY_DATA(ch) = NULL;
@@ -5046,7 +5089,7 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, 
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ);
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ, NOBITS);
 		}
 	}
 }
@@ -5716,11 +5759,12 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	vehicle_data *vvict = NULL;
-	char_data *vict = NULL;
+	char_data *ch_iter, *next_ch, *vict = NULL;
 	obj_data *ovict = NULL;
 	room_data *room_targ = NULL, *to_room, *find_room;
+	bitvector_t multi_targ = NOBITS;
 	bool has = FALSE;
-	int find_dir, iter, level, number;
+	int find_dir, iter, level, more_targets, number;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -5760,6 +5804,37 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		// extract numbering
 		number = get_number(&argptr);
 		
+		// multi targets, explicitly
+		if (!has && !str_cmp(argptr, "party") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+			has = TRUE;
+			multi_targ = ATAR_MULTI_CHAR_GROUP;
+		}
+		if (!has && !str_cmp(argptr, "allies") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+			has = TRUE;
+			multi_targ = ATAR_MULTI_CHAR_ALLIES;
+		}
+		if (!has && !str_cmp(argptr, "enemies") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
+			has = TRUE;
+			multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+		}
+		if (!has && (!str_cmp(argptr, "room") || !str_cmp(argptr, "all"))) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ROOM)) {
+				has = TRUE;
+				multi_targ = ATAR_MULTI_CHAR_ROOM;
+			}
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+				has = TRUE;
+				multi_targ = ATAR_MULTI_CHAR_GROUP;
+			}
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+				has = TRUE;
+				multi_targ = ATAR_MULTI_CHAR_ALLIES;
+			}
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
+				has = TRUE;
+				multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+			}
+		}
 		// char targets
 		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY))) {
 			if ((vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM)) != NULL) {
@@ -5857,6 +5932,23 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		has = TRUE;
 	}
 	else {	// no arg and no tar-ignore
+		// multi-target
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ROOM)) {
+			multi_targ = ATAR_MULTI_CHAR_ROOM;
+			has = TRUE;
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+			multi_targ = ATAR_MULTI_CHAR_GROUP;
+			has = TRUE;
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+			multi_targ = ATAR_MULTI_CHAR_ALLIES;
+			has = TRUE;
+		}
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
+			multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+			has = TRUE;
+		}
 		// room target
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM)) {
 			room_targ = get_random_room_for_ability(ch, abil);
@@ -5915,7 +6007,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		return;
 	}
-	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, TRUE)) {
+	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE)) {
 		// sent own message
 		return;
 	}
@@ -5932,7 +6024,36 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
-	call_ability(ch, abil, argument, vict, ovict, vvict, room_targ, level, RUN_ABIL_NORMAL, data);
+	if (multi_targ != NOBITS) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
+			if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
+				continue;	// skip immortals other than self
+			}
+			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_GROUP) && !in_same_group(ch_iter, ch)) {
+				continue;	// wrong group
+			}
+			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ALLIES) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
+				continue;	// not ally
+			}
+			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ENEMIES) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
+				continue;	// not ally
+			}
+			
+			// check cost
+			check_available_ability_cost(ch, abil, data, NULL, &more_targets);
+			if (more_targets < 1) {
+				// out of cost
+				break;
+			}
+			
+			// run it!
+			call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, RUN_ABIL_NORMAL, data);
+		}
+	}
+	else {
+		// single-target
+		call_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, RUN_ABIL_NORMAL, data);
+	}
 	
 	// 7. costs and consequences
 	if (data->should_charge_cost) {
@@ -5961,7 +6082,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
 			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
 	}
 	
 	// 9. clean up data
