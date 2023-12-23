@@ -5012,10 +5012,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group
 		}
-		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_ability_ally(ch_iter, ch)) {
+		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_ability_ally(ch, ch_iter)) {
 			continue;	// not ally
 		}
-		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && !is_ability_enemy(ch_iter, ch)) {
+		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && (ch_iter == ch || !is_ability_enemy(ch, ch_iter))) {
 			continue;	// not ally
 		}
 		
