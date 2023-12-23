@@ -1210,7 +1210,7 @@ bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
 	}
 	
 	// other checks similar to what will be called with messages in call_ability():
-	if (ABIL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < ABIL_COST(abil)) {
+	if (ABIL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < (ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil))) {
 		return FALSE;	// unlikely to afford cost
 	}
 	if (ABIL_COOLDOWN(abil) != NOTHING && get_cooldown_time(ch, ABIL_COOLDOWN(abil)) > 0) {
@@ -4724,7 +4724,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	if (run_mode != RUN_ABIL_OVER_TIME) {
 		// check costs and cooldowns now -- not on over-time
-		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil))) {
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
 			data->stop = TRUE;
 			data->should_charge_cost = FALSE;
