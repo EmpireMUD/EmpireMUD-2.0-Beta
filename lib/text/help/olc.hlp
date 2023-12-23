@@ -1669,10 +1669,10 @@ modify each other. They are:
  &cROOM-CITY&0 - Targets a city (center) in the player's empire by city name.
  &cROOM-COORDS&0 - Targets a room by coordinates.
  &cSTRING&0 - Argument is required, but not a traditional target.
- &cMULTI-CHAR-ALLIES&0 - Can target all allies.
- &cMULTI-CHAR-GROUP&0 - Can target whole group.
- &cMULTI-CHAR-ROOM&0 - Can target everyone in the room.
- &cMULTI-CHAR-ENEMIES&0 - Can target all enemies.
+ &cALLIES-MULTI&0 - Can target all allies.
+ &cGROUP-MULTI&0 - Can target whole group.
+ &cROOM-MULTI&0 - Can target everyone in the room.
+ &cENEMIES-MULTI&0 - Can target all enemies.
 
 See also: OLC ABILITIES
 #d

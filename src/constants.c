@@ -315,10 +315,10 @@ const char *ability_target_flags[] = {
 	"ROOM-COORDS",	// 20
 	"ROOM-NOT-HERE",
 	"STRING",
-	"MULTI-CHAR-ALLIES",
-	"MULTI-CHAR-GROUP",
-	"MULTI-CHAR-ROOM",	// 25
-	"MULTI-CHAR-ENEMIES",
+	"ALLIES-MULTI",
+	"GROUP-MULTI",
+	"ROOM-MULTI",	// 25
+	"ENEMIES-MULTI",
 	"\n"
 };
 

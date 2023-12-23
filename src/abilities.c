@@ -2252,13 +2252,13 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		return FALSE;	// missing abil
 	}
 	
-	if (IS_SET(multi_targ, ATAR_MULTI_CHAR_GROUP) && !GROUP(ch)) {
+	if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !GROUP(ch)) {
 		if (send_msgs) {
 			msg_to_char(ch, "You aren't even in a group.\r\n");
 		}
 		return FALSE;
 	}
-	if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ENEMIES)) {
+	if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI)) {
 		any = FALSE;
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (ch_iter != ch && is_fight_enemy(ch, ch_iter) && can_fight(ch, ch_iter) && CAN_SEE(ch, ch_iter)) {
@@ -5805,34 +5805,34 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		number = get_number(&argptr);
 		
 		// multi targets, explicitly
-		if (!has && (!str_cmp(argptr, "party") || !str_cmp(argptr, "group")) && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+		if (!has && (!str_cmp(argptr, "party") || !str_cmp(argptr, "group")) && IS_SET(ABIL_TARGETS(abil), ATAR_GROUP_MULTI)) {
 			has = TRUE;
-			multi_targ = ATAR_MULTI_CHAR_GROUP;
+			multi_targ = ATAR_GROUP_MULTI;
 		}
-		if (!has && (!str_cmp(argptr, "allies") || !str_cmp(argptr, "ally")) && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+		if (!has && (!str_cmp(argptr, "allies") || !str_cmp(argptr, "ally")) && IS_SET(ABIL_TARGETS(abil), ATAR_ALLIES_MULTI)) {
 			has = TRUE;
-			multi_targ = ATAR_MULTI_CHAR_ALLIES;
+			multi_targ = ATAR_ALLIES_MULTI;
 		}
-		if (!has && !str_cmp(argptr, "enemies") && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
+		if (!has && !str_cmp(argptr, "enemies") && IS_SET(ABIL_TARGETS(abil), ATAR_ENEMIES_MULTI)) {
 			has = TRUE;
-			multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+			multi_targ = ATAR_ENEMIES_MULTI;
 		}
 		if (!has && (!str_cmp(argptr, "room") || !str_cmp(argptr, "all"))) {
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ROOM)) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_MULTI)) {
 				has = TRUE;
-				multi_targ = ATAR_MULTI_CHAR_ROOM;
+				multi_targ = ATAR_ROOM_MULTI;
 			}
-			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_GROUP_MULTI)) {
 				has = TRUE;
-				multi_targ = ATAR_MULTI_CHAR_GROUP;
+				multi_targ = ATAR_GROUP_MULTI;
 			}
-			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_ALLIES_MULTI)) {
 				has = TRUE;
-				multi_targ = ATAR_MULTI_CHAR_ALLIES;
+				multi_targ = ATAR_ALLIES_MULTI;
 			}
-			else if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
+			else if (IS_SET(ABIL_TARGETS(abil), ATAR_ENEMIES_MULTI)) {
 				has = TRUE;
-				multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+				multi_targ = ATAR_ENEMIES_MULTI;
 			}
 		}
 		// char targets
@@ -5933,20 +5933,20 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else {	// no arg and no tar-ignore
 		// multi-target
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ROOM)) {
-			multi_targ = ATAR_MULTI_CHAR_ROOM;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_MULTI)) {
+			multi_targ = ATAR_ROOM_MULTI;
 			has = TRUE;
 		}
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_GROUP)) {
-			multi_targ = ATAR_MULTI_CHAR_GROUP;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_GROUP_MULTI)) {
+			multi_targ = ATAR_GROUP_MULTI;
 			has = TRUE;
 		}
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ALLIES)) {
-			multi_targ = ATAR_MULTI_CHAR_ALLIES;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ALLIES_MULTI)) {
+			multi_targ = ATAR_ALLIES_MULTI;
 			has = TRUE;
 		}
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CHAR_ENEMIES)) {
-			multi_targ = ATAR_MULTI_CHAR_ENEMIES;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ENEMIES_MULTI)) {
+			multi_targ = ATAR_ENEMIES_MULTI;
 			has = TRUE;
 		}
 		// room target
@@ -6029,13 +6029,13 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			if (IS_IMMORTAL(ch_iter) && ch_iter != ch) {
 				continue;	// skip immortals other than self
 			}
-			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_GROUP) && !in_same_group(ch_iter, ch)) {
+			if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 				continue;	// wrong group
 			}
-			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ALLIES) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
+			if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_fight_ally(ch_iter, ch)) {
 				continue;	// not ally
 			}
-			if (IS_SET(multi_targ, ATAR_MULTI_CHAR_ENEMIES) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
+			if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && ch_iter != ch && (!is_fight_enemy(ch_iter, ch) || !can_fight(ch, ch_iter))) {
 				continue;	// not ally
 			}
 			
