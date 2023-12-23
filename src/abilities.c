@@ -5099,6 +5099,9 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		if (!IS_NPC(ch_iter) && GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
 			continue;	// skip invisible imms
 		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && ch_iter == ch) {
+			continue;	// not self
+		}
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group
 		}
@@ -5344,6 +5347,19 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			}
 			else {
 				call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+			}
+			
+			// charge if needed
+			if (data->should_charge_cost) {
+				// additional costs:
+				data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(plab->ptr);
+				data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(plab->ptr);
+				data->cost += data->total_targets * ABIL_COST_PER_TARGET(plab->ptr);
+				
+				charge_ability_cost(ch, ABIL_COST_TYPE(plab->ptr), data->cost, ABIL_COOLDOWN(plab->ptr), ABIL_COOLDOWN_SECS(plab->ptr), WAIT_NONE);
+				if (ABIL_RESOURCE_COST(plab->ptr)) {
+					extract_resources(ch, ABIL_RESOURCE_COST(plab->ptr), FALSE, NULL);
+				}
 			}
 			
 			// clean up data
