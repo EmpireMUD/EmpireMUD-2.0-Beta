@@ -2662,6 +2662,17 @@ DO_ABIL(abil_action_magic_growth) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_put_to_sleep) {
+	if (vict) {
+		if (GET_POS(vict) > POS_SLEEPING) {
+			GET_POS(vict) = POS_SLEEPING;
+		}
+		data->success = TRUE;
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_remove_debuffs) {
 	struct affected_type *aff, *next_aff;
 	bool any = FALSE;
@@ -5188,6 +5199,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_HIDE: {
 				call_do_abil(abil_action_hide);
+				break;
+			}
+			case ABIL_ACTION_PUT_TO_SLEEP: {
+				call_do_abil(abil_action_put_to_sleep);
 				break;
 			}
 		}

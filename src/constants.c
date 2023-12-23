@@ -134,6 +134,7 @@ const char *ability_actions[] = {
 	"rescue one",
 	"rescue all",
 	"hide",
+	"put to sleep",
 	"\n"
 };
 
