@@ -957,12 +957,21 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 * @return bool TRUE if ok, FALSE to cancel out.
 */
 bool check_ability_pre_target(char_data *ch, ability_data *abil) {
+	int use_min_pos = ABIL_MIN_POS(abil);
+	
+	// prepare
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && ABIL_AFFECT_VNUM(abil) != NOTHING && affected_by_spell(ch, ABIL_AFFECT_VNUM(abil))) {
+		// allows toggles to bypass min-pos when toggling off
+		use_min_pos = POS_INCAP;
+	}
+	
+	// actual checks
 	if (!can_use_ability(ch, ABIL_VNUM(abil), MOVE, 0, NOTHING)) {
 		// pre-validates JUST the ability -- individual types must validate cost/cooldown
 		// sent its own error message
 		return FALSE;
 	}
-	if (!char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
+	if (!char_can_act(ch, use_min_pos, !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
 		// sent its own error message
 		return FALSE;
 	}
