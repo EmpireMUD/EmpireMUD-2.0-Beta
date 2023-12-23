@@ -4745,13 +4745,6 @@ void perform_over_time_ability(char_data *ch) {
 		// done!
 		if (multi_targ != NOBITS) {
 			call_multi_target_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
-			
-			if (data->total_targets == 0) {
-				// multi hit no one
-				data->should_charge_cost = FALSE;
-				data->no_msg = TRUE;
-				msg_to_char(ch, "There were no valid targets.\r\n");
-			}
 		}
 		else {
 			call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
@@ -5074,7 +5067,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool should_charge_cost, no_msg, fatal_error = FALSE;
+	bool no_msg, fatal_error = FALSE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -5096,7 +5089,6 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	}
 	
 	// save for later
-	should_charge_cost = data->should_charge_cost;
 	no_msg = data->no_msg;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
@@ -5151,9 +5143,13 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 	}
 	
-	// debug section
-	if (should_charge_cost != data->should_charge_cost) {
-		log("%s: should_charge_cost changed", ABIL_NAME(abil));
+	// did we even hit anybody
+	if (data->total_targets == 0) {
+		if (!data->no_msg && !IS_SET(run_mode, RUN_ABIL_HOOKED)) {
+			msg_to_char(ch, "There were no valid targets.\r\n");
+		}
+		data->should_charge_cost = FALSE;
+		data->no_msg = TRUE;
 	}
 	
 	// fail message in here because it is generally suppressed in multi-targs
@@ -5345,12 +5341,6 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			// the big GO
 			if (multi_targ != NOBITS) {
 				call_multi_target_ability(ch, plab->ptr, "", multi_targ, level, RUN_ABIL_HOOKED, data);
-				
-				if (data->total_targets == 0) {
-					// multi hit no one
-					data->should_charge_cost = FALSE;
-					data->no_msg = TRUE;	// don't send a fail
-				}
 			}
 			else {
 				call_ability(ch, plab->ptr, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
@@ -6329,13 +6319,6 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// 6. ** run the ability **
 	if (multi_targ != NOBITS && !ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
 		call_multi_target_ability(ch, abil, argument, multi_targ, level, RUN_ABIL_NORMAL, data);
-		
-		if (data->total_targets == 0) {
-			// multi hit no one
-			data->should_charge_cost = FALSE;
-			data->no_msg = TRUE;
-			msg_to_char(ch, "There were no valid targets.\r\n");
-		}
 	}
 	else {
 		// single-target
