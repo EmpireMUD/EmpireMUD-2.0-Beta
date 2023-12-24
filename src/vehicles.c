@@ -4375,7 +4375,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
 	count = 0;
 	LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
 	}
 	
 	// scripts
