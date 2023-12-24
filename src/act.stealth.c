@@ -576,68 +576,6 @@ ACMD(do_disguise) {
 }
 
 
-ACMD(do_diversion) {
-	char_data *victim, *next_vict;
-	struct affected_type *af;
-	int value, cost = 50;
-	bool first = TRUE;
-	
-	if (!can_use_ability(ch, ABIL_DIVERSION, MOVE, cost, COOLDOWN_DIVERSION)) {
-		return;
-	}
-	else if (!check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DIVERSION)) {
-		return;
-	}
-	else {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_DIVERSION, 30, WAIT_COMBAT_ABILITY);
-		
-		// variable messaging
-		switch (number(0, 2)) {
-			case 0: {
-				msg_to_char(ch, "You release a small flock of pigeons into the melee!\r\n");
-				act("$n releases a small flock of pigeons into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
-				break;
-			}
-			case 1: {
-				msg_to_char(ch, "You toss some firecrackers into the melee!\r\n");
-				act("$n tosses some firecrackers into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
-				break;
-			}
-			case 2: {
-				msg_to_char(ch, "You throw a pocketful of sparkling dust into the melee!\r\n");
-				act("$n throws a pocketful of sparkling dust into the melee!", FALSE, ch, NULL, NULL, TO_ROOM);
-				break;
-			}
-		}
-		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
-				continue;
-			}
-			
-			// TODO could macro this whole line since it's used in several AoEs
-			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				value = ceil(GET_CHARISMA(ch) * (first ? 1.0 : 0.5));
-				first = FALSE;
-				
-				af = create_mod_aff(ATYPE_DIVERSION, 15, APPLY_WITS, -value, ch);
-				affect_join(victim, af, NOBITS);
-				
-				msg_to_char(victim, "You can't seem to focus on the battle!\r\n");
-				engage_combat(ch, victim, TRUE);
-			}
-		}
-	}
-}
-
-
 ACMD(do_howl) {
 	char_data *victim, *next_vict;
 	struct affected_type *af;
