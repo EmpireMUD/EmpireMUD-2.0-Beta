@@ -6113,6 +6113,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		if (!data->no_msg && !IS_SET(run_mode, RUN_ABIL_HOOKED)) {
 			msg_to_char(ch, "There were no valid targets.\r\n");
 		}
+		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+			// this will refund it if possible
+			cancel_action(ch);
+		}
 		data->should_charge_cost = FALSE;
 		data->no_msg = TRUE;
 	}
