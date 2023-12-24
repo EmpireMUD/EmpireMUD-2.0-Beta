@@ -6153,6 +6153,9 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			continue;
 		}
 		
+		// allow fail messages on this run
+		data->sent_fail_msg = FALSE;
+		
 		// run it!
 		call_ability_one(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
 		
