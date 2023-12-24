@@ -1993,8 +1993,8 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");
 	init_config(CONFIG_SKILLS, "morph_timer", CONFTYPE_INT, "ticks to morph between forms");
 	init_config(CONFIG_SKILLS, "tracks_lifespan", CONFTYPE_INT, "minutes that a set of tracks lasts");
-	init_config(CONFIG_SKILLS, "greater_enchantments_bonus", CONFTYPE_DOUBLE, "multiplier for enchant points with Greater Enchants ability");
-	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting at level 100");
+	init_config(CONFIG_SKILLS, "greater_enchantments_bonus", CONFTYPE_DOUBLE, "multiplier for augment scale points when the player has a mastery ability");
+	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting/augments at level 100");
 	init_config(CONFIG_SKILLS, "min_exp_to_roll_skillup", CONFTYPE_INT, "minimum skill experience to roll for gains");
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");

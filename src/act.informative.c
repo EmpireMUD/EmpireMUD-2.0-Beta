@@ -2390,7 +2390,7 @@ ACMD(do_adventure) {
 	if (*argument) {
 		argument = any_one_arg(argument, arg);
 		if (is_abbrev(arg, "summon")) {
-			adventure_summon(ch, argument);
+			do_adventure_summon(ch, argument);
 			return;
 		}
 		// otherwise fall through to the rest of the command

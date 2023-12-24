@@ -401,6 +401,27 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 
 
 /**
+* Determines how many scaling points an augment (enchant) gets.
+*
+* @param char_data *ch The enchanter.
+* @param int max_scale Optional: The highest scale level it will use (0 = no max).
+* @return double The number of scale points available for an enchantment at that level.
+*/
+double get_augment_scale_for_char(char_data *ch, int max_scale) {
+	double points_available;
+	int level;
+
+	// enchant scale level is whichever is less: obj scale level, or player crafting level
+	level = MAX(get_crafting_level(ch), get_approximate_level(ch));
+	if (max_scale > 0) {
+		level = MIN(max_scale, level);
+	}
+	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
+	return MAX(points_available, 1.0);
+}
+
+
+/**
 * Finds an unfinished vehicle in the room that the character can finish.
 *
 * @param char_data *ch The person trying to craft a vehicle.
@@ -1669,7 +1690,7 @@ ACMD(do_gen_augment) {
 		is_master = (abil && ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil)));
 		
 		// determine points
-		points_available = get_enchant_scale_for_char(ch, scale);
+		points_available = get_augment_scale_for_char(ch, scale);
 		if (is_master) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}

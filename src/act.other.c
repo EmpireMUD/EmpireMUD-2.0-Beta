@@ -33,6 +33,7 @@
 *   Helpers
 *   Accept/Reject Helpers
 *   Alt Import
+*   Summon Functions
 *   Toggle Functions
 *   Commands
 */
@@ -46,169 +47,6 @@ char_data *find_minipet(char_data *ch);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
-
-/**
-* For the "adventure summon <player>" command.
-*
-* @param char_data *ch The player doing the summoning.
-* @param char *argument The typed argument.
-*/
-void adventure_summon(char_data *ch, char *argument) {
-	char arg[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
-	char_data *vict;
-	
-	one_argument(argument, arg);
-	
-	if (GET_POS(ch) < POS_STANDING) {
-		send_low_pos_msg(ch);
-	}
-	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
-		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Summon whom to the adventure?\r\n");
-	}
-	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (vict == ch) {
-		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
-	}
-	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
-		msg_to_char(ch, "You can only summon members of your own group.\r\n");
-	}
-	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
-		msg_to_char(ch, "Your target is already here.\r\n");
-	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
-		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
-	}
-	else if (!vict->desc) {
-		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
-	}
-	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
-		msg_to_char(ch, "You can't summon your own alts.\r\n");
-	}
-	else if (IS_DEAD(vict)) {
-		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
-	}
-	else if (!can_enter_instance(vict, inst)) {
-		msg_to_char(ch, "Your target can't enter this instance.\r\n");
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
-		msg_to_char(ch, "Your target can't be summoned here.\r\n");
-	}
-	else if (PLR_FLAGGED(vict, PLR_ADVENTURE_SUMMONED)) {
-		msg_to_char(ch, "You can't summon someone who is already adventure-summoned.\r\n");
-	}
-	else {
-		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
-		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(IN_ROOM(ch), FALSE));
-		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
-		command_lag(ch, WAIT_OTHER);
-	}
-}
-
-
-/**
-* Sends a player back to where they came from, if they were adventure-summoned
-* and they left the adventure.
-*
-* @param char_data *ch The person to return back where they came from.
-*/
-void adventure_unsummon(char_data *ch) {
-	room_data *room, *map, *was_in;
-	struct follow_type *fol, *next_fol;
-	bool reloc = FALSE;
-	
-	// safety first
-	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
-		return;
-	}
-	
-	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
-	
-	was_in = IN_ROOM(ch);
-	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
-	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
-	
-	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
-	
-	/*
-	*/
-	
-	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
-		char_to_room(ch, room);
-	}
-	else {
-		// nowhere safe to send back to
-		char_to_room(ch, find_load_room(ch));
-		reloc = TRUE;
-	}
-	
-	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
-	GET_LAST_DIR(ch) = NO_DIR;
-	qt_visit_room(ch, IN_ROOM(ch));
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
-
-	look_at_room(ch);
-	if (reloc) {
-		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
-	}
-	else {
-		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
-	}
-	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
-	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR, "summon");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "summon");
-	
-	msdp_update_room(ch);
-	
-	// followers?
-	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
-		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
-			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
-			char_to_room(fol->follower, IN_ROOM(ch));
-			GET_LAST_DIR(fol->follower) = NO_DIR;
-			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
-			look_at_room(fol->follower);
-			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
-			
-			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
-			entry_memory_mtrigger(fol->follower);
-			greet_mtrigger(fol->follower, NO_DIR, "summon");
-			greet_memory_mtrigger(fol->follower);
-			greet_vtrigger(fol->follower, NO_DIR, "summon");
-		}
-	}
-}
-
-
-/**
-* Ensures a character won't be returned home by adventure_unsummon()
-*
-* @param char_data *ch The person to cancel the return-summon data for.
-*/
-void cancel_adventure_summon(char_data *ch) {
-	if (!IS_NPC(ch)) {
-		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
-		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
-		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
-		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
-	}
-}
-
 
 /**
 * Dismisses all minipets controlled by the character, if any.
@@ -421,53 +259,6 @@ char_data *find_minipet(char_data *ch) {
 	}
 	
 	return found;	// if any
-}
-
-
-/**
-* Skips past the word 'summon ' or 'summons ' (case-insensitive).
-*
-* @param char *input The string to strip of 'summon(s) ', if present.
-* @return char* A pointer to the position in the string after the word 'summon(s) '.
-*/
-char *format_summon_name(char *input) {
-	char *start = input;
-	
-	skip_spaces(&start);
-	if (!strn_cmp(start, "summon ", 7)) {
-		start += 7;
-	}
-	else if (!strn_cmp(start, "summons ", 7)) {
-		start += 8;
-	}
-	
-	return start;
-}
-
-
-/**
-* Gets the line display for one summonable thing.
-*
-* @param char_data *ch The player.
-* @param const char *name The ability or mob name to show.
-* @param int min_level The required level, if any.
-* @param ability_data *from_abil The ability that grants the summon, if any.
-* @return char* The text for the summon list.
-*/
-char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_data *from_abil) {
-	static char output[256];
-	size_t size;
-	
-	size = snprintf(output, sizeof(output), "%s", name);
-	
-	if (from_abil && ABIL_COST(from_abil) > 0) {
-		size += snprintf(output + size, sizeof(output) - size, " (%d %s)", ABIL_COST(from_abil), pool_types[ABIL_COST_TYPE(from_abil)]);
-	}
-	if (min_level > 0 && (from_abil ? get_player_level_for_ability(ch, ABIL_VNUM(from_abil)) : get_approximate_level(ch)) < min_level) {
-		size += snprintf(output + size, sizeof(output) - size, " \trrequires level %d\t0", min_level);
-	}
-	
-	return output;
 }
 
 
@@ -710,99 +501,6 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 
 
 /**
-* Attempts to summon 1 mob. This does some final checks if you pass the
-* 'checks' var, which only needs to happen once if you're summoning several of
-* something.
-*
-* @param char_data *ch The player summoning.
-* @param ability_data *abil Which ability they are summoning with.
-* @param any_vnum vnum The mob vnum to summon.
-* @param bool checks If TRUE, checks a bunch of things and sends error messages. This is only for the first call in a loop.
-* @return bool TRUE if anything was summoned; FALSE if we sent an error.
-*/
-bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
-	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
-	char_data *proto = mob_proto(vnum);
-	char_data *mob;
-	
-	if (!proto || !abil) {
-		msg_to_char(ch, "That summon is not implemented yet.\r\n");
-		return FALSE;
-	}
-	if (checks && level < GET_MIN_SCALE_LEVEL(proto)) {
-		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
-		return FALSE;
-	}
-	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
-		return FALSE;
-	}
-	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to summon that in the solo role.\r\n");
-		return FALSE;
-	}
-	if (checks && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
-		return FALSE;
-	}
-	if (checks && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
-		return FALSE;
-	}
-	if (checks && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
-		return FALSE;
-	}
-	
-	// proceed:
-	if (checks) {
-		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-		send_pre_ability_messages(ch, NULL, NULL, abil, NULL);
-	}
-	
-	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
-	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		if (checks) {
-			send_ability_fail_messages(ch, NULL, NULL, abil, NULL);
-			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-		}
-		return FALSE;
-	}
-	
-	// load/update mob:
-	mob = read_mobile(vnum, TRUE);
-	
-	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
-	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
-	scale_mob_as_companion(mob, ch, level);
-	char_to_room(mob, IN_ROOM(ch));
-	add_follower(mob, ch, FALSE);
-	
-	// messaging to char
-	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
-	}
-	else {
-		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
-	}
-	
-	// messaging to room
-	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
-	}
-	else {
-		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
-	}
-	
-	load_mtrigger(mob);
-	
-	if (checks) {
-		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-	}
-	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
-	
-	return TRUE;
-}
-
-
-/**
 * Shows a player's own group to him.
 *
 * @param char_data *ch The person to display to.
@@ -964,83 +662,6 @@ INTERACTION_FUNC(skin_interact) {
 	}
 	
 	return TRUE;
-}
-
-
-/**
-* Begins a summon for a player -- see do_summon.
-*
-* @param char_data *ch The summoner.
-* @param char *argument The typed-in arg.
-*/
-void summon_player(char_data *ch, char *argument) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	char_data *vict, *ch_iter;
-	bool found;
-	
-	one_argument(argument, arg);
-	
-	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
-		msg_to_char(ch, "You can't summon players here.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must complete the building first.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Summon whom?\r\n");
-	}
-	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (vict == ch) {
-		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
-	}
-	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
-		msg_to_char(ch, "You can only summon members of your own group.\r\n");
-	}
-	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
-		msg_to_char(ch, "Your target is already here.\r\n");
-	}
-	else if (IS_DEAD(vict)) {
-		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
-		msg_to_char(ch, "Your target can't be summoned here.\r\n");
-	}
-	else {
-		// mostly-valid by now... just a little bit more to check
-		// requires a 2nd group member present IF the target is from a different empire
-		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
-			found = FALSE;
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
-					continue;
-				}
-			
-				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
-					found = TRUE;
-					break;
-				}
-			}
-		
-			if (!found) {
-				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
-				return;
-			}
-		}
-		
-		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s%s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
-		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
-		command_lag(ch, WAIT_OTHER);
-	}
 }
 
 
@@ -1543,6 +1164,555 @@ void do_alt_import(char_data *ch, char *argument) {
 	// cleanup	
 	if (alt && file) {
 		free_char(alt);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SUMMON FUNCTIONS ////////////////////////////////////////////////////////
+
+/**
+* Sends a player back to where they came from, if they were adventure-summoned
+* and they left the adventure.
+*
+* @param char_data *ch The person to return back where they came from.
+*/
+void adventure_unsummon(char_data *ch) {
+	room_data *room, *map, *was_in;
+	struct follow_type *fol, *next_fol;
+	bool reloc = FALSE;
+	
+	// safety first
+	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
+		return;
+	}
+	
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+	
+	was_in = IN_ROOM(ch);
+	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
+	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
+	
+	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	/*
+	*/
+	
+	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
+		char_to_room(ch, room);
+	}
+	else {
+		// nowhere safe to send back to
+		char_to_room(ch, find_load_room(ch));
+		reloc = TRUE;
+	}
+	
+	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
+	GET_LAST_DIR(ch) = NO_DIR;
+	qt_visit_room(ch, IN_ROOM(ch));
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
+
+	look_at_room(ch);
+	if (reloc) {
+		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
+	}
+	else {
+		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
+	}
+	
+	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
+	entry_memory_mtrigger(ch);
+	greet_mtrigger(ch, NO_DIR, "summon");
+	greet_memory_mtrigger(ch);
+	greet_vtrigger(ch, NO_DIR, "summon");
+	
+	msdp_update_room(ch);
+	
+	// followers?
+	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			char_to_room(fol->follower, IN_ROOM(ch));
+			GET_LAST_DIR(fol->follower) = NO_DIR;
+			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			look_at_room(fol->follower);
+			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+			
+			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
+			entry_memory_mtrigger(fol->follower);
+			greet_mtrigger(fol->follower, NO_DIR, "summon");
+			greet_memory_mtrigger(fol->follower);
+			greet_vtrigger(fol->follower, NO_DIR, "summon");
+		}
+	}
+}
+
+
+/**
+* Ensures a character won't be returned home by adventure_unsummon()
+*
+* @param char_data *ch The person to cancel the return-summon data for.
+*/
+void cancel_adventure_summon(char_data *ch) {
+	if (!IS_NPC(ch)) {
+		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
+		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
+	}
+}
+
+
+/**
+* Skips past the word 'summon ' or 'summons ' (case-insensitive).
+*
+* @param char *input The string to strip of 'summon(s) ', if present.
+* @return char* A pointer to the position in the string after the word 'summon(s) '.
+*/
+char *format_summon_name(char *input) {
+	char *start = input;
+	
+	skip_spaces(&start);
+	if (!strn_cmp(start, "summon ", 7)) {
+		start += 7;
+	}
+	else if (!strn_cmp(start, "summons ", 7)) {
+		start += 8;
+	}
+	
+	return start;
+}
+
+
+/**
+* Gets the line display for one summonable thing.
+*
+* @param char_data *ch The player.
+* @param const char *name The ability or mob name to show.
+* @param int min_level The required level, if any.
+* @param ability_data *from_abil The ability that grants the summon, if any.
+* @return char* The text for the summon list.
+*/
+char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_data *from_abil) {
+	static char output[256];
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "%s", name);
+	
+	if (from_abil && ABIL_COST(from_abil) > 0) {
+		size += snprintf(output + size, sizeof(output) - size, " (%d %s)", ABIL_COST(from_abil), pool_types[ABIL_COST_TYPE(from_abil)]);
+	}
+	if (min_level > 0 && (from_abil ? get_player_level_for_ability(ch, ABIL_VNUM(from_abil)) : get_approximate_level(ch)) < min_level) {
+		size += snprintf(output + size, sizeof(output) - size, " \trrequires level %d\t0", min_level);
+	}
+	
+	return output;
+}
+
+
+/**
+* Attempts to summon 1 mob. This does some final checks if you pass the
+* 'checks' var, which only needs to happen once if you're summoning several of
+* something.
+*
+* @param char_data *ch The player summoning.
+* @param ability_data *abil Which ability they are summoning with.
+* @param any_vnum vnum The mob vnum to summon.
+* @param bool checks If TRUE, checks a bunch of things and sends error messages. This is only for the first call in a loop.
+* @return bool TRUE if anything was summoned; FALSE if we sent an error.
+*/
+bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
+	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
+	char_data *proto = mob_proto(vnum);
+	char_data *mob;
+	
+	if (!proto || !abil) {
+		msg_to_char(ch, "That summon is not implemented yet.\r\n");
+		return FALSE;
+	}
+	if (checks && level < GET_MIN_SCALE_LEVEL(proto)) {
+		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
+		return FALSE;
+	}
+	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
+		return FALSE;
+	}
+	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to summon that in the solo role.\r\n");
+		return FALSE;
+	}
+	if (checks && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
+		return FALSE;
+	}
+	if (checks && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
+		return FALSE;
+	}
+	if (checks && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
+		return FALSE;
+	}
+	
+	// proceed:
+	if (checks) {
+		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+		send_pre_ability_messages(ch, NULL, NULL, abil, NULL);
+	}
+	
+	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
+	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		if (checks) {
+			send_ability_fail_messages(ch, NULL, NULL, abil, NULL);
+			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		}
+		return FALSE;
+	}
+	
+	// load/update mob:
+	mob = read_mobile(vnum, TRUE);
+	
+	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
+	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
+	scale_mob_as_companion(mob, ch, level);
+	char_to_room(mob, IN_ROOM(ch));
+	add_follower(mob, ch, FALSE);
+	
+	// messaging to char
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
+	}
+	else {
+		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
+	}
+	
+	// messaging to room
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
+	}
+	else {
+		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
+	}
+	
+	load_mtrigger(mob);
+	
+	if (checks) {
+		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+	}
+	
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
+	
+	return TRUE;
+}
+
+
+/**
+* For the "adventure summon <player>" command.
+*
+* @param char_data *ch The player doing the summoning.
+* @param char *argument The typed argument.
+*/
+void do_adventure_summon(char_data *ch, char *argument) {
+	char arg[MAX_INPUT_LENGTH];
+	struct instance_data *inst;
+	char_data *vict;
+	
+	one_argument(argument, arg);
+	
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+	}
+	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
+		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom to the adventure?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
+		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
+	}
+	else if (!vict->desc) {
+		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
+	}
+	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+		msg_to_char(ch, "You can't summon your own alts.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_enter_instance(vict, inst)) {
+		msg_to_char(ch, "Your target can't enter this instance.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
+	}
+	else if (PLR_FLAGGED(vict, PLR_ADVENTURE_SUMMONED)) {
+		msg_to_char(ch, "You can't summon someone who is already adventure-summoned.\r\n");
+	}
+	else {
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(IN_ROOM(ch), FALSE));
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+/**
+* Command processing for the "summon materials" ptech, called via the
+* central do_summon command.
+*
+* @param char_data *ch The person using the command.
+* @param char *argument The typed arg.
+*/
+void do_summon_materials(char_data *ch, char *argument) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
+	struct empire_storage_data *store, *next_store;
+	int count = 0, total = 1, number, pos, carry;
+	struct empire_island *isle;
+	ability_data *abil;
+	empire_data *emp;
+	int cost = 2;	// * number of things to summon
+	obj_data *proto;
+	bool one, found = FALSE, full = FALSE;
+
+	half_chop(argument, arg1, arg2);
+	
+	if (!has_player_tech(ch, PTECH_SUMMON_MATERIALS)) {
+		msg_to_char(ch, "You don't have the right ability to summon materials.\r\n");
+		return;
+	}
+	if (!(emp = GET_LOYALTY(ch))) {
+		msg_to_char(ch, "You can't summon empire materials if you're not in an empire.\r\n");
+		return;
+	}
+	if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_STORAGE)) {
+		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
+		return;
+	}
+	if (GET_POS(ch) < POS_RESTING) {
+		send_low_pos_msg(ch);
+		return;
+	}
+	if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED)) {
+		msg_to_char(ch, "You can't do that... you're stunned!\r\n");
+		return;
+	}
+	
+	if (!GET_ISLAND(IN_ROOM(ch)) || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You can't summon materials here.\r\n");
+		return;
+	}
+	
+	if (run_ability_triggers_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL)) {
+		return;
+	}
+	
+	// pull out a number if the first arg is a number
+	if (*arg1 && is_number(arg1)) {
+		total = atoi(arg1);
+		if (total < 1) {
+			msg_to_char(ch, "You have to summon at least 1.\r\n");
+			return;
+		}
+		strcpy(arg1, arg2);
+	}
+	else if (*arg1 && *arg2) {
+		// re-combine if it wasn't a number
+		sprintf(arg1 + strlen(arg1), " %s", arg2);
+	}
+	
+	// arg1 now holds the desired name
+	objname = arg1;
+	number = get_number(&objname);
+
+	// multiply cost for total, but don't store it
+	if (!can_use_ability(ch, NO_ABIL, MANA, cost * total, NOTHING)) {
+		return;
+	}
+
+	if (!*objname) {
+		msg_to_char(ch, "What material would you like to summon (use einventory to see what you have)?\r\n");
+		return;
+	}
+	
+	// messaging (allow custom messages)
+	abil = find_player_ability_by_tech(ch, PTECH_SUMMON_MATERIALS);
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else {
+		act("You open a tiny portal to summon materials...", FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else {
+		act("$n opens a tiny portal to summon materials...", (abil && ABILITY_FLAGGED(abil, ABILF_INVISIBLE)) ? TRUE : FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	pos = 0;
+	HASH_ITER(hh, isle->store, store, next_store) {
+		if (found) {
+			break;
+		}
+		if (store->amount < 1) {
+			continue;	// none of this
+		}
+		
+		proto = store->proto;
+		if (proto && multi_isname(objname, GET_OBJ_KEYWORDS(proto)) && (++pos == number)) {
+			found = TRUE;
+			
+			if (!CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+				msg_to_char(ch, "You can't summon %s.\r\n", GET_OBJ_SHORT_DESC(proto));
+				return;
+			}
+			if (stored_item_requires_withdraw(proto)) {
+				msg_to_char(ch, "You can't summon materials out of the vault.\r\n");
+				return;
+			}
+			
+			while (count < total && store->amount > 0) {
+				carry = IS_CARRYING_N(ch);
+				one = retrieve_resource(ch, emp, store, FALSE);
+				if (IS_CARRYING_N(ch) > carry) {
+					++count;	// got one
+				}
+				if (!one) {
+					full = TRUE;	// probably
+					break;	// done with this loop
+				}
+			}
+		}
+	}
+	
+	if (found && count < total && count > 0) {
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) || full) {
+			if (ch->desc) {
+				stack_msg_to_desc(ch->desc, "You managed to summon %d.\r\n", count);
+			}
+		}
+		else if (ch->desc) {
+			stack_msg_to_desc(ch->desc, "There weren't enough, but you managed to summon %d.\r\n", count);
+		}
+	}
+	
+	// result messages
+	if (!found) {
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) || full) {
+			msg_to_char(ch, "Your arms are full.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Nothing like that is stored around here.\r\n");
+		}
+	}
+	else if (count == 0) {
+		// they must have gotten an error message
+	}
+	else {
+		// save the empire
+		if (found) {
+			set_mana(ch, GET_MANA(ch) - (cost * count));	// charge only the amount retrieved
+			read_vault(emp);
+			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
+			run_ability_hooks_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL, NULL, NULL);
+		}
+	}
+	
+	command_lag(ch, WAIT_OTHER);
+}
+
+
+/**
+* Begins a summon for a player -- see do_summon.
+*
+* @param char_data *ch The summoner.
+* @param char *argument The typed-in arg.
+*/
+void do_summon_player(char_data *ch, char *argument) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char_data *vict, *ch_iter;
+	bool found;
+	
+	one_argument(argument, arg);
+	
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
+		msg_to_char(ch, "You can't summon players here.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must complete the building first.\r\n");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
+	}
+	else if (!*arg) {
+		msg_to_char(ch, "Summon whom?\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (vict == ch) {
+		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
+	}
+	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
+		msg_to_char(ch, "You can only summon members of your own group.\r\n");
+	}
+	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
+		msg_to_char(ch, "Your target is already here.\r\n");
+	}
+	else if (IS_DEAD(vict)) {
+		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
+	}
+	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
+		msg_to_char(ch, "Your target can't be summoned here.\r\n");
+	}
+	else {
+		// mostly-valid by now... just a little bit more to check
+		// requires a 2nd group member present IF the target is from a different empire
+		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
+					continue;
+				}
+			
+				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
+					found = TRUE;
+					break;
+				}
+			}
+		
+			if (!found) {
+				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
+				return;
+			}
+		}
+		
+		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s%s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
+		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
@@ -3974,11 +4144,11 @@ ACMD(do_summon) {
 	
 	// sepecial summons first
 	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "materials")) {
-		summon_materials(ch, arg2);
+		do_summon_materials(ch, arg2);
 		return;
 	}
 	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "player")) {
-		summon_player(ch, arg2);
+		do_summon_player(ch, arg2);
 		return;
 	}
 	

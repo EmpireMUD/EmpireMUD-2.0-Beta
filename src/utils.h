@@ -2118,10 +2118,6 @@ void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 
-// act.highsorcery.c
-double get_enchant_scale_for_char(char_data *ch, int max_scale);
-void summon_materials(char_data *ch, char *argument);
-
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
@@ -2187,10 +2183,10 @@ int total_bonus_healing(char_data *ch);
 void un_earthmeld(char_data *ch);
 
 // act.other.c
-void adventure_summon(char_data *ch, char *argument);
 void adventure_unsummon(char_data *ch);
 void cancel_adventure_summon(char_data *ch);
 bool dismiss_any_minipet(char_data *ch);
+void do_adventure_summon(char_data *ch, char *argument);
 void do_douse_room(char_data *ch, room_data *room, obj_data *cont);
 
 // act.quest.c
