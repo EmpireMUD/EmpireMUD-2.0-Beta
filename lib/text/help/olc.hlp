@@ -1315,6 +1315,11 @@ For example, Ritual of Burdens would be set up with these messages:
  5. [ot-self-to-room] *
  6. [ot-self-to-room] $n seems uplifted!
 
+When the ritual completes, it will display the final ot- message and then will
+display a self-to- or targ-to- message, if one exists (but will not show the
+default message if not). If the REPEAT-OVER-TIME flag is set, the ability will
+also immediately show the first ot- message again, too.
+
 You can set how a player appears while performing the ability when someone
 types "look" in the room by setting an over-time-longdesc custom message with
 $n for their name.
