@@ -4,7 +4,7 @@ Stamina Burst~
 A
 6 1
 C
-unknown 7 bg 0 0 0.00 -1 0 8 0 0
+unknown 7 g 0 0 0.00 -1 0 8 0 0
 D 256 174 0
 H 1 174 100.00 0
 M
@@ -30,7 +30,7 @@ Mana Siphon~
 A
 7 1
 C
-unknown 7 bg 0 0 0.00 -1 0 0 0 0
+unknown 7 g 0 0 0.00 -1 0 0 0 0
 D 256 176 0
 H 1 176 100.00 0
 M
@@ -72,7 +72,7 @@ S
 Master Survivalist~
 0 -1 1.00 0 q 0
 C
-unknown 0 bg 0 0 0.00 2090 75 0 0 0
+unknown 0 g 0 0 0.00 2090 75 0 0 0
 H 256 0 33.33 0
 M
 0
@@ -236,7 +236,7 @@ S
 Bloodsweat~
 d -1 1.00 0 0 0
 C
-bloodsweat 4 beg 3 20 0.00 2047 30 0 1 0
+bloodsweat 4 eg 3 20 0.00 2047 30 0 1 0
 D 64 11 0
 D 64 14 0
 M
@@ -384,8 +384,43 @@ X+ 3 10
 S
 #236
 Diversion~
-0 -1 1.00 0 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+9 -1
+C
+diversion 7 A 1 10 0.00 2051 30 4 1 0
+M
+13
+You release a small flock of pigeons into the melee!~
+M
+13
+You toss some firecrackers into the melee!~
+M
+13
+You throw a pocketful of sparkling dust into the melee!~
+M
+14
+$n releases a small flock of pigeons into the melee!~
+M
+14
+$n tosses some firecrackers into the melee!~
+M
+14
+$n throws a pocketful of sparkling dust into the melee!~
+M
+25
+*~
+M
+26
+You can't seem to focus on the battle!~
+M
+27
+*~
+T b 1
+X+ 1 3058
+X+ 2 15
+X+ 3 15
+X+ 8 10.00
 S
 #237
 Shadow Jab~
@@ -443,7 +478,7 @@ S
 Deathrise~
 0 -1 1.00 0 0 0
 C
-deathrise 0 bg 3 50 0.00 2091 600 0 5 0
+deathrise 0 g 3 50 0.00 2091 600 0 5 0
 M
 0
 You rise as suddenly as you fell, hungry for more!~
@@ -676,102 +711,6 @@ chant 8 o 2 0 0.00 -1 0 0 5 0
 D 16 5 0
 D 16 3 0
 M
-0
-You start the chant of illusions...~
-M
-0
-You chant, 'In shadows whispered by ancient trees,'~
-M
-0
-*~
-M
-0
-You chant, 'Nature's cloak, a subtle tease.'~
-M
-0
-*~
-M
-0
-You chant, 'Illusions woven 'neath the boughs,'~
-M
-0
-*~
-M
-0
-You chant, 'Where secrets dance, where silence vows.'~
-M
-0
-*~
-M
-0
-You watch as plants begin to grow around the road...~
-M
-0
-*~
-M
-0
-You chant, 'Overgrowth veils the trodden way,'~
-M
-0
-*~
-M
-0
-You chant, 'Hidden path, in wild display!'~
-M
-0
-*~
-M
-0
-As you finish the chant, the road is cloaked in illusion!~
-M
-1
-$n starts the chant of illusions...~
-M
-1
-$n chants, 'In shadows whispered by ancient trees,'~
-M
-1
-*~
-M
-1
-$n chants, 'Nature's cloak, a subtle tease.'~
-M
-1
-*~
-M
-1
-$n chants, 'Illusions woven 'neath the boughs,'~
-M
-1
-*~
-M
-1
-$n chants, 'Where secrets dance, where silence vows.'~
-M
-1
-*~
-M
-1
-You watch as plants begin to grow around the road...~
-M
-1
-*~
-M
-1
-$n chants, 'Overgrowth veils the trodden way,'~
-M
-1
-*~
-M
-1
-$n chants, 'Hidden path, in wild display!'~
-M
-1
-*~
-M
-1
-As $n finishes the chant, the road is cloaked in illusion!~
-M
 8
 You finish the chant, but it has no effect.~
 M
@@ -780,6 +719,102 @@ M
 M
 22
 $n is chanting around the road.~
+M
+32
+You start the chant of illusions...~
+M
+32
+You chant, 'In shadows whispered by ancient trees,'~
+M
+32
+*~
+M
+32
+You chant, 'Nature's cloak, a subtle tease.'~
+M
+32
+*~
+M
+32
+You chant, 'Illusions woven 'neath the boughs,'~
+M
+32
+*~
+M
+32
+You chant, 'Where secrets dance, where silence vows.'~
+M
+32
+*~
+M
+32
+You watch as plants begin to grow around the road...~
+M
+32
+*~
+M
+32
+You chant, 'Overgrowth veils the trodden way,'~
+M
+32
+*~
+M
+32
+You chant, 'Hidden path, in wild display!'~
+M
+32
+*~
+M
+32
+As you finish the chant, the road is cloaked in illusion!~
+M
+33
+$n starts the chant of illusions...~
+M
+33
+$n chants, 'In shadows whispered by ancient trees,'~
+M
+33
+*~
+M
+33
+$n chants, 'Nature's cloak, a subtle tease.'~
+M
+33
+*~
+M
+33
+$n chants, 'Illusions woven 'neath the boughs,'~
+M
+33
+*~
+M
+33
+$n chants, 'Where secrets dance, where silence vows.'~
+M
+33
+*~
+M
+33
+You watch as plants begin to grow around the road...~
+M
+33
+*~
+M
+33
+$n chants, 'Overgrowth veils the trodden way,'~
+M
+33
+*~
+M
+33
+$n chants, 'Hidden path, in wild display!'~
+M
+33
+*~
+M
+33
+As $n finishes the chant, the road is cloaked in illusion!~
 R
 1119 1 0 0
 R
@@ -798,7 +833,7 @@ S
 Whisperstride~
 0 -1 1.00 0 0 0
 C
-whisperstride 8 bg 1 100 0.00 2054 300 0 1 0
+whisperstride 8 g 1 100 0.00 2054 300 0 1 0
 D 2 0 0
 M
 0
@@ -1065,8 +1100,8 @@ T m 0
 S
 #296
 Trick Shots~
-0 -1 1.00 0 0 0
-T m 0
+a -1 1.00 0 0 0
+T b 1
 S
 #297
 Charge~

@@ -9,7 +9,7 @@ S
 Fly~
 cd -1 1.00 0 am 0
 C
-fly 8 bg 2 50 0.00 -1 0 0 5 0
+fly 8 g 2 50 0.00 -1 0 0 5 0
 D 1 40 0
 D 2 0 0
 M
@@ -161,7 +161,7 @@ cq -1 1.00 0 ag 0
 A
 26 1
 C
-deathshroud 3 bg 3 20 0.00 -1 0 0 1 0
+deathshroud 3 g 3 20 0.00 -1 0 0 1 0
 D 64 19 0
 M
 0
@@ -326,7 +326,7 @@ cd -1 1.00 0 ah 0
 A
 26 3
 C
-majesty 5 bg 3 0 0.00 -1 0 0 1 0
+majesty 5 g 3 0 0.00 -1 0 0 1 0
 M
 0
 You create a sense of supernatural majesty about yourself.~
@@ -350,7 +350,7 @@ cq -1 1.00 0 ag 0
 A
 26 1
 C
-mummify 3 bg 3 20 0.00 -1 0 0 1 0
+mummify 3 g 3 20 0.00 -1 0 0 1 0
 D 64 19 0
 M
 0
@@ -422,7 +422,7 @@ S
 Soulmask~
 cd -1 1.00 0 ag 0
 C
-soulmask 5 bg 3 0 0.00 -1 0 0 1 0
+soulmask 5 g 3 0 0.00 -1 0 0 1 0
 M
 0
 You conceal your magical aura!~
@@ -441,7 +441,7 @@ cd -1 1.00 0 abc 0
 A
 26 3
 C
-alacrity 5 bg 3 10 0.00 -1 0 0 1 0
+alacrity 5 g 3 10 0.00 -1 0 0 1 0
 M
 0
 You focus your blood into your lithe muscles...~
@@ -654,7 +654,7 @@ S
 Nightsight~
 cd -1 1.00 0 ag 0
 C
-nightsight 5 bg 0 0 0.00 -1 0 0 1 0
+nightsight 5 g 0 0 0.00 -1 0 0 1 0
 D 1 23 0
 M
 0

@@ -230,7 +230,7 @@ S
 Counterspell~
 dr -1 1.00 0 0 0
 C
-counterspell 7 bg 2 15 0.00 -1 0 0 3 0
+counterspell 7 g 2 15 0.00 -1 0 0 3 0
 M
 0
 You ready a counterspell.~
@@ -339,60 +339,6 @@ chant 8 o 2 0 0.00 -1 0 0 5 0
 D 16 12 0
 D 64 5 0
 M
-0
-You start the chant of nature...~
-M
-0
-You chant, 'O ancient Ash, bubbling waters, let life flow anew...'~
-M
-0
-*~
-M
-0
-You chant, 'O great Ceres, mother of seeds, rise above the dew...'~
-M
-0
-*~
-M
-0
-You chant, 'O Viridius, greenest father, god of vines that coil...'~
-M
-0
-*~
-M
-0
-You chant, 'O Chloris, Elysian spring, lift us from the soil!'~
-M
-0
-*~
-M
-1
-$n starts the chant of nature...~
-M
-1
-$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'~
-M
-1
-*~
-M
-1
-$n chants, 'O great Ceres, mother of seeds, rise above the dew...'~
-M
-1
-*~
-M
-1
-$n chants, 'O Viridius, greenest father, god of vines that coil...'~
-M
-1
-*~
-M
-1
-$n chants, 'O Chloris, Elysian spring, lift us from the soil!'~
-M
-1
-*~
-M
 22
 $n is loudly reciting a chant.~
 M
@@ -401,6 +347,60 @@ As you chant, the plants around you grow with amazing speed!~
 M
 30
 As $n chants, the plants around $m grow with amazing speed!~
+M
+32
+You start the chant of nature...~
+M
+32
+You chant, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+32
+*~
+M
+32
+You chant, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+32
+*~
+M
+32
+You chant, 'O Viridius, greenest father, god of vines that coil...'~
+M
+32
+*~
+M
+32
+You chant, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+32
+*~
+M
+33
+$n starts the chant of nature...~
+M
+33
+$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+33
+*~
+M
+33
+$n chants, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+33
+*~
+M
+33
+$n chants, 'O Viridius, greenest father, god of vines that coil...'~
+M
+33
+*~
+M
+33
+$n chants, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+33
+*~
 T s 1
 S
 #127
@@ -474,18 +474,6 @@ escape 8 qv 1 10 0.00 -1 0 0 8 0
 D 16 9 0
 D 128 1 0
 M
-0
-You run for the nearest exit...~
-M
-0
-You dive out!~
-M
-1
-$n runs toward the nearest exit...~
-M
-1
-$n dives out the exit!~
-M
 8
 You can't seem to escape!~
 M
@@ -503,6 +491,18 @@ $n dives in out of nowhere, sweating!~
 M
 31
 There's nothing to escape here.~
+M
+32
+You run for the nearest exit...~
+M
+32
+You dive out!~
+M
+33
+$n runs toward the nearest exit...~
+M
+33
+$n dives out the exit!~
 T u 1
 S
 #147
@@ -559,24 +559,6 @@ D 16 22 0
 D 16 23 0
 D 16 24 0
 M
-2
-*~
-M
-2
-You step into the shadows and emerge at $N!~
-M
-3
-*~
-M
-3
-*~
-M
-4
-*~
-M
-4
-$n steps into the shadows!~
-M
 10
 *~
 M
@@ -595,6 +577,9 @@ M
 17
 $n gathers the shadows around $mself...~
 M
+22
+The shadows cling to $n before you.~
+M
 28
 *~
 M
@@ -607,8 +592,23 @@ M
 31
 Shadowstep to whom?~
 M
-22
-The shadows cling to $n before you.~
+34
+*~
+M
+34
+You step into the shadows and emerge at $N!~
+M
+35
+*~
+M
+35
+*~
+M
+36
+*~
+M
+36
+$n steps into the shadows!~
 T u 1
 S
 #154
@@ -756,22 +756,28 @@ st -1 0.68 0 0 0
 A
 19 1
 C
-ritual 8 bg 2 5 0.00 -1 0 0 5 0
-M
-0
-You whisper your burdens into the air...~
+ritual 8 g 2 5 0.00 -1 0 0 5 0
 M
 0
 You feel the weight of the world lift from your shoulders!~
-M
-1
-$n whispers $s burdens into the air...~
 M
 1
 $n seems uplifted!~
 M
 22
 $n is whispering something into the air.~
+M
+32
+You whisper your burdens into the air...~
+M
+32
+*~
+M
+33
+$n whispers $s burdens into the air...~
+M
+33
+*~
 T b 1
 X+ 1 3052
 X+ 2 1800
@@ -792,7 +798,7 @@ A
 A
 24 1
 C
-manashield 5 beg 2 25 0.00 -1 0 8 5 0
+manashield 5 eg 2 25 0.00 -1 0 8 5 0
 M
 23
 You wipe the symbols off your arm and cancel your mana shield.~
@@ -890,114 +896,6 @@ ritual 8 mp 2 30 0.00 -1 0 0 3 0
 D 16 13 0
 D 2 1 0
 M
-0
-You draw mana to yourself...~
-M
-0
-*~
-M
-0
-You concentrate your power into a ball of fire...~
-M
-0
-*~
-M
-0
-You summon the full force of your magic...~
-M
-0
-*~
-M
-0
-You twist and grow the ball of fire in your hands...~
-M
-0
-*~
-M
-0
-You shoot one powerful fireball...~
-M
-1
-$n begins drawing mana to $mself...~
-M
-1
-*~
-M
-1
-$n concentrates $s power into a fireball...~
-M
-1
-*~
-M
-1
-$n draws more mana...~
-M
-1
-*~
-M
-1
-$n twists and grows the ball of fire in $s hands...~
-M
-1
-*~
-M
-1
-$n shoots one powerful fireball...~
-M
-2
-You draw mana to yourself as you focus on $V...~
-M
-2
-*~
-M
-2
-You concentrate your power into a ball of fire...~
-M
-2
-*~
-M
-2
-You summon the full force of your magic...~
-M
-2
-*~
-M
-2
-You twist and grow the ball of fire in your hands...~
-M
-2
-*~
-M
-2
-You shoot one powerful fireball at $V...~
-M
-4
-$n begins drawing mana to $mself as $e focuses on $V...~
-M
-4
-*~
-M
-4
-$n concentrates $s power into a fireball...~
-M
-4
-*~
-M
-4
-$n draws more mana...~
-M
-4
-*~
-M
-4
-$n twists and grows the ball of fire in $s hands...~
-M
-4
-*~
-M
-4
-$n shoots one powerful fireball at $V...~
-M
 8
 Your ritual fails.~
 M
@@ -1012,6 +910,114 @@ $n's ritual fails.~
 M
 22
 $n is conjuring a huge fireball!~
+M
+32
+You draw mana to yourself...~
+M
+32
+*~
+M
+32
+You concentrate your power into a ball of fire...~
+M
+32
+*~
+M
+32
+You summon the full force of your magic...~
+M
+32
+*~
+M
+32
+You twist and grow the ball of fire in your hands...~
+M
+32
+*~
+M
+32
+You shoot one powerful fireball...~
+M
+33
+$n begins drawing mana to $mself...~
+M
+33
+*~
+M
+33
+$n concentrates $s power into a fireball...~
+M
+33
+*~
+M
+33
+$n draws more mana...~
+M
+33
+*~
+M
+33
+$n twists and grows the ball of fire in $s hands...~
+M
+33
+*~
+M
+33
+$n shoots one powerful fireball...~
+M
+34
+You draw mana to yourself as you focus on $V...~
+M
+34
+*~
+M
+34
+You concentrate your power into a ball of fire...~
+M
+34
+*~
+M
+34
+You summon the full force of your magic...~
+M
+34
+*~
+M
+34
+You twist and grow the ball of fire in your hands...~
+M
+34
+*~
+M
+34
+You shoot one powerful fireball at $V...~
+M
+36
+$n begins drawing mana to $mself as $e focuses on $V...~
+M
+36
+*~
+M
+36
+$n concentrates $s power into a fireball...~
+M
+36
+*~
+M
+36
+$n draws more mana...~
+M
+36
+*~
+M
+36
+$n twists and grows the ball of fire in $s hands...~
+M
+36
+*~
+M
+36
+$n shoots one powerful fireball at $V...~
 T t 1
 S
 #173
@@ -1155,52 +1161,52 @@ S
 Phoenix Rite~
 s -1 1.00 0 aq 0
 C
-ritual 8 bg 0 0 0.00 -1 0 0 5 0
-M
-0
-You light some candles and begin the Phoenix Rite.~
-M
-0
-You sit and place the candles in a circle around you.~
-M
-0
-*~
-M
-0
-You focus on the flame of the candles...~
-M
-0
-*~
-M
-0
-You reach out to the sides and grab the flame of the candles in your hands!~
-M
-0
-The flames on the remaining candles shoot toward you and form the crest of the Phoenix!~
-M
-1
-$n lights some candles.~
-M
-1
-$n sits and places the candles in a circle around $mself.~
-M
-1
-*~
-M
-1
-$n moves back and forth as if in a trance.~
-M
-1
-*~
-M
-1
-$n's hands shoot out to the sides and grab the flames of the candles!~
-M
-1
-The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!~
+ritual 8 g 0 0 0.00 -1 0 0 5 0
 M
 22
 $n is sitting in a circle of candles.~
+M
+32
+You light some candles and begin the Phoenix Rite.~
+M
+32
+You sit and place the candles in a circle around you.~
+M
+32
+*~
+M
+32
+You focus on the flame of the candles...~
+M
+32
+*~
+M
+32
+You reach out to the sides and grab the flame of the candles in your hands!~
+M
+32
+The flames on the remaining candles shoot toward you and form the crest of the Phoenix!~
+M
+33
+$n lights some candles.~
+M
+33
+$n sits and places the candles in a circle around $mself.~
+M
+33
+*~
+M
+33
+$n moves back and forth as if in a trance.~
+M
+33
+*~
+M
+33
+$n's hands shoot out to the sides and grab the flames of the candles!~
+M
+33
+The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!~
 T b 1
 X+ 0 S
 X+ 1 3017
@@ -1210,7 +1216,30 @@ S
 #180
 Disenchant~
 0 -1 1.00 0 0 0
-T m 0
+C
+disenchant 8 i 2 5 0.00 -1 0 0 5 0
+D 16 40 0
+D 16 41 512
+D 64 20 0
+M
+2
+There is a burst of red light from $p and then it fizzles and is disenchanted.~
+M
+4
+*~
+M
+15
+You hold $p over your head and shout 'KA!' as you release the mana bound to it!~
+M
+17
+$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.~
+M
+20
+You manage to weave the freed mana into $p!~
+M
+21
+$n weaves the freed mana into $p!~
+T s 1
 S
 #181
 Greater Enchantments~
@@ -1246,44 +1275,44 @@ D 16 0 0
 D 16 1 0
 D 32 11 0
 M
-0
-You begin the incantation for the Ritual of Defense.~
-M
-0
-You say, 'Empower now this wall of stone...'~
-M
-0
-You say, 'With wisdom of the sages...'~
-M
-0
-You say, 'Ward against the foes above...'~
-M
-0
-You say, 'And strong, withstand the ages!'~
-M
-0
-You finish the ritual and the walls take on a strange magenta glow!~
-M
-1
-*~
-M
-1
-$n says, 'Empower now this wall of stone...'~
-M
-1
-$n says, 'With wisdom of the sages...'~
-M
-1
-$n says, 'Ward against the foes above...'~
-M
-1
-$n says, 'And strong, withstand the ages!'~
-M
-1
-$n finishes the ritual and the walls take on a strange magenta glow!~
-M
 22
 $n is performing the ritual of defense.~
+M
+32
+You begin the incantation for the Ritual of Defense.~
+M
+32
+You say, 'Empower now this wall of stone...'~
+M
+32
+You say, 'With wisdom of the sages...'~
+M
+32
+You say, 'Ward against the foes above...'~
+M
+32
+You say, 'And strong, withstand the ages!'~
+M
+32
+You finish the ritual and the walls take on a strange magenta glow!~
+M
+33
+*~
+M
+33
+$n says, 'Empower now this wall of stone...'~
+M
+33
+$n says, 'With wisdom of the sages...'~
+M
+33
+$n says, 'Ward against the foes above...'~
+M
+33
+$n says, 'And strong, withstand the ages!'~
+M
+33
+$n finishes the ritual and the walls take on a strange magenta glow!~
 R
 1114 1 0 0
 R
@@ -1304,24 +1333,6 @@ D 16 16 0
 D 16 22 0
 D 128 7 0
 M
-0
-You wrap yourself up and begin chanting...~
-M
-0
-There is a bright blue glow all around you...~
-M
-0
-There's a bright flash of light all around you...~
-M
-1
-$n wraps $mself up and begins chanting...~
-M
-1
-$n begins to glow bright blue, like a flame...~
-M
-1
-$n vanishes in a brilliant flash of light!~
-M
 8
 ... but nothing seems to happen.~
 M
@@ -1336,6 +1347,24 @@ M
 M
 30
 $n appears with a brilliant flash of light!~
+M
+32
+You wrap yourself up and begin chanting...~
+M
+32
+There is a bright blue glow all around you...~
+M
+32
+There's a bright flash of light all around you...~
+M
+33
+$n wraps $mself up and begins chanting...~
+M
+33
+$n begins to glow bright blue, like a flame...~
+M
+33
+$n vanishes in a brilliant flash of light!~
 T u 1
 S
 #188
@@ -1348,24 +1377,6 @@ D 16 16 0
 D 16 22 0
 D 16 25 0
 M
-0
-You wrap yourself up and begin chanting...~
-M
-0
-There is a bright blue glow all around you...~
-M
-0
-There's a bright flash of light all around you...~
-M
-1
-$n wraps $mself up and begins chanting...~
-M
-1
-$n begins to glow bright blue, like a flame...~
-M
-1
-$n vanishes in a brilliant flash of light!~
-M
 8
 ... but nothing seems to happen.~
 M
@@ -1380,6 +1391,24 @@ M
 M
 30
 $n appears with a brilliant flash of light!~
+M
+32
+You wrap yourself up and begin chanting...~
+M
+32
+There is a bright blue glow all around you...~
+M
+32
+There's a bright flash of light all around you...~
+M
+33
+$n wraps $mself up and begins chanting...~
+M
+33
+$n begins to glow bright blue, like a flame...~
+M
+33
+$n vanishes in a brilliant flash of light!~
 T u 1
 S
 #189
@@ -1405,50 +1434,50 @@ D 16 11 0
 D 64 4 0
 D 128 3 0
 M
-0
-You plant your staff hard into the ground and begin focusing mana...~
-M
-1
-$n plants $s staff hard into the ground and begins drawing mana toward $mself...~
-M
-0
-*~
-M
-1
-*~
-M
-0
-You send out shockwaves of mana from your staff...~
-M
-1
-$n's staff sends out shockwaves of mana...~
-M
-0
-*~
-M
-1
-*~
-M
-0
-*~
-M
-1
-*~
-M
-22
-$n has $s staff planted in the ground, focusing mana!~
+8
+The Devastation Ritual has ended.~
 M
 9
 *~
-M
-8
-The Devastation Ritual has ended.~
 M
 20
 You devastate the $1 and collect $p!~
 M
 21
 $n devastates the $1 and collects $p!~
+M
+22
+$n has $s staff planted in the ground, focusing mana!~
+M
+32
+You plant your staff hard into the ground and begin focusing mana...~
+M
+32
+*~
+M
+32
+You send out shockwaves of mana from your staff...~
+M
+32
+*~
+M
+32
+*~
+M
+33
+$n plants $s staff hard into the ground and begins drawing mana toward $mself...~
+M
+33
+*~
+M
+33
+$n's staff sends out shockwaves of mana...~
+M
+33
+*~
+M
+33
+*~
 T s 1
 S
 #192
@@ -1458,18 +1487,6 @@ C
 ritual 8 o 2 15 0.00 -1 0 0 5 2
 D 64 0 0
 D 64 1 0
-M
-0
-You murmur the words to the Sense Life Ritual...~
-M
-0
-You finish the ritual and your eyes are opened...~
-M
-1
-$n murmurs some arcane words...~
-M
-1
-$n finishes the ritual and $s eyes flash a bright white.~
 M
 8
 You sense no unseen presence.~
@@ -1485,6 +1502,18 @@ You sense $N here!~
 M
 26
 You are discovered!~
+M
+32
+You murmur the words to the Sense Life Ritual...~
+M
+32
+You finish the ritual and your eyes are opened...~
+M
+33
+$n murmurs some arcane words...~
+M
+33
+$n finishes the ritual and $s eyes flash a bright white.~
 T s 1
 S
 #193
@@ -1498,36 +1527,6 @@ D 16 8 0
 D 64 2 0
 D 64 3 0
 M
-0
-You pull a piece of chalk from your pocket and begin drawing circles on the ground.~
-M
-0
-*~
-M
-0
-You make crossed lines through the circles you've drawn.~
-M
-0
-*~
-M
-0
-You begin writing the words 'where', 'find', and 'reveal' on the ground.~
-M
-1
-$n pulls out a piece of chalk and begins drawing circles on the ground.~
-M
-1
-*~
-M
-1
-$n makes crossed lines through the circles $e has drawn.~
-M
-1
-*~
-M
-1
-$n begins writing words in the circles on the ground.~
-M
 22
 $n is writing on the ground with chalk.~
 M
@@ -1536,6 +1535,36 @@ You detect $N at $1~
 M
 28
 You detect $2 at $1~
+M
+32
+You pull a piece of chalk from your pocket and begin drawing circles on the ground.~
+M
+32
+*~
+M
+32
+You make crossed lines through the circles you've drawn.~
+M
+32
+*~
+M
+32
+You begin writing the words 'where', 'find', and 'reveal' on the ground.~
+M
+33
+$n pulls out a piece of chalk and begins drawing circles on the ground.~
+M
+33
+*~
+M
+33
+$n makes crossed lines through the circles $e has drawn.~
+M
+33
+*~
+M
+33
+$n begins writing words in the circles on the ground.~
 T s 1
 S
 #194

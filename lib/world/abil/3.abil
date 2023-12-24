@@ -1,11 +1,11 @@
 #300
 Architect~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #301
 Savage Bite~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 59 0
 D 1 60 0
 D 1 61 0
@@ -13,8 +13,135 @@ T e 1
 S
 #302
 Cartography~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 83 0
 T e 1
+S
+#303
+Trick Shots: Slow Leg~
+akx -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 29 10.00 0
+M
+2
+That shot to the leg seems to slow $N!~
+M
+3
+$n's last shot hit your leg! You feel slower.~
+M
+4
+$n's last shot seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 s
+X+ 1 3081
+X+ 2 10
+X+ 3 10
+S
+#304
+Trick Shots: Artery Bleed~
+akx -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 30 10.00 0
+H 4 32 10.00 0
+H 4 35 10.00 0
+M
+2
+Your shot opens a deep artery in $N -- $E is bleeding!~
+M
+3
+$n's shot opens a deep artery -- you are bleeding!~
+M
+4
+$n's shot opens a deep artery -- $N is bleeding!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T d 1
+X+ 1 3081
+X+ 2 25
+X+ 3 25
+X+ 6 5
+S
+#305
+Trick Shots: Dodgey Arm~
+akx -1 1.00 h 0 0
+A
+18 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 2 0 0
+D 256 296 0
+H 4 31 10.00 0
+M
+2
+That shot to the arm seems to shake $N!~
+M
+3
+$n's last shot hit your arm! You feel shaken.~
+M
+4
+$n's last shot seems to shake $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3081
+X+ 2 10
+X+ 3 10
+S
+#306
+Trick Shots: Head Stun~
+akx -1 1.00 htEI 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 34 10.00 0
+M
+2
+That shot to the head seems to stun $N!~
+M
+3
+$n's last shot hit your head! You feel stunned.~
+M
+4
+$n's last shot seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 t
+X+ 1 3081
+X+ 2 5
+X+ 3 5
 S
 $
