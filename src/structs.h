@@ -799,6 +799,9 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_IN_ROLE					37	// char must be in a certain role (or solo)
 #define ABIL_LIMIT_NO_WITNESSES				38	// nobody is watching
 #define ABIL_LIMIT_NO_WITNESSES_HIDE		39	// nobody is watching, unless you're good at hiding
+#define ABIL_LIMIT_CHECK_OBJ_BINDING		40	// ensures item is bound to actor or no one
+#define ABIL_LIMIT_OBJ_FLAGGED				41	// checks for object flag present
+#define ABIL_LIMIT_OBJ_NOT_FLAGGED			42	// checks for object flag absent
 
 
 // ABLIM_x: data needed for ability limits:
@@ -808,6 +811,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABLIM_WEAPON_TYPE	3	// requires an weapon type (blunt, sharp, magic)
 #define ABLIM_DAMAGE_TYPE	4	// requires a damage type (physical, magical, etc)
 #define ABLIM_ROLE			5	// requires a role
+#define ABLIM_OBJ_FLAG		6	// requires object flag
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -3967,7 +3971,7 @@ struct ability_data {
 struct ability_data_list {
 	int type;	// ADL_ type of data list
 	any_vnum vnum;	// number of the list entry thing
-	int misc;	// future use?
+	signed long long misc;	// used by some types
 	struct ability_data_list *next;
 };
 

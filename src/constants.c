@@ -487,6 +487,9 @@ const char *ability_limitations[] = {
 	"in role",
 	"no witnesses",
 	"no witnesses hide",
+	"check obj binding",	// 40
+	"obj flagged",
+	"obj not flagged",
 	"\n"
 };
 

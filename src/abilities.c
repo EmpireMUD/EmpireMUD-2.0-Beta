@@ -592,6 +592,11 @@ char *ability_data_display(struct ability_data_list *adl) {
 					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
+				case ABLIM_OBJ_FLAG: {
+					sprintbit(adl->misc, extra_bits, part, FALSE);
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
 				case ABLIM_NOTHING:
 				default: {
 					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
@@ -3491,6 +3496,35 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 						_set_fatal_error(TRUE);
 						return FALSE;
 					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_CHECK_OBJ_BINDING: {
+				if (ovict && !bind_ok(ovict, ch)) {
+					if (send_msgs) {
+						act("$p: Item is bound to someone else.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+					}
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_OBJ_FLAGGED: {
+				if (ovict && adl->misc && !OBJ_FLAGGED(ovict, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, extra_bits, part, FALSE);
+						msg_to_char(ch, "You need to target %s %s item.\r\n", AN(part), part);
+					}
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_OBJ_NOT_FLAGGED: {
+				if (ovict && adl->misc && OBJ_FLAGGED(ovict, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, extra_bits, part, FALSE);
+						msg_to_char(ch, "You can't target %s %s item.\r\n", AN(part), part);
+					}
+					return FALSE;
 				}
 				break;
 			}
@@ -7501,6 +7535,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 	bitvector_t type;
 	int int_in[10], xtype;
 	double dbl_in[4];
+	signed long long lld_in;
 	
 	CREATE(abil, ability_data, 1);
 	clear_ability(abil);
@@ -7596,7 +7631,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'D': {	// data
-				if (sscanf(line, "D %d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+				if (sscanf(line, "D %d %d %lld", &int_in[0], &int_in[1], &lld_in) != 3) {
 					log("SYSERR: Format error in D line of %s", error);
 					exit(1);
 				}
@@ -7604,7 +7639,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				CREATE(adl, struct ability_data_list, 1);
 				adl->type = int_in[0];
 				adl->vnum = int_in[1];
-				adl->misc = int_in[2];
+				adl->misc = lld_in;
 				
 				LL_APPEND(ABIL_DATA(abil), adl);
 				break;
@@ -7938,7 +7973,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	
 	// 'D' data
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		fprintf(fl, "D %d %d %d\n", adl->type, adl->vnum, adl->misc);
+		fprintf(fl, "D %d %d %lld\n", adl->type, adl->vnum, adl->misc);
 	}
 	
 	// 'H' hooks
@@ -9566,8 +9601,9 @@ OLC_MODULE(abiledit_data) {
 	ability_data *find_abil;
 	struct ability_data_list *adl, *next_adl;
 	bitvector_t allowed_types = 0;
-	int iter, num, type_id, val_id, misc = 0;
+	int iter, num, type_id, val_id;
 	bool found;
+	signed long long misc = 0;
 	
 	// ADL_x: determine valid types first
 	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT;
@@ -9725,6 +9761,15 @@ OLC_MODULE(abiledit_data) {
 									msg_to_char(ch, "Invalid role '%s'. See HELP ROLE.\r\n", val_b);
 									return;
 								}
+								break;
+							}
+							case ABLIM_OBJ_FLAG: {
+								if ((misc = search_block(val_b, extra_bits, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid obj flag '%s'. See HELP OEDIT FLAGS.\r\n", val_b);
+									return;
+								}
+								// convert to flag
+								misc = BIT(misc);
 								break;
 							}
 						}

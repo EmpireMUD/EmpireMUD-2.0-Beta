@@ -1164,6 +1164,7 @@ Limitation types:
  &ccan use as guest&0 - Location must be unclaimed or you have guest access (or better).
  &ccan use as member&0 - Location must be unclaimed or owned by your empire.
  &ccheck city found time&0 - Fails if the target city is not established yet.
+ &ccheck obj binding&0 - Ensures item target is not bound to someone else.
  &cdisarmable target&0
  &cguest permission at target&0 - Has guest (or better) access at the target location.
  &chave an empire&0 - Must be a member of any empire.
@@ -1179,6 +1180,8 @@ Limitation types:
  &cnot god target&0 - Target player must not be a god or immortal.
  &cnot here&0 - Target cannot be in same room.
  &cnot immobilized&0 - User does not have IMMOBILIZED affect.
+ &cobj flagged&0 - Object has a certain flag (see OEDIT FLAGS).
+ &cobj not flagged&0 - Object does not have a certain flag.
  &con a barrier tile&0 - Must be used on a barrier (wall) tile.
  &con a road&0 - Must be used on a road tile.
  &con the map&0 - Must be used on the map (includes the main room of buildings).
