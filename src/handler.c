@@ -107,6 +107,13 @@ struct glb_mob_interact_bean {
 	INTERACTION_FUNC(*func);
 };
 
+// for run_global_obj_interactions_func
+struct glb_obj_interact_bean {
+	obj_data *obj;
+	int type;
+	INTERACTION_FUNC(*func);
+};
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// AFFECT HANDLERS /////////////////////////////////////////////////////////
@@ -5155,6 +5162,12 @@ GLB_FUNCTION(run_global_mob_interactions_func) {
 }
 
 
+GLB_FUNCTION(run_global_obj_interactions_func) {
+	struct glb_obj_interact_bean *data = (struct glb_obj_interact_bean*)other_data;
+	return run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), NULL, data->obj, NULL, data->func);
+}
+
+
 /**
 * Attempts to run global mob interactions -- interactions from the globals table.
 *
@@ -5180,6 +5193,34 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	data->type = type;
 	data->func = func;
 	any = run_globals(GLOBAL_MOB_INTERACTIONS, run_global_mob_interactions_func, TRUE, MOB_FLAGS(mob), ch, (inst ? INST_ADVENTURE(inst) : NULL), GET_CURRENT_SCALE_LEVEL(mob), NULL, data);
+	free(data);
+	
+	return any;
+}
+
+
+/**
+* Attempts to run global obj interactions -- interactions from the globals table.
+*
+* @param char_data *ch The player who is interacting.
+* @param char_data *obj The object being interacted-with.
+* @param int type Any INTERACT_ const.
+* @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
+*/
+bool run_global_obj_interactions(char_data *ch, obj_data *obj, int type, INTERACTION_FUNC(*func)) {
+	struct glb_obj_interact_bean *data;
+	bool any = FALSE;
+	
+	// no work
+	if (!ch || !obj || !func) {
+		return FALSE;
+	}
+	
+	CREATE(data, struct glb_obj_interact_bean, 1);
+	data->obj = obj;
+	data->type = type;
+	data->func = func;
+	any = run_globals(GLOBAL_OBJ_INTERACTIONS, run_global_obj_interactions_func, TRUE, GET_OBJ_EXTRA(obj), ch, get_adventure_for_vnum(GET_OBJ_VNUM(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj), NULL, data);
 	free(data);
 	
 	return any;

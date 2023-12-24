@@ -4915,6 +4915,30 @@ table is for.
 
 See also: OLC GLOBALS
 #d
+"GEDIT OBJEXCLUDE"
+
+Usage:  .objexclude [add | remove] <flags>
+
+A 'Obj Interactions' global table may have obj flags set to exclude. If so, the
+global table is only used if a obj DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to LARGE objs.
+
+These are the same set of flags from HELP OEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT OBJFLAGS"
+
+Usage:  .objflags [add | remove] <flags>
+
+A 'Obj Interactions' global table may have obj flags set. If so, the global
+table is only used if a obj has ALL of the flags set here. For example, you
+might set a global table to only apply to LARGE objs.
+
+These are the same set of flags from HELP OEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT PERCENT" CUMULATIVE-PRC
 
 Usage:  .percent <amount>
@@ -4990,6 +5014,8 @@ Types:
  Mine Data - Used for MINE interactions, see HELP MINE DATA GLOBAL.
  Newbie Gear - Given/equipped to all new players.
  Map Spawns - Global spawn lists for map tiles, based on climate.
+ Obj Interactions - Used for global DISENCHANT when an item doesn't have its
+   own disenchant results.
 
 See also: OLC GLOBALS
 #d
@@ -5057,6 +5083,22 @@ Notes on Mob Interactions globals:
   mob). If the mob normally has a range of 150-250, and is scaled to 175, it
   will not trigger a global loot interaction that requires 200-250. But the
   same mob scaled to 225 would.
+
+See also: BUILDING GUIDE, OLC GLOBALS
+#d
+"GLOBAL OBJ INTERACTIONS" "OBJ INTERACTIONS GLOBAL" "OBJ INTERACTION GLOBAL"
+
+The 'Obj Interactions' Global allows DISENCHANT globals to be applied to all
+objects in a matching range. This can be used for disenchant tables that are
+adventure-wide, or global.
+
+Notes on Obj Interactions globals:
+- Only DISENCHANT object interactions are supported.
+- The min/max levels, if any, apply to the items (not the player disenchanting
+  the obj).
+- Global disenchant tables are only used if an item has no DISENCHANT results
+  itself, either because it has none configured, or because the random roll
+  didn't result in any from its own list.
 
 See also: BUILDING GUIDE, OLC GLOBALS
 #d
@@ -5615,6 +5657,7 @@ Object interaction types:
  &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
  &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
  &cIDENTIFIES-TO&0 - Becomds a different object when identified (e.g. a rock).
+ &cDISENCHANT&0 - Items received when disenchanting (also a global type).
 
 Room/vehicle interaction types:
  &cDIG&0 - Items received when using the dig action.

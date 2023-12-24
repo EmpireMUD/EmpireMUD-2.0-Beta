@@ -4790,6 +4790,7 @@ const char *global_types[] = {
 	"Mine Data",
 	"Newbie Gear",
 	"Map Spawns",
+	"Obj Interactions",
 	"\n"
 };
 
@@ -4843,6 +4844,7 @@ const char *interact_types[] = {
 	"LIQUID-CONJURE",
 	"OBJECT-CONJURE",
 	"VEHICLE-CONJURE",	// 35
+	"DISENCHANT",
 	"\n"
 };
 
@@ -4885,6 +4887,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ABIL,	// LIQUID-CONJURE
 	TYPE_ABIL,	// OBJECT-CONJURE
 	TYPE_ABIL,	// VEHICLE-CONJURE
+	TYPE_OBJ,	// DISENCHANT
 };
 
 
@@ -4926,6 +4929,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_LIQUID,	// LIQUID-CONJURE
 	TYPE_OBJ,	// OBJECT-CONJURE
 	TYPE_VEH,	// VEHICLE-CONJURE
+	TYPE_OBJ,	// DISENCHANT
 };
 
 
@@ -4969,6 +4973,7 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// LIQUID_CONJURE
 	FALSE,	// OBJECT_CONJURE
 	FALSE,	// VEHICLE_CONJURE
+	FALSE,	// DISENCHANT
 };
 
 

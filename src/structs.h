@@ -369,6 +369,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLOBAL_MINE_DATA  1
 #define GLOBAL_NEWBIE_GEAR  2
 #define GLOBAL_MAP_SPAWNS  3
+#define GLOBAL_OBJ_INTERACTIONS  4
 
 
 // GLB_FLAG_x flags for global_data
@@ -420,7 +421,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_LIQUID_CONJURE  33
 #define INTERACT_OBJECT_CONJURE  34
 #define INTERACT_VEHICLE_CONJURE  35
-#define NUM_INTERACTS  36
+#define INTERACT_DISENCHANT  36
+#define NUM_INTERACTS  37
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -635,10 +637,10 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_ROOM_COORDS	BIT(20)	// targets a room by coordinates
 #define ATAR_ROOM_NOT_HERE	BIT(21)	// modifier ensures it's not the current room
 #define ATAR_STRING			BIT(22)	// string is expected and arg cannot be empty
-#define ATAR_ALLIES_MULTI		BIT(23)	// all allies
-#define ATAR_GROUP_MULTI		BIT(24)	// whole group
+#define ATAR_ALLIES_MULTI	BIT(23)	// all allies
+#define ATAR_GROUP_MULTI	BIT(24)	// whole group
 #define ATAR_ROOM_MULTI		BIT(25)	// everyone in the room
-#define ATAR_ENEMIES_MULTI		BIT(26)	// all enemies
+#define ATAR_ENEMIES_MULTI	BIT(26)	// all enemies
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ROOM_MULTI | ATAR_ENEMIES_MULTI)
