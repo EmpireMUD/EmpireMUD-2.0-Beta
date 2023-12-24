@@ -117,52 +117,56 @@ PREP_ABIL(prep_room_affect_ability);
 DO_ABIL(do_teleport_ability);
 PREP_ABIL(prep_teleport_ability);
 
+// for ability struct
+#define CHECK_IMMUNE	TRUE
+#define IGNORE_IMMUNE	FALSE
 
 // setup for abilities
 struct {
 	bitvector_t type;	// ABILT_ const
 	PREP_ABIL(*prep_func);	// does the cost setup
 	DO_ABIL(*do_func);	// runs the ability
+	bool check_immune;	// whether or not immunities affect this type
 	bitvector_t fields;	// what shows in the menu/stats
 } do_ability_data[] = {
 	
 	// ABILT_x: setup by type; they run in this order:
 	
 	// types that don't run functions
-	{ ABILT_CRAFT, NULL, NULL, NOBITS },
-	{ ABILT_RESOURCE, NULL, NULL, NOBITS },
-	{ ABILT_PLAYER_TECH, NULL, NULL, ABILEDIT_DIFFICULTY },
-	{ ABILT_PASSIVE_BUFF, NULL, NULL, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
-	{ ABILT_COMPANION, NULL, NULL, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
-	{ ABILT_MORPH, NULL, NULL, NOBITS },
-	{ ABILT_AUGMENT, NULL, NULL, NOBITS },
-	{ ABILT_CUSTOM, NULL, NULL, NOBITS },
+	{ ABILT_CRAFT, NULL, NULL, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_RESOURCE, NULL, NULL, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_PLAYER_TECH, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_DIFFICULTY },
+	{ ABILT_PASSIVE_BUFF, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
+	{ ABILT_COMPANION, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
+	{ ABILT_MORPH, NULL, NULL, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_AUGMENT, NULL, NULL, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_CUSTOM, NULL, NULL, IGNORE_IMMUNE, NOBITS },
 	
 	// ones that should run early
-	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, ABILEDIT_COMMAND },
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
 	// attack/damage: some abilities stop here if they miss
-	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, ABILEDIT_COMMAND },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
-	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
 	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability, ABILEDIT_COMMAND },
-	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
-	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
-	{ ABILT_DOT, prep_dot_ability, do_dot_ability, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
-	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, ABILEDIT_COMMAND },
-	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, ABILEDIT_COMMAND },
-	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
-	{ ABILT_SUMMON_ANY, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
+	{ ABILT_DOT, prep_dot_ability, do_dot_ability, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
+	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
+	{ ABILT_SUMMON_ANY, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
 	// alaways run actions last
-	{ ABILT_ACTION, prep_action_ability, do_action_ability, ABILEDIT_COMMAND },
+	{ ABILT_ACTION, prep_action_ability, do_action_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
-	{ NOBITS, NULL, NULL, NOBITS }	// list terminator
+	{ NOBITS, NULL, NULL, FALSE, NOBITS }	// list terminator
 };
 
 
@@ -3921,17 +3925,6 @@ DO_ABIL(do_buff_ability) {
 		remaining_points = total_points;
 	}
 	
-	// TODO is this the correct place to check immunities?
-	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		if (ch == vict) {
-			msg_to_char(ch, "You're immune!\r\n");
-		}
-		else {
-			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-		}
-		return;
-	}
-	
 	// determine duration (in seconds)
 	dur = get_ability_duration(ch, abil);
 	
@@ -4154,11 +4147,6 @@ DO_ABIL(do_dot_ability) {
 	points = get_ability_type_data(data, ABILT_DOT)->scale_points;
 	
 	if (points <= 0) {
-		return;
-	}
-	
-	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 		return;
 	}
 	
@@ -6222,6 +6210,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
 void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
+	bool any_ignore_immune = FALSE;
 	double total_scale = 0.0;
 	int iter;
 	struct ability_exec_type *aet;
@@ -6236,6 +6225,10 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
 			call_prep_abil(do_ability_data[iter].prep_func);
+			
+			if (!do_ability_data[iter].check_immune) {
+				any_ignore_immune = TRUE;
+			}
 			
 			// look up data from the prep func
 			aet = get_ability_type_data(data, do_ability_data[iter].type);
@@ -6253,6 +6246,24 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	// early exit?
 	if (data->stop) {
+		return;
+	}
+	
+	// immunity check: early exit if there's no valid targets
+	// if any of the ability's types ignore immunity, this is checked later instead
+	if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil)) && !any_ignore_immune) {
+		// TODO consider custom immunity messages
+		if (ch == vict) {
+			msg_to_char(ch, "You're immune!\r\n");
+		}
+		else {
+			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		}
+		
+		// this counts as a fail
+		data->sent_fail_msg = TRUE;
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
 		return;
 	}
 	
@@ -6336,7 +6347,16 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			call_do_abil(do_ability_data[iter].do_func);
+			// ensure immunities don't block this type
+			if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+				// if this results in no-success, player will see a fail message
+				// if another type succeeds, they will see success instead
+				continue;
+			}
+			else {
+				// not immune -- do the thing
+				call_do_abil(do_ability_data[iter].do_func);
+			}
 		}
 	}
 	
