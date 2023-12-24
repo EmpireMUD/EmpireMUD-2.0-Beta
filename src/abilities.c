@@ -58,6 +58,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room, bool send_msgs, bool *fatal_error);
 INTERACTION_FUNC(devastate_crop);
 INTERACTION_FUNC(devastate_trees);
+INTERACTION_FUNC(disenchant_obj_interact);
 char *estimate_ability_cost(char_data *ch, ability_data *abil);
 struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type);
 void free_ability_exec(struct ability_exec *data);
@@ -2717,6 +2718,40 @@ DO_ABIL(abil_action_devastate_area) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_disenchant_obj) {
+	bool done = FALSE, reward;
+	struct obj_apply *apply, *next_apply;
+	
+	if (ovict) {
+		if (OBJ_FLAGGED(ovict, OBJ_ENCHANTED)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(ovict), OBJ_ENCHANTED);
+			done = TRUE;
+		}
+		
+		LL_FOREACH_SAFE(GET_OBJ_APPLIES(ovict), apply, next_apply) {
+			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				LL_DELETE(GET_OBJ_APPLIES(ovict), apply);
+				free(apply);
+				done = TRUE;
+			}
+		}
+		
+		// did we do anything?
+		if (done) {
+			data->success = TRUE;
+			request_obj_save_in_world(ovict);
+			
+			// reward
+			reward = run_interactions(ch, GET_OBJ_INTERACTIONS(ovict), INTERACT_DISENCHANT, IN_ROOM(ch), NULL, ovict, NULL, disenchant_obj_interact);
+			if (!reward) {
+				run_global_obj_interactions(ch, ovict, INTERACT_DISENCHANT, disenchant_obj_interact);
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_hide) {
 	// hide uses a simple bit, not an affect
 	if (IS_NPC(ch) || has_player_tech(ch, PTECH_HIDE_UPGRADE) || difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_MEDIUM)) {
@@ -3754,6 +3789,37 @@ INTERACTION_FUNC(devastate_trees) {
 		strtolower(type);
 		
 		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
+	}
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(disenchant_obj_interact) {
+	int num, obj_ok = 0;
+	obj_data *obj = NULL;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	// messaging
+	if (obj_ok && obj) {
+		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
 	}
 	
 	return TRUE;
@@ -5540,6 +5606,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_PUT_TO_SLEEP: {
 				call_do_abil(abil_action_put_to_sleep);
+				break;
+			}
+			case ABIL_ACTION_DISENCHANT_OBJ: {
+				call_do_abil(abil_action_disenchant_obj);
 				break;
 			}
 		}

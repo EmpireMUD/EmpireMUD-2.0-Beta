@@ -555,6 +555,9 @@ Action types:
    messages. Uses RANGE data, defaults to normal "nearby" range.
  &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
    name in per-item messages. Uses RANGE data, default 3 if not given.
+ &cdisenchant obj&0 - Remove enchantments from an item. Runs the DISENCHANT
+   interaction on the object (and globals) for a chance at something back.
+   Sends per-item messages when those interactions give an item.
  &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech. Has its own
    medium difficulty check without the ptech.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when

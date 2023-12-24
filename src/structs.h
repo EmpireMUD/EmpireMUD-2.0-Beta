@@ -670,6 +670,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_RESCUE_ALL				17	// rescues the target
 #define ABIL_ACTION_HIDE					18	// attempts a hide
 #define ABIL_ACTION_PUT_TO_SLEEP			19	// target is put to sleep
+#define ABIL_ACTION_DISENCHANT_OBJ			20	// disenchants an item
 
 
 // ABIL_CUSTOM_x: custom message types

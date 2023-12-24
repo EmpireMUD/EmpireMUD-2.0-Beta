@@ -135,6 +135,7 @@ const char *ability_actions[] = {
 	"rescue all",
 	"hide",
 	"put to sleep",
+	"disenchant obj",	// 20
 	"\n"
 };
 
