@@ -6918,7 +6918,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	// immunities: relevant or no
 	if (ABIL_IMMUNITIES(abil)) {
 		found = FALSE;
-		for (iter = 0; do_ability_data[iter].type != NOTHING; ++iter) {
+		for (iter = 0; do_ability_data[iter].type != NOBITS; ++iter) {
 			if (do_ability_data[iter].check_immune) {
 				found = TRUE;
 			}
