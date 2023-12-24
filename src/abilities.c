@@ -5980,6 +5980,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	if (data->should_charge_cost) {
 		if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 			// normal additional costs:
+			// (this actually runs on the intial over-time command, just not when it finishes)
 			data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
 			data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
 			data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
@@ -5993,7 +5994,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		else {
 			// over time costs: were costs higher than estimated at the start
 			if (((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0))) {
-				charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
+				charge_ability_cost(ch, ABIL_COST_TYPE(abil), (MAX(0, (data->total_targets - 1)) * ABIL_COST_PER_TARGET(abil)) + (data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
 			}
 			else {
 				command_lag(ch, ABIL_WAIT_TYPE(abil));
