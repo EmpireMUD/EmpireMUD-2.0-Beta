@@ -7843,10 +7843,39 @@ char *get_custom_message_pos(struct custom_message *list, int type, int pos) {
 	struct custom_message *ocm;
 	char *found = NULL;
 	
+	if (pos == NOTHING) {
+		return NULL;	// shortcut
+	}
+	
 	LL_FOREACH(list, ocm) {
 		if (ocm->type == type && pos-- <= 0) {
 			found = ocm->msg;
 			break;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* Picks a custom message at random from a set (by type), and then returns
+* the position number it was in, for use with get_custom_message_pos().
+*
+* @param struct custom_message *list The list of messages to check.
+* @param int type The type const for the message.
+* @return int A random message position, or NOTHING if no messages of that type were found.
+*/
+int get_custom_message_random_pos_number(struct custom_message *list, int type) {
+	struct custom_message *ocm;
+	int found = NOTHING;
+	int num_found = 0;
+	
+	LL_FOREACH(list, ocm) {
+		if (ocm->type == type) {
+			if (!number(0, num_found++)) {
+				found = num_found - 1;
+			}
 		}
 	}
 	

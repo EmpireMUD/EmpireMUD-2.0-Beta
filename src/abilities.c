@@ -4605,8 +4605,11 @@ ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvecto
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY MESSAGING ///////////////////////////////////////////////////////
 
+#define _ABIL_MATCHING_MESSAGE(set, type)  (has_custom_message_pos((set), (type), pos) ? get_custom_message_pos((set), (type), pos) : get_custom_message((set), (type)))
+
 /**
-* Sends the main messages for using an ability.
+* Sends the main messages for using an ability. If multiple variants of the
+* message are available, it tries to match them up by position.
 *
 * @param char_data *ch The player using the ability.
 * @param char_data *vict The targeted player, if any (or NULL).
@@ -4619,6 +4622,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	bool any, invis;
 	char buf[MAX_STRING_LENGTH];
 	char *msg;
+	int pos;
 	
 	bitvector_t act_flags = ACT_ABILITY;
 	
@@ -4640,9 +4644,12 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+			// determine message pos, for consistency
+			pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR);
+			
 			// to-char
 			any = TRUE;
-			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR))) {
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
@@ -4654,7 +4661,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		
 			// to room
-			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_ROOM))) {
+			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_ROOM))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 				}
@@ -4666,9 +4673,12 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		}
 		else {	// message: ch != vict
+			// determine message pos, for consistency
+			pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR);
+			
 			// to-char
 			any = TRUE;
-			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
@@ -4680,7 +4690,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		
 			// to vict
-			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
+			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 				}
@@ -4692,7 +4702,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 		
 			// to room
-			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 				}
@@ -4705,9 +4715,12 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 	}
 	else if (ovict) {	// messaging with obj target
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR);
+		
 		// to-char
 		any = TRUE;
-		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -4719,7 +4732,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 	
 		// to room
-		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 			}
@@ -4731,9 +4744,12 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 	}
 	else if (vvict) {	// messaging with vehicle target
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR);
+		
 		// to-char
 		any = TRUE;
-		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 			}
@@ -4745,7 +4761,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 	
 		// to room
-		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 			}
@@ -4774,6 +4790,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 */
 void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_data *abil, struct ability_exec *data) {
 	char *msg;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work?
@@ -4787,8 +4804,11 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		data->sent_any_msg = TRUE;	// guaranteed
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_COUNTERSPELL_TO_CHAR);
+	
 	// to-char
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_CHAR))) {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_COUNTERSPELL_TO_CHAR, pos))) {
 		if (*msg != '*') {
 			act(msg, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
 		}
@@ -4799,7 +4819,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 	}
 	
 	// to vict
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_VICT))) {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_COUNTERSPELL_TO_VICT))) {
 		if (*msg != '*') {
 			act(msg, FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 		}
@@ -4810,7 +4830,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 	}
 	
 	// to room
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_COUNTERSPELL_TO_ROOM))) {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_COUNTERSPELL_TO_ROOM))) {
 		if (*msg != '*') {
 			act(msg, FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 		}
@@ -4835,6 +4855,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	bool invis;
 	bitvector_t act_flags = ACT_ABILITY;
 	char *msg;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -4856,8 +4877,11 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_SELF_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR))) {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_SELF_TO_CHAR, pos))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -4869,7 +4893,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 	
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_SELF_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
@@ -4881,8 +4905,11 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 	}
 	else if (vict) {	// message: ch != vict
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR, pos))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -4894,7 +4921,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 	
 		// to vict
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_VICT))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
@@ -4906,7 +4933,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 	
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
@@ -4918,8 +4945,11 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 	}
 	else if (ovict) {	// message: obj targeted without vict
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR, pos))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
@@ -4930,7 +4960,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM))) {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 			}
@@ -5059,6 +5089,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	char buf[256], multi[24];
 	char *msg, *repl;
 	bitvector_t act_flags = ACT_ABILITY;
+	int pos;
 	
 	if (!ch || !abil || !vict) {
 		return;	// no work
@@ -5080,8 +5111,11 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 		*multi = '\0';
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_CHAR);
+	
 	// to-char ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_CHAR)) && *msg != '*') {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_CHAR, pos)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -5094,7 +5128,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	}
 	
 	// to vict ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_VICT | act_flags);
@@ -5102,7 +5136,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	}
 	
 	// to room ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
@@ -5128,6 +5162,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	char buf[256], multi[24];
 	char *msg, *repl;
 	bitvector_t act_flags = ACT_ABILITY;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -5149,8 +5184,11 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 		*multi = '\0';
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_CHAR);
+	
 	// to-char ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_CHAR)) && *msg != '*') {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_CHAR, pos)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
@@ -5163,7 +5201,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	}
 	
 	// to room ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, ovict, NULL, TO_ROOM | act_flags);
@@ -5189,6 +5227,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	char buf[256], multi[24];
 	char *msg, *repl;
 	bitvector_t act_flags = ACT_ABILITY;
+	int pos;
 	
 	if (!ch || !abil || !vvict) {
 		return;	// no work
@@ -5210,8 +5249,11 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 		*multi = '\0';
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_CHAR);
+	
 	// to-char ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_CHAR)) && *msg != '*') {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_CHAR, pos)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
@@ -5224,7 +5266,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	}
 	
 	// to room ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
 		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
@@ -5257,6 +5299,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	char *msg, *repl;
 	int iter;
 	bitvector_t act_flags = ACT_ABILITY;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -5271,8 +5314,11 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 		act_flags |= ACT_BUFF;
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR);
+	
 	// to-char ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_CHAR)) && *msg != '*') {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR, pos)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
 			snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
@@ -5291,7 +5337,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	}
 	
 	// to vict ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_VICT)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_VICT)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
 			snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
@@ -5305,7 +5351,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	}
 	
 	// to room ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_SPEC_TO_ROOM)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_ROOM)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
 			snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
@@ -5334,6 +5380,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	bool any, invis;
 	bitvector_t act_flags = ACT_ABILITY;
 	char *msg;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -5350,43 +5397,52 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	}
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_SELF_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) && *msg != '*') {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_SELF_TO_CHAR, pos)) && *msg != '*') {
 			act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM)) && *msg != '*') {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_SELF_TO_ROOM)) && *msg != '*') {
 			act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 	}
 	else if (vict) {	// message: ch != vict
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) && *msg != '*') {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_CHAR, pos)) && *msg != '*') {
 			act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
 		// to vict
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) && *msg != '*') {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) && *msg != '*') {
 			act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 	
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) && *msg != '*') {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) && *msg != '*') {
 			act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 		}
 	}
 	else if (ovict) {	// message: ovict without vict
+		// determine message pos, for consistency
+		pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_CHAR);
+		
 		// to-char
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) && *msg != '*') {
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_CHAR, pos)) && *msg != '*') {
 			act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			any = TRUE;
 		}
 	
 		// to room
-		if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) && *msg != '*') {
+		if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) && *msg != '*') {
 			act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
@@ -5410,6 +5466,7 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 	bool invis;
 	char *msg;
 	bitvector_t act_flags = ACT_ABILITY;
+	int pos;
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -5424,8 +5481,11 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 		act_flags |= ACT_BUFF;
 	}
 	
+	// determine message pos, for consistency
+	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TOGGLE_TO_CHAR);
+	
 	// to-char
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_TOGGLE_TO_CHAR))) {
+	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TOGGLE_TO_CHAR, pos))) {
 		if (*msg != '*') {
 			act(msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			if (data) {
@@ -5441,7 +5501,7 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 	}
 	
 	// to room ONLY if there's a custom message
-	if ((msg = abil_get_custom_message(abil, ABIL_CUSTOM_TOGGLE_TO_ROOM)) && *msg != '*') {
+	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TOGGLE_TO_ROOM)) && *msg != '*') {
 		act(msg, invis, ch, NULL, NULL, TO_ROOM | act_flags);
 	}
 }
@@ -5902,7 +5962,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		}
 		if (!has) {
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+				act(get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 			}
 			else {
 				msg_to_char(ch, "&Z%s %s?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Use that ability on", IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) ? "whom" : "what");

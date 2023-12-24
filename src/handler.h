@@ -310,6 +310,7 @@ int count_custom_messages(struct custom_message *list, int type);
 void free_custom_messages(struct custom_message *mes);
 char *get_custom_message(struct custom_message *list, int type);
 char *get_custom_message_pos(struct custom_message *list, int type, int pos);
+int get_custom_message_random_pos_number(struct custom_message *list, int type);
 bool has_custom_message(struct custom_message *list, int type);
 bool has_custom_message_pos(struct custom_message *list, int type, int pos);
 
