@@ -6027,12 +6027,6 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	// costs and consequences
 	if (data->should_charge_cost) {
 		if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-			// check costs?
-			if (data->cost == 0 && ABIL_COST(abil) > 0) {
-				// likely hit no targets, but if we got here we should be charging
-				data->cost = ABIL_COST(abil);
-			}
-			
 			// normal additional costs:
 			// (this actually runs on the intial over-time command, just not when it finishes)
 			data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
@@ -6193,7 +6187,11 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		// currently charging for these anyway
 		// data->should_charge_cost = FALSE;
-		
+		if (data->cost == 0 && ABIL_COST(abil) > 0) {
+			// hit no targets, so cost may not be set
+			data->cost = ABIL_COST(abil);
+		}
+	
 		// block fail message
 		data->no_msg = TRUE;
 	}
