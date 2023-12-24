@@ -6908,6 +6908,20 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	// immunities: relevant or no
+	if (ABIL_IMMUNITIES(abil)) {
+		found = FALSE;
+		for (iter = 0; do_ability_data[iter].type != NOTHING; ++iter) {
+			if (do_ability_data[iter].check_immune) {
+				found = TRUE;
+			}
+		}
+		if (!found) {
+			olc_audit_msg(ch, ABIL_VNUM(abil), "Has immunities but no types that check immunities");
+			problem = TRUE;
+		}
+	}
+	
 	// interactions
 	problem |= audit_interactions(ABIL_VNUM(abil), ABIL_INTERACTIONS(abil), TYPE_ABIL, ch);
 	
