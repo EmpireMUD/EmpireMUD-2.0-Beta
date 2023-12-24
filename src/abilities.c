@@ -6089,7 +6089,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool no_msg, fatal_error = FALSE;
+	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -6145,6 +6145,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		
 		// allow fail messages on this run
+		sent_any_fail |= data->sent_fail_msg;
 		data->sent_fail_msg = FALSE;
 		
 		// final validation?
@@ -6158,6 +6159,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		
 		// run it!
 		call_ability_one(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
+		
+		// store success for later and clear it so fail messages can be sent
+		any_success |= data->success;
+		data->success = FALSE;
 		
 		// in case no_msg was triggered by call_ability_one:
 		if (data->no_msg && !no_msg) {
@@ -6173,6 +6178,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			break;
 		}
 	}
+	
+	// restore these
+	data->sent_fail_msg |= sent_any_fail;
+	data->success |= any_success;
 	
 	// did we even hit anybody
 	if (data->total_targets == 0) {
