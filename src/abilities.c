@@ -6005,9 +6005,6 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// crowd control and ability hooks (only if successful)
 	if (data->success) {
-		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
-			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
-		}
 		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
 	}
 }
@@ -6282,15 +6279,12 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	// check for a no-effect/fail message
 	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
-		/* currently always showing the whole fail message
-		if (data->sent_any_msg) {
-			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
-		}
-		else {
-			// send a full fail
-		*/
-			send_ability_fail_messages(ch, vict, ovict, abil, data);
-		// }
+		send_ability_fail_messages(ch, vict, ovict, abil, data);
+	}
+
+	// check limit-crowd-control
+	if (data->success && vict && ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
+		limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
 	}
 }
 
