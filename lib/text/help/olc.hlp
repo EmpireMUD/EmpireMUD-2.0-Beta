@@ -917,8 +917,8 @@ These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
 player using the ability, and capitalized letters for the target.
 
 If you set more than one message of the same type, one will be chosen at
-random each time -- except OVER-TIME abilities, which will play their self-to
-and targ-to messages in sequential order.
+random each time -- except OVER-TIME messages, which will play in sequential
+order.
 
 Some messages have defaults that will show if you do not set them as custom
 messages. For abilities, the defaults can be prevented by setting a custom
@@ -956,10 +956,15 @@ Message types:
  &cper-char-to-char&0 - To actor when some abilities hit multiple characters.
  &cper-char-to-vict&0 - To target when some abilities hit multiple characters.
  &cper-char-to-room&0 - To actor when some abilities hit multiple characters.
- &cspec-to-char&0 - Special messaging on some abilities, to the actor.
+ &cspec-to-char&0 - Special messaging on some abilities.
  &cspec-to-vict&0 - Special messaging on some abilities, to the target.
  &cspec-to-room&0 - Special messaging on some abilities, to the room.
  &cno-argument&0 - Shown when the player does not type an argument.
+ &cot-self-to-char&0 - Over-time ability messages, showing every few seconds.
+ &cot-self-to-room&0
+ &cot-targ-to-char&0
+ &cot-targ-to-vict&0
+ &cot-targ-to-room&0
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -1296,19 +1301,19 @@ like, but if you set the command to "ritual" or "chant", it will add the
 ability to the player's ordinary ritual or chant command.
 
 The length of the over-time ability is determined by the number of to-char
-messages it has. It still uses the self-to- and targ-to- messages. Set as
+messages it has. It uses the ot-self-to- and ot-targ-to- messages. Set as
 many of these messages as you like and they will be played in order. The first
 message is played when the ability starts and the last one is played as it
 ends. Any message that only contains an asterisk (*) will take an action turn,
 but won't show a message for that turn.
 
 For example, Ritual of Burdens would be set up with these messages:
- 1. [self-to-char] You whisper your burdens into the air...
- 2. [self-to-char] *
- 3. [self-to-char] You feel the weight of the world lift from your shoulders!
- 4. [self-to-room] $n whispers $s burdens into the air...
- 5. [self-to-room] *
- 6. [self-to-room] $n seems uplifted!
+ 1. [ot-self-to-char] You whisper your burdens into the air...
+ 2. [ot-self-to-char] *
+ 3. [ot-self-to-char] You feel the weight of the world lift from your shoulders!
+ 4. [ot-self-to-room] $n whispers $s burdens into the air...
+ 5. [ot-self-to-room] *
+ 6. [ot-self-to-room] $n seems uplifted!
 
 You can set how a player appears while performing the ability when someone
 types "look" in the room by setting an over-time-longdesc custom message with
@@ -1698,14 +1703,6 @@ Messages when teleporting to rooms:
  Sent right before teleporting: &cself-to-char&0 and &cself-to-room&0
  Sent after self-to-char with bad target: &cfail-self-to-char&0 and &cfail-self-to-room&0
  Sent when appearing: &cspec-to-char&0 and &spec-to-room&0
- 
-Pre-self-to-char
-Self-to-char 1
-
- Ritual of Teleportation> 
-Self-to-char 2
-Fail-self-to-char
-
 
 Messages when teleporting to targets:
  Sent at the start: &cpre-targ-to-char&0 &cpre-targ-to-vict&0 &cpre-targ-to-room&0

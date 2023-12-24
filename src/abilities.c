@@ -4613,17 +4613,14 @@ ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvecto
 * @param obj_data *ovict The targeted object, if any (or NULL).
 * @param vehicle_data *vvict The targeted vehicle (NULL if none).
 * @param ability_data *abil The ability.
-* @param int use_pos For over-time abilities, pass the current message pos. For all others, pass NOTHING instead.
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
-void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data) {
+void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, struct ability_exec *data) {
 	bool any, invis;
 	char buf[MAX_STRING_LENGTH];
 	char *msg;
 	
 	bitvector_t act_flags = ACT_ABILITY;
-	
-	#define _AAM_MSG(type)  (use_pos == NOTHING ? get_custom_message(ABIL_CUSTOM_MSGS(abil), (type)) : get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), (type), use_pos))
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -4638,33 +4635,29 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		// non-violent buff
 		act_flags |= ACT_BUFF;
 	}
-	if (use_pos > 0) {
-		// counts as action spam
-		act_flags |= TO_SPAMMY;
-	}
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 			// to-char
 			any = TRUE;
-			if ((msg = _AAM_MSG(ABIL_CUSTOM_SELF_TO_CHAR))) {
+			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR))) {
 				if (*msg != '*') {
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
 			// to room
-			if ((msg = _AAM_MSG(ABIL_CUSTOM_SELF_TO_ROOM))) {
+			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_ROOM))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
@@ -4673,36 +4666,36 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		else {	// message: ch != vict
 			// to-char
 			any = TRUE;
-			if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 				if (*msg != '*') {
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
 			// to vict
-			if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_VICT))) {
+			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		
 			// to room
-			if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+			if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 				if (*msg != '*') {
 					act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 				}
 			}
-			else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
@@ -4712,24 +4705,24 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	else if (ovict) {	// messaging with obj target
 		// to-char
 		any = TRUE;
-		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
 		// to room
-		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
@@ -4738,24 +4731,24 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	else if (vvict) {	// messaging with vehicle target
 		// to-char
 		any = TRUE;
-		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_CHAR))) {
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR))) {
 			if (*msg != '*') {
 				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		}
 	
 		// to room
-		if ((msg = _AAM_MSG(ABIL_CUSTOM_TARGETED_TO_ROOM))) {
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_ROOM))) {
 			if (*msg != '*') {
 				act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (use_pos == NOTHING && !IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
@@ -4944,6 +4937,105 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 			snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
+	}
+}
+
+
+/**
+* Sends the periodic messages for an over-time/long-action ability. These have
+* no default, and will send nothing if there's no message configured.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param obj_data *ovict The targeted object, if any (or NULL).
+* @param vehicle_data *vvict The targeted vehicle (NULL if none).
+* @param ability_data *abil The ability.
+* @param int use_pos The current message position.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data) {
+	bool any, invis;
+	char *msg;
+	
+	bitvector_t act_flags = ACT_ABILITY;
+	
+	if (!ch || !abil || use_pos == NOTHING) {
+		return;	// no work
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	any = FALSE;
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		// non-violent buff
+		act_flags |= ACT_BUFF;
+	}
+	if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+		// counts as action spam unless violent
+		act_flags |= TO_SPAMMY;
+	}
+	
+	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
+		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+			// to-char
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_SELF_TO_CHAR, use_pos)) && *msg != '*') {
+				any = TRUE;
+				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+			}
+			
+			// to room
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_SELF_TO_ROOM, use_pos)) && *msg != '*') {
+				act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
+			}
+		}
+		else {	// message: ch != vict
+			// to-char
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR, use_pos)) && *msg != '*') {
+				any = TRUE;
+				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+			}
+			
+			// to vict
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_VICT, use_pos)) && *msg != '*') {
+				act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
+			}
+			
+			// to room
+			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_ROOM, use_pos)) && *msg != '*') {
+				act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
+			}
+		}
+	}
+	else if (ovict) {	// messaging with obj target
+		// to-char
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR, use_pos)) && *msg != '*') {
+			any = TRUE;
+			act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
+		}
+	
+		// to room
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_ROOM, use_pos)) && *msg != '*') {
+			act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
+		}
+	}
+	else if (vvict) {	// messaging with vehicle target
+		// to-char
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR, use_pos)) && *msg != '*') {
+			any = TRUE;
+			act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
+		}
+	
+		// to room
+		if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_ROOM, use_pos)) && *msg != '*') {
+			act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
+		}
+	}
+	
+	// mark this now
+	if (data && any) {
+		data->sent_any_msg = TRUE;
 	}
 }
 
@@ -5427,7 +5519,7 @@ void perform_over_time_ability(char_data *ch) {
 	
 	// message position is controlled by action timer
 	GET_ACTION_TIMER(ch) += 1;
-	send_ability_activation_messages(ch, vict, ovict, vvict, abil, GET_ACTION_TIMER(ch), data);
+	send_ability_over_time_messages(ch, vict, ovict, vvict, abil, GET_ACTION_TIMER(ch), data);
 	
 	// detect continuing?
 	if (vict && vict != ch && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
@@ -5480,7 +5572,7 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 		return;	// nothing to see here
 	}
 	
-	send_ability_activation_messages(ch, vict, ovict, vvict, abil, 0, data);
+	send_ability_over_time_messages(ch, vict, ovict, vvict, abil, 0, data);
 	
 	start_action(ch, ACT_OVER_TIME_ABILITY, 0);
 	GET_ACTION_VNUM(ch, 0) = ABIL_VNUM(abil);
@@ -6153,9 +6245,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	}
 	
 	// main messaging
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-		send_ability_activation_messages(ch, vict, ovict, vvict, abil, NOTHING, data);
-	}
+	send_ability_activation_messages(ch, vict, ovict, vvict, abil, data);
 	
 	// run the abilities
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {

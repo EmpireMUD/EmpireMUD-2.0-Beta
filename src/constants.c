@@ -359,6 +359,11 @@ const char *ability_custom_types[] = {
 	"spec-to-vict",
 	"spec-to-room",	// 30
 	"no-argument",
+	"ot-self-to-char",
+	"ot-self-to-room",
+	"ot-targ-to-char",
+	"ot-targ-to-vict",	// 35
+	"ot-targ-to-room",
 	"\n"
 };
 
@@ -379,6 +384,8 @@ const char *ability_custom_type_help =
 "&w Special messaging for some abilities: spec-to-char spec-to-vict spec-to-room&0\r\n"
 " When turning off a 'toggle' ability: toggle-to-char toggle-to-room\r\n"
 "&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n"
+" Over time messages with no target: ot-self-to-char ot-self-to-room\r\n"
+"&w Over time messsages with target: ot-targ-to-char ot-targ-to-vict ot-targ-to-room&0\r\n"
 " Other messages: no-argument\r\n";
 
 
