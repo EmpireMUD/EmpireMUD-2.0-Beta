@@ -2520,7 +2520,7 @@ ACMD(do_buffs) {
 		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
 			continue;	// no buff we can detect
 		}
-		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM)) {
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY)) {
 			continue;	// not a targeted character buff
 		}
 		

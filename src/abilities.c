@@ -5896,7 +5896,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		// if no target specified, and the spell isn't violent, default to self
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && !ABIL_IS_VIOLENT(abil)) {
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY) && !IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && !ABIL_IS_VIOLENT(abil)) {
 			vict = ch;
 			has = TRUE;
 		}
@@ -5913,7 +5913,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	
 	// 3. target validation
 	if (!has) {
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY | ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
 		else {
