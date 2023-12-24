@@ -6077,7 +6077,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE, should_charge = FALSE;
+	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -6152,8 +6152,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		any_success |= data->success;
 		data->success = FALSE;
 		
-		// store should-charge for later and clear it so each section can trigger it
-		should_charge |= data->should_charge_cost;
+		// clear this-- these abilities always charge, and this would prevent messages on other targets
 		data->should_charge_cost = TRUE;
 		
 		// in case no_msg was triggered by call_ability_one:
@@ -6174,18 +6173,22 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	// determine these
 	data->sent_fail_msg |= sent_any_fail;
 	data->success |= any_success;	// any success is a success
-	data->should_charge_cost = should_charge;	// can be turned off by all types, but any type on turns it on
+	data->should_charge_cost = TRUE;	// always charge for multis
 	
 	// did we even hit anybody
 	if (data->total_targets == 0) {
 		if (!data->no_msg && !IS_SET(run_mode, RUN_ABIL_HOOKED)) {
-			msg_to_char(ch, "There were no valid targets.\r\n");
+			// not currently showing this because they'd have seen immune messages and an activation message
+			// msg_to_char(ch, "There were no valid targets.\r\n");
 		}
 		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
 			// this will refund it if possible
 			cancel_action(ch);
 		}
-		data->should_charge_cost = FALSE;
+		// currently charging for these anyway
+		// data->should_charge_cost = FALSE;
+		
+		// block fail message
 		data->no_msg = TRUE;
 	}
 	
