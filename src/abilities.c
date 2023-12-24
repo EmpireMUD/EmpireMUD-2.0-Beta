@@ -10034,8 +10034,8 @@ OLC_MODULE(abiledit_hook) {
 						msg_to_char(ch, "No attack type given.\r\n");
 						return;
 					}
-					else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
-						msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+					else if (!(amd = find_attack_message_by_name_or_vnum(val_arg, FALSE))) {
+						msg_to_char(ch, "Unknown attack message '%s'.\r\n", val_arg);
 						return;
 					}
 					else {
