@@ -6077,7 +6077,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE;
+	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE, should_charge = FALSE;
 	int more_targets;
 	
 	if (data->stop) {
@@ -6152,6 +6152,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		any_success |= data->success;
 		data->success = FALSE;
 		
+		// store should-charge for later and clear it so each section can trigger it
+		should_charge |= data->should_charge_cost;
+		data->should_charge_cost = TRUE;
+		
 		// in case no_msg was triggered by call_ability_one:
 		if (data->no_msg && !no_msg) {
 			data->no_msg = FALSE;
@@ -6167,9 +6171,10 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 	}
 	
-	// restore these
+	// determine these
 	data->sent_fail_msg |= sent_any_fail;
-	data->success |= any_success;
+	data->success |= any_success;	// any success is a success
+	data->should_charge_cost = should_charge;	// can be turned off by all types, but any type on turns it on
 	
 	// did we even hit anybody
 	if (data->total_targets == 0) {
