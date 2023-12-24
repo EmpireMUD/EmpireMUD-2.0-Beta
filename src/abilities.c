@@ -1366,6 +1366,28 @@ struct ability_data_list *copy_data_list(struct ability_data_list *input) {
 
 
 /**
+* Copies ability type list.
+*
+* @param struct copy_ability_type_list *input_list The list to copy.
+* @return struct copy_ability_type_list* The copied list.
+*/
+struct ability_type *copy_ability_type_list(struct ability_type *input_list) {
+	struct ability_type *atl, *new_atl, *list;
+	
+	// copy typess in order
+	list = NULL;
+	LL_FOREACH(input_list, atl) {
+		CREATE(new_atl, struct ability_type, 1);
+		*new_atl = *atl;
+		new_atl->next = NULL;
+		LL_APPEND(list, new_atl);
+	}
+	
+	return list;
+}
+
+
+/**
 * Finds and removes an entry from an ability data list, by type + vnum + misc.
 *
 * @param ability_data *abil Which ability.
@@ -8783,6 +8805,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		*new = *input;
 
 		// copy things that are pointers
+		ABIL_TYPE_LIST(new) = copy_ability_type_list(ABIL_TYPE_LIST(input));
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
 		ABIL_RESOURCE_COST(new) = copy_resource_list(ABIL_RESOURCE_COST(input));
