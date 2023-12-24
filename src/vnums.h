@@ -43,7 +43,6 @@
 #define BOARD_IMM  2
 
 // Natural resources
-#define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
 #define o_WHEAT  141
 #define o_HOPS  143
@@ -80,7 +79,6 @@
 #define COMP_LUMBER  6000	// for 'tunnel'
 #define COMP_PILLAR  6015	// for 'tunnel'
 #define COMP_ROCK  6050	// for 'lay' (road)
-#define COMP_CLAY  6090	// for workforce bricks
 #define COMP_COMMON_METAL  6720	// for 'barde'
 #define COMP_NAILS  6790	// for 'tunnel' and default maintenance
 #define COMP_ROPE  6880	// for 'tie'
@@ -202,14 +200,9 @@
 #define COOLDOWN_OUTRAGE  2009
 #define COOLDOWN_MIRRORIMAGE  2017
 #define COOLDOWN_REJUVENATE  2021
-#define COOLDOWN_ENTANGLE  2025
 #define COOLDOWN_HEARTSTOP  2026
 #define COOLDOWN_TAME  2033
 #define COOLDOWN_SEARCH  2034
-#define COOLDOWN_BACKSTAB  2038
-#define COOLDOWN_BLIND  2040
-#define COOLDOWN_WEAKEN  2043
-#define COOLDOWN_MOONRISE  2044
 #define COOLDOWN_ALTERNATE  2045
 #define COOLDOWN_EARTHMELD  2048
 #define COOLDOWN_SHADOWCAGE  2049
