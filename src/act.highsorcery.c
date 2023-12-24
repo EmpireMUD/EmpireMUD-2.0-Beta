@@ -28,32 +28,9 @@
 
 /**
 * Contents:
-*   Data
 *   Helpers
 *   Commands
 */
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// DATA ////////////////////////////////////////////////////////////////////
-
-// for do_disenchant
-// TODO updates for this:
-//  - this should be moved to a live config for general disenchant -> possibly global interactions
-//  - add the ability to set disenchant results by gear or scaled level
-//  - add an obj interaction to allow custom disenchant results
-const struct {
-	obj_vnum vnum;
-	double chance;
-} disenchant_data[] = {
-	{ o_LIGHTNING_STONE, 5 },
-	{ o_BLOODSTONE, 5 },
-	{ o_IRIDESCENT_IRIS, 5 },
-	{ o_GLOWING_SEASHELL, 5 },
-
-	// this must go last
-	{ NOTHING, 0.0 }
-};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -246,78 +223,6 @@ void summon_materials(char_data *ch, char *argument) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
-
-ACMD(do_disenchant) {
-	struct obj_apply *apply, *next_apply;
-	obj_data *obj, *reward;
-	int iter, prc, rnd;
-	obj_vnum vnum = NOTHING;
-	int cost = 5;
-	
-	one_argument(argument, arg);
-	
-	if (!can_use_ability(ch, ABIL_DISENCHANT, MANA, cost, NOTHING)) {
-		// sends its own messages
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Disenchant what?\r\n");
-	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
-		return;
-	}
-	else if (!bind_ok(obj, ch)) {
-		msg_to_char(ch, "You can't disenchant something that is bound to someone else.\r\n");
-	}
-	else if (!OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
-		act("$p is not even enchanted.", FALSE, ch, obj, NULL, TO_CHAR);
-	}
-	else {
-		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
-		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
-		
-		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
-			next_apply = apply->next;
-			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
-				LL_DELETE(GET_OBJ_APPLIES(obj), apply);
-				free(apply);
-			}
-		}
-		
-		act("You hold $p over your head and shout 'KA!' as you release the mana bound to it!\r\nThere is a burst of red light from $p and then it fizzles and is disenchanted.", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.", FALSE, ch, obj, NULL, TO_ROOM);
-		gain_ability_exp(ch, ABIL_DISENCHANT, 33.4);
-		
-		request_obj_save_in_world(obj);
-		
-		// obj back?
-		if (skill_check(ch, ABIL_DISENCHANT, DIFF_MEDIUM)) {
-			rnd = number(1, 10000);
-			prc = 0;
-			for (iter = 0; disenchant_data[iter].vnum != NOTHING && vnum == NOTHING; ++iter) {
-				prc += disenchant_data[iter].chance * 100;
-				if (rnd <= prc) {
-					vnum = disenchant_data[iter].vnum;
-				}
-			}
-		
-			if (vnum != NOTHING) {
-				reward = read_object(vnum, TRUE);
-				obj_to_char(reward, ch);
-				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
-				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
-				if (load_otrigger(reward)) {
-					get_otrigger(reward, ch, FALSE);
-				}
-			}
-		}
-		
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DISENCHANT, 0, NULL, obj, NULL, NULL, NOBITS);
-	}
-}
-
 
 ACMD(do_mirrorimage) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
