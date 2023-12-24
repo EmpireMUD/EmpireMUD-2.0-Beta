@@ -151,13 +151,14 @@ DIVERSION
 Diversion
 Stealth Synergy Ability: 100 Trade
 Debuff type:  mental
-Cost:  50 move
+Linked trait:  Charisma
+Cost:  20 move + 10 per additional target
 Cooldown:  30 seconds
 Usage:  diversion
 
-You create a flashy diversion, penalizing all enemies. The first victim loses
-Wits equal to your Charisma. Each additional victim loses Wits equal to half
-your Charisma (rounded up) instead. This effect lasts 15 seconds.
+You create a flashy diversion, penalizing all enemies with reduced Wits. The
+first target receives a larger penalty; other targets are lower. This effect
+lasts 15 seconds.
 #
 ESCAPE
 

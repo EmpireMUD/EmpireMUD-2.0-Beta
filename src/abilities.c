@@ -6212,6 +6212,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	double total_scale = 0.0;
 	int iter;
+	struct ability_exec_type *aet;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
@@ -6224,8 +6225,16 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
 			call_prep_abil(do_ability_data[iter].prep_func);
 			
-			// for cost later
-			total_scale += get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
+			// look up data from the prep func
+			aet = get_ability_type_data(data, do_ability_data[iter].type);
+			
+			// reduce points if needed
+			if (ABILITY_FLAGGED(abil, ABILF_REDUCED_ON_EXTRA_TARGETS) && data->total_targets > 0) {
+				aet->scale_points /= 2;
+			}
+			
+			// save for cost later
+			total_scale += aet->scale_points;
 		}
 	}
 	data->max_scale = MAX(total_scale, data->max_scale);

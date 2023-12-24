@@ -1071,6 +1071,8 @@ The following ability flags are available:
  &cUNSCALED-PENALTY&0 - Negative buff attributes do not scale; positives do.
  &cSTOP-ON-MISS&0 - Attack or Damage abilities that miss won't perform their
    other types, such as buffs or conjures.
+ &cREDUCED-ON-EXTRA-TARGETS&0 - For multi-targeting, scaled down 50% after the
+   first target.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

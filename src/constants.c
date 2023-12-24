@@ -170,6 +170,7 @@ const char *ability_flags[] = {
 	"NOT-IN-DARK",	// 25
 	"UNSCALED-PENALTY",
 	"STOP-ON-MISS",
+	"REDUCED-ON-EXTRA-TARGETS",
 	"\n"
 };
 
@@ -204,6 +205,7 @@ const char *ability_flag_notes[] = {
 	"",	// 25 - ABILF_NOT_IN_DARK
 	"",	// ABILF_UNSCALED_PENALTY
 	"",	// ABILF_STOP_ON_MISS
+	"reduced on extra targets",
 	"\n"
 };
 
