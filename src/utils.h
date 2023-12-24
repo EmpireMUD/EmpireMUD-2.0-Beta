@@ -2049,7 +2049,9 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 // abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
+void add_all_gain_hooks(char_data *ch);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
+void apply_all_ability_techs(char_data *ch);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
 bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc);

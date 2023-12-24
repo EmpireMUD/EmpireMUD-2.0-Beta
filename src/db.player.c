@@ -53,9 +53,7 @@ extern int top_account_id;
 
 // external funcs
 ACMD(do_slash_channel);
-void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
-void apply_all_ability_techs(char_data *ch);
 EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);

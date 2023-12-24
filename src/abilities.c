@@ -31,14 +31,17 @@
 * Contents:
 *   Details screen
 *   Helpers
+*   Ability Interaction Funcs
 *   Ability Actions
 *   Ability Effects and Limits
-*   Ability Interaction Funcs
+*   Ability Prep Functions
+*   Ability Do Functions
 *   Ability Lookups
 *   Ability Messaging
 *   Abilities Over Time
-*   Ability Commands
-*   Utilities
+*   Ability Core Functions
+*   Player Utilities
+*   OLC Utilities
 *   Database
 *   OLC Handlers
 *   Displays
@@ -54,11 +57,9 @@ const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | 
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
+void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room, bool send_msgs, bool *fatal_error);
-INTERACTION_FUNC(devastate_crop);
-INTERACTION_FUNC(devastate_trees);
-INTERACTION_FUNC(disenchant_obj_interact);
 char *estimate_ability_cost(char_data *ch, ability_data *abil);
 struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type);
 void free_ability_exec(struct ability_exec *data);
@@ -69,6 +70,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
+void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct ability_exec *data);
 void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, struct ability_exec *data);
 
 
@@ -537,245 +539,6 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 
 
 /**
-* String display for one ADL item.
-*
-* @param struct ability_data_list *adl The data item to show.
-* @return char* The string to display.
-*/
-char *ability_data_display(struct ability_data_list *adl) {
-	static char output[MAX_STRING_LENGTH];
-	char type_str[256], part[256];
-	
-	prettier_sprintbit(adl->type, ability_data_types, type_str);
-	
-	// ADL_x: display by type
-	switch (adl->type) {
-		case ADL_PLAYER_TECH: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
-			break;
-		}
-		case ADL_EFFECT: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
-			break;
-		}
-		case ADL_READY_WEAPON: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
-			break;
-		}
-		case ADL_SUMMON_MOB: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
-			break;
-		}
-		case ADL_LIMITATION: {
-			// ABLIM_x:
-			switch (ability_limitation_misc[adl->vnum]) {
-				case ABLIM_ITEM_TYPE: {
-					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
-					break;
-				}
-				case ABLIM_ATTACK_TYPE: {
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
-					break;
-				}
-				case ABLIM_WEAPON_TYPE: {
-					sprinttype(adl->misc, weapon_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
-					break;
-				}
-				case ABLIM_DAMAGE_TYPE: {
-					sprinttype(adl->misc, damage_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
-					break;
-				}
-				case ABLIM_ROLE: {
-					sprinttype(adl->misc, class_role, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
-					break;
-				}
-				case ABLIM_OBJ_FLAG: {
-					sprintbit(adl->misc, extra_bits, part, FALSE);
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
-					break;
-				}
-				case ABLIM_NOTHING:
-				default: {
-					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
-					break;
-				}
-			}
-			break;
-		}
-		case ADL_PAINT_COLOR: {
-			snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
-			break;
-		}
-		case ADL_ACTION: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
-			break;
-		}
-		case ADL_RANGE: {
-			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
-			break;
-		}
-		case ADL_PARENT: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
-			break;
-		}
-		default: {
-			snprintf(output, sizeof(output), "%s: ???", type_str);
-			break;
-		}
-	}
-	
-	return output;
-}
-
-
-/**
-* String display for one ability hook.
-*
-* @param struct ability_data_list *adl The data item to show.
-* @return char* The string to display.
-*/
-char *ability_hook_display(struct ability_hook *ahook) {
-	static char output[MAX_STRING_LENGTH];
-	char type_str[256], label[256];
-	
-	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
-	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
-	
-	// AHOOK_x: display by type
-	switch (ahook->type) {
-		case AHOOK_ABILITY: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
-			break;
-		}
-		case AHOOK_ATTACK_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
-			break;
-		}
-		case AHOOK_WEAPON_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
-			break;
-		}
-		case AHOOK_DAMAGE_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
-			break;
-		}
-		
-		// simple types
-		case AHOOK_ATTACK:
-		case AHOOK_KILL:
-		case AHOOK_MELEE_ATTACK:
-		case AHOOK_RANGED_ATTACK:
-		case AHOOK_DYING:
-		case AHOOK_RESPAWN:
-		case AHOOK_RESURRECT: {
-			snprintf(output, sizeof(output), "%s", label);
-			break;
-		}
-		default: {
-			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
-			break;
-		}
-	}
-	
-	return output;
-}
-
-
-/**
-* Adds a gain hook for an ability.
-*
-* @param char_data *ch The player to add a hook to.
-* @param ability_data *abil The ability to add a hook for.
-*/
-void add_ability_gain_hook(char_data *ch, ability_data *abil) {
-	struct ability_gain_hook *agh;
-	any_vnum vnum;
-	
-	if (!ch || IS_NPC(ch) || !abil) {
-		return;
-	}
-	
-	vnum = ABIL_VNUM(abil);
-	HASH_FIND_INT(GET_ABILITY_GAIN_HOOKS(ch), &vnum, agh);
-	if (!agh) {
-		CREATE(agh, struct ability_gain_hook, 1);
-		agh->ability = ABIL_VNUM(abil);
-		HASH_ADD_INT(GET_ABILITY_GAIN_HOOKS(ch), ability, agh);
-	}
-	
-	agh->triggers = ABIL_GAIN_HOOKS(abil);
-}
-
-
-/**
-* Sets up the gain hooks for a player's ability on login.
-*
-* @param char_data *ch The player to set up hooks for.
-*/
-void add_all_gain_hooks(char_data *ch) {
-	struct player_ability_data *abil, *next_abil;
-	bool any;
-	int iter;
-	
-	if (!ch || IS_NPC(ch)) {
-		return;
-	}
-	
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
-		any = FALSE;
-		for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
-			if (abil->purchased[iter]) {
-				any = TRUE;
-				add_ability_gain_hook(ch, abil->ptr);
-			}
-		}
-	}
-}
-
-
-/**
-* This function adds a type to the ability's type list, and updates the summary
-* type flags.
-*
-* @param ability_data *abil Which ability we're adding a type to.
-* @param bitvector_t type Which ABILT_ flag.
-* @param int weight How much weight it gets (for scaling).
-*/
-void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
-	bitvector_t total = NOBITS;
-	struct ability_type *at;
-	bool found = FALSE;
-	
-	if (!type) {
-		return;
-	}
-	
-	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
-		total |= at->type;
-		
-		if (at->type == type) {
-			at->weight = weight;
-			found = TRUE;
-		}
-	}
-	
-	if (!found) {
-		CREATE(at, struct ability_type, 1);
-		at->type = type;
-		at->weight = weight;
-		LL_APPEND(ABIL_TYPE_LIST(abil), at);
-	}
-	
-	total |= type;
-	ABIL_TYPES(abil) = total;	// summarize flags
-}
-
-
-/**
 * Builds the bit set for all hooks on the ability.
 *
 * @param ability_data *abil The ability to compile hooks for.
@@ -790,167 +553,6 @@ bitvector_t all_abil_hooks(ability_data *abil) {
 	}
 	
 	return flags;
-}
-
-
-/**
-* Takes the techs from an ability and applies them to a player.
-*
-* @param char_data *ch The player to apply to.
-* @param ability_data *abil The ability whose techs we'll apply.
-*/
-void apply_ability_techs_to_player(char_data *ch, ability_data *abil) {
-	struct ability_data_list *adl;
-	
-	if (IS_NPC(ch) || !IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
-		return;	// no techs to apply
-	}
-	
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type != ADL_PLAYER_TECH) {
-			continue;
-		}
-		
-		// ok
-		add_player_tech(ch, ABIL_VNUM(abil), adl->vnum);
-	}
-}
-
-
-/**
-* Applies all the ability techs from a player's current skill set (e.g. upon
-* login).
-*
-* @param char_data *ch The player.
-*/
-void apply_all_ability_techs(char_data *ch) {
-	struct player_ability_data *plab, *next_plab;
-	ability_data *abil;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		abil = plab->ptr;
-		
-		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
-			continue;
-		}
-		
-		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
-			apply_ability_techs_to_player(ch, abil);
-		}
-	}
-}
-
-
-/**
-* Applies the passive buffs from 1 ability to the player. Call affect_total()
-* when you're done applying passive buffs.
-*
-* @param char_data *ch The player.
-* @param ability_data *abil The passive-buff ability to apply.
-*/
-void apply_one_passive_buff(char_data *ch, ability_data *abil) {
-	double remaining_points = 0, total_points = 0, share, amt;
-	struct ability_exec *data;
-	struct affected_type *af;
-	struct apply_data *apply;
-	int cap, level, total_w = 0;
-	bool unscaled, unscaled_penalty;
-	
-	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
-		return;	// safety first
-	}
-	
-	// remove if already on there
-	remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
-	
-	CREATE(data, struct ability_exec, 1);
-	data->abil = abil;
-	data->matching_role = has_matching_role(ch, abil, FALSE);
-	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
-	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
-	GET_RUNNING_ABILITY_DATA(ch) = data;
-	
-	// things only needed for scaled buffs
-	if (!unscaled) {
-		level = get_approximate_level(ch);
-		if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
-			level = MIN(level, cap);	// constrain by skill level
-		}
-		total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
-		
-		if (total_points < 0) {	// no work
-			GET_RUNNING_ABILITY_DATA(ch) = NULL;
-			free_ability_exec(data);
-			return;
-		}
-	}
-	
-	// affect flags? cost == level 100 ability
-	if (ABIL_AFFECTS(abil)) {
-		if (!unscaled) {
-			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-			// also reset total_points as it's used for weights below
-			total_points = remaining_points = MAX(0, remaining_points);
-		}
-		
-		af = create_flag_aff(ABIL_VNUM(abil), UNLIMITED, ABIL_AFFECTS(abil), ch);
-		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
-		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-	}
-	
-	// determine share for effects
-	if (!unscaled) {
-		total_w = 0;
-		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			if (!apply_never_scales[apply->location]) {
-				if (unscaled_penalty && apply->weight < 0) {
-					// give actual value of penalty, rounded up
-					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
-				}
-				else {
-					// apply directly as weight
-					total_w += ABSOLUTE(apply->weight);
-				}
-			}
-		}
-	}
-	
-	// now create affects for each apply that we can afford
-	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		// unscaled buff?
-		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
-			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
-			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
-			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-			continue;
-		}
-		
-		// scaled version: determine share
-		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
-		if (share > remaining_points) {
-			share = MIN(share, remaining_points);
-		}
-		
-		// determine amount
-		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
-		
-		// and apply?
-		if (share > 0 && amt != 0) {
-			remaining_points -= share;
-			remaining_points = MAX(0, remaining_points);
-			
-			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, amt, ch);
-			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
-			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-		}
-	}
-	
-	GET_RUNNING_ABILITY_DATA(ch) = NULL;
-	free_ability_exec(data);
 }
 
 
@@ -999,21 +601,6 @@ bool check_ability_pre_target(char_data *ch, ability_data *abil) {
 	
 	// ok!
 	return TRUE;
-}
-
-
-/**
-* Audits abilities on startup.
-*/
-void check_abilities(void) {
-	ability_data *abil, *next_abil;
-	
-	HASH_ITER(hh, ability_table, abil, next_abil) {
-		if (ABIL_MASTERY_ABIL(abil) != NOTHING && !find_ability_by_vnum(ABIL_MASTERY_ABIL(abil))) {
-			log("- Ability [%d] %s has invalid mastery ability %d", ABIL_VNUM(abil), ABIL_NAME(abil), ABIL_MASTERY_ABIL(abil));
-			ABIL_MASTERY_ABIL(abil) = NOTHING;
-		}
-	}
 }
 
 
@@ -1082,30 +669,6 @@ void check_available_ability_cost(char_data *ch, ability_data *abil, struct abil
 	if (left > 0 && afford_targets) {
 		*afford_targets = floor((double) left / ABIL_COST_PER_TARGET(abil));
 	}
-}
-
-
-/**
-* This will delete any matching hooks.
-*
-* @param ability_data *abil Which ability to delete hooks from.
-* @param int hook_type Which AHOOK_ const to look for.
-* @param int hook_value Which value to match.
-* @return bool TRUE if abil had that hook and it was deleted, FALSE if not.
-*/
-
-bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value) {
-	struct ability_hook *ahook, *next;
-	bool any = FALSE;
-	
-	LL_FOREACH_SAFE(ABIL_HOOKS(abil), ahook, next) {
-		if (ahook->type == hook_type && ahook->value == hook_value) {
-			LL_DELETE(ABIL_HOOKS(abil), ahook);
-			free(ahook);
-			any = TRUE;
-		}
-	}
-	return any;
 }
 
 
@@ -1311,7 +874,7 @@ bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
 		return FALSE;	// missing resources
 	}
 	
-	// other checks similar to what will be called with messages in call_ability():
+	// other checks similar to what will be called with messages in call_ability_one():
 	if (ABIL_TOTAL_COST(abil) > 0 && GET_CURRENT_POOL(ch, ABIL_COST_TYPE(abil)) < ABIL_TOTAL_COST(abil)) {
 		return FALSE;	// unlikely to afford cost
 	}
@@ -1321,162 +884,6 @@ bool pre_check_hooked_ability(char_data *ch, ability_data *abil) {
 	
 	// ok!
 	return TRUE;
-}
-
-
-/**
-* Copies ability hook list.
-*
-* @param struct ability_hook *input_list The list to copy.
-* @return struct ability_hook* The copied list.
-*/
-struct ability_hook *copy_ability_hooks(struct ability_hook *input_list) {
-	struct ability_hook *hook, *new_hook, *list;
-	
-	// copy hooks in order
-	list = NULL;
-	LL_FOREACH(input_list, hook) {
-		CREATE(new_hook, struct ability_hook, 1);
-		*new_hook = *hook;
-		new_hook->next = NULL;
-		LL_APPEND(list, new_hook);
-	}
-	
-	return list;
-}
-
-
-/**
-* Duplicates a list of ability data.
-*
-* @param struct ability_data_list *input The list to duplicate.
-* @return struct ability_data_list* The copy.
-*/
-struct ability_data_list *copy_data_list(struct ability_data_list *input) {
-	struct ability_data_list *list = NULL, *adl, *iter;
-	
-	LL_FOREACH(input, iter) {
-		CREATE(adl, struct ability_data_list, 1);
-		*adl = *iter;
-		LL_APPEND(list, adl);
-	}
-	
-	return list;
-}
-
-
-/**
-* Copies ability type list.
-*
-* @param struct copy_ability_type_list *input_list The list to copy.
-* @return struct copy_ability_type_list* The copied list.
-*/
-struct ability_type *copy_ability_type_list(struct ability_type *input_list) {
-	struct ability_type *atl, *new_atl, *list;
-	
-	// copy typess in order
-	list = NULL;
-	LL_FOREACH(input_list, atl) {
-		CREATE(new_atl, struct ability_type, 1);
-		*new_atl = *atl;
-		new_atl->next = NULL;
-		LL_APPEND(list, new_atl);
-	}
-	
-	return list;
-}
-
-
-/**
-* Finds and removes an entry from an ability data list, by type + vnum + misc.
-*
-* @param ability_data *abil Which ability.
-* @param int type Which ADL_ type.
-* @param any_vnum vnum Which vnum to remove.
-* @param int misc Which misc value to match.
-* @return bool TRUE if any were removed, FALSE if not found.
-*/
-bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc) {
-	struct ability_data_list *adl, *next;
-	bool any = FALSE;
-	
-	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
-		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
-			LL_DELETE(ABIL_DATA(abil), adl);
-			free(adl);
-			any = TRUE;
-		}
-	}
-	
-	return any;
-}
-
-
-/**
-* Finds and removes an entry from an ability data list, by vnum.
-*
-* @param ability_data *abil Which ability.
-* @param int type Which ADL_ type.
-* @param any_vnum vnum Which vnum to remove.
-* @return bool TRUE if any were removed, FALSE if not found.
-*/
-bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) {
-	struct ability_data_list *adl, *next;
-	bool any = FALSE;
-	
-	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
-		if (adl->type == type && adl->vnum == vnum) {
-			LL_DELETE(ABIL_DATA(abil), adl);
-			free(adl);
-			any = TRUE;
-		}
-	}
-	
-	return any;
-}
-
-
-/**
-* Finds an ability data entry that matches. This version ignores the 'misc'
-* field.
-*
-* @param ability_data *abil Which ability.
-* @param int type Which ADL_ type.
-* @param any_vnum vnum Which vnum to find.
-* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
-*/
-struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int type, any_vnum vnum) {
-	struct ability_data_list *adl;
-	
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type == type && adl->vnum == vnum) {
-			return adl;
-		}
-	}
-	
-	return NULL;
-}
-
-
-/**
-* Finds an ability data entry that matches, including the misc field.
-*
-* @param ability_data *abil Which ability.
-* @param int type Which ADL_ type.
-* @param any_vnum vnum Which vnum to find.
-* @param int misc Which misc to find.
-* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
-*/
-struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, int type, any_vnum vnum, int misc) {
-	struct ability_data_list *adl;
-	
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
-			return adl;
-		}
-	}
-	
-	return NULL;
 }
 
 
@@ -2479,6 +1886,221 @@ int wordcount_ability(ability_data *abil) {
 	count += wordcount_custom_messages(ABIL_CUSTOM_MSGS(abil));
 	
 	return count;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY INTERACTION FUNCS ///////////////////////////////////////////////
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_liquid_interaction) {
+	int amount;
+	
+	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
+		return FALSE;
+	}
+	
+	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
+	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
+	
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
+	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_object_interaction) {
+	int level, num, obj_ok = 0;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	obj_data *obj = NULL;
+	
+	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, level);
+		
+		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(obj, ch);
+		}
+		else {
+			obj_to_room(obj, IN_ROOM(ch));
+		}
+		
+		obj_ok = load_otrigger(obj);
+		if (obj_ok && obj->carried_by == ch) {
+			get_otrigger(obj, ch, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	// messaging?
+	if (obj_ok && obj) {
+		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
+	}
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(conjure_vehicle_interaction) {
+	bool junk;
+	int level, num;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	vehicle_data *veh = NULL;
+	
+	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		veh = read_vehicle(interaction->vnum, TRUE);
+		scale_vehicle_to_level(veh, level);
+		vehicle_to_room(veh, IN_ROOM(ch));
+		
+		// this is borrowed from act.trade.c
+		if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+			if (VEH_CLAIMS_WITH_ROOM(veh)) {
+				// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
+				if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
+					empire_data *emp = get_or_create_empire(ch);
+					if (emp) {
+						int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
+						if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+							claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
+						}
+					}
+				}
+			
+				// and set the owner to the room owner
+				perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			}
+			else {
+				perform_claim_vehicle(veh, GET_LOYALTY(ch));
+			}
+		}
+		
+		special_vehicle_setup(ch, veh);
+		load_vtrigger(veh);
+	}
+	
+	// messaging?
+	if (veh) {
+		send_ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data, NULL);
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* for devastation_ritual
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+*/
+INTERACTION_FUNC(devastate_crop) {
+	char type[256];
+	int num = interaction->quantity, obj_ok = 0;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	crop_data *cp = ROOM_CROP(inter_room);
+	ability_data *abil = data->abil;
+	obj_data *newobj = NULL;
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
+	}
+	
+	while (num-- > 0) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
+		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
+	}
+	
+	if (newobj && obj_ok) {
+		snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
+		strtolower(type);
+		
+		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* for devastation_ritual
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+*/
+INTERACTION_FUNC(devastate_trees) {
+	char type[256];
+	int num, obj_ok = 0;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	obj_data *newobj = NULL;
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
+		scale_item_to_level(newobj, 1);	// minimum level
+		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
+			get_otrigger(newobj, newobj->carried_by, FALSE);
+		}
+	}
+	
+	if (newobj && obj_ok) {
+		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
+		strtolower(type);
+		
+		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
+	}
+	
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(disenchant_obj_interact) {
+	int num, obj_ok = 0;
+	obj_data *obj = NULL;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
+	ability_data *abil = data->abil;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok) {
+			get_otrigger(obj, ch, FALSE);
+		}
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	// messaging
+	if (obj_ok && obj) {
+		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
+	}
+	
+	return TRUE;
 }
 
 
@@ -3634,217 +3256,1168 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// ABILITY INTERACTION FUNCS ///////////////////////////////////////////////
+//// ABILITY PREP FUNCTIONS //////////////////////////////////////////////////
 
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(conjure_liquid_interaction) {
-	int amount;
-	
-	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
-		return FALSE;
-	}
-	
-	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
-	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
-	
-	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
-	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
-	
-	return TRUE;
+/**
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_action_ability) {
+	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
 }
 
 
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(conjure_object_interaction) {
-	int level, num, obj_ok = 0;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	obj_data *obj = NULL;
+/**
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_attack_ability) {
+	get_ability_type_data(data, ABILT_ATTACK)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ATTACK, data);
+}
+
+
+/**
+* This function 'stops' if the ability is a toggle and you're toggling it off,
+* which keeps it from charging/cooldowning.
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_buff_ability) {
+	any_vnum affect_vnum;
+	bool was_sleep_aff;
 	
-	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
+	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY | AFF_EARTHMELD;
 	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, level);
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		was_sleep_aff = AFF_FLAGGED(vict, SLEEP_AFFS) ? TRUE : FALSE;
 		
-		if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-			obj_to_char(obj, ch);
+		send_ability_toggle_messages(vict, abil, data);
+		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
+		
+		// some affs come with forced sleep; toggling them updates player to resting
+		if (was_sleep_aff && GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(vict, SLEEP_AFFS)) {
+			GET_POS(ch) = POS_RESTING;
+		}
+		
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;	// free cancel
+		data->success = TRUE;	// I think this is a success?
+		return;
+	}
+	
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
+		if (vict == ch) {
+			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
 		}
 		else {
-			obj_to_room(obj, IN_ROOM(ch));
+			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
-		
-		obj_ok = load_otrigger(obj);
-		if (obj_ok && obj->carried_by == ch) {
-			get_otrigger(obj, ch, FALSE);
-		}
+
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
+		data->success = FALSE;
+		return;
 	}
 	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	// messaging?
-	if (obj_ok && obj) {
-		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
-	}
-	
-	return TRUE;
+	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
 }
 
 
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(conjure_vehicle_interaction) {
-	bool junk;
-	int level, num;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	vehicle_data *veh = NULL;
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_building_damage_ability) {
+	get_ability_type_data(data, ABILT_BUILDING_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUILDING_DAMAGE, data);
+}
+
+
+/**
+* Determines if ovict is a valid target for creating the liquid.
+* 
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_conjure_liquid_ability) {
+	char buf[256];
+	struct interaction_item *interact;
+	generic_data *existing, *gen;
 	
-	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
+	get_ability_type_data(data, ABILT_CONJURE_LIQUID)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_LIQUID, data);
 	
-	for (num = 0; num < interaction->quantity; ++num) {
-		veh = read_vehicle(interaction->vnum, TRUE);
-		scale_vehicle_to_level(veh, level);
-		vehicle_to_room(veh, IN_ROOM(ch));
-		
-		// this is borrowed from act.trade.c
-		if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
-			if (VEH_CLAIMS_WITH_ROOM(veh)) {
-				// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
-				if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
-					empire_data *emp = get_or_create_empire(ch);
-					if (emp) {
-						int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk, NULL);
-						if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
-							claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
-						}
-					}
-				}
+	if (!ovict) {
+		// should this error? or just do nothing
+		// data->stop = TRUE;
+		return;
+	}
+	if (!IS_DRINK_CONTAINER(ovict)) {
+		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+		CANCEL_ABILITY(data);
+		return;
+	}
+	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
+		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+		CANCEL_ABILITY(data);
+		return;
+	}
+	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
+		// check compatible contents
+		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+			if (interact->type != INTERACT_LIQUID_CONJURE) {
+				continue;	// not a liquid
+			}
+			if (!(gen = find_generic(interact->vnum, GENERIC_LIQUID))) {
+				continue;	// invalid liquid
+			}
+			if (GEN_VNUM(gen) == GEN_VNUM(existing)) {
+				continue;	// ok: same liquid
+			}
 			
-				// and set the owner to the room owner
-				perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			// ok, both are different liquids... is it a problem?
+			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
+				// 1 is not water, or existing is not basic water
+				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
+				act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+				CANCEL_ABILITY(data);
+				return;
+			}
+		}
+	}
+	
+	// otherwise it seems ok
+}
+
+
+/**
+* Determines if player can conjure objects.
+* 
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_conjure_object_ability) {
+	bool has_any, one_ata, any_inv, any_room;
+	int any_size, iter;
+	struct interaction_item *interact;
+	obj_data *proto;
+	
+	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
+	
+	one_ata = ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) ? TRUE : FALSE;
+	
+	// check interactions
+	any_size = 0;
+	any_inv = any_room = FALSE;
+	
+	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+		if (interact->type != INTERACT_OBJECT_CONJURE) {
+			continue;	// not an object
+		}
+		if (!(proto = obj_proto(interact->vnum))) {
+			continue;	// no proto
+		}
+		
+		// data to find
+		any_size = MAX(any_size, obj_carry_size(proto));
+		has_any = FALSE;
+		
+		if (CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
+			any_inv = TRUE;
+			for (iter = 0; iter < NUM_WEARS && !has_any; ++iter) {
+				if (one_ata && GET_EQ(ch, iter) && count_objs_by_vnum(interact->vnum, GET_EQ(ch, iter))) {
+					has_any = TRUE;
+				}
+			}
+			if (one_ata && !has_any && count_objs_by_vnum(interact->vnum, ch->carrying)) {
+				has_any = TRUE;
+			}
+			
+			// oops
+			if (one_ata && has_any) {
+				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
+			}
+		}
+		else {	// no-take
+			any_room = TRUE;
+			if (one_ata && count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
+				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
+				has_any = TRUE;
+			}
+		}
+		
+		if (one_ata && has_any) {
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+	
+	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	if (any_room && any_size > 0 && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && (any_size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
+		msg_to_char(ch, "You can't use that ability because the room is full.\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+}
+
+
+/**
+* Determines if player can conjure vehicles.
+* 
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_conjure_vehicle_ability) {
+	struct interaction_item *interact;
+	vehicle_data *proto, *viter;
+	
+	get_ability_type_data(data, ABILT_CONJURE_VEHICLE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_VEHICLE, data);
+	
+	// check interactions
+	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
+		if (interact->type != INTERACT_VEHICLE_CONJURE) {
+			continue;	// not an object
+		}
+		if (!(proto = vehicle_proto(interact->vnum))) {
+			continue;	// no proto
+		}
+		
+		// check room for any if one-at-a-time
+		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
+				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
+					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | TO_SLEEP | ACT_VEH_VICT);
+					CANCEL_ABILITY(data);
+					return;
+				}
+			}
+		}
+		
+		// check vehicle flagging
+		if (VEH_FLAGGED(proto, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)))) {
+			msg_to_char(ch, "You can't do that inside a building.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(proto, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
+			msg_to_char(ch, "You can't do that inside a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
+			CANCEL_ABILITY(data);
+			return;
+		}
+		if (VEH_SIZE(proto) > 0 && total_vehicle_size_in_room(IN_ROOM(ch), NULL) + VEH_SIZE(proto) > config_get_int("vehicle_size_per_tile")) {
+			msg_to_char(ch, "This area is already too full to do that.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		if (VEH_SIZE(proto) == 0 && total_small_vehicles_in_room(IN_ROOM(ch), NULL) >= config_get_int("vehicle_max_per_tile")) {
+			msg_to_char(ch, "This area is already too full to do that.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_damage_ability) {
+	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_dot_ability) {
+	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
+}
+
+
+/**
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_paint_building_ability) {
+	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_ready_weapon_ability) {
+	bool found;
+	int iter;
+	obj_data *obj;
+	struct ability_data_list *adl;
+	
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE)) {
+		// look for equipped item to toggle
+		found = FALSE;
+		for (iter = 0; iter < NUM_WEARS; ++iter) {
+			if (!(obj = GET_EQ(ch, iter))) {
+				continue;	// no obj
+			}
+			
+			// check for match
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_READY_WEAPON && adl->vnum == GET_OBJ_VNUM(obj)) {
+					if (!found) {
+						// only message once
+						send_ability_toggle_messages(ch, abil, data);
+					}
+					found = TRUE;
+					
+					// char message
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+					}
+					else {
+						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+					}
+	
+					// room message
+					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+					}
+					else {
+						act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					}
+				
+					// this may extract it
+					unequip_char_to_inventory(ch, iter);
+				}
+			}
+		}
+		
+		if (found) {
+			determine_gear_level(ch);
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;	// free cancel
+			data->success = TRUE;	// I think this is a success?
+		}
+		return;
+	}	// end toggle
+	
+	// determine what they want to ready?
+	data->ready_weapon_val = NOTHING;
+	
+	if (*argument) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && (obj = obj_proto(adl->vnum))) {
+				if (multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+					data->ready_weapon_val = adl->vnum;
+					break;
+				}
+			}
+		}
+		
+		if (data->ready_weapon_val == NOTHING) {
+			msg_to_char(ch, "What do you mean, '%s'?\r\n", argument);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_resurrect_ability) {
+	char_data *targ;
+	
+	get_ability_type_data(data, ABILT_RESURRECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESURRECT, data);
+	
+	if (vict) {
+		if (!IS_DEAD(vict)) {
+			if (ch == vict) {
+				msg_to_char(ch, "You're not dead yet.\r\n");
 			}
 			else {
-				perform_claim_vehicle(veh, GET_LOYALTY(ch));
+				msg_to_char(ch, "You can only resurrect a dead person.\r\n");
+			}
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (IS_NPC(vict)) {
+			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (ch != vict && GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		// otherwise probably ok
+	}
+	else if (ovict) {
+		if (!IS_CORPSE(ovict)) {
+			msg_to_char(ch, "That's not a corpse.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (!IS_PC_CORPSE(ovict)) {
+			msg_to_char(ch, "You can only use that on player corpses.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (!(targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
+			msg_to_char(ch, "You can resurrect the corpse of someone who is still playing.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (targ == ch) {
+			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(targ)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+		else if (IS_DEAD(targ) || ovict != find_obj(GET_LAST_CORPSE_ID(targ)) || !IS_CORPSE(ovict)) {
+			// victim has died AGAIN
+			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, targ, TO_CHAR | TO_NODARK | TO_SLEEP);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+}
+
+
+/**
+* This function 'stops' if the ability is a toggle and you're toggling it off,
+* which keeps it from charging/cooldowning.
+* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+PREP_ABIL(prep_room_affect_ability) {
+	any_vnum affect_vnum;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	// toggle off?
+	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
+		send_ability_toggle_messages(ch, abil, data);
+		affect_from_room_by_caster(room_targ, affect_vnum, ch, TRUE);
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;	// free cancel
+		data->success = TRUE;	// I think this is a success?
+		return;
+	}
+	
+	// one-at-a-time?
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
+		msg_to_char(ch, "The area is already affected by that ability.\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_teleport_ability) {
+	room_data *to_room;
+	
+	// determine what we are teleporting to
+	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
+	
+	// see if we're infiltrating
+	// TODO could this be moved to a function
+	if (HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch))) {
+		if (ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
+			// stealthable seems to apply
+			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+				msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+			if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
+				msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+			if (!can_infiltrate(ch, ROOM_OWNER(to_room))) {
+				// sends own message
+				CANCEL_ABILITY(data);
+				return;
+			}
+			
+			// otherwise attempt the infiltrate and logs on failure
+			if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
+				// infiltrate failed -- log it
+				if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
+					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
+				}
+				else {
+					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted infiltrating at (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(to_room), Y_COORD(to_room));
+				}
+				msg_to_char(ch, "You fail to infiltrate.\r\n");
+				CANCEL_ABILITY(data);
+				return;
+			}
+		}
+	}
+	
+	get_ability_type_data(data, ABILT_TELEPORT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_TELEPORT, data);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY DO FUNCTIONS ////////////////////////////////////////////////////
+
+/**
+* Performs an ability action.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_action_ability) {
+	struct ability_data_list *adl;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_ACTION) {
+			continue;
+		}
+		
+		// ABIL_ACTION_x: these should set data->success to TRUE only if they succeed
+		switch (adl->vnum) {
+			case ABIL_ACTION_DETECT_HIDE: {
+				call_do_abil(abil_action_detect_hide);
+				break;
+			}
+			case ABIL_ACTION_DETECT_EARTHMELD: {
+				call_do_abil(abil_action_detect_earthmeld);
+				break;
+			}
+			case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
+				call_do_abil(abil_action_detect_players_around);
+				break;
+			}
+			case ABIL_ACTION_DETECT_ADVENTURES_AROUND: {
+				call_do_abil(abil_action_detect_adventures_around);
+				break;
+			}
+			case ABIL_ACTION_DEVASTATE_AREA: {
+				call_do_abil(abil_action_devastate_area);
+				break;
+			}
+			case ABIL_ACTION_MAGIC_GROWTH: {
+				call_do_abil(abil_action_magic_growth);
+				break;
+			}
+			case ABIL_ACTION_CLOSE_PORTAL: {
+				call_do_abil(abil_action_close_portal);
+				break;
+			}
+			case ABIL_ACTION_APPLY_POISON: {
+				call_do_abil(abil_action_apply_poison);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_PHYSICAL_DOTS: {
+				call_do_abil(abil_action_remove_physical_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_MAGICAL_DOTS: {
+				call_do_abil(abil_action_remove_magical_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_FIRE_DOTS: {
+				call_do_abil(abil_action_remove_fire_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_POISON_DOTS: {
+				call_do_abil(abil_action_remove_poison_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_ALL_DOTS: {
+				call_do_abil(abil_action_remove_all_dots);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_DEBUFFS: {
+				call_do_abil(abil_action_remove_debuffs);
+				break;
+			}
+			case ABIL_ACTION_REMOVE_DRUNK: {
+				call_do_abil(abil_action_remove_drunk);
+				break;
+			}
+			case ABIL_ACTION_TAUNT: {
+				call_do_abil(abil_action_taunt);
+				break;
+			}
+			case ABIL_ACTION_RESCUE_ONE: {
+				call_do_abil(abil_action_rescue_one);
+				break;
+			}
+			case ABIL_ACTION_RESCUE_ALL: {
+				call_do_abil(abil_action_rescue_all);
+				break;
+			}
+			case ABIL_ACTION_HIDE: {
+				call_do_abil(abil_action_hide);
+				break;
+			}
+			case ABIL_ACTION_PUT_TO_SLEEP: {
+				call_do_abil(abil_action_put_to_sleep);
+				break;
+			}
+			case ABIL_ACTION_DISENCHANT_OBJ: {
+				call_do_abil(abil_action_disenchant_obj);
+				break;
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_attack_ability) {
+	int result;
+	
+	if (vict && vict != ch) {
+		result = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+		
+		if (result != 0) {
+			// anything other than a miss is a success
+			data->success = TRUE;
+		}
+		if (result == 0 || IS_DEAD(vict)) {
+			// died?
+			data->stop = TRUE;
+		}
+		if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
+			data->stop = TRUE;
+		}
+	}
+}
+
+
+/**
+* All buff-type abilities come through here. This handles scaling and buff
+* maintenance/replacement.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_buff_ability) {
+	struct affected_type *af;
+	struct apply_data *apply;
+	any_vnum affect_vnum;
+	double total_points = 1, remaining_points = 1, share, amt;
+	int dur, total_w = 1;
+	bool messaged, unscaled, unscaled_penalty;
+	bitvector_t aff_options;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
+	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
+	
+	if (!unscaled) {
+		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
+		
+		// guarantee at least 1 point in here
+		total_points = MAX(1.0, total_points);
+		
+		remaining_points = total_points;
+	}
+	
+	// TODO is this the correct place to check immunities?
+	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+		if (ch == vict) {
+			msg_to_char(ch, "You're immune!\r\n");
+		}
+		else {
+			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		}
+		return;
+	}
+	
+	// determine duration (in seconds)
+	dur = get_ability_duration(ch, abil);
+	
+	messaged = FALSE;	// to prevent duplicates
+	
+	// affect flags? cost == level 100 ability
+	if (ABIL_AFFECTS(abil)) {
+		if (!unscaled) {
+			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+			// reset total_points now, too, as it's used for the weighted share below
+			total_points = remaining_points = MAX(0, remaining_points);
+		}
+		
+		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+		
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_join(vict, af, aff_options);
+		messaged = TRUE;
+	}
+	
+	// determine share for effects
+	if (!unscaled) {
+		total_w = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			if (!apply_never_scales[apply->location]) {
+				if (unscaled_penalty && apply->weight < 0) {
+					// give actual value of penalty, rounded up
+					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
+				}
+				else {
+					// apply directly as weight
+					total_w += ABSOLUTE(apply->weight);
+				}
+			}
+		}
+	}
+	
+	// now create affects for each apply that we can afford
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		// unscaled version?
+		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
+			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
+			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+			affect_join(vict, af, aff_options);
+			messaged = TRUE;
+			continue;
+		}
+		
+		// scaled version: determine share of points
+		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+		if (share > remaining_points) {
+			share = MIN(share, remaining_points);
+		}
+		
+		// determine value of apply
+		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		
+		// and apply it
+		if (share > 0 && amt != 0) {
+			remaining_points -= share;
+			remaining_points = MAX(0, remaining_points);
+			
+			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
+			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
+			affect_join(vict, af, aff_options);
+			messaged = TRUE;
+		}
+	}
+	
+	// check if it kills them
+	if (GET_POS(vict) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
+		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
+		data->stop = TRUE;
+	}
+	
+	data->success = TRUE;
+}
+
+
+/**
+* Deals siege damage to the targeted vehicle or room.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_building_damage_ability) {
+	int dam = 1 + GET_INTELLIGENCE(ch);
+	sector_data *secttype;
+	bld_data *bldtype;
+	
+	if (vvict) {
+		besiege_vehicle(ch, vvict, dam, SIEGE_MAGICAL, NULL);
+		data->success = TRUE;
+	}
+	else if (room_targ) {
+		secttype = SECT(room_targ);
+		bldtype = GET_BUILDING(room_targ);
+		
+		besiege_room(ch, room_targ, dam, NULL);
+		
+		if (SECT(room_targ) != secttype || bldtype != GET_BUILDING(room_targ)) {
+			msg_to_char(ch, "It is destroyed!\r\n");
+			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		data->success = TRUE;
+	}
+}
+
+
+/**
+* Handler for conjure-liquid abilities.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_conjure_liquid_ability) {
+	if (!ovict) {
+		// can do nothing
+		return;
+	}
+	
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_LIQUID_CONJURE, IN_ROOM(ch), NULL, ovict, NULL, conjure_liquid_interaction);
+}
+
+
+/**
+* Handler for conjure-object abilities.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_conjure_object_ability) {
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
+}
+
+
+/**
+* Handler for conjure-vehicle abilities.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_conjure_vehicle_ability) {
+	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
+}
+
+
+/**
+* All damage abilities come through here.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_damage_ability) {
+	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
+	double reduced_scale;
+	int result, avail, dmg;
+	
+	// fine-tuning ability damage
+	double arbitrary_modifier = 4.0;
+	
+	// smoother scaling, for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
+	
+	// 1. calculate damage
+	dmg = subdata->scale_points * arbitrary_modifier;
+	
+	// 2. check costs and reduce by available mana/etc
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		check_available_ability_cost(ch, abil, data, &avail, NULL);
+		dmg = MIN(dmg, avail);
+	}
+	
+	// 3. store amount of damage now -- before bonus-physical
+	data->total_amount += dmg;
+	
+	// 4. bonus damage
+	switch (ABIL_DAMAGE_TYPE(abil)) {
+		case DAM_PHYSICAL: {
+			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale;
+			break;
+		}
+		case DAM_MAGICAL: {
+			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale;
+			break;
+		}
+	}
+	
+	// 5. do it
+	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
+	
+	if (result != 0) {
+		// anything other than a miss is a hit
+		data->success = TRUE;
+	}	
+	if (result < 0 || IS_DEAD(vict)) {
+		// dedz
+		data->stop = TRUE;
+	}
+	if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
+		data->stop = TRUE;
+	}
+}
+
+
+/**
+* All damage-over-time abilities come through here. This handles scaling and
+* stacking.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_dot_ability) {
+	any_vnum affect_vnum;
+	double points, reduced_scale;
+	int dur, dmg;
+	
+	// fine-tuning ability damage
+	double arbitrary_modifier = 1.5;
+	
+	// smoother scaling, for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
+	
+	points = get_ability_type_data(data, ABILT_DOT)->scale_points;
+	
+	if (points <= 0) {
+		return;
+	}
+	
+	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		return;
+	}
+	
+	// determine duration
+	dur = get_ability_duration(ch, abil);
+	
+	dmg = points * arbitrary_modifier;
+	
+	// bonus damage
+	switch (ABIL_DAMAGE_TYPE(abil)) {
+		case DAM_PHYSICAL: {
+			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
+			break;
+		}
+		case DAM_MAGICAL: {
+			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
+			break;
+		}
+	}
+
+	dmg = MAX(1, dmg);
+	apply_dot_effect(vict, affect_vnum, dur, ABIL_DAMAGE_TYPE(abil), dmg, ABIL_MAX_STACKS(abil), ch);
+	data->success = TRUE;
+}
+
+
+/**
+* Applies color to the building.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_paint_building_ability) {
+	struct ability_data_list *adl;
+	room_data *home;
+	int count = 0, color = -1;
+	
+	// find a color
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_PAINT_COLOR) {
+			continue;
+		}
+		if (!number(0, count++)) {
+			color = adl->vnum;
+		}
+	}
+	
+	if (color != -1 && room_targ && (home = HOME_ROOM(room_targ)) && IS_ANY_BUILDING(home)) {
+		set_room_extra_data(home, ROOM_EXTRA_PAINT_COLOR, color);
+	}
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_ready_weapon_ability) {
+	int count, pos;
+	struct ability_data_list *adl;
+	obj_data *obj, *proto;
+	
+	// did we inherit one?
+	any_vnum obj_vnum = data->ready_weapon_val;
+	
+	// pick at random
+	if (obj_vnum == NOTHING || obj_vnum == 0) {
+		count = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && !number(0, count++)) {
+				obj_vnum = adl->vnum;
+			}
+		}
+	}
+	
+	// did we find one?
+	if (obj_vnum == NOTHING || !(proto = obj_proto(obj_vnum))) {
+		// no success
+		return;
+	}
+	
+	// determine wear position
+	if (CAN_WEAR(proto, ITEM_WEAR_WIELD)) {
+		pos = WEAR_WIELD;
+	}
+	else if (CAN_WEAR(proto, ITEM_WEAR_HOLD)) {
+		pos = WEAR_HOLD;	// ONLY if they can't wield it
+	}
+	else if (CAN_WEAR(proto, ITEM_WEAR_RANGED)) {
+		pos = WEAR_RANGED;
+	}
+	else {
+		log("SYSERR: %s trying to ready %d %s with no valid wear bits (Ability %d %s)", GET_NAME(ch), GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), ABIL_VNUM(abil), ABIL_NAME(abil));
+		// fail / no success
+		return;
+	}
+	
+	// attempt to remove existing item
+	if (GET_EQ(ch, pos)) {
+		perform_remove(ch, pos);
+		
+		// did it work? if not, player got an error
+		if (GET_EQ(ch, pos)) {
+			return;
+		}
+	}
+	
+	// load the object
+	obj = read_object(obj_vnum, TRUE);
+	scale_item_to_level(obj, level);
+	equip_char(ch, obj, pos);
+	
+	send_ability_per_item_messages(ch, obj, 1, abil, data, NULL);
+	
+	// after messaging (objs may purge on load trig)
+	load_otrigger(obj);
+	// this goes directly to equipment so a GET trigger does not fire
+	
+	determine_gear_level(ch);
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_resurrect_ability) {
+	char_data *targ;
+	
+	if (ch == vict) {
+		perform_resurrection(ch, ch, IN_ROOM(ch), ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	else if (vict) {
+		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
+		add_offer(vict, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	else if (ovict && (targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
+		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, targ, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
+		add_offer(targ, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
+		data->success = TRUE;
+	}
+	// otherwise no success
+}
+
+
+/**
+* All room-affect abilities come through here.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_room_affect_ability) {
+	struct affected_type *af;
+	any_vnum affect_vnum;
+	double total_points = 1, remaining_points = 1;
+	int dur;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+	
+	total_points = get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points;
+	remaining_points = total_points;
+	
+	if (total_points <= 0) {
+		return;
+	}
+	
+	// determine duration (in seconds)
+	dur = get_ability_duration(ch, abil);
+	
+	// affect flags? cost == level 100 ability
+	if (room_targ && ABIL_AFFECTS(abil)) {
+		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points = MAX(0, remaining_points);
+		
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_to_room(room_targ, af);
+		free(af);	// affect_to_room duplicates affects
+	}
+	
+	data->success = TRUE;
+}
+
+
+/**
+* Various types of teleportation.
+*
+* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+*/
+DO_ABIL(do_teleport_ability) {
+	room_data *was_in = IN_ROOM(ch), *to_room;
+	bool infiltrate;
+	
+	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
+	
+	if (to_room != IN_ROOM(ch)) {
+		infiltrate = HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch)) && !can_use_room(ch, to_room, GUESTS_ALLOWED);
+		
+		if (infiltrate && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
+			// failure (will message as a fail on the ability)
+			// fall through to log infiltrate attempt
+		}
+		else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
+			// no message (will message as a fail on the ability)
+			return;
+		}
+		else {
+			// any existing adventure summon location is no longer valid after a voluntary teleport
+			// ... if the travel is further than the ability's range (which is used for random or targeted teleports, and is usually very close)
+			if (compute_distance(was_in, to_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+				cancel_adventure_summon(ch);
+			}
+			
+			char_from_room(ch);
+			char_to_room(ch, to_room);
+			qt_visit_room(ch, to_room);
+			look_at_room(ch);
+			
+			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
+			
+			GET_LAST_DIR(ch) = NO_DIR;
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
+		
+			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
+			entry_memory_mtrigger(ch);
+			greet_mtrigger(ch, NO_DIR, "ability");
+			greet_memory_mtrigger(ch);
+			greet_vtrigger(ch, NO_DIR, "ability");
+			
+			msdp_update_room(ch);	// once we're sure we're staying
+			data->success = TRUE;
+			
+			// teleport companion, too
+			if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
+				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
+				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
+				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
+				enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
+				entry_memory_mtrigger(GET_COMPANION(ch));
+				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+				greet_memory_mtrigger(GET_COMPANION(ch));
+				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
 			}
 		}
 		
-		special_vehicle_setup(ch, veh);
-		load_vtrigger(veh);
-	}
+		// chance to log
+		if (infiltrate && ROOM_OWNER(to_room) && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
+				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+			else {
+				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted shadowstepping into (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+			}
+		}
 	
-	// messaging?
-	if (veh) {
-		send_ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data, NULL);
-	}
-	
-	return TRUE;
-}
-
-
-/**
-* for devastation_ritual
-*
-* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-*/
-INTERACTION_FUNC(devastate_crop) {
-	char type[256];
-	int num = interaction->quantity, obj_ok = 0;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	crop_data *cp = ROOM_CROP(inter_room);
-	ability_data *abil = data->abil;
-	obj_data *newobj = NULL;
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
-	}
-	
-	while (num-- > 0) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
+		if (infiltrate && ROOM_OWNER(to_room)) {
+			// distrust just in case
+			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
+			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
+			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
+			run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL, NULL, NULL);
+			add_offense(ROOM_OWNER(to_room), OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(to_room), was_in) ? OFF_SEEN : NOBITS);
 		}
 	}
-	
-	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
-		strtolower(type);
-		
-		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
-	}
-	
-	return TRUE;
-}
-
-
-/**
-* for devastation_ritual
-*
-* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-*/
-INTERACTION_FUNC(devastate_trees) {
-	char type[256];
-	int num, obj_ok = 0;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	obj_data *newobj = NULL;
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
-	}
-	
-	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
-		strtolower(type);
-		
-		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
-	}
-	
-	return TRUE;
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(disenchant_obj_interact) {
-	int num, obj_ok = 0;
-	obj_data *obj = NULL;
-	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
-	ability_data *abil = data->abil;
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char(obj, ch);
-		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	// messaging
-	if (obj_ok && obj) {
-		send_ability_per_item_messages(ch, obj, interaction->quantity, abil, data, NULL);
-	}
-	
-	return TRUE;
 }
 
 
@@ -4865,17 +5438,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	else {
 		// done!
-		if (multi_targ != NOBITS) {
-			call_multi_target_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
-		}
-		else {
-			call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
-		}
-		
-		// were costs higher than estimated?
-		if (data->should_charge_cost && ((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0))) {
-			charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
-		}
+		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
 		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
@@ -4935,9 +5498,11 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// ABILITY COMMANDS ////////////////////////////////////////////////////////
+//// ABILITY CORE FUNCTIONS //////////////////////////////////////////////////
 
 /**
+* Step 1. CHECK ABILITY
+*
 * This checks if "string" is an ability's command, and performs it if so. This
 * is called by the command interpreter. To call an ability directly in code,
 * use perform_ability_command().
@@ -4998,1201 +5563,12 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 }
 
 
-/* This function is the very heart of the entire magic system.  All invocations
- * of all types of magic -- objects, spoken and unspoken PC and NPC spells, the
- * works -- all come through this function eventually. This is also the entry
- * point for non-spoken or unrestricted spells. Spellnum 0 is legal but silently
- * ignored here, to make callers simpler. */
-
 /**
-* This function is the core of the parameterized ability system. All normal
-* ability invocations go through this function. This is also a safe entry point
-* for non-cast or unrestricted abilities.
+* Step 2: PERFORM ABILITY
 *
-* @param char_data *ch The person performing the ability.
-* @param ability_data *abil The ability being used.
-* @param char_data *vict The character target, if any (may be NULL).
-* @param obj_data *ovict The object target, if any (may be NULL).
-* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
-* @param room_data *room_targ For room target, if any (may be NULL).
-* @param bitvector_t multi_targ For multiple targests, the target type (may be NOBITS).
-* @param int level The level to use the ability at.
-* @param bitvector_t run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
-* @param struct ability_exec *data The execution data to pass back and forth.
-*/
-void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
-	double total_scale = 0.0;
-	int iter;
-	
-	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
-	
-	if (!ch || !abil) {
-		return;
-	}
-	
-	if (IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-		// ability is being called at the end of an over-time action (already charged)
-		data->should_charge_cost = FALSE;
-	}
-	
-	// determine costs and scales
-	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
-		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			call_prep_abil(do_ability_data[iter].prep_func);
-			
-			// for cost later
-			total_scale += get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
-		}
-	}
-	data->max_scale = MAX(total_scale, data->max_scale);
-	
-	// early exit?
-	if (data->stop) {
-		return;
-	}
-	
-	// locked in now -- increment targets
-	data->total_targets += 1;
-	
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
-		// check costs and cooldowns now -- not on over-time/multi
-		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + (data->max_scale * ABIL_COST_PER_SCALE_POINT(abil)) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
-			// sends own message
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
-			return;
-		}
-	}
-	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
-		// resource cost check -- normal ONLY
-		if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, TRUE, ABIL_NAME(abil))) {
-			// sends own message
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
-			return;
-		}
-	}
-	
-	// ready to start the ability:
-	if (ABIL_IS_VIOLENT(abil) && SHOULD_APPEAR(ch)) {
-		appear(ch);
-	}
-	
-	// these happen immediately before the first message
-	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
-		return;
-	}
-	
-	// locked in! apply the effects
-	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
-	
-	// pre-messages if any (skip on over-time: already sent)
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
-		send_pre_ability_messages(ch, vict, ovict, abil, data);
-	}
-	
-	// WAIT! Over-time abilities stop here
-	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && IS_SET(run_mode, RUN_ABIL_NORMAL)) {
-		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, data);
-		return;
-	}
-	
-	// start meters now, to track direct damage()
-	if (ABIL_IS_VIOLENT(abil)) {
-		check_start_combat_meters(ch);
-		if (vict) {
-			check_start_combat_meters(vict);
-		}
-	}
-	
-	// counterspell?
-	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict, ch)) {
-		send_ability_counterspell_messages(ch, vict, abil, data);
-		data->stop = TRUE;	// prevent routines from firing
-		data->success = TRUE;	// counts as a successful ability use
-		data->no_msg = TRUE;	// don't show more messages
-	}
-	
-	// check for FAILURE:
-	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		send_ability_fail_messages(ch, vict, ovict, abil, data);
-		
-		data->success = TRUE;	// causes it to charge, skillup, and cooldown
-		data->stop = TRUE;	// prevents normal activation
-		data->no_msg = TRUE;	// prevents success message
-		data->engage_anyway = TRUE;	// allows engage-combat through a data->stop
-	}
-	
-	// main messaging
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-		send_ability_activation_messages(ch, vict, ovict, vvict, abil, NOTHING, data);
-	}
-	
-	// run the abilities
-	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
-		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
-			call_do_abil(do_ability_data[iter].do_func);
-		}
-	}
-	
-	// right after the do-funcs
-	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
-	
-	// exp gain unless we hit something that prevented costs
-	if (data->should_charge_cost && (!vict || can_gain_exp_from(ch, vict))) {
-		// TODO some way to modify this amount?
-		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-	}
-	
-	// check if should be in combat
-	if ((!data->stop && data->should_charge_cost) || data->engage_anyway) {
-		if (vict && vict != ch && (!data->success || !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE)) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
-			// auto-assist if we used an ability on someone who is fighting
-			if (!ABIL_IS_VIOLENT(abil) && FIGHTING(vict) && !FIGHTING(ch)) {
-				engage_combat(ch, FIGHTING(vict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
-			}
-			
-			// auto-attack if used on an enemy
-			if (ABIL_IS_VIOLENT(abil) && AWAKE(vict) && !FIGHTING(vict)) {
-				engage_combat(vict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
-			}
-		}
-	}
-	
-	// check for a no-effect/fail message
-	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
-		/* currently always showing the whole fail message
-		if (data->sent_any_msg) {
-			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
-		}
-		else {
-			// send a full fail
-		*/
-			send_ability_fail_messages(ch, vict, ovict, abil, data);
-		// }
-	}
-}
-
-
-/**
-* Calls a multi-target ability on all valid targets.
-*
-* @param char_data *ch The actor.
-* @param ability_data *abil Which ability they're using.
-* @param char *argument Any remaining args.
-* @param bitvector_t multi_targ Which target flag we're using.
-* @param int level What level we're doing the thing at.
-* @param bitvector_t run_mode Any run_mode flags to pass through.
-* @param struct ability_exec *data Data for the running ability.
-*/
-void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
-	char_data *ch_iter, *next_ch;
-	bool no_msg, fatal_error = FALSE;
-	int more_targets;
-	
-	if (data->stop) {
-		return;	// don't start
-	}
-	
-	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-		// check cooldowns and cost up front on multis, unless running over-time
-		// TODO: cost checking here does not account for cost-per-scale, which could be estimated from base scale funcs like in estimate_cost
-		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_TOTAL_COST(abil), ABIL_COOLDOWN(abil))) {
-			// sends own message
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
-			return;
-		}
-		
-		// send pre-messages now
-		send_pre_ability_messages(ch, NULL, NULL, abil, data);
-	}
-	
-	// save for later
-	no_msg = data->no_msg;
-	
-	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
-		if (fatal_error) {	// from the previous loop
-			data->stop = TRUE;
-			break;
-		}
-		if (!IS_NPC(ch_iter) && GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
-			continue;	// skip invisible imms
-		}
-		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && ch_iter == ch) {
-			continue;	// not self
-		}
-		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
-			continue;	// wrong group
-		}
-		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_ability_ally(ch, ch_iter)) {
-			continue;	// not ally
-		}
-		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && (ch_iter == ch || !is_ability_enemy(ch, ch_iter))) {
-			continue;	// not enemy
-		}
-		
-		// check cost
-		check_available_ability_cost(ch, abil, data, NULL, &more_targets);
-		if (more_targets < 1) {
-			// out of cost
-			break;
-		}
-		
-		// final validation?
-		if (!validate_ability_target(ch, abil, ch_iter, NULL, NULL, NULL, NOBITS, FALSE, &fatal_error)) {
-			if (data->no_msg && !no_msg) {
-				// turn messaging back on
-				data->no_msg = FALSE;
-			}
-			continue;
-		}
-		
-		// run it!
-		call_ability(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
-		
-		// in case no_msg was triggered by call_ability:
-		if (data->no_msg && !no_msg) {
-			data->no_msg = FALSE;
-		}
-		
-		// check for things that stop 1 but not all?
-		data->stop = FALSE;
-		
-		// did we die tho
-		if (IS_DEAD(ch)) {
-			data->stop = TRUE;
-			break;
-		}
-	}
-	
-	// did we even hit anybody
-	if (data->total_targets == 0) {
-		if (!data->no_msg && !IS_SET(run_mode, RUN_ABIL_HOOKED)) {
-			msg_to_char(ch, "There were no valid targets.\r\n");
-		}
-		data->should_charge_cost = FALSE;
-		data->no_msg = TRUE;
-	}
-	
-	// fail message in here because it is generally suppressed in multi-targs
-	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
-		send_ability_fail_messages(ch, NULL, NULL, abil, data);
-	}
-}
-
-
-/**
-* Things that proc right after an ability runs.
-*
-* @param char_data *ch The person performing the ability.
-* @param ability_data *abil The ability being used.
-* @param char_data *vict The character target, if any (may be NULL).
-* @param obj_data *ovict The object target, if any (may be NULL).
-* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
-* @param room_data *room_targ For room target, if any (may be NULL).
-* @param struct ability_exec *data The execution data to pass back and forth.
-*/
-void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data) {
-	if (data->stop) {
-		return;
-	}
-	
-	// counts as a weapon hit
-	if (vict && vict != ch && data->success && ABILITY_FLAGGED(abil, ABILF_WEAPON_HIT)) {
-		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && is_attack_flagged_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), AMDF_APPLY_POISON)) {
-			// chance to poison
-			if (!number(0, 1) && apply_poison(ch, vict) < 0) {
-				// dedz
-				data->stop = TRUE;
-				return;
-			}
-		}
-	}
-}
-
-
-/**
-* Attempts to run any abilities that have a matching hook type. This is used
-* to chain abilities, or to let abilities modify damage.
-*
-* @param char_data *ch The player (not supported for NPCS).
-* @param bitvector_t hook_type Which AHOOK_ type is running.
-* @param int level Which level to run it at (this is passed through for some types, may be 0 to auto-detect if possible).
-* @param char_data *vict Optional: Character target (may be NULL).
-* @param obj_data *ovict Optional: Character object (may be NULL).
-* @param vehicle_data *vvict Optional: Character vehicle (may be NULL).
-* @param room_data *room_targ Optional: Character room (may be NULL).
-* @param bitvector_t multi_targ Optional: Multiple target type (may be NOBITS).
-* @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
-*/
-void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ) {
-	bool any_targ, free_limiter = FALSE;
-	struct ability_hook *ahook;
-	ability_data *abil;
-	char_data *use_char;
-	obj_data *use_obj;
-	room_data *use_room;
-	vehicle_data *use_veh;
-	struct ability_exec *data;
-	struct player_ability_data *plab, *next_plab;
-	struct vnum_hash **use_limiter = NULL, *my_limiter = NULL;
-	
-	if (IS_NPC(ch) || IS_DEAD(ch) || EXTRACTED(ch)) {
-		return;
-	}
-	
-	// inherit or create a limiter
-	if (GET_RUNNING_ABILITY_LIMITER(ch)) {
-		use_limiter = GET_RUNNING_ABILITY_LIMITER(ch);
-	}
-	else {
-		use_limiter = &my_limiter;
-		GET_RUNNING_ABILITY_LIMITER(ch) = use_limiter;
-		free_limiter = TRUE;
-	}
-	
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		if (!(abil = plab->ptr) || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
-			continue;
-		}
-		if (!ABIL_HAS_HOOK(abil, hook_type)) {
-			continue;	// shortcut
-		}
-		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(abil))) {
-			continue;	// already ran
-		}
-		
-		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-			if (!IS_SET(ahook->type, hook_type)) {
-				continue;	// wrong type
-			}
-			if (ahook->value != hook_value) {
-				continue;	// wrong value
-			}
-			if (number(1, 10000) > ahook->percent * 100) {
-				continue;	// failed percent check
-			}
-			if (!pre_check_hooked_ability(ch, abil)) {
-				continue;	// unlikely to succeed
-			}
-			
-			// incoming targets
-			use_char = vict;
-			use_obj = ovict;
-			use_veh = vvict;
-			use_room = room_targ;
-			
-			// cancel multi if not allowed?
-			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
-				multi_targ = NOBITS;
-			}
-			
-			// compare targets
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
-				use_char = ch;	// convert to self
-			}
-			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT)) {
-				use_char = FIGHTING(ch);	// set to self
-			}
-			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
-				use_char = ch;	// set to self
-			}
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
-				use_room = IN_ROOM(ch);	// convert to this room
-			}
-				
-			// validation of targets
-			if (use_char == ch && (ABIL_IS_VIOLENT(abil) || IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF))) {
-				use_char = NULL;	// can't target self
-			}
-			if (use_char && use_char != ch && IN_ROOM(use_char) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)) {
-				use_char = NULL;	// char in wrong room
-			}
-			if (use_char && (IS_DEAD(use_char) || EXTRACTED(use_char))) {
-				use_char = NULL;	// gone
-			}
-			if (use_veh && IN_ROOM(use_veh) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
-				use_veh = NULL;	// veh in wrong room
-			}
-			if (use_veh && VEH_IS_EXTRACTED(use_veh)) {
-				use_veh = NULL;	// gone
-			}
-			
-			// do we have any mandatory targets left?
-			if (!IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING)) {
-				any_targ = FALSE;
-				if (IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) && use_char) {
-					any_targ = TRUE;
-				}
-				else if (IS_SET(ABIL_TARGETS(abil), OBJ_ATARS) && use_obj) {
-					any_targ = TRUE;
-				}
-				else if (IS_SET(ABIL_TARGETS(abil), VEH_ATARS) && use_veh) {
-					any_targ = TRUE;
-				}
-				else if (IS_SET(ABIL_TARGETS(abil), ROOM_ATARS) && use_room) {
-					any_targ = TRUE;
-				}
-				else if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
-					any_targ = TRUE;
-					if (multi_targ == NOBITS) {
-						multi_targ = ABIL_TARGETS(abil) & MULTI_CHAR_ATARS;
-					}
-				}
-				if (!any_targ || !validate_ability_target(ch, abil, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
-					continue;	// no apparent targets
-				}
-			}
-			
-			// match!
-			
-			// mark already run FIRST
-			add_vnum_hash(use_limiter, ABIL_VNUM(abil), 1);
-			
-			// determine level? or, preferably, inherit
-			if (!level) {
-				level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
-			}
-			
-			// construct data
-			CREATE(data, struct ability_exec, 1);
-			data->abil = abil;
-			data->should_charge_cost = TRUE;	// may still charge
-			data->matching_role = has_matching_role(ch, abil, TRUE);
-			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
-			
-			// the big GO
-			if (multi_targ != NOBITS) {
-				call_multi_target_ability(ch, abil, "", multi_targ, level, RUN_ABIL_HOOKED, data);
-			}
-			else {
-				call_ability(ch, abil, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
-			}
-			
-			// charge if needed
-			if (data->should_charge_cost) {
-				// additional costs:
-				data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
-				data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
-				data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
-				
-				charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_NONE);
-				if (ABIL_RESOURCE_COST(abil)) {
-					extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, NULL);
-				}
-			}
-			
-			if (data->success) {
-				// only if successful
-				if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
-					limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
-				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
-			}
-			
-			// clean up data
-			GET_RUNNING_ABILITY_DATA(ch) = NULL;
-			free_ability_exec(data);
-		}
-	}
-	
-	if (free_limiter) {
-		GET_RUNNING_ABILITY_LIMITER(ch) = NULL;
-		free_vnum_hash(&my_limiter);
-	}
-}
-
-
-/**
-* Runs any abiliy hooks for a given tech, IF the player has it.
-*
-* @param char_data *ch The player.
-* @param int tech The PTECH_ type that's being used.
-* @param char_data *vict Victim, if any (may be NULL).
-* @param obj_data *ovict Object target, if any (may be NULL).
-* @param vehicle_data *vvict Vehicle target, if any (may be NULL).
-* @param room_data *room_targ Room target, if any (may be NULL).
-*/
-void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
-	struct player_tech *iter;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	LL_FOREACH(GET_TECHS(ch), iter) {
-		if (iter->id == tech) {
-			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ, NOBITS);
-		}
-	}
-}
-
-
-/**
-* Performs an ability action.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_action_ability) {
-	struct ability_data_list *adl;
-	
-	if (!ch || !abil) {
-		return;	// no work
-	}
-	
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type != ADL_ACTION) {
-			continue;
-		}
-		
-		// ABIL_ACTION_x: these should set data->success to TRUE only if they succeed
-		switch (adl->vnum) {
-			case ABIL_ACTION_DETECT_HIDE: {
-				call_do_abil(abil_action_detect_hide);
-				break;
-			}
-			case ABIL_ACTION_DETECT_EARTHMELD: {
-				call_do_abil(abil_action_detect_earthmeld);
-				break;
-			}
-			case ABIL_ACTION_DETECT_PLAYERS_AROUND: {
-				call_do_abil(abil_action_detect_players_around);
-				break;
-			}
-			case ABIL_ACTION_DETECT_ADVENTURES_AROUND: {
-				call_do_abil(abil_action_detect_adventures_around);
-				break;
-			}
-			case ABIL_ACTION_DEVASTATE_AREA: {
-				call_do_abil(abil_action_devastate_area);
-				break;
-			}
-			case ABIL_ACTION_MAGIC_GROWTH: {
-				call_do_abil(abil_action_magic_growth);
-				break;
-			}
-			case ABIL_ACTION_CLOSE_PORTAL: {
-				call_do_abil(abil_action_close_portal);
-				break;
-			}
-			case ABIL_ACTION_APPLY_POISON: {
-				call_do_abil(abil_action_apply_poison);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_PHYSICAL_DOTS: {
-				call_do_abil(abil_action_remove_physical_dots);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_MAGICAL_DOTS: {
-				call_do_abil(abil_action_remove_magical_dots);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_FIRE_DOTS: {
-				call_do_abil(abil_action_remove_fire_dots);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_POISON_DOTS: {
-				call_do_abil(abil_action_remove_poison_dots);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_ALL_DOTS: {
-				call_do_abil(abil_action_remove_all_dots);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_DEBUFFS: {
-				call_do_abil(abil_action_remove_debuffs);
-				break;
-			}
-			case ABIL_ACTION_REMOVE_DRUNK: {
-				call_do_abil(abil_action_remove_drunk);
-				break;
-			}
-			case ABIL_ACTION_TAUNT: {
-				call_do_abil(abil_action_taunt);
-				break;
-			}
-			case ABIL_ACTION_RESCUE_ONE: {
-				call_do_abil(abil_action_rescue_one);
-				break;
-			}
-			case ABIL_ACTION_RESCUE_ALL: {
-				call_do_abil(abil_action_rescue_all);
-				break;
-			}
-			case ABIL_ACTION_HIDE: {
-				call_do_abil(abil_action_hide);
-				break;
-			}
-			case ABIL_ACTION_PUT_TO_SLEEP: {
-				call_do_abil(abil_action_put_to_sleep);
-				break;
-			}
-			case ABIL_ACTION_DISENCHANT_OBJ: {
-				call_do_abil(abil_action_disenchant_obj);
-				break;
-			}
-		}
-	}
-}
-
-
-// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(do_attack_ability) {
-	int result;
-	
-	if (vict && vict != ch) {
-		result = hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
-		
-		if (result != 0) {
-			// anything other than a miss is a success
-			data->success = TRUE;
-		}
-		if (result == 0 || IS_DEAD(vict)) {
-			// died?
-			data->stop = TRUE;
-		}
-		if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
-			data->stop = TRUE;
-		}
-	}
-}
-
-
-/**
-* All buff-type abilities come through here. This handles scaling and buff
-* maintenance/replacement.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_buff_ability) {
-	struct affected_type *af;
-	struct apply_data *apply;
-	any_vnum affect_vnum;
-	double total_points = 1, remaining_points = 1, share, amt;
-	int dur, total_w = 1;
-	bool messaged, unscaled, unscaled_penalty;
-	bitvector_t aff_options;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
-	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
-	
-	if (!unscaled) {
-		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
-		
-		// guarantee at least 1 point in here
-		total_points = MAX(1.0, total_points);
-		
-		remaining_points = total_points;
-	}
-	
-	// TODO is this the correct place to check immunities?
-	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		if (ch == vict) {
-			msg_to_char(ch, "You're immune!\r\n");
-		}
-		else {
-			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-		}
-		return;
-	}
-	
-	// determine duration (in seconds)
-	dur = get_ability_duration(ch, abil);
-	
-	messaged = FALSE;	// to prevent duplicates
-	
-	// affect flags? cost == level 100 ability
-	if (ABIL_AFFECTS(abil)) {
-		if (!unscaled) {
-			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-			// reset total_points now, too, as it's used for the weighted share below
-			total_points = remaining_points = MAX(0, remaining_points);
-		}
-		
-		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
-		
-		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
-		affect_join(vict, af, aff_options);
-		messaged = TRUE;
-	}
-	
-	// determine share for effects
-	if (!unscaled) {
-		total_w = 0;
-		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			if (!apply_never_scales[apply->location]) {
-				if (unscaled_penalty && apply->weight < 0) {
-					// give actual value of penalty, rounded up
-					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
-				}
-				else {
-					// apply directly as weight
-					total_w += ABSOLUTE(apply->weight);
-				}
-			}
-		}
-	}
-	
-	// now create affects for each apply that we can afford
-	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		// unscaled version?
-		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
-			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
-			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
-			affect_join(vict, af, aff_options);
-			messaged = TRUE;
-			continue;
-		}
-		
-		// scaled version: determine share of points
-		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
-		if (share > remaining_points) {
-			share = MIN(share, remaining_points);
-		}
-		
-		// determine value of apply
-		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
-		
-		// and apply it
-		if (share > 0 && amt != 0) {
-			remaining_points -= share;
-			remaining_points = MAX(0, remaining_points);
-			
-			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
-			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
-			affect_join(vict, af, aff_options);
-			messaged = TRUE;
-		}
-	}
-	
-	// check if it kills them
-	if (GET_POS(vict) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
-		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
-		data->stop = TRUE;
-	}
-	
-	data->success = TRUE;
-}
-
-
-/**
-* Deals siege damage to the targeted vehicle or room.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_building_damage_ability) {
-	int dam = 1 + GET_INTELLIGENCE(ch);
-	sector_data *secttype;
-	bld_data *bldtype;
-	
-	if (vvict) {
-		besiege_vehicle(ch, vvict, dam, SIEGE_MAGICAL, NULL);
-		data->success = TRUE;
-	}
-	else if (room_targ) {
-		secttype = SECT(room_targ);
-		bldtype = GET_BUILDING(room_targ);
-		
-		besiege_room(ch, room_targ, dam, NULL);
-		
-		if (SECT(room_targ) != secttype || bldtype != GET_BUILDING(room_targ)) {
-			msg_to_char(ch, "It is destroyed!\r\n");
-			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
-		}
-		data->success = TRUE;
-	}
-}
-
-
-/**
-* Handler for conjure-liquid abilities.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_conjure_liquid_ability) {
-	if (!ovict) {
-		// can do nothing
-		return;
-	}
-	
-	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_LIQUID_CONJURE, IN_ROOM(ch), NULL, ovict, NULL, conjure_liquid_interaction);
-}
-
-
-/**
-* Handler for conjure-object abilities.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_conjure_object_ability) {
-	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_OBJECT_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_object_interaction);
-}
-
-
-/**
-* Handler for conjure-vehicle abilities.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_conjure_vehicle_ability) {
-	data->success |= run_interactions(ch, ABIL_INTERACTIONS(abil), INTERACT_VEHICLE_CONJURE, IN_ROOM(ch), NULL, NULL, NULL, conjure_vehicle_interaction);
-}
-
-
-/**
-* All damage abilities come through here.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_damage_ability) {
-	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_DAMAGE);
-	double reduced_scale;
-	int result, avail, dmg;
-	
-	// fine-tuning ability damage
-	double arbitrary_modifier = 4.0;
-	
-	// smoother scaling, for bonuses, averaged toward 1.0
-	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
-	
-	// 1. calculate damage
-	dmg = subdata->scale_points * arbitrary_modifier;
-	
-	// 2. check costs and reduce by available mana/etc
-	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
-		check_available_ability_cost(ch, abil, data, &avail, NULL);
-		dmg = MIN(dmg, avail);
-	}
-	
-	// 3. store amount of damage now -- before bonus-physical
-	data->total_amount += dmg;
-	
-	// 4. bonus damage
-	switch (ABIL_DAMAGE_TYPE(abil)) {
-		case DAM_PHYSICAL: {
-			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale;
-			break;
-		}
-		case DAM_MAGICAL: {
-			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale;
-			break;
-		}
-	}
-	
-	// 5. do it
-	result = damage(ch, vict, dmg, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
-	
-	if (result != 0) {
-		// anything other than a miss is a hit
-		data->success = TRUE;
-	}	
-	if (result < 0 || IS_DEAD(vict)) {
-		// dedz
-		data->stop = TRUE;
-	}
-	if (result <= 0 && ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
-		data->stop = TRUE;
-	}
-}
-
-
-/**
-* All damage-over-time abilities come through here. This handles scaling and
-* stacking.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_dot_ability) {
-	any_vnum affect_vnum;
-	double points, reduced_scale;
-	int dur, dmg;
-	
-	// fine-tuning ability damage
-	double arbitrary_modifier = 1.5;
-	
-	// smoother scaling, for bonuses, averaged toward 1.0
-	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
-	
-	points = get_ability_type_data(data, ABILT_DOT)->scale_points;
-	
-	if (points <= 0) {
-		return;
-	}
-	
-	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
-		act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-		return;
-	}
-	
-	// determine duration
-	dur = get_ability_duration(ch, abil);
-	
-	dmg = points * arbitrary_modifier;
-	
-	// bonus damage
-	switch (ABIL_DAMAGE_TYPE(abil)) {
-		case DAM_PHYSICAL: {
-			dmg += GET_BONUS_PHYSICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
-			break;
-		}
-		case DAM_MAGICAL: {
-			dmg += GET_BONUS_MAGICAL(ch) * reduced_scale / MAX(1, dur/DOT_INTERVAL);
-			break;
-		}
-	}
-
-	dmg = MAX(1, dmg);
-	apply_dot_effect(vict, affect_vnum, dur, ABIL_DAMAGE_TYPE(abil), dmg, ABIL_MAX_STACKS(abil), ch);
-	data->success = TRUE;
-}
-
-
-/**
-* Applies color to the building.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_paint_building_ability) {
-	struct ability_data_list *adl;
-	room_data *home;
-	int count = 0, color = -1;
-	
-	// find a color
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type != ADL_PAINT_COLOR) {
-			continue;
-		}
-		if (!number(0, count++)) {
-			color = adl->vnum;
-		}
-	}
-	
-	if (color != -1 && room_targ && (home = HOME_ROOM(room_targ)) && IS_ANY_BUILDING(home)) {
-		set_room_extra_data(home, ROOM_EXTRA_PAINT_COLOR, color);
-	}
-	data->success = TRUE;
-}
-
-
-// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(do_ready_weapon_ability) {
-	int count, pos;
-	struct ability_data_list *adl;
-	obj_data *obj, *proto;
-	
-	// did we inherit one?
-	any_vnum obj_vnum = data->ready_weapon_val;
-	
-	// pick at random
-	if (obj_vnum == NOTHING || obj_vnum == 0) {
-		count = 0;
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && !number(0, count++)) {
-				obj_vnum = adl->vnum;
-			}
-		}
-	}
-	
-	// did we find one?
-	if (obj_vnum == NOTHING || !(proto = obj_proto(obj_vnum))) {
-		// no success
-		return;
-	}
-	
-	// determine wear position
-	if (CAN_WEAR(proto, ITEM_WEAR_WIELD)) {
-		pos = WEAR_WIELD;
-	}
-	else if (CAN_WEAR(proto, ITEM_WEAR_HOLD)) {
-		pos = WEAR_HOLD;	// ONLY if they can't wield it
-	}
-	else if (CAN_WEAR(proto, ITEM_WEAR_RANGED)) {
-		pos = WEAR_RANGED;
-	}
-	else {
-		log("SYSERR: %s trying to ready %d %s with no valid wear bits (Ability %d %s)", GET_NAME(ch), GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), ABIL_VNUM(abil), ABIL_NAME(abil));
-		// fail / no success
-		return;
-	}
-	
-	// attempt to remove existing item
-	if (GET_EQ(ch, pos)) {
-		perform_remove(ch, pos);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, pos)) {
-			return;
-		}
-	}
-	
-	// load the object
-	obj = read_object(obj_vnum, TRUE);
-	scale_item_to_level(obj, level);
-	equip_char(ch, obj, pos);
-	
-	send_ability_per_item_messages(ch, obj, 1, abil, data, NULL);
-	
-	// after messaging (objs may purge on load trig)
-	load_otrigger(obj);
-	// this goes directly to equipment so a GET trigger does not fire
-	
-	determine_gear_level(ch);
-	data->success = TRUE;
-}
-
-
-// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-DO_ABIL(do_resurrect_ability) {
-	char_data *targ;
-	
-	if (ch == vict) {
-		perform_resurrection(ch, ch, IN_ROOM(ch), ABIL_VNUM(abil));
-		data->success = TRUE;
-	}
-	else if (vict) {
-		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, vict, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
-		add_offer(vict, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
-		data->success = TRUE;
-	}
-	else if (ovict && (targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
-		act("$O is attempting to resurrect you (use 'accept/reject resurrection').", FALSE, targ, NULL, ch, TO_CHAR | TO_NODARK | TO_SLEEP);
-		add_offer(targ, ch, OFFER_RESURRECTION, ABIL_VNUM(abil));
-		data->success = TRUE;
-	}
-	// otherwise no success
-}
-
-
-/**
-* All room-affect abilities come through here.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_room_affect_ability) {
-	struct affected_type *af;
-	any_vnum affect_vnum;
-	double total_points = 1, remaining_points = 1;
-	int dur;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	total_points = get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points;
-	remaining_points = total_points;
-	
-	if (total_points <= 0) {
-		return;
-	}
-	
-	// determine duration (in seconds)
-	dur = get_ability_duration(ch, abil);
-	
-	// affect flags? cost == level 100 ability
-	if (room_targ && ABIL_AFFECTS(abil)) {
-		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-		remaining_points = MAX(0, remaining_points);
-		
-		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
-		affect_to_room(room_targ, af);
-		free(af);	// affect_to_room duplicates affects
-	}
-	
-	data->success = TRUE;
-}
-
-
-/**
-* Various types of teleportation.
-*
-* DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-DO_ABIL(do_teleport_ability) {
-	room_data *was_in = IN_ROOM(ch), *to_room;
-	bool infiltrate;
-	
-	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
-	
-	if (to_room != IN_ROOM(ch)) {
-		infiltrate = HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch)) && !can_use_room(ch, to_room, GUESTS_ALLOWED);
-		
-		if (infiltrate && !has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
-			// failure (will message as a fail on the ability)
-			// fall through to log infiltrate attempt
-		}
-		else if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "ability")) {
-			// no message (will message as a fail on the ability)
-			return;
-		}
-		else {
-			// any existing adventure summon location is no longer valid after a voluntary teleport
-			// ... if the travel is further than the ability's range (which is used for random or targeted teleports, and is usually very close)
-			if (compute_distance(was_in, to_room) > get_ability_data_value(abil, ADL_RANGE, TRUE)) {
-				cancel_adventure_summon(ch);
-			}
-			
-			char_from_room(ch);
-			char_to_room(ch, to_room);
-			qt_visit_room(ch, to_room);
-			look_at_room(ch);
-			
-			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
-			
-			GET_LAST_DIR(ch) = NO_DIR;
-			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-		
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
-			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR, "ability");
-			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR, "ability");
-			
-			msdp_update_room(ch);	// once we're sure we're staying
-			data->success = TRUE;
-			
-			// teleport companion, too
-			if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
-				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
-				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
-				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
-				enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
-				entry_memory_mtrigger(GET_COMPANION(ch));
-				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
-				greet_memory_mtrigger(GET_COMPANION(ch));
-				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
-			}
-		}
-		
-		// chance to log
-		if (infiltrate && ROOM_OWNER(to_room) && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
-			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
-				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
-			}
-			else {
-				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted shadowstepping into (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
-			}
-		}
-	
-		if (infiltrate && ROOM_OWNER(to_room)) {
-			// distrust just in case
-			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
-			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);
-			gain_player_tech_exp(ch, PTECH_INFILTRATE_UPGRADE, 50);
-			run_ability_hooks_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL, NULL, NULL);
-			add_offense(ROOM_OWNER(to_room), OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, ROOM_OWNER(to_room), was_in) ? OFF_SEEN : NOBITS);
-		}
-	}
-}
-
-
-/**
 * Performs an ability typed by a character. This function find the targets,
-* and pre-validates the ability.
+* and pre-validates the ability. This can be used as an entry-point if the
+* ability is called from another command, such as "ritual".
 *
 * @param char_data *ch The person who typed the command.
 * @param ability_data *abil The ability being used.
@@ -6468,548 +5844,819 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
-	if (multi_targ != NOBITS && !ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
-		call_multi_target_ability(ch, abil, argument, multi_targ, level, RUN_ABIL_NORMAL, data);
-	}
-	else {
-		// single-target
-		call_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, RUN_ABIL_NORMAL, data);
-	}
+	call_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, RUN_ABIL_NORMAL, data);
 	
-	// 7. costs and consequences
-	if (data->should_charge_cost) {
-		// additional costs:
-		data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
-		data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
-		data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
-		
-		// charge costs and cooldown unless the ability stopped itself -- regardless of success
-		charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-		if (ABIL_RESOURCE_COST(abil)) {
-			extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : NULL);
-		}
-	}
-	else {
-		// has wait type even without cost
-		command_lag(ch, ABIL_WAIT_TYPE(abil));
-	}
-	if (data->success) {
-		// only if successful
-		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
-			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
-		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
-	}
-	
-	// 9. clean up data
+	// 7. clean up data
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
 	free_ability_exec(data);
 }
 
 
 /**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+* Step 3: CALL ABILITY
+*
+* This function routes the ability through either single- or multiple targets.
+* It then charges any costs and limits any crowd-control abilities present.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The character target, if any (may be NULL).
+* @param obj_data *ovict The object target, if any (may be NULL).
+* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param room_data *room_targ For room target, if any (may be NULL).
+* @param bitvector_t multi_targ For multiple targests, the target type (may be NOBITS).
+* @param int level The level to use the ability at.
+* @param bitvector_t run_mode May include RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
+* @param struct ability_exec *data The execution data to pass back and forth.
 */
-PREP_ABIL(prep_action_ability) {
-	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_attack_ability) {
-	get_ability_type_data(data, ABILT_ATTACK)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ATTACK, data);
-}
-
-
-/**
-* This function 'stops' if the ability is a toggle and you're toggling it off,
-* which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_buff_ability) {
-	any_vnum affect_vnum;
-	bool was_sleep_aff;
-	
-	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY | AFF_EARTHMELD;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	// toggle off?
-	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && vict == ch && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
-		was_sleep_aff = AFF_FLAGGED(vict, SLEEP_AFFS) ? TRUE : FALSE;
-		
-		send_ability_toggle_messages(vict, abil, data);
-		affect_from_char_by_caster(vict, affect_vnum, ch, TRUE);
-		
-		// some affs come with forced sleep; toggling them updates player to resting
-		if (was_sleep_aff && GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(vict, SLEEP_AFFS)) {
-			GET_POS(ch) = POS_RESTING;
-		}
-		
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;	// free cancel
-		data->success = TRUE;	// I think this is a success?
-		return;
+void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
+	// run the ability
+	if (multi_targ != NOBITS && (IS_SET(run_mode, RUN_ABIL_OVER_TIME) || !ABILITY_FLAGGED(abil, ABILF_OVER_TIME))) {
+		call_multi_target_ability(ch, abil, argument, multi_targ, level, run_mode, data);
+	}
+	else {
+		// single-target only
+		call_ability_one(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, run_mode, data);
 	}
 	
-	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
-		if (vict == ch) {
-			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
+	// costs and consequences
+	if (data->should_charge_cost) {
+		if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+			// normal additional costs:
+			data->cost += data->max_scale * ABIL_COST_PER_SCALE_POINT(abil);
+			data->cost += data->total_amount * ABIL_COST_PER_AMOUNT(abil);
+			data->cost += data->total_targets * ABIL_COST_PER_TARGET(abil);
+		
+			// charge costs and cooldown unless the ability stopped itself -- regardless of success
+			charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+			if (ABIL_RESOURCE_COST(abil)) {
+				extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : NULL);
+			}
 		}
 		else {
-			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
-		}
-
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;
-		data->success = FALSE;
-		return;
-	}
-	
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_building_damage_ability) {
-	get_ability_type_data(data, ABILT_BUILDING_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUILDING_DAMAGE, data);
-}
-
-
-/**
-* Determines if ovict is a valid target for creating the liquid.
-* 
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_conjure_liquid_ability) {
-	char buf[256];
-	struct interaction_item *interact;
-	generic_data *existing, *gen;
-	
-	get_ability_type_data(data, ABILT_CONJURE_LIQUID)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_LIQUID, data);
-	
-	if (!ovict) {
-		// should this error? or just do nothing
-		// data->stop = TRUE;
-		return;
-	}
-	if (!IS_DRINK_CONTAINER(ovict)) {
-		act("$p is not a drink container.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
-		CANCEL_ABILITY(data);
-		return;
-	}
-	if (GET_DRINK_CONTAINER_CONTENTS(ovict) == GET_DRINK_CONTAINER_CAPACITY(ovict)) {
-		act("$p is already full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
-		CANCEL_ABILITY(data);
-		return;
-	}
-	if (GET_DRINK_CONTAINER_CONTENTS(ovict) > 0 && (existing = find_generic(GET_DRINK_CONTAINER_TYPE(ovict), GENERIC_LIQUID))) {
-		// check compatible contents
-		LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-			if (interact->type != INTERACT_LIQUID_CONJURE) {
-				continue;	// not a liquid
-			}
-			if (!(gen = find_generic(interact->vnum, GENERIC_LIQUID))) {
-				continue;	// invalid liquid
-			}
-			if (GEN_VNUM(gen) == GEN_VNUM(existing)) {
-				continue;	// ok: same liquid
-			}
-			
-			// ok, both are different liquids... is it a problem?
-			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
-				// 1 is not water, or existing is not basic water
-				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
-				act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
-				CANCEL_ABILITY(data);
-				return;
-			}
-		}
-	}
-	
-	// otherwise it seems ok
-}
-
-
-/**
-* Determines if player can conjure objects.
-* 
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_conjure_object_ability) {
-	bool has_any, one_ata, any_inv, any_room;
-	int any_size, iter;
-	struct interaction_item *interact;
-	obj_data *proto;
-	
-	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
-	
-	one_ata = ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) ? TRUE : FALSE;
-	
-	// check interactions
-	any_size = 0;
-	any_inv = any_room = FALSE;
-	
-	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-		if (interact->type != INTERACT_OBJECT_CONJURE) {
-			continue;	// not an object
-		}
-		if (!(proto = obj_proto(interact->vnum))) {
-			continue;	// no proto
-		}
-		
-		// data to find
-		any_size = MAX(any_size, obj_carry_size(proto));
-		has_any = FALSE;
-		
-		if (CAN_WEAR(proto, ITEM_WEAR_TAKE)) {
-			any_inv = TRUE;
-			for (iter = 0; iter < NUM_WEARS && !has_any; ++iter) {
-				if (one_ata && GET_EQ(ch, iter) && count_objs_by_vnum(interact->vnum, GET_EQ(ch, iter))) {
-					has_any = TRUE;
-				}
-			}
-			if (one_ata && !has_any && count_objs_by_vnum(interact->vnum, ch->carrying)) {
-				has_any = TRUE;
-			}
-			
-			// oops
-			if (one_ata && has_any) {
-				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
-			}
-		}
-		else {	// no-take
-			any_room = TRUE;
-			if (one_ata && count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
-				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
-				has_any = TRUE;
-			}
-		}
-		
-		if (one_ata && has_any) {
-			CANCEL_ABILITY(data);
-			return;
-		}
-	}
-	
-	if (any_inv && any_size > 0 && IS_CARRYING_N(ch) + any_size > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You can't use that ability because your inventory is full.\r\n");
-		CANCEL_ABILITY(data);
-		return;
-	}
-	if (any_room && any_size > 0 && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && (any_size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
-		msg_to_char(ch, "You can't use that ability because the room is full.\r\n");
-		CANCEL_ABILITY(data);
-		return;
-	}
-}
-
-
-/**
-* Determines if player can conjure vehicles.
-* 
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_conjure_vehicle_ability) {
-	struct interaction_item *interact;
-	vehicle_data *proto, *viter;
-	
-	get_ability_type_data(data, ABILT_CONJURE_VEHICLE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_VEHICLE, data);
-	
-	// check interactions
-	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
-		if (interact->type != INTERACT_VEHICLE_CONJURE) {
-			continue;	// not an object
-		}
-		if (!(proto = vehicle_proto(interact->vnum))) {
-			continue;	// no proto
-		}
-		
-		// check room for any if one-at-a-time
-		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
-			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
-				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
-					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | TO_SLEEP | ACT_VEH_VICT);
-					CANCEL_ABILITY(data);
-					return;
-				}
-			}
-		}
-		
-		// check vehicle flagging
-		if (VEH_FLAGGED(proto, VEH_NO_BUILDING) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)))) {
-			msg_to_char(ch, "You can't do that inside a building.\r\n");
-			CANCEL_ABILITY(data);
-			return;
-		}
-		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(proto, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
-			msg_to_char(ch, "You can't do that inside a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
-			CANCEL_ABILITY(data);
-			return;
-		}
-		if (VEH_SIZE(proto) > 0 && total_vehicle_size_in_room(IN_ROOM(ch), NULL) + VEH_SIZE(proto) > config_get_int("vehicle_size_per_tile")) {
-			msg_to_char(ch, "This area is already too full to do that.\r\n");
-			CANCEL_ABILITY(data);
-			return;
-		}
-		if (VEH_SIZE(proto) == 0 && total_small_vehicles_in_room(IN_ROOM(ch), NULL) >= config_get_int("vehicle_max_per_tile")) {
-			msg_to_char(ch, "This area is already too full to do that.\r\n");
-			CANCEL_ABILITY(data);
-			return;
-		}
-	}
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_damage_ability) {
-	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_dot_ability) {
-	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_paint_building_ability) {
-	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_ready_weapon_ability) {
-	bool found;
-	int iter;
-	obj_data *obj;
-	struct ability_data_list *adl;
-	
-	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE)) {
-		// look for equipped item to toggle
-		found = FALSE;
-		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (!(obj = GET_EQ(ch, iter))) {
-				continue;	// no obj
-			}
-			
-			// check for match
-			LL_FOREACH(ABIL_DATA(abil), adl) {
-				if (adl->type == ADL_READY_WEAPON && adl->vnum == GET_OBJ_VNUM(obj)) {
-					if (!found) {
-						// only message once
-						send_ability_toggle_messages(ch, abil, data);
-					}
-					found = TRUE;
-					
-					// char message
-					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
-						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
-					}
-					else {
-						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
-					}
-	
-					// room message
-					if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
-						act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
-					}
-					else {
-						act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
-					}
-				
-					// this may extract it
-					unequip_char_to_inventory(ch, iter);
-				}
-			}
-		}
-		
-		if (found) {
-			determine_gear_level(ch);
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;	// free cancel
-			data->success = TRUE;	// I think this is a success?
-		}
-		return;
-	}	// end toggle
-	
-	// determine what they want to ready?
-	data->ready_weapon_val = NOTHING;
-	
-	if (*argument) {
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && (obj = obj_proto(adl->vnum))) {
-				if (multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
-					data->ready_weapon_val = adl->vnum;
-					break;
-				}
-			}
-		}
-		
-		if (data->ready_weapon_val == NOTHING) {
-			msg_to_char(ch, "What do you mean, '%s'?\r\n", argument);
-			CANCEL_ABILITY(data);
-			return;
-		}
-	}
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_resurrect_ability) {
-	char_data *targ;
-	
-	get_ability_type_data(data, ABILT_RESURRECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESURRECT, data);
-	
-	if (vict) {
-		if (!IS_DEAD(vict)) {
-			if (ch == vict) {
-				msg_to_char(ch, "You're not dead yet.\r\n");
+			// over time costs: were costs higher than estimated at the start
+			if (((data->total_targets > 1 && ABIL_COST_PER_TARGET(abil) != 0.0) || (data->total_amount > 1 && ABIL_COST_PER_AMOUNT(abil) != 0.0))) {
+				charge_ability_cost(ch, ABIL_COST_TYPE(abil), ((data->total_targets - 1) * ABIL_COST_PER_TARGET(abil) + data->total_amount * ABIL_COST_PER_AMOUNT(abil)), NOTHING, 0, WAIT_NONE);
 			}
 			else {
-				msg_to_char(ch, "You can only resurrect a dead person.\r\n");
+				command_lag(ch, ABIL_WAIT_TYPE(abil));
 			}
-			CANCEL_ABILITY(data);
-			return;
+			// resources and main costs were charged when the ability started
 		}
-		else if (IS_NPC(vict)) {
-			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
-			CANCEL_ABILITY(data);
-			return;
-		}
-		else if (ch != vict && GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
-			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
-			CANCEL_ABILITY(data);
-			return;
-		}
-		// otherwise probably ok
 	}
-	else if (ovict) {
-		if (!IS_CORPSE(ovict)) {
-			msg_to_char(ch, "That's not a corpse.\r\n");
-			CANCEL_ABILITY(data);
+	else {
+		// has wait type even without cost
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
+	}
+	
+	// crowd control and ability hooks (only if successful)
+	if (data->success) {
+		if (ABILITY_FLAGGED(abil, ABILF_LIMIT_CROWD_CONTROL) && ABIL_AFFECT_VNUM(abil) != NOTHING) {
+			limit_crowd_control(vict, ABIL_AFFECT_VNUM(abil));
+		}
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), level, vict, ovict, vvict, room_targ, multi_targ);
+	}
+}
+
+
+/**
+* Step 3a: MULTI-TARGET HANDLING
+*
+* Calls a multi-target ability on all valid targets.
+*
+* @param char_data *ch The actor.
+* @param ability_data *abil Which ability they're using.
+* @param char *argument Any remaining args.
+* @param bitvector_t multi_targ Which target flag we're using.
+* @param int level What level we're doing the thing at.
+* @param bitvector_t run_mode Any run_mode flags to pass through.
+* @param struct ability_exec *data Data for the running ability.
+*/
+void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
+	char_data *ch_iter, *next_ch;
+	bool no_msg, fatal_error = FALSE;
+	int more_targets;
+	
+	if (data->stop) {
+		return;	// don't start
+	}
+	
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+		// check cooldowns and cost up front on multis, unless running over-time
+		// TODO: cost checking here does not account for cost-per-scale, which could be estimated from base scale funcs like in estimate_cost
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_TOTAL_COST(abil), ABIL_COOLDOWN(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
-		else if (!IS_PC_CORPSE(ovict)) {
-			msg_to_char(ch, "You can only use that on player corpses.\r\n");
-			CANCEL_ABILITY(data);
+		
+		// send pre-messages now
+		send_pre_ability_messages(ch, NULL, NULL, abil, data);
+	}
+	
+	// save for later
+	no_msg = data->no_msg;
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
+		if (fatal_error) {	// from the previous loop
+			data->stop = TRUE;
+			break;
+		}
+		if (!IS_NPC(ch_iter) && GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// skip invisible imms
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && ch_iter == ch) {
+			continue;	// not self
+		}
+		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
+			continue;	// wrong group
+		}
+		if (IS_SET(multi_targ, ATAR_ALLIES_MULTI) && ch_iter != ch && !is_ability_ally(ch, ch_iter)) {
+			continue;	// not ally
+		}
+		if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI) && (ch_iter == ch || !is_ability_enemy(ch, ch_iter))) {
+			continue;	// not enemy
+		}
+		
+		// check cost
+		check_available_ability_cost(ch, abil, data, NULL, &more_targets);
+		if (more_targets < 1) {
+			// out of cost
+			break;
+		}
+		
+		// final validation?
+		if (!validate_ability_target(ch, abil, ch_iter, NULL, NULL, NULL, NOBITS, FALSE, &fatal_error)) {
+			if (data->no_msg && !no_msg) {
+				// turn messaging back on
+				data->no_msg = FALSE;
+			}
+			continue;
+		}
+		
+		// run it!
+		call_ability_one(ch, abil, argument, ch_iter, NULL, NULL, NULL, multi_targ, level, run_mode | RUN_ABIL_MULTI, data);
+		
+		// in case no_msg was triggered by call_ability_one:
+		if (data->no_msg && !no_msg) {
+			data->no_msg = FALSE;
+		}
+		
+		// check for things that stop 1 but not all?
+		data->stop = FALSE;
+		
+		// did we die tho
+		if (IS_DEAD(ch)) {
+			data->stop = TRUE;
+			break;
+		}
+	}
+	
+	// did we even hit anybody
+	if (data->total_targets == 0) {
+		if (!data->no_msg && !IS_SET(run_mode, RUN_ABIL_HOOKED)) {
+			msg_to_char(ch, "There were no valid targets.\r\n");
+		}
+		data->should_charge_cost = FALSE;
+		data->no_msg = TRUE;
+	}
+	
+	// fail message in here because it is generally suppressed in multi-targs
+	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
+		send_ability_fail_messages(ch, NULL, NULL, abil, data);
+	}
+}
+
+
+/**
+* STEP 3b: ABILITY ACTIVATION (PER TARGET)
+*
+* This function is the core of the parameterized ability system. All normal
+* ability invocations go through this function. This is also a safe entry point
+* for non-cast or unrestricted abilities.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The character target, if any (may be NULL).
+* @param obj_data *ovict The object target, if any (may be NULL).
+* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param room_data *room_targ For room target, if any (may be NULL).
+* @param bitvector_t multi_targ For multiple targests, the target type (may be NOBITS).
+* @param int level The level to use the ability at.
+* @param bitvector_t run_mode May be RUN_ABIL_NORMAL, RUN_ABIL_OVER_TIME, etc.
+* @param struct ability_exec *data The execution data to pass back and forth.
+*/
+void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
+	double total_scale = 0.0;
+	int iter;
+	
+	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
+	
+	if (!ch || !abil) {
+		return;
+	}
+	
+	if (IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+		// ability is being called at the end of an over-time action (already charged)
+		data->should_charge_cost = FALSE;
+	}
+	
+	// determine costs and scales
+	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+			call_prep_abil(do_ability_data[iter].prep_func);
+			
+			// for cost later
+			total_scale += get_ability_type_data(data, do_ability_data[iter].type)->scale_points;
+		}
+	}
+	data->max_scale = MAX(total_scale, data->max_scale);
+	
+	// early exit?
+	if (data->stop) {
+		return;
+	}
+	
+	// locked in now -- increment targets
+	data->total_targets += 1;
+	
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
+		// check costs and cooldowns now -- not on over-time/multi
+		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), data->cost + (data->max_scale * ABIL_COST_PER_SCALE_POINT(abil)) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil), ABIL_COOLDOWN(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
-		else if (!(targ = is_playing(GET_CORPSE_PC_ID(ovict)))) {
-			msg_to_char(ch, "You can resurrect the corpse of someone who is still playing.\r\n");
-			CANCEL_ABILITY(data);
+	}
+	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
+		// resource cost check -- normal ONLY
+		if (ABIL_RESOURCE_COST(abil) && !has_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, TRUE, ABIL_NAME(abil))) {
+			// sends own message
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
 			return;
 		}
-		else if (targ == ch) {
-			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
-			CANCEL_ABILITY(data);
-			return;
+	}
+	
+	// ready to start the ability:
+	if (ABIL_IS_VIOLENT(abil) && SHOULD_APPEAR(ch)) {
+		appear(ch);
+	}
+	
+	// these happen immediately before the first message
+	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
+		return;
+	}
+	
+	// locked in! apply the effects
+	apply_ability_effects(abil, ch, vict, ovict, vvict, room_targ);
+	
+	// pre-messages if any (skip on over-time: already sent)
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME | RUN_ABIL_MULTI)) {
+		send_pre_ability_messages(ch, vict, ovict, abil, data);
+	}
+	
+	// WAIT! Over-time abilities stop here
+	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && IS_SET(run_mode, RUN_ABIL_NORMAL)) {
+		start_over_time_ability(ch, abil, argument, vict, ovict, vvict, room_targ, multi_targ, level, data);
+		return;
+	}
+	
+	// start meters now, to track direct damage()
+	if (ABIL_IS_VIOLENT(abil)) {
+		check_start_combat_meters(ch);
+		if (vict) {
+			check_start_combat_meters(vict);
 		}
-		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(targ)) {
-			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
-			CANCEL_ABILITY(data);
-			return;
+	}
+	
+	// counterspell?
+	if (!data->stop && ABILITY_FLAGGED(abil, ABILF_COUNTERSPELLABLE) && ABIL_IS_VIOLENT(abil) && vict && vict != ch && trigger_counterspell(vict, ch)) {
+		send_ability_counterspell_messages(ch, vict, abil, data);
+		data->stop = TRUE;	// prevent routines from firing
+		data->success = TRUE;	// counts as a successful ability use
+		data->no_msg = TRUE;	// don't show more messages
+	}
+	
+	// check for FAILURE:
+	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		send_ability_fail_messages(ch, vict, ovict, abil, data);
+		
+		data->success = TRUE;	// causes it to charge, skillup, and cooldown
+		data->stop = TRUE;	// prevents normal activation
+		data->no_msg = TRUE;	// prevents success message
+		data->engage_anyway = TRUE;	// allows engage-combat through a data->stop
+	}
+	
+	// main messaging
+	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
+		send_ability_activation_messages(ch, vict, ovict, vvict, abil, NOTHING, data);
+	}
+	
+	// run the abilities
+	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
+			call_do_abil(do_ability_data[iter].do_func);
 		}
-		else if (IS_DEAD(targ) || ovict != find_obj(GET_LAST_CORPSE_ID(targ)) || !IS_CORPSE(ovict)) {
-			// victim has died AGAIN
-			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, targ, TO_CHAR | TO_NODARK | TO_SLEEP);
-			CANCEL_ABILITY(data);
-			return;
+	}
+	
+	// right after the do-funcs
+	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
+	
+	// exp gain unless we hit something that prevented costs
+	if (data->should_charge_cost && (!vict || can_gain_exp_from(ch, vict))) {
+		// TODO some way to modify this amount?
+		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+	}
+	
+	// check if should be in combat
+	if ((!data->stop && data->should_charge_cost) || data->engage_anyway) {
+		if (vict && vict != ch && (!data->success || !ABILITY_FLAGGED(abil, ABILF_NO_ENGAGE)) && !EXTRACTED(vict) && !IS_DEAD(vict)) {
+			// auto-assist if we used an ability on someone who is fighting
+			if (!ABIL_IS_VIOLENT(abil) && FIGHTING(vict) && !FIGHTING(ch)) {
+				engage_combat(ch, FIGHTING(vict), ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+			}
+			
+			// auto-attack if used on an enemy
+			if (ABIL_IS_VIOLENT(abil) && AWAKE(vict) && !FIGHTING(vict)) {
+				engage_combat(vict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+			}
+		}
+	}
+	
+	// check for a no-effect/fail message
+	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
+		/* currently always showing the whole fail message
+		if (data->sent_any_msg) {
+			msg_to_char(ch, "It doesn't seem to have any effect.\r\n");
+		}
+		else {
+			// send a full fail
+		*/
+			send_ability_fail_messages(ch, vict, ovict, abil, data);
+		// }
+	}
+}
+
+
+/**
+* Things that proc right after an ability runs.
+*
+* @param char_data *ch The person performing the ability.
+* @param ability_data *abil The ability being used.
+* @param char_data *vict The character target, if any (may be NULL).
+* @param obj_data *ovict The object target, if any (may be NULL).
+* @param vehicle_data *vvict The vehicle target, if any (may be NULL).
+* @param room_data *room_targ For room target, if any (may be NULL).
+* @param struct ability_exec *data The execution data to pass back and forth.
+*/
+void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data) {
+	if (data->stop) {
+		return;
+	}
+	
+	// counts as a weapon hit
+	if (vict && vict != ch && data->success && ABILITY_FLAGGED(abil, ABILF_WEAPON_HIT)) {
+		if (has_player_tech(ch, PTECH_POISON) && GET_EQ(ch, WEAR_WIELD) && is_attack_flagged_by_vnum(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)), AMDF_APPLY_POISON)) {
+			// chance to poison
+			if (!number(0, 1) && apply_poison(ch, vict) < 0) {
+				// dedz
+				data->stop = TRUE;
+				return;
+			}
 		}
 	}
 }
 
 
 /**
-* This function 'stops' if the ability is a toggle and you're toggling it off,
-* which keeps it from charging/cooldowning.
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+* Attempts to run any abilities that have a matching hook type. This is used
+* to chain abilities, or to let abilities modify damage.
+*
+* @param char_data *ch The player (not supported for NPCS).
+* @param bitvector_t hook_type Which AHOOK_ type is running.
+* @param int level Which level to run it at (this is passed through for some types, may be 0 to auto-detect if possible).
+* @param char_data *vict Optional: Character target (may be NULL).
+* @param obj_data *ovict Optional: Character object (may be NULL).
+* @param vehicle_data *vvict Optional: Character vehicle (may be NULL).
+* @param room_data *room_targ Optional: Character room (may be NULL).
+* @param bitvector_t multi_targ Optional: Multiple target type (may be NOBITS).
+* @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
 */
-PREP_ABIL(prep_room_affect_ability) {
-	any_vnum affect_vnum;
+void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ) {
+	bool any_targ, free_limiter = FALSE;
+	struct ability_hook *ahook;
+	ability_data *abil;
+	char_data *use_char;
+	obj_data *use_obj;
+	room_data *use_room;
+	vehicle_data *use_veh;
+	struct ability_exec *data;
+	struct player_ability_data *plab, *next_plab;
+	struct vnum_hash **use_limiter = NULL, *my_limiter = NULL;
 	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	// toggle off?
-	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
-		send_ability_toggle_messages(ch, abil, data);
-		affect_from_room_by_caster(room_targ, affect_vnum, ch, TRUE);
-		data->stop = TRUE;
-		data->should_charge_cost = FALSE;	// free cancel
-		data->success = TRUE;	// I think this is a success?
+	if (IS_NPC(ch) || IS_DEAD(ch) || EXTRACTED(ch)) {
 		return;
 	}
 	
-	// one-at-a-time?
-	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
-		msg_to_char(ch, "The area is already affected by that ability.\r\n");
-		CANCEL_ABILITY(data);
-		return;
+	// inherit or create a limiter
+	if (GET_RUNNING_ABILITY_LIMITER(ch)) {
+		use_limiter = GET_RUNNING_ABILITY_LIMITER(ch);
+	}
+	else {
+		use_limiter = &my_limiter;
+		GET_RUNNING_ABILITY_LIMITER(ch) = use_limiter;
+		free_limiter = TRUE;
 	}
 	
-	get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_teleport_ability) {
-	room_data *to_room;
-	
-	// determine what we are teleporting to
-	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
-	
-	// see if we're infiltrating
-	// TODO could this be moved to a function
-	if (HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch))) {
-		if (ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
-			// stealthable seems to apply
-			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
-				msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
-				CANCEL_ABILITY(data);
-				return;
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!(abil = plab->ptr) || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;
+		}
+		if (!ABIL_HAS_HOOK(abil, hook_type)) {
+			continue;	// shortcut
+		}
+		if (find_in_vnum_hash(*use_limiter, ABIL_VNUM(abil))) {
+			continue;	// already ran
+		}
+		
+		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
+			if (!IS_SET(ahook->type, hook_type)) {
+				continue;	// wrong type
 			}
-			if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_STEALTH)) {
-				msg_to_char(ch, "You don't have the empire rank required to commit stealth acts.\r\n");
-				CANCEL_ABILITY(data);
-				return;
+			if (ahook->value != hook_value) {
+				continue;	// wrong value
 			}
-			if (!can_infiltrate(ch, ROOM_OWNER(to_room))) {
-				// sends own message
-				CANCEL_ABILITY(data);
-				return;
+			if (number(1, 10000) > ahook->percent * 100) {
+				continue;	// failed percent check
+			}
+			if (!pre_check_hooked_ability(ch, abil)) {
+				continue;	// unlikely to succeed
 			}
 			
-			// otherwise attempt the infiltrate and logs on failure
-			if (!has_player_tech(ch, PTECH_INFILTRATE_UPGRADE) && !player_tech_skill_check(ch, PTECH_INFILTRATE, DIFF_HARD)) {
-				// infiltrate failed -- log it
-				if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
-					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted at (%d, %d)!", X_COORD(to_room), Y_COORD(to_room));
-				}
-				else {
-					log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "%s has been spotted infiltrating at (%d, %d)!", PERS(ch, ch, FALSE), X_COORD(to_room), Y_COORD(to_room));
-				}
-				msg_to_char(ch, "You fail to infiltrate.\r\n");
-				CANCEL_ABILITY(data);
-				return;
+			// incoming targets
+			use_char = vict;
+			use_obj = ovict;
+			use_veh = vvict;
+			use_room = room_targ;
+			
+			// cancel multi if not allowed?
+			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
+				multi_targ = NOBITS;
 			}
+			
+			// compare targets
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
+				use_char = ch;	// convert to self
+			}
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT)) {
+				use_char = FIGHTING(ch);	// set to self
+			}
+			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
+				use_char = ch;	// set to self
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
+				use_room = IN_ROOM(ch);	// convert to this room
+			}
+				
+			// validation of targets
+			if (use_char == ch && (ABIL_IS_VIOLENT(abil) || IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF))) {
+				use_char = NULL;	// can't target self
+			}
+			if (use_char && use_char != ch && IN_ROOM(use_char) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)) {
+				use_char = NULL;	// char in wrong room
+			}
+			if (use_char && (IS_DEAD(use_char) || EXTRACTED(use_char))) {
+				use_char = NULL;	// gone
+			}
+			if (use_veh && IN_ROOM(use_veh) != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
+				use_veh = NULL;	// veh in wrong room
+			}
+			if (use_veh && VEH_IS_EXTRACTED(use_veh)) {
+				use_veh = NULL;	// gone
+			}
+			
+			// do we have any mandatory targets left?
+			if (!IS_SET(ABIL_TARGETS(abil), ATAR_IGNORE | ATAR_STRING)) {
+				any_targ = FALSE;
+				if (IS_SET(ABIL_TARGETS(abil), CHAR_ATARS) && use_char) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(abil), OBJ_ATARS) && use_obj) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(abil), VEH_ATARS) && use_veh) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(abil), ROOM_ATARS) && use_room) {
+					any_targ = TRUE;
+				}
+				else if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
+					any_targ = TRUE;
+					if (multi_targ == NOBITS) {
+						multi_targ = ABIL_TARGETS(abil) & MULTI_CHAR_ATARS;
+					}
+				}
+				if (!any_targ || !validate_ability_target(ch, abil, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
+					continue;	// no apparent targets
+				}
+			}
+			
+			// match!
+			
+			// mark already run FIRST
+			add_vnum_hash(use_limiter, ABIL_VNUM(abil), 1);
+			
+			// determine level? or, preferably, inherit
+			if (!level) {
+				level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
+			}
+			
+			// construct data
+			CREATE(data, struct ability_exec, 1);
+			data->abil = abil;
+			data->should_charge_cost = TRUE;	// may still charge
+			data->matching_role = has_matching_role(ch, abil, TRUE);
+			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
+			
+			// the big GO
+			call_ability(ch, abil, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+			
+			// clean up data
+			GET_RUNNING_ABILITY_DATA(ch) = NULL;
+			free_ability_exec(data);
 		}
 	}
 	
-	get_ability_type_data(data, ABILT_TELEPORT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_TELEPORT, data);
+	if (free_limiter) {
+		GET_RUNNING_ABILITY_LIMITER(ch) = NULL;
+		free_vnum_hash(&my_limiter);
+	}
+}
+
+
+/**
+* Runs any abiliy hooks for a given tech, IF the player has it.
+*
+* @param char_data *ch The player.
+* @param int tech The PTECH_ type that's being used.
+* @param char_data *vict Victim, if any (may be NULL).
+* @param obj_data *ovict Object target, if any (may be NULL).
+* @param vehicle_data *vvict Vehicle target, if any (may be NULL).
+* @param room_data *room_targ Room target, if any (may be NULL).
+*/
+void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ) {
+	struct player_tech *iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_TECHS(ch), iter) {
+		if (iter->id == tech) {
+			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ, NOBITS);
+		}
+	}
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// UTILITIES ///////////////////////////////////////////////////////////////
+//// PLAYER UTILITIES ////////////////////////////////////////////////////////
+
+/**
+* Adds a gain hook for an ability.
+*
+* @param char_data *ch The player to add a hook to.
+* @param ability_data *abil The ability to add a hook for.
+*/
+void add_ability_gain_hook(char_data *ch, ability_data *abil) {
+	struct ability_gain_hook *agh;
+	any_vnum vnum;
+	
+	if (!ch || IS_NPC(ch) || !abil) {
+		return;
+	}
+	
+	vnum = ABIL_VNUM(abil);
+	HASH_FIND_INT(GET_ABILITY_GAIN_HOOKS(ch), &vnum, agh);
+	if (!agh) {
+		CREATE(agh, struct ability_gain_hook, 1);
+		agh->ability = ABIL_VNUM(abil);
+		HASH_ADD_INT(GET_ABILITY_GAIN_HOOKS(ch), ability, agh);
+	}
+	
+	agh->triggers = ABIL_GAIN_HOOKS(abil);
+}
+
+
+/**
+* Sets up the gain hooks for a player's ability on login.
+*
+* @param char_data *ch The player to set up hooks for.
+*/
+void add_all_gain_hooks(char_data *ch) {
+	struct player_ability_data *abil, *next_abil;
+	bool any;
+	int iter;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		any = FALSE;
+		for (iter = 0; iter < NUM_SKILL_SETS && !any; ++iter) {
+			if (abil->purchased[iter]) {
+				any = TRUE;
+				add_ability_gain_hook(ch, abil->ptr);
+			}
+		}
+	}
+}
+
+
+/**
+* Takes the techs from an ability and applies them to a player.
+*
+* @param char_data *ch The player to apply to.
+* @param ability_data *abil The ability whose techs we'll apply.
+*/
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil) {
+	struct ability_data_list *adl;
+	
+	if (IS_NPC(ch) || !IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+		return;	// no techs to apply
+	}
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_PLAYER_TECH) {
+			continue;
+		}
+		
+		// ok
+		add_player_tech(ch, ABIL_VNUM(abil), adl->vnum);
+	}
+}
+
+
+/**
+* Applies all the ability techs from a player's current skill set (e.g. upon
+* login).
+*
+* @param char_data *ch The player.
+*/
+void apply_all_ability_techs(char_data *ch) {
+	struct player_ability_data *plab, *next_plab;
+	ability_data *abil;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;
+		}
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
+			apply_ability_techs_to_player(ch, abil);
+		}
+	}
+}
+
+
+/**
+* Applies the passive buffs from 1 ability to the player. Call affect_total()
+* when you're done applying passive buffs.
+*
+* @param char_data *ch The player.
+* @param ability_data *abil The passive-buff ability to apply.
+*/
+void apply_one_passive_buff(char_data *ch, ability_data *abil) {
+	double remaining_points = 0, total_points = 0, share, amt;
+	struct ability_exec *data;
+	struct affected_type *af;
+	struct apply_data *apply;
+	int cap, level, total_w = 0;
+	bool unscaled, unscaled_penalty;
+	
+	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
+		return;	// safety first
+	}
+	
+	// remove if already on there
+	remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
+	
+	CREATE(data, struct ability_exec, 1);
+	data->abil = abil;
+	data->matching_role = has_matching_role(ch, abil, FALSE);
+	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
+	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
+	GET_RUNNING_ABILITY_DATA(ch) = data;
+	
+	// things only needed for scaled buffs
+	if (!unscaled) {
+		level = get_approximate_level(ch);
+		if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
+			level = MIN(level, cap);	// constrain by skill level
+		}
+		total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
+		
+		if (total_points < 0) {	// no work
+			GET_RUNNING_ABILITY_DATA(ch) = NULL;
+			free_ability_exec(data);
+			return;
+		}
+	}
+	
+	// affect flags? cost == level 100 ability
+	if (ABIL_AFFECTS(abil)) {
+		if (!unscaled) {
+			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+			// also reset total_points as it's used for weights below
+			total_points = remaining_points = MAX(0, remaining_points);
+		}
+		
+		af = create_flag_aff(ABIL_VNUM(abil), UNLIMITED, ABIL_AFFECTS(abil), ch);
+		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
+	
+	// determine share for effects
+	if (!unscaled) {
+		total_w = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			if (!apply_never_scales[apply->location]) {
+				if (unscaled_penalty && apply->weight < 0) {
+					// give actual value of penalty, rounded up
+					total_w += ceil(ABSOLUTE(apply->weight) * apply_values[apply->location]);
+				}
+				else {
+					// apply directly as weight
+					total_w += ABSOLUTE(apply->weight);
+				}
+			}
+		}
+	}
+	
+	// now create affects for each apply that we can afford
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		// unscaled buff?
+		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, apply->weight, ch);
+			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+			continue;
+		}
+		
+		// scaled version: determine share
+		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+		if (share > remaining_points) {
+			share = MIN(share, remaining_points);
+		}
+		
+		// determine amount
+		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		
+		// and apply?
+		if (share > 0 && amt != 0) {
+			remaining_points -= share;
+			remaining_points = MAX(0, remaining_points);
+			
+			af = create_mod_aff(ABIL_VNUM(abil), UNLIMITED, apply->location, amt, ch);
+			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+		}
+	}
+	
+	GET_RUNNING_ABILITY_DATA(ch) = NULL;
+	free_ability_exec(data);
+}
+
+
+/**
+* Audits abilities on startup.
+*/
+void check_abilities_on_startup(void) {
+	ability_data *abil, *next_abil;
+	
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (ABIL_MASTERY_ABIL(abil) != NOTHING && !find_ability_by_vnum(ABIL_MASTERY_ABIL(abil))) {
+			log("- Ability [%d] %s has invalid mastery ability %d", ABIL_VNUM(abil), ABIL_NAME(abil), ABIL_MASTERY_ABIL(abil));
+			ABIL_MASTERY_ABIL(abil) = NOTHING;
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC UTILITIES ////////////////////////////////////////////////////////////
 
 /**
 * Checks for common ability problems and reports them to ch.
@@ -7509,6 +7156,44 @@ void remove_ability_from_table(ability_data *abil) {
 
 
 /**
+* This function adds a type to the ability's type list, and updates the summary
+* type flags.
+*
+* @param ability_data *abil Which ability we're adding a type to.
+* @param bitvector_t type Which ABILT_ flag.
+* @param int weight How much weight it gets (for scaling).
+*/
+void add_type_to_ability(ability_data *abil, bitvector_t type, int weight) {
+	bitvector_t total = NOBITS;
+	struct ability_type *at;
+	bool found = FALSE;
+	
+	if (!type) {
+		return;
+	}
+	
+	LL_FOREACH(ABIL_TYPE_LIST(abil), at) {
+		total |= at->type;
+		
+		if (at->type == type) {
+			at->weight = weight;
+			found = TRUE;
+		}
+	}
+	
+	if (!found) {
+		CREATE(at, struct ability_type, 1);
+		at->type = type;
+		at->weight = weight;
+		LL_APPEND(ABIL_TYPE_LIST(abil), at);
+	}
+	
+	total |= type;
+	ABIL_TYPES(abil) = total;	// summarize flags
+}
+
+
+/**
 * Initializes a new ability. This clears all memory for it, so set the vnum
 * AFTER.
 *
@@ -7524,6 +7209,186 @@ void clear_ability(ability_data *abil) {
 	ABIL_SCALE(abil) = 1.0;
 	ABIL_MAX_STACKS(abil) = 1;
 	ABIL_MIN_POS(abil) = POS_STANDING;
+}
+
+
+/**
+* Copies ability hook list.
+*
+* @param struct ability_hook *input_list The list to copy.
+* @return struct ability_hook* The copied list.
+*/
+struct ability_hook *copy_ability_hooks(struct ability_hook *input_list) {
+	struct ability_hook *hook, *new_hook, *list;
+	
+	// copy hooks in order
+	list = NULL;
+	LL_FOREACH(input_list, hook) {
+		CREATE(new_hook, struct ability_hook, 1);
+		*new_hook = *hook;
+		new_hook->next = NULL;
+		LL_APPEND(list, new_hook);
+	}
+	
+	return list;
+}
+
+
+/**
+* Duplicates a list of ability data.
+*
+* @param struct ability_data_list *input The list to duplicate.
+* @return struct ability_data_list* The copy.
+*/
+struct ability_data_list *copy_data_list(struct ability_data_list *input) {
+	struct ability_data_list *list = NULL, *adl, *iter;
+	
+	LL_FOREACH(input, iter) {
+		CREATE(adl, struct ability_data_list, 1);
+		*adl = *iter;
+		LL_APPEND(list, adl);
+	}
+	
+	return list;
+}
+
+
+/**
+* Copies ability type list.
+*
+* @param struct copy_ability_type_list *input_list The list to copy.
+* @return struct copy_ability_type_list* The copied list.
+*/
+struct ability_type *copy_ability_type_list(struct ability_type *input_list) {
+	struct ability_type *atl, *new_atl, *list;
+	
+	// copy typess in order
+	list = NULL;
+	LL_FOREACH(input_list, atl) {
+		CREATE(new_atl, struct ability_type, 1);
+		*new_atl = *atl;
+		new_atl->next = NULL;
+		LL_APPEND(list, new_atl);
+	}
+	
+	return list;
+}
+
+
+/**
+* Finds and removes an entry from an ability data list, by type + vnum + misc.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to remove.
+* @param int misc Which misc value to match.
+* @return bool TRUE if any were removed, FALSE if not found.
+*/
+bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc) {
+	struct ability_data_list *adl, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
+		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
+			LL_DELETE(ABIL_DATA(abil), adl);
+			free(adl);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Finds and removes an entry from an ability data list, by vnum.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to remove.
+* @return bool TRUE if any were removed, FALSE if not found.
+*/
+bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum) {
+	struct ability_data_list *adl, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next) {
+		if (adl->type == type && adl->vnum == vnum) {
+			LL_DELETE(ABIL_DATA(abil), adl);
+			free(adl);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* This will delete any matching hooks.
+*
+* @param ability_data *abil Which ability to delete hooks from.
+* @param int hook_type Which AHOOK_ const to look for.
+* @param int hook_value Which value to match.
+* @return bool TRUE if abil had that hook and it was deleted, FALSE if not.
+*/
+
+bool delete_from_ability_hooks(ability_data *abil, int hook_type, int hook_value) {
+	struct ability_hook *ahook, *next;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(ABIL_HOOKS(abil), ahook, next) {
+		if (ahook->type == hook_type && ahook->value == hook_value) {
+			LL_DELETE(ABIL_HOOKS(abil), ahook);
+			free(ahook);
+			any = TRUE;
+		}
+	}
+	return any;
+}
+
+
+/**
+* Finds an ability data entry that matches. This version ignores the 'misc'
+* field.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to find.
+* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
+*/
+struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int type, any_vnum vnum) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type && adl->vnum == vnum) {
+			return adl;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Finds an ability data entry that matches, including the misc field.
+*
+* @param ability_data *abil Which ability.
+* @param int type Which ADL_ type.
+* @param any_vnum vnum Which vnum to find.
+* @param int misc Which misc to find.
+* @return struct ability_data_list* The matching entry if it exists, or NULL if not.
+*/
+struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, int type, any_vnum vnum, int misc) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == type && adl->vnum == vnum && adl->misc == misc) {
+			return adl;
+		}
+	}
+	
+	return NULL;
 }
 
 
@@ -8827,6 +8692,155 @@ ability_data *setup_olc_ability(ability_data *input) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
+
+/**
+* String display for one ADL item.
+*
+* @param struct ability_data_list *adl The data item to show.
+* @return char* The string to display.
+*/
+char *ability_data_display(struct ability_data_list *adl) {
+	static char output[MAX_STRING_LENGTH];
+	char type_str[256], part[256];
+	
+	prettier_sprintbit(adl->type, ability_data_types, type_str);
+	
+	// ADL_x: display by type
+	switch (adl->type) {
+		case ADL_PLAYER_TECH: {
+			snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
+			break;
+		}
+		case ADL_EFFECT: {
+			snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
+			break;
+		}
+		case ADL_READY_WEAPON: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
+			break;
+		}
+		case ADL_SUMMON_MOB: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			break;
+		}
+		case ADL_LIMITATION: {
+			// ABLIM_x:
+			switch (ability_limitation_misc[adl->vnum]) {
+				case ABLIM_ITEM_TYPE: {
+					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_ATTACK_TYPE: {
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
+					break;
+				}
+				case ABLIM_WEAPON_TYPE: {
+					sprinttype(adl->misc, weapon_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_DAMAGE_TYPE: {
+					sprinttype(adl->misc, damage_types, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_ROLE: {
+					sprinttype(adl->misc, class_role, part, sizeof(part), "UNKNOWN");
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_OBJ_FLAG: {
+					sprintbit(adl->misc, extra_bits, part, FALSE);
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
+				case ABLIM_NOTHING:
+				default: {
+					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
+					break;
+				}
+			}
+			break;
+		}
+		case ADL_PAINT_COLOR: {
+			snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			break;
+		}
+		case ADL_ACTION: {
+			snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
+			break;
+		}
+		case ADL_RANGE: {
+			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
+			break;
+		}
+		case ADL_PARENT: {
+			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "%s: ???", type_str);
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
+* String display for one ability hook.
+*
+* @param struct ability_data_list *adl The data item to show.
+* @return char* The string to display.
+*/
+char *ability_hook_display(struct ability_hook *ahook) {
+	static char output[MAX_STRING_LENGTH];
+	char type_str[256], label[256];
+	
+	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
+	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
+	
+	// AHOOK_x: display by type
+	switch (ahook->type) {
+		case AHOOK_ABILITY: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
+			break;
+		}
+		case AHOOK_ATTACK_TYPE: {
+			snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
+			break;
+		}
+		case AHOOK_WEAPON_TYPE: {
+			snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
+			break;
+		}
+		case AHOOK_DAMAGE_TYPE: {
+			snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
+			break;
+		}
+		
+		// simple types
+		case AHOOK_ATTACK:
+		case AHOOK_KILL:
+		case AHOOK_MELEE_ATTACK:
+		case AHOOK_RANGED_ATTACK:
+		case AHOOK_DYING:
+		case AHOOK_RESPAWN:
+		case AHOOK_RESURRECT: {
+			snprintf(output, sizeof(output), "%s", label);
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
+			break;
+		}
+	}
+	
+	return output;
+}
+
 
 /**
 * Determines what fields can appear in the ability menu, stat ability, etc.

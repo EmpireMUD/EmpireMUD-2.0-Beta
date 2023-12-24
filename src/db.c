@@ -53,7 +53,7 @@ void build_all_shop_lookups();
 void build_land_map();
 void build_player_index();
 void build_world_map();
-void check_abilities();
+void check_abilities_on_startup();
 void check_and_link_faction_relations();
 void check_archetypes();
 void check_classes();
@@ -642,7 +642,7 @@ void boot_world(void) {
 	
 	// check for bad data
 	log("Verifying data.");
-	check_abilities();
+	check_abilities_on_startup();
 	check_and_link_faction_relations();
 	check_archetypes();
 	check_classes();
