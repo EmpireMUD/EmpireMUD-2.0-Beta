@@ -4622,6 +4622,8 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	
 	bitvector_t act_flags = ACT_ABILITY;
 	
+	#define _AAM_NO_DEFAULT(abil)	(IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABILITY_FLAGGED((abil), ABILF_OVER_TIME))
+	
 	if (!ch || !abil) {
 		return;	// no work
 	}
@@ -4645,7 +4647,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -4657,7 +4659,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 				}
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
@@ -4671,7 +4673,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 				}
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -4683,7 +4685,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 				}
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
@@ -4695,7 +4697,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 					act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 				}
 			}
-			else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
 				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
@@ -4710,7 +4712,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
@@ -4722,7 +4724,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
@@ -4736,7 +4738,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
@@ -4748,7 +4750,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 				act(msg, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK)) {
+		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
 			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
