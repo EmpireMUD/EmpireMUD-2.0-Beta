@@ -4149,65 +4149,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 					free(af);
 				}
 			}
-		
-			// ability effects
-			if (!IS_NPC(ch) && weapon && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL_DEBUFFS) && skill_check(ch, ABIL_TRICK_SHOTS, DIFF_RARELY)) {
-				switch (GET_MISSILE_WEAPON_TYPE(weapon)) {
-					case TYPE_BOW: {
-						af = create_flag_aff(ATYPE_TRICK_SHOT, 10, AFF_SLOW, ch);
-						affect_join(vict, af, 0);
-						
-						act("That shot to the leg seems to slow $N!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's last shot hit your leg! You feel slower.", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's last shot seems to stun $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						break;
-					}
-					case TYPE_CROSSBOW: {
-						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
-						break;
-					}
-					case TYPE_PISTOL: {
-						af = create_mod_aff(ATYPE_TRICK_SHOT, 10, APPLY_DODGE, -(GET_DEXTERITY(ch) * hit_per_dex), ch);
-						affect_join(vict, af, 0);
-						
-						act("That shot to the arm seems to shake $N!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's last shot hit your arm! You feel shaken.", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's last shot seems to shake $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						break;
-					}
-					case TYPE_MUSKET: {
-						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
-						break;
-					}
-					case TYPE_SLING: {
-						if (!AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_STUNNED | AFF_HARD_STUNNED)) {
-							af = create_flag_aff(ATYPE_TRICK_SHOT, 5, AFF_STUNNED, ch);
-							affect_join(vict, af, 0);
-						
-							act("That shot to the head seems to stun $N!", FALSE, ch, NULL, vict, TO_CHAR);
-							act("$n's last shot hit your head! You feel stunned.", FALSE, ch, NULL, vict, TO_VICT);
-							act("$n's last shot seems to stun $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						}
-						break;
-					}
-					case TYPE_SPEAR_THROWER: {
-						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
-						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
-						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
-						
-						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 25, DAM_PHYSICAL, 5, 5, ch);
-						break;
-					}
-				}
-			}
 		}
 		
 		// fire a consume trigger but it can't block execution here
@@ -4219,13 +4160,9 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		if (can_gain_exp_from(ch, vict)) {
 			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_player_tech_exp(ch, PTECH_FASTER_RANGED_COMBAT, 2);
-			gain_ability_exp(ch, ABIL_TRICK_SHOTS, 2);
 			run_ability_gain_hooks(ch, vict, AGH_RANGED);
 		}
 		run_ability_hooks_by_player_tech(ch, PTECH_FASTER_RANGED_COMBAT, vict, NULL, NULL, NULL);
-		if (has_ability(ch, ABIL_TRICK_SHOTS)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TRICK_SHOTS, 0, vict, NULL, NULL, NULL, NOBITS);
-		}
 	}
 	
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
