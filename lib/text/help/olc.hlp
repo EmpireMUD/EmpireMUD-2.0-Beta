@@ -1663,34 +1663,48 @@ See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
 
 Usage:  .targets [add | remove] <flag>
 
-This determines what targets an ability has. Many of these flags go together or
-modify each other. They are:
- &cIGNORE&0 - Has no automatic targets.
- &cCHAR-ROOM&0 - Targets a character in the room with the actor.
- &cCHAR-WORLD&0 - Targets a character anywhere in the world.
- &cCHAR-CLOSEST&0 - Targets the closest person with that name.
- &yFIGHT-SELF&0 - Modifier: Targets self if no argument while fighting.
- &yFIGHT-VICTIM&0 - Modifier: Targets victim if no argument while fighting.
- &ySELF-ONLY&0 - Modifier: Can only target yourself.
- &yNOT-SELF&0 - Modifier: Character target cannot be self.
- &cOBJ-INV&0 - Targets an object in your inventory.
- &cOBJ-ROOM&0 - Targets an object on the ground.
- &cOBJ-WORLD&0 - Targets an object anywhere.
- &cOBJ-EQUIP&0 - Targets an object you're wearing.
- &cVEH-ROOM&0 - Targets a vehicle in the room.
- &cVEH-WORLD&0 - Targets a vehicle anywhere.
+This determines what targets an ability has.
+
+Character targets:
+ &ySELF-ONLY&0 - Targets the user.
+ &cCHAR-ROOM&0 - A character in the room with the actor.
+ &cCHAR-WORLD&0 - A character anywhere in the world.
+ &cCHAR-CLOSEST&0 - The closest person with that name.
+
+Object targets:
+ &cOBJ-INV&0 - An object in your inventory.
+ &cOBJ-ROOM&0 - An object on the ground.
+ &cOBJ-WORLD&0 - An object anywhere.
+ &cOBJ-EQUIP&0 - An object you're wearing.
+
+Room targets:
  &cROOM-HERE&0 - Targets the room you're in.
- &cROOM-ADJACENT&0 - Targets in a direction.
- &cROOM-EXIT&0 - Targets the exit (from a building or vehicle).
- &cROOM-HOME&0 - Targets the player's home, if any.
- &cROOM-RANDOM&0 - Targets a random room up to the RANGE data.
- &cROOM-CITY&0 - Targets a city (center) in the player's empire by city name.
- &cROOM-COORDS&0 - Targets a room by coordinates.
- &cSTRING&0 - Argument is required, but not a traditional target.
+ &cROOM-ADJACENT&0 - A room in a given direction.
+ &cROOM-EXIT&0 - The room outside (from a building or vehicle).
+ &cROOM-HOME&0 - The player's home, if any.
+ &cROOM-RANDOM&0 - A random room (up to the distance from RANGE data).
+ &cROOM-CITY&0 - A city (center) in the player's empire, by city name.
+ &cROOM-COORDS&0 - Any room by coordinates.
+
+Vehicle targets:
+ &cVEH-ROOM&0 - A vehicle (or vehicle-style building) in the room.
+ &cVEH-WORLD&0 - A vehicle anywhere.
+
+Multiple targets:
  &cALLIES-MULTI&0 - Can target all allies.
  &cGROUP-MULTI&0 - Can target whole group.
- &cROOM-MULTI&0 - Can target everyone in the room.
+ &cROOM-MULTI&0 - Can target all characters in the room.
  &cENEMIES-MULTI&0 - Can target all enemies.
+
+Miscellaneous targets:
+ &cIGNORE&0 - Has no automatic targets.
+ &cSTRING&0 - An argument is required, but not a traditional target.
+
+Modifier flags (use in combination with the above flags):
+ &yFIGHT-SELF&0 - Targets self if no argument while fighting.
+ &yFIGHT-VICTIM&0 - Targets victim if no argument while fighting.
+ &yNOT-SELF&0 - Character target cannot be self.
+ &cMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
 See also: OLC ABILITIES
 #d

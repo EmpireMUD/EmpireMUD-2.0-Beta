@@ -1793,7 +1793,7 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 	if (IS_SET(multi_targ, ATAR_ENEMIES_MULTI)) {
 		any = FALSE;
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-			if (ch_iter != ch && is_ability_enemy(ch, ch_iter) && CAN_SEE(ch, ch_iter)) {
+			if (ch_iter != ch && is_ability_enemy(ch, ch_iter) && (!IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CAN_SEE) || CAN_SEE(ch, ch_iter))) {
 				any = TRUE;
 				break;
 			}
@@ -6063,6 +6063,9 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && ch_iter == ch) {
 			continue;	// not self
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CAN_SEE) && !CAN_SEE(ch, ch_iter)) {
+			continue;	// can't see
 		}
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group
