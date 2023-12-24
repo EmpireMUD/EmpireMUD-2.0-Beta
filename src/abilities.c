@@ -5522,10 +5522,10 @@ void perform_over_time_ability(char_data *ch) {
 	send_ability_over_time_messages(ch, vict, ovict, vvict, abil, GET_ACTION_TIMER(ch), data);
 	
 	// detect continuing?
-	if (vict && vict != ch && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+	if (((vict && vict != ch) || ovict || vvict) && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
 		// ongoing ability: do nothing
 	}
-	else if ((!vict || vict == ch) && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
+	else if ((!vict || vict == ch) && has_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_SELF_TO_CHAR, GET_ACTION_TIMER(ch) + 1)) {
 		// ongoing ability: do nothing
 	}
 	else {
