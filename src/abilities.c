@@ -5515,7 +5515,7 @@ void perform_over_time_ability(char_data *ch) {
 	// construct data
 	CREATE(data, struct ability_exec, 1);
 	data->abil = abil;
-	data->should_charge_cost = FALSE;	// already charged, generally
+	data->should_charge_cost = TRUE;	// will only charge overage costs, and only if needed
 	data->matching_role = has_matching_role(ch, abil, TRUE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
@@ -6150,11 +6150,6 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	if (!ch || !abil) {
 		return;
-	}
-	
-	if (IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
-		// ability is being called at the end of an over-time action (already charged)
-		data->should_charge_cost = FALSE;
 	}
 	
 	// determine costs and scales
