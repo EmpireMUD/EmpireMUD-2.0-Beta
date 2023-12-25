@@ -10836,7 +10836,7 @@ OLC_MODULE(abiledit_pooltype) {
 	else {
 		ABIL_POOL_TYPE(abil) = olc_process_type(ch, argument, "pool type", "pooltype", pool_types, ABIL_POOL_TYPE(abil));
 		if (!*argument) {
-			msg_to_char(ch, "Or <\typooltype any\t0> for any pool.\r\n");
+			msg_to_char(ch, "Or <\typooltype any\t0> for any pool\r\n");
 		}
 	}
 }
