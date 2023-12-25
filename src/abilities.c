@@ -6352,7 +6352,6 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		send_ability_fail_messages(ch, vict, ovict, abil, data);
 		
-		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
 		data->no_msg = TRUE;	// prevents success message
 		data->engage_anyway = TRUE;	// allows engage-combat through a data->stop
