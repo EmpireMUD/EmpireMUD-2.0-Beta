@@ -823,7 +823,7 @@ void empire_player_tech_skillup(empire_data *emp, int tech, double amount) {
 * Determines which skill or ability is referred to by either arg2 or whole_arg,
 * depending upon whether or not the first word was "info" (which is dropped).
 *
-* This prefers, in order: exact skill, exact ability, abbreviated skill,
+* This prefers, in order: exact skill, abbreviated skill, exact ability,
 * abbreviated ability.
 *
 * This requires multiple strings which are already available in the command
@@ -846,10 +846,10 @@ static bool find_skill_or_ability_for_command(char *arg1, char *rest_arg, char *
 	if ((*found_skill = find_skill_by_name_exact(use_arg, FALSE))) {
 		return TRUE;
 	}
-	else if ((*found_abil = find_ability_by_name_exact(use_arg, FALSE))) {
+	else if ((*found_skill = find_skill_by_name_exact(use_arg, TRUE))) {
 		return TRUE;
 	}
-	else if ((*found_skill = find_skill_by_name_exact(use_arg, TRUE))) {
+	else if ((*found_abil = find_ability_by_name_exact(use_arg, FALSE))) {
 		return TRUE;
 	}
 	else if ((*found_abil = find_ability_by_name_exact(use_arg, TRUE))) {
@@ -1778,6 +1778,40 @@ bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech) {
  //////////////////////////////////////////////////////////////////////////////
 //// CORE SKILL COMMANDS /////////////////////////////////////////////////////
 
+ACMD(do_ability) {
+	char outbuf[MAX_STRING_LENGTH * 2];
+	ability_data *abil;
+	
+	skip_spaces(&argument);
+	
+	// optional info arg (changes nothing)
+	if (!strn_cmp(argument, "info ", 5)) {
+		argument += 4;
+		skip_spaces(&argument);
+	}
+	
+	if (!*argument) {
+		msg_to_char(ch, "Get info for which ability?\r\n");
+	}
+	else if (!(abil = find_ability_by_name_exact(argument, TRUE))) {
+		// no matching abil
+		if (find_skill_by_name_exact(argument, TRUE)) {
+			msg_to_char(ch, "Invalid ability. Try 'skill %s' instead.\r\n", argument);
+		}
+		else {
+			msg_to_char(ch, "Unknown ability '%s'.\r\n", argument);
+		}
+	}
+	else {
+		// ability details
+		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
+		if (ch->desc) {
+			page_string(ch->desc, outbuf, 1);
+		}
+	}
+}
+
+
 ACMD(do_noskill) {
 	struct player_skill_data *skdata;
 	skill_data *skill;
@@ -2391,7 +2425,6 @@ ACMD(do_skills) {
 	}
 	else if (abil) {
 		// ability details
-		void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf);
 		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);

@@ -2077,6 +2077,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data, char **replace, int replace_count);
 void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
 void setup_ability_companions(char_data *ch);
+void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf);
 
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
