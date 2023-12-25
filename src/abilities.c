@@ -109,6 +109,9 @@ PREP_ABIL(prep_paint_building_ability);
 DO_ABIL(do_ready_weapon_ability);
 PREP_ABIL(prep_ready_weapon_ability);
 
+DO_ABIL(do_restore_ability);
+PREP_ABIL(prep_restore_ability);
+
 DO_ABIL(do_resurrect_ability);
 PREP_ABIL(prep_resurrect_ability);
 
@@ -146,9 +149,10 @@ struct {
 	// ones that should run early
 	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
-	// attack/damage: some abilities stop here if they miss
+	// attack/damage and restoration: some abilities stop here if they miss
 	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_RESTORE, prep_restore_ability, do_restore_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_POOL_TYPE | ABILEDIT_COST_PER_AMOUNT },
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
@@ -3710,6 +3714,12 @@ PREP_ABIL(prep_ready_weapon_ability) {
 
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_restore_ability) {
+	// TODO
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_resurrect_ability) {
 	char_data *targ;
 	
@@ -4354,6 +4364,11 @@ DO_ABIL(do_ready_weapon_ability) {
 	
 	determine_gear_level(ch);
 	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_restore_ability) {
 }
 
 
@@ -8103,6 +8118,14 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							ABIL_COST_PER_TARGET(abil) = dbl_in[0];
 							break;
 						}
+						case 9: {	// X+ 5: pool type
+							if (sscanf(line, "X+ 9 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_POOL_TYPE(abil) = int_in[0];
+							break;
+						}
 						default: {
 							log("SYSERR: Unknown 'X+' type %d in %s", xtype, error);
 							exit(1);
@@ -8361,6 +8384,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	if (ABIL_COST_PER_TARGET(abil) != 0.0) {
 		fprintf(fl, "X+ 8 %.2f\n", ABIL_COST_PER_TARGET(abil));
+	}
+	if (ABIL_POOL_TYPE(abil)) {
+		fprintf(fl, "X+ 9 %d\n", ABIL_POOL_TYPE(abil));
 	}
 	// former 'X' type is no longer used; replaced by X+
 	
@@ -9318,6 +9344,9 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 	if (ABIL_REQUIRES_TOOL(abil)) {
 		fields |= ABILEDIT_TOOL;
 	}
+	if (ABIL_POOL_TYPE(abil) != 0) {
+		fields |= ABILEDIT_POOL_TYPE;
+	}
 	
 	return fields;
 }
@@ -9445,10 +9474,13 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%sDamage type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), damage_types[ABIL_DAMAGE_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sPool type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS)) {
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
@@ -9655,10 +9687,13 @@ void olc_show_ability(char_data *ch) {
 	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
 		sprintf(buf + strlen(buf), "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
+		sprintf(buf + strlen(buf), "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS)) {
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE)) {
 		sprintf(buf + strlen(buf), "\r\n");
 	}
 	
@@ -10657,6 +10692,25 @@ OLC_MODULE(abiledit_minposition) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_pooltype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_POOL_TYPE)) {
+		msg_to_char(ch, "This type of ability does not have that property. Add the RESTORE type to use it.\r\n");
+	}
+	else if (!str_cmp(argument, "any")) {
+		ABIL_POOL_TYPE(abil) = ANY_POOL;
+		msg_to_char(ch, "It can now affect any pool.\r\n");
+	}
+	else {
+		ABIL_POOL_TYPE(abil) = olc_process_type(ch, argument, "pool type", "pooltype", pool_types, ABIL_POOL_TYPE(abil));
+		if (!*argument) {
+			msg_to_char(ch, "Or <\typooltype any\t0> for any pool.\r\n");
+		}
+	}
 }
 
 

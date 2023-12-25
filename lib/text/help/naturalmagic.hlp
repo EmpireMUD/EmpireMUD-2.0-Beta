@@ -38,21 +38,15 @@ decreasing the victim's magical resistance.
 
 Ancestral Healing (Natural Magic ability)
 
-This passive ability channels the power of your ancestors to add your Greatness
-attribute to your Bonus-Healing trait, which affects all of your healing
-abilities. This Greatness effect gets more powerful as your level goes up.
+This passive ability channels the power of your ancestors to boost your healing
+power. The size of this boost is based on your Greatness trait, and is higher
+in the healer role.
 
-The amount of Bonus-Healing added is a proportion of your Greatness: your total
-Greatness is added per 150 player levels, with a proportion of your Greatness
-for any portion under 150 levels. For example, if you are level 75, you gain
-half your Greatness. At level 150, it's your full Greatness. At level 300, it's
-2x Greatness.
-
-This ability gains experience when you use an ability that's boosted by it.
+This ability gains experience when you heal someone.
 
 Note: Bonus healing does not add to the cost of healing spells.
 
-See also: HEAL, REJUVENATE
+See also: HEAL, REJUVENATE, PASSIVES
 #
 "ANIMAL FORMS"
 

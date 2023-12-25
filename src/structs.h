@@ -601,6 +601,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_RESURRECT			BIT(21)	// resurrects a player
 #define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
 #define ABILT_ATTACK			BIT(23)	// hits the target with one's own weapon attack
+#define ABILT_RESTORE			BIT(24)	// restores pools (health, etc)
 
 
 // ATAR_x: ability targeting flags
@@ -3950,6 +3951,7 @@ struct ability_data {
 	struct apply_data *applies;	// affects
 	int attack_type;	// damage
 	int damage_type;	// damage
+	int pool_type;	// restore
 	int max_stacks;	// dot
 	struct ability_data_list *data;	// LL of additional data
 	struct interaction_item *interactions;	// LL of regular interactions

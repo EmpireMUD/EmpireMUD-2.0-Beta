@@ -1591,6 +1591,16 @@ Messages:
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
+"ABILEDIT POOLTYPE" "ABILEDIT POOL TYPE"
+
+Usage:  .pooltype <health | mana | move | blood | any>
+
+This determines which pool a RESTORE ability will affect. If you set it to
+'any', the player will choose which to restore from health, mana, or move
+(not blood).
+
+See also: RESTORE ABILITY
+#d
 "ABILEDIT RESOURCECOST" "ABILEDIT RESOURCE COST"
 
 Usage:  .resource add <type> <amount> <vnum/name>

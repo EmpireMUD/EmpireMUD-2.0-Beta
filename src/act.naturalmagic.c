@@ -41,26 +41,6 @@ ACMD(do_dismount);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* Returns the amount of healing to add if the player has Ancestral Healing and
-* the Greatness attribute.
-*
-* @param char_data *ch The character to check for the ability.
-* @return int The amount of healing to add (or 0 if none).
-*/
-int ancestral_healing(char_data *ch) {
-	double mod, amt;
-	
-	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING) || !check_solo_role(ch)) {
-		return 0;
-	}
-	
-	mod = get_approximate_level(ch) / 150.0;
-	amt = round(GET_GREATNESS(ch) * mod);
-	return MAX(0, amt);
-}
-
-
-/**
 * Despawns ch's companion if it has the given vnum. This will send a 'leaves'
 * message.
 * 
@@ -95,7 +75,7 @@ bool despawn_companion(char_data *ch, mob_vnum vnum) {
 * @return int The total Bonus-Healing trait for that person, with any modifiers.
 */
 int total_bonus_healing(char_data *ch) {
-	return GET_BONUS_HEALING(ch) + ancestral_healing(ch);
+	return GET_BONUS_HEALING(ch);
 }
 
 
@@ -640,14 +620,10 @@ ACMD(do_heal) {
 		
 		will_gain = can_gain_exp_from(ch, vict);
 		run_ability_hooks(ch, AHOOK_ABILITY, abil, 0, vict, NULL, NULL, NULL, NOBITS);
-		if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, 0, vict, NULL, NULL, NULL, NOBITS);
-		}
 	}
 	
 	if (abil != NO_ABIL && will_gain) {
 		gain_ability_exp(ch, abil, gain);
-		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, gain);	// triggers on all heals
 	}
 }
 
@@ -845,7 +821,6 @@ ACMD(do_rejuvenate) {
 	
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_REJUVENATE, 15);
-		gain_ability_exp(ch, ABIL_ANCESTRAL_HEALING, 15);
 	}
 
 	if (FIGHTING(vict) && !FIGHTING(ch)) {
@@ -853,8 +828,5 @@ ACMD(do_rejuvenate) {
 	}
 	
 	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_REJUVENATE, 0, vict, NULL, NULL, NULL, NOBITS);
-	if (has_ability(ch, ABIL_ANCESTRAL_HEALING)) {
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_ANCESTRAL_HEALING, 0, vict, NULL, NULL, NULL, NOBITS);
-	}
 }
 

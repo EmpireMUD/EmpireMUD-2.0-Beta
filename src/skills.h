@@ -159,7 +159,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_REFASHION  216
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_NOBLE_BEARING  228
-#define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
 #define ABIL_HONE  262
 #define ABIL_STABLEMASTER  272
@@ -222,6 +221,10 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define FMODE_MELEE  0	// Hand-to-hand combat
 #define FMODE_MISSILE  1	// Ranged combat
 #define FMODE_WAITING  2	// Fighting someone in ranged combat
+
+
+// for restoration abilities: pool type can be any
+#define ANY_POOL	-1
 
 
 // RESCUE_x: Rescue message types

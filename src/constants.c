@@ -236,6 +236,7 @@ const char *ability_type_flags[] = {
 	"RESURRECT",
 	"RESOURCE",
 	"ATTACK",
+	"RESTORE",
 	"\n"
 };
 
@@ -266,18 +267,7 @@ const char *ability_type_notes[] = {
 	"resurrection",
 	"resource gathering",
 	"attack",
-/*
-	"UNAFFECTS",
-	"POINTS",
-	"ALTER-OBJS",
-	"GROUPS",
-	"MASSES",
-	"AREAS",
-	"CREATIONS",
-	"MANUAL",
-	"ROOMS",
-	"CRAFT",
-*/
+	"restoration",
 	"\n"
 };
 
