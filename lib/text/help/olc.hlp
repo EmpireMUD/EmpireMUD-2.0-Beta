@@ -970,6 +970,8 @@ Message types:
  &cot-targ-to-vict&0
  &cot-targ-to-room&0
 
+For messages to help test abilities, see HELP ABILEDIT TESTING.
+
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
 "ABILEDIT DAMAGE ABILITY" "DAMAGE ABILITY" "DAMAGE ABILITIES"
@@ -1775,6 +1777,58 @@ Messages:
    &cfail-self-to-room&0
 
 See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT TESTING"
+
+This help file assists with building the correct set of messages for an
+ability. Many types of abilities can send several types of messages and one of
+the trickiest parts of building an ability is setting the correct ones.
+
+Add the following messages to your ability, save it, and use it to see which
+ones are displayed. These commands will add the full set of messages:
+
+.cust add self-to-char self-to-char
+.cust add self-to-room self-to-room
+.cust add targ-to-char targ-to-char $N
+.cust add targ-to-vict targ-to-vict
+.cust add targ-to-room targ-to-room
+.cust add counter-to-char counter-to-char $N
+.cust add counter-to-vict counter-to-vict
+.cust add counter-to-room counter-to-room
+.cust add fail-self-to-char fail-self-to-char
+.cust add fail-self-to-room fail-self-to-room
+.cust add fail-targ-to-char fail-targ-to-char $N
+.cust add fail-targ-to-vict fail-targ-to-vict
+.cust add fail-targ-to-room fail-targ-to-room
+.cust add pre-self-to-char pre-self-to-char
+.cust add pre-self-to-room pre-self-to-room
+.cust add pre-targ-to-char pre-targ-to-char $N
+.cust add pre-targ-to-vict pre-targ-to-vict
+.cust add pre-targ-to-room pre-targ-to-room
+.cust add per-veh-to-char per-veh-to-char $V
+.cust add per-veh-to-room per-veh-to-room
+.cust add per-item-to-char per-item-to-char $p
+.cust add per-item-to-room per-item-to-room
+.cust add over-time-longdesc over-time-longdesc
+.cust add toggle-to-char toggle-to-char
+.cust add toggle-to-room toggle-to-room
+.cust add per-char-to-char per-char-to-char $N
+.cust add per-char-to-vict per-char-to-vict
+.cust add per-char-to-room per-char-to-room
+.cust add spec-to-char spec-to-char $N
+.cust add spec-to-vict spec-to-vict
+.cust add spec-to-room spec-to-room
+.cust add no-argument no-argument
+.cust add ot-self-to-char ot-self-to-char start
+.cust add ot-self-to-room ot-self-to-room start
+.cust add ot-targ-to-char ot-targ-to-char start
+.cust add ot-targ-to-vict ot-targ-to-vict start
+.cust add ot-targ-to-room ot-targ-to-room start
+.cust add ot-self-to-char ot-self-to-char end
+.cust add ot-self-to-room ot-self-to-room end
+.cust add ot-targ-to-char ot-targ-to-char end
+.cust add ot-targ-to-vict ot-targ-to-vict end
+.cust add ot-targ-to-room ot-targ-to-room end
 #d
 "ABILEDIT TYPES"
 
