@@ -2303,7 +2303,7 @@ OLC_MODULE(attackedit_message) {
 			smart_copy_attack_messages(ch, other, amd);
 		}
 	}
-	else if (!str_cmp(arg, "duplicate")) {
+	else if (is_abbrev(arg, "duplicate")) {
 		skip_spaces(&arg2);
 		if (GET_OLC_ATTACK_NUM(ch->desc) > 0) {
 			msg_to_char(ch, "You can't do that while editing a message. Go back to the menu first.\r\n");
@@ -2328,6 +2328,7 @@ OLC_MODULE(attackedit_message) {
 				// success
 				add_attack_message(amd, new_ams);
 				GET_OLC_ATTACK_NUM(ch->desc) = ATTACK_NUM_MSGS(amd);
+				olc_show_attack_message(ch);
 			}
 			else {
 				msg_to_char(ch, "Invalid message number to duplicate.\r\n");
