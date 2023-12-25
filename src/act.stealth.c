@@ -857,51 +857,6 @@ ACMD(do_search) {
 }
 
 
-ACMD(do_shadowcage) {
-	char_data *victim, *next_vict;
-	struct affected_type *af;
-	int value, cost = 50;
-	bool first = TRUE;
-	
-	if (!can_use_ability(ch, ABIL_SHADOWCAGE, MOVE, cost, COOLDOWN_SHADOWCAGE)) {
-		return;
-	}
-	else if (!check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SHADOWCAGE)) {
-		return;
-	}
-	else {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_SHADOWCAGE, 30, WAIT_COMBAT_ABILITY);
-		
-		act("You shoot webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_ABILITY);
-		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM | ACT_ABILITY);
-		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
-				continue;
-			}
-			
-			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				value = GET_CHARISMA(ch) * (first ? 4 : 2);
-				first = FALSE;
-				
-				af = create_mod_aff(ATYPE_SHADOWCAGE, 15, APPLY_DODGE, -value, ch);
-				affect_join(victim, af, NOBITS);
-				
-				act("You can't seem to dodge as well in the shadowcage!", FALSE, ch, NULL, victim, TO_VICT | ACT_ABILITY);
-				engage_combat(ch, victim, TRUE);
-			}
-		}
-	}
-}
-
-
 /* Sneak is now sneak <direction>.  Note that entire parties may not sneak together. */
 ACMD(do_sneak) {
 	int dir;
