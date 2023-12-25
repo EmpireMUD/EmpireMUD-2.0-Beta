@@ -3746,6 +3746,14 @@ PREP_ABIL(prep_restore_ability) {
 			return;
 		}
 	}
+	else {
+		// assigned pool
+		if (vict && GET_CURRENT_POOL(vict, ABIL_POOL_TYPE(abil)) >= GET_MAX_POOL(vict, ABIL_POOL_TYPE(abil))) {
+			// full
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
 }
 
 
