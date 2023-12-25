@@ -95,8 +95,37 @@ T f 1
 S
 #209
 Outrage~
-0 -1 1.00 0 0 0
-T m 0
+a -1 1.00 0 0 0
+C
+outrage 7 AB 1 25 0.00 2009 9 0 2 2
+D 64 15 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+13
+You spin wildly with outrage, hitting everything in sight!~
+M
+14
+$n spins wildly with outrage, hitting everything in sight!~
+T x 1
+T s 1
+X+ 8 25.00
 S
 #210
 Unnatural Thirst~
@@ -343,13 +372,64 @@ X+ 3 15
 S
 #233
 Shadowcage~
-0 -1 1.00 0 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+18 -1
+C
+shadowcage 7 A 1 10 0.00 2049 30 4 2 0
+M
+2
+*~
+M
+3
+You can't seem to dodge as well in the shadowcage!~
+M
+4
+*~
+M
+13
+You shoot webs of pure shadow, forming a tight cage!~
+M
+14
+$n shoots webs of pure shadow, forming a tight cage!~
+M
+38
+$N doesn't seem to notice.~
+T b 1
+X+ 1 3055
+X+ 2 15
+X+ 3 15
+X+ 8 10.00
 S
 #234
 Howl~
-0 -1 1.00 0 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+17 -1
+C
+howl 7 A 1 10 10.00 2050 30 4 2 0
+M
+2
+*~
+M
+3
+You are too scared to aim effectively!~
+M
+4
+*~
+M
+13
+You let out a fearsome howl!~
+M
+14
+$n lets out a bone-chilling howl!~
+M
+38
+$N doesn't seem to notice.~
+T b 1
+X+ 1 3056
+X+ 2 15
+X+ 3 15
 S
 #235
 Crucial Jab~
@@ -388,7 +468,7 @@ afC -1 1.00 D 0 0
 A
 9 -1
 C
-diversion 7 A 1 10 0.00 2051 30 4 1 0
+diversion 7 A 1 10 0.00 2051 30 4 2 0
 M
 2
 *~
@@ -416,6 +496,9 @@ $n tosses some firecrackers into the melee!~
 M
 14
 $n throws a pocketful of sparkling dust into the melee!~
+M
+38
+$N doesn't seem to notice.~
 T b 1
 X+ 1 3058
 X+ 2 15

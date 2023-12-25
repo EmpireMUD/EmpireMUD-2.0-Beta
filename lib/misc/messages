@@ -1356,13 +1356,13 @@ $n pathetically tries to take a swing at $N - ha!
 M50 e 0 
 Suffering~
 has died at~
-#
+$N lies suffering on the ground until no blood is left in $S body.
 You feel wounded -- too wounded -- you die...
 $N lies suffering on the ground until no blood is left in $S body.
 #
 suffer miss victim - should never see.
 suffer miss room - should never see.
-#
+$N lies helplessly on the ground and suffers...
 You lie on the ground suffering from your terrible wounds...
 $N lies helplessly on the ground and suffers...
 #
@@ -1372,13 +1372,13 @@ Suffer god room - should never see.
 M50 e 0 
 Suffering~
 has died at~
-#
+$N suffers from bloodlack, and the lack of a beating heart...
 You can only lie still as your last heartbeat ebbs...
 $N suffers from bloodlack, and the lack of a beating heart...
 #
 suffer miss victim - should never see.
 suffer miss room - should never see.
-#
+$N lies immobile on the ground, suffering...
 You lie on the ground suffering from bleeding wounds...
 $N lies immobile on the ground, suffering...
 #
@@ -1388,13 +1388,13 @@ Suffer god room -- should never see.
 M51 e 0 
 Guard Tower~
 has been killed by a guard tower at~
-#
+A well-aimed arrow from a near-by guard tower pierces $N's heart, killing $M!
 A well-aimed arrow from a near-by guard tower pierces your heart, killing you!
 A well-aimed arrow from a near-by guard tower pierces $N's heart, killing $M!
-#
+An arrow from a near-by guard tower strikes the ground with a thud.
 An arrow from a near-by guard tower strikes the ground near your feet with a dull thud.
 An arrow from a near-by guard tower strikes the ground with a thud.
-#
+You hear a dull thud as an arrow pierces $N in the shoulder!
 You are hit by an arrow from a guard tower!
 You hear a dull thud as an arrow pierces $N in the shoulder!
 #
@@ -1404,13 +1404,13 @@ You hear a dull thud as an arrow pierces $N in the shoulder!
 M51 e 0 
 Guard Tower~
 has been killed by a guard tower at~
-#
+A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
-#
+An arrow from a nearby guard tower strikes the ground with a thud.
 An arrow from a nearby guard tower strikes the ground near your feet with a dull thud.
 An arrow from a nearby guard tower strikes the ground with a thud.
-#
+You hear a dull thud as an arrow pierces $N in the leg!
 You are hit by an arrow from a guard tower!
 You hear a dull thud as an arrow pierces $N in the leg!
 #
@@ -1420,13 +1420,13 @@ You hear a dull thud as an arrow pierces $N in the leg!
 M51 e 0 
 Guard Tower~
 has been killed by a guard tower at~
-#
+A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
-#
+An arrow from a nearby guard tower strikes the ground with a thud.
 An arrow from a nearby guard tower strikes the ground near your feet with a dull thud.
 An arrow from a nearby guard tower strikes the ground with a thud.
-#
+You hear a dull thud as an arrow pierces $N in the arm!
 You are hit by an arrow from a guard tower!
 You hear a dull thud as an arrow pierces $N in the arm!
 #
@@ -1436,13 +1436,13 @@ You hear a dull thud as an arrow pierces $N in the arm!
 M51 e 0 
 Guard Tower~
 has been killed by a guard tower at~
-#
+A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
 A well-aimed arrow from a nearby guard tower pierces your heart, killing you!
 A well-aimed arrow from a nearby guard tower pierces $N's heart, killing $M!
-#
+An arrow from a nearby guard tower strikes the ground with a thud.
 An arrow from a nearby guard tower strikes the ground near your feet with a dull thud.
 An arrow from a nearby guard tower strikes the ground with a thud.
-#
+You hear a dull thud as an arrow pierces $N in the stomach!
 You are hit by an arrow from a guard tower!
 You hear a dull thud as an arrow pierces $N in the stomach!
 #
@@ -1516,14 +1516,14 @@ $n dares a bash at $N and is sent sprawling without touching $M.
 M56 e 0 
 Sunburn~
 ~
-#
+$n screams in agony as the flames envelop $m and $e crumples to the ground!
 You scream in agony as the flames envelop your body!
 $n screams in agony as the flames envelop $m and $e crumples to the ground!
 #
 #
 #
 #
-You wince in pain as the sun scorches your unliving flesh!
+You wince in pain as the sun scorches your flesh!
 #
 #
 #
@@ -1532,13 +1532,13 @@ You wince in pain as the sun scorches your unliving flesh!
 M57 e 0 
 Poison~
 ~
-#
+$N winces in pain and falls over dead from your searing poison!
 You wince in pain as your insides burn up and you fall over dead from $n's burning poison.
 $N winces in pain and falls over dead from $n's searing poison!
 #
 #
 #
-#
+$N winces in pain as $E is burned from the inside by your searing poison!
 You wince in pain as you are burned from the inside by $n's searing poison!
 $N winces in pain as $E is burned from the inside by $n's searing poison!
 #
@@ -1612,13 +1612,13 @@ $n shoots a lightning bolt at $N, but misses.
 M61 e 0 
 Physical DoT~
 ~
-#
+$N bleeds out from $S open wounds, and dies.
 You bleed out from your open wounds and die.
 $N bleeds out from $S open wounds, and dies.
 #
 #
 #
-#
+$N winces in pain from $S open wounds.
 You wince in pain from your open wounds.
 $N winces in pain from $S open wounds.
 #
@@ -1628,13 +1628,13 @@ $N winces in pain from $S open wounds.
 M61 e 0 
 Physical DoT~
 ~
-#
+$N succumbs to $S open wounds, and dies.
 You succumb to your open wounds and die.
 $N succumbs to $S open wounds, and dies.
 #
 #
 #
-#
+$N bleeds from open wounds.
 You bleed from open wounds.
 $N bleeds from open wounds.
 #
@@ -1676,13 +1676,13 @@ $N basks in the glow of $n's sunshock.
 M64 e 0 
 Magical DoT~
 ~
-#
+The searing magical pain proves too much for $N, and $E falls over dead!
 The searing magical pain proves too much, and you fall over dead!
 The searing magical pain proves too much for $N, and $E falls over dead!
 #
 #
 #
-#
+$N twitches as magical pain sears through $M!
 You twitch as magical pain sears through you!
 $N twitches as magical pain sears through $M!
 #
@@ -1692,13 +1692,13 @@ $N twitches as magical pain sears through $M!
 M64 e 0 
 Magical DoT~
 ~
-#
+The residual magic flowing through $N proves too much, and $E falls over dead!
 The residual magic flowing through you proves too much, and you fall over dead!
 The residual magic flowing through $N proves too much, and $E falls over dead!
 #
 #
 #
-#
+$N seems to be burning on the inside as magical pain courses through $M!
 You're burning from the inside as magical pain courses through you!
 $N seems to be burning on the inside as magical pain courses through $M!
 #
@@ -1708,13 +1708,13 @@ $N seems to be burning on the inside as magical pain courses through $M!
 M65 e 0 
 Fire DoT~
 ~
-#
+The fire overtakes $N and $E burns to death!
 The fire overtakes you and you burn to death!
 The fire overtakes $N and $E burns to death!
 #
 #
 #
-#
+$N shouts in pain as the fire scorches $S flesh!
 You shout in pain as the fire scorches your flesh!
 $N shouts in pain as the fire scorches $S flesh!
 #
@@ -1724,13 +1724,13 @@ $N shouts in pain as the fire scorches $S flesh!
 M65 e 0 
 Fire DoT~
 ~
-#
+$N falls over dead, burnt to a crisp!
 You fall over dead, burnt to a crisp!
 $N falls over dead, burnt to a crisp!
 #
 #
 #
-#
+$N is on fire, $S flesh sizzles and $E appears to be in agony!
 You are on fire! Your flesh sizzles with agony!
 $N is on fire, $S flesh sizzles and $E appears to be in agony!
 #
@@ -1740,13 +1740,13 @@ $N is on fire, $S flesh sizzles and $E appears to be in agony!
 M66 e 0 
 Poison DoT~
 ~
-#
+The poison reaches $N's heart and $E crumples to the ground, dead!
 The poison reaches your heart and you crumple to the ground, dead!
 The poison reaches $N's heart and $E crumples to the ground, dead!
 #
 #
 #
-#
+$N winces in pain as poison courses through $S blood!
 You wince in pain as poison courses through your blood!
 $N winces in pain as poison courses through $S blood!
 #
@@ -1756,13 +1756,13 @@ $N winces in pain as poison courses through $S blood!
 M66 e 0 
 Poison DoT~
 ~
-#
+$N suddenly falls over, dead from poison!
 The poison hits your brain. Your vision fades to black and you fall down dead!
 $N suddenly falls over, dead from poison!
 #
 #
 #
-#
+$N acts like $E's burning from the inside as poison flows through $S veins!
 You burn from the inside out as poison flows through your veins!
 $N acts like $E's burning from the inside as poison flows through $S veins!
 #
@@ -2009,16 +2009,80 @@ Heavy Bash~
 #
 #
 
+M306 e 0 
+Darkshroud DoT~
+~
+$N's eyes go dark as $E slumps to the ground, dead!
+The darkness overtakes you as the last light leaves your eyes!
+$N's eyes go dark as $E slumps to the ground, dead!
+#
+#
+#
+$N groans as the shards of darkness cut at $M.
+Shards of darkness cut at you from within.
+$N groans as the shards of darkness cut at $M.
+#
+#
+#
+
+M306 e 0 
+Darkshroud DoT~
+~
+$N slumps to the ground as $S body begins to dissolve into darkness!
+You pass out as your body begins to dissolve into darkness!
+$N slumps to the ground as $S body begins to dissolve into darkness!
+#
+#
+#
+$N screams and clutches $S head as dark shards cut at $M!
+You scream as the darkness pierces your mind!
+$N screams and clutches $S head as dark shards cut at $M!
+#
+#
+#
+
+M307 0 0 
+Darkshroud~
+~
+The darkness cuts through $N's heart -- $E falls over dead!
+The darkness cuts through your heart. Everything goes black!
+The darkness cuts through $N's heart -- $E falls over dead!
+The dark strike cuts just under $N's arm.
+The dark strike cuts just under your arm.
+The dark strike cuts just under $N's arm.
+The darkness cuts through $N!
+The darkness cuts through you!
+The darkness cuts through $N!
+The darkness enshrouds $N but quickly fades.
+The darkness enshrouds you but quickly fades.
+The darkness enshrouds $N but quickly fades.
+
+M307 0 0 
+Darkshroud~
+~
+The darkness flows into $N... $S eyes go dark and $E drops to the ground.
+The darkness flows into you and everything goes dark.
+The darkness flows into $N... $S eyes go dark and $E drops to the ground.
+The darkness waves over and around $N.
+The darkness waves over and around you.
+The darkness waves over and around $N.
+The darkness enshrouds $N and cuts through $M!
+The darkness enshrouds you as you feel it cut through you!
+The darkness enshrouds $N and cuts through $M!
+The darkness enshrouds $N but quickly fades.
+The darkness enshrouds you but quickly fades.
+The darkness enshrouds $N but quickly fades.
+
 M3106 e 0 
 Freezing DoT~
 ~
-#
+$N is frozen solid in place as $E dies of the cold!
 Oh no... you froze to death!
 $N is frozen solid in place as $E dies of the cold!
 #
 #
 #
-#
+$N shivers as $E slowly freezes.
 You shiver as you slowly freeze.
 $N shivers as $E slowly freezes.
 #
@@ -2028,13 +2092,13 @@ $N shivers as $E slowly freezes.
 M3107 e 0 
 Sweltering DoT~
 ~
-#
+$N falls over from the heat, dead!
 The world goes dark as you pass out from the heat... and die!
 $N falls over from the heat, dead!
 #
 #
 #
-#
+$N sweats profusely as $E suffers in the heat.
 You sweat profusely as you suffer in the heat.
 $N sweats profusely as $E suffers in the heat.
 #

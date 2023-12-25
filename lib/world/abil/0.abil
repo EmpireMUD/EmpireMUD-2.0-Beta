@@ -520,8 +520,42 @@ T j 0
 S
 #36
 Heartstop~
-0 -1 1.00 0 0 0
-T m 0
+a -1 1.00 h 0 0
+C
+heartstop 7 bfh 1 30 0.00 2026 30 0 2 3
+D 16 43 0
+M
+2
+*~
+M
+3
+Your blood becomes inert!~
+M
+4
+*~
+M
+10
+But nothing happens.~
+M
+11
+But nothing happens.~
+M
+12
+*~
+M
+15
+You grab $N and press hard against $S throat...~
+M
+16
+$n grabs you and presses hard against your throat...~
+M
+17
+$n grabs $N and presses hard against $S throat...~
+T b 1
+X+ 0 v
+X+ 1 3016
+X+ 2 15
+X+ 3 15
 S
 #37
 Taste Blood~

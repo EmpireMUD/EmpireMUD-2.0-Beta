@@ -144,4 +144,27 @@ X+ 1 3081
 X+ 2 5
 X+ 3 5
 S
+#307
+Darkshroud~
+afk -1 1.00 0 0 0
+C
+darkshroud 7 A 1 25 0.00 2092 30 9 2 2
+M
+13
+The shadows draw close to you and then strike out with a dark fury!~
+M
+14
+The shadows draw close to $n and then strike out with a dark fury!~
+M
+10
+fail $N~
+T c 1
+T d 3
+X+ 1 3112
+X+ 2 20
+X+ 3 20
+X+ 4 307
+X+ 5 4
+X+ 8 25.00
+S
 $
