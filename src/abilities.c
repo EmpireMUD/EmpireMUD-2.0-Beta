@@ -7190,18 +7190,19 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 */
 char *list_one_ability(ability_data *abil, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char part[MAX_STRING_LENGTH];
-	ability_data *mastery;
+	char mastery[256], types[1024];
+	ability_data *mabil;
 	
 	if (detail) {
-		if ((mastery = find_ability_by_vnum(ABIL_MASTERY_ABIL(abil)))) {
-			snprintf(part, sizeof(part), " (%s)", ABIL_NAME(mastery));
+		if ((mabil = find_ability_by_vnum(ABIL_MASTERY_ABIL(abil)))) {
+			snprintf(mastery, sizeof(mastery), " (%s)", ABIL_NAME(mabil));
 		}
 		else {
-			*part = '\0';
+			*mastery = '\0';
 		}
+		get_ability_type_display(ABIL_TYPE_LIST(abil), types, FALSE);
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", ABIL_VNUM(abil), ABIL_NAME(abil), part);
+		snprintf(output, sizeof(output), "[%5d] %s%s - %s", ABIL_VNUM(abil), ABIL_NAME(abil), mastery, types);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
