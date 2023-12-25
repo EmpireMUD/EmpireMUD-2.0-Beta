@@ -633,7 +633,7 @@ void check_available_ability_cost(char_data *ch, ability_data *abil, struct abil
 	
 	// init
 	if (afford_amount) {
-		*afford_targets = 0;
+		*afford_amount = 0;
 	}
 	if (afford_amount) {
 		*afford_targets = 0;
