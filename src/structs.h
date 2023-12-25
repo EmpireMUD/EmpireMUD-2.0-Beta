@@ -702,6 +702,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR	34
 #define ABIL_CUSTOM_OVER_TIME_TARG_TO_VICT	35
 #define ABIL_CUSTOM_OVER_TIME_TARG_TO_ROOM	36
+#define ABIL_CUSTOM_IMMUNE_SELF_TO_CHAR		37
+#define ABIL_CUSTOM_IMMUNE_TARG_TO_CHAR		38
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used

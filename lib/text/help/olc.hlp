@@ -969,6 +969,8 @@ Message types:
  &cot-targ-to-char&0
  &cot-targ-to-vict&0
  &cot-targ-to-room&0
+ &cimmune-self-to-char&0 - To actor when immune to their own ability.
+ &cimmune-targ-to-char&0 - To actor when other target is immune to the ability.
 
 For messages to help test abilities, see HELP ABILEDIT TESTING.
 
@@ -1829,6 +1831,10 @@ ones are displayed. These commands will add the full set of messages:
 .cust add ot-targ-to-char ot-targ-to-char end
 .cust add ot-targ-to-vict ot-targ-to-vict end
 .cust add ot-targ-to-room ot-targ-to-room end
+.cust add immune-self-to-char immune-self-to-char
+.cust add immune-targ-to-char immune-targ-to-char
+
+See also: ABILEDIT CUSTOM
 #d
 "ABILEDIT TYPES"
 

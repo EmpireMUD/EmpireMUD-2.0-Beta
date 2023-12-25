@@ -4962,6 +4962,54 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 
 
 /**
+* Sends the message for an immune response when using an ability.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player who is immune (may be same as ch).
+* @param ability_data *abil The ability.
+* @param struct ability_exec *data The execution info for the ability (may be NULL).
+*/
+void send_ability_immune_messages(char_data *ch, char_data *vict, ability_data *abil, struct ability_exec *data) {
+	char *msg;
+	
+	if (!ch || !abil) {
+		return;	// no work?
+	}
+	if (data && data->no_msg) {
+		return;
+	}
+	
+	// mark this now
+	if (data) {
+		data->sent_any_msg = TRUE;	// guaranteed
+	}
+	
+	if (!vict || ch == vict) {
+		// self-to-char
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_IMMUNE_SELF_TO_CHAR))) {
+			if (*msg != '*') {
+				act(msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP | ACT_ABILITY);
+			}
+		}
+		else {
+			act("You're immune!", FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+		}
+	}
+	else {
+		// targ-to-char
+		if ((msg = get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_IMMUNE_TARG_TO_CHAR))) {
+			if (*msg != '*') {
+				act(msg, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
+			}
+		}
+		else {
+			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+		}
+	}
+}
+
+
+/**
 * Sends the periodic messages for an over-time/long-action ability. These have
 * no default, and will send nothing if there's no message configured.
 *
@@ -6269,13 +6317,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	// immunity check: early exit if there's no valid targets
 	// if any of the ability's types ignore immunity, this is checked later instead
 	if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil)) && !any_ignore_immune) {
-		// TODO consider custom immunity messages
-		if (ch == vict) {
-			msg_to_char(ch, "You're immune!\r\n");
-		}
-		else {
-			act("$N is immune!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
-		}
+		send_ability_immune_messages(ch, vict, abil, data);
 		
 		// this counts as a fail
 		data->sent_fail_msg = TRUE;

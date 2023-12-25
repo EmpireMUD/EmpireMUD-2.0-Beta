@@ -355,6 +355,8 @@ const char *ability_custom_types[] = {
 	"ot-targ-to-char",
 	"ot-targ-to-vict",	// 35
 	"ot-targ-to-room",
+	"immune-self-to-char",
+	"immune-targ-to-char",
 	"\n"
 };
 
@@ -377,7 +379,8 @@ const char *ability_custom_type_help =
 "&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n"
 " Over time messages with no target: ot-self-to-char ot-self-to-room\r\n"
 "&w Over time messsages with target: ot-targ-to-char ot-targ-to-vict ot-targ-to-room&0\r\n"
-" Other messages: no-argument\r\n";
+" Message shown to the user when the target is immune: immune-self-to-char, immune-targ-to-char\r\n"
+"&w Other messages: no-argument&0\r\n";
 
 
 
