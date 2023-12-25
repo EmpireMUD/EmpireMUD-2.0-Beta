@@ -192,6 +192,7 @@ HOWL
 
 Howl
 Stealth Synergy Ability: 100 Natural Magic
+Linked trait: charisma
 Cost:  20 move + 10 per additional target
 Cooldown:  30 seconds
 Debuff type:  mental
@@ -391,13 +392,14 @@ SHADOWCAGE "SHADOW CAGE"
 Shadowcage
 Stealth Synergy Ability:  100 High Sorcery
 Debuff type:  mental
-Cost:  50 move
+Linked trait: charisma
+Cost:  20 move + 10 per additional target.
 Cooldown:  30 seconds
 Usage:  shadowcage
 
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
-Charisma instead. This effect lasts 15 seconds.
+You create a cage of shadows, making it harder for all enemies to dodge. The
+first target gets the largest penalty; other targets are lower. This effect
+lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"
 
