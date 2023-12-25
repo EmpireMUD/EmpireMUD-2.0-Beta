@@ -1832,7 +1832,7 @@ ones are displayed. These commands will add the full set of messages:
 .cust add ot-targ-to-vict ot-targ-to-vict end
 .cust add ot-targ-to-room ot-targ-to-room end
 .cust add immune-self-to-char immune-self-to-char
-.cust add immune-targ-to-char immune-targ-to-char
+.cust add immune-targ-to-char immune-targ-to-char $N
 
 See also: ABILEDIT CUSTOM
 #d
