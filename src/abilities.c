@@ -6456,6 +6456,7 @@ void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_
 * @param any_vnum hook_value The value for that hook, e.g. an ability vnum (hooks that don't have this always use 0).
 */
 void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ) {
+	bitvector_t use_multi;
 	bool any_targ, free_limiter = FALSE;
 	struct ability_hook *ahook;
 	ability_data *abil;
@@ -6511,10 +6512,11 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			use_obj = ovict;
 			use_veh = vvict;
 			use_room = room_targ;
+			use_multi = multi_targ;
 			
 			// cancel multi if not allowed?
-			if (multi_targ != NOBITS && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
-				multi_targ = NOBITS;
+			if (use_multi != NOBITS && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
+				use_multi = NOBITS;
 			}
 			
 			// compare targets
@@ -6565,11 +6567,11 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 				}
 				else if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
 					any_targ = TRUE;
-					if (multi_targ == NOBITS) {
-						multi_targ = ABIL_TARGETS(abil) & MULTI_CHAR_ATARS;
+					if (use_multi == NOBITS) {
+						use_multi = ABIL_TARGETS(abil) & MULTI_CHAR_ATARS;
 					}
 				}
-				if (!any_targ || !validate_ability_target(ch, abil, use_char, use_obj, use_veh, use_room, multi_targ, FALSE, NULL)) {
+				if (!any_targ || !validate_ability_target(ch, abil, use_char, use_obj, use_veh, use_room, use_multi, FALSE, NULL)) {
 					continue;	// no apparent targets
 				}
 			}
@@ -6592,7 +6594,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
 			
 			// the big GO
-			call_ability(ch, abil, "", use_char, use_obj, use_veh, use_room, multi_targ, level, RUN_ABIL_HOOKED, data);
+			call_ability(ch, abil, "", use_char, use_obj, use_veh, use_room, use_multi, level, RUN_ABIL_HOOKED, data);
 			
 			// clean up data
 			GET_RUNNING_ABILITY_DATA(ch) = NULL;
