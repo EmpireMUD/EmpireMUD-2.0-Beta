@@ -742,7 +742,8 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_USING_READY_WEAPON		BIT(13)	// only gains if a ready-weapon is equipped
 #define AGH_ONLY_USING_COMPANION		BIT(14)	// only if the player is using a companion from this ability
 #define AGH_NOT_WHILE_ASLEEP	BIT(15)	// prevent gains while sleeping (or dying)
-#define AGH_DYING				BIT(16)	// calledwhen the player dies (before auto-resurrect)
+#define AGH_DYING				BIT(16)	// called when the player dies (before auto-resurrect)
+#define AGH_DO_HEAL				BIT(17)	// called when the player heals someone
 
 
 // AHOOK_x: Ability hooks (things that cause an ability to run itself)

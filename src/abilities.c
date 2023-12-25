@@ -1701,6 +1701,10 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			amount = 100;
 			break;
 		}
+		case AGH_DO_HEAL: {
+			amount = 15;
+			break;
+		}
 		case AGH_MELEE:
 		case AGH_RANGED:
 		case AGH_DODGE:
@@ -4484,6 +4488,7 @@ DO_ABIL(do_restore_ability) {
 	// mark success on any change
 	if (GET_CURRENT_POOL(vict, use_pool) != old_val) {
 		data->success = TRUE;
+		run_ability_gain_hooks(ch, vict, AGH_DO_HEAL);
 	}
 	else if (ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
 		data->stop = TRUE;
