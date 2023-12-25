@@ -6128,11 +6128,13 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 			continue;	// not enemy
 		}
 		
-		// check cost
-		check_available_ability_cost(ch, abil, data, NULL, &more_targets);
-		if (more_targets < 1) {
-			// out of cost
-			break;
+		// check cost available
+		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
+			check_available_ability_cost(ch, abil, data, NULL, &more_targets);
+			if (more_targets < 1) {
+				// out of cost
+				break;
+			}
 		}
 		
 		// allow fail messages on this run
