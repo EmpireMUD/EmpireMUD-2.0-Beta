@@ -3715,7 +3715,33 @@ PREP_ABIL(prep_ready_weapon_ability) {
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_restore_ability) {
-	// TODO
+	int iter;
+	bool any;
+	char arg[MAX_INPUT_LENGTH];
+	
+	// words that will be accepted in do_restore_ability
+	const char *valid_pool_choices[] = { "health", "hp", "hitpoints", "hits", "moves", "movement", "mv", "mana", "mp", "magic", "\n" };	// terminate with \n
+	
+	// scale points	
+	get_ability_type_data(data, ABILT_RESTORE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESTORE, data);
+	
+	if (ABIL_POOL_TYPE(abil) == ANY_POOL) {
+		// verify available pool
+		one_argument(argument, arg);
+		
+		any = FALSE;
+		for (iter = 0; *valid_pool_choices[iter] != '\n' && *arg && !any; ++iter) {
+			if (is_abbrev(arg, valid_pool_choices[iter])) {
+				any = TRUE;
+			}
+		}
+		
+		if (!any && (!vict || (GET_HEALTH(vict) != GET_MAX_HEALTH(vict) && GET_MOVE(vict) != GET_MAX_MOVE(vict) && GET_MANA(vict) != GET_MAX_MANA(vict)))) {
+			msg_to_char(ch, "You must choose health, moves, or mana.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
 }
 
 
@@ -4369,6 +4395,99 @@ DO_ABIL(do_ready_weapon_ability) {
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_restore_ability) {
+	char arg[MAX_INPUT_LENGTH];
+	double amount, reduced_scale;
+	int avail, old_val, use_pool = HEALTH;
+	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
+	
+	const int points_per_scale = 8;	// amount per scale point, base
+	
+	if (!vict) {
+		return;	// no victim = no work
+	}
+	
+	// smoother scaling, for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
+	
+	// 1. determine pool
+	if (ABIL_POOL_TYPE(abil) != ANY_POOL) {
+		use_pool = ABIL_POOL_TYPE(abil);
+	}
+	else {
+		one_argument(argument, arg);
+		
+		// determine which pool
+		if (*arg) {
+			// NOTE: any new terms here should also be added in prep_restore_ability
+			if (is_abbrev(arg, "health") || is_abbrev(arg, "hp") || is_abbrev(arg, "hitpoints") || is_abbrev(arg, "hits")) {
+				use_pool = HEALTH;
+			}
+			else if (is_abbrev(arg, "moves") || is_abbrev(arg, "movement") || is_abbrev(arg, "mv")) {
+				use_pool = MOVE;
+			}
+			else if (is_abbrev(arg, "mana") || is_abbrev(arg, "mp") || is_abbrev(arg, "magic")) {
+				use_pool = MANA;
+			}
+			else {
+				// player cannot choose blood; anything else is a failure
+				return;
+			}
+		}
+		else {
+			// try to pick
+			if (GET_HEALTH(vict) < GET_MAX_HEALTH(vict)) { 
+				use_pool = HEALTH;
+			}
+			else if (GET_MOVE(vict) < GET_MAX_MOVE(vict)) {
+				use_pool = MOVE;
+			}
+			else if (GET_MANA(vict) < GET_MAX_MANA(vict)) {
+				use_pool = MANA;
+			}
+			else {
+				// nothing to restore
+				return;
+			}
+		}
+	}
+	
+	// 2. determine amount
+	amount = subdata->scale_points * points_per_scale;
+	
+	// 3. check costs and reduce by available mana/etc
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		check_available_ability_cost(ch, abil, data, &avail, NULL);
+		amount = MIN(amount, avail);
+	}
+	
+	// 4. store amount of damage now -- before bonus-healing
+	data->total_amount += amount;
+	
+	// 5. bonus healing
+	amount += GET_BONUS_HEALING(ch) * reduced_scale;
+	
+	// 6. apply it
+	amount = MAX(0, amount);
+	old_val = GET_CURRENT_POOL(vict, use_pool);
+	
+	switch (use_pool) {
+		case HEALTH: {
+			heal(ch, vict, amount);
+			break;
+		}
+		default: {
+			set_current_pool(vict, use_pool, GET_CURRENT_POOL(vict, use_pool) + amount);
+			break;
+		}
+	}
+	
+	// mark success on any change
+	if (GET_CURRENT_POOL(vict, use_pool) != old_val) {
+		data->success = TRUE;
+	}
+	else if (ABILITY_FLAGGED(abil, ABILF_STOP_ON_MISS)) {
+		data->stop = TRUE;
+	}
 }
 
 
