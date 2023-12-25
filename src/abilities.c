@@ -4508,8 +4508,10 @@ DO_ABIL(do_restore_ability) {
 	// 5. store amount of damage now -- before bonus-healing
 	data->total_amount += amount;
 	
-	// 6. bonus healing
-	amount += GET_BONUS_HEALING(ch) * reduced_scale;
+	// 6. bonus healing (health only)
+	if (use_pool == HEALTH) {
+		amount += GET_BONUS_HEALING(ch) * reduced_scale;
+	}
 	
 	// 7. apply it
 	amount = MAX(0, amount);
