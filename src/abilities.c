@@ -6080,7 +6080,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 */
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	char_data *ch_iter, *next_ch;
-	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = TRUE;
+	bool no_msg, fatal_error = FALSE, sent_any_fail = FALSE, any_success = FALSE;
 	int more_targets;
 	
 	if (data->stop) {
