@@ -522,7 +522,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	
 	// supercede?
-	if ((supercede = check_superceded_by(ch, abil))) {
+	if ((supercede = check_superceded_by(ch, abil)) != abil) {
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Superceded by: %s\r\n", ABIL_NAME(supercede));
 	}
 	
