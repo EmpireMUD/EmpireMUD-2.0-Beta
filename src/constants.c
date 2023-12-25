@@ -309,7 +309,7 @@ const char *ability_target_flags[] = {
 	"STRING",
 	"ALLIES-MULTI",
 	"GROUP-MULTI",
-	"ROOM-MULTI",	// 25
+	"ANY-MULTI",	// 25
 	"ENEMIES-MULTI",
 	"MULTI-CAN-SEE",
 	"\n"

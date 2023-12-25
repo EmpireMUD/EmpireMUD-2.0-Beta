@@ -629,12 +629,12 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_STRING			BIT(22)	// w. string is expected and arg cannot be empty
 #define ATAR_ALLIES_MULTI	BIT(23)	// x. all allies
 #define ATAR_GROUP_MULTI	BIT(24)	// y. whole group
-#define ATAR_ROOM_MULTI		BIT(25)	// z. everyone in the room
+#define ATAR_ANY_MULTI		BIT(25)	// z. everyone in the room
 #define ATAR_ENEMIES_MULTI	BIT(26)	// A. all enemies
 #define ATAR_MULTI_CAN_SEE	BIT(27)	// B. modifies multi-targ to only hit visible people
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
-#define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ROOM_MULTI | ATAR_ENEMIES_MULTI)
+#define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ANY_MULTI | ATAR_ENEMIES_MULTI)
 #define OBJ_ATARS			(ATAR_OBJ_INV | ATAR_OBJ_ROOM | ATAR_OBJ_WORLD | ATAR_OBJ_EQUIP)
 #define VEH_ATARS			(ATAR_VEH_ROOM | ATAR_VEH_WORLD)
 #define ROOM_ATARS			(ATAR_ROOM_HERE | ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS)

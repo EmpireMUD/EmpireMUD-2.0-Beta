@@ -1281,7 +1281,7 @@ settings accommodate how powerful they can be.
 Targets: Use one or more of the following targets to indicate who it hits:
  &cALLIES-MULTI&0 - All allies in the room including group members and empiremates.
  &cGROUP-MULTI&0 - Members of your own group (and their companions).
- &cROOM-MULTI&0 - All characters in the room.
+ &cANY-MULTI&0 - All characters in the room.
  &cENEMIES-MULTI&0 - All enemies in the room, including most neutral mobs.
  &yMULTI-CAN-SEE&0 - This modifier will only hit targets if you can see them.
 
@@ -1732,7 +1732,7 @@ Vehicle targets:
 Multiple targets (see ABILEDIT MULTI):
  &cALLIES-MULTI&0 - Can target all allies.
  &cGROUP-MULTI&0 - Can target whole group.
- &cROOM-MULTI&0 - Can target all characters in the room.
+ &cANY-MULTI&0 - Can target all characters in the room.
  &cENEMIES-MULTI&0 - Can target all enemies.
 
 Miscellaneous targets:

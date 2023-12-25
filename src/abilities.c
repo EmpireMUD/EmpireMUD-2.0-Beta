@@ -5780,9 +5780,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			multi_targ = ATAR_ENEMIES_MULTI;
 		}
 		if (!has && (!str_cmp(argptr, "room") || !str_cmp(argptr, "all"))) {
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_MULTI)) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ANY_MULTI)) {
 				has = TRUE;
-				multi_targ = ATAR_ROOM_MULTI;
+				multi_targ = ATAR_ANY_MULTI;
 			}
 			else if (IS_SET(ABIL_TARGETS(abil), ATAR_GROUP_MULTI)) {
 				has = TRUE;
@@ -5895,8 +5895,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else {	// no arg and no tar-ignore
 		// multi-target
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_MULTI)) {
-			multi_targ = ATAR_ROOM_MULTI;
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ANY_MULTI)) {
+			multi_targ = ATAR_ANY_MULTI;
 			has = TRUE;
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_GROUP_MULTI)) {
