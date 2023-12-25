@@ -604,34 +604,34 @@ typedef struct vehicle_data vehicle_data;
 
 
 // ATAR_x: ability targeting flags
-#define ATAR_IGNORE			BIT(0)	// ignore target
-#define ATAR_CHAR_ROOM		BIT(1)	// pc/npc in room
-#define ATAR_CHAR_WORLD		BIT(2)	// pc/npc in the world
-#define ATAR_CHAR_CLOSEST	BIT(3)	// closest pc/npc in the world
-#define ATAR_FIGHT_SELF		BIT(4)	// if fighting and no arg, targets self
-#define ATAR_FIGHT_VICT		BIT(5)	// if fighting and no arg, targets opponent
-#define ATAR_SELF_ONLY		BIT(6)	// targets self if no arg, and only allows self
-#define ATAR_NOT_SELF		BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
-#define ATAR_OBJ_INV		BIT(8)	// object in inventory
-#define ATAR_OBJ_ROOM		BIT(9)	// object in the room
-#define ATAR_OBJ_WORLD		BIT(10)	// object in the world
-#define ATAR_OBJ_EQUIP		BIT(11)	// object held/equipped
-#define ATAR_VEH_ROOM		BIT(12)	// vehicle in the room
-#define ATAR_VEH_WORLD		BIT(13)	// vehicle in the world
-#define ATAR_ROOM_HERE		BIT(14)	// targets the room you're in
-#define ATAR_ROOM_ADJACENT	BIT(15)	// targets in a direction
-#define ATAR_ROOM_EXIT		BIT(16)	// targets the outside of the current place
-#define ATAR_ROOM_HOME		BIT(17)	// targets the player's home room
-#define ATAR_ROOM_RANDOM	BIT(18)	// targets a random room (combine with a RANGE limit)
-#define ATAR_ROOM_CITY		BIT(19)	// targets a city from one's own empire
-#define ATAR_ROOM_COORDS	BIT(20)	// targets a room by coordinates
-#define ATAR_ROOM_NOT_HERE	BIT(21)	// modifier ensures it's not the current room
-#define ATAR_STRING			BIT(22)	// string is expected and arg cannot be empty
-#define ATAR_ALLIES_MULTI	BIT(23)	// all allies
-#define ATAR_GROUP_MULTI	BIT(24)	// whole group
-#define ATAR_ROOM_MULTI		BIT(25)	// everyone in the room
-#define ATAR_ENEMIES_MULTI	BIT(26)	// all enemies
-#define ATAR_MULTI_CAN_SEE	BIT(27)	// modifies multi-targ to only hit visible people
+#define ATAR_IGNORE			BIT(0)	// a. ignore target
+#define ATAR_CHAR_ROOM		BIT(1)	// b. pc/npc in room
+#define ATAR_CHAR_WORLD		BIT(2)	// c. pc/npc in the world
+#define ATAR_CHAR_CLOSEST	BIT(3)	// d. closest pc/npc in the world
+#define ATAR_FIGHT_SELF		BIT(4)	// e. if fighting and no arg, targets self
+#define ATAR_FIGHT_VICT		BIT(5)	// f. if fighting and no arg, targets opponent
+#define ATAR_SELF_ONLY		BIT(6)	// g. targets self if no arg, and only allows self
+#define ATAR_NOT_SELF		BIT(7)	// h. target is any other char, always use with e.g. TAR_CHAR_ROOM
+#define ATAR_OBJ_INV		BIT(8)	// i. object in inventory
+#define ATAR_OBJ_ROOM		BIT(9)	// j. object in the room
+#define ATAR_OBJ_WORLD		BIT(10)	// k. object in the world
+#define ATAR_OBJ_EQUIP		BIT(11)	// l. object held/equipped
+#define ATAR_VEH_ROOM		BIT(12)	// m. vehicle in the room
+#define ATAR_VEH_WORLD		BIT(13)	// n. vehicle in the world
+#define ATAR_ROOM_HERE		BIT(14)	// o. targets the room you're in
+#define ATAR_ROOM_ADJACENT	BIT(15)	// p. targets in a direction
+#define ATAR_ROOM_EXIT		BIT(16)	// q. targets the outside of the current place
+#define ATAR_ROOM_HOME		BIT(17)	// r. targets the player's home room
+#define ATAR_ROOM_RANDOM	BIT(18)	// s. targets a random room (combine with a RANGE limit)
+#define ATAR_ROOM_CITY		BIT(19)	// t. targets a city from one's own empire
+#define ATAR_ROOM_COORDS	BIT(20)	// u. targets a room by coordinates
+#define ATAR_ROOM_NOT_HERE	BIT(21)	// v. modifier ensures it's not the current room
+#define ATAR_STRING			BIT(22)	// w. string is expected and arg cannot be empty
+#define ATAR_ALLIES_MULTI	BIT(23)	// x. all allies
+#define ATAR_GROUP_MULTI	BIT(24)	// y. whole group
+#define ATAR_ROOM_MULTI		BIT(25)	// z. everyone in the room
+#define ATAR_ENEMIES_MULTI	BIT(26)	// A. all enemies
+#define ATAR_MULTI_CAN_SEE	BIT(27)	// B. modifies multi-targ to only hit visible people
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ROOM_MULTI | ATAR_ENEMIES_MULTI)
