@@ -677,6 +677,31 @@ void check_available_ability_cost(char_data *ch, ability_data *abil, struct abil
 
 
 /**
+* Looks for an ability that supercedes the one we already found. This allows
+* abilities to cascade to more powerful version, such as Heal to Heal Friend to
+* Heal Party.
+*
+* @param char_data *ch The person using the ability.
+* @param ability_data *abil Which ability they are trying to use.
+* @return ability_data* Which one to actually use (may be the same as abil).
+*/
+ability_data *check_superceded_by(char_data *ch, ability_data *abil) {
+	ability_data *other;
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_SUPERCEDED_BY && has_ability(ch, adl->vnum) && (other = ability_proto(adl->vnum)) && other != abil) {
+			// recurse!
+			return check_superceded_by(ch, other);
+		}
+	}
+	
+	// just return same ability if we got here
+	return abil;
+}
+
+
+/**
 * Estimates how much an ability will cost the player right now. Does not
 * account for per-amount or per-target costs because they vary by situation.
 *
@@ -1335,6 +1360,51 @@ char_data *load_companion_mob(char_data *leader, struct companion_data *cd) {
 	load_mtrigger(mob);
 	
 	return mob;
+}
+
+
+/**
+* Recursive check to see if the supercede chain results in a loop. To be called
+* by has_looping_supercede_list().
+*
+* @param ability_data *abil The current ability to check.
+* @param any_vnum to_find The ability we started from, ensuring a loop.
+* @param int depth Prevents infinite loops from forming by accident.
+* @return bool TRUE if a loop was detected, FALSE (safe) if no loop.
+*/
+bool recursive_supercede_loop_check(ability_data *abil, any_vnum to_find, int depth) {
+	struct ability_data_list *adl;
+	bool found_loop = FALSE;
+	
+	if (++depth > 100) {
+		return TRUE;	// at 100 this is basically guaranteed to be a loop of some kind
+	}
+	
+	if (abil) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_SUPERCEDED_BY) {
+				if (adl->vnum == to_find) {
+					return TRUE;	// found loop
+				}
+				else {
+					found_loop |= recursive_supercede_loop_check(ability_proto(adl->vnum), to_find, depth);
+				}
+			}
+		}
+	}
+	
+	return found_loop;
+}
+
+
+/**
+* Detects if the supercede list is at risk for an infinite loop.
+*
+* @param ability_data *abil Which ability to check.
+* @return bool TRUE if there's a dangerous loop, FALSE if not.
+*/
+bool has_looping_supercede_list(ability_data *abil) {
+	return recursive_supercede_loop_check(abil, ABIL_VNUM(abil), 0);
 }
 
 
@@ -5795,12 +5865,21 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		return;
 	}
 	
+	// allow stop first (before supercede)
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && GET_ACTION_VNUM(ch, 0) == ABIL_VNUM(abil)) {
 		// already doing it
 		msg_to_char(ch, "You stop what you were doing.\r\n");
 		cancel_action(ch);
 		return;
 	}
+	
+	// check for a supercede ability and pass control to that instead:
+	if ((abil = check_superceded_by(ch, abil))) {
+		perform_ability_command(ch, abil, argument);
+		return;
+	}
+	
+	// already acting? (after supercede)
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already doing something else.\r\n");
 		return;
@@ -7060,6 +7139,12 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 	}
 	
+	// recursion?
+	if (has_looping_supercede_list(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "WARNING: Superceded-by list appears to loop back to itself");
+		problem = TRUE;
+	}
+	
 	// violent types?
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_DOT | ABILT_BUILDING_DAMAGE) && !ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "Missing VIOLENT flag");
@@ -7265,6 +7350,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any |= (ABIL_MASTERY_ABIL(abiter) == vnum);
 		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
 		any |= find_ability_data_entry_for(abiter, ADL_PARENT, vnum) ? TRUE : FALSE;
+		any |= find_ability_data_entry_for(abiter, ADL_SUPERCEDED_BY, vnum) ? TRUE : FALSE;
 		
 		if (any) {
 			++found;
@@ -8351,6 +8437,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 		found |= delete_from_ability_hooks(abil, AHOOK_ABILITY, vnum);
 		found |= delete_from_ability_data_list(abil, ADL_PARENT, vnum);
+		found |= delete_from_ability_data_list(abil, ADL_SUPERCEDED_BY, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost related deleted ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
@@ -8477,6 +8564,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			}
 			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_PARENT, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUPERCEDED_BY, vnum);
 			
 			if (found) {
 				msg_to_desc(desc, "An ability linked to the one you're editing has been deleted.\r\n");
@@ -9066,6 +9154,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 			break;
 		}
 		case ADL_PARENT: {
+			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			break;
+		}
+		case ADL_SUPERCEDED_BY: {
 			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
@@ -10003,7 +10095,7 @@ OLC_MODULE(abiledit_data) {
 	signed long long misc = 0;
 	
 	// ADL_x: determine valid types first
-	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT;
+	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT | ADL_SUPERCEDED_BY;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
 		allowed_types |= ADL_ACTION;
 	}
@@ -10220,6 +10312,14 @@ OLC_MODULE(abiledit_data) {
 					}
 					else if (has_ability_data_any(find_abil, ADL_PARENT)) {
 						msg_to_char(ch, "You cannot chain parent abilities.\r\n");
+						return;
+					}
+					val_id = ABIL_VNUM(find_abil);
+					break;
+				}
+				case ADL_SUPERCEDED_BY: {
+					if (!(find_abil = find_ability(val_arg))) {
+						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
 						return;
 					}
 					val_id = ABIL_VNUM(find_abil);

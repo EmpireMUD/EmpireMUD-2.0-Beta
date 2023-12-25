@@ -721,6 +721,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_ACTION			BIT(6)	// has a specific action when successful
 #define ADL_RANGE			BIT(7)	// some abilities can control range
 #define ADL_PARENT			BIT(8)	// indicates this ability comes free with that one
+#define ADL_SUPERCEDED_BY	BIT(9)	// if player has that ability, use it instead of this one
 
 
 // AGH_x: ability gain hooks

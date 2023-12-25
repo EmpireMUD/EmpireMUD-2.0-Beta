@@ -395,6 +395,7 @@ const char *ability_data_types[] = {
 	"ACTION",
 	"RANGE",
 	"PARENT",
+	"SUPERCEDED-BY",
 	"\n"
 };
 

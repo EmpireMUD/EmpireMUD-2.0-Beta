@@ -1014,6 +1014,9 @@ The 'data' field is used by different types of abilities. Available types are:
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
  &cRANGE&0 - Used by some actions, as noted.
  &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
+ &cSUPERCEDED-BY&0 - A better version of this ability. If the player tries to
+   use this one while they also have the one it's superceded by, that one is
+   used instead. For example, Heal - Heal Friend - Heal Party.
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
