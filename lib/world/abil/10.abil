@@ -6,7 +6,7 @@ A
 A
 18 -1
 C
-frenzy 7 beg 1 30 0 2070 60 0 1 0
+frenzy 7 eg 1 30 0.00 2070 60 0 1 0
 M
 0
 You work yourself into a frenzy!~
@@ -26,7 +26,7 @@ A
 A
 17 -1
 C
-defend 7 beg 1 30 0 2071 60 0 1 0
+defend 7 eg 1 30 0.00 2071 60 0 1 0
 M
 0
 You dig in and prepare to defend!~
@@ -44,7 +44,7 @@ i -1 1.00 0 0 0
 A
 22 1
 C
-intensify 7 beg 2 20 1 2072 9 0 1 0
+intensify 7 eg 2 20 1.00 2072 9 0 1 0
 M
 0
 You focus your rage and intensify your magic!~
@@ -62,7 +62,7 @@ ai -1 1.50 o 0 0
 A
 22 -1
 C
-abate 7 bfh 2 30 2 2073 9 8 2 0
+abate 7 bfh 2 30 2.00 2073 9 8 2 0
 M
 2
 You lunge toward $N and hit $M in the head!~
@@ -83,7 +83,7 @@ i -1 2.00 0 0 0
 A
 22 1
 C
-amplify 7 beg 2 30 2 2074 6 0 1 0
+amplify 7 eg 2 30 2.00 2074 6 0 1 0
 M
 0
 You focus on your training in sorcery and battle...~
@@ -101,7 +101,7 @@ ai -1 1.00 o 0 0
 A
 24 -1
 C
-beguile 7 bfh 2 20 2 2075 9 8 2 0
+beguile 7 bfh 2 20 2.00 2075 9 8 2 0
 M
 2
 You stare into $N's eyes and beguile $M!~
@@ -122,7 +122,7 @@ ak -1 1.00 h 0 0
 A
 12 -1
 C
-undermine 7 bfh 1 40 2 2076 30 4 2 0
+undermine 7 bfh 1 40 2.00 2076 30 4 2 0
 M
 2
 You stab at $N's armor, undermining it!~
@@ -143,7 +143,7 @@ ak -1 1.00 h 0 0
 A
 21 -1
 C
-exhaust 7 bfh 1 20 2 2077 9 4 2 0
+exhaust 7 bfh 1 20 2.00 2077 9 4 2 0
 M
 2
 You dodge in and out around $N to exhaust $M!~
@@ -164,7 +164,7 @@ l -1 2.00 0 0 0
 A
 12 1
 C
-withstand 7 beg 1 1 4 2078 12 0 1 0
+withstand 7 eg 1 1 4.00 2078 12 0 1 0
 M
 0
 You hunker down and prepare to withstand the worst...~
@@ -182,7 +182,7 @@ al -1 1.00 h 0 0
 A
 21 -1
 C
-hinder 7 bfh 1 20 2 2079 6 1 2 0
+hinder 7 bfh 1 20 2.00 2079 6 1 2 0
 M
 2
 You distract $N to hinder $S attacks!~
@@ -203,7 +203,7 @@ al -1 1.00 h 0 0
 A
 22 -1
 C
-hobble 7 bfh 1 6 2 2080 6 1 2 0
+hobble 7 bfh 1 6 2.00 2080 6 1 2 0
 M
 2
 You hobble $N with a blow to the leg!~
@@ -226,7 +226,7 @@ A
 A
 22 1
 C
-adapt 7 beg 3 5 0 2081 6 9 1 0
+adapt 7 eg 3 5 0.00 2081 6 9 1 0
 M
 0
 You focus your blood into a battle adaptation.~
@@ -244,7 +244,7 @@ ak -1 1.00 h 0 0
 A
 12 -1
 C
-lacerate 7 bfh 3 3 0 2082 9 9 2 0
+lacerate 7 bfh 3 3 0.00 2082 9 9 2 0
 M
 2
 You swirl around $N, cutting open dozens of tiny lacerations with your nails.~
@@ -265,7 +265,7 @@ ai -1 1.00 h 0 0
 A
 24 -1
 C
-infect 7 bfh 3 3 0 2083 9 9 2 0
+infect 7 bfh 3 3 0.00 2083 9 9 2 0
 M
 3
 $n jabs you with a drop of $s blood...~
@@ -286,7 +286,7 @@ k -1 1.25 0 0 0
 A
 21 1
 C
-prepared 7 beg 1 12 1 2084 12 0 1 0
+prepared 7 eg 1 12 1.00 2084 12 0 1 0
 M
 0
 You remember your preparations.~
@@ -306,7 +306,7 @@ A
 A
 24 1
 C
-gleam 7 beg 1 20 1 2085 30 0 1 0
+gleam 7 eg 1 20 1.00 2085 30 0 1 0
 M
 0
 Your armor gleams in the light!~
@@ -324,7 +324,7 @@ al -1 1.00 h 0 0
 A
 12 -1
 C
-sunder 7 bfh 1 10 1 2086 9 2 2 0
+sunder 7 bfh 1 10 1.00 2086 9 2 2 0
 M
 2
 You grab $N's armor and sunder it!~
@@ -343,7 +343,7 @@ S
 Shimmering Anvil~
 rt -1 1.00 0 0 0
 C
-conjure 8 a 2 100 0 2063 3600 0 5 0
+conjure 8 a 2 100 0.00 2063 3600 0 5 0
 I 35 1100 100.00 1  # VEHICLE-CONJURE: shimmering anvil
 M
 18
@@ -363,7 +363,7 @@ S
 Conjure Fruit~
 dq -1 1.00 0 0 0
 C
-conjure 5 a 2 25 0 2089 30 0 5 1
+conjure 5 a 2 25 0.00 2089 30 0 5 1
 I 34 3001 1.03 1 x  # OBJECT-CONJURE: green apple
 I 34 3006 1.03 1 x  # OBJECT-CONJURE: plump peach
 I 34 3042 1.03 1 x  # OBJECT-CONJURE: single ripe mango
@@ -414,7 +414,7 @@ S
 Collapse Portal~
 0 -1 1.00 0 0 0
 C
-collapse 8 j 2 15 0 -1 0 0 5 0
+collapse 8 j 2 15 0.00 -1 0 0 5 0
 D 64 6 0
 D 16 26 8
 M
