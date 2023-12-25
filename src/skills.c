@@ -1844,7 +1844,6 @@ ACMD(do_noskill) {
 }
 
 
-// search hint: do_ability/do_abilities
 ACMD(do_skills) {
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], outbuf[MAX_STRING_LENGTH * 2], *ptr;
 	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
