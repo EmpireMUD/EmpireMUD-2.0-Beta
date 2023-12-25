@@ -3750,8 +3750,8 @@ PREP_ABIL(prep_restore_ability) {
 		// assigned pool
 		if (vict && GET_CURRENT_POOL(vict, ABIL_POOL_TYPE(abil)) >= GET_MAX_POOL(vict, ABIL_POOL_TYPE(abil))) {
 			// full
-			data->stop = TRUE;
-			data->should_charge_cost = FALSE;
+			send_ability_fail_messages(ch, vict, NULL, abil, data);
+			CANCEL_ABILITY(data);
 			return;
 		}
 	}
