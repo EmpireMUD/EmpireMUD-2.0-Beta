@@ -5967,6 +5967,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		else if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
+		else if (IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
+			msg_to_char(ch, "Invalid target.\r\n");
+		}
 		else {
 			msg_to_char(ch, "There's nothing like that here.\r\n");
 		}
