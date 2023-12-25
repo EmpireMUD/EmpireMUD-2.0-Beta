@@ -4510,7 +4510,7 @@ DO_ABIL(do_restore_ability) {
 	
 	// 6. bonus healing (health only)
 	if (use_pool == HEALTH) {
-		amount += GET_BONUS_HEALING(ch) * reduced_scale;
+		amount += total_bonus_healing(ch) * reduced_scale;
 	}
 	
 	// 7. apply it
