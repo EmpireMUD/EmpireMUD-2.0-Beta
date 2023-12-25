@@ -1136,7 +1136,10 @@ use ".gen search 1234".
 
 Usage:  .gainhooks [add | remove] <flags>
 
-This tells the ability when to trigger skill gain:
+This tells the ability when to trigger skill gain. Abilities with commands also
+gain experience when their commands are used.
+
+Available gain hooks:
  &cONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
    is on.
  &cMELEE&0 - Gains when you hit in melee combat.
