@@ -304,6 +304,7 @@ const char *ability_target_flags[] = {
 	"MULTI-CAN-SEE",
 	"NOT-ALLY",
 	"NOT-ENEMY",
+	"DEAD-OK",	// 30
 	"\n"
 };
 

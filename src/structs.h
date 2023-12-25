@@ -635,6 +635,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATAR_MULTI_CAN_SEE	BIT(27)	// B. modifies multi-targ to only hit visible people
 #define ATAR_NOT_ALLY		BIT(28)	// C. cannot target an ally
 #define ATAR_NOT_ENEMY		BIT(29)	// D. cannot target an enemy
+#define ATAR_DEAD_OK		BIT(30)	// E. can target dead people
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST)
 #define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ANY_MULTI | ATAR_ENEMIES_MULTI)

@@ -194,7 +194,6 @@ ACMD(do_gsay);
 
 ACMD(do_harness);
 ACMD(do_harvest);
-ACMD(do_heal);
 ACMD(do_help);
 ACMD(do_helpsearch);
 ACMD(do_herd);
@@ -719,7 +718,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "handbook", POS_DEAD, do_gen_text_string, LVL_START_IMM, CTYPE_IMMORTAL, TEXT_FILE_HANDBOOK ),
 	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	// SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "herd", POS_STANDING, do_herd, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "helpsearch", POS_DEAD, do_helpsearch, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "hint", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),

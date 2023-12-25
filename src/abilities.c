@@ -1493,6 +1493,9 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 			if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ENEMY) && is_ability_enemy(ch, *vict)) {
 				return FALSE;	// is enemy
 			}
+			if (IS_DEAD(*vict) && !IS_SET(ABIL_TARGETS(abil), ATAR_DEAD_OK)) {
+				return FALSE;	// is dead
+			}
 		}
 		
 		// check obj targets
@@ -1883,6 +1886,8 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		return FALSE;	// missing abil
 	}
 	
+	// ATAR_x: target validation
+	
 	if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !GROUP(ch)) {
 		if (send_msgs) {
 			msg_to_char(ch, "You aren't even in a group.\r\n");
@@ -1948,6 +1953,17 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 			}
 			return FALSE;
 		}
+	}
+	if (vict && IS_DEAD(vict) && !IS_SET(ABIL_TARGETS(abil), ATAR_DEAD_OK)) {
+		if (send_msgs) {
+			if (ch == vict) {
+				msg_to_char(ch, "You can't do that -- you're already dead!\r\n");
+			}
+			else {
+				act("You can't do that -- $N is already dead!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+			}
+		}
+		return FALSE;
 	}
 	if (vict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ALLY) && (ch == vict || is_ability_ally(ch, vict))) {
 		if (send_msgs) {
@@ -6440,6 +6456,9 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		if (!IS_NPC(ch_iter) && GET_INVIS_LEV(ch_iter) > GET_ACCESS_LEVEL(ch)) {
 			continue;	// skip invisible imms
+		}
+		if (IS_DEAD(ch_iter) && !IS_SET(ABIL_TARGETS(abil), ATAR_DEAD_OK)) {
+			continue;	// skip dead
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && ch_iter == ch) {
 			continue;	// not self
