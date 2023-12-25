@@ -4401,7 +4401,7 @@ DO_ABIL(do_ready_weapon_ability) {
 DO_ABIL(do_restore_ability) {
 	char arg[MAX_INPUT_LENGTH];
 	double amount, reduced_scale;
-	int avail, old_val, use_pool = HEALTH;
+	int avail, diff, old_val, use_pool = HEALTH;
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
 	
 	const int points_per_scale = 8;	// amount per scale point, base
@@ -4464,16 +4464,19 @@ DO_ABIL(do_restore_ability) {
 		amount = MIN(amount, avail);
 	}
 	
-	// 4. store amount of damage now -- before bonus-healing
+	// 4. reduce to how much they actually need
+	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
+	amount = MIN(amount, diff);
+	
+	// 5. store amount of damage now -- before bonus-healing
 	data->total_amount += amount;
 	
-	// 5. bonus healing
+	// 6. bonus healing
 	amount += GET_BONUS_HEALING(ch) * reduced_scale;
 	
-	// 6. apply it
+	// 7. apply it
 	amount = MAX(0, amount);
 	old_val = GET_CURRENT_POOL(vict, use_pool);
-	
 	switch (use_pool) {
 		case HEALTH: {
 			heal(ch, vict, amount);
@@ -4485,7 +4488,7 @@ DO_ABIL(do_restore_ability) {
 		}
 	}
 	
-	// mark success on any change
+	// 8. mark success on any change
 	if (GET_CURRENT_POOL(vict, use_pool) != old_val) {
 		data->success = TRUE;
 		run_ability_gain_hooks(ch, vict, AGH_DO_HEAL);
