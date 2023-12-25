@@ -1763,6 +1763,8 @@ Modifier flags (use in combination with the above flags):
  &yFIGHT-SELF&0 - Targets self if no argument while fighting.
  &yFIGHT-VICTIM&0 - Targets victim if no argument while fighting.
  &yNOT-SELF&0 - Character target cannot be self.
+ &yNOT-ALLY&0 - Cannot target an ally.
+ &yNOT-ENEMY&0 - Cannot target an enemy.
  &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
 See also: OLC ABILITIES

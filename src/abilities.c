@@ -1487,6 +1487,12 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 			if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM) && !IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD) && IN_ROOM(*vict) != IN_ROOM(ch)) {
 				return FALSE;	// wrong room
 			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ALLY) && (ch == *vict || is_ability_ally(ch, *vict))) {
+				return FALSE;	// is ally
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ENEMY) && is_ability_enemy(ch, *vict)) {
+				return FALSE;	// is enemy
+			}
 		}
 		
 		// check obj targets
@@ -1942,6 +1948,18 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 			}
 			return FALSE;
 		}
+	}
+	if (vict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ALLY) && (ch == vict || is_ability_ally(ch, vict))) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on an ally!\r\n");
+		}
+		return FALSE;
+	}
+	if (vict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ENEMY) && is_ability_enemy(ch, vict)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on an enemy!\r\n");
+		}
+		return FALSE;
 	}
 	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), (ROOM_ATARS & ~ATAR_ROOM_HERE))) {
 		if (send_msgs) {
@@ -6426,6 +6444,12 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CAN_SEE) && !CAN_SEE(ch, ch_iter)) {
 			continue;	// can't see
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ALLY) && (ch_iter == ch || is_ability_ally(ch, ch_iter))) {
+			continue;	// is ally
+		}
+		if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_ENEMY) && is_ability_enemy(ch, ch_iter)) {
+			continue;	// is enemy
 		}
 		if (IS_SET(multi_targ, ATAR_GROUP_MULTI) && !in_same_group(ch_iter, ch)) {
 			continue;	// wrong group

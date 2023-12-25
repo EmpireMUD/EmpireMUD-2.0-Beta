@@ -302,6 +302,8 @@ const char *ability_target_flags[] = {
 	"ANY-MULTI",	// 25
 	"ENEMIES-MULTI",
 	"MULTI-CAN-SEE",
+	"NOT-ALLY",
+	"NOT-ENEMY",
 	"\n"
 };
 
