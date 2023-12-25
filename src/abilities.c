@@ -53,6 +53,11 @@
 const char *default_ability_name = "Unnamed Ability";
 const bitvector_t conjure_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 
+// used for targeting some restore effects
+const char *health_pool_kws[] = { "health", "hp", "hitpoints", "hits", "\n" };
+const char *move_pool_kws[] = { "moves", "movement", "mv", "\n" };
+const char *mana_pool_kws[] = { "mana", "mp", "magic", "\n" };
+
 // local protos
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
@@ -3719,41 +3724,50 @@ PREP_ABIL(prep_ready_weapon_ability) {
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_restore_ability) {
-	int iter;
-	bool any;
+	int use_pool = HEALTH;
 	char arg[MAX_INPUT_LENGTH];
-	
-	// words that will be accepted in do_restore_ability
-	const char *valid_pool_choices[] = { "health", "hp", "hitpoints", "hits", "moves", "movement", "mv", "mana", "mp", "magic", "\n" };	// terminate with \n
 	
 	// scale points	
 	get_ability_type_data(data, ABILT_RESTORE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESTORE, data);
 	
-	if (ABIL_POOL_TYPE(abil) == ANY_POOL) {
+	if (ABIL_POOL_TYPE(abil) != ANY_POOL) {
+		use_pool = ABIL_POOL_TYPE(abil);
+	}
+	else {
 		// verify available pool
 		one_argument(argument, arg);
 		
-		any = FALSE;
-		for (iter = 0; *valid_pool_choices[iter] != '\n' && *arg && !any; ++iter) {
-			if (is_abbrev(arg, valid_pool_choices[iter])) {
-				any = TRUE;
-			}
+		if (*arg && search_block(arg, health_pool_kws, FALSE) != NOTHING) {
+			use_pool = HEALTH;
 		}
-		
-		if (!any && (!vict || (GET_HEALTH(vict) != GET_MAX_HEALTH(vict) && GET_MOVE(vict) != GET_MAX_MOVE(vict) && GET_MANA(vict) != GET_MAX_MANA(vict)))) {
+		else if (*arg && search_block(arg, move_pool_kws, FALSE) != NOTHING) {
+			use_pool = MOVE;
+		}
+		else if (*arg && search_block(arg, mana_pool_kws, FALSE) != NOTHING) {
+			use_pool = MANA;
+		}
+		else if (!*arg && vict && GET_HEALTH(vict) < GET_MAX_HEALTH(vict)) {
+			use_pool = HEALTH;
+		}
+		else if (!*arg && vict && GET_MOVE(vict) < GET_MAX_MOVE(vict)) {
+			use_pool = MOVE;
+		}
+		else if (!*arg && vict && GET_MANA(vict) < GET_MAX_MANA(vict)) {
+			use_pool = MANA;
+		}
+		else {
 			msg_to_char(ch, "You must choose health, moves, or mana.\r\n");
 			CANCEL_ABILITY(data);
 			return;
 		}
 	}
-	else {
-		// assigned pool
-		if (vict && GET_CURRENT_POOL(vict, ABIL_POOL_TYPE(abil)) >= GET_MAX_POOL(vict, ABIL_POOL_TYPE(abil))) {
-			// full
-			send_ability_fail_messages(ch, vict, NULL, abil, data);
-			CANCEL_ABILITY(data);
-			return;
-		}
+	
+	// check cap
+	if (vict && GET_CURRENT_POOL(vict, use_pool) >= GET_MAX_POOL(vict, use_pool)) {
+		// full
+		send_ability_fail_messages(ch, vict, NULL, abil, data);
+		CANCEL_ABILITY(data);
+		return;
 	}
 }
 
@@ -4429,22 +4443,18 @@ DO_ABIL(do_restore_ability) {
 	else {
 		one_argument(argument, arg);
 		
-		// determine which pool
-		if (*arg) {
-			// NOTE: any new terms here should also be added in prep_restore_ability
-			if (is_abbrev(arg, "health") || is_abbrev(arg, "hp") || is_abbrev(arg, "hitpoints") || is_abbrev(arg, "hits")) {
-				use_pool = HEALTH;
-			}
-			else if (is_abbrev(arg, "moves") || is_abbrev(arg, "movement") || is_abbrev(arg, "mv")) {
-				use_pool = MOVE;
-			}
-			else if (is_abbrev(arg, "mana") || is_abbrev(arg, "mp") || is_abbrev(arg, "magic")) {
-				use_pool = MANA;
-			}
-			else {
-				// player cannot choose blood; anything else is a failure
-				return;
-			}
+		if (*arg && search_block(arg, health_pool_kws, FALSE) != NOTHING) {
+			use_pool = HEALTH;
+		}
+		else if (*arg && search_block(arg, move_pool_kws, FALSE) != NOTHING) {
+			use_pool = MOVE;
+		}
+		else if (*arg && search_block(arg, mana_pool_kws, FALSE) != NOTHING) {
+			use_pool = MANA;
+		}
+		else if (*arg) {
+			// player cannot choose blood; anything else is a failure
+			return;
 		}
 		else {
 			// try to pick
