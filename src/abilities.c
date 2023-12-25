@@ -5997,6 +5997,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	char arg[MAX_INPUT_LENGTH], *argptr = arg;
 	struct ability_exec *data;
 	struct empire_city_data *city;
+	ability_data *super;
 	vehicle_data *vvict = NULL;
 	char_data *vict = NULL;
 	obj_data *ovict = NULL;
@@ -6019,8 +6020,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	
 	// check for a supercede ability and pass control to that instead:
-	if ((abil = check_superceded_by(ch, abil))) {
-		perform_ability_command(ch, abil, argument);
+	if ((super = check_superceded_by(ch, abil)) != abil) {
+		perform_ability_command(ch, super, argument);
 		return;
 	}
 	
