@@ -1,3 +1,21 @@
+ABILITY ABILITIES "ABILITY INFO" "ABILITY COMMAND"
+
+Usage:  ability <name>
+
+The 'ability' command displays information about the ability. This information
+comes from the game's database so it's always up-to-date. Abilities also have
+help files for more information.
+
+Abilities you purchase from skill trees can be used to gain levels in their
+skill tree up to 10 times each. Abilities below level 50 only gain skill up to
+50, and abilities below 75 only gain skill levels up to 75.
+
+When you use an ability, its level is limited to your level in its parent skill
+unless you have 100 in that skill, in which case it scales all the way up to
+your full level.
+
+See also: ABILITY POINTS, TRAINING SKILLS, SKILLS
+#
 "ABILITY POINTS"
 
 You earn "ability" points at certain skill levels. These points are used to
@@ -535,7 +553,7 @@ Example:
 
 See also: APPROACH, USE
 #
-SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
+SKILL SKILLS "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
         skill <name> -- see details about a skill or ability
@@ -556,9 +574,6 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-If you specify an ability, you will see information about that ability. For
-more information, see the help page for each skill or ability.
-
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
 without the skill name, you can see which skills have free resets available.
@@ -567,8 +582,8 @@ the wrong ability, or because you were using a certain set of abilities to
 level up and are ready for a longterm set. Resetting a skill only resets your
 current set (see SKILL SWAP).
 
-It also shows the range in which you can gain the skill, although you can gain
-no more than 10 points from any one ability.
+Abilities in each skill tree show the range in which you can use them to gain
+the skill, although you can gain no more than 10 levels from any one ability.
 
 When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
@@ -577,10 +592,8 @@ your full level.
 If you don't want to see alerts each time you gain a skill level, you can turn
 them off with the "smessages" command.
 
-The ability (or abilities) command is identical to the skills command.
-
 See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
-   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES
+   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES, ABILITIES
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
