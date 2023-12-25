@@ -60,6 +60,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data);
 bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room, bool send_msgs, bool *fatal_error);
+ability_data *check_superceded_by(char_data *ch, ability_data *abil);
 char *estimate_ability_cost(char_data *ch, ability_data *abil);
 struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type);
 void free_ability_exec(struct ability_exec *data);
@@ -190,7 +191,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	double chain_prc = 100.0;
 	int count, iter;
 	size_t size, l_size;
-	ability_data *abiter, *next_abil;
+	ability_data *abiter, *next_abil, *supercede;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
 	struct ability_data_list *adl;
@@ -509,6 +510,11 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	if (count > 0 || more_learned) {
 		has_param_details = TRUE;
+	}
+	
+	// supercede?
+	if ((supercede = check_superceded_by(ch, abil))) {
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Superceded by: %s\r\n", ABIL_NAME(supercede));
 	}
 	
 	if (!has_param_details) {
