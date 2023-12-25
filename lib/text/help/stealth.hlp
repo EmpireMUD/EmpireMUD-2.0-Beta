@@ -121,6 +121,22 @@ Gains experience when you cast Darkness.
 
 See also: BLIND, DARK
 #
+DARKSHROUD "DARK SHROUD"
+
+Darkshroud (Stealth ability)
+
+Usage:  darkshroud
+Linked trait:  wits
+Cost:  50 move +25 per additional target
+Cooldown:  30 seconds
+Duration:  20 seconds
+
+This power allows you to strike out with shards of darkness, cutting through
+enemies beyond the physical level and causing traumatic damage over time. This
+ability hits all enemies in the room at once. It is stronger in the melee role.
+
+See also: MELEE
+#
 "DAGGER MASTERY"
 
 Dagger Mastery (Stealth ability)
