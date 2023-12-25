@@ -2598,7 +2598,7 @@ DO_ABIL(abil_action_rescue_one) {
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_taunt) {
-	if (vict && can_fight(ch, vict) && FIGHTING(vict) != ch) {
+	if (vict && FIGHTING(vict) != ch && can_fight(ch, vict)) {
 		if (FIGHTING(vict)) {
 			perform_rescue(ch, FIGHTING(vict), vict, RESCUE_FOCUS);
 			data->success = TRUE;
