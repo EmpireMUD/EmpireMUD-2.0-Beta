@@ -436,9 +436,9 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Difficulty: %s\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	
-	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil)) {
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil) > 1) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "DoT stacks to: %d\r\n", ABIL_MAX_STACKS(abil));
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "DoT stacks to: %dx\r\n", ABIL_MAX_STACKS(abil));
 	}
 	
 	// notes (flags), if parameterized -- LAST
