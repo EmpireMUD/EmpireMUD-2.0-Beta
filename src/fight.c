@@ -2409,7 +2409,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 	
 	if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict && msg->msg[MSG_GOD].attacker_msg) {
+			if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_GOD].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
 				}
@@ -2438,7 +2438,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 	else if (dam != 0) {
 		if (GET_POS(vict) == POS_DEAD) {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict && msg->msg[MSG_DIE].attacker_msg) {
+				if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_DIE].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
 					}
@@ -2466,7 +2466,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		}
 		else {
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-				if (ch != vict && msg->msg[MSG_HIT].attacker_msg) {
+				if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_HIT].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
 					}
@@ -2495,7 +2495,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 	}
 	else if (ch != vict) {	/* Dam == 0 */
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-			if (ch != vict && msg->msg[MSG_MISS].attacker_msg) {
+			if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_MISS].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
 					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
 				}
