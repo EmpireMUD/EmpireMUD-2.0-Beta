@@ -768,6 +768,17 @@ See also:
 
 See also: COMPANION
 #
+SUPERCEDE SUPERCEDED "SUPERCEDED BY ABILITY"
+
+Some abilities are 'superceded by' other abilities. This means the 2nd ability
+is an upgraded version of the first one. Once you learn the superceding
+ability, you can no longer use the original one.
+
+For example, Heal is superceded by Heal Friend, which does the same thing and
+more. Heal Friend is, in turn, superceded by Heal Party.
+
+See also: ABILITY
+#
 TAME
 
 Usage:  tame <animal>
