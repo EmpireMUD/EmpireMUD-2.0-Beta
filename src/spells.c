@@ -85,7 +85,7 @@ ACMD(do_ready) {
 	struct ability_data_list *adl;
 	struct player_ability_data *plab, *next_plab;
 	
-	skip_spaces(&argument);
+	quoted_arg_or_all(argument, arg);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't use ready.\r\n");
@@ -94,7 +94,7 @@ ACMD(do_ready) {
 	
 	#define VALID_READY_ABIL(ch, plab, abil)  ((abil) && (plab) && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS) && (!ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "ready")))
 	
-	if (!*argument) {
+	if (!*arg) {
 		size = snprintf(buf, sizeof(buf), "You know how to ready the following weapons:\r\n");
 		
 		found = full = FALSE;
@@ -156,7 +156,7 @@ ACMD(do_ready) {
 		
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type == ADL_READY_WEAPON && (proto = obj_proto(adl->vnum))) {
-				if (multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+				if (multi_isname(arg, GET_OBJ_KEYWORDS(proto))) {
 					found = TRUE;
 					found_abil = abil;
 					break;
@@ -179,7 +179,7 @@ ACMD(do_ready) {
 	}
 	
 	// pass through to ready-weapon ability
-	perform_ability_command(ch, found_abil, argument);
+	perform_ability_command(ch, found_abil, arg);
 }
 
 
