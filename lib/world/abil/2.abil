@@ -390,6 +390,15 @@ A
 C
 diversion 7 A 1 10 0.00 2051 30 4 1 0
 M
+2
+*~
+M
+3
+You can't seem to focus on the battle!~
+M
+4
+*~
+M
 13
 You release a small flock of pigeons into the melee!~
 M
@@ -407,15 +416,6 @@ $n tosses some firecrackers into the melee!~
 M
 14
 $n throws a pocketful of sparkling dust into the melee!~
-M
-25
-*~
-M
-26
-You can't seem to focus on the battle!~
-M
-27
-*~
 T b 1
 X+ 1 3058
 X+ 2 15
