@@ -6902,6 +6902,14 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No targets set");
 		problem = TRUE;
 	}
+	if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY | ATAR_FIGHT_SELF | ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI) && ABIL_IS_VIOLENT(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "Violent ability has friendly targets");
+		problem = TRUE;
+	}
+	if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CAN_SEE) && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "MULTI-CAN-SEE modifier without any multi-target flags");
+		problem = TRUE;
+	}
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && ABIL_HOOKS(abil)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "OVER-TIME flag with ability hooks");
 		problem = TRUE;
