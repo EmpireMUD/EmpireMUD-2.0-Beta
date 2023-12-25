@@ -893,6 +893,10 @@ target.
 For example, if the cost per target is 15 and the ability affects two
 characters, it costs an extra 30.
 
+If a player is too low on mana/move points for all possible targets, the
+ability will hit as many as possible and stop when the player cannot afford
+another target.
+
 See also: OLC ABILITIES, ABILEDIT COST
 #d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY"
@@ -1265,6 +1269,37 @@ most abilities, this is "resting", "fighting", or "standing". This applies to
 command abilities as well as companion, summon, and ready weapon abilities.
 
 See also: POSITIONS, OLC ABILITIES
+#d
+"ABILEDIT MULTI" "ABILEDIT MULTIPLE TARGETS" "MULTIPLE TARGETS ABILITIES"
+
+Abilities may target more than one person. These abilities apply their full
+scaling points to each target; it's important to ensure the cost and scaling
+settings accommodate how powerful they can be.
+
+Targets: Use one or more of the following targets to indicate who it hits:
+ &cALLIES-MULTI&0 - All allies in the room including group members and empiremates.
+ &cGROUP-MULTI&0 - Members of your own group (and their companions).
+ &cROOM-MULTI&0 - All characters in the room.
+ &cENEMIES-MULTI&0 - All enemies in the room, including most neutral mobs.
+ &yMULTI-CAN-SEE&0 - This modifier will only hit targets if you can see them.
+
+Costs: These abilities may be priced in different ways. Sometimes a flat cost
+is appropriate, and other times you should rely on the <costpertarget> field.
+
+Messaging: These should generally start with &cpre-self-to-&0 messages. Each
+character hit will trigger &ctarg-to-&0 messages except the player using the
+ability, who instead has &cself-to-&0 messages. If combined with the OVER-TIME
+flag, &cot-self-to-&0 messages are used (because there is no target character
+until the end of the over-time action).
+
+Immunity: If the ability has immunity flags that match characters who would be
+targeted by the ability, the player will see "Name is immune" messages for
+those characters, but no fail messages. Immune characters do not add to the
+cost even if there is a cost-per-target, but the ability's base cost will still
+be charged if all possible targets are immune (unlike a single-target ability)
+as the pre-messages have already been displayed.
+
+See also: OLC ABILITIES
 #d
 "ABILEDIT NAME"
 
@@ -1692,7 +1727,7 @@ Vehicle targets:
  &cVEH-ROOM&0 - A vehicle (or vehicle-style building) in the room.
  &cVEH-WORLD&0 - A vehicle anywhere.
 
-Multiple targets:
+Multiple targets (see ABILEDIT MULTI):
  &cALLIES-MULTI&0 - Can target all allies.
  &cGROUP-MULTI&0 - Can target whole group.
  &cROOM-MULTI&0 - Can target all characters in the room.
@@ -1706,7 +1741,7 @@ Modifier flags (use in combination with the above flags):
  &yFIGHT-SELF&0 - Targets self if no argument while fighting.
  &yFIGHT-VICTIM&0 - Targets victim if no argument while fighting.
  &yNOT-SELF&0 - Character target cannot be self.
- &cMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
+ &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
 See also: OLC ABILITIES
 #d
