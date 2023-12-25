@@ -236,18 +236,6 @@ const char *ability_type_flags[] = {
 	"RESURRECT",
 	"RESOURCE",
 	"ATTACK",
-/*
-	"UNAFFECTS",
-	"POINTS",
-	"ALTER-OBJS",
-	"GROUPS",
-	"MASSES",
-	"AREAS",
-	"CREATIONS",
-	"MANUAL",
-	"ROOMS",
-	"CRAFT",
-*/
 	"\n"
 };
 

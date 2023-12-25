@@ -601,17 +601,6 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_RESURRECT			BIT(21)	// resurrects a player
 #define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
 #define ABILT_ATTACK			BIT(23)	// hits the target with one's own weapon attack
-/*
-#define ABILT_UNAFFECTS	BIT(2)
-#define ABILT_POINTS	BIT(3)	// e.g. heal?
-#define ABILT_ALTER_OBJS	BIT(4)
-#define ABILT_GROUPS	BIT(5)
-#define ABILT_MASSES	BIT(6)
-#define ABILT_AREAS	BIT(7)
-#define ABILT_CREATIONS	BIT(9)
-#define ABILT_MANUAL	BIT(10)
-#define ABILT_ROOMS	BIT(11)
-*/
 
 
 // ATAR_x: ability targeting flags
