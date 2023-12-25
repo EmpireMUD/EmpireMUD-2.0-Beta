@@ -3211,6 +3211,20 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_TARGET_IS_VAMPIRE: {
+				if (vict && !IS_VAMPIRE(vict)) {
+					if (send_msgs) {
+						if (ch == vict) {
+							msg_to_char(ch, "You are not a vampire.\r\n");
+						}
+						else {
+							act("$n is not a vampire.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+					}
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

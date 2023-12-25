@@ -492,6 +492,7 @@ const char *ability_limitations[] = {
 	"check obj binding",	// 40
 	"obj flagged",
 	"obj not flagged",
+	"target is vampire",
 	"\n"
 };
 
@@ -541,6 +542,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_CHECK_OBJ_BINDING
 	ABLIM_OBJ_FLAG,	// ABIL_LIMIT_OBJ_FLAGGED
 	ABLIM_OBJ_FLAG,	// ABIL_LIMIT_OBJ_NOT_FLAGGED
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_IS_VAMPIRE
 };
 
 

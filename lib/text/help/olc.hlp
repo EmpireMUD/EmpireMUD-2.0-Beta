@@ -1213,6 +1213,7 @@ Limitation types:
  &ctarget has any DoT&0 - Target must be afflicted by a DoT.
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
+ &ctarget is vampire&0 - Target must be a vampire.
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
  &cusing any poison&0 - Player must have poison ready.

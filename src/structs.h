@@ -801,6 +801,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_CHECK_OBJ_BINDING		40	// ensures item is bound to actor or no one
 #define ABIL_LIMIT_OBJ_FLAGGED				41	// checks for object flag present
 #define ABIL_LIMIT_OBJ_NOT_FLAGGED			42	// checks for object flag absent
+#define ABIL_LIMIT_TARGET_IS_VAMPIRE		43	// requires that the target be a vampire
 
 
 // ABLIM_x: data needed for ability limits:
