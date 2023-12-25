@@ -203,7 +203,6 @@ ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
 ACMD(do_hostile);
-ACMD(do_howl);
 ACMD(do_hunt);
 
 ACMD(do_identify);
@@ -734,7 +733,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "home", POS_DEAD, do_home, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
-	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 	SIMPLE_CMD( "hunt", POS_STANDING, do_hunt, NO_MIN, CTYPE_SKILL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),

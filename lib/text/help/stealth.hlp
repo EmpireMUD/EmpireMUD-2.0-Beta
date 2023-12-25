@@ -192,14 +192,14 @@ HOWL
 
 Howl
 Stealth Synergy Ability: 100 Natural Magic
-Cost:  50 move
+Cost:  20 move + 10 per additional target
 Cooldown:  30 seconds
 Debuff type:  mental
 Usage:  howl
 
-You let out a terrifying howl, penalizing all enemies. The first victim loses
-to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
-2x Charisma instead.
+You let out a terrifying howl, lowering the accuracy of all enemies. The first
+target receives the largest penalty; other targets are lower. This effect lasts
+15 seconds.
 #
 INFILTRATE "IMPROVED INFILTRATE"
 

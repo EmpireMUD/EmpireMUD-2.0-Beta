@@ -162,7 +162,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_SANGUINE_RESTORATION  226
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_SHADOWCAGE  233
-#define ABIL_HOWL  234
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
 #define ABIL_HONE  262

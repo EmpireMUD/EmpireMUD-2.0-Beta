@@ -576,51 +576,6 @@ ACMD(do_disguise) {
 }
 
 
-ACMD(do_howl) {
-	char_data *victim, *next_vict;
-	struct affected_type *af;
-	int value, cost = 50;
-	bool first = TRUE;
-	
-	if (!can_use_ability(ch, ABIL_HOWL, MOVE, cost, COOLDOWN_HOWL)) {
-		return;
-	}
-	else if (!check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
-	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_HOWL)) {
-		return;
-	}
-	else {
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-		
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_HOWL, 30, WAIT_COMBAT_ABILITY);
-		
-		act("You let out a fearsome howl!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_ABILITY);
-		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM | ACT_ABILITY);
-		
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
-			if (AFF_FLAGGED(victim, AFF_IMMUNE_MENTAL_DEBUFFS)) {
-				continue;
-			}
-			
-			if (victim != ch && IS_NPC(victim) && CAN_SEE(ch, victim) && !is_fight_ally(ch, victim) && !in_same_group(ch, victim) && can_fight(ch, victim)) {
-				value = GET_CHARISMA(ch) * (first ? 4 : 2);
-				first = FALSE;
-				
-				af = create_mod_aff(ATYPE_HOWL, 15, APPLY_TO_HIT, -value, ch);
-				affect_join(victim, af, NOBITS);
-				
-				msg_to_char(victim, "You are too scared to aim effectively!\r\n");
-				engage_combat(ch, victim, TRUE);
-			}
-		}
-	}
-}
-
-
 ACMD(do_infiltrate) {
 	room_data *to_room, *was_in;
 	int dir;
