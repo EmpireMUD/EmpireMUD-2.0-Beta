@@ -82,59 +82,44 @@ void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, 
 
 // ability function prototypes
 DO_ABIL(do_action_ability);
-PREP_ABIL(prep_action_ability);
-
 DO_ABIL(do_attack_ability);
-PREP_ABIL(prep_attack_ability);
-
 DO_ABIL(do_buff_ability);
-PREP_ABIL(prep_buff_ability);
-
 DO_ABIL(do_building_damage_ability);
-PREP_ABIL(prep_building_damage_ability);
-
 DO_ABIL(do_conjure_liquid_ability);
-PREP_ABIL(prep_conjure_liquid_ability);
-
 DO_ABIL(do_conjure_object_ability);
-PREP_ABIL(prep_conjure_object_ability);
-
 DO_ABIL(do_conjure_vehicle_ability);
-PREP_ABIL(prep_conjure_vehicle_ability);
-
 DO_ABIL(do_damage_ability);
-PREP_ABIL(prep_damage_ability);
-
 DO_ABIL(do_dot_ability);
-PREP_ABIL(prep_dot_ability);
-
 DO_ABIL(do_paint_building_ability);
-PREP_ABIL(prep_paint_building_ability);
-
 DO_ABIL(do_ready_weapon_ability);
-PREP_ABIL(prep_ready_weapon_ability);
-
 DO_ABIL(do_restore_ability);
-PREP_ABIL(prep_restore_ability);
-
 DO_ABIL(do_resurrect_ability);
-PREP_ABIL(prep_resurrect_ability);
-
 DO_ABIL(do_room_affect_ability);
-PREP_ABIL(prep_room_affect_ability);
-
 DO_ABIL(do_teleport_ability);
+
+PREP_ABIL(prep_buff_ability);
+PREP_ABIL(prep_conjure_liquid_ability);
+PREP_ABIL(prep_conjure_object_ability);
+PREP_ABIL(prep_conjure_vehicle_ability);
+PREP_ABIL(prep_ready_weapon_ability);
+PREP_ABIL(prep_restore_ability);
+PREP_ABIL(prep_resurrect_ability);
+PREP_ABIL(prep_room_affect_ability);
 PREP_ABIL(prep_teleport_ability);
 
 // for ability struct
 #define CHECK_IMMUNE	TRUE
 #define IGNORE_IMMUNE	FALSE
 
+#define SCALED_TYPE		TRUE
+#define UNSCALED_TYPE	FALSE
+
 // setup for abilities
 struct {
 	bitvector_t type;	// ABILT_ const
 	PREP_ABIL(*prep_func);	// does the cost setup
 	DO_ABIL(*do_func);	// runs the ability
+	bool scaled_type;
 	bool check_immune;	// whether or not immunities affect this type
 	bitvector_t fields;	// what shows in the menu/stats
 } do_ability_data[] = {
@@ -142,41 +127,41 @@ struct {
 	// ABILT_x: setup by type; they run in this order:
 	
 	// types that don't run functions
-	{ ABILT_CRAFT, NULL, NULL, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_RESOURCE, NULL, NULL, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_PLAYER_TECH, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_DIFFICULTY },
-	{ ABILT_PASSIVE_BUFF, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
-	{ ABILT_COMPANION, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
-	{ ABILT_MORPH, NULL, NULL, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_AUGMENT, NULL, NULL, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_CUSTOM, NULL, NULL, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_CRAFT, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_RESOURCE, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_PLAYER_TECH, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_DIFFICULTY },
+	{ ABILT_PASSIVE_BUFF, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
+	{ ABILT_COMPANION, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
+	{ ABILT_MORPH, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_AUGMENT, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_CUSTOM, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
 	
 	// ones that should run early
-	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
 	// attack/damage and restoration: some abilities stop here if they miss
-	{ ABILT_ATTACK, prep_attack_ability, do_attack_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
-	{ ABILT_RESTORE, prep_restore_ability, do_restore_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_POOL_TYPE | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_ATTACK, NULL, do_attack_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_DAMAGE, NULL, do_damage_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_RESTORE, prep_restore_ability, do_restore_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_POOL_TYPE | ABILEDIT_COST_PER_AMOUNT },
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
-	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_PAINT_BUILDING, prep_paint_building_ability, do_paint_building_ability, ABILEDIT_COMMAND },
-	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
-	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
-	{ ABILT_DOT, prep_dot_ability, do_dot_ability, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
-	{ ABILT_BUILDING_DAMAGE, prep_building_damage_ability, do_building_damage_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
-	{ ABILT_SUMMON_ANY, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_PAINT_BUILDING, NULL, do_paint_building_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
+	{ ABILT_DOT, NULL, do_dot_ability, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
+	{ ABILT_BUILDING_DAMAGE, NULL, do_building_damage_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
+	{ ABILT_SUMMON_ANY, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
 	// alaways run actions last
-	{ ABILT_ACTION, prep_action_ability, do_action_ability, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_ACTION, NULL, do_action_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
-	{ NOBITS, NULL, NULL, FALSE, NOBITS }	// list terminator
+	{ NOBITS, NULL, NULL, FALSE, FALSE, NOBITS }	// list terminator
 };
 
 
@@ -785,7 +770,7 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 		
 		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
-			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].scaled_type) {
 				cost += standard_ability_scale(ch, abil, level, do_ability_data[iter].type, data) * ABIL_COST_PER_SCALE_POINT(abil);
 			}
 		}
@@ -3456,22 +3441,6 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 //// ABILITY PREP FUNCTIONS //////////////////////////////////////////////////
 
 /**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_action_ability) {
-	get_ability_type_data(data, ABILT_ACTION)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ACTION, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_attack_ability) {
-	get_ability_type_data(data, ABILT_ATTACK)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ATTACK, data);
-}
-
-
-/**
 * This function 'stops' if the ability is a toggle and you're toggling it off,
 * which keeps it from charging/cooldowning.
 * PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
@@ -3515,14 +3484,6 @@ PREP_ABIL(prep_buff_ability) {
 		data->success = FALSE;
 		return;
 	}
-	
-	get_ability_type_data(data, ABILT_BUFF)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUFF, data);
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_building_damage_ability) {
-	get_ability_type_data(data, ABILT_BUILDING_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_BUILDING_DAMAGE, data);
 }
 
 
@@ -3535,9 +3496,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	char buf[256];
 	struct interaction_item *interact;
 	generic_data *existing, *gen;
-	
-	get_ability_type_data(data, ABILT_CONJURE_LIQUID)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_LIQUID, data);
-	
+		
 	if (!ovict) {
 		// should this error? or just do nothing
 		// data->stop = TRUE;
@@ -3591,8 +3550,6 @@ PREP_ABIL(prep_conjure_object_ability) {
 	int any_size, iter;
 	struct interaction_item *interact;
 	obj_data *proto;
-	
-	get_ability_type_data(data, ABILT_CONJURE_OBJECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_OBJECT, data);
 	
 	one_ata = ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) ? TRUE : FALSE;
 	
@@ -3664,8 +3621,6 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 	struct interaction_item *interact;
 	vehicle_data *proto, *viter;
 	
-	get_ability_type_data(data, ABILT_CONJURE_VEHICLE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_CONJURE_VEHICLE, data);
-	
 	// check interactions
 	LL_FOREACH(ABIL_INTERACTIONS(abil), interact) {
 		if (interact->type != INTERACT_VEHICLE_CONJURE) {
@@ -3708,30 +3663,6 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 			return;
 		}
 	}
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_damage_ability) {
-	get_ability_type_data(data, ABILT_DAMAGE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DAMAGE, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_dot_ability) {
-	get_ability_type_data(data, ABILT_DOT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_DOT, data);
-}
-
-
-/**
-* PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-*/
-PREP_ABIL(prep_paint_building_ability) {
-	get_ability_type_data(data, ABILT_PAINT_BUILDING)->scale_points = standard_ability_scale(ch, abil, level, ABILT_PAINT_BUILDING, data);
 }
 
 
@@ -3821,9 +3752,6 @@ PREP_ABIL(prep_restore_ability) {
 	
 	const int points_per_scale = 8;	// amount per scale point, base
 	
-	// scale points	
-	subdata->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESTORE, data);
-	
 	if (!vict) {
 		return;	// no victim = no work
 	}
@@ -3908,8 +3836,6 @@ PREP_ABIL(prep_restore_ability) {
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_resurrect_ability) {
 	char_data *targ;
-	
-	get_ability_type_data(data, ABILT_RESURRECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESURRECT, data);
 	
 	if (vict) {
 		if (!IS_DEAD(vict)) {
@@ -3996,8 +3922,6 @@ PREP_ABIL(prep_room_affect_ability) {
 		CANCEL_ABILITY(data);
 		return;
 	}
-	
-	get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_ROOM_AFFECT, data);
 }
 
 
@@ -4044,8 +3968,6 @@ PREP_ABIL(prep_teleport_ability) {
 			}
 		}
 	}
-	
-	get_ability_type_data(data, ABILT_TELEPORT)->scale_points = standard_ability_scale(ch, abil, level, ABILT_TELEPORT, data);
 }
 
 
@@ -6649,25 +6571,35 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	// determine costs and scales
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
-		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
-			call_prep_abil(do_ability_data[iter].prep_func);
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type)) {
+			aet = get_ability_type_data(data, do_ability_data[iter].type);
 			
+			// check scaling (some types)
+			if (do_ability_data[iter].scaled_type) {
+				aet->scale_points = standard_ability_scale(ch, abil, level, do_ability_data[iter].type, data);
+				
+				// reduce points if needed
+				if (ABILITY_FLAGGED(abil, ABILF_REDUCED_ON_EXTRA_TARGETS) && data->total_targets > 0) {
+					aet->scale_points /= 2;
+				}
+			}
+			
+			// prep func, if any
+			if (do_ability_data[iter].prep_func) {
+				call_prep_abil(do_ability_data[iter].prep_func);
+			}
+			
+			// find out if any types ignore immunity
 			if (!do_ability_data[iter].check_immune) {
 				any_ignore_immune = TRUE;
 			}
 			
-			// look up data from the prep func
-			aet = get_ability_type_data(data, do_ability_data[iter].type);
-			
-			// reduce points if needed
-			if (ABILITY_FLAGGED(abil, ABILF_REDUCED_ON_EXTRA_TARGETS) && data->total_targets > 0) {
-				aet->scale_points /= 2;
-			}
-			
-			// save for cost later
+			// save for cost later (may be 0 here)
 			total_scale += aet->scale_points;
 		}
 	}
+	
+	// record highest scaling
 	data->max_scale = MAX(total_scale, data->max_scale);
 	
 	// early exit?
