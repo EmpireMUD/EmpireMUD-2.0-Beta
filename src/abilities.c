@@ -6109,10 +6109,11 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		// if it has _only_ ATAR_IGNORE, skip argument entirely
 		has = TRUE;
 	}
-	else if (*argument && IS_SET(ABIL_TARGETS(abil), ATAR_STRING)) {
+	else if (*argument && ABIL_TARGETS(abil) == ATAR_STRING) {
 		has = TRUE;
+		// string ONLY: set has; otherwise pass thru
 	}
-	else if (*argument) {
+	else if (*argument && !IS_SET(ABIL_TARGETS(abil), ATAR_STRING)) {
 		argument = one_argument(argument, arg);
 		skip_spaces(&argument);	// anything left
 		
