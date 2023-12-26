@@ -576,6 +576,51 @@ bitvector_t all_abil_hooks(ability_data *abil) {
 
 
 /**
+* For the auditor, determines if either ability is in a supercede chain that
+* leads to the other.
+*
+* @param ability_data *a One ability.
+* @param ability_data *b The other ability.
+* @return bool TRUE if either can supercede the other; FALSE if not.
+*/
+bool can_supercede_either(ability_data *a, ability_data *b) {
+	struct ability_data_list *adl;
+	
+	if (!a || !b || a == b) {
+		return FALSE;	// safety shortcut
+	}
+	
+	// check a
+	LL_FOREACH(ABIL_DATA(a), adl) {
+		if (adl->type == ADL_SUPERCEDED_BY) {
+			if (adl->vnum == ABIL_VNUM(b)) {
+				return TRUE;	// found
+			}
+			else {
+				// recurse
+				return can_supercede_either(ability_proto(adl->vnum), b);
+			}
+		}
+	}
+	
+	// check b
+	LL_FOREACH(ABIL_DATA(b), adl) {
+		if (adl->type == ADL_SUPERCEDED_BY) {
+			if (adl->vnum == ABIL_VNUM(a)) {
+				return TRUE;	// found
+			}
+			else {
+				// recurse
+				return can_supercede_either(ability_proto(adl->vnum), a);
+			}
+		}
+	}
+	
+	return FALSE;	// did not find
+}
+
+
+/**
 * Things that are checked early in perform_ability_command(), which may also
 * be checked repeatedly in perform_over_time_ability(). This function should
 * send a message if it fails, and ONLY if it fails.
@@ -7326,7 +7371,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same name as ability %d", ABIL_VNUM(abiter));
 			problem = TRUE;
 		}
-		if (ABIL_COMMAND(abil) && ABIL_COMMAND(abiter) && !str_cmp(ABIL_COMMAND(abil), ABIL_COMMAND(abiter)) && search_block(ABIL_COMMAND(abil), ignore_same_command, TRUE) == NOTHING) {
+		if (ABIL_COMMAND(abil) && ABIL_COMMAND(abiter) && !str_cmp(ABIL_COMMAND(abil), ABIL_COMMAND(abiter)) && search_block(ABIL_COMMAND(abil), ignore_same_command, TRUE) == NOTHING && !can_supercede_either(abil, abiter)) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Same command as ability %d %s", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 			problem = TRUE;
 		}
