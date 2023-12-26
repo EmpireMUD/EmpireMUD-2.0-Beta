@@ -2181,7 +2181,6 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 
 // act.naturalmagic.c
 bool despawn_companion(char_data *ch, mob_vnum vnum);
-char *report_healing(char_data *healed, int amount, char_data *report_to);
 int total_bonus_healing(char_data *ch);
 void un_earthmeld(char_data *ch);
 

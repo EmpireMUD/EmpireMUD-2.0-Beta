@@ -80,34 +80,6 @@ int total_bonus_healing(char_data *ch) {
 
 
 /**
-* Builds part of a string to show how much a person was healed.
-*
-* @param char_data *healed Person who was healed.
-* @param int amount The amount healed.
-* @param char_data *report_to The person to send the message to (the healer).
-* @return char* The healing string to show, like (+5, 25%).
-*/
-char *report_healing(char_data *healed, int amount, char_data *report_to) {
-	static char output[80];
-	size_t size;
-	
-	*output = '\0';
-	//	if (SHOW_FIGHT_MESSAGES(report_to, FM_MY_HEALS)) {
-		size = snprintf(output, sizeof(output), " (%+d", amount);
-		
-		if (healed != report_to && (is_fight_enemy(healed, report_to) || (IS_NPC(healed) && !is_fight_ally(healed, report_to)))) {
-			size += snprintf(output + size, sizeof(output) - size, ", %.1f%%)", (GET_HEALTH(healed) * 100.0 / MAX(1, GET_MAX_HEALTH(healed))));
-		}
-		else {
-			size += snprintf(output + size, sizeof(output) - size, ", %d/%d)", GET_HEALTH(healed), GET_MAX_HEALTH(healed));
-		}
-	//	}
-	
-	return output;
-}
-
-
-/**
 * Ends an earthmeld and sends messages.
 *
 * @param char_data *ch The earthmelded one.
