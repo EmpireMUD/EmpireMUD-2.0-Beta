@@ -4030,6 +4030,8 @@ struct ability_exec {
 	
 	// data passed by types
 	any_vnum ready_weapon_val;
+	int restore_pool;
+	int restore_amount;
 	
 	struct ability_exec_type *types;	// LL of type data
 };

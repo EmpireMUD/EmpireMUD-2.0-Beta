@@ -3758,17 +3758,25 @@ PREP_ABIL(prep_ready_weapon_ability) {
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_restore_ability) {
-	int use_pool = HEALTH;
+	double amount, reduced_scale;
+	int avail, diff, use_pool = HEALTH;
 	char arg[MAX_INPUT_LENGTH];
+	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
+	
+	const int points_per_scale = 8;	// amount per scale point, base
 	
 	// scale points	
-	get_ability_type_data(data, ABILT_RESTORE)->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESTORE, data);
+	subdata->scale_points = standard_ability_scale(ch, abil, level, ABILT_RESTORE, data);
 	
+	if (!vict) {
+		return;	// no victim = no work
+	}
+	
+	// 1. determine pool
 	if (ABIL_POOL_TYPE(abil) != ANY_POOL) {
 		use_pool = ABIL_POOL_TYPE(abil);
 	}
 	else {
-		// verify available pool
 		one_argument(argument, arg);
 		
 		if (*arg && search_block(arg, health_pool_kws, FALSE) != NOTHING) {
@@ -3780,29 +3788,64 @@ PREP_ABIL(prep_restore_ability) {
 		else if (*arg && search_block(arg, mana_pool_kws, FALSE) != NOTHING) {
 			use_pool = MANA;
 		}
-		else if (!*arg && vict && GET_HEALTH(vict) < GET_MAX_HEALTH(vict)) {
-			use_pool = HEALTH;
-		}
-		else if (!*arg && vict && GET_MOVE(vict) < GET_MAX_MOVE(vict)) {
-			use_pool = MOVE;
-		}
-		else if (!*arg && vict && GET_MANA(vict) < GET_MAX_MANA(vict)) {
-			use_pool = MANA;
-		}
-		else {
+		else if (*arg) {
+			// player cannot choose blood; anything else is a failure
 			msg_to_char(ch, "You must choose health, moves, or mana.\r\n");
 			CANCEL_ABILITY(data);
 			return;
 		}
+		else {
+			// try to pick
+			if (GET_HEALTH(vict) < GET_MAX_HEALTH(vict)) { 
+				use_pool = HEALTH;
+			}
+			else if (GET_MOVE(vict) < GET_MAX_MOVE(vict)) {
+				use_pool = MOVE;
+			}
+			else if (GET_MANA(vict) < GET_MAX_MANA(vict)) {
+				use_pool = MANA;
+			}
+			else {
+				// nothing to restore? pass to next section for the fail
+			}
+		}
 	}
 	
-	// check cap
-	if (vict && GET_CURRENT_POOL(vict, use_pool) >= GET_MAX_POOL(vict, use_pool)) {
+	// 2. check cap and bail out
+	if (GET_CURRENT_POOL(vict, use_pool) >= GET_MAX_POOL(vict, use_pool)) {
 		// full
 		send_ability_fail_messages(ch, vict, NULL, abil, data);
 		CANCEL_ABILITY(data);
 		return;
 	}
+	
+	// 3.1. smoother scaling for bonuses, averaged toward 1.0
+	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
+	
+	// 3.2. determine amount
+	amount = subdata->scale_points * points_per_scale;
+	
+	// 4.1. check costs and reduce by available mana/etc
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		check_available_ability_cost(ch, abil, data, &avail, NULL);
+		amount = MIN(amount, avail);
+	}
+	
+	// 4.2. reduce to how much they actually need
+	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
+	amount = MIN(amount, diff);
+	
+	// 5. store amount of damage now -- before bonus-healing
+	data->total_amount += amount;
+	
+	// 6. bonus healing (health only)
+	if (use_pool == HEALTH) {
+		amount += total_bonus_healing(ch) * reduced_scale;
+	}
+	
+	// 7. store it for do_restore_ability
+	data->restore_pool = use_pool;
+	data->restore_amount = amount;
 }
 
 
@@ -4456,81 +4499,15 @@ DO_ABIL(do_ready_weapon_ability) {
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_restore_ability) {
-	char arg[MAX_INPUT_LENGTH];
-	double amount, reduced_scale;
-	int avail, diff, old_val, use_pool = HEALTH;
-	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
-	
-	const int points_per_scale = 8;	// amount per scale point, base
+	int amount, old_val, use_pool;
 	
 	if (!vict) {
 		return;	// no victim = no work
 	}
 	
-	// smoother scaling, for bonuses, averaged toward 1.0
-	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
+	use_pool = data->restore_pool;
+	amount = data->restore_amount;	
 	
-	// 1. determine pool
-	if (ABIL_POOL_TYPE(abil) != ANY_POOL) {
-		use_pool = ABIL_POOL_TYPE(abil);
-	}
-	else {
-		one_argument(argument, arg);
-		
-		if (*arg && search_block(arg, health_pool_kws, FALSE) != NOTHING) {
-			use_pool = HEALTH;
-		}
-		else if (*arg && search_block(arg, move_pool_kws, FALSE) != NOTHING) {
-			use_pool = MOVE;
-		}
-		else if (*arg && search_block(arg, mana_pool_kws, FALSE) != NOTHING) {
-			use_pool = MANA;
-		}
-		else if (*arg) {
-			// player cannot choose blood; anything else is a failure
-			return;
-		}
-		else {
-			// try to pick
-			if (GET_HEALTH(vict) < GET_MAX_HEALTH(vict)) { 
-				use_pool = HEALTH;
-			}
-			else if (GET_MOVE(vict) < GET_MAX_MOVE(vict)) {
-				use_pool = MOVE;
-			}
-			else if (GET_MANA(vict) < GET_MAX_MANA(vict)) {
-				use_pool = MANA;
-			}
-			else {
-				// nothing to restore
-				return;
-			}
-		}
-	}
-	
-	// 2. determine amount
-	amount = subdata->scale_points * points_per_scale;
-	
-	// 3. check costs and reduce by available mana/etc
-	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
-		check_available_ability_cost(ch, abil, data, &avail, NULL);
-		amount = MIN(amount, avail);
-	}
-	
-	// 4. reduce to how much they actually need
-	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
-	amount = MIN(amount, diff);
-	
-	// 5. store amount of damage now -- before bonus-healing
-	data->total_amount += amount;
-	
-	// 6. bonus healing (health only)
-	if (use_pool == HEALTH) {
-		amount += total_bonus_healing(ch) * reduced_scale;
-	}
-	
-	// 7. apply it
-	amount = MAX(0, amount);
 	old_val = GET_CURRENT_POOL(vict, use_pool);
 	switch (use_pool) {
 		case HEALTH: {
@@ -4543,7 +4520,7 @@ DO_ABIL(do_restore_ability) {
 		}
 	}
 	
-	// 8. mark success on any change
+	// mark success on any change
 	if (GET_CURRENT_POOL(vict, use_pool) != old_val) {
 		data->success = TRUE;
 		run_ability_gain_hooks(ch, vict, AGH_DO_HEAL);
@@ -4895,7 +4872,7 @@ ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvecto
 */
 void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, struct ability_exec *data) {
 	bool any, invis;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], healing[256];
 	char *msg;
 	int pos;
 	
@@ -4912,9 +4889,15 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	
+	// healing portion (restore only)
+	if (IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) && data->restore_amount > 0) {
+		strcpy(healing, report_healing(vict, data->restore_amount, ch));
+	}
+	else {
+		*healing = '\0';
 	}
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
@@ -4926,12 +4909,19 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			any = TRUE;
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, pos))) {
 				if (*msg != '*') {
-					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					if (*healing) {
+						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					}
+					else {
+						// just act it out
+						act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					}
 				}
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s!", SAFE_ABIL_COMMAND(abil));
+				snprintf(buf, sizeof(buf), "You use %s!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
@@ -4955,24 +4945,38 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			any = TRUE;
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 				if (*msg != '*') {
-					act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					if (*healing) {
+						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					}
+					else {
+						// just act it out
+						act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
+					}
 				}
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s on $N!", SAFE_ABIL_COMMAND(abil));
+				snprintf(buf, sizeof(buf), "You use %s on $N!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
 			// to vict
 			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
 				if (*msg != '*') {
-					act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
+					if (*healing) {
+						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
+					}
+					else {
+						// just act it out
+						act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
+					}
 				}
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s on you!", SAFE_ABIL_COMMAND(abil));
+				snprintf(buf, sizeof(buf), "$n uses %s on you!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		
@@ -5140,10 +5144,8 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	// mark this now
 	if (data) {
@@ -5323,14 +5325,9 @@ void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *o
 	
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
-	if (!ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-		// counts as action spam unless violent
-		act_flags |= TO_SPAMMY;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= !ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_SPAMMY : NOBITS;
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
@@ -5422,10 +5419,8 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5495,10 +5490,8 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5560,10 +5553,8 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5632,10 +5623,8 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	// determine message pos, for consistency
 	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR);
@@ -5714,10 +5703,8 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// determine message pos, for consistency
@@ -5799,10 +5786,7 @@ void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct abil
 	}
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
-	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
-		// non-violent buff
-		act_flags |= ACT_BUFF;
-	}
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
 	
 	// determine message pos, for consistency
 	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TOGGLE_TO_CHAR);
