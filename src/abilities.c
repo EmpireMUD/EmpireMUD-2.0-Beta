@@ -4906,6 +4906,10 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	// healing portion (restore only)
 	if (IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) && data->restore_amount > 0) {
 		size = snprintf(healing, sizeof(healing), " (%+d", data->restore_amount);
+		if (data->restore_pool != HEALTH) {
+			size += snprintf(healing + size, sizeof(healing) - size, " %s", pool_types[data->restore_pool]);
+		}
+		
 		val = GET_CURRENT_POOL(vict ? vict : ch, data->restore_pool) + data->restore_amount;
 		val = MIN(val, GET_MAX_POOL(vict ? vict : ch, data->restore_pool));
 		
