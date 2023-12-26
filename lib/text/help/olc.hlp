@@ -1014,9 +1014,7 @@ The 'data' field is used by different types of abilities. Available types are:
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
  &cRANGE&0 - Used by some actions, as noted.
  &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
- &cSUPERCEDED-BY&0 - A better version of this ability. If the player tries to
-   use this one while they also have the one it's superceded by, that one is
-   used instead. For example, Heal - Heal Friend - Heal Party.
+ &cSUPERCEDED-BY&0 - A better version of this ability. SEE ABILEDIT SUPERCEDE
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -1717,6 +1715,20 @@ When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
+#d
+"ABILEDIT SUPERCEDE" "ABILEDIT SUPERCEDED-BY" "SUPERCEDING ABILITIES" "SUPERCEDED-BY ABILITIES"
+
+The SUPERCEDED-BY ability data indicates that another ability replaces this
+one. If the player tries to use an ability and they also have the one it's
+superceded by, they automatically use that one instead. Generally both
+abilities should have the same command.
+
+This is used, for example, to improve the player's "heal" command:
+ [109] Heal - A basic ability that only heals the user.
+ [110] Heal Friend - A slightly cheaper heal that also heals others.
+ [111] Heal Party - An even better heal that can target the whole group.
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT TARGETS"
 
