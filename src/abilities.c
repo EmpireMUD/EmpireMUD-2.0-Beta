@@ -6215,6 +6215,11 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		has = TRUE;
 	}
 	else {	// no arg and no tar-ignore
+		// if no target specified, and the spell isn't violent, default to self
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY) && !IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && !ABIL_IS_VIOLENT(abil) && (!FIGHTING(ch) || !IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_VICT))) {
+			vict = ch;
+			has = TRUE;
+		}
 		// multi-target
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ANY_MULTI)) {
 			multi_targ = ATAR_ANY_MULTI;
@@ -6264,11 +6269,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 				has = TRUE;
 			}
 		}
-		// if no target specified, and the spell isn't violent, default to self
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY) && !IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF) && !ABIL_IS_VIOLENT(abil)) {
-			vict = ch;
-			has = TRUE;
-		}
+		
+		// didn't find one?
 		if (!has) {
 			if (abil_has_custom_message(abil, ABIL_CUSTOM_NO_ARGUMENT)) {
 				act(get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_NO_ARGUMENT), FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
