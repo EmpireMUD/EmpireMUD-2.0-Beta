@@ -4874,7 +4874,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	bool any, invis;
 	char buf[MAX_STRING_LENGTH], healing[256];
 	char *msg;
-	int pos;
+	int pos, size, val;
 	
 	bitvector_t act_flags = ACT_ABILITY;
 	
@@ -4894,7 +4894,16 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	
 	// healing portion (restore only)
 	if (IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) && data->restore_amount > 0) {
-		strcpy(healing, report_healing(vict, data->restore_amount, ch));
+		size = snprintf(healing, sizeof(healing), " (%+d", data->restore_amount);
+		val = GET_CURRENT_POOL(vict ? vict : ch, data->restore_pool) + data->restore_amount;
+		val = MIN(val, GET_MAX_POOL(vict ? vict : ch, data->restore_pool));
+		
+		if (vict && vict != ch && (is_fight_enemy(ch, vict) || (IS_NPC(vict) && !is_fight_ally(ch, vict)))) {
+			size += snprintf(healing + size, sizeof(healing) - size, ", %.1f%%)", (val * 100.0 / MAX(1, GET_MAX_POOL(vict ? vict : ch, data->restore_pool))));
+		}
+		else {
+			size += snprintf(healing + size, sizeof(healing) - size, ", %d/%d)", val, GET_MAX_POOL(vict ? vict : ch, data->restore_pool));
+		}
 	}
 	else {
 		*healing = '\0';
