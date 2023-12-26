@@ -379,7 +379,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_EXTRA_BLOOD(ch)  GET_EXTRA_ATT(ch, ATT_EXTRA_BLOOD)
 #define GET_BONUS_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_PHYSICAL)
 #define GET_BONUS_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_MAGICAL)
-#define GET_BONUS_HEALING(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_HEALING)	// use total_bonus_healing(ch) for most uses
+#define GET_BONUS_HEALING(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_HEALING)
 #define GET_HEAL_OVER_TIME(ch)  GET_EXTRA_ATT(ch, ATT_HEAL_OVER_TIME)
 #define GET_CRAFTING_BONUS(ch)  GET_EXTRA_ATT(ch, ATT_CRAFTING_BONUS)
 #define GET_AGE_MODIFIER(ch)  GET_EXTRA_ATT(ch, ATT_AGE_MODIFIER)
@@ -2181,7 +2181,6 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 
 // act.naturalmagic.c
 bool despawn_companion(char_data *ch, mob_vnum vnum);
-int total_bonus_healing(char_data *ch);
 void un_earthmeld(char_data *ch);
 
 // act.other.c

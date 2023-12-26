@@ -3253,7 +3253,7 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 		MSDPSetNumber(ch->desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, GET_BONUS_HEALING(ch));
 		MSDPSetNumber(ch->desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 		MSDPSetNumber(ch->desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 		

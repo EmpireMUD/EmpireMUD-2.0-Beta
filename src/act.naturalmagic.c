@@ -29,7 +29,6 @@
 /**
 * Contents:
 *   Helpers
-*   Potions
 *   Commands
 */
 
@@ -71,15 +70,6 @@ bool despawn_companion(char_data *ch, mob_vnum vnum) {
 
 
 /**
-* @param char_data *ch The person.
-* @return int The total Bonus-Healing trait for that person, with any modifiers.
-*/
-int total_bonus_healing(char_data *ch) {
-	return GET_BONUS_HEALING(ch);
-}
-
-
-/**
 * Ends an earthmeld and sends messages.
 *
 * @param char_data *ch The earthmelded one.
@@ -98,51 +88,6 @@ void un_earthmeld(char_data *ch) {
 				command_lag(ch, WAIT_ABILITY);
 			}
 		}
-	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// POTIONS /////////////////////////////////////////////////////////////////
-
-/**
-* Apply the actual effects of a potion. This does NOT extract the potion.
-*
-* @param obj_data *obj the potion
-* @param char_data *ch the quaffer
-*/
-void apply_potion(obj_data *obj, char_data *ch) {
-	any_vnum aff_type = GET_POTION_AFFECT(obj) != NOTHING ? GET_POTION_AFFECT(obj) : ATYPE_POTION;
-	struct affected_type *af;
-	struct obj_apply *apply;
-	
-	act("A swirl of light passes over you!", FALSE, ch, NULL, NULL, TO_CHAR);
-	act("A swirl of light passes over $n!", FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	// ensure scaled
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-		scale_item_to_level(obj, 1);	// minimum level
-	}
-	
-	// remove any old buffs (if adding a new one)
-	if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
-		affect_from_char(ch, aff_type, FALSE);
-	}
-	
-	if (GET_OBJ_AFF_FLAGS(obj)) {
-		af = create_flag_aff(aff_type, 30 * SECS_PER_REAL_MIN, GET_OBJ_AFF_FLAGS(obj), ch);
-		affect_to_char(ch, af);
-		free(af);
-	}
-
-	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
-		af = create_mod_aff(aff_type, 30 * SECS_PER_REAL_MIN, apply->location, apply->modifier, ch);
-		affect_to_char(ch, af);
-		free(af);
-	}
-	
-	if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && GET_POTION_COOLDOWN_TIME(obj) > 0) {
-		add_cooldown(ch, GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TIME(obj));
 	}
 }
 
@@ -486,55 +431,4 @@ ACMD(do_purify) {
 		
 		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PURIFY, 0, vict, NULL, NULL, NULL, NOBITS);
 	}
-}
-
-
-ACMD(do_quaff) {
-	obj_data *obj;
-	
-	one_argument(argument, arg);
-	
-	if (!*arg) {
-		msg_to_char(ch, "Which potion would you like to quaff?\r\n");
-	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-	}
-	else if (!IS_POTION(obj)) {
-		msg_to_char(ch, "You can only quaff potions.\r\n");
-	}
-	else if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)) > 0) {
-		msg_to_char(ch, "You can't quaff that until your %s cooldown expires.\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)));
-	}
-	else {
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
-			scale_item_to_level(obj, 1);	// just in case
-		}
-		
-		if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
-			return;	// check trigger last
-		}
-
-
-		// message to char
-		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
-			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		else {
-			act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		
-		// message to room
-		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
-			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
-		}
-		else {
-			act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
-		}
-		
-		apply_potion(obj, ch);
-		
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
-		extract_obj(obj);
-	}	
 }

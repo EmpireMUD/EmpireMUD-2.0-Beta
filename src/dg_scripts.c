@@ -3101,7 +3101,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bonus_healing")) {
-						snprintf(str, slen, "%d", total_bonus_healing(c));
+						snprintf(str, slen, "%d", GET_BONUS_HEALING(c));
 					}
 					else if (!str_cmp(field, "bonus_magical")) {
 						snprintf(str, slen, "%d", GET_BONUS_MAGICAL(c));

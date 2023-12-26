@@ -2834,7 +2834,7 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 			return GET_BONUS_MAGICAL(ch);
 		}
 		case APPLY_BONUS_HEALING: {
-			return total_bonus_healing(ch);
+			return GET_BONUS_HEALING(ch);
 		}
 		case APPLY_RESIST_MAGICAL: {
 			return GET_RESIST_MAGICAL(ch);

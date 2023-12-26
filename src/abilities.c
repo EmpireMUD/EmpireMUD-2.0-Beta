@@ -3824,7 +3824,7 @@ PREP_ABIL(prep_restore_ability) {
 	
 	// 6. bonus healing (health only)
 	if (use_pool == HEALTH) {
-		amount += total_bonus_healing(ch) * reduced_scale;
+		amount += GET_BONUS_HEALING(ch) * reduced_scale;
 	}
 	
 	// 7. store it for do_restore_ability
@@ -4175,7 +4175,7 @@ DO_ABIL(do_buff_ability) {
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
 		// bonus healing if it's a HoT
 		if (apply->location == APPLY_HEAL_OVER_TIME) {
-			bonus = total_bonus_healing(ch);
+			bonus = GET_BONUS_HEALING(ch);
 			if (bonus > 0) {
 				bonus = ceil(bonus / (double) dur);
 				bonus = MAX(1, bonus);
