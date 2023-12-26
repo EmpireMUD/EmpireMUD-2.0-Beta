@@ -1078,8 +1078,8 @@ The following ability flags are available:
  &cDIFFICULT-ANYWAY&0 - Checks difficulty even if the target can't see you.
  &cNOT-IN-DARK&0 - Cannot be used in the dark unless you can see.
  &cUNSCALED-PENALTY&0 - Negative buff attributes do not scale; positives do.
- &cSTOP-ON-MISS&0 - Attack or Damage abilities that miss won't perform their
-   other types, such as buffs or conjures.
+ &cSTOP-ON-MISS&0 - Attack, Damage, or Restore abilities that miss won't
+   perform their other types, such as buffs or conjures.
  &cREDUCED-ON-EXTRA-TARGETS&0 - For multi-targeting, scaled down 50% after the
    first target.
 
