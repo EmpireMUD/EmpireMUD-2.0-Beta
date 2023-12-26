@@ -301,7 +301,6 @@ ACMD(do_recipes);
 ACMD(do_reclaim);
 ACMD(do_recolor);
 ACMD(do_reforge);
-ACMD(do_rejuvenate);
 ACMD(do_reload);
 ACMD(do_remove);
 ACMD(do_reply);
@@ -858,7 +857,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "redesignate", POS_STANDING, do_designate, NO_MIN, CTYPE_BUILD, SCMD_REDESIGNATE ),
 	STANDARD_CMD( "refashion", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFASHION, CTYPE_SKILL, NOBITS, ABIL_REFASHION ),
 	STANDARD_CMD( "reforge", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFORGE, CTYPE_SKILL, NOBITS, ABIL_REFORGE ),
-	ABILITY_CMD( "rejuvenate", POS_FIGHTING, do_rejuvenate, NO_MIN, CTYPE_SKILL, ABIL_REJUVENATE ),
 	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
