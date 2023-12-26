@@ -1977,7 +1977,7 @@ const double apply_values[] = {
 	0.025,	// "MAX-MOVE",
 	0.5,	// RESIST-PHYSICAL
 	0.25,	// "BLOCK",
-	0.5,	// "HEAL-OVER-TIME",
+	0.25,	// "HEAL-OVER-TIME",
 	0.020,	// "HEALTH",
 	0.025,	// "MAX-MANA",
 	0.15,	// "TO-HIT",
