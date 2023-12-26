@@ -6578,6 +6578,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	double total_scale = 0.0;
 	int iter;
 	struct ability_exec_type *aet;
+	struct player_ability_data *plab, *next_plab;
 	
 	#define _ABIL_VICT_CAN_SEE(vict, ch, abil)  ((ch) == (vict) || ABILITY_FLAGGED((abil), ABILF_DIFFICULT_ANYWAY) || (AWAKE(vict) && CAN_SEE((vict), (ch))))
 	
@@ -6724,6 +6725,19 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	if (data->should_charge_cost && (!vict || can_gain_exp_from(ch, vict))) {
 		// TODO some way to modify this amount?
 		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		
+		// look for others that should gain here, too, based on supercedes
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			if (!plab->ptr || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+				continue;	// don't have it
+			}
+			if (check_superceded_by(ch, plab->ptr) != abil) {
+				continue;	// wrong abil
+			}
+			
+			// made it here? gain that one, too
+			gain_ability_exp(ch, ABIL_VNUM(plab->ptr), 15);
+		}
 	}
 	
 	// check if should be in combat
@@ -8514,7 +8528,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
+	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || (ABIL_WAIT_TYPE(abil) != WAIT_NONE && ABIL_WAIT_TYPE(abil) != WAIT_ABILITY) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %.2f %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
 	}
 	
@@ -9827,7 +9841,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_WAIT)) {
-		sprintf(buf + strlen(buf), "<%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
+		sprintf(buf + strlen(buf), "<%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_ABILITY), wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
