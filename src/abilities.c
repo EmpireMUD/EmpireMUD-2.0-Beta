@@ -4115,7 +4115,7 @@ DO_ABIL(do_buff_ability) {
 	struct apply_data *apply;
 	any_vnum affect_vnum;
 	double total_points = 1, remaining_points = 1, share, amt;
-	int dur, total_w = 1;
+	int bonus, dur, total_w = 1;
 	bool messaged, unscaled, unscaled_penalty;
 	bitvector_t aff_options;
 	
@@ -4151,6 +4151,7 @@ DO_ABIL(do_buff_ability) {
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
 		affect_join(vict, af, aff_options);
 		messaged = TRUE;
+		data->success = TRUE;
 	}
 	
 	// determine share for effects
@@ -4172,9 +4173,25 @@ DO_ABIL(do_buff_ability) {
 	
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		// bonus healing if it's a HoT
+		if (apply->location == APPLY_HEAL_OVER_TIME) {
+			bonus = total_bonus_healing(ch);
+			if (bonus > 0) {
+				bonus = ceil(bonus / (double) dur);
+				bonus = MAX(1, bonus);
+			}
+			else if (bonus < 0) {
+				bonus = ceil(bonus / (double) dur);
+				bonus = MIN(-1, bonus);
+			}
+		}
+		else {
+			bonus = 0;
+		}
+		
 		// unscaled version?
 		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
-			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
+			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight + bonus, ch);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(vict, af, aff_options);
 			messaged = TRUE;
@@ -4189,6 +4206,7 @@ DO_ABIL(do_buff_ability) {
 		
 		// determine value of apply
 		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		amt += bonus;
 		
 		// and apply it
 		if (share > 0 && amt != 0) {
@@ -4199,6 +4217,7 @@ DO_ABIL(do_buff_ability) {
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(vict, af, aff_options);
 			messaged = TRUE;
+			data->success = TRUE;
 		}
 	}
 	
@@ -4207,8 +4226,6 @@ DO_ABIL(do_buff_ability) {
 		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
 		data->stop = TRUE;
 	}
-	
-	data->success = TRUE;
 }
 
 
