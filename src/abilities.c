@@ -1934,6 +1934,17 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	if (vict && ABILITY_FLAGGED(abil, ABILF_NOT_IN_COMBAT) && FIGHTING(vict)) {
+		if (send_msgs) {
+			if (vict == ch) {
+				send_to_char("No way! You're fighting for your life!\r\n", ch);
+			}
+			else {
+				act("You can't use that on $N while $e's fighting!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+			}
+		}
+		return FALSE;
+	}
 	if (vict && vict != ch && ABIL_IS_VIOLENT(abil)) {
 		if (!can_fight(ch, vict)) {
 			if (send_msgs) {
