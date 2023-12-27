@@ -573,6 +573,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_UNSCALED_PENALTY		BIT(26)	// A. negative buffs are unscaled; positive ones still scale
 #define ABILF_STOP_ON_MISS			BIT(27)	// B. attack/damage miss will prevent buff and DoT types
 #define ABILF_REDUCED_ON_EXTRA_TARGETS	BIT(28)	// C. for multi-targeting, scale is 50% on targets after the first
+#define ABILF_USE_SKILL_BELOW_MAX	BIT(29)	// D. if the player is below maximum on the skill for the ability, limits it to that skill level
 
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

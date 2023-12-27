@@ -171,6 +171,7 @@ const char *ability_flags[] = {
 	"UNSCALED-PENALTY",
 	"STOP-ON-MISS",
 	"REDUCED-ON-EXTRA-TARGETS",
+	"USE-SKILL-BELOW-MAX",
 	"\n"
 };
 
@@ -206,6 +207,7 @@ const char *ability_flag_notes[] = {
 	"",	// ABILF_UNSCALED_PENALTY
 	"",	// ABILF_STOP_ON_MISS
 	"reduced on extra targets",
+	"uses skill level if below max",
 	"\n"
 };
 

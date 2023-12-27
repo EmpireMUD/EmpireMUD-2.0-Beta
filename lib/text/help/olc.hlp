@@ -1082,6 +1082,8 @@ The following ability flags are available:
    perform their other types, such as buffs or conjures.
  &cREDUCED-ON-EXTRA-TARGETS&0 - For multi-targeting, scaled down 50% after the
    first target.
+ &cUSE-SKILL-BELOW-MAX&0 - If the ability comes from a skill, will use only the
+   skill's level if the player isn't at the skill's maximum level.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
