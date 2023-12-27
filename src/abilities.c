@@ -1075,9 +1075,9 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 	// start here
 	level = get_approximate_level(ch);
 	
-	// adjust for ability?
+	// adjust for ability's skill
 	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum))) {
-		if ((skl = ABIL_ASSIGNED_SKILL(abil))) {
+		if (ABILITY_FLAGGED(abil, ABILF_USE_SKILL_BELOW_MAX) && (skl = ABIL_ASSIGNED_SKILL(abil))) {
 			// adjust based on level in the assigned skill
 			skill_level = get_skill_level(ch, SKILL_VNUM(skl));
 			
@@ -3750,7 +3750,7 @@ PREP_ABIL(prep_restore_ability) {
 	char arg[MAX_INPUT_LENGTH];
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
 	
-	const int points_per_scale = 8;	// amount per scale point, base
+	const int points_per_scale_per_hundred = 8;	// amount per scale point, base
 	
 	if (!vict) {
 		return;	// no victim = no work
@@ -3807,7 +3807,7 @@ PREP_ABIL(prep_restore_ability) {
 	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
 	
 	// 3.2. determine amount
-	amount = subdata->scale_points * points_per_scale;
+	amount = subdata->scale_points * points_per_scale_per_hundred * ((level > 100) ? level / 100.0 : 1.0);
 	
 	// 4.1. check costs and reduce by available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
