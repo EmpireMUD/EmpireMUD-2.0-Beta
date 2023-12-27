@@ -10262,6 +10262,7 @@ OLC_MODULE(abiledit_cooldown) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	any_vnum old;
 	char arg2[MAX_INPUT_LENGTH];
+	generic_data *gen;
 	
 	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_COOLDOWN)) {
 		msg_to_char(ch, "This type of ability does not have that property. Set a command or add an ability hook to use it.\r\n");
@@ -10277,13 +10278,16 @@ OLC_MODULE(abiledit_cooldown) {
 		old = ABIL_COOLDOWN(abil);
 		ABIL_COOLDOWN(abil) = olc_process_number(ch, arg, "cooldown vnum", "cooldown", 0, MAX_VNUM, ABIL_COOLDOWN(abil));
 
-		if (!find_generic(ABIL_COOLDOWN(abil), GENERIC_COOLDOWN)) {
+		if ((gen = find_generic(ABIL_COOLDOWN(abil), GENERIC_COOLDOWN))) {
+			msg_to_char(ch, "It is now: %s\r\n", GEN_NAME(gen));
+			if (*arg2) {
+				// pass thru to cdtime
+				abiledit_cdtime(ch, type, arg2);
+			}
+		}
+		else {
 			msg_to_char(ch, "Invalid cooldown generic vnum %d. Old value restored.\r\n", ABIL_COOLDOWN(abil));
 			ABIL_COOLDOWN(abil) = old;
-		}
-		else if (*arg2) {
-			// pass thru to cdtime
-			abiledit_cdtime(ch, type, arg2);
 		}
 	}
 }
