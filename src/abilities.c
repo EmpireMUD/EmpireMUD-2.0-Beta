@@ -10022,6 +10022,20 @@ OLC_MODULE(abiledit_summon_mob) {
 }
 
 
+OLC_MODULE(abiledit_supercededby) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		snprintf(arg, sizeof(arg), "%s superceded-by %s", arg1, arg2);
+	}
+	else {
+		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
 OLC_MODULE(abiledit_limitation) {
 	// pass-thru to .data: must rearrrange args
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];

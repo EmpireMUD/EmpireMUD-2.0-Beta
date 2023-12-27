@@ -92,6 +92,7 @@ OLC_MODULE(abiledit_ptech);
 OLC_MODULE(abiledit_effect);
 OLC_MODULE(abiledit_ready_weapon);
 OLC_MODULE(abiledit_summon_mob);
+OLC_MODULE(abiledit_supercededby);
 OLC_MODULE(abiledit_limitation);
 OLC_MODULE(abiledit_paint_color);
 OLC_MODULE(abiledit_action);
@@ -649,6 +650,7 @@ const struct olc_command_data olc_data[] = {
 	{ "effect", abiledit_effect, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "ready-weapon", abiledit_ready_weapon, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "summon-mob", abiledit_summon_mob, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "supercededby", abiledit_supercededby, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "limitation", abiledit_limitation, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "paint-color", abiledit_paint_color, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "action", abiledit_action, OLC_ABILITY, OLC_CF_EDITOR },
