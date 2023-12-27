@@ -3750,7 +3750,8 @@ PREP_ABIL(prep_restore_ability) {
 	char arg[MAX_INPUT_LENGTH];
 	struct ability_exec_type *subdata = get_ability_type_data(data, ABILT_RESTORE);
 	
-	const int points_per_scale_per_hundred = 8;	// amount per scale point, base
+	const int points_per_scale_base = 8;	// amount per scale point, base
+	const int points_per_scale_over_100 = 6;	// for levels above 100
 	
 	if (!vict) {
 		return;	// no victim = no work
@@ -3807,7 +3808,10 @@ PREP_ABIL(prep_restore_ability) {
 	reduced_scale = (1.0 + ABIL_SCALE(abil)) / 2.0;
 	
 	// 3.2. determine amount
-	amount = subdata->scale_points * points_per_scale_per_hundred * ((level > 100) ? level / 100.0 : 1.0);
+	amount = subdata->scale_points * points_per_scale_base;
+	if (level > 100) {
+		amount += subdata->scale_points * points_per_scale_over_100 * ((level - 100) / 100.0);
+	}
 	
 	// 4.1. check costs and reduce by available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
