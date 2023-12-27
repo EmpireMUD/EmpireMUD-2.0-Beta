@@ -103,6 +103,26 @@ Type:  passive
 
 The vampire's blood-fueled form is more resilient against physical damage.
 #
+"BLOODBOUND ARCANUM"
+
+Bloodbound Arcanum (Vampire ability)
+
+Some vampires develop the ability to draw mana directly from their own
+unnatural blood. This ability passively increases mana regeneration and is
+stronger in the caster and healer roles.
+
+See also: CASTER ROLE, HEALER ROLE, MANA REGEN, PASSIVES
+#
+"BLOODBORNE TENACITY"
+
+Bloodborne Tenacity (Vampire ability)
+
+The blood that sustains a vampire can also be used to keep going long after
+other bodies would have given out. This bloodborne tenacity passively increases
+move regeneration. It is stronger in the melee role.
+
+See also: MELEE ROLE, MOVE REGEN, PASSIVES
+#
 BLOODSWEAT "BLOOD SWEAT"
 
 Bloodsweat

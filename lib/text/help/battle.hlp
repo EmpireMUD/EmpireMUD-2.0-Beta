@@ -106,8 +106,8 @@ Cost:  15 move
 Debuff type:  physical, stun
 
 Bash your target with your weapon and send him flying to the ground. When you
-successfully bash, your target is briefly stunned. As a specialty ability, bash
-cannot miss. At Battle 100, bash does double damage.
+successfully bash, your target is briefly stunned. Has a chance to deal
+additional damage based on your Battle skill.
 
 Only one person in the room may be bash-stunned at a time. Using the ability on
 a second person will release the first one.
@@ -669,6 +669,20 @@ SUMMARY "COMBAT SUMMARY"
 Usage:  summary
 
 This command shows a summary of you, your allies, and your enemies in combat.
+#
+SURGE
+
+Surge (Battle ability)
+
+Usage:  surge
+Cooldown:  6 minutes
+Duration:  30 seconds
+
+Grit your teeth and prepare for a surge in battle! This ability boosts your
+move regeneration significantly, if only briefly. It is stronger in the melee
+or tank role.
+
+See also: MOVE REGEN, MELEE ROLE, TANK ROLE
 #
 "BODYGUARD"
 
