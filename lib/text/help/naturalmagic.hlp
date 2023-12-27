@@ -97,6 +97,17 @@ The banshee familiar will use the following abilities in combat:
 
 See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
+"BY THE SUN AND STARS" "SUN AND STARS"
+
+By the Sun and Stars (Natural Magic ability)
+
+Nature mages can learn to draw mana from the bountiful light above. Your mana
+regeneration is always higher; moreso in the healer or caster roles.
+
+This ability gains experience passively over time.
+
+See also: CASTER ROLE, HEALER ROLE, PASSIVES
+#
 "ASTRAL WEREWOLF FORM"
 
 Astral Werewolf Form
@@ -841,17 +852,6 @@ fighting.
 Gains experience when you cast this spell.
 
 See also: CASTER, SOLO
-#
-"SOLAR POWER"
-
-Solar Power (Natural Magic ability)
-
-Nature mages can learn to draw mana from the sunlight, as plants do. With this
-ability, mana regeneration doubles as long as it's sunny. This ability scales
-with your Natural Magic skill, and as a level 76+ skill it works even without
-the sun.
-
-Solar Power gains experience every time you benefit from its effect.
 #
 SOULSIGHT "SOUL SIGHT"
 
