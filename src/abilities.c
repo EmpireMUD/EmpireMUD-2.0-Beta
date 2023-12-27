@@ -6582,7 +6582,7 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
 	bool any_ignore_immune = FALSE;
 	double total_scale = 0.0;
-	int iter;
+	int gain, iter;
 	struct ability_exec_type *aet;
 	struct player_ability_data *plab, *next_plab;
 	
@@ -6739,8 +6739,30 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	// exp gain unless we hit something that prevented costs
 	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict))) {
-		// TODO some way to modify this amount?
-		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		// determine exp gain amount
+		if (ABIL_COOLDOWN_SECS(abil) >= 300) {
+			// long cooldown
+			gain = 75;
+		}
+		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
+			// medium-long cooldown
+			gain = 50;
+		}
+		else {
+			// short/no cooldown
+			gain = 15;
+		}
+		if (data->cost > 50) {
+			// high cost
+			gain += 15;
+		}
+		if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME)) {
+			// slow ability
+			gain += 10;
+		}
+		
+		// gain for this abilitty
+		gain_ability_exp(ch, ABIL_VNUM(abil), gain);
 		
 		// look for others that should gain here, too, based on supercedes
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
@@ -6752,7 +6774,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 			}
 			
 			// made it here? gain that one, too
-			gain_ability_exp(ch, ABIL_VNUM(plab->ptr), 15);
+			gain_ability_exp(ch, ABIL_VNUM(plab->ptr), gain);
 		}
 	}
 	
