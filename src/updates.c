@@ -3336,11 +3336,16 @@ PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
 // updates with the new required affect on counterspell and phoenix rite plus heal friend
 PLAYER_UPDATE_FUNC(b5_166_player_update) {
 	struct affected_type *hjp;
+	struct player_skill_data *plsk, *next_plsk;
 	
 	any_vnum COUNTERSPELL = 3021;
 	any_vnum PHOENIX_RITE = 3017;
+	
 	any_vnum HEAL_FRIEND = 110;
 	any_vnum NATURAL_MAGIC = 3;
+	
+	any_vnum BASH = 97;
+	any_vnum BATTLE = 0;
 	
 	// new affect flags
 	LL_FOREACH(ch->affected, hjp) {
@@ -3356,6 +3361,18 @@ PLAYER_UPDATE_FUNC(b5_166_player_update) {
 	// heal friend increased in level
 	if (has_ability(ch, HEAL_FRIEND) && get_skill_level(ch, NATURAL_MAGIC) < 55) {
 		remove_ability(ch, ability_proto(HEAL_FRIEND), FALSE);
+	}
+	
+	// bash increased in level
+	if (has_ability(ch, BASH) && get_skill_level(ch, BATTLE) < 80) {
+		remove_ability(ch, ability_proto(BASH), FALSE);
+	}
+	
+	// grant free skill resets
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->level > 0) {
+			plsk->resets = MIN(plsk->resets + 1, MAX_SKILL_RESETS);
+		}
 	}
 }
 
