@@ -463,7 +463,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// check versioning: load a new version
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
-		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));		
+		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 		extract_obj(obj);
 		obj = new;
 		

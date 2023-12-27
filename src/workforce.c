@@ -95,26 +95,26 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "weaving", WEAVER, FALSE, NOTHING },
 	{ "production", PRODUCTION_ASSISTANT, FALSE, NOTHING },
 	{ "crafting", CRAFTING_APPRENTICE, FALSE, NOTHING },
-		{ "unused", BRICKMAKER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "abandon-dismantled", NOTHING, FALSE, NOTHING },
-		{ "unused", GARDENER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "fire-brigade", FIRE_BRIGADE, FALSE, NOTHING },
-		{ "unused", TRAPPER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "tanning", TANNER, FALSE, NOTHING },
 	{ "shearing", SHEARER, FALSE, NOTHING },
 	{ "minting", COIN_MAKER, FALSE, TECH_SKILLED_LABOR },
 	{ "dismantle-mines", MINE_SUPERVISOR, FALSE, NOTHING },
 	{ "abandon-chopped", NOTHING, FALSE, NOTHING },
 	{ "abandon-farmed", NOTHING, FALSE, NOTHING },
-		{ "unused", APPRENTICE_EXARCH, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "milling", MILL_WORKER, FALSE, NOTHING },
-		{ "unused", VEHICLE_REPAIRMAN, TRUE, NOTHING },	// note: formerly repair-vehicles, which merged with maintenance
+		{ "unused", NOTHING, TRUE, NOTHING },	// note: formerly repair-vehicles, which merged with maintenance
 	{ "oilmaking", PRESS_WORKER, FALSE, NOTHING },
 	{ "general", NOTHING, TRUE, NOTHING },
 	{ "fishing", FISHERMAN, FALSE, NOTHING },
 	{ "burn-stumps", STUMP_BURNER, FALSE, NOTHING },
 	{ "prospecting", PROSPECTOR, FALSE, TECH_WORKFORCE_PROSPECTING },
-		{ "unused", GLASSMAKER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 };
 
 

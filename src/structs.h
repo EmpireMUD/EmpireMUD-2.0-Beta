@@ -1079,7 +1079,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
 #define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
 #define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
-#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_FORGE  BIT(7)	// can use the forge command here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
 #define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
 	#define FNC_UNUSED  BIT(10)	// formerly "HENGE" which now uses a script
@@ -1096,7 +1096,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_SMELT  BIT(21)	// allows smelting here
 #define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
 #define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
-#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TAILOR  BIT(24)	// counts as tailor for crafts like weaving
 #define FNC_TANNERY  BIT(25)	// allows tanning here
 #define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
 #define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
@@ -2791,6 +2791,7 @@ typedef enum {
 #define PTECH_FASTER_RANGED_COMBAT  93	// slight speed boost in ranged combat
 #define PTECH_RIDING_SWAP_ANYWHERE  94	// can swap in any location
 #define PTECH_RIDING_RELEASE_MOUNT  95	// can release your mounts
+#define PTECH_REWORK_COMMAND  96	// allows refreshing and restringing gear
 
 
 // SM_x: status messages

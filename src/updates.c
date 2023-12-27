@@ -247,14 +247,14 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -304,7 +304,7 @@ void b3_2_map_and_gear(void) {
 	log(" - disenchanting the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -314,7 +314,7 @@ void b3_2_map_and_gear(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 			}
@@ -324,7 +324,7 @@ void b3_2_map_and_gear(void) {
 	log(" - disenchanting trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -878,14 +878,14 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -903,7 +903,7 @@ void b5_14_superior_items(void) {
 	log(" - refreshing superiors in the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -913,7 +913,7 @@ void b5_14_superior_items(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 			}
@@ -923,7 +923,7 @@ void b5_14_superior_items(void) {
 	log(" - refreshing superiors in trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1022,14 +1022,14 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1047,7 +1047,7 @@ void b5_23_potion_update(void) {
 	log(" - updating the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1064,7 +1064,7 @@ void b5_23_potion_update(void) {
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 					eus->obj = new;
 				}
 				
@@ -1077,7 +1077,7 @@ void b5_23_potion_update(void) {
 	log(" - updating trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1094,14 +1094,14 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1119,7 +1119,7 @@ void b5_24_poison_update(void) {
 	log(" - updating the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1136,7 +1136,7 @@ void b5_24_poison_update(void) {
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 					eus->obj = new;
 				}
 				
@@ -1149,7 +1149,7 @@ void b5_24_poison_update(void) {
 	log(" - updating trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1696,14 +1696,14 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1733,7 +1733,7 @@ void b5_86_update(void) {
 	log(" - refreshing the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1743,7 +1743,7 @@ void b5_86_update(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && IS_MISSILE_WEAPON(obj)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -1754,7 +1754,7 @@ void b5_86_update(void) {
 	log(" - refreshing trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -2659,7 +2659,7 @@ obj_data *b5_130b_check_replace_obj(obj_data *obj) {
 		for (iter = 0; stop_list[iter] != -1; ++iter) {
 			if (GET_OBJ_VNUM(obj) == stop_list[iter]) {
 				// copy obj
-				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			
 				// check scripts
 				found = FALSE;

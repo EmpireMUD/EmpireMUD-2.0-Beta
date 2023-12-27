@@ -247,10 +247,6 @@ struct alias_data {
 #define SCMD_REBOOT			0
 #define SCMD_SHUTDOWN		1
 
-// do_reforge
-#define SCMD_REFORGE  0
-#define SCMD_REFASHION  1
-
 // do_ritual
 #define SCMD_RITUAL  0
 #define SCMD_CHANT  1

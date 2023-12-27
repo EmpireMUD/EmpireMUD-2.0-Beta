@@ -272,7 +272,7 @@ obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 room_data *find_room_obj_saves_in(obj_data *obj);
-obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level, bool keep_strings, bool keep_augments);
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
 void remove_from_object_list(obj_data *obj);

@@ -10526,7 +10526,7 @@ ACMD(do_rescale) {
 			scale_item_to_level(obj, level);
 		}
 		else {
-			new = fresh_copy_obj(obj, level);
+			new = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 			obj = new;

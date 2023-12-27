@@ -19,7 +19,7 @@ which other skills you have at high levels. Use the 'role' command to choose
 which set of skills to use.
 
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
-  REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
+  REWORK, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
 "ADVANCED WOODWORKING"
 
@@ -964,35 +964,36 @@ you know that require the item.
 
 See also: LEARN
 #
-REFORGE REFASHION
+REWORK REFORGE REFASHION
 
-Refashion (Trade ability)
-Reforge (Trade ability)
+Rework (Trade ability)
 
-Usage:  reforge <item | person> name <new name>
-        reforge <item | person> <renew | superior>
+Usage:  rework <item | person> name <new name>
+        rework <item | person> <renew | superior>
 
-A great blacksmith (weapons) or tailor (armors, clothing, shields) can use this
-ability in three ways:
+A great craftsman can use this ability in three ways:
 
-Name: You can take a generic item and give it a name. The name must contain
-the main keyword of the original item (like 'sword', 'clothes', etc, depending
-on the item). Requires 1 blue iris per 3 gear rating on the item.
+Name: You can take a generic item and give it a name. The name must contain at
+least part of the original item's name; usually this is its primary keyword
+(like 'sword' or 'clothes') but may be longer, depending upon the item.
 
-Renew: This undoes any enchantments, disenchantments, name, superior quality, 
-and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear rating on the base (unmodified) item.
+Renew: This undoes any enchantments, name, superior quality, and all other
+effects that have been applied to an item, and restores the item to its base
+stats.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear rating on the
-item. If the item came from a hard, group, or boss mob, it will lose this
-quality when you make it superior.
+the correct mastery ability. If the item came from a hard, group, or boss mob,
+it will lose this quality when you make it superior.
 
-An item must be in your inventory to reforge it. However, if another player
-"shares" an item, you can reforge that item by targeting that player by name
-(e.g. "reforge Lyra superior").
+An item must be in your inventory to rework it. However, if another player
+"shares" an item, you can rework that item by targeting that player by name
+(e.g. "rework Lyra superior").
+
+Reworking an item always costs 1 magic gem per 3 gear rating on the item. You
+can only renew an item or make it superior if you have the ability to craft it
+in the first place (but can rename most gear).
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #

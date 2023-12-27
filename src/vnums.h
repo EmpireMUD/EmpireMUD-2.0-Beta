@@ -43,7 +43,6 @@
 #define BOARD_IMM  2
 
 // Natural resources
-#define o_BLOODSTONE  104
 #define o_WHEAT  141
 #define o_HOPS  143
 #define o_BARLEY  145
@@ -63,12 +62,6 @@
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
 
-// herbs
-#define o_IRIDESCENT_IRIS  1206
-
-// misc stuff
-#define o_GLOWING_SEASHELL  1300
-
 // for catapults/ships
 #define o_HEAVY_SHOT  2135	// TODO: Could apply the ammo system to vehicles
 
@@ -79,6 +72,7 @@
 #define COMP_LUMBER  6000	// for 'tunnel'
 #define COMP_PILLAR  6015	// for 'tunnel'
 #define COMP_ROCK  6050	// for 'lay' (road)
+#define COMP_MAGIC_GEM  6600	// for 'rework'
 #define COMP_COMMON_METAL  6720	// for 'barde'
 #define COMP_NAILS  6790	// for 'tunnel' and default maintenance
 #define COMP_ROPE  6880	// for 'tie'
@@ -96,40 +90,26 @@
 // empire mobs
 #define CITIZEN_MALE  202
 #define CITIZEN_FEMALE  203
-#define GUARD  204
 #define FARMER  206
 #define FELLER  207
 #define MINER  208
 #define BUILDER  209
-#define STEALTH_MASTER  221
 #define DIGGER  224
 #define STUMP_BURNER  226
 #define SCRAPER  227
 #define REPAIRMAN  229
-#define THUG  230
-#define CITY_GUARD  251
 #define SAWYER  256
 #define SMELTER  257
 #define WEAVER  258
-#define STONECUTTER  259	// unused now
-#define NAILMAKER  260	// unused now
-#define BRICKMAKER  261	// unused now
-#define GARDENER  262	// unused now
 #define FIRE_BRIGADE  265
-#define TRAPPER  266	// unused now
 #define TANNER  267
 #define SHEARER  268
 #define COIN_MAKER  269
-#define DOCKWORKER  270	// unused?
-#define APPRENTICE_EXARCH  271	// unused now
 #define MILL_WORKER  272
-#define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
 #define PRESS_WORKER  276
 #define MINE_SUPERVISOR  277
 #define FISHERMAN  279
-#define BEEKEEPER  281	// unused now
-#define GLASSMAKER  282	// unused now
 #define CRAFTING_APPRENTICE  283
 #define PRODUCTION_ASSISTANT  284
 #define PROSPECTOR  285
@@ -146,14 +126,10 @@
 #define ATYPE_POISON  3004
 #define ATYPE_BOOST  3005
 #define ATYPE_EARTHMELD  3010
-#define ATYPE_MUMMIFY  3011
 #define ATYPE_BITE_PENALTY  3025	// called "biting" / ATYPE_BITING (search hint)
 #define ATYPE_INSPIRE  3026
-#define ATYPE_JABBED  3027
 #define ATYPE_VIGOR  3031
-#define ATYPE_SLOW  3035
 #define ATYPE_DG_AFFECT  3039
-#define ATYPE_DEATHSHROUD  3041
 #define ATYPE_DEATH_PENALTY  3046
 #define ATYPE_STUN_IMMUNITY  3050
 #define ATYPE_WAR_DELAY  3051
@@ -163,7 +139,6 @@
 #define ATYPE_WELL_FED  3064
 #define ATYPE_BITE  3070
 #define ATYPE_CANT_STOP  3071	// for vampires
-#define ATYPE_SOULCHAIN  3074
 #define ATYPE_ARROW_TO_THE_KNEE  3076
 #define ATYPE_HOSTILE_DELAY  3077
 #define ATYPE_NATURE_BURN  3078
@@ -174,7 +149,6 @@
 #define ATYPE_UNSTUCK  3101
 #define ATYPE_POTION  3102
 #define ATYPE_HUNTED  3103
-#define ATYPE_WORKING  3104
 #define ATYPE_ARROW_DISTRACTION  3105
 #define ATYPE_COLD_PENALTY  3106	// "freezing"
 #define ATYPE_HOT_PENALTY  3107	// "sweltering"

@@ -195,6 +195,7 @@ extern const struct material_data materials[NUM_MATERIALS];
 extern const char *container_bits[];
 extern const char *corpse_flags[];
 extern const char *fullness[];
+extern const char *item_rename_keywords[];
 extern const char *light_flags[];
 extern const char *light_flags_for_identify[];
 extern const char *mint_flags[];

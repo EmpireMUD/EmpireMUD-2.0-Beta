@@ -300,7 +300,6 @@ ACMD(do_reboot);
 ACMD(do_recipes);
 ACMD(do_reclaim);
 ACMD(do_recolor);
-ACMD(do_reforge);
 ACMD(do_reload);
 ACMD(do_remove);
 ACMD(do_reply);
@@ -311,6 +310,7 @@ ACMD(do_rest);
 ACMD(do_restore);
 ACMD(do_retrieve);
 ACMD(do_return);
+ACMD(do_rework);
 ACMD(do_ritual);
 ACMD(do_roadsign);
 ACMD(do_role);
@@ -855,8 +855,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "reclaim", POS_STANDING, do_reclaim, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "recolor", POS_DEAD, do_recolor, 0, CTYPE_UTIL ),
 	SCMD_CMD( "redesignate", POS_STANDING, do_designate, NO_MIN, CTYPE_BUILD, SCMD_REDESIGNATE ),
-	STANDARD_CMD( "refashion", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFASHION, CTYPE_SKILL, NOBITS, ABIL_REFASHION ),
-	STANDARD_CMD( "reforge", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFORGE, CTYPE_SKILL, NOBITS, ABIL_REFORGE ),
 	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
@@ -868,6 +866,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "restore", POS_DEAD, do_restore, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESTORE ),
 	SIMPLE_CMD( "retrieve", POS_STANDING, do_retrieve, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "return", POS_DEAD, do_return, NO_MIN, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "rework", POS_STANDING, do_rework, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "ride", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "rite", POS_SLEEPING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "ritual", POS_SLEEPING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),

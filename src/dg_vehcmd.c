@@ -1700,7 +1700,7 @@ VCMD(do_vscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(otarg, level);
+			fresh = fresh_copy_obj(otarg, level, TRUE, TRUE);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}

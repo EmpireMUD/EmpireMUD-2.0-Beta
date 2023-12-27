@@ -1544,6 +1544,7 @@ Available techs are:
  &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
  &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
  &cRiding-Release-Mount&0 * - Can release mounts as mobs.
+ &cRework-Command&0 * - Player can rework items.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
@@ -3416,7 +3417,7 @@ Available functions:
  CARPENTER - required by some crafts
  DIGGING - triggers the workforce digging chore (also need interaction)
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships
- FORGE - can use the forge and reforge commands here
+ FORGE - can use the forge command here
  GLASSBLOWER - required for some crafts
  GUARD-TOWER - hostile toward enemy players, at range
  &rLIBRARY*&0 - can write and store books here
@@ -3432,7 +3433,7 @@ Available functions:
  SMELT - allows smelting here
  STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
  SUMMON-PLAYER - allows the summon player command
- TAILOR - counts as tailor; can use refashion here
+ TAILOR - counts as tailor for crafts like weaving
  TANNERY - allows tanning here
  &rTAVERN*&0 - functions as a tavern (don't set this on the same building as DRINK)
  &rTOMB*&0 - players can re-spawn here after dying
@@ -7147,9 +7148,8 @@ It should not be capitalized unless it contains a proper noun. Names should
 always start with "a", "an", or "the" unless it wouldn't make sense in a
 sentence.
 
-If an object has a capital letter in its short description, the Reforge and
-Refashion abilities will treat it as already "named" and will not allow it to
-be renamed.
+If an object has a capital letter in its short description, the Rework
+ability will treat it as already "named" and will not allow it to be renamed.
 
 All of the words in the object name should also appear in the keywords list,
 except a/an/the.

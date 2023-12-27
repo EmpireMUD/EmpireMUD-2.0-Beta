@@ -801,7 +801,6 @@ any immortal:
 - prompt/display: additional options available
 - pursuit: mobs won't pursue imms
 - quit: not restricted by pvp timer
-- refashion: doesn't require a tailor
 - reply: still works after the target alternates
 - score: can target others
 - shops, quests, crafts, socials, morphs: Can use things with IN-DEV on them

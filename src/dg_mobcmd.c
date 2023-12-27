@@ -2587,7 +2587,7 @@ ACMD(do_mscale) {
 			scale_item_to_level(obj, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(obj, level);
+			fresh = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, fresh);
 			extract_obj(obj);
 		}

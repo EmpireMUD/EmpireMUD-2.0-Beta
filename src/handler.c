@@ -6539,9 +6539,11 @@ room_data *find_room_obj_saves_in(obj_data *obj) {
 *
 * @param obj_data *obj The item to load a fresh copy of.
 * @param int scale_level If >0, will scale the new copy to that level.
+* @param bool keep_strings If TRUE, preserves any changed strings.
+* @param bool keep_augments If TRUE, preserves any enchantments/hones etc.
 * @return obj_data* The new object.
 */
-obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level, bool keep_strings, bool keep_augments) {
 	struct trig_var_data *var, *copy;
 	struct obj_binding *bind;
 	obj_data *proto, *new;
@@ -6569,7 +6571,9 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		REMOVE_BIT(GET_OBJ_EXTRA(new), (OBJ_HARD_DROP | OBJ_GROUP_DROP));
 	}
 	
-	// copy bindings	
+	// copy exact bind flags and bindings
+	GET_OBJ_EXTRA(new) &= ~OBJ_BIND_FLAGS;
+	GET_OBJ_EXTRA(new) |= (GET_OBJ_EXTRA(obj) & OBJ_BIND_FLAGS);
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
 		add_obj_binding(bind->idnum, &OBJ_BOUND_TO(new));
 	}
@@ -6593,17 +6597,19 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	}
 	
 	// custom strings?
-	if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-		set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
-	}
-	if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-		set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
-	}
-	if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-		set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
-	}
-	if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-		set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
+	if (keep_strings) {
+		if (GET_OBJ_SHORT_DESC(obj) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
+			set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
+		}
+		if (GET_OBJ_LONG_DESC(obj) && GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
+			set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
+		}
+		if (GET_OBJ_KEYWORDS(obj) && GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
+			set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
+		}
+		if (GET_OBJ_ACTION_DESC(obj) && GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
+			set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
+		}
 	}
 	
 	// ITEM_x: certain things that must always copy over
@@ -6704,7 +6710,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	}
 	
 	// copy enchantments/hone ONLY if level is the same
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj)) {
+	if (keep_augments && GET_OBJ_CURRENT_SCALE_LEVEL(new) == GET_OBJ_CURRENT_SCALE_LEVEL(obj)) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && !OBJ_FLAGGED(new, OBJ_ENCHANTED)) {
 			SET_BIT(GET_OBJ_EXTRA(new), OBJ_ENCHANTED);
 		}

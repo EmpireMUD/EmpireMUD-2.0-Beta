@@ -1315,6 +1315,7 @@ const char *player_tech_types[] = {
 	"Faster-Ranged-Combat",
 	"Riding-Swap-Anywhere",
 	"Riding-Release-Mount",	// 95
+	"Rework-Command",
 	"\n"
 };
 
@@ -3312,6 +3313,51 @@ const char *obj_custom_type_help =
 // basic speed is the theoretical average weapon speed without wits/haste,
 // and is used to apply bonus-physical/magical evenly by adjusting for speed
 const double basic_speed = 4.0;	// seconds between attacks
+
+
+// rework: if the first keyword of an item is in this list, it's safe to rename
+const char *item_rename_keywords[] = {
+	"aegis", "aklys", "amulet", "antlers", "apparatus", "armband", "armbands",
+	"armguards", "armor", "axe", "backpack", "bag", "bags", "band", "bands",
+	"bangles", "barbette", "battlegear", "baubles", "beads", "bedknob",
+	"bells", "belt", "bindings", "blouse", "bodysuit", "bone", "bonnet",
+	"book", "boots", "bow", "bracelet", "bracelets", "bracer", "bracers",
+	"braces", "breastplate", "breeches", "broom", "buckler", "bulwark",
+	"candlestick", "cannon", "cannons", "cap", "cape", "caps", "carapace",
+	"cauldron", "censer", "chain", "chains", "chaps", "charm", "chisel",
+	"choker", "chopper", "chrysanthemum", "cincture", "circlet", "claws",
+	"claymore", "cloak", "clothes", "clothing", "club", "coat", "coif", "coil",
+	"collar", "counterweight", "cowl", "crown", "cuffs", "cuirass",
+	"cumberbund", "dagger", "doublet", "dress", "earcuff", "earcuffs",
+	"earplates", "earring", "earrings", "edge", "effigy", "ensemble", "eye",
+	"eyepiece", "falchion", "fang", "fetish", "fiddle", "flail", "fleece",
+	"flute", "focus", "footwraps", "garb", "garments", "garter", "gauntlet",
+	"gauntlets", "girdle", "glaive", "gloves", "goggles", "gourd", "gown",
+	"greatbow", "greatstaff", "greaves", "grimoire", "guard", "guards",
+	"hammer", "hand", "handaxe", "handguards", "handwraps", "hat", "hatchet",
+	"hauberk", "headdress", "helm", "helmet", "hides", "hole", "hood", "hoop",
+	"horn", "hose", "idol", "jacket", "jerkin", "kilt", "knapsack", "kneecap",
+	"knife", "kris", "lantern", "leathers", "leggings", "legguards",
+	"legplates", "locket", "loincloth", "longsword", "lyre", "mace", "mantle",
+	"mask", "mattock", "maul", "moccasins", "necklace", "net", "orb", "outfit",
+	"pack", "pan", "pantaloons", "pants", "pauldrons", "pearls", "pelts",
+	"pendant", "pendulum", "pestle", "pick", "pickaxe", "pike", "pipes",
+	"plate", "plates", "pocket", "post", "pouch", "raiment", "raiments",
+	"regalia", "ring", "robe", "robes", "rucksack", "sabatons", "sack",
+	"saddle", "sandals", "sash", "satchel", "scepter", "sceptre", "scythe",
+	"shackles", "shawl", "shield", "shinguards", "shirt", "shiv", "shoe",
+	"shoes", "shoestring", "shovel", "sickle", "sigil", "skean", "skin",
+	"skirt", "skull", "skullcap", "sleeves", "slippers", "spear", "spellbook",
+	"spike", "staff", "stake", "statuette", "stick", "stiletto", "stockings",
+	"strands", "strap", "stud", "studs", "suit", "surcoat", "sweater", "sword",
+	"talisman", "talon", "tambourine", "timepiece", "toga", "tome", "torch",
+	"totem", "trappings", "trident", "trousers", "tuba", "tunic", "tusk",
+	"vambraces", "vest", "waistband", "waistcoat", "wand", "warhammer",
+	"warstaff", "watch", "weapon", "whip", "wimple", "wings", "wraps",
+	"wristband", "wristbands", "wristblade", "wristcuff", "wristguard",
+	"wristguards", "wristplate", "wristplates", "xylophone",
+	"\n"	// this must be last
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
