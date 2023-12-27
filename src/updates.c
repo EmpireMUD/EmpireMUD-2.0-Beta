@@ -3333,13 +3333,16 @@ PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
 }
 
 
-// updates with the new required affect on counterspell and phoenix rite
-PLAYER_UPDATE_FUNC(b5_166_affect_update) {
+// updates with the new required affect on counterspell and phoenix rite plus heal friend
+PLAYER_UPDATE_FUNC(b5_166_player_update) {
 	struct affected_type *hjp;
 	
 	any_vnum COUNTERSPELL = 3021;
 	any_vnum PHOENIX_RITE = 3017;
+	any_vnum HEAL_FRIEND = 110;
+	any_vnum NATURAL_MAGIC = 3;
 	
+	// new affect flags
 	LL_FOREACH(ch->affected, hjp) {
 		if (hjp->type == COUNTERSPELL && hjp->bitvector == NOBITS) {
 			hjp->bitvector = AFF_COUNTERSPELL;
@@ -3348,6 +3351,11 @@ PLAYER_UPDATE_FUNC(b5_166_affect_update) {
 		if (hjp->type == PHOENIX_RITE && hjp->bitvector == NOBITS) {
 			hjp->bitvector = AFF_AUTO_RESURRECT;
 		}
+	}
+	
+	// heal friend increased in level
+	if (has_ability(ch, HEAL_FRIEND) && get_skill_level(ch, NATURAL_MAGIC) < 55) {
+		remove_ability(ch, ability_proto(HEAL_FRIEND), FALSE);
 	}
 }
 
@@ -3463,7 +3471,7 @@ const struct {
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
-	{ "b5.166", b5_166_barrier_magentafication, b5_166_affect_update, "Updating enchanted walls and affects" },
+	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
