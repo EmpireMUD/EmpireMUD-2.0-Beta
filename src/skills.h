@@ -155,7 +155,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_NOBLE_BEARING  228
 #define ABIL_CONFER  240
 #define ABIL_HONE  262
-#define ABIL_STABLEMASTER  272
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 #define ABIL_CHARGE  297

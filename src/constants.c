@@ -1313,6 +1313,8 @@ const char *player_tech_types[] = {
 	"Flee-Upgrade",
 	"Faster-Melee-Combat",
 	"Faster-Ranged-Combat",
+	"Riding-Swap-Anywhere",
+	"Riding-Release-Mount",	// 95
 	"\n"
 };
 

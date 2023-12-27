@@ -444,11 +444,6 @@ bool point_update_player(char_data *ch) {
 		gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
 	}
 	
-	if (GET_MOUNT_LIST(ch)) {
-		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STABLEMASTER, 0, ch, NULL, NULL, NULL, NOBITS);
-	}
-	
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
 	
 	// death count decrease after 3 minutes without a death

@@ -1542,6 +1542,8 @@ Available techs are:
  &cFlee-Upgrade&0 * - Increased chance to flee.
  &cFaster-Melee-Combat&0 * - Slight speed boost in melee combat.
  &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
+ &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
+ &cRiding-Release-Mount&0 * - Can release mounts as mobs.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.

@@ -2789,6 +2789,8 @@ typedef enum {
 #define PTECH_FLEE_UPGRADE  91	// increased chance to flee
 #define PTECH_FASTER_MELEE_COMBAT  92	// slight speed boost in melee
 #define PTECH_FASTER_RANGED_COMBAT  93	// slight speed boost in ranged combat
+#define PTECH_RIDING_SWAP_ANYWHERE  94	// can swap in any location
+#define PTECH_RIDING_RELEASE_MOUNT  95	// can release your mounts
 
 
 // SM_x: status messages

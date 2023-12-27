@@ -407,8 +407,8 @@ void do_mount_release(char_data *ch, char *argument) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to release mounts here (you wouldn't be able to re-mount it)!\r\n");
 	}
-	else if (!has_ability(ch, ABIL_STABLEMASTER)) {
-		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
+	else if (!has_player_tech(ch, PTECH_RIDING_RELEASE_MOUNT)) {
+		msg_to_char(ch, "You do not have the ability to release your mounts; they are only loyal to you.\r\n");
 	}
 	else if (*argument) {
 		msg_to_char(ch, "You can only release your active mount (you get this error if you type a name).\r\n");
@@ -442,6 +442,8 @@ void do_mount_release(char_data *ch, char *argument) {
 		queue_delayed_update(ch, CDU_SAVE);	// prevent mob duplication
 		
 		load_mtrigger(mob);
+		
+		gain_player_tech_exp(ch, PTECH_RIDING_RELEASE_MOUNT, 30);
 	}
 }
 
@@ -450,27 +452,25 @@ void do_mount_release(char_data *ch, char *argument) {
 void do_mount_swap(char_data *ch, char *argument) {
 	struct mount_data *mount, *iter, *next_iter;
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool was_mounted = FALSE;
+	bool was_mounted = FALSE, stablemaster;
 	char_data *proto;
 	int number;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
-		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
+	stablemaster = has_player_tech(ch, PTECH_RIDING_SWAP_ANYWHERE);
+	
+	if (!stablemaster && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
+		msg_to_char(ch, "You can only swap mounts in a stable.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This stable must be in a city for you to swap mounts without the Stablemaster ability.\r\n");
+	if (!stablemaster && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This stable must be in a city for you to swap mounts.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!stablemaster && !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must complete the stable first.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to swap mounts here.\r\n");
-		return;
-	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (!stablemaster && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
 		return;
 	}
@@ -525,6 +525,8 @@ void do_mount_swap(char_data *ch, char *argument) {
 	if (was_mounted) {
 		do_mount_current(ch);
 	}
+	
+	gain_player_tech_exp(ch, PTECH_RIDING_SWAP_ANYWHERE, 30);
 }
 
 

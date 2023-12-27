@@ -369,7 +369,7 @@ Usage:  mount <swap | list> <keyword(s)>
 
 Stablemaster allows you to change your active mount anywhere. It also lets you
 release your active mount so that it can be traded to others. Gains experience
-passively, as long as you have at least one mount.
+when used.
 
 Without Stablemaster, you can't release your mount at all.
 
