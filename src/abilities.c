@@ -7147,7 +7147,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	struct ability_exec *data;
 	struct affected_type *af;
 	struct apply_data *apply;
-	int cap, level, total_w = 0;
+	int level, total_w = 0;
 	bool unscaled, unscaled_penalty;
 	
 	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
@@ -7166,10 +7166,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	
 	// things only needed for scaled buffs
 	if (!unscaled) {
-		level = get_approximate_level(ch);
-		if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
-			level = MIN(level, cap);	// constrain by skill level
-		}
+		level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 		total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
 		
 		if (total_points < 0) {	// no work
