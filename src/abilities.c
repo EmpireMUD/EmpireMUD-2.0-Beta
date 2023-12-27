@@ -372,6 +372,12 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		if (*lbuf) {
 			has_param_details = TRUE;
+			for (iter = 0; iter < strlen(lbuf); ++iter) {
+				if (lbuf[iter] == '-') {
+					// convert dash to space for readability
+					lbuf[iter] = ' ';
+				}
+			}
 			size += snprintf(outbuf + size, sizeof_outbuf - size, "Grants: %s\r\n", lbuf);
 		}
 	}
