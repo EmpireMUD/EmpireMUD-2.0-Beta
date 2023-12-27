@@ -2311,8 +2311,6 @@ int health_gain(char_data *ch, bool info_only) {
 int mana_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
 	
-	double solar_power_levels[] = { 2, 2.5, 2.5 };
-	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
 	}
@@ -2324,17 +2322,6 @@ int mana_gain(char_data *ch, bool info_only) {
 	else {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
-		
-		if (has_ability(ch, ABIL_SOLAR_POWER)) {
-			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
-				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
-			
-				if (!info_only) {
-					gain_ability_exp(ch, ABIL_SOLAR_POWER, 1);
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SOLAR_POWER, 0, ch, NULL, NULL, NULL, NOBITS);
-				}
-			}
-		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1 + (get_approximate_level(ch) / 20);
