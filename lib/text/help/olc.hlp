@@ -9523,6 +9523,18 @@ Object values:
  1 - corpse size
  2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
 #d
+"CROWD CONTROL" CROWD-CONTROL "LIMIT CROWD CONTROL" LIMIT-CROWD-CONTROL
+
+The term "crowd control" refers to abilities that manage additional mobs in a
+fight. For example, stunning a mob or transforming it into a form that doesn't
+deal damage are forms of crowd control.
+
+On abilities, the LIMIT-CROWD-CONTROL flag ensures only 1 mob is
+crowd-controlled by that ability at a time. When the ability is used, all other
+mobs in the room who are affected by it will return to normal.
+
+See also: ABILEDIT FLAGS
+#d
 "CURRENCY ITEM" "CURRENCY OBJECT"
 
 Currency items represent a pile of adventure currency. The name of the currency
