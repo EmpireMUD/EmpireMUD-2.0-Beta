@@ -146,18 +146,24 @@ X+ 3 5
 S
 #307
 Darkshroud~
-afk -1 1.00 0 0 0
+afk -1 1.30 0 0 0
 C
 darkshroud 7 A 1 25 0.00 2092 30 9 2 2
+M
+10
+The darkshroud seems to miss $N.~
+M
+11
+Thankfully, the darkshroud seems to miss you.~
+M
+12
+*~
 M
 13
 The shadows draw close to you and then strike out with a dark fury!~
 M
 14
 The shadows draw close to $n and then strike out with a dark fury!~
-M
-10
-fail $N~
 T c 1
 T d 3
 X+ 1 3112
@@ -165,6 +171,35 @@ X+ 2 20
 X+ 3 20
 X+ 4 307
 X+ 5 4
+X+ 8 25.00
+S
+#308
+Wilderblaze~
+afi -1 1.50 0 0 0
+C
+wilderblaze 7 A 2 25 0.00 2093 30 8 3 2
+M
+10
+$N takes cover at the last second as the wilderblaze misses $M.~
+M
+11
+You take cover just in time as the wilderblaze misses you!~
+M
+12
+*~
+M
+13
+The air around you begins to ignite as you channel mana into the air!~
+M
+14
+The air begins to ignite around $n as $e glares with a fiery focus...~
+T c 2
+T d 5
+X+ 1 3113
+X+ 2 20
+X+ 3 20
+X+ 4 308
+X+ 5 2
 X+ 8 25.00
 S
 $

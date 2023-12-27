@@ -18,8 +18,44 @@ T e 1
 S
 #103
 Firstaid~
-0 -1 1.00 0 0 0
-T m 0
+q -1 1.50 0 0 0
+C
+firstaid 5 b 1 20 0.00 -1 0 0 7 0
+D 64 8 0
+D 64 11 0
+D 64 10 0
+M
+0
+You apply first aid to your wounds.~
+M
+1
+$n applies first aid to $s wounds.~
+M
+2
+You apply first aid to $N's wounds.~
+M
+3
+$n applies first aid to your wounds.~
+M
+4
+$n applies first aid to $N's wounds.~
+M
+8
+You don't have any wounds to tend.~
+M
+9
+*~
+M
+10
+$E doesn't have any wounds to tend.~
+M
+11
+*~
+M
+12
+*~
+T y 3
+T s 1
 S
 #104
 Fleet~
@@ -93,18 +129,107 @@ X+ 3 75
 S
 #109
 Heal~
-0 -1 1.00 0 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 g 2 1 0.00 -1 0 8 5 0
+D 512 110 0
+M
+0
+You swirl your mana around your body to heal your wounds.~
+M
+1
+$n's body swirls with mana and $s wounds seem to heal.~
+M
+8
+You don't need any healing.~
+M
+9
+*~
+T y 1
+X+ 7 0.75
 S
 #110
 Heal Friend~
-0 -1 1.00 0 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 beD 2 1 0.00 -1 0 0 5 0
+D 512 111 0
+M
+8
+You don't need any healing.~
+M
+9
+*~
+M
+0
+You swirl your mana around your body to heal your wounds.~
+M
+1
+$n's body swirls with mana and $s wounds seem to heal.~
+M
+2
+You let your mana pulse and wave around $N, healing $S wounds.~
+M
+3
+$n sends forth a wave of mana, which pulses through your body and heals your wounds.~
+M
+4
+A wave of mana shoots from $n to $N, healing $S wounds.~
+M
+10
+$N doesn't need any healing.~
+M
+11
+*~
+M
+12
+*~
+T y 1
+X+ 7 0.50
 S
 #111
 Heal Party~
-0 -1 1.00 0 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 beyD 2 1 0.00 -1 0 8 5 0
+M
+0
+The mana swirls around your body and heals your wounds.~
+M
+1
+The mana swirls around $n's body and heals $s wounds.~
+M
+2
+The mana washes over $N, healing $S wounds.~
+M
+3
+The mana washes over you, healing your wounds.~
+M
+4
+The mana washes over $N, healing $S wounds.~
+M
+8
+You don't need any healing.~
+M
+9
+*~
+M
+10
+$N doesn't need any healing.~
+M
+11
+*~
+M
+12
+*~
+M
+13
+You let loose a pulse of healing mana...~
+M
+14
+$n lets loose a pulse of healing mana...~
+T y 1
+X+ 7 0.25
 S
 #112
 Healing Potions~
@@ -118,8 +243,30 @@ T a 0
 S
 #114
 Rejuvenate~
-0 -1 1.00 0 0 0
-T m 0
+dfj -1 1.00 0 0 0
+A
+14 1
+C
+rejuvenate 5 beD 2 15 1.25 -1 0 8 5 0
+M
+0
+You surround yourself with the bright white mana of rejuvenation.~
+M
+1
+$n surrounds $mself with the bright white mana of rejuvenation.~
+M
+2
+You surround $N with the bright white mana of rejuvenation.~
+M
+3
+$n surrounds you with the bright white mana of rejuvenation.~
+M
+4
+$n surrounds $N with the bright white mana of rejuvenation.~
+T b 1
+X+ 1 3023
+X+ 2 30
+X+ 3 30
 S
 #115
 Purify~
@@ -547,7 +694,7 @@ S
 Shadowstep~
 s -1 1.00 0 0 0
 C
-shadowstep 8 dh 1 50 0.00 2037 60 0 1 0
+shadowstep 8 dhE 1 50 0.00 2037 60 0 1 0
 D 2 0 0
 D 128 7 0
 D 16 16 0

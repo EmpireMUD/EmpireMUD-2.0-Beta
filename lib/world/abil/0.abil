@@ -379,8 +379,24 @@ T e 1
 S
 #27
 Regenerate~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 2.00 0 0 0
+C
+regenerate 8 gw 3 1 0.00 -1 0 0 1 0
+M
+0
+You focus your blood into regeneration.~
+M
+1
+$n's wounds seem to seal themselves.~
+M
+8
+You don't seem to need any regeneration.~
+M
+9
+*~
+T y 1
+X+ 7 0.40
+X+ 9 -1
 S
 #28
 Summon Thug~
@@ -814,9 +830,11 @@ A
 T f 1
 S
 #87
-Reforge~
+Rework~
 0 -1 1.00 0 0 0
-T m 0
+D 1 96 0
+T a 1
+T e 1
 S
 #88
 Block Arrows~

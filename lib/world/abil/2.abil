@@ -174,7 +174,7 @@ S
 Resurrect~
 0 -1 1.00 0 0 0
 C
-resurrect 8 bhij 2 75 0.00 -1 0 0 5 0
+resurrect 8 bhijE 2 75 0.00 -1 0 0 5 0
 M
 2
 You begin channeling mana to resurrect $O...~
@@ -196,7 +196,7 @@ S
 Moonrise~
 0 -1 1.00 0 0 0
 C
-moonrise 7 bhij 2 200 0.00 2044 1200 0 3 0
+moonrise 7 bhijE 2 200 0.00 2044 1200 0 3 0
 M
 2
 You let out a bone-chilling howl...~
@@ -544,8 +544,12 @@ T e 1
 S
 #239
 Ancestral Healing~
-0 -1 1.00 0 0 0
-T m 0
+j -1 1.00 0 r 0
+A
+23 1
+C
+unknown 8 0 0 0 0.00 -1 0 5 0 0
+T f 1
 S
 #240
 Confer~
@@ -561,7 +565,7 @@ S
 Deathrise~
 0 -1 1.00 0 0 0
 C
-deathrise 0 g 3 50 0.00 2091 600 0 5 0
+deathrise 0 gE 3 50 0.00 2091 600 0 5 0
 M
 0
 You rise as suddenly as you fell, hungry for more!~
@@ -948,7 +952,9 @@ S
 #272
 Stablemaster~
 0 -1 1.00 0 0 0
-T m 0
+D 1 94 0
+D 1 95 0
+T e 1
 S
 #273
 Ablate~
