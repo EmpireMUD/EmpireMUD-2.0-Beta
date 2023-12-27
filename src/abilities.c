@@ -1076,14 +1076,22 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 	level = get_approximate_level(ch);
 	
 	// adjust for ability's skill
-	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum))) {
-		if (ABILITY_FLAGGED(abil, ABILF_USE_SKILL_BELOW_MAX) && (skl = ABIL_ASSIGNED_SKILL(abil))) {
-			// adjust based on level in the assigned skill
-			skill_level = get_skill_level(ch, SKILL_VNUM(skl));
-			
-			// constrain only if player hasn't maxed this skill
-			if (skill_level < SKILL_MAX_LEVEL(skl)) {
+	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum)) && (skl = ABIL_ASSIGNED_SKILL(abil))) {
+		// adjust based on level in the assigned skill
+		skill_level = get_skill_level(ch, SKILL_VNUM(skl));
+		
+		if (skill_level < SKILL_MAX_LEVEL(skl)) {
+			if (level < skill_level) {
+				// approx level is lower than skill level: use skill level instead
+				level = skill_level;
+			}
+			else if (ABILITY_FLAGGED(abil, ABILF_USE_SKILL_BELOW_MAX)) {
+				// flagged to use only the skill level itself
 				level = MIN(level, skill_level);
+			}
+			else if (level >= CLASS_SKILL_CAP) {
+				// level is above class cap -- restrict sub-max skills to a percentage of total level
+				level *= (double)skill_level / (double)CLASS_SKILL_CAP;
 			}
 		}
 	}
