@@ -110,4 +110,22 @@ The scorch of the wilderblaze fades from your skin, but you won't soon forget it
 T4
 $s skin blazes with wildfire.~
 S
+#3114
+magivore~
+4 0
+0 0 0 0
+T0
+You've consumed as much mana as possible for the moment.~
+T4
+The air around him is distorted and rippling frenetically.~
+T5
+...the air ripples and distorts around $m!~
+S
+#3115
+surge~
+4 0
+0 0 0 0
+T0
+You feel your surge of energy come to an end.~
+S
 $

@@ -424,9 +424,11 @@ Sneak~
 T m 0
 S
 #30
-Solar Power~
-0 -1 1.00 0 0 0
-T m 0
+By the Sun and Stars~
+ij -1 1.00 0 h 0
+A
+7 1
+T f 1
 S
 #31
 Soulsight~
