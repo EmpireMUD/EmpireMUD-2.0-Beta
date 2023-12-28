@@ -1163,9 +1163,9 @@ int get_approximate_level(char_data *ch) {
 
 
 /**
-* @param any_vnum skill which SKILL_x
-* @param int level at what level
-* @return int how many abilities are available by that level
+* @param any_vnum skill Which skill
+* @param int level at What level
+* @return int How many abilities are available by that level
 */
 int get_ability_points_available(any_vnum skill, int level) {
 	int iter, count;
@@ -1183,7 +1183,7 @@ int get_ability_points_available(any_vnum skill, int level) {
 
 /**
 * @param char_data *ch the person to check
-* @param any_vnum skill Which SKILL_x to check
+* @param any_vnum skill Which skill to check
 * @return int how many ability points ch has available in skill
 */
 int get_ability_points_available_for_char(char_data *ch, any_vnum skill) {
@@ -1203,7 +1203,7 @@ int get_ability_points_available_for_char(char_data *ch, any_vnum skill) {
 
 /**
 * @param char_data *ch the person to check
-* @param any_vnum skill Which SKILL_x to check
+* @param any_vnum skill Which skill to check
 * @return int total abilities bought in a skill
 */
 int get_ability_points_spent(char_data *ch, any_vnum skill) {
@@ -1635,7 +1635,7 @@ bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag) {
 * those levels later.
 *
 * @param char_data *ch The player.
-* @param any_vnum skill Which SKILL_x.
+* @param any_vnum skill Which skill.
 */
 void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum skill) {
 	struct player_ability_data *abil, *next_abil;

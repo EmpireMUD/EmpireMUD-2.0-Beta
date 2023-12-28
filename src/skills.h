@@ -12,24 +12,21 @@
 
 #define EMPIRE_CHORE_SKILL_CAP  15  // how high you can gain some skills without using a yellow ability
 
-#define GAINS_PER_ABILITY  10	// times you can gain skill from each ability
+#define GAINS_PER_ABILITY  10	// times you can gain skill from each ability -- TODO: should be a config?
 
 // skill gain caps
-#define CLASS_SKILL_CAP  100  // class skills
+#define CLASS_SKILL_CAP  100  // class skills -- TODO: rename MAX_SKILL_CAP ?
 #define SPECIALTY_SKILL_CAP  75  // accessory skill
 #define BASIC_SKILL_CAP  50  // common skills
 #define IS_ANY_SKILL_CAP(ch, skill)  (get_skill_level((ch), (skill)) == SKILL_MAX_LEVEL(find_skill_by_vnum(skill)) || get_skill_level((ch), (skill)) == SPECIALTY_SKILL_CAP || get_skill_level((ch), (skill)) == BASIC_SKILL_CAP || (get_skill_level((ch), (skill)) == 0 && !CAN_GAIN_NEW_SKILLS(ch)))
 #define NEXT_CAP_LEVEL(ch, skill)  (get_skill_level((ch), (skill)) <= BASIC_SKILL_CAP ? BASIC_SKILL_CAP : (get_skill_level((ch), (skill)) <= SPECIALTY_SKILL_CAP ? SPECIALTY_SKILL_CAP : (CLASS_SKILL_CAP)))
 
 // skill > basic level
-#define IS_SPECIALTY_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > BASIC_SKILL_CAP)
 #define IS_SPECIALTY_ABILITY(ch, abil)	(get_ability_skill_level((ch), (abil)) > BASIC_SKILL_CAP)
 
 // skill > specialty level
-#define IS_CLASS_SKILL(ch, skill)	((IS_NPC(ch) ? get_approximate_level(ch) : get_skill_level((ch), (skill))) > SPECIALTY_SKILL_CAP)
 #define IS_CLASS_ABILITY(ch, abil)	(get_ability_skill_level((ch), (abil)) > SPECIALTY_SKILL_CAP)
 
-#define CHOOSE_BY_SKILL_LEVEL(arr, ch, skill)	(IS_CLASS_SKILL((ch), (skill)) ? (arr)[2] : (IS_SPECIALTY_SKILL((ch), (skill)) ? (arr)[1] : (arr)[0]))
 #define CHOOSE_BY_ABILITY_LEVEL(arr, ch, abil)	(IS_CLASS_ABILITY((ch), (abil)) ? (arr)[2] : (IS_SPECIALTY_ABILITY((ch), (abil)) ? (arr)[1] : (arr)[0]))
 
 // TODO move some of this to a config
@@ -49,14 +46,17 @@
 #define call_prep_abil(name)  (name)(ch, abil, argument, level, vict, ovict, vvict, room_targ, data)
 #define call_do_abil(name)  (name)(ch, abil, argument, level, vict, ovict, vvict, room_targ, data)
 
+
 // abilities.c prototypes
 int get_ability_duration(char_data *ch, ability_data *abil);
+
 
 // class.c prototypes
 void assign_class_abilities(char_data *ch, class_data *cls, int role);
 bool is_class_ability(ability_data *abil);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 void update_class_and_abilities(char_data *ch);
+
 
 // skills.c prototypes
 // TODO sort this
@@ -103,6 +103,7 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech);
 
+
 // spells.c prototypes
 bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 
@@ -116,9 +117,9 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define NUM_DIFF_TYPES  5
 
 
-// SKILL_x: skill vnums
-// Skill vnums no longer appear in the code -- all skills are configured using
-// the .skill editor in-game.
+// SKILL_x: skill Skill vnums no longer appear in the code -- all skills are
+// configured using the .skill editor in-game and any inherent properties are
+// now controlled by skill flags.
 
 
 // for ability definitions
