@@ -763,14 +763,6 @@ void update_vampire_sun(char_data *ch) {
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to your natural form!\r\n");
 	}
-
-	if (affected_by_spell(ch, ATYPE_BOOST)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		affect_from_char(ch, ATYPE_BOOST, FALSE);
-	}
 	
 	// lastly
 	if (found) {
