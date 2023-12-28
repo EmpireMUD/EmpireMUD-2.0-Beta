@@ -562,6 +562,8 @@ Action types:
    medium difficulty check without the ptech.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
    the evolution works with $1 as the old sector name and $2 as the new one.
+ &cpurify&0 - Removes flagged skills and vampire status from the target. Use in
+   conjuction with the 'can purify target' limitation.
  &cput to sleep&0 - Target is put to sleep.
  &cremove debuffs&0 - Removes debuffs (except self-debuffs and penalties).
  &cremove drunk&0 - Cancels any drunkenness on the target.
@@ -1183,6 +1185,7 @@ Usage:  .data add limitation <type>
 
 Limitation types:
  &cally permission at target&0 - Has ally (or better) access at the target location.
+ &ccan purify target&0 - Target is valid for a purify ability.
  &ccan teleport here&0 - Current room does not block teleport.
  &ccan teleport target&0 - Target room does not block teleport.
  &ccan use as ally&0 - Location must be unclaimed or you are an ally (or better).

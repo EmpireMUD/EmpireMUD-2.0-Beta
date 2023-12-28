@@ -668,6 +668,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_HIDE					18	// attempts a hide
 #define ABIL_ACTION_PUT_TO_SLEEP			19	// target is put to sleep
 #define ABIL_ACTION_DISENCHANT_OBJ			20	// disenchants an item
+#define ABIL_ACTION_PURIFY					21	// removes skills with REMOVED-BY-PURIFY
 
 
 // ABIL_CUSTOM_x: custom message types
@@ -810,6 +811,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_OBJ_FLAGGED				41	// checks for object flag present
 #define ABIL_LIMIT_OBJ_NOT_FLAGGED			42	// checks for object flag absent
 #define ABIL_LIMIT_TARGET_IS_VAMPIRE		43	// requires that the target be a vampire
+#define ABIL_LIMIT_CAN_PURIFY_TARGET		44	// target can be purified
 
 
 // ABLIM_x: data needed for ability limits:

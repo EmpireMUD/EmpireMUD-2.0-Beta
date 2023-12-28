@@ -2663,6 +2663,38 @@ DO_ABIL(abil_action_magic_growth) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_purify) {
+	bool any, was_vampire;
+	
+	if (vict) {
+		any = FALSE;
+		was_vampire = IS_VAMPIRE(vict);
+		
+		// clear skills if applicable
+		if (IS_NPC(vict)) {
+			// npc
+			any = IS_VAMPIRE(vict);
+			remove_mob_flags(vict, MOB_VAMPIRE);
+		}
+		else {
+			// player
+			any = remove_skills_by_flag(vict, SKILLF_REMOVED_BY_PURIFY);
+		}
+		
+		// un-vampiring is a common action for purify
+		if (was_vampire && !IS_VAMPIRE(vict)) {
+			check_un_vampire(vict, FALSE);
+		}
+		
+		if (any) {
+			data->success = TRUE;
+			msg_to_char(vict, "You feel some of your power diminish and fade away!");
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_put_to_sleep) {
 	if (vict) {
 		if (GET_POS(vict) > POS_SLEEPING) {
@@ -3447,6 +3479,29 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_CAN_PURIFY_TARGET: {
+				if (vict) {
+					if (!IS_NPC(vict) && has_player_tech(vict, PTECH_NO_PURIFY)) {
+						if (send_msgs) {
+							msg_to_char(ch, "That ability will have no effect%s.\r\n", (ch != vict ? " on that person" : ""));
+						}
+						return FALSE;
+					}
+					else if (vict != ch && IS_NPC(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
+						if (send_msgs) {
+							msg_to_char(ch, "You cannot purify so powerful a %s.\r\n", (MOB_FLAGGED(vict, MOB_ANIMAL) ? "creature" : "person"));
+						}
+						return FALSE;
+					}
+					else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
+						if (send_msgs) {
+							act("You can't use that on someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+						return FALSE;
+					}
+				}
+				break;
+			}
 		}
 	}
 	
@@ -4137,6 +4192,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_DISENCHANT_OBJ: {
 				call_do_abil(abil_action_disenchant_obj);
+				break;
+			}
+			case ABIL_ACTION_PURIFY: {
+				call_do_abil(abil_action_purify);
 				break;
 			}
 		}
