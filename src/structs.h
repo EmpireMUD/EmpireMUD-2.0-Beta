@@ -4032,6 +4032,7 @@ struct ability_exec {
 	double max_scale;	// for cost-per-scale-point
 	
 	// data passed by types
+	bool has_mastery;	// TRUE if the player has the mastery ability
 	bool matching_role;	// if FALSE, has penalties from no matching role
 	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
 	

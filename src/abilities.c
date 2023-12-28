@@ -1918,7 +1918,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	}
 	
 	// check mastery ability
-	if (ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil))) {
+	if (data->has_mastery) {
 		points *= 1.25;	// mastery bonus.. slightly more powerful
 	}
 	
@@ -1940,6 +1940,7 @@ struct ability_exec *start_ability_data(char_data *ch, ability_data *abil, bool 
 	CREATE(data, struct ability_exec, 1);
 	data->should_charge_cost = TRUE;	// this will be shut off if needed, but most things charge
 	data->abil = abil;
+	data->has_mastery = (ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil)));
 	data->matching_role = has_matching_role(ch, abil, ignore_solo_check);
 	data->trait_modifier = get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
 	return data;
