@@ -4022,7 +4022,6 @@ struct ability_exec {
 	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
 	bool sent_fail_msg;	// if TRUE, it sent at least one fail
 	bool no_msg;	// indicates you shouldn't send messages
-	bool matching_role;	// if FALSE, no bonuses from matching role
 	bool engage_anyway;	// we engage combat if !stop || engage_anyway
 	
 	// costs
@@ -4033,6 +4032,9 @@ struct ability_exec {
 	double max_scale;	// for cost-per-scale-point
 	
 	// data passed by types
+	bool matching_role;	// if FALSE, has penalties from no matching role
+	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
+	
 	any_vnum ready_weapon_val;
 	int restore_pool;
 	int restore_amount;

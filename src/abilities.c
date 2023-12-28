@@ -77,6 +77,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_toggle_messages(char_data *ch, ability_data *abil, struct ability_exec *data);
+struct ability_exec *start_ability_data(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void start_over_time_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, struct ability_exec *data);
 
 
@@ -770,9 +771,7 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 	
 	if (ABIL_COST_PER_SCALE_POINT(abil) != 0.0) {
 		// need a temporary data bean for this:
-		CREATE(data, struct ability_exec, 1);
-		data->abil = abil;
-		data->matching_role = has_matching_role(ch, abil, FALSE);
+		data = start_ability_data(ch, abil, TRUE);
 		level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 		
 		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
@@ -1212,7 +1211,7 @@ double get_trait_modifier(char_data *ch, int apply) {
 		}
 	}
 	
-	return MAX(0, MIN(1.0, value));
+	return MAX(0.0, MIN(1.0, value));
 }
 
 
@@ -1266,21 +1265,29 @@ bool has_ability_data_any(ability_data *abil, int type) {
 * @param char_data *ch The player or npc.
 * @param ability_data *abil The ability to check for a match.
 * @param bool ignore_solo_check If TRUE, doesn't care if the player is alone for 'solo' abilities.
+* @return bool TRUE if the player has a matching role, FALSE if not.
 */
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check) {
+	bool solo;
+	
 	if (IS_NPC(ch) || !ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
 		return TRUE;	// npc/no-role-required
 	}
-	if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
+	
+	// check solo once
+	solo = (GET_CLASS_ROLE(ch) == ROLE_SOLO && (ignore_solo_check || check_solo_role(ch)));
+	
+	// compare to all role flags
+	if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || solo)) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
+	else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || solo)) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
+	else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || solo)) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
+	else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || solo)) {
 		return TRUE;
 	}
 	
@@ -1890,20 +1897,52 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	
 	// determine points
 	points = level / 100.0 * config_get_double("scale_points_at_100");
-	if (type) {
+	
+	// weighted portion of the available points
+	if (type != NOBITS) {
 		points *= get_type_modifier(abil, type);
 	}
+	
+	// scale setting
 	points *= ABIL_SCALE(abil);
+	
+	// lower with lower trait, higher with higher trait
 	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
 		// trait range is 0.75x to 1.25x
-		points *= 0.75 + (get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil)) / 2.0);
+		points *= 0.75 + (data->trait_modifier / 2.0);
 	}
 	
-	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
-		points *= data->matching_role ? 1.20 : 0.80;
+	// apply matching role if over level 100
+	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && get_approximate_level(ch) >= CLASS_SKILL_CAP) {
+		points *= data->matching_role ? 1.20 : 0.70;
+	}
+	
+	// check mastery ability
+	if (ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil))) {
+		points *= 1.25;	// mastery bonus.. slightly more powerful
 	}
 	
 	return MAX(1.0, points);	// ensure minimum of 1 point
+}
+
+
+/**
+* Generates the ability's execution 'data' when running the ability. This sets
+* up the basic variables in the data.
+*
+* @param char_data *ch The person using the ability.
+* @param ability_data *abil Which ability.
+* @param bool ignore_solo_check If TRUE, won't care if the player is really solo. FALSE checks solo and denies the role bonus.
+* @return struct ability_exec* The instantiated (and allocated) data with basic setup complete.
+*/
+struct ability_exec *start_ability_data(char_data *ch, ability_data *abil, bool ignore_solo_check) {
+	struct ability_exec *data;
+	CREATE(data, struct ability_exec, 1);
+	data->should_charge_cost = TRUE;	// this will be shut off if needed, but most things charge
+	data->abil = abil;
+	data->matching_role = has_matching_role(ch, abil, ignore_solo_check);
+	data->trait_modifier = get_trait_modifier(ch, ABIL_LINKED_TRAIT(abil));
+	return data;
 }
 
 
@@ -5906,10 +5945,7 @@ void perform_over_time_ability(char_data *ch) {
 	}
 	
 	// construct data
-	CREATE(data, struct ability_exec, 1);
-	data->abil = abil;
-	data->should_charge_cost = TRUE;	// will only charge overage costs, and only if needed
-	data->matching_role = has_matching_role(ch, abil, TRUE);
+	data = start_ability_data(ch, abil, FALSE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// message position is controlled by action timer
@@ -6342,11 +6378,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	level = get_player_level_for_ability(ch, ABIL_VNUM(abil));
 	
 	// 5. exec data to pass through
-	CREATE(data, struct ability_exec, 1);
-	data->abil = abil;
-	data->cost = ABIL_COST(abil);	// base cost, may be modified
-	data->should_charge_cost = TRUE;	// may be turned off any time
-	data->matching_role = has_matching_role(ch, abil, TRUE);
+	data = start_ability_data(ch, abil, FALSE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
 	
 	// 6. ** run the ability **
@@ -6995,10 +7027,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			}
 			
 			// construct data
-			CREATE(data, struct ability_exec, 1);
-			data->abil = abil;
-			data->should_charge_cost = TRUE;	// may still charge
-			data->matching_role = has_matching_role(ch, abil, TRUE);
+			data = start_ability_data(ch, abil, FALSE);
 			GET_RUNNING_ABILITY_DATA(ch) = data;	// this may override one still on them but is ok
 			
 			// the big GO
@@ -7171,9 +7200,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	// remove if already on there
 	remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
 	
-	CREATE(data, struct ability_exec, 1);
-	data->abil = abil;
-	data->matching_role = has_matching_role(ch, abil, FALSE);
+	data = start_ability_data(ch, abil, TRUE);
 	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
 	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
 	GET_RUNNING_ABILITY_DATA(ch) = data;
