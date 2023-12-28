@@ -1255,7 +1255,7 @@ The mastery ability is a separate ability which boosts the performance of this
 ability if a player has both. For example, many crafting abilities have linked
 mastery abilities that result in the (superior) flag on crafts.
 
-Most abilities have no mastery ability.
+Scalable abilities that aren't crafts get a 25% boost from masteries.
 
 See also: OLC ABILITIES
 #d
