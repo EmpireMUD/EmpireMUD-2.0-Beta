@@ -484,8 +484,12 @@ tiny cuts.
 
 Noble Bearing (Battle ability)
 
-Damage to your character is reduced by your Greatness rating. Gain experience
-when you take damage.
+Damage to your character is reduced due to your Greatness. This effect is
+greater in the tank role.
+
+Gain experience when you take damage.
+
+See also: PASSIVES, TANK ROLE
 #
 "NULL MANA"
 
