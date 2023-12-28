@@ -1086,6 +1086,8 @@ The following ability flags are available:
    first target.
  &cUSE-SKILL-BELOW-MAX&0 - If the ability comes from a skill, will use only the
    skill's level if the player isn't at the skill's maximum level.
+ &cUNREMOVABLE-BUFF&0 - Buff/debuff is marked as cast by the target so it
+   cannot be removed with the 'remove debuffs' action.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d

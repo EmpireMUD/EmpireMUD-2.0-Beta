@@ -4239,6 +4239,7 @@ DO_ABIL(do_buff_ability) {
 	int bonus, dur, total_w = 1;
 	bool messaged, unscaled, unscaled_penalty;
 	bitvector_t aff_options;
+	char_data *use_caster;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
@@ -4252,6 +4253,14 @@ DO_ABIL(do_buff_ability) {
 		total_points = MAX(1.0, total_points);
 		
 		remaining_points = total_points;
+	}
+	
+	// set who the cast-by is
+	if (ABILITY_FLAGGED(abil, ABILF_UNREMOVABLE_BUFF)) {
+		use_caster = vict ? vict : ch;
+	}
+	else {
+		use_caster = ch;
 	}
 	
 	// determine duration (in seconds)
@@ -4269,7 +4278,7 @@ DO_ABIL(do_buff_ability) {
 		
 		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 		
-		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), use_caster);
 		affect_join(vict, af, aff_options);
 		messaged = TRUE;
 		data->success = TRUE;
@@ -4312,7 +4321,7 @@ DO_ABIL(do_buff_ability) {
 		
 		// unscaled version?
 		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
-			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight + bonus, ch);
+			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight + bonus, use_caster);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(vict, af, aff_options);
 			messaged = TRUE;
@@ -4334,7 +4343,7 @@ DO_ABIL(do_buff_ability) {
 			remaining_points -= share;
 			remaining_points = MAX(0, remaining_points);
 			
-			af = create_mod_aff(affect_vnum, dur, apply->location, amt, ch);
+			af = create_mod_aff(affect_vnum, dur, apply->location, amt, use_caster);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(vict, af, aff_options);
 			messaged = TRUE;
