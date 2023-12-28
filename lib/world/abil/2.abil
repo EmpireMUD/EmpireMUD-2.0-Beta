@@ -248,7 +248,9 @@ Sanguine Restoration~
 o -1 1.00 0 0 0
 A
 20 75
+D 1 97 0
 T f 1
+T e 0
 S
 #227
 Ward Against Magic~
@@ -258,8 +260,14 @@ T e 1
 S
 #228
 Noble Bearing~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 1.00 0 f 0
+A
+12 1
+A
+24 1
+C
+unknown 8 0 0 0 0.00 -1 0 5 0 0
+T f 1
 S
 #229
 Bloodsweat~

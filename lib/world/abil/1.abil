@@ -270,8 +270,42 @@ X+ 3 30
 S
 #115
 Purify~
-0 -1 1.00 0 0 0
-T m 0
+0 -1 1.00 o 0 0
+C
+purify 8 b 2 50 0.00 -1 0 0 1 0
+D 16 44 0
+D 64 21 0
+M
+0
+You let your mana wash over your body and purify your form.~
+M
+1
+$n seems to dance as $s mana washes over $s body and purifies $m.~
+M
+2
+You let your mana wash over $N, purifying $M.~
+M
+3
+$n holds out $s hands and $s mana washes over you, purifying you.~
+M
+4
+$n holds out $s hands and $s mana washes over $N, purifying $M.~
+M
+8
+Nothing seems to happen.~
+M
+9
+*~
+M
+10
+Nothing seems to happen.~
+M
+11
+Nothing seems to happen.~
+M
+12
+*~
+T s 1
 S
 #116
 Cleanse~
@@ -941,23 +975,23 @@ c -1 1.00 0 af 0
 A
 16 -1
 A
-12 1
+12 2
 A
-24 1
+24 2
 C
 manashield 5 eg 2 25 0.00 -1 0 8 5 0
-M
-23
-You wipe the symbols off your arm and cancel your mana shield.~
-M
-24
-$n wipes the arcane symbols off $s arm.~
 M
 0
 You pull out a grease pencil and draw a series of arcane symbols down your left arm...~
 M
 1
 $n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.~
+M
+23
+You wipe the symbols off your arm.~
+M
+24
+$n wipes the arcane symbols off $s arm.~
 T b 1
 X+ 1 3008
 X+ 2 1800
@@ -1400,8 +1434,47 @@ T a 0
 S
 #183
 Vigor~
-0 -1 1.00 0 0 0
-T m 0
+drE -1 2.00 0 0 0
+A
+6 -1
+C
+vigor 7 be 2 12 1.50 -1 0 8 5 0
+M
+0
+You focus your thoughts and say the word 'maktso', and you feel a burst of vigor!~
+M
+1
+$n closes $s eyes and says the word 'maktso', and $e seems suddenly refreshed.~
+M
+2
+You focus your thoughts and say the word 'maktso', and $N suddenly seems refreshed.~
+M
+3
+$n closes $s eyes and says the word 'maktso', and you feel a sudden burst of vigor!~
+M
+4
+$n closes $s eyes and says the word 'maktso', and $N suddenly seems refreshed.~
+M
+8
+You already have full movement points.~
+M
+9
+*~
+M
+10
+$E already has full movement points.~
+M
+11
+*~
+M
+12
+*~
+T y 1
+T b 2
+X+ 1 3031
+X+ 2 75
+X+ 3 75
+X+ 9 1
 S
 #184
 Enchant Armor~
@@ -1557,18 +1630,6 @@ M
 33
 $n vanishes in a brilliant flash of light!~
 T u 1
-S
-#189
-Portal Magic~
-0 -1 1.00 0 0 0
-D 1 36 0
-T e 0
-S
-#190
-Portal Master~
-0 -1 1.00 0 0 0
-D 1 37 0
-T e 0
 S
 #191
 Devastation Ritual~

@@ -77,9 +77,11 @@ S
 #1115
 nexus crystal~
 1115 2
-2 189 h 2 -1 0 0
+2 198 hq 2 -1 0 0
 R
 6600 1 1 0
+R
+2 50 4 0
 S
 #1119
 nocturnium spike~

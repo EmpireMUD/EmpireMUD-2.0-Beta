@@ -2073,6 +2073,38 @@ The darkness enshrouds $N but quickly fades.
 The darkness enshrouds you but quickly fades.
 The darkness enshrouds $N but quickly fades.
 
+M308 e 0 
+Wilderblaze~
+~
+The wilderblaze burns $N to ash!
+The wilderblaze burns you to ash!
+The wilderblaze burns $N to ash!
+#
+The wilderblaze scorches past you, thankfully!
+#
+The wilderblaze engulfs $N!
+The wilderblaze engulfs you!
+The wilderblaze engulfs $N!
+#
+#
+#
+
+M308 e 0 
+Wilderblaze~
+~
+The wilderblaze ignites $N, melting $M to the ground!
+The wilderblaze ignites you, painfully melting your flesh as you die in agony!
+The wilderblaze ignites $N, melting $M to the ground!
+#
+The wilderblaze flows past you with little more than a warm glow.
+#
+$N screams out as the wilderblaze immolates $M!
+You scream involuntarily as the wilderblaze immolates you!
+$N screams out as the wilderblaze immolates $M!
+#
+#
+#
+
 M3106 e 0 
 Freezing DoT~
 ~
