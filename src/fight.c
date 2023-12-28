@@ -3306,6 +3306,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	
 	// chained abilities?
 	if (!full_miss && ch != victim) {
+		run_ability_hooks(ch, AHOOK_DAMAGE_ANY, 0, 0, victim, NULL, NULL, NULL, NOBITS);
 		run_ability_hooks(ch, AHOOK_DAMAGE_TYPE, damtype, 0, victim, NULL, NULL, NULL, NOBITS);
 	}
 	
@@ -3486,9 +3487,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	double attack_speed, cur_speed, dam;
 	attack_message_data *amd;
 	char_data *check;
-	
-	// some config TODO move this into the config system?
-	double big_game_hunter[] = { 1.05, 1.05, 1.10 };
 
 	// brief sanity
 	if (!victim || !ch || EXTRACTED(victim) || IS_DEAD(victim)) {
@@ -3664,18 +3662,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_player_tech(ch, PTECH_BONUS_VS_ANIMALS)) {
 				dam *= 2;
 			}
-		
-			// raw damage modified by big game hunter
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_BIG_GAME_HUNTER) && (IS_VAMPIRE(victim) || IS_MAGE(victim))) {
-				if (can_gain_exp_from(ch, victim)) {
-					gain_ability_exp(ch, ABIL_BIG_GAME_HUNTER, 1);
-				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BIG_GAME_HUNTER, 0, victim, NULL, NULL, NULL, NOBITS);
-		
-				if (skill_check(ch, ABIL_BIG_GAME_HUNTER, DIFF_MEDIUM)) {
-					dam = (int) (CHOOSE_BY_ABILITY_LEVEL(big_game_hunter, ch, ABIL_BIG_GAME_HUNTER) * dam);
-				}
-			}
 		}
 		
 		dam = round(dam);
@@ -3699,15 +3685,21 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// check post-hit skills
 		if (result > 0 && ch != victim && IN_ROOM(victim) == IN_ROOM(ch)) {
-			// check repeatedly that the victim didn't die
-			if (combat_round ) {
+			if (combat_round) {
 				run_ability_hooks(ch, AHOOK_ATTACK, 0, 0, victim, NULL, NULL, NULL, NOBITS);
+				
+				if (FIGHT_MODE(ch) == FMODE_MELEE) {
+					run_ability_hooks(ch, AHOOK_MELEE_ATTACK, 0, 0, victim, NULL, NULL, NULL, NOBITS);
+				}
+				if (FIGHT_MODE(ch) == FMODE_MISSILE) {
+					run_ability_hooks(ch, AHOOK_RANGED_ATTACK, 0, 0, victim, NULL, NULL, NULL, NOBITS);
+				}
 			}
-			if (combat_round && FIGHT_MODE(ch) == FMODE_MELEE) {
-				run_ability_hooks(ch, AHOOK_MELEE_ATTACK, 0, 0, victim, NULL, NULL, NULL, NOBITS);
+			if (IS_MAGE(victim)) {
+				run_ability_hooks(ch, AHOOK_ATTACK_MAGE, 0, 0, victim, NULL, NULL, NULL, NOBITS);
 			}
-			if (combat_round && FIGHT_MODE(ch) == FMODE_MISSILE) {
-				run_ability_hooks(ch, AHOOK_RANGED_ATTACK, 0, 0, victim, NULL, NULL, NULL, NOBITS);
+			if (IS_VAMPIRE(victim)) {
+				run_ability_hooks(ch, AHOOK_ATTACK_VAMPIRE, 0, 0, victim, NULL, NULL, NULL, NOBITS);
 			}
 			if (weapon) {
 				run_ability_hooks(ch, AHOOK_ATTACK_TYPE, w_type, 0, victim, NULL, NULL, NULL, NOBITS);

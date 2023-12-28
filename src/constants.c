@@ -445,6 +445,9 @@ const char *ability_hook_types[] = {
 	"Dying",
 	"Respawn",
 	"Resurrect",	// 10
+	"Damage-Any",
+	"Attack-Mage",
+	"Attack-Vampire",
 	"\n"
 };
 

@@ -765,6 +765,9 @@ typedef struct vehicle_data vehicle_data;
 #define AHOOK_DYING				BIT(8)	// right before death
 #define AHOOK_RESPAWN			BIT(9)	// character respawned
 #define AHOOK_RESURRECT			BIT(10)	// character was resurrected
+#define AHOOK_DAMAGE_ANY		BIT(11)	// any type of damage
+#define AHOOK_ATTACK_MAGE		BIT(12)	// attack against a mage character
+#define AHOOK_ATTACK_VAMPIRE	BIT(13)	// attack against a vampire character
 
 
 // ABIL_LIMIT_x: Limitations when trying to use an ability

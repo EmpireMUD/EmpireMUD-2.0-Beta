@@ -9695,6 +9695,9 @@ char *ability_hook_display(struct ability_hook *ahook) {
 		
 		// simple types
 		case AHOOK_ATTACK:
+		case AHOOK_ATTACK_MAGE:
+		case AHOOK_ATTACK_VAMPIRE:
+		case AHOOK_DAMAGE_ANY:
 		case AHOOK_KILL:
 		case AHOOK_MELEE_ATTACK:
 		case AHOOK_RANGED_ATTACK:
@@ -11012,6 +11015,9 @@ OLC_MODULE(abiledit_hook) {
 				
 				// these require no data
 				case AHOOK_ATTACK:
+				case AHOOK_ATTACK_MAGE:
+				case AHOOK_ATTACK_VAMPIRE:
+				case AHOOK_DAMAGE_ANY:
 				case AHOOK_KILL:
 				case AHOOK_MELEE_ATTACK:
 				case AHOOK_RANGED_ATTACK:
