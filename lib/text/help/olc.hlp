@@ -1464,7 +1464,7 @@ Available techs are:
  &cCustomize-Building&0 * - Can customize buildings.
  &cDeep-Mines&0 * - Mines are 50% larger.
  &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
- &cFastcasting&0 - Wits reduces lag from non-combat abilities rather than
+ &cFastcasting&0 * - Wits reduces lag from non-combat abilities rather than
     improving combat speed.
  &cFast-Find&0 * - Dig, gather, and pick are faster.
  &cFish-Command&0 *

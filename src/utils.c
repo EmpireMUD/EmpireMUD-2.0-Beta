@@ -3196,6 +3196,8 @@ void command_lag(char_data *ch, int wait_type) {
 				
 				// ensure minimum of 0.5 seconds
 				wait = MAX(wait, 0.5 RL_SEC);
+				
+				gain_player_tech_exp(ch, PTECH_FASTCASTING, 5);
 			}
 			break;
 		}
