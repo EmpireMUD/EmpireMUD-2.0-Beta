@@ -2769,7 +2769,6 @@ ACMD(do_interlink) {
 ACMD(do_lay) {
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
-	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS, get_climate(IN_ROOM(ch)));
 	struct resource_data *charged = NULL;
 	
@@ -2793,10 +2792,6 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
-	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_PATHFINDING)) {
-		// rough requires Pathfinding
-		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
-	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD)) {
 		// already a road -- attempt to un-lay it
 		if (COMPLEX_DATA(IN_ROOM(ch)) && GET_BUILT_WITH(IN_ROOM(ch))) {
@@ -2824,12 +2819,6 @@ ACMD(do_lay) {
 
 		msg_to_char(ch, "You lay a road here.\r\n");
 		act("$n lays a road here.", FALSE, ch, 0, 0, TO_ROOM);
-
-		// skillup before sect change
-		if (SECT_FLAGGED(check_sect, SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_PATHFINDING, 15);
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_PATHFINDING, 0, NULL, NULL, NULL, IN_ROOM(ch), NOBITS);
-		}
 				
 		// change it over
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(road_sect), GET_SECT_VNUM(original_sect));

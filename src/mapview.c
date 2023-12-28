@@ -533,11 +533,6 @@ char *get_room_name(room_data *room, bool color) {
 	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room)))
 		strcat(name, GET_CROP_TITLE(cp));
 
-	/* Custom names by type */
-	else if (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH)) {
-		strcat(name, "A Winding Path");
-	}
-
 	/* Building */
 	else if (GET_BUILDING(room)) {
 		strcat(name, GET_BLD_TITLE(GET_BUILDING(room)));
@@ -2217,10 +2212,6 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room))) {
 		strcpy(temp, GET_CROP_NAME(cp));
 		CAP(temp);
-		partial_dark = show_dark;
-	}
-	else if (IS_ROAD(to_room) && SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
-		strcpy(temp, "Winding Path");
 		partial_dark = show_dark;
 	}
 	else {
