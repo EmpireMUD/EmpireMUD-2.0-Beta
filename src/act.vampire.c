@@ -669,8 +669,8 @@ void update_biting_char(char_data *ch) {
 	}
 	set_blood(ch, GET_BLOOD(ch) + amount);
 	
-	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
-	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {
 		hamt = GET_MAX_HEALTH(ch) / 10;
 		heal(ch, ch, hamt);
 		
@@ -731,11 +731,11 @@ void update_biting_char(char_data *ch) {
 		}
 	}
 	
-	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
-	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
 	gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 5);
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_SANGUINE_RESTORATION, 0, ch, NULL, NULL, NULL, NOBITS);
+	gain_player_tech_exp(ch, PTECH_BITE_REGENERATION, 5);
+	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
 	run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL, NULL);
+	run_ability_hooks_by_player_tech(ch, PTECH_BITE_REGENERATION, ch, NULL, NULL, NULL);
 }
 
 

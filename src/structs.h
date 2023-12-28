@@ -2795,6 +2795,7 @@ typedef enum {
 #define PTECH_RIDING_SWAP_ANYWHERE  94	// can swap in any location
 #define PTECH_RIDING_RELEASE_MOUNT  95	// can release your mounts
 #define PTECH_REWORK_COMMAND  96	// allows refreshing and restringing gear
+#define PTECH_BITE_REGENERATION  97	// rapid regeneration while drinking blood from humans
 
 
 // SM_x: status messages

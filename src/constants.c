@@ -1320,6 +1320,7 @@ const char *player_tech_types[] = {
 	"Riding-Swap-Anywhere",
 	"Riding-Release-Mount",	// 95
 	"Rework-Command",
+	"Bite-Regeneration"
 	"\n"
 };
 

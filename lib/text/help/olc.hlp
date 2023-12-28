@@ -1547,6 +1547,7 @@ Available techs are:
  &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
  &cRiding-Release-Mount&0 * - Can release mounts as mobs.
  &cRework-Command&0 * - Player can rework items.
+ &cBite-Regeneration&0 * - Rapid HMV regeneration while drinking blood.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
