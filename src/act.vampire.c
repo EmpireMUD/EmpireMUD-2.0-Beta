@@ -549,50 +549,6 @@ void sun_message(char_data *ch) {
 
 
 /**
-* This comes from a special case of do_eat() subcmd SCMD_TASTE.
-* At the start of this function, we're only sure they typed "taste <vict>"
-*
-* char_data *ch the person doing the tasting
-* char_data *vict the person being tasted
-*/
-void taste_blood(char_data *ch, char_data *vict) {
-	if (GET_FEEDING_FROM(ch) && GET_FEEDING_FROM(ch) != vict)
-		msg_to_char(ch, "You've already got your fangs in someone else.\r\n");
-	else if (GET_ACTION(ch) != ACT_NONE)
-		msg_to_char(ch, "You're a bit busy right now.\r\n");
-	else if (ch == vict)
-		msg_to_char(ch, "It seems redundant to taste your own blood.\r\n");
-	else if (!IS_NPC(vict) && AWAKE(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE))
-		act("You don't have permission to taste $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
-	else {
-		act("You taste a sample of $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
-		act("$n tastes a sample of your blood!", FALSE, ch, 0, vict, TO_VICT);
-		act("$n tastes a sample of $N's blood!", FALSE, ch, 0, vict, TO_NOTVICT);
-		
-		if (IS_VAMPIRE(vict)) {
-			act("$E is a vampire.", FALSE, ch, NULL, vict, TO_CHAR);
-		}
-
-		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
-			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
-			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-		}
-		
-		if (!IS_NPC(vict)) {
-			sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
-			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-		}
-		
-		command_lag(ch, WAIT_ABILITY);
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
-		}
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_TASTE_BLOOD, 0, vict, NULL, NULL, NULL, NOBITS);
-	}
-}
-
-
-/**
 * Checks if a person is not a vampire and, if not, clears certain vampire
 * traits and restores the player's blood (since non-vampires cannot drink
 * blood).

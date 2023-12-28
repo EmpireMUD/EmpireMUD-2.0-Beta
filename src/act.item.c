@@ -5856,19 +5856,9 @@ ACMD(do_eat) {
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			// special case: Taste Blood
-			char_data *vict;
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM))) {
-				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
-					taste_blood(ch, vict);
-				}
-				return;
-			}
-			else {
-				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-				send_to_char(buf, ch);
-				return;
-			}
+			sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+			send_to_char(buf, ch);
+			return;
 		}
 	}
 	if (GET_OBJ_TYPE(food) == ITEM_DRINKCON) {
