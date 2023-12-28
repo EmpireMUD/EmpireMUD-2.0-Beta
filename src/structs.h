@@ -578,31 +578,32 @@ typedef struct vehicle_data vehicle_data;
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
 // ABILT_x: ability type flags
-#define ABILT_CRAFT				BIT(0)	// related to crafting/building
-#define ABILT_BUFF				BIT(1)	// applies an affect
-#define ABILT_DAMAGE			BIT(2)	// deals damage
-#define ABILT_DOT				BIT(3)	// damage over time effect
-#define ABILT_PLAYER_TECH		BIT(4)	// some player tech feature
-#define ABILT_PASSIVE_BUFF		BIT(5)	// similar to a buff except always on
-#define ABILT_READY_WEAPONS		BIT(6)	// use READY-WEAPON data to add to a player's ready list
-#define ABILT_COMPANION			BIT(7)	// grants companions
-#define ABILT_SUMMON_ANY		BIT(8)	// player can summon from a list of mobs
-#define ABILT_SUMMON_RANDOM		BIT(9)	// player can summon a mob at random from a list
-#define ABILT_MORPH				BIT(10)	// ability has morphs that require it
-#define ABILT_AUGMENT			BIT(11)	// related to augments/enchants
-#define ABILT_CUSTOM			BIT(12)	// ability is hard-coded
-#define ABILT_CONJURE_OBJECT	BIT(13)	// creates 1 or more items
-#define ABILT_CONJURE_LIQUID	BIT(14)	// puts liquid in a drink container
-#define ABILT_CONJURE_VEHICLE	BIT(15)	// creates a vehicle in the room
-#define ABILT_ROOM_AFFECT		BIT(16)	// puts an affect on a room
-#define ABILT_PAINT_BUILDING	BIT(17)	// applies color to the building
-#define ABILT_ACTION			BIT(18)	// performs an action (from data list)
-#define ABILT_BUILDING_DAMAGE	BIT(19)	// blasts a building or vehicle
-#define ABILT_TELEPORT			BIT(20)	// relocates the player
-#define ABILT_RESURRECT			BIT(21)	// resurrects a player
-#define ABILT_RESOURCE			BIT(22)	// used for gathering resources; no built-in properties
-#define ABILT_ATTACK			BIT(23)	// hits the target with one's own weapon attack
-#define ABILT_RESTORE			BIT(24)	// restores pools (health, etc)
+#define ABILT_CRAFT				BIT(0)	// a. related to crafting/building
+#define ABILT_BUFF				BIT(1)	// b. applies an affect
+#define ABILT_DAMAGE			BIT(2)	// c. deals damage
+#define ABILT_DOT				BIT(3)	// d. damage over time effect
+#define ABILT_PLAYER_TECH		BIT(4)	// e. some player tech feature
+#define ABILT_PASSIVE_BUFF		BIT(5)	// f. similar to a buff except always on
+#define ABILT_READY_WEAPONS		BIT(6)	// g. use READY-WEAPON data to add to a player's ready list
+#define ABILT_COMPANION			BIT(7)	// h. grants companions
+#define ABILT_SUMMON_ANY		BIT(8)	// i. player can summon from a list of mobs
+#define ABILT_SUMMON_RANDOM		BIT(9)	// j. player can summon a mob at random from a list
+#define ABILT_MORPH				BIT(10)	// k. ability has morphs that require it
+#define ABILT_AUGMENT			BIT(11)	// l. related to augments/enchants
+#define ABILT_CUSTOM			BIT(12)	// m. ability is hard-coded
+#define ABILT_CONJURE_OBJECT	BIT(13)	// n. creates 1 or more items
+#define ABILT_CONJURE_LIQUID	BIT(14)	// o. puts liquid in a drink container
+#define ABILT_CONJURE_VEHICLE	BIT(15)	// p. creates a vehicle in the room
+#define ABILT_ROOM_AFFECT		BIT(16)	// q. puts an affect on a room
+#define ABILT_PAINT_BUILDING	BIT(17)	// r. applies color to the building
+#define ABILT_ACTION			BIT(18)	// s. performs an action (from data list)
+#define ABILT_BUILDING_DAMAGE	BIT(19)	// t. blasts a building or vehicle
+#define ABILT_TELEPORT			BIT(20)	// u. relocates the player
+#define ABILT_RESURRECT			BIT(21)	// v. resurrects a player
+#define ABILT_RESOURCE			BIT(22)	// w. used for gathering resources; no built-in properties
+#define ABILT_ATTACK			BIT(23)	// x. hits the target with one's own weapon attack
+#define ABILT_RESTORE			BIT(24)	// y. restores pools (health, etc)
+#define ABILT_MASTERY		    BIT(25)	// z. no inherent functions; just marks it as mastery of another one
 
 
 // ATAR_x: ability targeting flags

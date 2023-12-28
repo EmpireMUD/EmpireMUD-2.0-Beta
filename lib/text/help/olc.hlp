@@ -1891,7 +1891,7 @@ ones are displayed. These commands will add the full set of messages:
 
 See also: ABILEDIT CUSTOM
 #d
-"ABILEDIT TYPES"
+"ABILEDIT TYPES" "ABILITY TYPES"
 
 Usage:  .types add <type> [weight]
         .types change <type> <weight>
@@ -1918,6 +1918,7 @@ The following types are available (each has its own help file):
  &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
+ &cMASTERY&0 - No inherent properties; just a label where applicable.
  &cMORPH&0 - Ability has morphs that require it.
  &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
