@@ -1618,6 +1618,21 @@ See HELP OLC RESOURCES for more information.
 
 See also: OLC CRAFTS, RESOURCE ACTIONS
 #d
+"ABILEDIT RESTORE ABILITY" "ABILEDIT RESTORATION ABILITY" "RESTORE ABILITIES" "RESTORATION ABILITIES"
+
+The RESTORE ability type gives some health, mana, moves, or blood to the target
+when used. It can also offer the user the choice of health, mana, or moves
+(they cannot choose blood).
+
+Properties of restore abilities:
+ <&ypooltype&0> Which pool it restores, or "any" to let the user pick.
+
+Messaging:
+- Uses regular &cself-to-char&0 or &ctarg-to-char&0 messages, but will append
+  the amount that was restored.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT RESURRECT ABILITY" "ABILEDIT RESURRECTION" "RESURRECT ABILITIES" "RESURRECTION ABILITIES"
 
 The RESURRECT ability offers resurrection to a dead player or corpse target.
@@ -1907,11 +1922,12 @@ The following types are available (each has its own help file):
  &cPTECH&0 - Various 'techs' that players get from abilities.
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
  &cRESOURCE&0 - Used for resources, e.g. on interaction restrictions.
+ &cRESTORE&0 - Gives some health, move, mana, or blood points.
+ &rRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
  &cROOM-AFFECT&0 - Similar to a buff, for the room.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
  &cTELEPORT&0 - Teleports the player; see ABILEDIT TELEPORT.
- &rRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
