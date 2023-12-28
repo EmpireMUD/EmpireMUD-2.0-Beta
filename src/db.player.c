@@ -6003,10 +6003,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 					EMPIRE_MIN_LEVEL(e) = level;
 				}
 				EMPIRE_MAX_LEVEL(e) = MAX(EMPIRE_MAX_LEVEL(e), level);
-
-				if (read_techs) {
-					adjust_abilities_to_empire(ch, e, TRUE);
-				}
 			}
 			
 			// update next timeout check

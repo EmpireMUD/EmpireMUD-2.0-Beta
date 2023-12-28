@@ -2645,7 +2645,7 @@ ACMD(do_portal) {
 		return;
 	}
 	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
-		msg_to_char(ch, "You can't open a portal to another land without a portal master in your empire.\r\n");
+		msg_to_char(ch, "You can't open a portal to such a distant land.\r\n");
 		return;
 	}
 

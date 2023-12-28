@@ -1823,8 +1823,8 @@ target empire and ally portals by portal number, but the -all list can't be
 targeted this way.
 
 Portals can only connect two locations on the same land mass (continent or
-island) unless your empire has a Portal Master. You can't open a portal at all
-if there isn't at least a Portal Mage.
+island) unless your empire has the Astral Cartography progress goal. You can't
+open a portal at all unless your empire has the Portalmancy progression.
 
 You can't enter a portal of any kind if it's on a tile you don't have
 permission to use, such as one owned by an enemy empire. Infiltrate can get
@@ -1832,7 +1832,7 @@ around this (you still use the 'enter' command).
 
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS, COLLAPSE, INFILTRATE
+See also: PORTAL SICKNESS, COLLAPSE, INFILTRATE
 #
 "PORTAL SICKNESS" "PORTALING SICKNESS" "PORTALLING SICKNESS"
 
@@ -1845,13 +1845,12 @@ before it wears off, you'll get five minutes of portal sickness instead. After
 that, you can portal again as soon as your portal sickness is below one minute.
 You can see your current portal sickness by typing 'cooldowns'.
 
-Portal mages only get four minutes of portal sickness instead of five. City-to-
-city portals cause just two minutes instead of five.
+City-to-city portals cause just two minutes instead of five.
 
 Only entering portals causes portal sickness. You can still open portals while
 you have portal sickness.
 
-See also: COOLDOWNS, ENTER, PORTALS, PORTAL MAGE
+See also: COOLDOWNS, ENTER, PORTALS
 #
 POUR
 

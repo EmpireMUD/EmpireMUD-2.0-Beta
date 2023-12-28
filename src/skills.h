@@ -63,7 +63,6 @@ void update_class_and_abilities(char_data *ch);
 char *ability_color(char_data *ch, ability_data *abil);
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 bool can_gain_exp_from(char_data *ch, char_data *vict);
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
@@ -142,8 +141,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_STAFF_MASTERY  171
 #define ABIL_MIRRORIMAGE  177
-#define ABIL_PORTAL_MAGIC  189
-#define ABIL_PORTAL_MASTER  190
 #define ABIL_CONFER  240
 #define ABIL_HONE  262
 #define ABIL_KITE  294

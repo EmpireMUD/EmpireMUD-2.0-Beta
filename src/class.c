@@ -65,14 +65,12 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		UT_hash_handle hh;
 	};
 	
-	bool resume_empire = FALSE;
 	struct assign_abil_t *hash = NULL, *aat, *next_aat, *check;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
 	struct ability_data_list *adl;
 	struct synergy_ability *syn;
 	struct class_ability *clab;
-	empire_data *emp = GET_LOYALTY(ch);
 	skill_data *skill;
 	any_vnum vnum;
 
@@ -194,22 +192,12 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {
-			if (emp && !resume_empire) {
-				// remove temporarily
-				adjust_abilities_to_empire(ch, emp, FALSE);
-				resume_empire = TRUE;
-			}
 			remove_ability(ch, aat->ptr, FALSE);
 			check_skill_sell(ch, aat->ptr);
 			qt_change_ability(ch, aat->vnum);
 		}
 		// add if needed
 		if (aat->can_have) {
-			if (emp && !resume_empire) {
-				// remove temporarily
-				adjust_abilities_to_empire(ch, emp, FALSE);
-				resume_empire = TRUE;
-			}
 			add_ability(ch, aat->ptr, FALSE);
 			qt_change_ability(ch, aat->vnum);
 		}
@@ -217,12 +205,6 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		// clean up memory
 		HASH_DEL(hash, aat);
 		free(aat);
-	}
-	
-	if (emp && resume_empire) {
-		// back again
-		adjust_abilities_to_empire(ch, emp, TRUE);
-		resort_empires(FALSE);
 	}
 }
 

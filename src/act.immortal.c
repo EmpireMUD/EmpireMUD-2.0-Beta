@@ -10550,7 +10550,6 @@ ACMD(do_restore) {
 	struct cooldown_data *cool;
 	generic_data *gen, *next_gen;
 	vehicle_data *veh;
-	empire_data *emp;
 	char_data *vict;
 	int i, iter;
 	
@@ -10746,25 +10745,15 @@ ACMD(do_restore) {
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 		}
-		update_class_and_abilities(vict);
 		
-		// temporarily remove empire abilities
-		emp = GET_LOYALTY(vict);
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, FALSE);
-		}
+		update_class_and_abilities(vict);
 		
 		HASH_ITER(hh, ability_table, abil, next_abil) {
 			// add abilities to set 0
 			add_ability_by_set(vict, abil, 0, TRUE);
 		}
-
-		affect_total(vict);
 		
-		// re-add abilities
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, TRUE);
-		}
+		affect_total(vict);
 		
 		// languages
 		HASH_ITER(hh, generic_table, gen, next_gen) {

@@ -1489,8 +1489,8 @@ Available techs are:
  &cPickpocket&0 *^ - Can use the pickpocket command/interaction.
  &cPoison&0 *^ - Can use poisons in combat.
  &cPoison-Upgrade&0 * - Improves the effect of all poisons (requires Poison).
- &cPortal&0 * - Can open normal portals at the correct buildings.
- &cPortal-Upgrade&0 * - Can open longer-range portals (requires Portal).
+ &cPortal&0 * - Can open normal portals at the correct buildings; shorter sickness.
+ &cPortal-Upgrade&0 * - Can open longer-range portals (if you can open portals).
  &cRanged-Combat&0 * - Can use a ranged weapon.
  &cRiding&0 * - Can ride/mount.
  &cRiding-Flying&0 * - Can use flying mounts on all terrain (requires Riding).

@@ -479,25 +479,6 @@ void add_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 }
 
 
-/**
-* This function reads abilities out of a player and modifies the empire technology.
-*
-* @param char_data *ch
-* @param empire_data *emp The empire
-* @param bool add Adds the abilities if TRUE, or removes them if FALSE
-*/
-void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
-	int mod = (add ? 1 : -1);
-	
-	if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
-		EMPIRE_TECH(emp, TECH_PORTALS) += mod;
-	}
-	if (has_ability(ch, ABIL_PORTAL_MASTER)) {
-		EMPIRE_TECH(emp, TECH_MASTER_PORTALS) += mod;
-	}
-}
-
-
 /** 
 * @param char_data *ch The player
 * @param ability_data *abil The ability
@@ -626,18 +607,12 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 */
 void check_ability_levels(char_data *ch, any_vnum skill) {
 	struct player_ability_data *abil, *next_abil;
-	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
 	ability_data *abd;
 	int iter;
 	
 	if (IS_NPC(ch)) {	// somehow
 		return;
-	}
-	
-	// remove ability techs -- only if playing
-	if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
-		adjust_abilities_to_empire(ch, emp, FALSE);
 	}
 	
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
@@ -671,12 +646,6 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
-	
-	// add ability techs -- only if playing
-	if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
-		adjust_abilities_to_empire(ch, emp, TRUE);
-		resort_empires(FALSE);
-	}
 }
 
 
@@ -701,16 +670,10 @@ bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum) {
 */
 void clear_char_abilities(char_data *ch, any_vnum skill) {
 	struct player_ability_data *abil, *next_abil;
-	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
 	ability_data *abd;
 	
 	if (!IS_NPC(ch)) {
-		// remove ability techs -- only if playing
-		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
-			adjust_abilities_to_empire(ch, emp, FALSE);
-		}
-		
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
@@ -721,12 +684,6 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 			}
 		}
 		queue_delayed_update(ch, CDU_SAVE);
-		
-		// add ability techs -- only if playing
-		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
-			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires(FALSE);
-		}
 	}
 }
 
@@ -1509,11 +1466,6 @@ void perform_swap_skill_sets(char_data *ch) {
 	old_set = GET_CURRENT_SKILL_SET(ch);
 	cur_set = (old_set == 1) ? 0 : 1;
 	
-	// remove ability techs
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
-	}
-	
 	// update skill set
 	GET_CURRENT_SKILL_SET(ch) = cur_set;
 	
@@ -1538,12 +1490,6 @@ void perform_swap_skill_sets(char_data *ch) {
 			plab->purchased[cur_set] = plab->purchased[old_set];
 			qt_change_ability(ch, ABIL_VNUM(abil));	// in case
 		}
-	}
-	
-	// add ability techs -- only if playing
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-		resort_empires(FALSE);
 	}
 	
 	// call this at the end just in case
@@ -1857,7 +1803,6 @@ ACMD(do_skills) {
 	struct skill_ability *skab;
 	ability_data *abil;
 	int points, level, iter;
-	empire_data *emp;
 	bool found, any, line;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
 	int min_level = -1, max_level = -1;
@@ -2126,23 +2071,9 @@ ACMD(do_skills) {
 		}
 		
 		// good to go
-		
-		emp = GET_LOYALTY(ch);
-		
-		// remove empire abilities temporarily
-		if (emp) {
-			adjust_abilities_to_empire(ch, emp, FALSE);
-		}
-		
 		add_ability(ch, abil, FALSE);
 		msg_to_char(ch, "You purchase %s.\r\n", ABIL_NAME(abil));
 		queue_delayed_update(ch, CDU_SAVE);
-		
-		// re-add empire abilities
-		if (emp) {
-			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires(FALSE);
-		}
 		
 		update_class_and_abilities(ch);
 	}
@@ -2354,18 +2285,9 @@ ACMD(do_skills) {
 		// good to go
 		msg_to_char(ch, "You no longer know %s.\r\n", ABIL_NAME(abil));
 
-		if (GET_LOYALTY(ch)) {
-			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
-		}
-
 		remove_ability(ch, abil, FALSE);
 		check_skill_sell(ch, abil);
 		queue_delayed_update(ch, CDU_SAVE);
-		
-		if (GET_LOYALTY(ch)) {
-			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-			resort_empires(FALSE);
-		}
 		update_class_and_abilities(ch);
 	}
 	else if (!find_skill_or_ability_for_command(arg, arg2, whole_arg, &skill, &abil)) {
@@ -2831,18 +2753,8 @@ void give_level_zero_abilities(char_data *ch) {
 		// check that the player has it
 		for (set = 0; set < NUM_SKILL_SETS; ++set) {
 			if (!has_ability_in_set(ch, ABIL_VNUM(abil), set)) {
-				// if current set, need to update empire abilities
-				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
-					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
-				}
-				
 				// add the ability for this set
 				add_ability_by_set(ch, abil, set, FALSE);
-				
-				// if current set, need to update empire abilities
-				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
-					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-				}
 			}
 		}
 	}

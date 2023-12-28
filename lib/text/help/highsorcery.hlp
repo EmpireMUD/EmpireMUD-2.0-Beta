@@ -90,7 +90,7 @@ the other end of the portal.
 
 Gain skill whenever you collapse a portal.
 
-See also: PORTAL, PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS
+See also: PORTAL, PORTAL SICKNESS
 #
 COLORBURST
 
@@ -331,36 +331,6 @@ You can re-cast the ritual to gain experience, but it will gain experience when
 it saves you as well.
 
 See also: RITUAL
-#
-"PORTAL MAGIC" "PORTAL MAGE"
-
-Portal Magic (High Sorcery ability)
-
-Learning portal magic allows you to create portal nodes, craft nexus crystals,
-and allows members of your empire to use them. These portals can only connect
-two locations on the same island or continent, unless you have a Portal Master
-in the empire.
-
-A "portal mage" is a person with the Portal Magic ability. Without a portal
-mage in your empire, you cannot use portal buildings. Portal mages only get
-four minutes of portal sickness instead of five.
-
-You can gain Portal Magic skill whenever someone in your empire uses your
-portal magic to open a portal.
-
-See also: COLLAPSE, PORTAL, PORTAL MASTER
-#
-"PORTAL MASTER"
-
-Portal Master (High Sorcery ability)
-
-Becoming a Portal Master removes the same-island-only limit on your empire's
-portals.
-
-You can gain Portal Master skill whenever someone in your empire opens a
-portal.
-
-See also: COLLAPSE, PORTAL, PORTAL MAGIC, PORTAL SICKNESS
 #
 "RITUAL OF BURDENS" "BURDENS RITUAL" "BURDEN RITUAL"
 
