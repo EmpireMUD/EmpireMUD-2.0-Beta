@@ -2168,6 +2168,7 @@ const char *craft_flags[] = {
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
 	"TAKE-REQUIRED-OBJ",
+	"DISMANTLE-WITHOUT-ABILITY",
 	"\n"
 };
 
@@ -2194,6 +2195,7 @@ const char *craft_flag_for_info[] = {
 	"must be by a river",
 	"",	// remove-production
 	"",	// take-required-obj
+	"", // CRAFT_DISMANTLE_WITHOUT_ABILITY
 	"\n"
 };
 

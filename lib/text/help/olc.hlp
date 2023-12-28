@@ -3802,27 +3802,29 @@ You must leave the IN-DEVELOPMENT flag set until the recipe is ready to go
 live, at which point it becomes available to players who have the right skill.
 
 Available flags:
- POTTERY - always requires cooking fire, goes faster at potter's hut
- BUILDING - makes a building (not needed on the BUILD craft type)
- SKILLED-LABOR - workforce cannot work this craft unless you have Skilled Labor
- SKIP-CONSUMES-TO - won't run consumes-to interactions on any of the resources
+ &cPOTTERY&0 - always requires cooking fire, goes faster at potter's hut
+ &cBUILDING&0 - makes a building (not needed on the BUILD craft type)
+ &cSKILLED-LABOR&0 - workforce cannot work this craft unless you have Skilled Labor
+ &cSKIP-CONSUMES-TO&0 - won't run consumes-to interactions on any of the resources
     (for example: if you're mixing paints and don't want to refund the jars)
- FIRE - requires cooking fire
- SOUP - requires a container of water and creates a liquid instead of an item
- IN-DEVELOPMENT - only immortals can use this recipe
- UPGRADE - for building recipes only, marks this recipe as the cost to upgrade
+ &cFIRE&0 - requires cooking fire
+ &cSOUP&0 - requires a container of water and creates a liquid instead of an item
+ &cIN-DEVELOPMENT&0 - only immortals can use this recipe
+ &cUPGRADE&0 - for building recipes only, marks this recipe as the cost to upgrade
     to this building type from some other type
- DISMANTLE-ONLY - for building recipes only, this recipe allows the building
+ &cDISMANTLE-ONLY&0 - for building recipes only, this recipe allows the building
     to be dismantled, but not built; it won't show up in the build list
- IN-CITY-ONLY - a craft or building can only be made in a city radius
- VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
- LEARNED - requires the player/empire 'learn' a recipe to use it
- BY-RIVER - must be adjacent to a river
- REMOVE-PRODUCTION - removes this craft's resources from empire production
+ &cIN-CITY-ONLY&0 - a craft or building can only be made in a city radius
+ &cVEHICLE&0 - creates a vehicle instead of an item, see CRAFT VEHICLES
+ &cLEARNED&0 - requires the player/empire 'learn' a recipe to use it
+ &cBY-RIVER&0 - must be adjacent to a river
+ &cREMOVE-PRODUCTION&0 - removes this craft's resources from empire production
     counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
     Does not work on vehicles/buildings.
- TAKE-REQUIRED-OBJ - takes the 'required object' when you start the craft, and
+ &cTAKE-REQUIRED-OBJ&0 - takes the 'required object' when you start the craft, and
     may refund it when dismantled (unless the object is 1-USE)
+ &cDISMANTLE-WITHOUT-ABILITY&0 - buildings and vehicles can be dismantled without
+    the origina ability.
 
 Additional flags are available via the REQUIRESFUNCTION option.
 

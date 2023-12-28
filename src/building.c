@@ -2094,7 +2094,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (!HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
-	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	else if ((craft = find_craft_for_vehicle(veh)) && !CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_WITHOUT_ABILITY) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
@@ -2258,7 +2258,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	if (!CRAFT_FLAGGED(type, CRAFT_DISMANTLE_WITHOUT_ABILITY) && GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
 		return;
 	}
