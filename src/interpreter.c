@@ -1676,6 +1676,9 @@ ACMD(do_missing_help_files) {
 		if (!ABIL_NAME(abil)) {
 			continue;
 		}
+		if (has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// generally not needed
+		}
 		
 		if (!find_help_entry(LVL_TOP, ABIL_NAME(abil))) {
 			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_NAME(abil));
@@ -1692,7 +1695,7 @@ ACMD(do_missing_help_files) {
 	}
 	
 	// possible need for trailing crlf
-	if ((++count % 4) == 0) {
+	if ((count % 4) != 0) {
 		strcat(lbuf, "\r\n");
 	}
 	
