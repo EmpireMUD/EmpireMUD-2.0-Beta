@@ -671,15 +671,11 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			else if (use_resist < 0) {	// negative resistance (penalty)
 				use_resist *= -1;	// make positive
 				use_resist = diminishing_returns(use_resist, 2.0);	// diminish on a scale of 2
-				use_resist /= 100;	// use_resist is now a % to increase
+				use_resist /= 100.0;	// use_resist is now a % to increase
 				dam = (int) round(dam * (1.0 + use_resist));
 			}
 		}
-	
-		if (check_blood_fortitude(victim, can_gain_exp_from(victim, attacker))) {
-			dam = (int) round(0.9 * dam);
-		}
-	
+		
 		// redirect some damage to mana: player only
 		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && has_ability(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
 			int absorb = MIN(dam / 2, GET_MANA(victim));

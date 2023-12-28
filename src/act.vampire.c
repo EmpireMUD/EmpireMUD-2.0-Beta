@@ -171,19 +171,6 @@ void cancel_siring(char_data *ch) {
 }
 
 
-// checks for Blood Fortitude and does skill gain
-bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE) && check_solo_role(ch)) {
-		if (can_gain_skill) {
-			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
-		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BLOOD_FORTITUDE, 0, ch, NULL, NULL, NULL, NOBITS);
-		}
-		return TRUE;
-	}
-	return FALSE;
-}
-
-
 // returns TRUE if the character is a vampire and has the ability; sends its own error
 bool check_vampire_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
 	if (!IS_VAMPIRE(ch)) {
