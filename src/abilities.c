@@ -2688,7 +2688,7 @@ DO_ABIL(abil_action_purify) {
 		
 		if (any) {
 			data->success = TRUE;
-			msg_to_char(vict, "You feel some of your power diminish and fade away!");
+			msg_to_char(vict, "You feel some of your power diminish and fade away!\r\n");
 		}
 	}
 }
