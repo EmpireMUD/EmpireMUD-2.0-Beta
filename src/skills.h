@@ -154,18 +154,11 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 // TYPE_x: WEAPON ATTACK TYPES
 // As of b5.166 these are edited with the .attack editor and do not need code
 // consts unless they are special-cased in code.
-#define TYPE_UNDEFINED  -1
+#define TYPE_UNDEFINED  -1	// TODO rename these from TYPE_ to ATTACK_
 #define TYPE_RESERVED  0
-#define TYPE_STAB  4
-#define TYPE_HIT  15	// default physical
-#define TYPE_MAGIC_FIRE  16	// disarmable fire blast
-#define TYPE_MANA_BLAST  28	// default magical
-#define TYPE_BOW  29	// shoot / bow
-#define TYPE_CROSSBOW  30	// shoot / crossbow
-#define TYPE_PISTOL  31	// shoot / pistol
-#define TYPE_MUSKET  32	// shoot / musket
-#define TYPE_SLING  34	// shoot / sling
-#define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
+#define TYPE_STAB  4	// used by dagger mastery -- TODO convert weapon masteries
+#define TYPE_HIT  15	// default physical -- TODO: should be a config
+#define TYPE_MANA_BLAST  28	// default magical -- TODO: should be a config
 
 // Special attacks (not available on weapons): these correspond to attack vnums
 #define TYPE_SUFFERING			50	// used when players die from their wounds

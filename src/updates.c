@@ -854,6 +854,8 @@ void b5_1_global_update(void) {
 void b5_3_missile_update(void) {
 	obj_data *obj, *next_obj;
 	
+	int TYPE_BOW = 29;	// bow type at the time of this patch
+	
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (!IS_MISSILE_WEAPON(obj)) {
 			continue;
