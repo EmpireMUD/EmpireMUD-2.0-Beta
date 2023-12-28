@@ -402,7 +402,6 @@ ACMD(do_use);
 ACMD(do_users);
 
 ACMD(do_veintap);
-ACMD(do_vigor);
 ACMD(do_visible);
 ACMD(do_vnum);
 ACMD(do_vstat);
@@ -987,7 +986,6 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	ABILITY_CMD( "veintap", POS_STANDING, do_veintap, NO_MIN, CTYPE_SKILL, ABIL_VEINTAP ),
 	SCMD_CMD( "version", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_VERSION ),
-	ABILITY_CMD( "vigor", POS_FIGHTING, do_vigor, NO_MIN, CTYPE_SKILL, ABIL_VIGOR ),
 	SIMPLE_CMD( "visible", POS_RESTING, do_visible, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "vnum", POS_DEAD, do_vnum, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
 	GRANT_CMD( "vstat", POS_DEAD, do_vstat, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
