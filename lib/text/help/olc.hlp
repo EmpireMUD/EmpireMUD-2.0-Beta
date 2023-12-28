@@ -999,7 +999,7 @@ it.
 
 See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 #d
-"ABILEDIT DATA" "ABILEDIT READY-WEAPON" "ABILEDIT SUMMON-MOB" "ABILEDIT PAINT-COLOR" "ABILEDIT RANGE"
+"ABILEDIT DATA" "ABILEDIT SUMMON-MOB" "ABILEDIT PAINT-COLOR" "ABILEDIT RANGE"
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
@@ -1579,6 +1579,8 @@ Ready-Weapons abilities have the following:
  <&ytargets&0> If there's only one weapon in the data, or it will pick at
    random from the data, set the IGNORE target. If they choose from the list,
    set the STRING target instead.
+ <&ymasteryability&0> A mastery ability will cause the readied weapon to be
+   superior in quality.
 
 Messages:
 - The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom

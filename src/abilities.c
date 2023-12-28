@@ -4536,6 +4536,12 @@ DO_ABIL(do_ready_weapon_ability) {
 	
 	// load the object
 	obj = read_object(obj_vnum, TRUE);
+	
+	// mastery = superior
+	if (data->has_mastery) {
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
+	}
+	
 	scale_item_to_level(obj, level);
 	equip_char(ch, obj, pos);
 	
