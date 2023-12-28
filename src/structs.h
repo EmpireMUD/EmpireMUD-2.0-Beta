@@ -2391,6 +2391,7 @@ typedef enum {
 #define CDU_MSDP_EMPIRE_ALL  BIT(7)	// runs update_MSDP_empire_data()
 #define CDU_MSDP_EMPIRE_CLAIMS  BIT(8)	// runs update_MSDP_empire_claims()
 #define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
+#define CDU_TRAIT_HOOKS  BIT(10)	// runs check_trait_hooks()
 
 
 // CHANNEL_HISTORY_x: types of channel histories -- act.comm.c
@@ -4009,6 +4010,16 @@ struct ability_hook {
 };
 
 
+// used to detect changes in attributes
+struct ability_trait_hook {
+	any_vnum ability;	// which ability to update
+	int linked_trait;	// which trait to watch
+	int last_value;		// last known value of the trait
+	
+	UT_hash_handle hh;	// GET_ABILITY_TRAIT_HOOKS(ch)
+};
+
+
 // determines the weight for each type, to affect scaling
 struct ability_type {
 	bitvector_t type;	// a single ABILT_ flag
@@ -5089,7 +5100,6 @@ struct player_special_data {
 	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
-	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
 	struct empire_unique_storage *home_storage;	// DLL: items stored in the home
 	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
@@ -5130,6 +5140,8 @@ struct player_special_data {
 	bool map_memory_loaded;	// whether or not it has been loaded yet
 	int map_memory_count;	// how many tiles are currently remembered
 	
+	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
+	struct ability_trait_hook *trait_hooks;	// hash table to watch for trait changes
 	struct combat_meters meters;	// combat meter data
 	
 	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp

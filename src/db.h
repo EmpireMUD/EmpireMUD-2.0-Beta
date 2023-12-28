@@ -289,6 +289,7 @@ extern ability_data *sorted_abilities;
 
 #define ability_proto  find_ability_by_vnum	// why don't all the types have "type_proto()" functions?
 void free_ability(ability_data *abil);
+void free_trait_hooks(struct ability_trait_hook **hash);
 char *get_ability_name_by_vnum(any_vnum vnum);
 void remove_ability_from_table(ability_data *abil);
 

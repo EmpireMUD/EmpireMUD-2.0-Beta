@@ -1106,6 +1106,11 @@ void affect_total(char_data *ch) {
 		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 	}
 	
+	// look for changed traits if player has trait hooks
+	if (!IS_NPC(ch)) {
+		queue_delayed_update(ch, CDU_TRAIT_HOOKS);
+	}
+	
 	// delayed re-send of msdp affects
 	if (ch->desc) {
 		queue_delayed_update(ch, CDU_MSDP_AFFECTS | CDU_MSDP_ATTRIBUTES);

@@ -1203,6 +1203,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define DONT_SAVE_DELAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->dont_save_delay))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))
 #define GET_ABILITY_GAIN_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gain_hooks))
+#define GET_ABILITY_TRAIT_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->trait_hooks))
 #define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))
 #define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_cycle))
@@ -2055,6 +2056,7 @@ void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void apply_all_ability_techs(char_data *ch);
 void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
+void check_trait_hooks(char_data *ch);
 bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc);
 bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum);
 ability_data *find_ability_on_skill(char *name, skill_data *skill);

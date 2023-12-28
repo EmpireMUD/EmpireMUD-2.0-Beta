@@ -1053,6 +1053,7 @@ void free_char(char_data *ch) {
 			free(mount);
 		}
 		free_player_event_data(GET_EVENT_DATA(ch));
+		free_trait_hooks(&GET_ABILITY_TRAIT_HOOKS(ch));
 		
 		while ((eq_set = GET_EQ_SETS(ch))) {
 			GET_EQ_SETS(ch) = eq_set->next;

@@ -408,6 +408,10 @@ void run_delayed_refresh(void) {
 	// player portion
 	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
 		// CDU_x: functionality for delayed update types
+		if (IS_SET(cdu->type, CDU_TRAIT_HOOKS)) {
+			check_trait_hooks(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_TRAIT_HOOKS);
+		}
 		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
 			refresh_passive_buffs(cdu->ch);
 			REMOVE_BIT(cdu->type, CDU_PASSIVE_BUFFS);

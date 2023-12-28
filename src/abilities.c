@@ -40,6 +40,7 @@
 *   Ability Messaging
 *   Abilities Over Time
 *   Ability Core Functions
+*   Trait Hooks
 *   Player Utilities
 *   OLC Utilities
 *   Database
@@ -70,8 +71,8 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil);
 struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitvector_t type);
 void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
-bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data);
+void remove_trait_hook(char_data *ch, any_vnum abil_vnum);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
 void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
@@ -1675,6 +1676,8 @@ void refresh_passive_buffs(char_data *ch) {
 */
 void remove_passive_buff(char_data *ch, struct affected_type *aff) {
 	if (ch && !IS_NPC(ch) && aff) {
+		remove_trait_hook(ch, aff->type);
+		
 		// NOTE: does not use affected_type->expire_event
 		affect_modify(ch, aff->location, aff->modifier, aff->bitvector, FALSE);
 		LL_DELETE(GET_PASSIVE_BUFFS(ch), aff);
@@ -7080,6 +7083,105 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, 
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// TRAIT HOOKS /////////////////////////////////////////////////////////////
+
+/**
+* Add a trait hook. This helps detect when a trait has changed so that a
+* passive buff ability can update itself, too.
+*
+* @param char_data *ch The player.
+* @param ability_data *abil The passive buff ability with a linked trait.
+*/
+void add_trait_hook(char_data *ch, ability_data *abil) {
+	struct ability_trait_hook *ath;
+	any_vnum vnum;
+	
+	if (!ch || IS_NPC(ch) || !abil) {
+		return;	// no work
+	}
+	
+	// detect existing
+	vnum = ABIL_VNUM(abil);
+	HASH_FIND_INT(GET_ABILITY_TRAIT_HOOKS(ch), &vnum, ath);
+	
+	// create if needed
+	if (!ath) {
+		CREATE(ath, struct ability_trait_hook, 1);
+		ath->ability = vnum;
+		HASH_ADD_INT(GET_ABILITY_TRAIT_HOOKS(ch), ability, ath);
+	}
+	
+	// update
+	ath->linked_trait = ABIL_LINKED_TRAIT(abil);
+	ath->last_value = get_attribute_by_apply(ch, ath->linked_trait);
+	
+	// do not request a save -- this is unsaved data
+}
+
+
+/**
+* Checks if any trait has changed and, if so, refreshes passive buffs.
+*
+* @param char_data *ch The player to check.
+*/
+void check_trait_hooks(char_data *ch) {
+	struct ability_trait_hook *ath, *next;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	// check for changes
+	HASH_ITER(hh, GET_ABILITY_TRAIT_HOOKS(ch), ath, next) {
+		if (get_attribute_by_apply(ch, ath->linked_trait) != ath->last_value) {
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+			break;	// only needed to detect one change
+		}
+	}
+}
+
+
+/**
+* Frees any trait hooks in the list.
+*
+* @param struct ability_trait_hook **list A pointer to the hash to free.
+*/
+void free_trait_hooks(struct ability_trait_hook **hash) {
+	struct ability_trait_hook *ath, *next;
+	
+	if (hash) {
+		HASH_ITER(hh, *hash, ath, next) {
+			HASH_DEL(*hash, ath);
+			free(ath);
+		}
+	}
+}
+
+
+/**
+* Removes the trait hook for an ability, if present.
+*
+* @param char_data *ch The player.
+* @param any_vnum abil_vnum The ability to remove the trait hook for.
+*/
+void remove_trait_hook(char_data *ch, any_vnum abil_vnum) {
+	struct ability_trait_hook *ath;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	HASH_FIND_INT(GET_ABILITY_TRAIT_HOOKS(ch), &abil_vnum, ath);
+	if (ath) {
+		HASH_DEL(GET_ABILITY_TRAIT_HOOKS(ch), ath);
+		free(ath);
+	}
+	
+	// do not request a save -- this is unsaved data
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILITIES ////////////////////////////////////////////////////////
 
 /**
@@ -7283,6 +7385,11 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
+	}
+	
+	// mark for later updates
+	if (ABIL_LINKED_TRAIT(abil)) {
+		add_trait_hook(ch, abil);
 	}
 	
 	GET_RUNNING_ABILITY_DATA(ch) = NULL;
