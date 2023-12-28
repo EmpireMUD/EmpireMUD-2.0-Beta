@@ -807,9 +807,9 @@ D 1 42 0
 T e 1
 S
 #83
-Lay Paths~
+Mountain Paths~
 0 -1 1.00 0 0 0
-T m 0
+T a 1
 S
 #84
 Reflexes~

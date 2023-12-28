@@ -185,4 +185,21 @@ You repair the walls of $V.~
 T5
 $n repairs the walls of $V.~
 S
+#1011
+tend the trail~
+2 0
+0 0 0 0
+T0
+You spruce up the trail and ensure the route is clear.~
+T1
+$n spruces up the trail and ensures the route is clear.~
+T2
+You spruce up the trail and ensure the route is clear.~
+T3
+$n spruces up the trail and ensures the route is clear.~
+T4
+You spruce up the trail and ensure the route is clear.~
+T5
+$n spruces up the trail and ensures the route is clear.~
+S
 $
