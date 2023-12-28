@@ -1983,7 +1983,7 @@ const double apply_values[] = {
 	1,	// "WITS",
 	0.1,	// "AGE",
 	0.025,	// "MAX-MOVE",
-	0.5,	// RESIST-PHYSICAL
+	0.3,	// RESIST-PHYSICAL
 	0.25,	// "BLOCK",
 	0.25,	// "HEAL-OVER-TIME",
 	0.020,	// "HEALTH",
@@ -1995,7 +1995,7 @@ const double apply_values[] = {
 	1,	// BONUS-PHYSICAL
 	1,	// BONUS-MAGICAL
 	1,	// BONUS-HEALING
-	0.5,	// RESIST-MAGICAL
+	0.3,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
 	1,	// NIGHT-VISION
