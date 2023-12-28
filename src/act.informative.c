@@ -344,6 +344,12 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 }
 
 
+// quick alpha sorter for the passives command
+int sort_passives(struct affected_type *a, struct affected_type *b) {
+	return strcmp(get_ability_name_by_vnum(a->type), get_ability_name_by_vnum(b->type));
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CHART FUNCTIONS /////////////////////////////////////////////////////////
 
@@ -4087,6 +4093,7 @@ ACMD(do_passives) {
 		msg_to_char(ch, "Passive buffs for %s:\r\n", PERS(vict, ch, TRUE));
 	}
 	
+	LL_SORT(GET_PASSIVE_BUFFS(vict), sort_passives);
 	LL_FOREACH(GET_PASSIVE_BUFFS(vict), aff) {
 		*buf2 = '\0';
 		
