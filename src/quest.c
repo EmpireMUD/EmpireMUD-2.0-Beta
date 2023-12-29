@@ -755,7 +755,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				break;
 			}
 			case QR_SET_SKILL: {
-				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
+				int val = MAX(0, MIN(MAX_SKILL_CAP, reward->amount));
 				bool loss;
 				
 				loss = (val < get_skill_level(ch, reward->vnum));

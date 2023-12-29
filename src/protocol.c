@@ -2768,7 +2768,7 @@ static const char *GetMSSP_IP() {
 static const char *GetMSSP_Levels() {
 	adv_data *iter, *next_iter;
 	static char buf[256];
-	int max = CLASS_SKILL_CAP;	// to start
+	int max = MAX_SKILL_CAP;	// to start
 	
 	// find highest level adventure zone:
 	HASH_ITER(hh, adventure_table, iter, next_iter) {

@@ -647,7 +647,7 @@ void real_update_player(char_data *ch) {
 		if (GET_POS(ch) == POS_DEAD) {
 			msg_to_char(ch, "You die from your wounds!\r\n");
 			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}
@@ -677,7 +677,7 @@ void real_update_player(char_data *ch) {
 		if (GET_MOVE(ch) <= 0) {
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
 			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}

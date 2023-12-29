@@ -204,7 +204,7 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 * @return int A TYPE_ value.
 */
 int get_attack_type(char_data *ch, obj_data *weapon) {
-	int w_type = TYPE_HIT;
+	int w_type;
 
 	// always prefer weapon
 	if (weapon && IS_WEAPON(weapon) && !AFF_FLAGGED(ch, AFF_DISARMED)) {
@@ -221,17 +221,17 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 		else if (IS_NPC(ch) && (MOB_ATTACK_TYPE(ch) != 0) && AFF_FLAGGED(ch, AFF_DISARMED)) {
 			// disarmed mob
 			if (get_attack_damage_type_by_vnum(MOB_ATTACK_TYPE(ch)) == DAM_MAGICAL) {
-				w_type = TYPE_MANA_BLAST;
+				w_type = config_get_int("default_magical_attack");
 			}
 			else {
-				w_type = TYPE_HIT;
+				w_type = config_get_int("default_physical_attack");
 			}
 		}
 		else if (AFF_FLAGGED(ch, AFF_DISARMED) && weapon && IS_WEAPON(weapon) && get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(weapon)) == DAM_MAGICAL) {
-			w_type = TYPE_MANA_BLAST;
+			w_type = config_get_int("default_magical_attack");
 		}
 		else {
-			w_type = TYPE_HIT;
+			w_type = config_get_int("default_physical_attack");
 		}
 	}
 	
@@ -3410,11 +3410,11 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 
 	// this prevents players from using things that engage combat over and over
 	if (GET_POS(vict) == POS_INCAP && GET_POS(ch) >= POS_FIGHTING) {
-		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, vict, ATTACK_UNDEFINED, DAM_PHYSICAL);
 		return;
 	}
 	else if (GET_POS(ch) == POS_INCAP && GET_POS(vict) >= POS_FIGHTING) {
-		perform_execute(vict, ch, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(vict, ch, ATTACK_UNDEFINED, DAM_PHYSICAL);
 		return;
 	}
 
@@ -3553,7 +3553,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// ensure this isn't someone continuing to attack someone who has been
 	// incapacitated by turning off auto-kill
 	if (GET_POS(victim) == POS_INCAP) {
-		perform_execute(ch, victim, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, victim, ATTACK_UNDEFINED, DAM_PHYSICAL);
 		if (IS_DEAD(victim)) {
 			return -1;
 		}
@@ -3635,7 +3635,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				run_ability_gain_hooks(ch, victim, AGH_MELEE);
 			}
 			
-			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && match_attack_type(GET_WEAPON_TYPE(weapon), TYPE_STAB)) {
+			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && match_attack_type(GET_WEAPON_TYPE(weapon), ATTACK_STAB)) {
 				dam *= 1.5;
 				if (can_gain_exp_from(ch, victim)) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
@@ -3733,7 +3733,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 void out_of_blood(char_data *ch) {
 	msg_to_char(ch, "You die from lack of blood!\r\n");
 	act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-	death_log(ch, ch, TYPE_SUFFERING);
+	death_log(ch, ch, ATTACK_SUFFERING);
 	die(ch, ch);
 }
 
@@ -3769,7 +3769,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 	}
 
 	/* Sent here by do_execute() */
-	if (attacktype == TYPE_UNDEFINED)
+	if (attacktype == ATTACK_UNDEFINED)
 		ok = TRUE;
 
 	if (!ok) {
@@ -3798,7 +3798,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		if (ch != victim)
 			death_log(victim, ch, ATTACK_EXECUTE);
 		else
-			death_log(victim, ch, TYPE_SUFFERING);
+			death_log(victim, ch, ATTACK_SUFFERING);
 	}
 
 	/* Actually killed him! */

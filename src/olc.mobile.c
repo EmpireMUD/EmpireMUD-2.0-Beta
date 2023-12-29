@@ -116,7 +116,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No maximum scale level on non-adventure mob");
 		problem = TRUE;
 	}
-	if (MOB_ATTACK_TYPE(mob) == TYPE_RESERVED || !(amd = real_attack_message(MOB_ATTACK_TYPE(mob)))) {
+	if (MOB_ATTACK_TYPE(mob) == ATTACK_RESERVED || !(amd = real_attack_message(MOB_ATTACK_TYPE(mob)))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Invalid attack type");
 		problem = TRUE;
 	}

@@ -2130,7 +2130,7 @@ OLC_MODULE(archedit_skill) {
 	}
 	else if (is_abbrev(cmd_arg, "add") || is_abbrev(cmd_arg, "change")) {
 		// add and change are actually the same
-		if (!*num_arg || !isdigit(*num_arg) || (num = atoi(num_arg)) < 0 || num > CLASS_SKILL_CAP) {
+		if (!*num_arg || !isdigit(*num_arg) || (num = atoi(num_arg)) < 0 || num > MAX_SKILL_CAP) {
 			msg_to_char(ch, "Invalid skill level '%s'.\r\n", num_arg);
 			return;
 		}

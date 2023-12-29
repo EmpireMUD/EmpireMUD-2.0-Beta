@@ -486,7 +486,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Flagged CONSUME-OBJ but no object required");
 		problem = TRUE;
 	}
-	if (MORPH_ATTACK_TYPE(morph) == TYPE_RESERVED || !(amd = real_attack_message(MORPH_ATTACK_TYPE(morph)))) {
+	if (MORPH_ATTACK_TYPE(morph) == ATTACK_RESERVED || !(amd = real_attack_message(MORPH_ATTACK_TYPE(morph)))) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid attack type");
 		problem = TRUE;
 	}

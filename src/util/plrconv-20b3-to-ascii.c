@@ -299,7 +299,7 @@ struct b3_player_special_data_saved {
 	sh_int skill_level;  // levels computed based on class skills
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
 	

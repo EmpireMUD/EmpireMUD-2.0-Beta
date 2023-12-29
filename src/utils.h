@@ -1042,7 +1042,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VAL_WEAPON_DAMAGE_BONUS  1
 #define VAL_WEAPON_TYPE  2
 #define GET_WEAPON_DAMAGE_BONUS(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_DAMAGE_BONUS) : 0)
-#define GET_WEAPON_TYPE(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_TYPE) : TYPE_UNDEFINED)
+#define GET_WEAPON_TYPE(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_TYPE) : ATTACK_UNDEFINED)
 
 #define IS_ANY_WEAPON(obj)  (IS_WEAPON(obj) || IS_MISSILE_WEAPON(obj))
 
@@ -2048,39 +2048,6 @@ unsigned long long microtime(void);
 bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
 bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
-
-// abilities.c
-void add_ability_gain_hook(char_data *ch, ability_data *abil);
-void add_all_gain_hooks(char_data *ch);
-void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-void apply_all_ability_techs(char_data *ch);
-void apply_one_passive_buff(char_data *ch, ability_data *abil);
-bool check_ability(char_data *ch, char *string, bool exact);
-void check_trait_hooks(char_data *ch);
-bool delete_misc_from_ability_data_list(ability_data *abil, int type, any_vnum vnum, int misc);
-bool delete_from_ability_data_list(ability_data *abil, int type, any_vnum vnum);
-ability_data *find_ability_on_skill(char *name, skill_data *skill);
-struct ability_data_list *find_ability_data_entry_for(ability_data *abil, int type, any_vnum vnum);
-struct ability_data_list *find_ability_data_entry_for_misc(ability_data *abil, int type, any_vnum vnum, int misc);
-ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
-void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players);
-int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
-bool has_ability_data_any(ability_data *abil, int type);
-bool has_ability_hook(ability_data *abil, int hook_type, int hook_value);
-char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
-void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
-void read_ability_requirements();
-void refresh_passive_buffs(char_data *ch);
-void remove_passive_buff(char_data *ch, struct affected_type *aff);
-void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
-void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
-void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value, int level, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ);
-void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ);
-void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
-void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data, char **replace, int replace_count);
-void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data);
-void setup_ability_companions(char_data *ch);
-void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf);
 
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);

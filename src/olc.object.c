@@ -224,7 +224,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED || !(amd = real_attack_message(GET_WEAPON_TYPE(obj)))) {
+			if (GET_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_WEAPON_TYPE(obj)))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
 				problem = TRUE;
 			}
@@ -260,7 +260,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			if (GET_MISSILE_WEAPON_TYPE(obj) == TYPE_RESERVED || !(amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(obj)))) {
+			if (GET_MISSILE_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(obj)))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type not set");
 				problem = TRUE;
 			}

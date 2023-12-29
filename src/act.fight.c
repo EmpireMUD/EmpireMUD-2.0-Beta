@@ -250,7 +250,7 @@ ACMD(do_execute) {
 		act("You can't execute $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else {
-		perform_execute(ch, victim, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, victim, ATTACK_UNDEFINED, DAM_PHYSICAL);
 	}
 }
 

@@ -381,7 +381,7 @@ void sire_char(char_data *ch, char_data *victim) {
 	else {
 		// can't gain a vampire skills: guess I'll just die then
 		if (!IS_NPC(victim)) {
-			death_log(victim, ch, TYPE_SUFFERING);
+			death_log(victim, ch, ATTACK_SUFFERING);
 		}
 		die(victim, ch);	// returns a corpse but we don't need it
 	}

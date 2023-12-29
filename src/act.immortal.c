@@ -2707,8 +2707,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> skill <skill> <level>\r\n");
 			return 0;
 		}
-		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", CLASS_SKILL_CAP);
+		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > MAX_SKILL_CAP) {
+			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", MAX_SKILL_CAP);
 			return 0;
 		}
 		else if (!(skill = find_skill(skillname))) {

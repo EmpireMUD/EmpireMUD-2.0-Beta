@@ -4956,7 +4956,7 @@ void start_new_character(char_data *ch) {
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 			level = get_skill_level(ch, sk->skill) + sk->level;
-			level = MIN(level, CLASS_SKILL_CAP);
+			level = MIN(level, MAX_SKILL_CAP);
 			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
@@ -6339,7 +6339,7 @@ PROMO_APPLY(promo_skillups) {
 				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level + 10));
 			}
 			else {
-				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level + 10));
+				set_skill(ch, skill->vnum, MIN(MAX_SKILL_CAP, skill->level + 10));
 			}
 		}
 	}

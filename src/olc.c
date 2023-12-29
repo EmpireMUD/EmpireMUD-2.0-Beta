@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "skills.h"
 
 /**
 * Contents:

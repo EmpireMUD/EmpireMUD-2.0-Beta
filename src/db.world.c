@@ -1624,7 +1624,7 @@ EVENTFUNC(burn_down_event) {
 		}
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!IS_NPC(ch)) {
-				death_log(ch, ch, TYPE_SUFFERING);
+				death_log(ch, ch, ATTACK_SUFFERING);
 			}
 			die(ch, ch);
 		}

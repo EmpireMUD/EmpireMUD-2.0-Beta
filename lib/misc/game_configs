@@ -136,6 +136,8 @@ scale_points_at_100 4.000000
 *
 * Mobs configs
 default_language_vnum 150
+default_magical_attack 28
+default_physical_attack 15
 max_npc_attribute 15
 mob_despawn_radius 3
 mob_pursuit_distance 25

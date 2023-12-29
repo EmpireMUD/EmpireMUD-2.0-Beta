@@ -966,7 +966,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (GET_POS(vict) == POS_DEAD) {
 		if (!IS_NPC(vict)) {
 			syslog(SYS_DEATH, 0, TRUE, "%s killed by script at %s", GET_NAME(vict), get_room_name(IN_ROOM(vict), FALSE));
-			death_log(vict, vict, TYPE_SUFFERING);
+			death_log(vict, vict, ATTACK_SUFFERING);
 		}
 		die(vict, killer ? killer : vict);
 	}

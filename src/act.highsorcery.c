@@ -146,7 +146,7 @@ ACMD(do_mirrorimage) {
 	
 	// mimic weapon
 	wield = GET_EQ(ch, WEAR_WIELD);
-	MOB_ATTACK_TYPE(mob) = wield ? GET_WEAPON_TYPE(wield) : TYPE_HIT;
+	MOB_ATTACK_TYPE(mob) = wield ? GET_WEAPON_TYPE(wield) : config_get_int("default_physical_attack");
 	MOB_DAMAGE(mob) = 3;	// deliberately low (it will miss anyway)
 	
 	// mirrors are no good at hitting or dodging

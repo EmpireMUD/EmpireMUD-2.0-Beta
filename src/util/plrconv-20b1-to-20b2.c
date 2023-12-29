@@ -166,7 +166,7 @@ struct b1_player_special_data_saved {
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
 	sh_int last_known_level;	// for getting level of offline characters
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
 	
@@ -408,7 +408,7 @@ struct b2_player_special_data_saved {
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
 	sh_int last_known_level;	// for getting level of offline characters
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
 	

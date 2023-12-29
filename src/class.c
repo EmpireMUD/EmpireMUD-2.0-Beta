@@ -104,7 +104,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		}
 		
 		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
-		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
+		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
@@ -378,7 +378,7 @@ bool is_class_ability(ability_data *abil) {
 void update_class_and_abilities(char_data *ch) {
 	#define NUM_BEST  3
 	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
-	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
+	#define BEST_SUM_REQUIRED_FOR_100  (2 * MAX_SKILL_CAP + SPECIALTY_SKILL_CAP)
 	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
 	
 	int at_zero, over_basic, over_specialty, old_level, best_class_count, class_count;
@@ -493,17 +493,17 @@ void update_class_and_abilities(char_data *ch) {
 	
 	// set level
 	GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
-	GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
+	GET_SKILL_LEVEL(ch) = MIN(MAX_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 	
 	// disallow role if level is too low
-	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+	if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
 		GET_CLASS_ROLE(ch) = ROLE_NONE;
 	}
 	
 	// set progression (% of the way from 75 to 100)
 	if (best_class && GET_SKILL_LEVEL(ch) >= SPECIALTY_SKILL_CAP) {
 		// class progression level based on % of the way
-		GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (CLASS_SKILL_CAP - SPECIALTY_SKILL_CAP);
+		GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (MAX_SKILL_CAP - SPECIALTY_SKILL_CAP);
 	}
 	else {
 		GET_CLASS_PROGRESSION(ch) = 0;
@@ -1472,7 +1472,7 @@ OLC_MODULE(classedit_requires) {
 	skill_data *skill;
 	int iter, level = 0;
 	
-	int valid_levels[] = { 0, BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };
+	int valid_levels[] = { 0, BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, MAX_SKILL_CAP, -1 };
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: requires <skill> <level>\r\n");
@@ -1660,8 +1660,8 @@ ACMD(do_class) {
 	else if (*arg && !str_cmp(arg, "role")) {
 		// Handle role selection or display
 		
-		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", MAX_SKILL_CAP);
 		}
 		else if (!*arg2) {
 			msg_to_char(ch, "Your group role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
@@ -1723,8 +1723,8 @@ ACMD(do_role) {
 	if (*arg) {
 		// Handle role selection or display
 		
-		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", MAX_SKILL_CAP);
 		}
 		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
 			msg_to_char(ch, "You can't do that while fighting!\r\n");

@@ -240,7 +240,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev) {
 	}
 	else if (!IS_NPC(ch)) {
 		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-			if (plsk->level >= CLASS_SKILL_CAP) {
+			if (plsk->level >= MAX_SKILL_CAP) {
 				sprintf(buffer + strlen(buffer), "%s%s", (*buffer ? (abbrev ? "/" : ", ") : ""), abbrev ? SKILL_ABBREV(plsk->ptr) : SKILL_NAME(plsk->ptr));
 			}
 		}

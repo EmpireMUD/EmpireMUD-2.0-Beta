@@ -490,7 +490,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 		// these limit abilities purchased under each cap to players who are still under that cap
 		if (ABIL_SKILL_LEVEL(abil) >= BASIC_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < BASIC_SKILL_CAP) {
 			if (ABIL_SKILL_LEVEL(abil) >= SPECIALTY_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SPECIALTY_SKILL_CAP) {
-				if (ABIL_SKILL_LEVEL(abil) >= CLASS_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP) {
+				if (ABIL_SKILL_LEVEL(abil) >= MAX_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < MAX_SKILL_CAP) {
 					return TRUE;
 				}
 			}
@@ -1081,7 +1081,7 @@ int get_ability_skill_level(char_data *ch, any_vnum ability) {
 			return get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)));
 		}
 		else {
-			return MIN(CLASS_SKILL_CAP, GET_COMPUTED_LEVEL(ch));
+			return MIN(MAX_SKILL_CAP, GET_COMPUTED_LEVEL(ch));
 		}
 	}
 }
@@ -1149,7 +1149,7 @@ int get_ability_points_available_for_char(char_data *ch, any_vnum skill) {
 	int avail = MAX(0, get_ability_points_available(skill, get_skill_level(ch, skill)) - spent);
 	
 	// allow early if they're at a deadend
-	if (avail == 0 && spent < max && get_skill_level(ch, skill) >= EMPIRE_CHORE_SKILL_CAP && green_skill_deadend(ch, skill)) {
+	if (avail == 0 && spent < max && green_skill_deadend(ch, skill)) {
 		return 1;
 	}
 	else {
@@ -1243,8 +1243,8 @@ void get_skill_abilities_display(struct skill_display_t **list, char_data *ch, s
 		else if (skab->level < SPECIALTY_SKILL_CAP) {
 			max_skill = SPECIALTY_SKILL_CAP;
 		}
-		else if (skab->level <= CLASS_SKILL_CAP) {
-			max_skill = CLASS_SKILL_CAP;
+		else if (skab->level <= MAX_SKILL_CAP) {
+			max_skill = MAX_SKILL_CAP;
 		}
 		
 		// get the proper color for this ability
@@ -2141,7 +2141,7 @@ ACMD(do_skills) {
 				msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
 			}
 		}
-		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
+		else if (SKILL_MIN_DROP_LEVEL(skill) >= MAX_SKILL_CAP) {
 			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
 		}
 		else if (!is_number(arg2)) {
@@ -2468,7 +2468,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	bool honed;
 
 	// players won't be able to use gear >= these levels if their skill level is < the level
-	int skill_level_ranges[] = { CLASS_SKILL_CAP, SPECIALTY_SKILL_CAP, BASIC_SKILL_CAP, -1 };	// terminate with -1
+	int skill_level_ranges[] = { MAX_SKILL_CAP, SPECIALTY_SKILL_CAP, BASIC_SKILL_CAP, -1 };	// terminate with -1
 	
 	if (IS_NPC(ch)) {
 		return TRUE;
@@ -2532,7 +2532,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	// check levels
 	if (!IS_IMMORTAL(ch)) {
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(item) <= CLASS_SKILL_CAP) {
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(item) <= MAX_SKILL_CAP) {
 			for (iter = 0; skill_level_ranges[iter] != -1; ++iter) {
 				if (GET_OBJ_CURRENT_SCALE_LEVEL(item) > skill_level_ranges[iter] && GET_SKILL_LEVEL(ch) < skill_level_ranges[iter]) {
 					if (send_messages) {
@@ -2550,10 +2550,10 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 			else {
 				level_min = GET_OBJ_CURRENT_SCALE_LEVEL(item) - 25;
 			}
-			level_min = MAX(level_min, CLASS_SKILL_CAP);
-			if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+			level_min = MAX(level_min, MAX_SKILL_CAP);
+			if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
 				if (send_messages) {
-					snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", CLASS_SKILL_CAP, level_min);
+					snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", MAX_SKILL_CAP, level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);
 				}
 				return FALSE;
@@ -3401,7 +3401,7 @@ void clear_skill(skill_data *skill) {
 	memset((char *) skill, 0, sizeof(skill_data));
 	
 	SKILL_VNUM(skill) = NOTHING;
-	SKILL_MAX_LEVEL(skill) = CLASS_SKILL_CAP;
+	SKILL_MAX_LEVEL(skill) = MAX_SKILL_CAP;
 }
 
 
@@ -4256,7 +4256,7 @@ void olc_show_skill(char_data *ch) {
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), CLASS_SKILL_CAP), SKILL_MAX_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), MAX_SKILL_CAP), SKILL_MAX_LEVEL(skill));
 	sprintf(buf + strlen(buf), "<%smindrop\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
@@ -4379,13 +4379,13 @@ OLC_MODULE(skilledit_flags) {
 
 OLC_MODULE(skilledit_maxlevel) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	SKILL_MAX_LEVEL(skill) = olc_process_number(ch, argument, "maximum level", "maxlevel", 1, CLASS_SKILL_CAP, SKILL_MAX_LEVEL(skill));
+	SKILL_MAX_LEVEL(skill) = olc_process_number(ch, argument, "maximum level", "maxlevel", 1, MAX_SKILL_CAP, SKILL_MAX_LEVEL(skill));
 }
 
 
 OLC_MODULE(skilledit_mindrop) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	SKILL_MIN_DROP_LEVEL(skill) = olc_process_number(ch, argument, "minimum drop level", "mindrop", 0, CLASS_SKILL_CAP, SKILL_MIN_DROP_LEVEL(skill));
+	SKILL_MIN_DROP_LEVEL(skill) = olc_process_number(ch, argument, "minimum drop level", "mindrop", 0, MAX_SKILL_CAP, SKILL_MIN_DROP_LEVEL(skill));
 }
 
 
@@ -4543,7 +4543,7 @@ OLC_MODULE(skilledit_synergy) {
 		}
 		else if (is_abbrev(type_arg, "level")) {
 			if (!isdigit(*val_arg) || (level = atoi(val_arg)) < 1) {
-				msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", CLASS_SKILL_CAP, val_arg);
+				msg_to_char(ch, "Level must be 1-%d, '%s' given.\r\n", MAX_SKILL_CAP, val_arg);
 				return;
 			}
 		}

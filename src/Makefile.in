@@ -314,7 +314,7 @@ olc.building.o: olc.building.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) olc.building.c
 olc.o: olc.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
-  handler.h db.h comm.h olc.h dg_scripts.h constants.h
+  handler.h db.h comm.h olc.h dg_scripts.h constants.h skills.h
 	$(CC) -c $(CFLAGS) olc.c
 olc.attack.o: olc.attack.c conf.h sysdep.h structs.h protocol.h uthash.h \
   utlist.h utils.h interpreter.h db.h comm.h olc.h skills.h handler.h \

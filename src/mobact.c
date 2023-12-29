@@ -2052,7 +2052,7 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	int iter, level = 0;
 	
 	// level caps for sub-100 scaling -- TODO this is very similar to what's done in can_wear_item()
-	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
+	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, MAX_SKILL_CAP, -1 };	// terminate with -1
 	
 	// determine who we're really scaling to (ONLY if check_group)
 	if (check_group) {
@@ -2075,7 +2075,7 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 		level = GET_COMPUTED_LEVEL(scale_to);
 		
 		// for people under the class cap, also cap scaling on their level range
-		if (GET_SKILL_LEVEL(scale_to) < CLASS_SKILL_CAP) {
+		if (GET_SKILL_LEVEL(scale_to) < MAX_SKILL_CAP) {
 			for (iter = 0; level_ranges[iter] != -1; ++iter) {
 				if (GET_SKILL_LEVEL(scale_to) <= level_ranges[iter]) {
 					level = MIN(level, level_ranges[iter]);
@@ -2116,9 +2116,9 @@ void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level) {
 		scale_level = get_approximate_level(leader);
 	}
 	
-	if (scale_level > CLASS_SKILL_CAP) {
+	if (scale_level > MAX_SKILL_CAP) {
 		// 25 levels lower if over 100
-		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
+		scale_level = MAX(MAX_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
 	set_mob_flags(mob, MOB_NO_RESCALE);	// ensure it doesn't rescale itself
@@ -2198,8 +2198,8 @@ void scale_mob_to_level(char_data *mob, int level) {
 	// set up: determine how many levels the mob gets in each level range
 	low_level = MAX(0, MIN(level, BASIC_SKILL_CAP));
 	mid_level = MAX(0, MIN(level, SPECIALTY_SKILL_CAP) - BASIC_SKILL_CAP);
-	high_level = MAX(0, MIN(level, CLASS_SKILL_CAP) - SPECIALTY_SKILL_CAP);
-	over_level = MAX(0, level - CLASS_SKILL_CAP);
+	high_level = MAX(0, MIN(level, MAX_SKILL_CAP) - SPECIALTY_SKILL_CAP);
+	over_level = MAX(0, level - MAX_SKILL_CAP);
 	
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 

@@ -567,7 +567,7 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 		}
 		else {
 			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
-				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
+				level = craft_lev;	// no ability = use full level
 			}
 			else if (!ABIL_ASSIGNED_SKILL(abil)) {
 				// probably a class skill
@@ -582,8 +582,8 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				else if (psr < SPECIALTY_SKILL_CAP) {
 					level = MIN(SPECIALTY_SKILL_CAP, craft_lev);
 				}
-				else if (psr < CLASS_SKILL_CAP) {
-					level = MIN(CLASS_SKILL_CAP, craft_lev);
+				else if (psr < MAX_SKILL_CAP) {
+					level = MIN(MAX_SKILL_CAP, craft_lev);
 				}
 				else {	// is a skill ability but >= class skill level (100) -- don't restrict
 					level = craft_lev;
@@ -1637,7 +1637,7 @@ ACMD(do_gen_augment) {
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP) {
+		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < MAX_SKILL_CAP) {
 			scale = MIN(scale, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 		}
 		

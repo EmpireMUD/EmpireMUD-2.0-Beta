@@ -1096,9 +1096,9 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 				// flagged to use only the skill level itself
 				level = MIN(level, skill_level);
 			}
-			else if (level >= CLASS_SKILL_CAP) {
-				// level is above class cap -- restrict sub-max skills to a percentage of total level
-				level *= (double)skill_level / (double)CLASS_SKILL_CAP;
+			else if (level >= MAX_SKILL_CAP) {
+				// level is above cap -- restrict sub-max skills to a percentage of total level
+				level *= (double)skill_level / (double)MAX_SKILL_CAP;
 			}
 		}
 	}
@@ -1917,7 +1917,7 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	}
 	
 	// apply matching role if over level 100
-	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && get_approximate_level(ch) >= CLASS_SKILL_CAP) {
+	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && get_approximate_level(ch) >= MAX_SKILL_CAP) {
 		points *= data->matching_role ? 1.10 : 0.60;
 	}
 	
@@ -4399,7 +4399,7 @@ DO_ABIL(do_buff_ability) {
 	
 	// check if it kills them
 	if (GET_POS(buff_target) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
-		perform_execute(ch, buff_target, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, buff_target, ATTACK_UNDEFINED, DAM_PHYSICAL);
 		data->stop = TRUE;
 		data->success = TRUE;
 	}
