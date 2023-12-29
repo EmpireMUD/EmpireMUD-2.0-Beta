@@ -7644,7 +7644,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	}
 	
 	// non-ability commands
-	if (ABIL_COMMAND(abil)) {
+	if (ABIL_COMMAND(abil) && search_block(ABIL_COMMAND(abil), ignore_same_command, TRUE) == NOTHING) {
 		for (iter = 0; *cmd_info[iter].command != '\n'; ++iter) {
 			if (!str_cmp(ABIL_COMMAND(abil), cmd_info[iter].command)) {
 				olc_audit_msg(ch, ABIL_VNUM(abil), "Ability command blocked by real command '%s'", cmd_info[iter].command);
