@@ -1699,19 +1699,21 @@ the 'scale' on an ability, you should also increase its cost and/or cooldown.
 
 See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
 #d
-"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION"
+"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION" "ABILEDIT DURATIONS"
 
 Usage:  .shortduration <seconds | unlimited>
         .longduration <seconds | unlimited>
 
 For buff/dot abilities, this is how long the effect lasts. Short duration
 applies when the actor has the skill at a low level. Long duration is used when
-the ability's assigned skill is at its max level.
+the ability's assigned skill is at its max level. It the ability isn't from a
+skill tree, short duration is used under level 100.
 
 Be careful with unlimited duration buffs -- these should always be self-only
 toggles. DoTs cannot have unlimited duration.
 
-You can also choose to set both durations to the same amount of time.
+If an ability only has one duration, that duration is always used. You can also
+choose to set both durations to the same amount of time.
 
 See also: OLC ABILITIES, BUFF ABILITIES, DOT ABILITIES
 #d
