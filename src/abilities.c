@@ -1114,9 +1114,10 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 *
 * @param char_data *ch The pperson lookin for a random room.
 * @param ability_data *abil Which ability they are using.
+* @param bool require_guest_permission If TRUE, checks permission
 * @return room_data* The random room, NULL if none found, or current room if range 0.
 */
-room_data *get_random_room_for_ability(char_data *ch, ability_data *abil) {
+room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool require_guest_permission) {
 	room_data *rand_room, *to_room = NULL;
 	int rand_x, rand_y, range;
 	int tries = 0;
@@ -1134,7 +1135,7 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil) {
 		rand_room = real_shift(HOME_ROOM(IN_ROOM(ch)), rand_x, rand_y);
 		
 		// found outdoors! (we don't pick interiors at random)
-		if (rand_room && !ROOM_IS_CLOSED(rand_room)) {
+		if (rand_room && !ROOM_IS_CLOSED(rand_room) && (!require_guest_permission || can_use_room(ch, rand_room, GUESTS_ALLOWED))) {
 			to_room = rand_room;
 		}
 		++tries;
@@ -1603,13 +1604,16 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_CITY) && ROOM_OWNER(*room_targ) == GET_LOYALTY(ch) && IS_CITY_CENTER(*room_targ)) {
 				match = TRUE;	// ok: is home
 			}
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM) && compute_distance(IN_ROOM(ch), *room_targ) <= get_ability_data_value(abil, ADL_RANGE, TRUE)) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM | ATAR_ROOM_RANDOM_CAN_USE) && compute_distance(IN_ROOM(ch), *room_targ) <= get_ability_data_value(abil, ADL_RANGE, TRUE)) {
 				match = TRUE;	// ok: random and within range
 			}
 			
 			// override all of those
 			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_NOT_HERE) && *room_targ == IN_ROOM(ch)) {
 				match = FALSE;	// not-here but here
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM_CAN_USE) && !can_use_room(ch, *room_targ, GUESTS_ALLOWED)) {
+				match = FALSE;	// needs at least guest
 			}
 			
 			if (!match) {
@@ -6435,8 +6439,8 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			has = TRUE;
 		}
 		// room target
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM)) {
-			room_targ = get_random_room_for_ability(ch, abil);
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM | ATAR_ROOM_RANDOM_CAN_USE)) {
+			room_targ = get_random_room_for_ability(ch, abil, IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM_CAN_USE) ? TRUE : FALSE);
 			has = TRUE;
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
@@ -7098,7 +7102,7 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 			if (!use_char && FIGHTING(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_FIGHT_SELF)) {
 				use_char = ch;	// set to self
 			}
-			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && (!use_room || !IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT | ATAR_ROOM_EXIT | ATAR_ROOM_HOME | ATAR_ROOM_RANDOM | ATAR_ROOM_RANDOM_CAN_USE | ATAR_ROOM_CITY | ATAR_ROOM_COORDS))) {
 				use_room = IN_ROOM(ch);	// convert to this room
 			}
 				

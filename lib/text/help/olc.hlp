@@ -1787,6 +1787,8 @@ Room targets:
  &cROOM-EXIT&0 - The room outside (from a building or vehicle).
  &cROOM-HOME&0 - The player's home, if any.
  &cROOM-RANDOM&0 - A random room (up to the distance from RANGE data).
+ &cROOM-RANDOM-CAN-USE&0 - A random room the player has at least guest
+   permission in (up to the distance from RANGE data).
  &cROOM-CITY&0 - A city (center) in the player's empire, by city name.
  &cROOM-COORDS&0 - Any room by coordinates.
 
