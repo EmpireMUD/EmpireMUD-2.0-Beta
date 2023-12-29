@@ -2009,6 +2009,54 @@ Heavy Bash~
 #
 #
 
+M99 e 0 
+Big Game Hunter~
+~
+... you hunt $M down and make sure $E's dead!
+... and $e hunts you down and finishes the job!
+... $n hunts $N down and finishes the job!
+#
+#
+#
+... that was a precise hit!
+... that was a painfully precise hit!
+#
+#
+#
+#
+
+M99 e 0 
+Big Game Hunter~
+~
+... you finish the job and put $M down!
+... $e comes over to finish the job, and it's the last thing you see!
+... $n catches $N by surprise -- for the last time!
+#
+#
+#
+... your hunting expertise leaves $M in pain!
+... $s hunting expertise leaves you in pain!
+#
+#
+#
+#
+
+M99 e 0 
+Big Game Hunter~
+~
+... you hunt $M down and make sure $E's dead!
+... and $e hunts you down and finishes the job!
+... $n hunts $N down and finishes the job!
+#
+#
+#
+... vital hit!
+... that was a vital hit!
+#
+#
+#
+#
+
 M306 e 0 
 Darkshroud DoT~
 ~

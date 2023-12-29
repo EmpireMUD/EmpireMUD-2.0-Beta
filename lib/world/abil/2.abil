@@ -1202,8 +1202,35 @@ T b 1
 S
 #297
 Charge~
-0 -1 1.00 0 0 0
-T m 0
+afm -1 1.00 0 0 0
+C
+charge 7 bfh 1 50 0.00 2069 180 0 2 0
+D 64 22 0
+D 64 23 0
+D 16 15 0
+M
+2
+You charge at $N!~
+M
+3
+$n charges at you!~
+M
+4
+$n charges at $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+31
+Charge at whom?~
+T x 1
+T s 0
 S
 #298
 Fletching~
