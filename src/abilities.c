@@ -9594,6 +9594,11 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
 		ABIL_INTERACTIONS(new) = copy_interaction_list(ABIL_INTERACTIONS(input));
 		ABIL_HOOKS(new) = copy_ability_hooks(ABIL_HOOKS(input));
+		
+		// unassign this data:
+		ABIL_ASSIGNED_SKILL(new) = NULL;
+		ABIL_IS_CLASS(new) = FALSE;
+		ABIL_IS_SYNERGY(new) = FALSE;
 	}
 	else {
 		// brand new: some defaults
