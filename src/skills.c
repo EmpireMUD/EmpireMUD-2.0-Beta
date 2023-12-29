@@ -721,12 +721,18 @@ int compute_bonus_exp_per_day(char_data *ch) {
 * @return bool TRUE for success, FALSE for failure.
 */
 bool difficulty_check(int level, int difficulty) {
-	int chance = (int) (skill_check_difficulty_modifier[difficulty] * (double) level);
+	int chance;
 	
 	// always succeeds
 	if (difficulty == DIFF_TRIVIAL) {
 		return TRUE;
 	}
+	
+	// cap incoming level at 100
+	level = MIN(level, MAX_SKILL_CAP);
+	
+	// apply modifier to level
+	chance = (int) (skill_check_difficulty_modifier[difficulty] * (double) level);
 	
 	return (number(1, 100) <= chance);
 }
@@ -1068,6 +1074,7 @@ struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bo
 */
 int get_ability_skill_level(char_data *ch, any_vnum ability) {
 	ability_data *abd;
+	skill_data *sk;
 	
 	if (IS_NPC(ch)) {
 		return get_approximate_level(ch);
@@ -1077,8 +1084,8 @@ int get_ability_skill_level(char_data *ch, any_vnum ability) {
 		if (ability != NO_ABIL && !has_ability(ch, ability)) {
 			return 0;
 		}
-		else if (ability != NO_ABIL && (abd = find_ability_by_vnum(ability)) && ABIL_ASSIGNED_SKILL(abd)) {
-			return get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)));
+		else if (ability != NO_ABIL && (abd = find_ability_by_vnum(ability)) && (sk = find_assigned_skill(abd, ch))) {
+			return get_skill_level(ch, SKILL_VNUM(sk));
 		}
 		else {
 			return MIN(MAX_SKILL_CAP, GET_COMPUTED_LEVEL(ch));
@@ -2628,6 +2635,34 @@ struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil) 
 	
 	LL_SEARCH_SCALAR(SKILL_ABILITIES(skill), find, vnum, ABIL_VNUM(abil));
 	return find;
+}
+
+
+/**
+* Finds an assigned skill for an ability OR one of those ability's parents.
+*
+* @param ability_data *abil Which ability to find a skill for.
+* @param char_data *ch Optional: Only consider abilities possessed by this person (NULL to skip this).
+* @return skill_data* The skill if found, or NULL if not.
+*/
+skill_data *find_assigned_skill(ability_data *abil, char_data *ch) {
+	ability_data *find;
+	struct ability_data_list *adl;
+	
+	// my own skill
+	if (ABIL_ASSIGNED_SKILL(abil)) {
+		return ABIL_ASSIGNED_SKILL(abil);
+	}
+	
+	// check parents
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_PARENT && (!ch || has_ability(ch, adl->vnum)) && (find = ability_proto(adl->vnum)) && ABIL_ASSIGNED_SKILL(find)) {
+			return ABIL_ASSIGNED_SKILL(find);
+		}
+	}
+	
+	// no?
+	return NULL;
 }
 
 

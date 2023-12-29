@@ -803,14 +803,16 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 *
 */
 int get_ability_duration(char_data *ch, ability_data *abil) {
+	skill_data *skill;
+	
 	if (!ch || !abil) {
 		return 0;
 	}
-	else if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil))) {
+	else if ((skill = find_assigned_skill(abil, ch)) && get_skill_level(ch, SKILL_VNUM(skill)) < SKILL_MAX_LEVEL(skill)) {
 		// below assigned skill max: prefer short
 		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
 	}
-	else if (!ABIL_ASSIGNED_SKILL(abil) && get_approximate_level(ch) < MAX_SKILL_CAP) {
+	else if (!skill && get_approximate_level(ch) < MAX_SKILL_CAP) {
 		// no assigned skill; below full skill cap: prefer short
 		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
 	}
@@ -1089,24 +1091,26 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 	level = get_approximate_level(ch);
 	
 	// adjust for ability's skill
-	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum)) && (skl = ABIL_ASSIGNED_SKILL(abil))) {
+	if (abil_vnum != NO_ABIL && (abil = find_ability_by_vnum(abil_vnum)) && (skl = find_assigned_skill(abil, ch))) {
 		// adjust based on level in the assigned skill
 		skill_level = get_skill_level(ch, SKILL_VNUM(skl));
 		
+		// is player below max for the skill tree?
 		if (skill_level < SKILL_MAX_LEVEL(skl)) {
 			if (level < skill_level) {
-				// approx level is lower than skill level: use skill level instead
-				level = skill_level;
+				// player level is lower than skill's level: use lower of the two
+				level = MIN(level, skill_level);
 			}
 			else if (ABILITY_FLAGGED(abil, ABILF_USE_SKILL_BELOW_MAX)) {
-				// flagged to use only the skill level itself
+				// flagged to not pass the skill level; level is above skill level
 				level = MIN(level, skill_level);
 			}
 			else if (level >= MAX_SKILL_CAP) {
-				// level is above cap -- restrict sub-max skills to a percentage of total level
+				// player level is above cap -- restrict sub-max skills to a percentage of total level
 				level *= (double)skill_level / (double)MAX_SKILL_CAP;
 			}
 		}
+		// else we are >= skill's max level and will use player's full level
 	}
 	
 	return level;
@@ -3474,7 +3478,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
+					if (ch_iter != ch && (GET_LEADER(ch_iter) != ch || !AFF_FLAGGED(ch_iter, AFF_CHARM)) && AWAKE(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED) && CAN_SEE(ch_iter, ch) && !MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_HARD) && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_HIDE_UPGRADE)) {
 						msg_to_char(ch, "You can't do that with somebody watching!\r\n");
 						_set_fatal_error(TRUE);
 						return FALSE;
@@ -4840,7 +4844,7 @@ DO_ABIL(do_teleport_ability) {
 		}
 		
 		// chance to log
-		if (infiltrate && ROOM_OWNER(to_room) && !player_tech_skill_check(ch, PTECH_INFILTRATE_UPGRADE, DIFF_HARD)) {
+		if (infiltrate && ROOM_OWNER(to_room) && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_INFILTRATE_UPGRADE)) {
 			if (has_player_tech(ch, PTECH_INFILTRATE_UPGRADE)) {
 				log_to_empire(ROOM_OWNER(to_room), ELOG_HOSTILITY, "An infiltrator has been spotted shadowstepping into (%d, %d)!", X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}

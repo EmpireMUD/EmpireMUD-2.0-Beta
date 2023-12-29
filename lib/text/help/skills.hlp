@@ -8,13 +8,21 @@ help files for more information.
 
 Abilities you purchase from skill trees can be used to gain levels in their
 skill tree up to 10 times each. Abilities below level 50 only gain skill up to
-50, and abilities below 75 only gain skill levels up to 75.
+50, and abilities below 75 only gain skill levels up to 75. See ABILITY LEVELS
+for how this affects them.
 
-When you use an ability, its level is limited to your level in its parent skill
-unless you have 100 in that skill, in which case it scales all the way up to
-your full level.
+See also: ABILITY LEVELS, ABILITY POINTS, TRAINING SKILLS, SKILLS, SKILL CAPS,
+   SPECIALIZE
+#
+"ABILITY LEVELS" "ABILITY POWER" "ABILITY SCALE" "ABILITY SCALING"
 
-See also: ABILITY POINTS, TRAINING SKILLS, SKILLS, SKILL CAPS, SPECIALIZE
+Abilities that come from skills activate at different levels depending upon
+your level in that skill. Abilities from other things, such as synergies,
+always use your full level.
+
+When you use an ability from a skill tree that's below its maximum level, e.g.
+a skill you have at 50 or 75, it activates at that percent of your total level.
+For example, a level 50 ability will scale to 50% of your full level.
 #
 "ABILITY POINTS"
 
