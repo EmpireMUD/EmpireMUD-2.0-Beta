@@ -4407,7 +4407,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	cleanup_coins(ch);
 	
 	// verify abils}
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
 
 	// script/trigger stuff

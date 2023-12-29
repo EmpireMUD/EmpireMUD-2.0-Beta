@@ -201,7 +201,7 @@ void free_class(class_data *cls);
 void remove_class_from_table(class_data *cls);
 
 // class.c prototypes
-void assign_class_abilities(char_data *ch, class_data *cls, int role);
+void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role);
 bool is_class_ability(ability_data *abil);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 void update_class_and_abilities(char_data *ch);

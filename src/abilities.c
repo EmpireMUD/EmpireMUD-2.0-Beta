@@ -807,9 +807,15 @@ int get_ability_duration(char_data *ch, ability_data *abil) {
 		return 0;
 	}
 	else if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil))) {
+		// below assigned skill max: prefer short
+		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
+	}
+	else if (!ABIL_ASSIGNED_SKILL(abil) && get_approximate_level(ch) < MAX_SKILL_CAP) {
+		// no assigned skill; below full skill cap: prefer short
 		return ABIL_SHORT_DURATION(abil) ? ABIL_SHORT_DURATION(abil) : ABIL_LONG_DURATION(abil);
 	}
 	else {
+		// all other cases: prefer long
 		return ABIL_LONG_DURATION(abil) ? ABIL_LONG_DURATION(abil) : ABIL_SHORT_DURATION(abil);
 	}
 }

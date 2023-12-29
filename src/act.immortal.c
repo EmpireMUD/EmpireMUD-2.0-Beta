@@ -1033,7 +1033,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	}
 	
 	GET_CLASS_ROLE(ch) = ROLE_NONE;
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
 		msg_to_char(ch, "Your group role has been reset.\r\n");

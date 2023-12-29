@@ -57,7 +57,7 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 * @param class_data *cls Optional: Any player class, or NULL to detect from the player.
 * @param int role Optional: Any ROLE_ const, or NOTHING to detect from the player.
 */
-void assign_class_abilities(char_data *ch, class_data *cls, int role) {
+void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) {
 	// helper type
 	struct assign_abil_t {
 		any_vnum vnum;	// which abil
@@ -493,7 +493,7 @@ void update_class_and_abilities(char_data *ch) {
 	
 	// set class and assign abilities
 	GET_CLASS(ch) = best_class;
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
 		affect_total(ch);
@@ -1662,7 +1662,7 @@ ACMD(do_class) {
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
-			assign_class_abilities(ch, NULL, NOTHING);
+			assign_class_and_extra_abilities(ch, NULL, NOTHING);
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
@@ -1722,7 +1722,7 @@ ACMD(do_role) {
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
-			assign_class_abilities(ch, NULL, NOTHING);
+			assign_class_and_extra_abilities(ch, NULL, NOTHING);
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);

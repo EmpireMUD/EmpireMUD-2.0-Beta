@@ -1493,7 +1493,7 @@ void perform_swap_skill_sets(char_data *ch) {
 	}
 	
 	// call this at the end just in case
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	affect_total(ch);
 	
 	queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
