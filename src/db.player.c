@@ -1472,7 +1472,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CAN_GAIN_NEW_SKILLS(ch) = atoi(line + 21) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Can Get Bonus Skills: ", 22)) {
-					CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
+					// this property is no longer used
+					// CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Class: ", 7)) {
 					GET_CLASS(ch) = find_class_by_vnum(atoi(line + 7));
@@ -2692,9 +2693,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'C'
 	if (CAN_GAIN_NEW_SKILLS(ch)) {
 		fprintf(fl, "Can Gain New Skills: 1\n");
-	}
-	if (CAN_GET_BONUS_SKILLS(ch)) {
-		fprintf(fl, "Can Get Bonus Skills: 1\n");
 	}
 	fprintf(fl, "Class: %d\n", GET_CLASS(ch) ? CLASS_VNUM(GET_CLASS(ch)) : NOTHING);
 	fprintf(fl, "Class Progression: %d\n", GET_CLASS_PROGRESSION(ch));

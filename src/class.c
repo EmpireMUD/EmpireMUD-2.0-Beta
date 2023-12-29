@@ -103,7 +103,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the max skill cap (100)
 		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
@@ -379,13 +379,12 @@ void update_class_and_abilities(char_data *ch) {
 	#define NUM_BEST  3
 	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * MAX_SKILL_CAP + SPECIALTY_SKILL_CAP)
-	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
+	#define CLASS_LEVEL_BUFFER  (MAX_SKILL_CAP - SPECIALTY_SKILL_CAP - 1)	// allows the class when still this much under the final level requirement
 	
-	int at_zero, over_basic, over_specialty, old_level, best_class_count, class_count;
+	int over_zero, old_level, best_class_count, class_count;
 	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
 	class_data *class, *next_class, *old_class, *best_class;
 	struct player_skill_data *skdata, *next_skdata;
-	skill_data *skill, *next_skill;
 	struct class_skill_req *csr;
 	bool ok;
 	
@@ -398,13 +397,7 @@ void update_class_and_abilities(char_data *ch) {
 		best[best_iter] = NO_SKILL;
 		best_level[best_iter] = 0;
 	}
-	over_basic = 0, over_specialty = 0;
-	at_zero = 0;
-	HASH_ITER(hh, skill_table, skill, next_skill) {
-		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) && SKILL_FLAGGED(skill, SKILLF_BASIC)) {
-			++at_zero;	// count total live skills (ignoring non-basics)
-		}
-	}
+	over_zero = 0;
 	
 	// find skill counts
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skdata) {
@@ -412,13 +405,7 @@ void update_class_and_abilities(char_data *ch) {
 			continue;	// ignore non-basics
 		}
 		if (skdata->level > 0) {
-			--at_zero;
-		}
-		if (skdata->level > BASIC_SKILL_CAP) {
-			++over_basic;
-		}
-		if (skdata->level > SPECIALTY_SKILL_CAP) {
-			++over_specialty;
+			++over_zero;
 		}
 		
 		// update best
@@ -443,11 +430,8 @@ void update_class_and_abilities(char_data *ch) {
 	
 	// set up skill limits:
 	
-	// can still gain new skills (gain from 0) if either you have more zeroes than required for bonus skills, or you're not using bonus skills
-	CAN_GAIN_NEW_SKILLS(ch) = (at_zero > ZEROES_REQUIRED_FOR_BONUS_SKILLS) || (over_basic <= NUM_SPECIALTY_SKILLS_ALLOWED);
-	
-	// you qualify for bonus skills so long as you have enough skills at zero
-	CAN_GET_BONUS_SKILLS(ch) = (at_zero >= ZEROES_REQUIRED_FOR_BONUS_SKILLS);
+	// can still gain new skills (gain from 0)?
+	CAN_GAIN_NEW_SKILLS(ch) = (over_zero < config_get_int("skills_per_char"));
 	
 	old_class = GET_CLASS(ch);
 	old_level = GET_SKILL_LEVEL(ch);

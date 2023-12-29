@@ -18,14 +18,6 @@
 #define BASIC_SKILL_CAP			50	// common skills
 
 
-
-// TODO move some of this to a config
-#define ZEROES_REQUIRED_FOR_BONUS_SKILLS  1  // if you have this many BASIC skills at zero, you get BONUS_SPECIALTY_SKILLS_ALLOWED
-
-#define NUM_CLASS_SKILLS_ALLOWED  2	// skills > SPECIALTY_SKILL_CAP
-#define NUM_SPECIALTY_SKILLS_ALLOWED  3  // skills > BASIC_SKILL_CAP
-#define BONUS_SPECIALTY_SKILLS_ALLOWED  1  // extra skills that can be > BASIC_SKILL_CAP if you meet ZEROES_REQUIRED_FOR_BONUS_SKILLS
-
 // specific skill checks
 #define CHECK_MAJESTY(ch)  (AFF_FLAGGED((ch), AFF_MAJESTY) && number(0, GET_CHARISMA(ch)))
 

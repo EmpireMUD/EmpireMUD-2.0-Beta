@@ -14,7 +14,7 @@ When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
 
-See also: ABILITY POINTS, TRAINING SKILLS, SKILLS
+See also: ABILITY POINTS, TRAINING SKILLS, SKILLS, SKILL CAPS, SPECIALIZE
 #
 "ABILITY POINTS"
 
@@ -574,14 +574,6 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-When you hit a skill cap level (50, 75, 100) you get to reset your abilities
-in that skill. To do that, you can type "skill reset <skill>". If you type it
-without the skill name, you can see which skills have free resets available.
-You can reset in order to buy a different set of abilities, because you bought
-the wrong ability, or because you were using a certain set of abilities to
-level up and are ready for a longterm set. Resetting a skill only resets your
-current set (see SKILL SWAP).
-
 Abilities in each skill tree show the range in which you can use them to gain
 the skill, although you can gain no more than 10 levels from any one ability.
 
@@ -592,28 +584,26 @@ your full level.
 If you don't want to see alerts each time you gain a skill level, you can turn
 them off with the "smessages" command.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
-   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES, ABILITIES
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL RESET, ABILITIES,
+   TRAINING SKILLS, ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES
 #
-"SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
+"SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "PRIMARY SKILLS" "SPECIALTY SKILLS" "SECONDARY SKILLS" "BASIC SKILLS" "TERTIARY SKILLS"
 
 Skills are capped at certain levels to limit the number of abilities any one
 character can have. When you reach 50 or 75 in a skill, you will stop gaining
 points in that skill. To choose that skill for further advancement as one of
-your specialty or synergy skills, use the "specialize" command. This will get
-you a free level in the skill.
+your specialty skills, use the "specialize" command. This will give you a free
+level in the skill.
 
-* You can have two skills at 100. These are your class skills.
+* You can have two skill trees at level 100. These are your primary skills.
   These skills will get 16 abilities each.
-* You can have one skill at 75. This is your specialty skill.
+* You can have two more skills at level 75. These are your specialty skills.
   These skills will get 13 abilities each.
-* The rest of the skills are limited to 50. These are basic skills.
+* You can have two more skills at level 50. These are basic skills.
   These skills will get 9 abilities each.
 
-You can get a second specialty skill (75) if you keep one of your basic skills
-at zero (0). Once you have no basic skills left at zero, you can no longer
-choose to specialize an extra skill. The opposite is also true: if you
-specialize an extra skill, you'll no longer be able to gain in your last zero.
+This means you get a total of 6 skill trees on each character at levels 100,
+100, 75, 75, 50, and 50.
 
 You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
@@ -634,6 +624,27 @@ lose any abilities you purchased above the new level.
 Some skills cannot be dropped all the way to zero voluntarily.
 
 See also: SKILL
+#
+"SKILL RESET" "ABILITY RESET" "RESET ABILITY" "RESET ABILITIES"
+
+Usage:  skill reset [skill]
+
+The "skill reset" command lets you choose different abilities in a skill tree.
+Your level in that tree will remain the same, but all your ability points are
+refunded.
+
+You can reset in order to buy a different set of abilities, because you bought
+the wrong ability, or because you were using a certain set of abilities to
+level up and are ready for a longterm set. Resetting a skill only resets your
+current set (see SKILL SWAP).
+
+Using "skill reset" without a skill name will display how many resets you have
+available in each skill tree. You get a free reset in each skill when you hit
+a cap level (50, 75, or 100) as well as when you specialize the skill. After
+that, you can get more skill resets by using certain items.
+
+See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
+   ABILITIES, LETHEIAN ICON
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
 
@@ -717,13 +728,12 @@ SPECIALIZE SPECIALTY
 
 Usage:  specialize <skill>
 
-This command allows you to choose which skills become your class skills and
-specialties. You can only specialize a skill that's at 50 (the basic skill cap)
-or 75 (the specialty skill cap). Doing this will gain you a free level in the
-skill and allow you to continue leveling it.
+This command allows you to choose which skills your character will specialize
+in. You can only specialize a skill that's at 50 (the basic skill cap) or 75
+(the specialty skill cap). Doing this will gain you a free level in the
+skill and allow you to continue leveling it to 75 or 100.
 
-NOTE: This is a temporary command. In the future, we intend to use quests and
-other mechanisms for players who want to specialize.
+Some skills may require additional work to specialize them.
 
 See also: SKILL, SKILL CAPS
 #

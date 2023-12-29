@@ -2360,13 +2360,14 @@ ACMD(do_skills) {
 // this is a temporary command for picking skill specs, and will ultimately be replaced by quests or other mechanisms
 ACMD(do_specialize) {
 	struct player_skill_data *plsk, *next_plsk;
-	int count, specialty_allowed;
+	int count, max_level_allowed, specialty_allowed;
 	skill_data *sk;
 	
 	skip_spaces(&argument);
 	
-	// make certain these are up-to-datec
-	specialty_allowed = NUM_SPECIALTY_SKILLS_ALLOWED + (CAN_GET_BONUS_SKILLS(ch) ? BONUS_SPECIALTY_SKILLS_ALLOWED : 0);
+	// make certain these are up-to-date
+	max_level_allowed = config_get_int("skills_at_max_level");
+	specialty_allowed = config_get_int("skills_at_specialty_level") + max_level_allowed;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Specialize in which skill?\r\n");
@@ -2406,8 +2407,8 @@ ACMD(do_specialize) {
 					++count;
 				}
 			}
-			if ((count + 1) > NUM_CLASS_SKILLS_ALLOWED) {
-				msg_to_char(ch, "You can only have %d skill%s above level %d.\r\n", NUM_CLASS_SKILLS_ALLOWED, (NUM_CLASS_SKILLS_ALLOWED != 1 ? "s" : ""), SPECIALTY_SKILL_CAP);
+			if ((count + 1) > max_level_allowed) {
+				msg_to_char(ch, "You can only have %d skill%s above level %d.\r\n", max_level_allowed, PLURAL(max_level_allowed), SPECIALTY_SKILL_CAP);
 				return;
 			}
 		}

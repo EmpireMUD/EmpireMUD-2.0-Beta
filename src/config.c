@@ -2044,6 +2044,9 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "max_map_while_moving", CONFTYPE_INT, "maximum mapsize if the player is moving quickly");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
+	init_config(CONFIG_PLAYERS, "skills_at_max_level", CONFTYPE_INT, "how many skill trees players can have at 100");
+	init_config(CONFIG_PLAYERS, "skills_at_specialty_level", CONFTYPE_INT, "how many skill trees players can have at 75 (not counting 100s)");
+	init_config(CONFIG_PLAYERS, "skills_per_char", CONFTYPE_INT, "how many total skill trees players may learn at once");
 	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel and global history log files");
 	init_config(CONFIG_PLAYERS, "temperature_discomfort", CONFTYPE_INT, "temperature after which penalties begin");
 	init_config(CONFIG_PLAYERS, "temperature_extreme", CONFTYPE_INT, "temperature after which players take damage");

@@ -570,7 +570,7 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				level = craft_lev;	// no ability = use full level
 			}
 			else if (!ABIL_ASSIGNED_SKILL(abil)) {
-				// probably a class skill
+				// probably a synergy
 				level = craft_lev;
 			}
 			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
@@ -585,7 +585,7 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				else if (psr < MAX_SKILL_CAP) {
 					level = MIN(MAX_SKILL_CAP, craft_lev);
 				}
-				else {	// is a skill ability but >= class skill level (100) -- don't restrict
+				else {	// is a skill ability but >= max skill level (100) -- don't restrict
 					level = craft_lev;
 				}
 			}

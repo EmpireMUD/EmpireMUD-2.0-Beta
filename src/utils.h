@@ -1198,7 +1198,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // ch->player_specials: player_special_data
 #define AFFECTS_CONVERTED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->affects_converted))
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
-#define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
 #define DONT_SAVE_DELAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->dont_save_delay))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))

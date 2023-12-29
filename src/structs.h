@@ -5098,8 +5098,7 @@ struct player_special_data {
 	struct player_ability_data *ability_hash;
 	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
-	bool can_get_bonus_skills;	// can buy extra 75's
-	sh_int skill_level;  // levels computed based on class skills
+	sh_int skill_level;  // levels computed based on skills above level 75
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
