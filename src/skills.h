@@ -369,6 +369,8 @@ static inline bool noskill_ok(char_data *ch, any_vnum skill) {
 * Tests if the character is at any of the skill cap levels (50, 75, 100) for
 * a given skill.
 *
+* Formerly a macro.
+*
 * @param char_data *ch A player.
 * @param any_vnum skill Which skill to test.
 * @return bool TRUE if the character is at a cap; FALSE if not.
@@ -383,6 +385,9 @@ static inline bool IS_ANY_SKILL_CAP(char_data *ch, any_vnum skill) {
 	else if (level == MAX_SKILL_CAP || level == SPECIALTY_SKILL_CAP || level == BASIC_SKILL_CAP) {
 		return TRUE;
 	}
+	else if (level == 0 && !CAN_GAIN_NEW_SKILLS(ch)) {
+		return FALSE;
+	}
 	else {
 		return FALSE;
 	}
@@ -393,6 +398,8 @@ static inline bool IS_ANY_SKILL_CAP(char_data *ch, any_vnum skill) {
 * Determines what the next "cap level" is for a player on a given skill. These
 * are level 50, 75, or 100 and may be limited if the skill has a low maximum.
 * A character who is at one of those caps will return their current level.
+*
+* Formerly a macro.
 *
 * @param char_data *ch A player.
 * @param any_vnum skill Which skill to check the next cap for.
