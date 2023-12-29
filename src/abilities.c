@@ -7572,6 +7572,10 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No name set");
 		problem = TRUE;
 	}
+	if (ABIL_TYPES(abil) == NOBITS) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "No types set (set CUSTOM if none apply)");
+		problem = TRUE;
+	}
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
 		if (ABIL_MASTERY_ABIL(abil) == ABIL_VNUM(abil)) {
 			olc_audit_msg(ch, ABIL_VNUM(abil), "Mastery ability is itself");
