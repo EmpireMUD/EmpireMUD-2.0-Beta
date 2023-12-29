@@ -575,6 +575,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_REDUCED_ON_EXTRA_TARGETS	BIT(28)	// C. for multi-targeting, scale is 50% on targets after the first
 #define ABILF_USE_SKILL_BELOW_MAX	BIT(29)	// D. if the player is below maximum on the skill for the ability, limits it to that skill level
 #define ABILF_UNREMOVABLE_BUFF		BIT(30)	// E. buff/debuff cannot be cleansed (marks victim as the caster)
+#define ABILF_BUFF_SELF_NOT_TARGET	BIT(31)	// F. buff portion of the ability will go on the caster; everything else hits the victim
 
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

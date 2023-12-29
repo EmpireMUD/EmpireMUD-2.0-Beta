@@ -4283,12 +4283,13 @@ DO_ABIL(do_buff_ability) {
 	int bonus, dur, total_w = 1;
 	bool messaged, unscaled, unscaled_penalty;
 	bitvector_t aff_options;
-	char_data *use_caster;
+	char_data *use_caster, *buff_target;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
 	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
 	unscaled_penalty = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_PENALTY) ? TRUE : FALSE);
+	buff_target = (ABILITY_FLAGGED(abil, ABILF_BUFF_SELF_NOT_TARGET) ? ch : (vict ? vict : ch));
 	
 	if (!unscaled) {
 		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
@@ -4301,7 +4302,7 @@ DO_ABIL(do_buff_ability) {
 	
 	// set who the cast-by is
 	if (ABILITY_FLAGGED(abil, ABILF_UNREMOVABLE_BUFF)) {
-		use_caster = vict ? vict : ch;
+		use_caster = buff_target;
 	}
 	else {
 		use_caster = ch;
@@ -4323,7 +4324,7 @@ DO_ABIL(do_buff_ability) {
 		aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 		
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), use_caster);
-		affect_join(vict, af, aff_options);
+		affect_join(buff_target, af, aff_options);
 		messaged = TRUE;
 		data->success = TRUE;
 	}
@@ -4367,7 +4368,7 @@ DO_ABIL(do_buff_ability) {
 		if (apply_never_scales[apply->location] || unscaled || (unscaled_penalty && apply->weight < 0)) {
 			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight + bonus, use_caster);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
-			affect_join(vict, af, aff_options);
+			affect_join(buff_target, af, aff_options);
 			messaged = TRUE;
 			continue;
 		}
@@ -4389,15 +4390,15 @@ DO_ABIL(do_buff_ability) {
 			
 			af = create_mod_aff(affect_vnum, dur, apply->location, amt, use_caster);
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
-			affect_join(vict, af, aff_options);
+			affect_join(buff_target, af, aff_options);
 			messaged = TRUE;
 			data->success = TRUE;
 		}
 	}
 	
 	// check if it kills them
-	if (GET_POS(vict) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
-		perform_execute(ch, vict, TYPE_UNDEFINED, DAM_PHYSICAL);
+	if (GET_POS(buff_target) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
+		perform_execute(ch, buff_target, TYPE_UNDEFINED, DAM_PHYSICAL);
 		data->stop = TRUE;
 	}
 }

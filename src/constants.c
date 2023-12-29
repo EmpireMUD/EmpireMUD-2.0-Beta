@@ -175,7 +175,8 @@ const char *ability_flags[] = {
 	"STOP-ON-MISS",
 	"REDUCED-ON-EXTRA-TARGETS",
 	"USE-SKILL-BELOW-MAX",
-	"UNREMOVABLE-BUFF",
+	"UNREMOVABLE-BUFF",	// 30
+	"BUFF-SELF-NOT-TARGET",
 	"\n"
 };
 
@@ -213,6 +214,7 @@ const char *ability_flag_notes[] = {
 	"reduced on extra targets",
 	"uses skill level if below max",
 	"unremovable",
+	"buffs self not target",
 	"\n"
 };
 
