@@ -1149,7 +1149,7 @@ int get_ability_points_available_for_char(char_data *ch, any_vnum skill) {
 	int avail = MAX(0, get_ability_points_available(skill, get_skill_level(ch, skill)) - spent);
 	
 	// allow early if they're at a deadend
-	if (avail == 0 && spent < max && green_skill_deadend(ch, skill)) {
+	if (avail == 0 && spent < max && get_skill_level(ch, skill) > 0 && green_skill_deadend(ch, skill)) {
 		return 1;
 	}
 	else {
