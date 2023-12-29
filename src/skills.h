@@ -386,7 +386,7 @@ static inline bool IS_ANY_SKILL_CAP(char_data *ch, any_vnum skill) {
 		return TRUE;
 	}
 	else if (level == 0 && !CAN_GAIN_NEW_SKILLS(ch)) {
-		return FALSE;
+		return TRUE;
 	}
 	else {
 		return FALSE;
