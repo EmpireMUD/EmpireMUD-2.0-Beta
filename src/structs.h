@@ -774,6 +774,8 @@ typedef struct vehicle_data vehicle_data;
 #define AHOOK_ATTACK_MAGE		BIT(12)	// attack against a mage character
 #define AHOOK_ATTACK_VAMPIRE	BIT(13)	// attack against a vampire character
 
+#define COMBAT_AHOOKS	(AHOOK_ATTACK | AHOOK_ATTACK_TYPE | AHOOK_DAMAGE_TYPE | AHOOK_KILL | AHOOK_MELEE_ATTACK | AHOOK_RANGED_ATTACK | AHOOK_WEAPON_TYPE | AHOOK_DAMAGE_ANY | AHOOK_ATTACK_MAGE | AHOOK_ATTACK_VAMPIRE)
+
 
 // ABIL_LIMIT_x: Limitations when trying to use an ability
 #define ABIL_LIMIT_ON_BARRIER				0	// must be on a barrier

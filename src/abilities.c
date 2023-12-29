@@ -817,30 +817,14 @@ int get_ability_duration(char_data *ch, ability_data *abil) {
 
 /**
 * @param ability_data *abil Which ability.
-* @param int hook_type Which AHOOK_ const to look for.
+* @param bitvector_t hook_type Which AHOOK_ const to look for.
 * @param int hook_value Which value to match (ability vnum or 0 for many other types).
 * @return bool TRUE if abil has that hook, FALSE if not.
 */
-bool has_ability_hook(ability_data *abil, int hook_type, int hook_value) {
+bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value) {
 	struct ability_hook *ahook;
 	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-		if (ahook->type == hook_type && ahook->value == hook_value) {
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-
-/**
-* @param ability_data *abil Which ability.
-* @param int hook_type Which AHOOK_ const to look for; may be NOTHING to just check for ANY hooks.
-* @return bool TRUE if abil has that type of hook, FALSE if not.
-*/
-bool has_ability_hook_any(ability_data *abil, int hook_type) {
-	struct ability_hook *ahook;
-	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-		if (hook_type == NOTHING || ahook->type == hook_type) {
+		if (IS_SET(ahook->type, hook_type) && ahook->value == hook_value) {
 			return TRUE;
 		}
 	}
@@ -7598,6 +7582,10 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	}
 	if (IS_SET(ABIL_TARGETS(abil), ATAR_MULTI_CAN_SEE) && !IS_SET(ABIL_TARGETS(abil), MULTI_CHAR_ATARS)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "MULTI-CAN-SEE modifier without any multi-target flags");
+		problem = TRUE;
+	}
+	if (ABIL_MIN_POS(abil) > POS_FIGHTING && IS_SET(ABIL_HOOK_FLAGS(abil), COMBAT_AHOOKS)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "Minimum position is above Fighting with combat ability hooks");
 		problem = TRUE;
 	}
 	if (ABILITY_FLAGGED(abil, ABILF_OVER_TIME) && ABIL_HOOKS(abil)) {
