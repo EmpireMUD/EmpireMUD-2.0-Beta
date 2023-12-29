@@ -5092,7 +5092,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	}
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
-		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+		if (ch == vict || (!vict && !ovict && !vvict)) {	// message: targeting self
 			// determine message pos, for consistency
 			pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR);
 			
@@ -5518,10 +5518,10 @@ void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *o
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
-	act_flags |= !ABILITY_FLAGGED(abil, ABILF_VIOLENT) ? TO_SPAMMY : NOBITS;
+	act_flags |= (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && use_pos > 0) ? TO_SPAMMY : NOBITS;
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
-		if (ch == vict || (!vict && !ovict)) {	// message: targeting self
+		if (ch == vict || (!vict && !ovict && !vvict)) {	// message: targeting self
 			// to-char
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_SELF_TO_CHAR, use_pos)) && *msg != '*') {
 				any = TRUE;
