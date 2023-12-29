@@ -401,9 +401,6 @@ void update_class_and_abilities(char_data *ch) {
 	
 	// find skill counts
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skdata) {
-		if (!SKILL_FLAGGED(skdata->ptr, SKILLF_BASIC)) {
-			continue;	// ignore non-basics
-		}
 		if (skdata->level > 0) {
 			++over_zero;
 		}

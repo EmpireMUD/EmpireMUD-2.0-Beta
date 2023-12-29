@@ -2389,7 +2389,7 @@ ACMD(do_specialize) {
 		if (get_skill_level(ch, SKILL_VNUM(sk)) == BASIC_SKILL_CAP) {
 			count = 0;
 			HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-				if (SKILL_FLAGGED(plsk->ptr, SKILLF_BASIC) && plsk->level > BASIC_SKILL_CAP) {
+				if (plsk->level > BASIC_SKILL_CAP) {
 					++count;
 				}
 			}
@@ -2403,7 +2403,7 @@ ACMD(do_specialize) {
 		if (get_skill_level(ch, SKILL_VNUM(sk)) == SPECIALTY_SKILL_CAP) {
 			count = 0;
 			HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-				if (SKILL_FLAGGED(plsk->ptr, SKILLF_BASIC) && plsk->level > SPECIALTY_SKILL_CAP) {
+				if (plsk->level > SPECIALTY_SKILL_CAP) {
 					++count;
 				}
 			}
