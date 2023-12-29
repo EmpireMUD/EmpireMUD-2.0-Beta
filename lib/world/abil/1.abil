@@ -644,6 +644,8 @@ S
 #145
 Improved Infiltrate~
 0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 22 0
 T e 1
 S
@@ -707,6 +709,8 @@ S
 #150
 Cling to Shadow~
 0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 2
 D 1 20 0
 T e 1
 S
@@ -1547,11 +1551,12 @@ S
 Ritual of Teleportation~
 s -1 1.00 0 0 0
 C
-ritual 8 rs 2 25 0.00 2019 600 0 5 0
-D 16 3 0
+ritual 8 rF 2 25 0.00 2019 600 0 5 0
 D 16 16 0
 D 16 22 0
 D 128 7 0
+D 16 2 0
+D 16 19 0
 M
 8
 ... but nothing seems to happen.~
@@ -1585,6 +1590,9 @@ $n begins to glow bright blue, like a flame...~
 M
 33
 $n vanishes in a brilliant flash of light!~
+M
+39
+You can't teleport there with this ritual.~
 T u 1
 S
 #188
@@ -1592,10 +1600,11 @@ City Teleportation~
 s -1 1.00 0 0 0
 C
 ritual 8 t 2 15 0.00 2020 900 0 5 0
-D 16 3 0
 D 16 16 0
 D 16 22 0
 D 16 25 0
+D 16 2 0
+D 16 19 0
 M
 8
 ... but nothing seems to happen.~
@@ -1629,6 +1638,12 @@ $n begins to glow bright blue, like a flame...~
 M
 33
 $n vanishes in a brilliant flash of light!~
+M
+31
+Teleport to which city?~
+M
+39
+Unknown city.~
 T u 1
 S
 #191
@@ -1641,6 +1656,7 @@ D 16 4 0
 D 16 11 0
 D 64 4 0
 D 128 3 0
+D 16 21 0
 M
 8
 The Devastation Ritual has ended.~
