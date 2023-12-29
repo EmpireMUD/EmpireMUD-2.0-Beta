@@ -1202,11 +1202,15 @@ T b 1
 S
 #297
 Charge~
-afm -1 1.00 0 0 0
+afmoF -1 1.00 0 0 0
+A
+17 100
+A
+21 15
+A
+22 15
 C
 charge 7 bfh 1 50 0.00 2069 180 0 2 0
-D 64 22 0
-D 64 23 0
 D 16 15 0
 M
 2
@@ -1229,8 +1233,10 @@ M
 M
 31
 Charge at whom?~
-T x 1
-T s 0
+T b 1
+X+ 1 3080
+X+ 2 5
+X+ 3 5
 S
 #298
 Fletching~
