@@ -4370,6 +4370,7 @@ DO_ABIL(do_buff_ability) {
 			aff_options = (messaged ? SILENT_AFF : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_BUFF) ? ADD_MODIFIER : NOBITS) | (ABILITY_FLAGGED(abil, ABILF_CUMULATIVE_DURATION) ? ADD_DURATION : NOBITS);
 			affect_join(buff_target, af, aff_options);
 			messaged = TRUE;
+			data->success = TRUE;
 			continue;
 		}
 		
@@ -4400,6 +4401,7 @@ DO_ABIL(do_buff_ability) {
 	if (GET_POS(buff_target) == POS_INCAP && ABIL_IS_VIOLENT(abil)) {
 		perform_execute(ch, buff_target, TYPE_UNDEFINED, DAM_PHYSICAL);
 		data->stop = TRUE;
+		data->success = TRUE;
 	}
 }
 
