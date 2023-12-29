@@ -2373,6 +2373,25 @@ DO_ABIL(abil_action_close_portal) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_close_to_melee) {
+	if (vict) {
+		if (FIGHTING(ch)) {
+			// ensure melee
+			FIGHT_MODE(ch) = FMODE_MELEE;
+			FIGHT_WAIT(ch) = 0;
+			data->success = TRUE;
+		}
+		if (vict != ch && FIGHTING(vict) == ch) {
+			// reciprocate melee if they're fighting me
+			FIGHT_MODE(vict) = FMODE_MELEE;
+			FIGHT_WAIT(vict) = 0;
+			data->success = TRUE;
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
@@ -2851,6 +2870,23 @@ DO_ABIL(abil_action_rescue_one) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_set_fighting_target) {
+	if (vict && vict != ch) {
+		if (FIGHTING(ch)) {
+			FIGHTING(ch) = vict;
+			data->success = TRUE;
+		}
+		else {	// not yet fighting
+			engage_combat(ch, vict, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+		}
+		if (!FIGHTING(vict) && AWAKE(vict)) {
+			engage_combat(vict, ch, ABILITY_FLAGGED(abil, ABILF_RANGED | ABILF_RANGED_ONLY) ? FALSE : TRUE);
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_taunt) {
 	if (vict && FIGHTING(vict) != ch && can_fight(ch, vict)) {
 		if (FIGHTING(vict)) {
@@ -2858,7 +2894,7 @@ DO_ABIL(abil_action_taunt) {
 			data->success = TRUE;
 		}
 		else if (AWAKE(vict)) {
-			engage_combat(vict, vict, FALSE);
+			engage_combat(vict, ch, FALSE);
 			data->success = TRUE;
 		}
 	}
@@ -4196,6 +4232,14 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_PURIFY: {
 				call_do_abil(abil_action_purify);
+				break;
+			}
+			case ABIL_ACTION_CLOSE_TO_MELEE: {
+				call_do_abil(abil_action_close_to_melee);
+				break;
+			}
+			case ABIL_ACTION_SET_FIGHTING_TARGET: {
+				call_do_abil(abil_action_set_fighting_target);
 				break;
 			}
 		}

@@ -670,6 +670,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_PUT_TO_SLEEP			19	// target is put to sleep
 #define ABIL_ACTION_DISENCHANT_OBJ			20	// disenchants an item
 #define ABIL_ACTION_PURIFY					21	// removes skills with REMOVED-BY-PURIFY
+#define ABIL_ACTION_CLOSE_TO_MELEE			22	// immediately drops from ranged combat to melee
+#define ABIL_ACTION_SET_FIGHTING_TARGET		23	// ensures ch is hitting vict
 
 
 // ABIL_CUSTOM_x: custom message types
