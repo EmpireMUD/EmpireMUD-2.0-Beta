@@ -1705,8 +1705,8 @@ Usage:  .shortduration <seconds | unlimited>
         .longduration <seconds | unlimited>
 
 For buff/dot abilities, this is how long the effect lasts. Short duration
-applies when the actor has the skill at a low level. Long duration is for
-high-level users and class abilities.
+applies when the actor has the skill at a low level. Long duration is used when
+the ability's assigned skill is at its max level.
 
 Be careful with unlimited duration buffs -- these should always be self-only
 toggles. DoTs cannot have unlimited duration.

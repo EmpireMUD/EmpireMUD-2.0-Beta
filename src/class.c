@@ -49,8 +49,9 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 //// HELPERS ////////////////////////////////////////////////////////////////
 
 /**
-* Checks that the player has the correct set of class abilities, and removes
-* any they shouldn't have. This function ignores immortals.
+* Checks that the player has the correct set of abilities from their class,
+* role, synergy, etc; and removes any they shouldn't have. This function
+* ignores immortals.
 *
 * @param char_data *ch The player to check.
 * @param class_data *cls Optional: Any player class, or NULL to detect from the player.
@@ -173,7 +174,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_FIND_INT(hash, &vnum, check);
 			
 			if (check && !check->can_have) {
-				continue;	// missing synergy/class ability
+				continue;	// missing synergy/class/role ability
 			}
 			if (!check && !has_ability(ch, adl->vnum)) {
 				continue;	// missing basic ability

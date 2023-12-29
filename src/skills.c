@@ -1486,7 +1486,7 @@ void perform_swap_skill_sets(char_data *ch) {
 				qt_change_ability(ch, ABIL_VNUM(abil));
 			}
 		}
-		else {	// class ability: just ensure it matches the old one
+		else {	// non-purchased ability: just ensure it matches the old one; updates itself in assign_class_abilites
 			plab->purchased[cur_set] = plab->purchased[old_set];
 			qt_change_ability(ch, ABIL_VNUM(abil));	// in case
 		}
