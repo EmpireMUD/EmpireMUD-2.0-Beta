@@ -7643,6 +7643,24 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		}
 	}
 	
+	// non-ability commands
+	if (ABIL_COMMAND(abil)) {
+		for (iter = 0; *cmd_info[iter].command != '\n'; ++iter) {
+			if (!str_cmp(ABIL_COMMAND(abil), cmd_info[iter].command)) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Ability command blocked by real command '%s'", cmd_info[iter].command);
+				problem = TRUE;
+			}
+			else if (is_abbrev(ABIL_COMMAND(abil), cmd_info[iter].command)) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Warning: ability command is an abbbreviation of the '%s' command", cmd_info[iter].command);
+				problem = TRUE;
+			}
+			else if (is_abbrev(cmd_info[iter].command, ABIL_COMMAND(abil))) {
+				olc_audit_msg(ch, ABIL_VNUM(abil), "Warning: the real '%s' command is an abbbreviation of the ability's command", cmd_info[iter].command);
+				problem = TRUE;
+			}
+		}
+	}
+	
 	// data
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		switch (adl->type) {

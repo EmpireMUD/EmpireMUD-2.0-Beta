@@ -1105,7 +1105,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	}
 
 	/* otherwise, find the command */
-	for (length = strlen(arg), cmd = 0; *cmd_info[cmd].command != '\n'; cmd++) {
+	for (length = strlen(arg), cmd = 0; *cmd_info[cmd].command != '\n'; ++cmd) {
 		if (GET_ACCESS_LEVEL(ch) < cmd_info[cmd].minimum_level && (cmd_info[cmd].grants == NO_GRANTS || !IS_GRANTED(ch, cmd_info[cmd].grants))) {
 			continue;
 		}
