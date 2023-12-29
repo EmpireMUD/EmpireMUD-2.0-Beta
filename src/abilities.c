@@ -6441,7 +6441,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		// room target
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM | ATAR_ROOM_RANDOM_CAN_USE)) {
 			room_targ = get_random_room_for_ability(ch, abil, IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_RANDOM_CAN_USE) ? TRUE : FALSE);
-			has = TRUE;
+			has = (room_targ != NULL);
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE)) {
 			room_targ = IN_ROOM(ch);
