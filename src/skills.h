@@ -172,6 +172,7 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer, bool
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool has_ability_data_any(ability_data *abil, int type);
 bool has_ability_hook(ability_data *abil, int hook_type, int hook_value);
+bool has_ability_hook_any(ability_data *abil, int hook_type);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void read_ability_requirements();

@@ -833,6 +833,22 @@ bool has_ability_hook(ability_data *abil, int hook_type, int hook_value) {
 
 
 /**
+* @param ability_data *abil Which ability.
+* @param int hook_type Which AHOOK_ const to look for; may be NOTHING to just check for ANY hooks.
+* @return bool TRUE if abil has that type of hook, FALSE if not.
+*/
+bool has_ability_hook_any(ability_data *abil, int hook_type) {
+	struct ability_hook *ahook;
+	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
+		if (hook_type == NOTHING || ahook->type == hook_type) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
 * Determines if two people could be considered allies for the purposes of
 * ability targeting.
 *
@@ -5058,7 +5074,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	char *msg;
 	int pos, size, val;
 	
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	
 	#define _AAM_NO_DEFAULT(abil)	(IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK) || ABILITY_FLAGGED((abil), ABILF_OVER_TIME))
 	
@@ -5072,7 +5088,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	// healing portion (restore only)
 	if (IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) && data->restore_amount > 0) {
@@ -5327,7 +5343,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 */
 void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool invis;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	char *msg;
 	int pos;
 	
@@ -5340,7 +5356,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	// mark this now
 	if (data) {
@@ -5509,7 +5525,7 @@ void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *o
 	bool any, invis;
 	char *msg;
 	
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	
 	if (!ch || !abil || use_pos == NOTHING) {
 		return;	// no work
@@ -5521,7 +5537,7 @@ void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *o
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	act_flags |= (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && use_pos > 0) ? TO_SPAMMY : NOBITS;
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
@@ -5603,7 +5619,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	int pos;
 	
 	if (!ch || !abil || !vict) {
@@ -5615,7 +5631,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5674,7 +5690,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	int pos;
 	
 	if (!ch || !abil) {
@@ -5686,7 +5702,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5737,7 +5753,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	bool invis;
 	char buf[256], multi[24];
 	char *msg, *repl;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	int pos;
 	
 	if (!ch || !abil || !vvict) {
@@ -5749,7 +5765,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
 		snprintf(multi, sizeof(multi), " (x%d)", quantity);
@@ -5807,7 +5823,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	char tok[4];
 	char *msg, *repl;
 	int iter;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	int pos;
 	
 	if (!ch || !abil) {
@@ -5819,7 +5835,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	// determine message pos, for consistency
 	pos = get_custom_message_random_pos_number(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR);
@@ -5885,7 +5901,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 */
 void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data) {
 	bool any, invis;
-	bitvector_t act_flags = ACT_ABILITY;
+	bitvector_t act_flags = NOBITS;
 	char *msg;
 	int pos;
 	
@@ -5899,7 +5915,7 @@ void send_pre_ability_messages(char_data *ch, char_data *vict, obj_data *ovict, 
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
-	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : NOBITS;
+	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (ch == vict || (!vict && !ovict)) {	// message: targeting self
 		// determine message pos, for consistency
