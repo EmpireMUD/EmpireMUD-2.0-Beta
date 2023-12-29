@@ -144,7 +144,6 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 #define ABIL_HONE  262
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
-#define ABIL_CHARGE  297
 
 
 // TYPE_x: WEAPON ATTACK TYPES

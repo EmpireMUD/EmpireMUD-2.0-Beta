@@ -167,12 +167,9 @@ Cost:  50 move
 Cooldown:  3 minutes
 Usage:  charge [target]
 
-This ability allows you to charge directly into melee range. It can only be
-used if you're in ranged combat (or running into melee) or aren't in combat
-at all.
-
-You receive a brief boost to your to-hit and damage when you charge. The amount
-of the damage boost is based on your strength and intelligence.
+This ability allows you to charge directly into melee range and hit your target
+with your weapon. It can only be used if you're in ranged combat (or running
+into melee) or if you aren't in combat at all.
 #
 "CUT DEEP" "DEEP CUTS"
 
