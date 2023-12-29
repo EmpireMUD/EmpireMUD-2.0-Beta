@@ -1195,9 +1195,9 @@ Limitation types:
  &ccan purify target&0 - Target is valid for a purify ability.
  &ccan teleport here&0 - Current room does not block teleport.
  &ccan teleport target&0 - Target room does not block teleport.
- &ccan use as ally&0 - Location must be unclaimed or you are an ally (or better).
- &ccan use as guest&0 - Location must be unclaimed or you have guest access (or better).
- &ccan use as member&0 - Location must be unclaimed or owned by your empire.
+ &ccan use as ally&0 - Current room must be unclaimed or you are an ally (or better).
+ &ccan use as guest&0 - Current room must be unclaimed or you have guest access (or better).
+ &ccan use as member&0 - Current room must be unclaimed or owned by your empire.
  &ccheck city found time&0 - Fails if the target city is not established yet.
  &ccheck obj binding&0 - Ensures item target is not bound to someone else.
  &cdisarmable target&0

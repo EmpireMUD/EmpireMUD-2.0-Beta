@@ -3045,33 +3045,33 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_CAN_USE_GUEST: {
 				want_room_permission = TRUE;
 				
-				if (can_use_room(ch, any_room, GUESTS_ALLOWED)) {
+				if (can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_ALLY: {
 				want_room_permission = TRUE;
 				
-				if (can_use_room(ch, any_room, MEMBERS_AND_ALLIES)) {
+				if (can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
 			case ABIL_LIMIT_CAN_USE_MEMBER: {
 				want_room_permission = TRUE;
 				
-				if (can_use_room(ch, any_room, MEMBERS_ONLY)) {
+				if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that %s.\r\n", (any_room == IN_ROOM(ch) ? "here" : "there"));
+					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
