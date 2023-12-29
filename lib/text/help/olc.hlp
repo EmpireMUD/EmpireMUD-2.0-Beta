@@ -975,6 +975,7 @@ Message types:
  &cot-targ-to-room&0
  &cimmune-self-to-char&0 - To actor when immune to their own ability.
  &cimmune-targ-to-char&0 - To actor when other target is immune to the ability.
+ &cno-target&0 - Shown when the ability target is not found.
 
 For messages to help test abilities, see HELP ABILEDIT TESTING.
 

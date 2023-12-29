@@ -361,6 +361,7 @@ const char *ability_custom_types[] = {
 	"ot-targ-to-room",
 	"immune-self-to-char",
 	"immune-targ-to-char",
+	"no-target",
 	"\n"
 };
 
@@ -384,7 +385,7 @@ const char *ability_custom_type_help =
 " Over time messages with no target: ot-self-to-char ot-self-to-room\r\n"
 "&w Over time messsages with target: ot-targ-to-char ot-targ-to-vict ot-targ-to-room&0\r\n"
 " Message shown to the user when the target is immune: immune-self-to-char, immune-targ-to-char\r\n"
-"&w Other messages: no-argument&0\r\n";
+"&w Other messages: no-argument, no-target&0\r\n";
 
 
 

@@ -6484,6 +6484,9 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		if (IS_SET(ABIL_TARGETS(abil), ATAR_SELF_ONLY)) {
 			msg_to_char(ch, "You can only use that on yourself.\r\n");
 		}
+		else if (abil_has_custom_message(abil, ABIL_CUSTOM_NO_TARGET)) {
+			act(get_custom_message(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_NO_TARGET), FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
+		}
 		else if (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_CHAR_CLOSEST | ATAR_CHAR_WORLD)) {
 			send_config_msg(ch, "no_person");
 		}
