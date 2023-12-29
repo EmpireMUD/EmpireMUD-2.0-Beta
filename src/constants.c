@@ -316,6 +316,7 @@ const char *ability_target_flags[] = {
 	"NOT-ALLY",
 	"NOT-ENEMY",
 	"DEAD-OK",	// 30
+	"ROOM-RANDOM-CAN-USE",
 	"\n"
 };
 

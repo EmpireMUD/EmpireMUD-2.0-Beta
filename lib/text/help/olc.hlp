@@ -1822,9 +1822,9 @@ See also: OLC ABILITIES
 The TELEPORT ability type moves the player from one room to another. It can
 target any target type.
 
-If you use the ROOM-RANDOM target, you must set a RANGE in the ability's data.
-This range will only apply to random targets unless you also add the "within
-range" limitation, which will apply it to all targets.
+If you use the ROOM-RANDOM or ROOM-RANDOM-CAN-USE target, you must set a RANGE
+in the ability's data. This range will only apply to random targets unless you
+also add the "within range" limitation, which will apply it to all targets.
 
 Messages when teleporting to rooms:
  Sent at the start: &cpre-self-to-char&0 and &cpre-self-to-room&0
