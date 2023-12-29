@@ -169,7 +169,11 @@ Usage:  charge [target]
 
 This ability allows you to charge directly into melee range and hit your target
 with your weapon. It can only be used if you're in ranged combat (or running
-into melee) or if you aren't in combat at all.
+into melee) or aren't in combat at all.
+
+You receive a brief boost to your to-hit and damage when you charge.
+
+Gain experience by using Charge.
 #
 "CUT DEEP" "DEEP CUTS"
 
