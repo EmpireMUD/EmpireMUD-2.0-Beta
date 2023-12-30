@@ -2458,7 +2458,7 @@ if %move% == 1
   end
   set id %targ.id%
   * random obj
-  set object_1 a gaudy neck ties
+  set object_1 a gaudy neck tie
   set object_2 a hideous Christmas sweater
   set object_3 fluffy woolen socks
   set object_4 a pet rock
