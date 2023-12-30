@@ -2471,7 +2471,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 				if (emp && IS_IMMORTAL(ch)) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 				}
-				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+				else if (emp && !player_tech_skill_check(ch, PTECH_STEAL_COMMAND, DIFF_HARD)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
@@ -2479,10 +2479,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 					GET_STOLEN_TIMER(obj) = time(0);
 					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 					trigger_distrust_from_stealth(ch, emp);
-					gain_ability_exp(ch, ABIL_STEAL, 50);
+					gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
 					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 				}
-				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL, NOBITS);
+				run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 			}
 			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 				// un-steal if this was the original owner
@@ -2608,7 +2608,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			if (emp && IS_IMMORTAL(ch)) {
 				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 			}
-			else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+			else if (emp && !player_tech_skill_check(ch, PTECH_STEAL_COMMAND, DIFF_HARD)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			
@@ -2616,11 +2616,11 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 				GET_STOLEN_TIMER(obj) = time(0);
 				GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 				trigger_distrust_from_stealth(ch, emp);
-				gain_ability_exp(ch, ABIL_STEAL, 50);
+				gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
 				add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 			}
 			
-			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL, NOBITS);
+			run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 		}
 		else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 			// un-steal if this was the original owner

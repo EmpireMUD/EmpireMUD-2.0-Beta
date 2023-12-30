@@ -120,8 +120,8 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (!has_ability(ch, ABIL_STEAL)) {
-		msg_to_char(ch, "You don't have the Steal ability.\r\n");
+	if (!has_player_tech(ch, PTECH_STEAL_COMMAND)) {
+		msg_to_char(ch, "You can't steal anything.\r\n");
 		return FALSE;
 	}
 	
@@ -941,11 +941,11 @@ ACMD(do_steal) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot steal.\r\n");
 	}
-	else if (!can_use_ability(ch, ABIL_STEAL, NOTHING, 0, NOTHING)) {
-		// sends own message
+	else if (!has_player_tech(ch, PTECH_STEAL_COMMAND)) {
+		msg_to_char(ch, "You can't steal anything.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_STEAL)) {
-		return;
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL)) {
+		// triggered
 	}
 	else if (!IS_IMMORTAL(ch) && !can_steal(ch, emp)) {
 		// sends own message
@@ -984,12 +984,12 @@ ACMD(do_steal) {
 					if (IS_IMMORTAL(ch)) {
 						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(proto), EMPIRE_NAME(emp));
 					}
-					else if (!skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+					else if (!player_tech_skill_check(ch, PTECH_STEAL_COMMAND, DIFF_HARD)) {
 						log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 					}
 
 					retrieve_resource(ch, emp, store, TRUE);
-					gain_ability_exp(ch, ABIL_STEAL, 50);
+					gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
 				
 					if (stored_item_requires_withdraw(proto)) {
 						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
@@ -998,7 +998,7 @@ ACMD(do_steal) {
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
-					run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STEAL, 0, NULL, NULL, NULL, NULL, NOBITS);
+					run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL, NULL, NULL);
 				}
 			}
 		}

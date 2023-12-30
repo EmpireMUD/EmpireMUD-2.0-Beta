@@ -1335,6 +1335,7 @@ const char *player_tech_types[] = {
 	"Riding-Release-Mount",	// 95
 	"Rework-Command",
 	"Bite-Regeneration",
+	"Steal-Command",
 	"\n"
 };
 

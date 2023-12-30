@@ -920,7 +920,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "statusmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
 	SCMD_CMD( "smessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
-	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
+	SIMPLE_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
