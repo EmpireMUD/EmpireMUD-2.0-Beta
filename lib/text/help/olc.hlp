@@ -932,6 +932,8 @@ Usage:  .custom add <type> <message>
         .custom remove <number | all>
         .custom sort
 
+(See also: ABILEDIT CUSTOM ABILITIES)
+
 You can set custom messages on abilities. Different types of abilities may use
 different messages; see the help files for each ability type for more info.
 These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
@@ -992,7 +994,17 @@ Message types:
 
 For messages to help test abilities, see HELP ABILEDIT TESTING.
 
-See also: OLC ABILITIES, DOLLAR SIGN CODES
+See also: OLC ABILITIES, ABILEDIT CUSTOM ABILITIES, DOLLAR SIGN CODES
+#d
+"ABILEDIT CUSTOM ABILITIES" "ABILEDIT CUSTOM ABILITY" "CUSTOM ABILITIES" "CUSTOM ABILITY"
+
+A CUSTOM ability is one that is hard-coded, not configured through the ability
+engine. This refers to a small number of abilities that are too complex to
+be managed by this system, usually due to complicated arguments or options.
+
+Example custom abilities: 136 Inspire, 177 Mirrorimage, 240 Confer
+
+See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT DAMAGE ABILITY" "DAMAGE ABILITY" "DAMAGE ABILITIES"
 
