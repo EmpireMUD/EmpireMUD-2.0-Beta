@@ -6834,10 +6834,6 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 		}
 		// currently charging for these anyway
 		// data->should_charge_cost = FALSE;
-		if (data->cost == 0 && ABIL_COST(abil) > 0) {
-			// hit no targets, so cost may not be set
-			data->cost = ABIL_COST(abil);
-		}
 	
 		// block fail message
 		data->no_msg = TRUE;
