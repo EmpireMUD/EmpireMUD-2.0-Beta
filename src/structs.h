@@ -2731,7 +2731,7 @@ typedef enum {
 #define PTECH_FISH_COMMAND  16	// can use the 'fish' command/interaction
 #define PTECH_FORAGE_COMMAND  17	// can use the 'forage' command/interaction
 #define PTECH_HARVEST_UPGRADE  18	// more results from harvest
-#define PTECH_HEALING_BOOST  19	// increases healing effects
+	#define PTECH_UNUSED  19	// deprecated: was HEALING_BOOST
 #define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
 #define PTECH_INFILTRATE  21	// can enter buildings without permission
 #define PTECH_INFILTRATE_UPGRADE  22	// better infiltrates

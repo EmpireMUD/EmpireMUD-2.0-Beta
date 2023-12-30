@@ -1477,7 +1477,6 @@ Available techs are:
  &cFish-Command&0 *
  &cForage-Command&0 *
  &cHarvest-Upgrade&0 * - More items received from harvest.
- &cHealing-Boost&0 - Improves all healing abilities.
  &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
  &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
  &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.

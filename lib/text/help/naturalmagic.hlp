@@ -519,17 +519,6 @@ to heal (self, ally or party).
 
 See also: HEALER
 #
-"HEALING BOOST"
-
-Healing Boost
-Requires: 100 Natural Magic, Healer/Solo role
-
-This ability increases the amount healed by abilities such as Heal and
-Rejuvenate, making the user more effective at healing. This ability is
-automatic.
-
-See also: HEAL, HEALER, REJUVENATE
-#
 "HEALING POTIONS" "HEALING ELIXIRS"
 
 Usage:  brew <potion>
