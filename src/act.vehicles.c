@@ -448,7 +448,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 				if (emp && IS_IMMORTAL(ch)) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 				}
-				else if (emp && !player_tech_skill_check(ch, PTECH_STEAL_COMMAND, DIFF_HARD)) {
+				else if (emp && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_STEAL_COMMAND)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
