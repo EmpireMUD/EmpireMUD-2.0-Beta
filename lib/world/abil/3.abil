@@ -283,4 +283,65 @@ M
 T x 1
 T s 0
 S
+#314
+Red Mist~
+0 -1 0.25 0 0 0
+C
+unknown 7 g 0 0 0.00 -1 0 0 0 0
+H 1 315 100.00 0
+M
+0
+A fine red mist sprays across your skin.~
+M
+0
+You bathe in the red mist of battle!~
+M
+0
+You feel refreshed by the red mist of battle!~
+M
+0
+The red mist feels good on your skin.~
+M
+1
+*~
+M
+8
+*~
+M
+9
+*~
+T y 1
+T z 1
+X+ 9 3
+S
+#315
+Red Mist: Splash Blood~
+a -1 1.00 G 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 314 0
+H 8 0 10.00 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+38
+*~
+T A 1
+S
 $

@@ -65,7 +65,7 @@ T m 0
 S
 #6
 Ready Blood Weapons~
-0 -1 1.00 0 bcn 0
+0 314 1.00 0 bcn 0
 C
 unknown 5 w 3 40 0.00 -1 0 0 2 0
 D 4 1101 0
@@ -101,7 +101,7 @@ T m 0
 S
 #8
 Claws~
-c -1 1.00 0 bn 0
+c 314 1.00 0 bn 0
 C
 claws 5 a 3 10 0.00 -1 0 0 2 0
 D 4 1127 0
