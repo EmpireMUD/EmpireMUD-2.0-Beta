@@ -1175,6 +1175,28 @@ void affect_total_room(room_data *room) {
 
 
 /**
+* Matches both an ATYPE (or affect generic) and a caster ID on a DoT
+* (damage-over-time) effect on the character.
+*
+* @param char_data *ch The person to look for a DoT on.
+* @param any_vnum type The ATYPE_ const or affect generic for the DoT.
+* @param char_data *caster The caster to look for.
+* @return int The number of "stacks" of that DoT on the character, or 0 if not affected.
+*/
+int affected_by_dot_from_caster(char_data *ch, any_vnum type, char_data *caster) {
+	struct over_time_effect_type *dot;
+	
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->type == type && dot->cast_by == CAST_BY_ID(caster)) {
+			return dot->stack;
+		}
+	}
+	
+	return 0;	// none found
+}
+
+
+/**
 * @param char_data *ch The person to check
 * @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if ch is affected by anything with matching type

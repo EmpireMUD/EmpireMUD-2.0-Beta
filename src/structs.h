@@ -4060,14 +4060,16 @@ struct ability_exec {
 	int total_targets;	// for cost-per-target
 	double max_scale;	// for cost-per-scale-point
 	
-	// data passed by types
+	// core scaling data
 	bool has_mastery;	// TRUE if the player has the mastery ability
 	bool matching_role;	// if FALSE, has penalties from no matching role
 	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
 	
+	// data passed by types
 	any_vnum ready_weapon_val;
 	int restore_pool;
 	int restore_amount;
+	any_vnum summon_vnum;
 	
 	struct ability_exec_type *types;	// LL of type data
 };

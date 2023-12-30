@@ -99,6 +99,8 @@ DO_ABIL(do_ready_weapon_ability);
 DO_ABIL(do_restore_ability);
 DO_ABIL(do_resurrect_ability);
 DO_ABIL(do_room_affect_ability);
+DO_ABIL(do_summon_any_ability);
+DO_ABIL(do_summon_random_ability);
 DO_ABIL(do_teleport_ability);
 
 DO_ABIL(fail_attack_ability);
@@ -108,10 +110,12 @@ PREP_ABIL(prep_buff_ability);
 PREP_ABIL(prep_conjure_liquid_ability);
 PREP_ABIL(prep_conjure_object_ability);
 PREP_ABIL(prep_conjure_vehicle_ability);
+PREP_ABIL(prep_dot_ability);
 PREP_ABIL(prep_ready_weapon_ability);
 PREP_ABIL(prep_restore_ability);
 PREP_ABIL(prep_resurrect_ability);
 PREP_ABIL(prep_room_affect_ability);
+PREP_ABIL(prep_summon_any_ability);
 PREP_ABIL(prep_teleport_ability);
 
 // for ability struct
@@ -161,12 +165,12 @@ struct {
 	{ ABILT_PAINT_BUILDING, NULL, do_paint_building_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
 	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, NULL, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
-	{ ABILT_DOT, NULL, do_dot_ability, NULL, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
+	{ ABILT_DOT, prep_dot_ability, do_dot_ability, NULL, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
 	{ ABILT_BUILDING_DAMAGE, NULL, do_building_damage_ability, NULL, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
-	{ ABILT_SUMMON_ANY, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_ANY, prep_summon_any_ability, do_summon_any_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, do_summon_random_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
 	// alaways run actions last
 	{ ABILT_ACTION, NULL, do_action_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
@@ -2922,6 +2926,44 @@ DO_ABIL(abil_action_taunt) {
 }
 
 
+
+/**
+* Not quite an action but still part of an ability... Attempts to summon 1 mob.
+*
+* @param char_data *ch The player summoning.
+* @param ability_data *abil Which ability they are summoning with.
+* @param any_vnum vnum The mob vnum to summon.
+* @param int level What level the ability is being used at.
+* @param struct ability_exec *data The running data for the ability.
+* @return bool TRUE if anything was summoned; FALSE if we sent an error.
+*/
+bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, int level, struct ability_exec *data) {
+	char_data *proto = mob_proto(vnum);
+	char_data *mob;
+	
+	if (!proto || !abil) {
+		msg_to_char(ch, "That summon is not implemented yet.\r\n");
+		return FALSE;
+	}
+	
+	// load/update mob:
+	mob = read_mobile(vnum, TRUE);
+	
+	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
+	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
+	scale_mob_as_companion(mob, ch, level);
+	char_to_room(mob, IN_ROOM(ch));
+	add_follower(mob, ch, FALSE);
+	
+	send_ability_per_char_messages(ch, mob, 1, abil, data, NULL);
+	
+	load_mtrigger(mob);
+	
+	// success
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY EFFECTS AND LIMITS //////////////////////////////////////////////
 
@@ -3837,6 +3879,28 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_dot_ability) {
+	any_vnum affect_vnum;
+	
+	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
+	
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_dot_from_caster(vict, affect_vnum, ch) >= ABIL_MAX_STACKS(abil)) {
+		if (vict == ch) {
+			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
+		}
+		else {
+			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+		}
+		
+		data->stop = TRUE;
+		data->should_charge_cost = FALSE;
+		data->success = FALSE;
+		return;
+	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_ready_weapon_ability) {
 	bool found;
 	int iter;
@@ -3909,6 +3973,68 @@ PREP_ABIL(prep_ready_weapon_ability) {
 			CANCEL_ABILITY(data);
 			return;
 		}
+	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_summon_any_ability) {
+	any_vnum found_name = NOTHING, found_one = NOTHING;
+	bool found_many = FALSE;
+	char_data *proto = NULL;
+	struct ability_data_list *adl;
+	
+	// find by mob name
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
+			continue;	// no match
+		}
+		
+		// mark for later
+		if (found_one == NOTHING) {
+			found_one = adl->vnum;
+		}
+		else {
+			found_many = TRUE;
+		}
+		
+		if (!*argument) {
+			continue;	// no name provided -- just setting found_one/found_many
+		}
+		if (!multi_isname(argument, GET_PC_NAME(proto))) {
+			continue;	// no string match
+		}
+		
+		// if we got here, there was a name match
+		found_name = adl->vnum;
+		break;
+	}
+	
+	// did we find anything?
+	if (found_name != NOTHING) {
+		// name match
+		data->summon_vnum = found_name;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You don't know how to summon %s '%s'.\r\n", AN(argument), argument);
+		CANCEL_ABILITY(data);
+		return;
+	}
+	else if (found_one != NOTHING && !found_many) {
+		// found exactly 1
+		data->summon_vnum = found_one;
+	}
+	else {
+		msg_to_char(ch, "What did you want to summon?\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	// final validation: min-level
+	if (data->summon_vnum > 0 && (proto = mob_proto(data->summon_vnum)) && level < GET_MIN_SCALE_LEVEL(proto)) {
+		msg_to_char(ch, "You are not powerful enough to summon %s.\r\n", PERS(proto, proto, FALSE));
+		CANCEL_ABILITY(data);
+		return;
 	}
 }
 
@@ -4792,6 +4918,116 @@ DO_ABIL(do_room_affect_ability) {
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
 		affect_to_room(room_targ, af);
 		free(af);	// affect_to_room duplicates affects
+	}
+	
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_summon_any_ability) {
+	int mob_count = 0, fol_count = 0;
+	int num, to_summon;
+	char_data *mob;
+	
+	int max_npcs = config_get_int("summon_npc_limit");
+	int max_followers = config_get_int("npc_follower_limit");
+	
+	if (data->summon_vnum <= 0) {
+		return;	// nothing to summon (should have been pre-determined)
+	}
+	
+	// count mobs and check limit
+	fol_count = 0;
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		if (IS_NPC(mob)) {
+			++mob_count;
+			
+			if (!GET_COMPANION(mob) && GET_LEADER(mob) == ch) {
+				++fol_count;
+			}
+		}
+	}
+	
+	// how many are allowed
+	to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
+	to_summon = MIN((max_followers - fol_count), to_summon);	// safety limits
+	to_summon = MIN((max_npcs - mob_count), to_summon);
+	to_summon = MAX(1, to_summon);	// allays allow 1 if we got here (if it came through 'summon', that may have limited it further)
+	
+	for (num = 0; num < to_summon; ++num) {
+		if (!perform_summon(ch, abil, data->summon_vnum, level, data)) {
+			return;	// received an error
+		}
+	}
+	
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_summon_random_ability) {
+	any_vnum summon_vnum;
+	int mob_count = 0, fol_count = 0;
+	int count, num, to_summon;
+	char_data *mob, *proto;
+	struct ability_data_list *adl;
+	
+	int max_npcs = config_get_int("summon_npc_limit");
+	int max_followers = config_get_int("npc_follower_limit");
+	
+	if (data->summon_vnum <= 0) {
+		return;	// nothing to summon (should have been pre-determined)
+	}
+	
+	// count mobs and check limit
+	count = 0;
+	fol_count = 0;
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		if (IS_NPC(mob)) {
+			++mob_count;
+			
+			if (!GET_COMPANION(mob) && GET_LEADER(mob) == ch) {
+				++fol_count;
+			}
+		}
+	}
+	
+	// how many are allowed
+	to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
+	to_summon = MIN((max_followers - fol_count), to_summon);	// safety limits
+	to_summon = MIN((max_npcs - mob_count), to_summon);
+	to_summon = MAX(1, to_summon);	// allays allow 1 if we got here (if it came through 'summon', that may have limited it further)
+	
+	// main summon loop: counting number to summon
+	for (num = 0; num < to_summon; ++num) {
+		// inner loop: determining who to summon at random
+		summon_vnum = NOTHING;
+		count = 0;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
+				continue;	// not a mob
+			}
+			if (level < GET_MIN_SCALE_LEVEL(proto)) {
+				continue;	// pre-checking level failed
+			}
+			
+			// presumably this is ok
+			if (!number(0, count++)) {
+				summon_vnum = adl->vnum;
+			}
+		}
+		
+		if (summon_vnum != NOTHING) {
+			// do it!
+			if (!perform_summon(ch, abil, summon_vnum, level, data)) {
+				return;	// received an error
+			}
+		}
+		else if (num == 0) {
+			// failed to find a summon on the first round
+			return;
+		}
 	}
 	
 	data->success = TRUE;

@@ -82,6 +82,7 @@ void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 void affect_total_room(room_data *room);
+int affected_by_dot_from_caster(char_data *ch, any_vnum type, char_data *caster);
 bool affected_by_spell(char_data *ch, any_vnum type);
 bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
