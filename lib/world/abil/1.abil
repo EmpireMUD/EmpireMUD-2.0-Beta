@@ -633,7 +633,10 @@ S
 #143
 Steal~
 0 -1 1.00 0 0 0
-T m 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
+D 1 98 0
+T e 1
 S
 #144
 Infiltrate~

@@ -787,12 +787,6 @@ Hone~
 0 -1 1.00 0 0 0
 T l 1
 S
-#263
-Healing Boost~
-0 -1 1.00 0 0 0
-D 1 19 0
-T e 1
-S
 #264
 Exquisite Woodworking~
 0 203 1.00 0 0 0
@@ -1109,10 +1103,12 @@ S
 #286
 Evasion~
 0 -1 1.00 0 df 0
+T m 1
 S
 #287
 Weapon Proficiency~
 0 -1 1.00 0 bc 0
+T m 1
 S
 #288
 Primitive Crafts~
