@@ -198,7 +198,9 @@ switch %questvnum%
     %teleport% %SnowmanInRoom% %self%
     %force% %actor% follow snowman
     set PlayerOnAbominableQuest %actor%
+    set PlayerOnAbominableQuest_id %actor.id%
     remote PlayerOnAbominableQuest %SnowmanInRoomID%
+    remote PlayerOnAbominableQuest_id %SnowmanInRoomID%
   break
   case 16676
     %load% obj 16676 %actor% inv
@@ -1384,7 +1386,9 @@ done
 %teleport% %self% %self.room%
 %force% %AbominableSnowman% kill %self.pc_name%
 wait 1
-%send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+if %self.PlayerOnAbominableQuest% && %self.PlayerOnAbominableQuest.id% == %self.PlayerOnAbominableQuest_id%
+  %send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+end
 ~
 #16631
 snowman target will not escape~
@@ -1401,7 +1405,9 @@ abominable kills regular snowman~
 0 z 100
 ~
 if %actor.vnum% == 16600
-  %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  if %actor.PlayerOnAbominableQuest% && %actor.PlayerOnAbominableQuest.id% == %actor.PlayerOnAbominableQuest_id%
+    %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  end
   wait 1
   %echo% ~%self% runs off!
   %purge% %self%
