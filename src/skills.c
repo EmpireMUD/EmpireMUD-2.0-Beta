@@ -2056,7 +2056,7 @@ ACMD(do_skills) {
 		}
 		
 		if (!ABIL_IS_PURCHASE(abil) && !IS_IMMORTAL(ch)) {
-			msg_to_char(ch, "You cannot buy that ability.\r\n");
+			msg_to_char(ch, "%s: You cannot buy that ability.\r\n", ABIL_NAME(abil));
 			return;
 		}
 		
