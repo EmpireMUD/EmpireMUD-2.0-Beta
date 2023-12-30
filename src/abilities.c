@@ -6103,7 +6103,7 @@ void perform_over_time_ability(char_data *ch) {
 	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
 	bitvector_t multi_targ = NOBITS;
 	char arg[MAX_INPUT_LENGTH];
-	int iter;
+	int iter, level;
 	ability_data *abil;
 	char_data *vict;
 	obj_data *ovict, *proto, *temp_obj;
@@ -6159,8 +6159,22 @@ void perform_over_time_ability(char_data *ch) {
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
 			strcpy(arg, NULLSAFE(GET_ACTION_STRING(ch)));
+			level = GET_ACTION_VNUM(ch, 1);
 			end_action(ch);
-			start_over_time_ability(ch, abil, arg, vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), data);
+			
+			// this did not check costs correctly:
+			// start_over_time_ability(ch, abil, arg, vict, ovict, vvict, room_targ, multi_targ, level, data);
+			
+			// clean up old data...
+			GET_RUNNING_ABILITY_DATA(ch) = NULL;
+			free_ability_exec(data);
+			
+			// restart the ability
+			data = start_ability_data(ch, abil, FALSE);
+			GET_RUNNING_ABILITY_DATA(ch) = data;
+			call_ability(ch, abil, arg, vict, ovict, vvict, room_targ, multi_targ, level, RUN_ABIL_NORMAL, data);
+			
+			// the new 'data' will be cleaned up at the end
 		}
 		else {
 			// end
