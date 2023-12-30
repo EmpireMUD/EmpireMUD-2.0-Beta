@@ -3786,15 +3786,16 @@ void announce_login(char_data *ch) {
 				continue;
 			}
 			
+			// header divider
 			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
-			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			msg_to_char(desc->character, "- %s ", buf);
 			
 			// rest of the divider
 			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
 				buf2[iter] = '-';
 			}
 			buf2[iter] = '\0';	// terminate
-			msg_to_char(desc->character, "%s\r\n", buf2);
+			msg_to_char(desc->character, "%s\r\n%s", buf2, GET_ACCOUNT(ch)->notes);
 		}
 	}
 	
