@@ -3380,7 +3380,7 @@ Available flags:
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
  NO-CUSTOMIZE - cannot be customized by players
- NO-AUTO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
+ NO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
     normally used on buildings that are part of adventures like the Hamlet.
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here

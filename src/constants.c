@@ -3643,7 +3643,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
 	"NO-CUSTOMIZE",
-	"NO-AUTO-ABANDON-WHEN-RUINED",
+	"NO-ABANDON-WHEN-RUINED",
 	"*",
 	"*",
 	"*",	// 25

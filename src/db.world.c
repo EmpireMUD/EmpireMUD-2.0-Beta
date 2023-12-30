@@ -1225,7 +1225,7 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
-				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_ABANDON_WHEN_RUINED)) {
 					abandon_room(room);
 				}
 				disassociate_building(room);
@@ -3538,7 +3538,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3666,7 +3666,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3747,7 +3747,7 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		if (!bld || !BLD_FLAGGED(bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		if (!bld || !BLD_FLAGGED(bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 			abandon_room(room);
 		}
 		disassociate_building(room);
