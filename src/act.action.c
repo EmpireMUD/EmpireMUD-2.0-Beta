@@ -883,7 +883,7 @@ INTERACTION_FUNC(finish_chopping) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
 		
-		if (IN_ROOM(obj)) {
+		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
@@ -938,7 +938,7 @@ INTERACTION_FUNC(finish_digging) {
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
 			
-			if (IN_ROOM(obj)) {
+			if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 			}
 		}
@@ -1039,7 +1039,7 @@ INTERACTION_FUNC(finish_foraging) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (IN_ROOM(obj)) {
+		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
@@ -1086,7 +1086,7 @@ INTERACTION_FUNC(finish_gathering) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
 		
-		if (IN_ROOM(obj)) {
+		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
@@ -1143,7 +1143,7 @@ INTERACTION_FUNC(finish_harvesting) {
 			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 			act(cust ? cust : "$n gets $p!", FALSE, ch, obj, NULL, TO_ROOM);
 			
-			if (IN_ROOM(obj)) {
+			if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 			}
 		}
@@ -1182,7 +1182,7 @@ INTERACTION_FUNC(finish_mining) {
 	}
 	
 	if (obj && obj_ok) {
-		if (IN_ROOM(obj)) {
+		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
@@ -4145,7 +4145,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 			act(cust ? cust : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
 		}
 		
-		if (IN_ROOM(obj)) {
+		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 	}
