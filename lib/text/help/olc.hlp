@@ -1818,14 +1818,21 @@ Players can have a limited number of followers at a time, including ones from
 summons.
 
 Summon abilities have the following properties:
+ <&ycommand&0> Summons may have their own command or may share the 'summon'
+              command.
  <&ylinkedtrait&0> Optional: If you set a linked trait, more than one mob may
-            be summoned at a time if that trait is high.
+              be summoned at a time if that trait is high.
+ <&ytargets&0> Use IGNORE for SUMMON-RANDOM and STRING for SUMMON-ANY.
  <&ydata&0> Add the SUMMON-MOB data type to grant new mobs.
-            - A SUMMON-ANY ability will list the mobs individually on the
-              'summon' command.
-            - A SUMMON-RANDOM ability will only list the ability name on the
-              'summon' command.
+            - A SUMMON-ANY ability allows the player to choose which mob from
+              the ability's data. If using the 'summon' command, they're
+              summoned by mob name rather than ability name.
+            - A SUMMON-RANDOM ability chooses at random and, if using the
+              'summon' command, is summoned by ability name.
             - You can set level limits on the mob.
+ <&yflags&0> The ONE-AT-A-TIME flag will block new summons while any mobs from
+              the ability data are in the room and either following you or
+              following nobody (ones following other players are ignored).
 
 Notes:
 - Summoned mobs silently follow the player. Use a trigger like #9804 to cancel
@@ -1833,15 +1840,20 @@ Notes:
 - If you want the summoned mob to be charmed, use a trigger like #9805.
 - Setting a linked trait will increase the number of summons but it's really
   only implemented for base attributes like Strength and Wits.
-- Cannot use the INVISIBLE flag for messaging.
-- These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
-  messages when a player summons the mob. &c$n&0 represents the player and
-  &c&N&0 represents the mob. For fails, use &cfail-self-to-char&0 and
-  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
-  &cpre-self-to-room&0.
+- There is a limit on the number of mobs in the room at a time, which will
+  block some summons. All summons that use the 'summon' command are prevented
+  by this limit. Summons with their own command will still allow you to summon
+  1 mob and, in this case, should usually have the ONE-AT-A-TIME flag.
 
-When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
-and !DRINK-BLOOD flags.
+Messaging:
+- Displays &cpre-self-to-char&0 and &cpre-self-to-room&0 first, then &cself-to-char&0
+  and &cself-to-room&0 if it succeeds.
+- Displays &cfail-self-to-char&0 and &cfail-self-to-room&0 if it fails.
+- Successful summons each send &cper-char-to-char&0 and &cper-char-to-room&0
+  messages.
+
+When a mob is summoned, it automatically gets the SPAWNED, !LOOT, and !EXP
+flags.
 
 Example summon abilities: 168 Summon Swift, 34 Summon Animals
 
