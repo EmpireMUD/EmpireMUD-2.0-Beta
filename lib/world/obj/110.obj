@@ -270,7 +270,7 @@ T 11021
 T 11022
 S
 #11022
-carcass~
+carcass cow half-eaten~
 a half-eaten cow carcass~
 A half-eaten cow carcass is rotting on the ground.~
    This carcass appears to be most of a cow, although something has already
@@ -282,7 +282,7 @@ the smell is foul enough to make you retch.
 7 144
 S
 #11023
-carcass~
+carcass horse rotting~
 a rotting horse carcass~
 A rotting horse carcass is lying on the ground.~
    What remains of the horse is lying on the ground, rotting, covered in flies
@@ -410,7 +410,7 @@ Craft (level 100): magnificent feathered headdress
 10 0
 S
 #11032
-daedalus wings~
+wings daedalus~
 the wings of Daedalus~
 The wings of Daedalus lie here.~
    These wings are made from magnificent, oversized roc feathers. The skill
