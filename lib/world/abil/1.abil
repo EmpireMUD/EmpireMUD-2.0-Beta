@@ -456,14 +456,13 @@ X+ 2 20
 X+ 3 20
 S
 #122
-Familiar~
-0 -1 1.00 0 o 0
+Feline Familiars~
+0 -1 1.00 0 ho 0
 C
 unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 500 0
 D 8 501 0
 D 8 502 0
-D 8 506 0
 M
 2
 You send up a jet of sparkling blue mana and $N appears!~

@@ -344,4 +344,18 @@ M
 *~
 T A 1
 S
+#316
+Giant Tortoise Familiar~
+0 -1 1.00 0 ho 0
+C
+unknown 8 0 2 50 0.00 -1 0 0 5 0
+D 8 506 0
+M
+2
+You send out a burst of shimmering green mana and $N appears!~
+M
+4
+$n sends out a burst of shimmering green mana and $N appears!~
+T h 0
+S
 $
