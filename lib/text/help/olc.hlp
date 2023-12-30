@@ -119,10 +119,6 @@ on the editors instead, see HELP OLC.
 
 ** Editor Notes **
 
-Abilities (ABILEDIT):
-- The mastery ability is mainly used to determine when a craft should be marked
-  (superior). Do not apply mastery abilities to abilities that don't need this.
-
 Adventures (ADVEDIT):
 - You should use the CAN-DELAY-LOAD flag whenever possible. This will reduce
   work (and lag) from having many copies of the adventure by not loading the
@@ -222,9 +218,6 @@ Crops (CROPEDIT):
 - Players foraging on any tile have a chance to find the forage item from any
   wild crop in the area, if they get nothing back from the sector's own forage
   list.
-
-Events (EVEDIT):
-- Use quests or scripts to give event points.
 
 Factions (FEDIT):
 - The REP-FROM-KILLS flag causes you to lose reputation if you kill a mob who
@@ -516,7 +509,9 @@ Usage:  .abil <command>
         .command
 
 The .olc ability editor allows you to configure the data for various abilities.
-The main properties set up here are names and mastery abilities.
+Many types of abilities can be configured in this editor. See ABILEDIT types
+for a list of ability types; these also have help files with more information,
+such as ABILEDIT BUFF.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
@@ -1289,7 +1284,12 @@ mastery abilities that result in the (superior) flag on crafts.
 
 Scalable abilities that aren't crafts get a 25% boost from masteries.
 
-See also: OLC ABILITIES
+MASTERY is also an ability type, for marking abilities that only give mastery
+to other abilities. This type of ability has no inherent properties.
+
+Example mastery abilities: 194 Master Tailor
+
+See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT MAXSTACKS" "ABILEDIT MAX STACKS"
 
@@ -1313,6 +1313,17 @@ most abilities, this is "resting", "fighting", or "standing". This applies to
 command abilities as well as companion, summon, and ready weapon abilities.
 
 See also: POSITIONS, OLC ABILITIES
+#d
+"ABILEDIT MORPH ABILITY" "ABILEDIT MORPH ABILITIES" "MORPH ABILITY" "MORPH ABILITIES"
+
+The MORPH ability type marks an ability that gives the player new morph forms.
+The data for morphs is not configured in the ability editor, however. Morphs
+are assigned to the ability inside the morph editor. This type of ability has
+no other properties.
+
+Example morph abilities: 4 Wolf Form, 215 Animal Forms
+
+See also: OLC ABILITIES, OLC MORPHS, MORPHEDIT REQUIRES ABILITY
 #d
 "ABILEDIT MULTI" "ABILEDIT MULTIPLE TARGETS" "MULTIPLE TARGETS ABILITIES"
 
@@ -1648,6 +1659,25 @@ This determines which pool a RESTORE ability will affect. If you set it to
 
 See also: RESTORE ABILITY
 #d
+"ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"
+
+The RESOURCE ability type marks an ability as mainly related to resource-gain.
+This type of ability does not have properties of its own, but it's often used
+through other editors to give the player access to more things.
+
+For example, ability 70 Find Herbs is used in the interaction list of many
+sectors (terrains) to restrict who can get herbs by using 'pick' there. Here's
+an example of that interaction:
+ 1. PICK: 125-max iridescent blue iris (1206) 8.33% (p)
+ 2. PICK: 125-max sack of fiveleaf (1201) 100.00% (p) (Ability: Find Herbs)
+ 3. PICK: 125-max small flower (123) 100.00% (p)
+
+With those interactions, all players find the iris at 8.33%, but someone with
+Find Herbs will get fiveleaf the rest of the time, while someone without it
+finds only small flowers.
+
+See also: OLC ABILITIES
+#d
 "ABILEDIT RESOURCECOST" "ABILEDIT RESOURCE COST"
 
 Usage:  .resource add <type> <amount> <vnum/name>
@@ -1659,7 +1689,7 @@ This command sets the resources required to use the ability.
 
 See HELP OLC RESOURCES for more information.
 
-See also: OLC CRAFTS, RESOURCE ACTIONS
+See also: OLC ABILITIES, RESOURCE ACTIONS
 #d
 "ABILEDIT RESTORE ABILITY" "ABILEDIT RESTORATION ABILITY" "RESTORE ABILITIES" "RESTORATION ABILITIES"
 
