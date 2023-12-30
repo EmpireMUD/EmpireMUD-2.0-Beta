@@ -7057,6 +7057,11 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 		// gain for this abilitty
 		gain_ability_exp(ch, ABIL_VNUM(abil), gain);
 		
+		// gain for mastery?
+		if (ABIL_MASTERY_ABIL(abil) != NOTHING && ABIL_MASTERY_ABIL(abil) != ABIL_VNUM(abil)) {
+			gain_ability_exp(ch, ABIL_MASTERY_ABIL(abil), gain);
+		}
+		
 		// look for others that should gain here, too, based on supercedes
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			if (!plab->ptr || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
