@@ -1797,12 +1797,14 @@ S
 #194
 Master Tailor~
 0 -1 1.00 0 0 0
-T a 0
+T z 1
+T a 1
 S
 #195
 Master Blacksmith~
 0 -1 1.00 0 0 0
-T a 0
+T z 1
+T a 1
 S
 #196
 Deadly Weapons~

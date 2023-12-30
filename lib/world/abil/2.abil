@@ -58,7 +58,8 @@ S
 #203
 Master Craftsman~
 0 203 1.00 0 0 0
-T a 0
+T z 1
+T a 1
 S
 #204
 Master Farmer~
@@ -158,11 +159,6 @@ S
 Animal Forms~
 0 -1 1.00 0 0 0
 T k 1
-S
-#216
-Refashion~
-0 -1 1.00 0 0 0
-T m 0
 S
 #218
 Dual-Wield~
