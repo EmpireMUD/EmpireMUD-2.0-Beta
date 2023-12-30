@@ -3513,7 +3513,8 @@ while %cycles_left% >= 0
   end
   switch %cycles_left%
     case 3
-      %echo% You invoke the demon and start to look for a good hiding place to observe from.
+      %send% %actor% You invoke the demon and start to look for a good hiding place to observe from.
+      %echoaround% %actor% ~%actor% invokes the demon and you start to look for a good hiding place to observe from.
     break
     case 2
       %echo% A thump, a bump, and a clunk can be heard.
