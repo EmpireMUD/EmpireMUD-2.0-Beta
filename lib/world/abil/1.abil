@@ -1039,24 +1039,36 @@ S
 Summon Swift~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0.00 2032 60 0 5 2
+summon 8 w 2 10 0.00 2032 60 0 5 2
 D 8 400 0
 D 8 401 0
 D 8 402 0
 D 8 403 0
 D 8 404 0
 M
-2
-You open a portal and $N dashes out!~
+0
+*~
 M
-4
-$n opens a portal and $N dashes out!~
+1
+*~
 M
 8
-You open a portal but nobody comes out.~
+... but nothing comes out before it closes.~
 M
 9
-$n opens a portal but nothing comes out.~
+... but nothing comes out before it closes.~
+M
+13
+You open a portal...~
+M
+14
+$n opens a portal...~
+M
+25
+$N comes dashing out!~
+M
+27
+$N comes dashing out!~
 T i 0
 S
 #169

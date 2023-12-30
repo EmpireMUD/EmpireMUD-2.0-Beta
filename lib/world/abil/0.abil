@@ -402,20 +402,32 @@ S
 Summon Thug~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 1 50 0.00 2031 30 0 1 2
+summon 8 a 1 50 0.00 2031 30 0 1 2
 D 8 230 0
 M
-2
-You give the secret signal... $N appears.~
+0
+*~
 M
-4
-$N walks up.~
+1
+*~
 M
 8
-You give the secret signal... but nobody shows up.~
+... but nobody shows up.~
 M
 9
+*~
+M
+13
+You give the secret signal...~
+M
+14
 $n makes a hand gesture.~
+M
+25
+$N walks up.~
+M
+27
+$N walks up.~
 T j 0
 S
 #29
@@ -476,7 +488,7 @@ S
 Summon Animals~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0.00 2028 30 4 5 2
+summon 8 a 2 10 0.00 2028 30 4 5 2
 D 8 530 0
 D 8 531 0
 D 8 532 0
@@ -488,34 +500,52 @@ D 8 537 0
 D 8 538 0
 D 8 539 0
 M
+0
+*~
+M
+1
+*~
+M
+8
+... nobody seems to respond.~
+M
+9
+*~
+M
 13
 You whistle a melodic little tune into the air...~
 M
 14
 $n whistles a melodic little tune into the air...~
 M
-2
+25
 $N arrives suddenly!~
 M
-4
+27
 $N arrives suddenly!~
-M
-8
-Nobody seems to respond.~
-M
-9
-Nothing seems to happen.~
 T j 0
 S
 #35
 Summon Humans~
 0 -1 1.00 0 0 0
 C
-unknown 8 0 3 10 0.00 2027 60 4 1 2
+summon 8 a 3 10 0.00 2027 60 4 1 2
 D 8 9029 0
 D 8 9030 0
 D 8 9031 0
 D 8 9032 0
+M
+0
+*~
+M
+1
+*~
+M
+8
+... nobody seems to respond.~
+M
+9
+*~
 M
 13
 You focus your supernatural pheromones into a single drop of blood and let it fall to the ground...~
@@ -523,16 +553,10 @@ M
 14
 $n drips blood on the ground...~
 M
-2
+25
 $N arrives.~
 M
-8
-Nobody seems to respond.~
-M
-9
-Nothing seems to happen.~
-M
-4
+27
 $N arrives.~
 T j 0
 S
