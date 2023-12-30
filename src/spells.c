@@ -631,9 +631,6 @@ ACMD(do_ready) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	if (!char_can_act(ch, ABIL_MIN_POS(found_abil), !ABILITY_FLAGGED(found_abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(found_abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
-		return;
-	}
 	
 	// pass through to ready-weapon ability
 	perform_ability_command(ch, found_abil, arg);
@@ -720,11 +717,6 @@ ACMD(do_ritual) {
 		}
 		
 		// match!
-		if (GET_POS(ch) < POS_RESTING || GET_POS(ch) < ABIL_MIN_POS(abil)) {
-			send_low_pos_msg(ch);	// not high enough pos for this conjure
-			return;
-		}
-		
 		perform_ability_command(ch, abil, arg2);
 		found = TRUE;
 		break;
