@@ -1270,6 +1270,22 @@ Limitation types:
 
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
+"ABILEDIT LINK ABILITY" "LINK ABILITY" "LINK ABILITIES"
+
+The LINK ability type has no real properties of its own. Its purpose is to help
+create complex abilities, for example by checking immunities on a target before
+an ability that targets one's self.
+
+The best example is 315 Splash Blood, which is a helper for ability
+314 Red Mist. Splash Blood hooks on any physical damage against a target but
+has a !DRINK-BLOOD immunity flag. If this immunity is present, nothing else
+happens. If not, it will chain to 314 Red Mist, which targets the player to
+restore blood. Red Mist cannot check the immunity itself because its target is
+the player who's attacking, not the victim of the attack. Splash Blood fills in
+the middle link for this.
+
+See also: OLC ABILITIES
+#d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
 Usage:  .linkedtrait <trait | none>
@@ -2015,6 +2031,7 @@ The following types are available (each has its own help file):
  &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
+ &cLINK&0 - Helper type for complex hook abilities.
  &cMASTERY&0 - No inherent properties; just a label where applicable.
  &cMORPH&0 - Ability has morphs that require it.
  &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
