@@ -93,6 +93,7 @@ DO_ABIL(do_conjure_object_ability);
 DO_ABIL(do_conjure_vehicle_ability);
 DO_ABIL(do_damage_ability);
 DO_ABIL(do_dot_ability);
+DO_ABIL(do_link_ability);
 DO_ABIL(do_paint_building_ability);
 DO_ABIL(do_ready_weapon_ability);
 DO_ABIL(do_restore_ability);
@@ -143,6 +144,7 @@ struct {
 	{ ABILT_MORPH, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
 	{ ABILT_AUGMENT, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
 	{ ABILT_CUSTOM, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_LINK, NULL, do_link_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, NOBITS },
 	
 	// ones that should run early
 	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
@@ -4590,6 +4592,15 @@ DO_ABIL(do_dot_ability) {
 
 	dmg = MAX(1, dmg);
 	apply_dot_effect(vict, affect_vnum, dur, ABIL_DAMAGE_TYPE(abil), dmg, ABIL_MAX_STACKS(abil), ch);
+	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_link_ability) {
+	// I am just a conduit between two abilities
+	// e.g. if a hooked ability will target self, but something in the middle
+	// needs to check immunities on another target.
 	data->success = TRUE;
 }
 

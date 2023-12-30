@@ -606,6 +606,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_ATTACK			BIT(23)	// x. hits the target with one's own weapon attack
 #define ABILT_RESTORE			BIT(24)	// y. restores pools (health, etc)
 #define ABILT_MASTERY		    BIT(25)	// z. no inherent functions; just marks it as mastery of another one
+#define ABILT_LINK				BIT(26)	// A. only serves to link between two other abilities
 
 
 // ATAR_x: ability targeting flags

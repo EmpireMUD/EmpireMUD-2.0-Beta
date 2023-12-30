@@ -247,6 +247,7 @@ const char *ability_type_flags[] = {
 	"ATTACK",
 	"RESTORE",
 	"MASTERY",	// 25
+	"LINK",
 	"\n"
 };
 
@@ -279,6 +280,7 @@ const char *ability_type_notes[] = {
 	"attack",
 	"restoration",
 	"mastery",	// 25
+	"links abilities",
 	"\n"
 };
 
