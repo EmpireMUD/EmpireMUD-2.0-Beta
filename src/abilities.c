@@ -4976,10 +4976,6 @@ DO_ABIL(do_summon_random_ability) {
 	int max_npcs = config_get_int("summon_npc_limit");
 	int max_followers = config_get_int("npc_follower_limit");
 	
-	if (data->summon_vnum <= 0) {
-		return;	// nothing to summon (should have been pre-determined)
-	}
-	
 	// count mobs and check limit
 	count = 0;
 	fol_count = 0;
@@ -7919,7 +7915,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	int iter;
 	
 	const char *ignore_same_command[] = {
-		"chant", "conjure", "ready", "ritual",
+		"cast", "chant", "conjure", "ready", "ritual", "summon",
 		"\n"
 	};
 	
