@@ -116,6 +116,7 @@ PREP_ABIL(prep_restore_ability);
 PREP_ABIL(prep_resurrect_ability);
 PREP_ABIL(prep_room_affect_ability);
 PREP_ABIL(prep_summon_any_ability);
+PREP_ABIL(prep_summon_random_ability);
 PREP_ABIL(prep_teleport_ability);
 
 // for ability struct
@@ -170,7 +171,7 @@ struct {
 	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
 	{ ABILT_SUMMON_ANY, prep_summon_any_ability, do_summon_any_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT | ABILEDIT_COMMAND },
-	{ ABILT_SUMMON_RANDOM, NULL, do_summon_random_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT | ABILEDIT_COMMAND },
+	{ ABILT_SUMMON_RANDOM, prep_summon_random_ability, do_summon_random_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT | ABILEDIT_COMMAND },
 	
 	// alaways run actions last
 	{ ABILT_ACTION, NULL, do_action_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
@@ -3978,68 +3979,6 @@ PREP_ABIL(prep_ready_weapon_ability) {
 
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
-PREP_ABIL(prep_summon_any_ability) {
-	any_vnum found_name = NOTHING, found_one = NOTHING;
-	bool found_many = FALSE;
-	char_data *proto = NULL;
-	struct ability_data_list *adl;
-	
-	// find by mob name
-	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
-			continue;	// no match
-		}
-		
-		// mark for later
-		if (found_one == NOTHING) {
-			found_one = adl->vnum;
-		}
-		else {
-			found_many = TRUE;
-		}
-		
-		if (!*argument) {
-			continue;	// no name provided -- just setting found_one/found_many
-		}
-		if (!multi_isname(argument, GET_PC_NAME(proto))) {
-			continue;	// no string match
-		}
-		
-		// if we got here, there was a name match
-		found_name = adl->vnum;
-		break;
-	}
-	
-	// did we find anything?
-	if (found_name != NOTHING) {
-		// name match
-		data->summon_vnum = found_name;
-	}
-	else if (*argument) {
-		msg_to_char(ch, "You don't know how to summon %s '%s'.\r\n", AN(argument), argument);
-		CANCEL_ABILITY(data);
-		return;
-	}
-	else if (found_one != NOTHING && !found_many) {
-		// found exactly 1
-		data->summon_vnum = found_one;
-	}
-	else {
-		msg_to_char(ch, "What did you want to summon?\r\n");
-		CANCEL_ABILITY(data);
-		return;
-	}
-	
-	// final validation: min-level
-	if (data->summon_vnum > 0 && (proto = mob_proto(data->summon_vnum)) && level < GET_MIN_SCALE_LEVEL(proto)) {
-		msg_to_char(ch, "You are not powerful enough to summon %s.\r\n", PERS(proto, proto, FALSE));
-		CANCEL_ABILITY(data);
-		return;
-	}
-}
-
-
-// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_restore_ability) {
 	double amount, reduced_scale;
 	int avail, diff, use_pool = HEALTH;
@@ -4221,6 +4160,104 @@ PREP_ABIL(prep_room_affect_ability) {
 		msg_to_char(ch, "The area is already affected by that ability.\r\n");
 		CANCEL_ABILITY(data);
 		return;
+	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_summon_any_ability) {
+	any_vnum found_name = NOTHING, found_one = NOTHING;
+	bool found_many = FALSE;
+	char_data *ch_iter, *proto = NULL;
+	struct ability_data_list *adl;
+	
+	// check this first
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_SUMMON_MOB) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (GET_MOB_VNUM(ch_iter) == adl->vnum && (!GET_LEADER(ch_iter) || GET_LEADER(ch_iter) == ch)) {
+						act("You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
+						CANCEL_ABILITY(data);
+						return;
+					}
+				}
+			}
+		}
+	}
+	
+	// find by mob name
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
+			continue;	// no match
+		}
+		
+		// mark for later
+		if (found_one == NOTHING) {
+			found_one = adl->vnum;
+		}
+		else {
+			found_many = TRUE;
+		}
+		
+		if (!*argument) {
+			continue;	// no name provided -- just setting found_one/found_many
+		}
+		if (!multi_isname(argument, GET_PC_NAME(proto))) {
+			continue;	// no string match
+		}
+		
+		// if we got here, there was a name match
+		found_name = adl->vnum;
+		break;
+	}
+	
+	// did we find anything?
+	if (found_name != NOTHING) {
+		// name match
+		data->summon_vnum = found_name;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You don't know how to summon %s '%s'.\r\n", AN(argument), argument);
+		CANCEL_ABILITY(data);
+		return;
+	}
+	else if (found_one != NOTHING && !found_many) {
+		// found exactly 1
+		data->summon_vnum = found_one;
+	}
+	else {
+		msg_to_char(ch, "What did you want to summon?\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	// final validation: min-level
+	if (data->summon_vnum > 0 && (proto = mob_proto(data->summon_vnum)) && level < GET_MIN_SCALE_LEVEL(proto)) {
+		msg_to_char(ch, "You are not powerful enough to summon %s.\r\n", PERS(proto, proto, FALSE));
+		CANCEL_ABILITY(data);
+		return;
+	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_summon_random_ability) {
+	char_data *ch_iter;
+	struct ability_data_list *adl;
+	
+	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_SUMMON_MOB) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (GET_MOB_VNUM(ch_iter) == adl->vnum && (!GET_LEADER(ch_iter) || GET_LEADER(ch_iter) == ch)) {
+						act("You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
+						CANCEL_ABILITY(data);
+						return;
+					}
+				}
+			}
+		}
 	}
 }
 
