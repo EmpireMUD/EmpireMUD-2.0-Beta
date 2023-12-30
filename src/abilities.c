@@ -7665,7 +7665,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "REPEAT-OVER-TIME flag without OVER-TIME");
 		problem = TRUE;
 	}
-	if (!abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR) && ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !IS_SET(ABIL_TYPES(abil), ABILT_ATTACK | ABILT_DAMAGE)) {
+	if (!abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR) && ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !IS_SET(ABIL_TYPES(abil), ABILT_ATTACK | ABILT_DAMAGE | ABILT_CRAFT | ABILT_CUSTOM | ABILT_PLAYER_TECH)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No fail messages");
 		problem = TRUE;
 	}
