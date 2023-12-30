@@ -860,8 +860,13 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		craft_level = get_craft_scale_level(ch, craft);
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
-		if ((GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) && GET_OBJ_MIN_SCALE_LEVEL(proto) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
-			sprintf(buf + strlen(buf), ", level %d (%s)", craft_level, level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
+			if (GET_OBJ_MIN_SCALE_LEVEL(proto) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
+				sprintf(buf + strlen(buf), ", level %d (%s)", craft_level, level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+			}
+			else {	// same min/max
+				sprintf(buf + strlen(buf), ", level %d", craft_level);
+			}
 		}
 		else if (OBJ_FLAGGED(proto, OBJ_SCALABLE) && craft_level > 0) {
 			sprintf(buf + strlen(buf), ", level %d", craft_level);
