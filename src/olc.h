@@ -210,6 +210,7 @@ void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
 bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
+bool delete_from_interaction_restrictions(struct interaction_item **list, int type, any_vnum vnum);
 bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
@@ -349,6 +350,7 @@ int wordcount_vehicle(vehicle_data *veh);
 
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
+bool find_interaction_restriction_in_list(struct interaction_item *list, int type, any_vnum vnum);
 bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 
 

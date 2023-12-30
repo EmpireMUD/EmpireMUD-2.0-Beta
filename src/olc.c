@@ -5332,6 +5332,35 @@ struct spawn_info *copy_spawn_list(struct spawn_info *input_list) {
 
 
 /**
+* If an interaction list contains any matching restrictions, those restrictions
+* are deleted. The interactions themselves are not otherwise affected nor
+* removed.
+*
+* @param struct interaction_item *list The interactions to check.
+* @param int type The INTERACT_RESTRICT_ type to look for.
+* @param any_vnum vnum The vnum to look for, of that type.
+* @return bool TRUE if any matching restrictions were found and deleted, FALSE if not.
+*/
+bool delete_from_interaction_restrictions(struct interaction_item **list, int type, any_vnum vnum) {
+	bool any = FALSE;
+	struct interaction_item *inter;
+	struct interact_restriction *restr, *next_restr;
+	
+	LL_FOREACH(*list, inter) {
+		LL_FOREACH_SAFE(inter->restrictions, restr, next_restr) {
+			if (restr->type == type && restr->vnum == vnum) {
+				any = TRUE;
+				LL_DELETE(inter->restrictions, restr);
+				free(restr);
+			}
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * Finds an extra description by number, starting with 1.
 *
 * @param struct extra_descr_data *list The list to search.
@@ -5347,6 +5376,32 @@ struct extra_descr_data *find_extra_desc_by_num(struct extra_descr_data *list, i
 	}
 	
 	return ex;
+}
+
+
+/**
+* Determines if an interaction list contains a matching restriction on any of
+* its interactions.
+*
+* @param struct interaction_item *list The interactions to check.
+* @param int type The INTERACT_RESTRICT_ type to look for.
+* @param any_vnum vnum The vnum to look for, of that type.
+* @return bool TRUE if any are found in the list, FALSE if there are no matches.
+*/
+bool find_interaction_restriction_in_list(struct interaction_item *list, int type, any_vnum vnum) {
+	struct interaction_item *inter;
+	struct interact_restriction *restr;
+	
+	LL_FOREACH(list, inter) {
+		LL_FOREACH(inter->restrictions, restr) {
+			if (restr->type == type && restr->vnum == vnum) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// found none
+	return FALSE;
 }
 
 

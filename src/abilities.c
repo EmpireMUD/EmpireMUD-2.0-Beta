@@ -7989,23 +7989,30 @@ char *list_one_ability(ability_data *abil, bool detail) {
 * @param any_vnum vnum The ability vnum.
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
+	bool any;
 	char buf[MAX_STRING_LENGTH];
+	int size, found;
 	ability_data *abil = find_ability_by_vnum(vnum);
-	struct global_data *glb, *next_glb;
 	ability_data *abiter, *next_abiter;
+	augment_data *aug, *next_aug;
+	bld_data *bld, *next_bld;
+	char_data *mob, *next_mob;
+	class_data *cls, *next_cls;
 	craft_data *craft, *next_craft;
+	crop_data *crop, *next_crop;
+	struct global_data *glb, *next_glb;
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
+	room_template *rmt, *next_rmt;
+	sector_data *sect, *next_sect;
 	skill_data *skill, *next_skill;
+	obj_data *obj, *next_obj;
 	progress_data *prg, *next_prg;
-	augment_data *aug, *next_aug;
-	struct synergy_ability *syn;
 	social_data *soc, *next_soc;
-	class_data *cls, *next_cls;
+	vehicle_data *veh, *next_veh;
+	struct synergy_ability *syn;
 	struct class_ability *clab;
 	struct skill_ability *skab;
-	int size, found;
-	bool any;
 	
 	if (!abil) {
 		msg_to_char(ch, "There is no ability %d.\r\n", vnum);
@@ -8022,6 +8029,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
 		any |= find_ability_data_entry_for(abiter, ADL_PARENT, vnum) ? TRUE : FALSE;
 		any |= find_ability_data_entry_for(abiter, ADL_SUPERCEDED_BY, vnum) ? TRUE : FALSE;
+		any |= find_interaction_restriction_in_list(ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (any) {
 			++found;
@@ -8034,6 +8042,15 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (GET_AUG_ABILITY(aug) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = find_interaction_restriction_in_list(GET_BLD_INTERACTIONS(bld), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -8056,11 +8073,32 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// crops
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		any = find_interaction_restriction_in_list(GET_CROP_INTERACTIONS(crop), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		}
+	}
+	
 	// globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
-		if (GET_GLOBAL_ABILITY(glb) == vnum) {
+		any = find_interaction_restriction_in_list(GET_GLOBAL_INTERACTIONS(glb), INTERACT_RESTRICT_ABILITY, vnum);
+		any |= (GET_GLOBAL_ABILITY(glb) == vnum);
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+		}
+	}
+	
+	// mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		any = find_interaction_restriction_in_list(MOB_INTERACTIONS(mob), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -8069,6 +8107,15 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (MORPH_ABILITY(morph) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		}
+	}
+	
+	// objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		any = find_interaction_restriction_in_list(GET_OBJ_INTERACTIONS(obj), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
@@ -8098,6 +8145,24 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		any = find_interaction_restriction_in_list(GET_RMT_INTERACTIONS(rmt), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		}
+	}
+	
+	// sectors
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		any = find_interaction_restriction_in_list(GET_SECT_INTERACTIONS(sect), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
@@ -8135,6 +8200,15 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = find_interaction_restriction_in_list(VEH_INTERACTIONS(veh), INTERACT_RESTRICT_ABILITY, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
@@ -9086,17 +9160,23 @@ ability_data *create_ability_table_entry(any_vnum vnum) {
 void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	struct player_ability_data *plab, *next_plab;
 	ability_data *abil, *abiter, *next_abiter;
-	struct global_data *glb, *next_glb;
+	augment_data *aug, *next_aug;
+	bld_data *bld, *next_bld;
+	char_data *chiter, *mob, *next_mob;
+	class_data *cls, *next_cls;
 	craft_data *craft, *next_craft;
+	crop_data *crop, *next_crop;
+	descriptor_data *desc;
+	struct global_data *glb, *next_glb;
 	morph_data *morph, *next_morph;
 	quest_data *quest, *next_quest;
+	room_template *rmt, *next_rmt;
+	sector_data *sect, *next_sect;
 	skill_data *skill, *next_skill;
+	obj_data *obj, *next_obj;
 	progress_data *prg, *next_prg;
-	augment_data *aug, *next_aug;
 	social_data *soc, *next_soc;
-	class_data *cls, *next_cls;
-	descriptor_data *desc;
-	char_data *chiter;
+	vehicle_data *veh, *next_veh;
 	char name[256];
 	bool found;
 	
@@ -9117,9 +9197,10 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			ABIL_MASTERY_ABIL(abiter) = NOTHING;
 			found = TRUE;
 		}
-		found |= delete_from_ability_hooks(abil, AHOOK_ABILITY, vnum);
-		found |= delete_from_ability_data_list(abil, ADL_PARENT, vnum);
-		found |= delete_from_ability_data_list(abil, ADL_SUPERCEDED_BY, vnum);
+		found |= delete_from_ability_hooks(abiter, AHOOK_ABILITY, vnum);
+		found |= delete_from_ability_data_list(abiter, ADL_PARENT, vnum);
+		found |= delete_from_ability_data_list(abiter, ADL_SUPERCEDED_BY, vnum);
+		found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost related deleted ability", ABIL_VNUM(abiter), ABIL_NAME(abiter));
@@ -9134,6 +9215,16 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Augment %d %s set IN-DEV due to deleted ability", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
+	// update buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		found = delete_from_interaction_restrictions(&GET_BLD_INTERACTIONS(bld), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost interaction restrictions due to deleted ability", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
 	
@@ -9156,13 +9247,39 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update crops
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		found = delete_from_interaction_restrictions(&GET_CROP_INTERACTIONS(crop), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Crop %d %s lost interaction restrictions due to deleted ability", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
+		}
+	}
+	
 	// update globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
+		found = FALSE;
 		if (GET_GLOBAL_ABILITY(glb) == vnum) {
+			found = TRUE;
 			GET_GLOBAL_ABILITY(glb) = NOTHING;
+		}
+		found |= delete_from_interaction_restrictions(&GET_GLOBAL_INTERACTIONS(glb), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
 			SET_BIT(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Global %d %s set IN-DEV due to deleted ability", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
+		}
+	}
+	
+	// update mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		found = delete_from_interaction_restrictions(&MOB_INTERACTIONS(mob), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost interaction restrictions due to deleted ability", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
 		}
 	}
 	
@@ -9173,6 +9290,16 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Morph %d %s set IN-DEV due to deleted ability", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
+	// update objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = delete_from_interaction_restrictions(&(obj->proto_data->interactions), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Object %d %s lost interaction restrictions due to deleted ability", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
@@ -9200,6 +9327,26 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		found = delete_from_interaction_restrictions(&GET_RMT_INTERACTIONS(rmt), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Room template %d %s lost interaction restrictions due to deleted ability", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
+	// update sectors
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		found = delete_from_interaction_restrictions(&GET_SECT_INTERACTIONS(sect), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Sector %d %s lost interaction restrictions due to deleted ability", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+		}
+	}
+	
 	// update skills
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(skill), vnum);
@@ -9218,6 +9365,16 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Social %d %s set IN-DEV due to deleted ability", SOC_VNUM(soc), SOC_NAME(soc));
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		found = delete_from_interaction_restrictions(&VEH_INTERACTIONS(veh), INTERACT_RESTRICT_ABILITY, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost interaction restrictions due to deleted ability", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
 	
@@ -9247,6 +9404,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_PARENT, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUPERCEDED_BY, vnum);
+			found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), INTERACT_RESTRICT_ABILITY, vnum);
 			
 			if (found) {
 				msg_to_desc(desc, "An ability linked to the one you're editing has been deleted.\r\n");
@@ -9256,6 +9414,12 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (GET_AUG_ABILITY(GET_OLC_AUGMENT(desc)) == vnum) {
 				GET_AUG_ABILITY(GET_OLC_AUGMENT(desc)) = NOTHING;
 				msg_to_desc(desc, "The required ability has been deleted from the augment you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_BUILDING(desc)) {
+			found = delete_from_interaction_restrictions(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the building you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_CLASS(desc)) {
@@ -9270,16 +9434,40 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "The required ability has been deleted from the craft you're editing.\r\n");
 			}
 		}
+		if (GET_OLC_CROP(desc)) {
+			found = delete_from_interaction_restrictions(&GET_CROP_INTERACTIONS(GET_OLC_CROP(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the crop you're editing.\r\n");
+			}
+		}
 		if (GET_OLC_GLOBAL(desc)) {
+			found = FALSE;
 			if (GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) == vnum) {
+				found = TRUE;
 				GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) = NOTHING;
+			}
+			found |= delete_from_interaction_restrictions(&GET_GLOBAL_INTERACTIONS(GET_OLC_GLOBAL(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+		
+			if (found) {
 				msg_to_desc(desc, "The required ability has been deleted from the global you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_MOBILE(desc)) {
+			found = delete_from_interaction_restrictions(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the mobile you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_MORPH(desc)) {
 			if (MORPH_ABILITY(GET_OLC_MORPH(desc)) == vnum) {
 				MORPH_ABILITY(GET_OLC_MORPH(desc)) = NOTHING;
 				msg_to_desc(desc, "The required ability has been deleted from the morph you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = delete_from_interaction_restrictions(&(GET_OLC_OBJECT(desc)->proto_data->interactions), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the object you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
@@ -9299,6 +9487,18 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "An ability has been deleted from the quest you're editing.\r\n");
 			}
 		}
+		if (GET_OLC_ROOM_TEMPLATE(desc)) {
+			found = delete_from_interaction_restrictions(&GET_RMT_INTERACTIONS(GET_OLC_ROOM_TEMPLATE(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the room template you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_SECTOR(desc)) {
+			found = delete_from_interaction_restrictions(&GET_SECT_INTERACTIONS(GET_OLC_SECTOR(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the sector you're editing.\r\n");
+			}
+		}
 		if (GET_OLC_SKILL(desc)) {
 			found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(GET_OLC_SKILL(desc)), vnum);
 			found |= remove_ability_from_synergy_abilities(&SKILL_SYNERGIES(GET_OLC_SKILL(desc)), vnum);
@@ -9312,6 +9512,12 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A required ability has been deleted from the social you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			found = delete_from_interaction_restrictions(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), INTERACT_RESTRICT_ABILITY, vnum);
+			if (found) {
+				msg_to_desc(desc, "A required ability has been deleted from interactions on the vehicle you're editing.\r\n");
 			}
 		}
 	}
