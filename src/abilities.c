@@ -11529,7 +11529,7 @@ OLC_MODULE(abiledit_longduration) {
 		}
 	}
 	else {
-		ABIL_LONG_DURATION(abil) = olc_process_number(ch, argument, "long duration", "longduration", 1, MAX_INT, ABIL_LONG_DURATION(abil));
+		ABIL_LONG_DURATION(abil) = olc_process_number(ch, argument, "long duration", "longduration", 0, MAX_INT, ABIL_LONG_DURATION(abil));
 	}
 }
 
@@ -11647,7 +11647,7 @@ OLC_MODULE(abiledit_shortduration) {
 		}
 	}
 	else {
-		ABIL_SHORT_DURATION(abil) = olc_process_number(ch, argument, "short duration", "shortduration", 1, MAX_INT, ABIL_SHORT_DURATION(abil));
+		ABIL_SHORT_DURATION(abil) = olc_process_number(ch, argument, "short duration", "shortduration", 0, MAX_INT, ABIL_SHORT_DURATION(abil));
 	}
 }
 
