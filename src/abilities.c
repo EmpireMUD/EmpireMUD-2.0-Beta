@@ -36,6 +36,7 @@
 *   Ability Effects and Limits
 *   Ability Prep Functions
 *   Ability Do Functions
+*   Ability Fail Functions
 *   Ability Lookups
 *   Ability Messaging
 *   Abilities Over Time
@@ -99,6 +100,9 @@ DO_ABIL(do_resurrect_ability);
 DO_ABIL(do_room_affect_ability);
 DO_ABIL(do_teleport_ability);
 
+DO_ABIL(fail_attack_ability);
+DO_ABIL(fail_damage_ability);
+
 PREP_ABIL(prep_buff_ability);
 PREP_ABIL(prep_conjure_liquid_ability);
 PREP_ABIL(prep_conjure_object_ability);
@@ -121,6 +125,7 @@ struct {
 	bitvector_t type;	// ABILT_ const
 	PREP_ABIL(*prep_func);	// does the cost setup
 	DO_ABIL(*do_func);	// runs the ability
+	DO_ABIL(*fail_func);	// called if the ability fails due to difficulty
 	bool scaled_type;
 	bool check_immune;	// whether or not immunities affect this type
 	bitvector_t fields;	// what shows in the menu/stats
@@ -129,42 +134,42 @@ struct {
 	// ABILT_x: setup by type; they run in this order:
 	
 	// types that don't run functions
-	{ ABILT_MASTERY, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_CRAFT, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_RESOURCE, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_PLAYER_TECH, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_DIFFICULTY },
-	{ ABILT_PASSIVE_BUFF, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
-	{ ABILT_COMPANION, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
-	{ ABILT_MORPH, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_AUGMENT, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
-	{ ABILT_CUSTOM, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_MASTERY, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_CRAFT, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_RESOURCE, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_PLAYER_TECH, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_DIFFICULTY },
+	{ ABILT_PASSIVE_BUFF, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_APPLIES | ABILEDIT_AFFECTS },
+	{ ABILT_COMPANION, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COST | ABILEDIT_WAIT | ABILEDIT_COOLDOWN | ABILEDIT_DIFFICULTY },
+	{ ABILT_MORPH, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_AUGMENT, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
+	{ ABILT_CUSTOM, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, NOBITS },
 	
 	// ones that should run early
-	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_TELEPORT, prep_teleport_ability, do_teleport_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
 	// attack/damage and restoration: some abilities stop here if they miss
-	{ ABILT_ATTACK, NULL, do_attack_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_DAMAGE, NULL, do_damage_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
-	{ ABILT_RESTORE, prep_restore_ability, do_restore_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_POOL_TYPE | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_ATTACK, NULL, do_attack_ability, fail_attack_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_DAMAGE, NULL, do_damage_ability, fail_damage_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_IMMUNITIES | ABILEDIT_COST_PER_AMOUNT },
+	{ ABILT_RESTORE, prep_restore_ability, do_restore_ability, NULL, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_POOL_TYPE | ABILEDIT_COST_PER_AMOUNT },
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
-	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_PAINT_BUILDING, NULL, do_paint_building_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
-	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
-	{ ABILT_DOT, NULL, do_dot_ability, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
-	{ ABILT_BUILDING_DAMAGE, NULL, do_building_damage_ability, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
-	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
-	{ ABILT_SUMMON_ANY, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
-	{ ABILT_SUMMON_RANDOM, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_PAINT_BUILDING, NULL, do_paint_building_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
+	{ ABILT_BUFF, prep_buff_ability, do_buff_ability, NULL, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_APPLIES | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES },
+	{ ABILT_DOT, NULL, do_dot_ability, NULL, SCALED_TYPE, CHECK_IMMUNE, ABILEDIT_AFFECT_VNUM | ABILEDIT_DAMAGE_TYPE | ABILEDIT_COMMAND | ABILEDIT_DURATION | ABILEDIT_IMMUNITIES | ABILEDIT_MAX_STACKS },
+	{ ABILT_BUILDING_DAMAGE, NULL, do_building_damage_ability, NULL, SCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_RESURRECT, prep_resurrect_ability, do_resurrect_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
+	{ ABILT_SUMMON_ANY, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT },
 	
 	// alaways run actions last
-	{ ABILT_ACTION, NULL, do_action_ability, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
+	{ ABILT_ACTION, NULL, do_action_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
-	{ NOBITS, NULL, NULL, FALSE, FALSE, NOBITS }	// list terminator
+	{ NOBITS, NULL, NULL, NULL, FALSE, FALSE, NOBITS }	// list terminator
 };
 
 
@@ -4866,6 +4871,40 @@ DO_ABIL(do_teleport_ability) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ABILITY FAIL FUNCTIONS //////////////////////////////////////////////////
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(fail_attack_ability) {
+	int result;
+	attack_message_data *amd;
+	
+	if (vict && vict != ch) {
+		if (GET_EQ(ch, WEAR_WIELD) && IS_WEAPON(GET_EQ(ch, WEAR_WIELD)) && (amd = real_attack_message(GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD))))) {
+			// hit for 0 with the wield weapon
+			result = damage(ch, vict, 0, amd ? ATTACK_VNUM(amd) : config_get_int("default_physical_attack"), amd ? ATTACK_DAMAGE_TYPE(amd) : DAM_PHYSICAL, NULL);
+			if (result < 0) {
+				data->stop = TRUE;
+			}
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(fail_damage_ability) {
+	int result;
+	
+	if (vict && vict != ch) {
+		// damage for 0
+		result = damage(ch, vict, 0, ABIL_ATTACK_TYPE(abil), ABIL_DAMAGE_TYPE(abil), NULL);
+		if (result < 0) {
+			data->stop = TRUE;
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// ABILITY LOOKUPS /////////////////////////////////////////////////////////
 
 /**
@@ -6899,6 +6938,13 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		send_ability_fail_messages(ch, vict, ovict, abil, data);
 		
+		// fun fail functions unless stopped
+		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].fail_func) {
+				call_do_abil(do_ability_data[iter].fail_func);
+			}
+		}
+		
 		data->stop = TRUE;	// prevents normal activation
 		data->no_msg = TRUE;	// prevents success message
 		data->engage_anyway = TRUE;	// allows engage-combat through a data->stop
@@ -6983,8 +7029,17 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	}
 	
 	// check for a no-effect/fail message
-	if (!data->success && !data->no_msg && !data->sent_fail_msg) {
-		send_ability_fail_messages(ch, vict, ovict, abil, data);
+	if (!data->success) {
+		if (!data->no_msg && !data->sent_fail_msg) {
+			send_ability_fail_messages(ch, vict, ovict, abil, data);
+		}
+		
+		// fun fail functions unless stopped
+		for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+			if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].fail_func) {
+				call_do_abil(do_ability_data[iter].fail_func);
+			}
+		}
 	}
 
 	// check limit-crowd-control
