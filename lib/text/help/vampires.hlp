@@ -137,7 +137,7 @@ Cooldown:  30 seconds
 This power purges a vampire's blood of any poisons, including alcohol, by
 sweating them out.
 #
-"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF
+"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF BLOODAXE BLOODWHIP BLOODMATTOCK
 
 Ready Blood Weapons (Vampire ability)
 
@@ -167,6 +167,8 @@ When you activate this power, you will automatically wield the weapon of your
 choice, and it will disappear when unequipped.
 
 Gains experience when you create the blood weapon, or fight with it.
+
+See also: RED MIST
 #
 BOOST
 
@@ -202,6 +204,8 @@ The vampire can turn his fingers into huge, deadly claws that do grievous
 melee damage.
 
 Claws gains experience when toggled on and when you attack with them.
+
+See also: RED MIST
 #
 COMMAND
 
@@ -388,6 +392,15 @@ enable you to see items on the ground.
 Gains experience passively when you're standing in a dark room.
 
 See also: PASSIVES
+#
+"RED MIST"
+
+Red Mist (Vampire ability)
+
+With this ability, you gain a chance to absorb blood from the air after any
+physical attack. Your claws and blood weapons are also upgraded in quality.
+
+See also: CLAWS, READY BLOOD WEAPONS
 #
 REGENERATE
 
