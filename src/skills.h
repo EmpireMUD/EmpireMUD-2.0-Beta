@@ -173,6 +173,7 @@ bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value)
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void read_ability_requirements();
+void redetect_ability_targets_on_login(char_data *ch);
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);

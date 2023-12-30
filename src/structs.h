@@ -5075,11 +5075,13 @@ struct player_special_data {
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
 	char *action_string;	// for run, abilities, etc
-	char_data *action_targ_char;	// unsaved: action targets this char
-	bitvector_t action_targ_multi;	// unsaved: action targets group/etc
+	char_data *action_targ_char;	// action targets this char (saved as id)
+	int temporary_char_targ;	// helps when loading action_targ_char
+	bitvector_t action_targ_multi;	// action targets group/etc
 	obj_data *action_targ_obj;	// unsaved: action targets this object
-	vehicle_data *action_targ_veh;	// unsaved: action targets this vehicle
-	room_vnum action_targ_room;	// unsaved: action targets this room
+	vehicle_data *action_targ_veh;	// action targets this vehicle
+	int temporary_veh_targ;	// helps when loading action_targ_veh
+	room_vnum action_targ_room;	// action targets this room
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in

@@ -73,6 +73,7 @@ struct ability_exec_type *get_ability_type_data(struct ability_exec *data, bitve
 void free_ability_exec(struct ability_exec *data);
 void free_ability_hooks(struct ability_hook *list);
 void post_ability_procs(char_data *ch, ability_data *abil, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, struct ability_exec *data);
+bool recursive_supercede_loop_check(ability_data *abil, any_vnum to_find, int depth);
 void remove_trait_hook(char_data *ch, any_vnum abil_vnum);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity, ability_data *abil, struct ability_exec *data, char *replace_1);
@@ -1284,6 +1285,17 @@ bool has_ability_data_any(ability_data *abil, int type) {
 
 
 /**
+* Detects if the supercede list is at risk for an infinite loop.
+*
+* @param ability_data *abil Which ability to check.
+* @return bool TRUE if there's a dangerous loop, FALSE if not.
+*/
+bool has_looping_supercede_list(ability_data *abil) {
+	return recursive_supercede_loop_check(abil, ABIL_VNUM(abil), 0);
+}
+
+
+/**
 * Determines if the player is in a matching role. This is always true if it's
 * an NPC or if the ability doesn't have role flags.
 *
@@ -1489,17 +1501,6 @@ bool recursive_supercede_loop_check(ability_data *abil, any_vnum to_find, int de
 
 
 /**
-* Detects if the supercede list is at risk for an infinite loop.
-*
-* @param ability_data *abil Which ability to check.
-* @return bool TRUE if there's a dangerous loop, FALSE if not.
-*/
-bool has_looping_supercede_list(ability_data *abil) {
-	return recursive_supercede_loop_check(abil, ABIL_VNUM(abil), 0);
-}
-
-
-/**
 * For abilities stored to the character as action data, attempts to find and
 * validate targets again.
 *
@@ -1653,6 +1654,45 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 	}
 	
 	return TRUE;	// if we got here it's fine
+}
+
+
+/**
+* Tries to pick back up targets for over-time abilities when a player logs
+* back in.
+*
+* @param char_data *ch The player.
+*/
+void redetect_ability_targets_on_login(char_data *ch) {
+	char_data *ch_iter;
+	vehicle_data *veh;
+	
+	if (!ch || !IN_ROOM(ch) || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	if (GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (CAST_BY_ID(ch_iter) == GET_ACTION_TEMPORARY_CHAR_ID(ch)) {
+				// probable match
+				GET_ACTION_CHAR_TARG(ch) = ch_iter;
+				break;
+			}
+		}
+		
+		// clear now either way
+		GET_ACTION_TEMPORARY_CHAR_ID(ch) = 0;
+	}
+	if (GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_VNUM(veh) == GET_ACTION_TEMPORARY_VEH_ID(ch)) {
+				// probable match
+				GET_ACTION_VEH_TARG(ch) = veh;
+				break;
+			}
+		}
+		GET_ACTION_TEMPORARY_VEH_ID(ch) = NOTHING;
+	}
 }
 
 

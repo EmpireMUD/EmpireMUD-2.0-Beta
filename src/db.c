@@ -1812,6 +1812,9 @@ void init_player_specials(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	USING_POISON(ch) = NOTHING;
 	GET_MAP_MEMORY_LOADED(ch) = FALSE;
+	GET_ACTION_TEMPORARY_CHAR_ID(ch) = 0;
+	GET_ACTION_TEMPORARY_VEH_ID(ch) = NOTHING;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 	
 	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 		CREATION_ARCHETYPE(ch, iter) = NOTHING;

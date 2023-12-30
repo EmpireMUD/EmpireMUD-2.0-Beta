@@ -1369,6 +1369,17 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						last_res = res;
 					}
 				}
+				else if (!strn_cmp(line, "Action-targets: ", 16)) {
+					if (sscanf(line + 16, "%d %lld %d %d", &i_in[0], &bit_in, &i_in[2], &i_in[3]) == 4) {
+						// character and vehicle must be converted once in the game
+						GET_ACTION_TEMPORARY_CHAR_ID(ch) = i_in[0];
+						GET_ACTION_MULTI_TARG(ch) = bit_in;
+						GET_ACTION_TEMPORARY_VEH_ID(ch) = i_in[2];
+						GET_ACTION_ROOM_TARG(ch) = i_in[3];
+						
+						// object targets are lost in this process
+					}
+				}
 				else if (!strn_cmp(line, "Action-vnum: ", 13)) {
 					if (sscanf(line + 13, "%d %d", &i_in[0], &i_in[1]) == 2) {
 						if (i_in[0] < NUM_ACTION_VNUMS) {
@@ -2649,6 +2660,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
 			// argument order is for consistency with other resource lists
 			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+		}
+		if (GET_ACTION_CHAR_TARG(ch) || GET_ACTION_MULTI_TARG(ch) || GET_ACTION_VEH_TARG(ch) || GET_ACTION_ROOM_TARG(ch) != NOWHERE || GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0 || GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
+			// object targets are not quit-safe and are not saved
+			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_VNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
 		}
 	}
 	if (GET_ACTION_STRING(ch)) {
@@ -4514,6 +4529,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
 		load_companion_mob(ch, compan);
 	}
+	// redetect targets afterwards in case the companion was the target
+	redetect_ability_targets_on_login(ch);
 	
 	// ensure these are fresh
 	if (GET_LOYALTY(ch)) {
