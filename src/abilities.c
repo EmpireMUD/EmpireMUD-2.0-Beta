@@ -6103,12 +6103,14 @@ void perform_over_time_ability(char_data *ch) {
 	any_vnum abil_vnum = GET_ACTION_VNUM(ch, 0);
 	bitvector_t multi_targ = NOBITS;
 	char arg[MAX_INPUT_LENGTH];
+	int iter;
 	ability_data *abil;
 	char_data *vict;
-	obj_data *ovict;
+	obj_data *ovict, *proto, *temp_obj;
 	vehicle_data *vvict;
 	room_data *room_targ;
 	struct ability_exec *data;
+	struct resource_data *res;
 	
 	// re-validate ability
 	if (!(abil = ability_proto(abil_vnum)) || !has_ability(ch, abil_vnum) || !check_ability_pre_target(ch, abil)) {
@@ -6141,6 +6143,18 @@ void perform_over_time_ability(char_data *ch) {
 	else {
 		// done!
 		call_ability(ch, abil, NULLSAFE(GET_ACTION_STRING(ch)), vict, ovict, vvict, room_targ, multi_targ, GET_ACTION_VNUM(ch, 1), RUN_ABIL_OVER_TIME, data);
+		
+		// any consume-to on any used resources
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			if ((proto = obj_proto(res->vnum)) && has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_CONSUMES_TO)) {
+				temp_obj = read_object(res->vnum, FALSE);
+				obj_to_char(temp_obj, ch);
+				for (iter = 0; iter < res->amount; ++iter) {
+					run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
+				}
+				extract_obj(temp_obj);
+			}
+		}
 		
 		if (data->success && ABILITY_FLAGGED(abil, ABILF_REPEAT_OVER_TIME)) {
 			// auto-repeat
@@ -6590,6 +6604,10 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 * @param struct ability_exec *data The execution data to pass back and forth.
 */
 void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *vict, obj_data *ovict, vehicle_data *vvict, room_data *room_targ, bitvector_t multi_targ, int level, bitvector_t run_mode, struct ability_exec *data) {
+	int iter;
+	obj_data *proto, *temp_obj;
+	struct resource_data *res, *list = NULL;
+	
 	// run the ability
 	if (multi_targ != NOBITS && (IS_SET(run_mode, RUN_ABIL_OVER_TIME) || !ABILITY_FLAGGED(abil, ABILF_OVER_TIME))) {
 		call_multi_target_ability(ch, abil, argument, multi_targ, level, run_mode, data);
@@ -6611,7 +6629,22 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			// charge costs and cooldown unless the ability stopped itself -- regardless of success
 			charge_ability_cost(ch, ABIL_COST_TYPE(abil), data->cost, ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
 			if (ABIL_RESOURCE_COST(abil)) {
-				extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : NULL);
+				extract_resources(ch, ABIL_RESOURCE_COST(abil), FALSE, GET_ACTION(ch) == ACT_OVER_TIME_ABILITY ? &GET_ACTION_RESOURCES(ch) : &list);
+				
+				// consumes-to, if it made a local list
+				if (list) {
+					LL_FOREACH(list, res) {
+						if ((proto = obj_proto(res->vnum)) && has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_CONSUMES_TO)) {
+							temp_obj = read_object(res->vnum, FALSE);
+							obj_to_char(temp_obj, ch);
+							for (iter = 0; iter < res->amount; ++iter) {
+								run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
+							}
+							extract_obj(temp_obj);
+						}
+					}
+					free_resource_list(list);
+				}
 			}
 		}
 		else {
