@@ -4864,7 +4864,6 @@ set diary_list 11918 11920 11919
 set list_size 3
 return 1
 wait 0
-set ch %self.carried_by%
 * check owned list
 set list %diary_list%
 while %list%
