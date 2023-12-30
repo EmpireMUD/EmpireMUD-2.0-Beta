@@ -6633,6 +6633,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	obj_data *proto, *temp_obj;
 	struct resource_data *res, *list = NULL;
 	
+	// init base cost
+	data->cost = ABIL_COST(abil);
+	
 	// run the ability
 	if (multi_targ != NOBITS && (IS_SET(run_mode, RUN_ABIL_OVER_TIME) || !ABILITY_FLAGGED(abil, ABILF_OVER_TIME))) {
 		call_multi_target_ability(ch, abil, argument, multi_targ, level, run_mode, data);
@@ -6878,7 +6881,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 		return;
 	}
 	
-	// determine costs and scales
+	// determine scaling and costs; check if we'll ignore immunity
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type)) {
 			aet = get_ability_type_data(data, do_ability_data[iter].type);
@@ -6893,11 +6896,6 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 				}
 			}
 			
-			// prep func, if any
-			if (do_ability_data[iter].prep_func) {
-				call_prep_abil(do_ability_data[iter].prep_func);
-			}
-			
 			// find out if any types ignore immunity
 			if (!do_ability_data[iter].check_immune) {
 				any_ignore_immune = TRUE;
@@ -6910,6 +6908,13 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	
 	// record highest scaling
 	data->max_scale = MAX(total_scale, data->max_scale);
+	
+	// ability prep functions
+	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
+		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].prep_func) {
+			call_prep_abil(do_ability_data[iter].prep_func);
+		}
+	}
 	
 	// early exit?
 	if (data->stop) {
