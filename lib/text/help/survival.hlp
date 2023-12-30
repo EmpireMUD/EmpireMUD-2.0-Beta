@@ -14,19 +14,6 @@ which set of skills to use.
 
 See also: SCAVENGING, ROLE, SKILL, SKILL SYNERGY
 #
-BUTCHER
-
-Usage:  butcher <corpse>
-Tool:  knife
-
-With a little practice, you can butcher a corpse into smaller cuts of meat.
-This command succeeds about 60% of the time unskilled, and 100% of the time
-with the Huntsman ability. Not all corpses can be butchered.
-
-Gains experience when you butcher something.
-
-See also: HUNTSMAN, SKIN COMMAND
-#
 "BY MOONLIGHT"
 
 By Moonlight (Survival ability)

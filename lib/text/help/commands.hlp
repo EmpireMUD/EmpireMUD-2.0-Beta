@@ -408,6 +408,17 @@ To light torches or other items, use 'light'.
 
 See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
 #
+BUTCHER
+
+Usage:  butcher <corpse>
+Tool:  knife
+
+With a little practice, you can butcher a corpse into smaller cuts of meat.
+This command succeeds about 60% of the time unskilled, and 100% of the time
+with the Huntsman ability. Not all corpses can be butchered.
+
+See also: HUNTSMAN, SKIN COMMAND
+#
 BUY LIST SHOP SHOPS
 
 Usage:  list [keywords]
@@ -1062,6 +1073,24 @@ Example:
   > fill canteen fountain
 
 See also: POUR, DRINK
+#
+FIRE CATAPULT CANNONS
+
+Usage:  fire <vehicle> <direction | target vehicle> 
+
+Certain vehicles are siege weapons and can fire at buildings or at other
+vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
+rooms, or at vehicles in the same room.
+
+If you're aboard a ship with cannons, you can fire from onboard the ship, but
+it still fires only at vehicles in the room the ship is in, or at adjacent
+rooms from there.
+
+Example:  
+  > fire catapult north
+  > fire brigantine 2.brigantine
+
+See also: COOKING FIRE, DOUSE, HARNESS
 #
 FLEE
 
@@ -2112,6 +2141,15 @@ If you want to see your own stats from combat, use 'meters'.
 
 See also: GROUP, METERS, SUMMARY
 #
+RESPAWN
+
+Usage:  respawn
+
+When your character has died, you can still observe for a short time. When you
+are ready to respawn, use this command.
+
+See also: BRIEF RESPITE, DEATH, TOMB
+#
 RITUAL RITE
 
 Usage:  ritual [type] [target]
@@ -2612,6 +2650,12 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+SUMMARY "COMBAT SUMMARY"
+
+Usage:  summary
+
+This command shows a summary of you, your allies, and your enemies in combat.
 #
 "SUMMON PLAYERS"
 

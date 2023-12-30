@@ -176,6 +176,17 @@ You create a flashy diversion, penalizing all enemies with reduced Wits. The
 first target receives a larger penalty; other targets are lower. This effect
 lasts 15 seconds.
 #
+"DUAL-WIELD" "DUAL WIELD"
+
+Dual-Wield
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
+
+With this ability, you can attack with weapons in both hands (the wield and
+hold slots). Without it, you can still hold a weapon in your off-hand, but
+will never attack with it.
+
+Your off-hand receives a significant to-hit penalty.
+#
 ESCAPE
 
 Escape (Stealth ability)

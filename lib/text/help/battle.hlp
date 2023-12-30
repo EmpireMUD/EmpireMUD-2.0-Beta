@@ -19,13 +19,6 @@ which set of skills to use.
 
 See also: EVASION, WEAPON PROFICIENCY, ROLE, SKILL, SKILL SYNERGY
 #
-AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
-
-An area-of-effect ability is one that hits multiple targets in the room. In
-general, these abilities only target NPCs.
-
-Examples: OUTRAGE
-#
 ABATE
 
 Usage:  abate [victim]
@@ -230,17 +223,6 @@ or 'mana blast', but not all mobs can be disarmed.
 
 Gain experience when you try to disarm someone, even if it fails.
 #
-"DUAL-WIELD" "DUAL WIELD"
-
-Dual-Wield
-Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
-
-With this ability, you can attack with weapons in both hands (the wield and
-hold slots). Without it, you can still hold a weapon in your off-hand, but
-will never attack with it.
-
-Your off-hand receives a significant to-hit penalty.
-#
 ENDURANCE
 
 Endurance (Battle ability)
@@ -286,24 +268,6 @@ more damage overall.
 Gain experience when you hit a combat opponent.
 
 See also: QUICK DRAW, SPEED
-#
-FIRE CATAPULT CANNONS
-
-Usage:  fire <vehicle> <direction | target vehicle> 
-
-Certain vehicles are siege weapons and can fire at buildings or at other
-vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
-rooms, or at vehicles in the same room.
-
-If you're aboard a ship with cannons, you can fire from onboard the ship, but
-it still fires only at vehicles in the room the ship is in, or at adjacent
-rooms from there.
-
-Example:  
-  > fire catapult north
-  > fire brigantine 2.brigantine
-
-See also: COOKING FIRE, DOUSE, HARNESS
 #
 FIRSTAID "FIRST AID"
 
@@ -601,15 +565,6 @@ Example:
 
 See also: OUTRAGE
 #
-RESPAWN
-
-Usage:  respawn
-
-When your character has died, you can still observe for a short time. When you
-are ready to respawn, use this command.
-
-See also: BRIEF RESPITE, DEATH, TOMB
-#
 "SHIELD BLOCK" SHIELDS
 
 Shield Block (Battle ability)
@@ -641,20 +596,6 @@ Gain experience when you attack something.
 
 See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE, FRENZY
 #
-SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
-
-On EmpireMUD, combat is speed-based, not round-based or turn-based. Each
-weapon or other attack has an associated speed, which determines how long or
-short your character waits between attacks.
-
-Your current speed is shown on your score display. A lower speed is better,
-since it is the time between attacks.
-
-Things that boost your speed, such as Wits and Hasten, increase your damage
-proportionally.
-
-See also: SCORE, WITS, HASTEN, SLOW
-#
 "STUNNING BLOW"
 
 Stunning Blow (Battle ability)
@@ -668,12 +609,6 @@ stunned for longer at higher levels.
 Gain experience when you inflict a stunning blow.
 
 See also: BASH
-#
-SUMMARY "COMBAT SUMMARY"
-
-Usage:  summary
-
-This command shows a summary of you, your allies, and your enemies in combat.
 #
 SURGE
 

@@ -138,16 +138,6 @@ This ability also allows you to:
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
 #
-BRONZE "BRONZE INGOT"
-
-Used for:  forge
-Stored in:  Foundry
-
-Bronze is a metal that was once so common that there is an entire Age named
-after it. Bronze is made by smelting copper and tin ingots together.
-
-See also: FORGE, METALS, MINE, SMELT
-#
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
 Carts and their more advanced cousins, carriages, caravans and wagons, are
@@ -576,18 +566,6 @@ You can hone the following item slots:
 
 See also: RECIPES
 #
-IRON "IRON INGOT" "IRON ORE"
-
-Used for:  forge, build, manufacture
-Stored in:  Foundry
-
-Iron ore is found by mining in the mountains. It is useful in building and
-forging equipment, as well as manufacturing ships.
-
-You can learn about getting iron via HELP IRON GUIDE.
-
-See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
-#
 "IMPERIAL ARMORS" "IMPERIAL ARMORSMITHING"
 
 Imperial Armors (Trade ability)
@@ -612,17 +590,6 @@ Shield:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
-#
-IMPERIUM "IMPERIUM ORE"
-
-Used for:  forge
-Stored in:  Foundry
-
-Imperium is a rare, strong metal with a bright white color. It is used to make
-powerful weapons and armor. Smelting imperium ingots requires mixing it with
-tin.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "IRON BLADES"
 
@@ -702,16 +669,6 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
-#
-"LETHEIAN ICON"
-
-usage: use <icon> <skill name>
-
-Letheian icons are consumable trinkets which grant an extra skill reset for a
-skill of your choice, allowing you to choose new abilities for that skill. They
-are crafted using the Master Craftsman ability.
-
-See also: MASTER CRAFTSMAN, SKILL RESET
 #
 "MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
@@ -812,17 +769,6 @@ eventide metals, respectively.
 These metals are generally used in crafts in the 200-300 level range.
 
 See also: RARE METALS, SMELT
-#
-NOCTURNIUM "NOCTURNIUM ORE"
-
-Used for:  forge, sew
-Stored in:  Foundry
-
-Nocturnium is a deep black metal, its surface swirling with mana. It is often
-plated onto powerful magical objects. Smelting stable nocturnium requires that
-you mix it with copper.
-
-See also: FORGE, METALS, MINE, SEW, SMELT
 #
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
@@ -1185,16 +1131,6 @@ You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
 See also: SKIN, LEATHER
-#
-TIN "TIN INGOT" "TIN ORE"
-
-Used for:  smelting bronze
-Stored in:  Foundry
-
-Tin is an uncommon white metal used since ancient times to create bronze. It
-can also be smelted with imperium ore to make imperium ingots.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "TINKER CRAFTS"
 

@@ -68,6 +68,16 @@ digging in the mountains.
 
 See also: DIG
 #
+BRONZE "BRONZE INGOT"
+
+Used for:  forge
+Stored in:  Foundry
+
+Bronze is a metal that was once so common that there is an entire Age named
+after it. Bronze is made by smelting copper and tin ingots together.
+
+See also: FORGE, METALS, MINE, SMELT
+#
 "BUFF FOOD" "BUFF FOODS" "WELL FED" WELL-FED
 
 Buff foods are foods that give you a bonus when you eat them. Unlike normal
@@ -460,6 +470,29 @@ and crafts.
 
 See also: GEM, PICK, FIND HERBS
 #
+IMPERIUM "IMPERIUM ORE"
+
+Used for:  forge
+Stored in:  Foundry
+
+Imperium is a rare, strong metal with a bright white color. It is used to make
+powerful weapons and armor. Smelting imperium ingots requires mixing it with
+tin.
+
+See also: FORGE, METALS, MINE, SMELT
+#
+IRON "IRON INGOT" "IRON ORE"
+
+Used for:  forge, build, manufacture
+Stored in:  Foundry
+
+Iron ore is found by mining in the mountains. It is useful in building and
+forging equipment, as well as manufacturing ships.
+
+You can learn about getting iron via HELP IRON GUIDE.
+
+See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
+#
 KEEP UNKEEP
 
 Usage:  keep <item>
@@ -518,6 +551,16 @@ Common types of leather are:
   absinthian leather (thick magic leather)
 
 See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
+#
+"LETHEIAN ICON"
+
+usage: use icon <skill name>
+
+Letheian icons are consumable trinkets which grant an extra skill reset for a
+skill of your choice, allowing you to choose new abilities for that skill. They
+are crafted using the Master Craftsman ability.
+
+See also: MASTER CRAFTSMAN, SKILL RESET
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -658,6 +701,17 @@ stored in Towers of Sorcery, and are used to build certain buildings. Crafting
 them requires the Portalmancy progression.
 
 See also: EXARCH CRAFTS, PORTAL
+#
+NOCTURNIUM "NOCTURNIUM ORE"
+
+Used for:  forge, sew
+Stored in:  Foundry
+
+Nocturnium is a deep black metal, its surface swirling with mana. It is often
+plated onto powerful magical objects. Smelting stable nocturnium requires that
+you mix it with copper.
+
+See also: FORGE, METALS, MINE, SEW, SMELT
 #
 OIL OILS "OIL COMPONENT" "SEED OILS" "VEGETABLE OILS"
 
@@ -941,6 +995,16 @@ Common types of cloth are:
   manasilk cloth (magic cloth)
 
 See also: COMPONENT, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
+#
+TIN "TIN INGOT" "TIN ORE"
+
+Used for:  smelting bronze
+Stored in:  Foundry
+
+Tin is an uncommon white metal used since ancient times to create bronze. It
+can also be smelted with imperium ore to make imperium ingots.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 "TRADE COMMAND"
 
