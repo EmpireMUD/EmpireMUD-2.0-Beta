@@ -533,6 +533,101 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// also do_chant, do_ritual: handles SCMD_CAST, SCMD_RITUAL, SCMD_CHANT
+ACMD(do_cast) {
+	bool found, full;
+	char *arg2;
+	size_t size, count;
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	
+	const char *cast_noun[] = { "spell", "ritual", "chant" };
+	const char *cast_command[] = { "cast", "ritual", "chant" };
+	
+	#define VALID_CAST_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_COMMAND(abil) && !str_cmp(ABIL_COMMAND(abil), cast_command[subcmd]))
+	
+	arg2 = one_word(argument, arg);	// first arg: ritual/chant type
+	skip_spaces(&arg2);	// remaining arg
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot do that.\r\n");
+		return;
+	}
+	
+	// no-arg: show list
+	if (!*arg) {
+		// already doing this?
+		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(ch, 0))) && (plab = get_ability_data(ch, ABIL_VNUM(abil), FALSE)) && VALID_CAST_ABIL(ch, plab)) {
+			msg_to_char(ch, "You stop the %s.\r\n", cast_noun[subcmd]);
+			cancel_action(ch);
+			return;
+		}
+		
+		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", cast_noun[subcmd]);
+		
+		found = full = FALSE;
+		count = 0;
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			abil = plab->ptr;
+			if (!VALID_CAST_ABIL(ch, plab)) {
+				continue;
+			}
+			
+			// append
+			if (size + strlen(ABIL_NAME(abil)) + 38 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ABIL_NAME(abil), ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
+			}
+			else {
+				full = TRUE;
+				break;
+			}
+			
+			// found 1
+			found = TRUE;
+		}
+		
+		if (!found) {
+			strcat(buf, " nothing\r\n");	// always room for this if !found
+			if (subcmd == SCMD_CAST) {
+				msg_to_char(ch, "(Most magical abilities have their own commands rather than 'cast'.)\r\n");
+			}
+		}
+		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			strcat(buf, "\r\n");
+		}
+		
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}	// end no-arg
+	
+	// with arg: determine what they typed
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		if (!VALID_CAST_ABIL(ch, plab)) {
+			continue;	// not a conjure ability
+		}
+		if (!multi_isname(arg, ABIL_NAME(abil))) {
+			continue;	// wrong name: not-targeted
+		}
+		
+		// match!
+		perform_ability_command(ch, abil, arg2);
+		found = TRUE;
+		break;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "You don't know that %s.\r\n", cast_noun[subcmd]);
+	}
+}
+
+
 ACMD(do_ready) {
 	bool found, full;
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
@@ -634,97 +729,6 @@ ACMD(do_ready) {
 	
 	// pass through to ready-weapon ability
 	perform_ability_command(ch, found_abil, arg);
-}
-
-
-// also do_chant: handles SCMD_RITUAL, SCMD_CHANT
-ACMD(do_ritual) {
-	bool found, full;
-	char *arg2;
-	size_t size, count;
-	ability_data *abil;
-	struct player_ability_data *plab, *next_plab;
-	
-	const char *ritual_scmd[] = { "ritual", "chant" };
-	
-	#define VALID_RITCHANT_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_COMMAND(abil) && !str_cmp(ABIL_COMMAND(abil), ritual_scmd[subcmd]))
-	
-	arg2 = one_word(argument, arg);	// first arg: ritual/chant type
-	skip_spaces(&arg2);	// remaining arg
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot do that.\r\n");
-		return;
-	}
-	
-	// no-arg: show list
-	if (!*arg) {
-		// already doing this?
-		if (GET_ACTION(ch) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(ch, 0))) && (plab = get_ability_data(ch, ABIL_VNUM(abil), FALSE)) && VALID_RITCHANT_ABIL(ch, plab)) {
-			msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
-			cancel_action(ch);
-			return;
-		}
-		
-		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", ritual_scmd[subcmd]);
-		
-		found = full = FALSE;
-		count = 0;
-		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-			abil = plab->ptr;
-			if (!VALID_RITCHANT_ABIL(ch, plab)) {
-				continue;
-			}
-			
-			// append
-			if (size + strlen(ABIL_NAME(abil)) + 38 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ABIL_NAME(abil), ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
-			}
-			else {
-				full = TRUE;
-				break;
-			}
-			
-			// found 1
-			found = TRUE;
-		}
-		
-		if (!found) {
-			strcat(buf, " nothing\r\n");	// always room for this if !found
-		}
-		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			strcat(buf, "\r\n");
-		}
-		
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
-		return;
-	}	// end no-arg
-	
-	// with arg: determine what they typed
-	found = FALSE;
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		abil = plab->ptr;
-		if (!VALID_RITCHANT_ABIL(ch, plab)) {
-			continue;	// not a conjure ability
-		}
-		if (!multi_isname(arg, ABIL_NAME(abil))) {
-			continue;	// wrong name: not-targeted
-		}
-		
-		// match!
-		perform_ability_command(ch, abil, arg2);
-		found = TRUE;
-		break;
-	}
-	
-	if (!found) {
-		msg_to_char(ch, "You don't know that %s.\r\n", ritual_scmd[subcmd]);
-	}
 }
 
 

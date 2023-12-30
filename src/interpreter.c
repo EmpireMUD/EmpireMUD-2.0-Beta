@@ -78,6 +78,7 @@ ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
 
+ACMD(do_cast);
 ACMD(do_cede);
 ACMD(do_changepass);
 ACMD(do_chart);
@@ -309,7 +310,6 @@ ACMD(do_restore);
 ACMD(do_retrieve);
 ACMD(do_return);
 ACMD(do_rework);
-ACMD(do_ritual);
 ACMD(do_roadsign);
 ACMD(do_role);
 ACMD(do_roll);
@@ -567,9 +567,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "brief", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
 	STANDARD_CMD( "chop", POS_STANDING, do_chop, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "cast", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_CAST ),
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, NO_MIN, CTYPE_EMPIRE ),
-	STANDARD_CMD( "chant", POS_SLEEPING, do_ritual, NO_MIN, NO_GRANTS, SCMD_CHANT, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "chant", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_CHANT ),
 	SIMPLE_CMD( "chart", POS_DEAD, do_chart, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -603,7 +604,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "credits", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_CREDITS ),
 	SIMPLE_CMD( "create", POS_STANDING, do_create, LVL_GOD, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "customize", POS_STANDING, do_customize, NO_MIN, CTYPE_BUILD ),
-	SCMD_CMD( "cast", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_CAST ),
 	SCMD_CMD( "compact", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
 	SCMD_CMD( "date", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_DATE ),
@@ -863,8 +863,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "return", POS_DEAD, do_return, NO_MIN, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "rework", POS_STANDING, do_rework, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "ride", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "rite", POS_SLEEPING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "ritual", POS_SLEEPING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "rite", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_RITUAL ),
+	SCMD_CMD( "ritual", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_RITUAL ),
 	STANDARD_CMD( "roadsign", POS_STANDING, do_roadsign, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "role", POS_DEAD, do_role, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "roll", POS_RESTING, do_roll, NO_MIN, CTYPE_UTIL ),

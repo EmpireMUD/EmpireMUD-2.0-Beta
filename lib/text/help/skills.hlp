@@ -66,6 +66,21 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
+CAST SPELL SPELLS
+
+Usage:  cast <spell> [target]
+        cast "<multi-word spell>" target
+
+The cast command is used for certain spells; however, unlike similar MUDs such
+as CircleMUD or DikuMUD, cast is not used for most magical abilities. If you
+have any spells that can be cast with this command, typing 'cast' by itself
+will list them.
+
+If a spell has more than 1 word in its name, you can try to abbreviate it to
+one word, or you can put quotation marks around the spell name.
+
+See also: SKILL, ABILITY
+#
 CHIP KNAPPER KNAPPING "FLINT KNAPPING"
 
 Chip (Primitive Crafts ability)

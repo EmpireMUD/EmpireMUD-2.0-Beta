@@ -4009,6 +4009,7 @@ ACMD(do_nearby) {
 ACMD(do_no_cmd) {
 	switch (subcmd) {
 		case NOCMD_CAST: {
+			// this one is no longer used because we have the 'cast' command again as of b5.166
 			msg_to_char(ch, "EmpireMUD doesn't use the 'cast' command. You use most abilities by typing their name.\r\n");
 			break;
 		}
