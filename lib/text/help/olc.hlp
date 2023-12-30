@@ -578,6 +578,8 @@ Action types:
  &cset fighting target&0 - Ensures the user is attacking the victim specifically.
  &ctaunt&0 - Target will switch combat focus to the actor.
 
+Example action abilities: 116 Cleanse, 209 Outrage
+
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT AFFECTS" "ABILEDIT AFFECT"
@@ -674,6 +676,8 @@ wield slot.
 This is often paired with the STOP-ON-MISS flag to apply buffs or conjure items
 only if the attack succeeds.
 
+Example attack abilities: 155 Jab, 209 Outrage
+
 Not to be confused with: ABILEDIT ATTACK TYPE
 See also: OLC ABILITIES
 #d
@@ -701,6 +705,8 @@ Buff abilities have the following properties:
  <&yapply&0> Trait modifiers to give.
  <&yaffectvnum&0> Which affect (generic) to use for the buff.
 
+Example buff abilities: 1 Fly, 97 Bash, 166 Foresight, 205 Master Survivalist
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITIES" "BUILDING DAMAGE ABILITY" "ABILEDIT BUILDING DAMAGE ABILITY"
@@ -717,6 +723,8 @@ Messages:
  Sent on each tick for vehicle targets: &ctarg-to-char&0 and &ctarg-to-room&0
  Sent on failure for building targets: &cfail-self-to-char&0 and &cfail-self-to-room&0
  Sent on failure for vehicle targets: &cfail-targ-to-char&0 and &cfail-targ-to-room&0
+
+Example building-damage abilities: 172 Siege Ritual
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -741,6 +749,8 @@ Notes:
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
 
+Example companion abilities: 122 Familiar, 138 Bodyguard
+
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
 #d
 "ABILEDIT CONJURE LIQUID ABILITY" "ABILEDIT CONJURE-LIQUID ABILITY" "CONJURE LIQUID ABILITY" "CONJURE-LIQUID ABILITY" "CONJURE LIQUID ABILITIES" "CONJURE-LIQUID ABILITIES" CONJURE-LIQUID
@@ -763,6 +773,8 @@ Conjure-liquid abilities have the following properties:
 
 This type of ability uses the &ctarg-to-*&0 custom messages with the &y$p&0 token for
 the targeted object.
+
+Example conjure-liquid abilities: 
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
@@ -792,6 +804,8 @@ Messages:
  Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
    &cfail-self-to-room&0
 
+Example conjure-liquid abilities: 1019 Conjure Fruit
+
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
 "ABILEDIT CONJURE VEHICLE ABILITY" "ABILEDIT CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITY" "CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITIES" "CONJURE-VEHICLE ABILITIES" CONJURE-VEHICLE
@@ -816,12 +830,16 @@ Messages:
  Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
    &cfail-self-to-room&0
 
+Example conjure-vehicle abilities: 1018 Shimmering Anvil
+
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
 
 The CRAFT ability type indicates that an ability is only used to make crafts.
 This type of ability has no "command" or other special properties.
+
+Example craft abilities: 51 Forge, 248 Exarch Crafts
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -992,6 +1010,8 @@ DAmage abilities have the following properties:
  <&yattacktype&0> Determines the attack messages.
  <&ydamagetype&0> What type of damage it does.
 
+Example damage abilities: 3 Backstab, 39 Critical Backstab, 308 Wilderblaze
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT DAMAGETYPE" "ABILEDIT DAMAGE TYPE"
@@ -1047,6 +1067,8 @@ DoT abilities have the following properties:
  <&ylongduration&0> How long it lasts (at class level).
  <&ymaxstacks&0> How many times this DoT can stack.
  <&yaffectvnum&0> Which affect (generic) to use for the DoT.
+
+Example DoT abilities: 98 Cut Deep, 125 Skybrand, 155 Jab
 
 See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES
 #d
@@ -1397,6 +1419,8 @@ It always targets the room -- you must set a &gROOM&0 target flag.
 
 For a list of paint colors, see HELP PAINT ITEM
 
+Example paint-building abilities: 186 Ritual of Defense
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT PARENT" "PARENT ABILITY" "CHILD ABILITY" "CHAINED ABILITIES"
@@ -1446,6 +1470,8 @@ Buff abilities have the following properties:
 
 Note: Passive-buff abilities are not affected by the 'solo' role's limitation
 on being alone; they will remain active.
+
+Example passive-buff abilities: 0 Gift of Nature, 228 Noble Bearing
 
 See also: OLC ABILITIES, ABILEDIT TYPES, PASSIVES
 #d
@@ -1562,6 +1588,8 @@ Available techs are:
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
 
+Example player-tech abilities: 18 Search, 143 Steal
+
 See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
 #d
 "ABILEDIT READY-WEAPONS ABILITY" "READY-WEAPONS ABILITY" "READY-WEAPONS ABILITIES" "READY WEAPONS ABILITY" "READY-WEAPON ABILITY" "READY WEAPON ABILITIES"
@@ -1606,6 +1634,8 @@ Messages:
   weapon itself because they are also displayed if the player removes the
   weapon.
 
+Example ready-weapon abilities: 6 Ready Blood Weapons, 8 Claws
+
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
 "ABILEDIT POOLTYPE" "ABILEDIT POOL TYPE"
@@ -1644,6 +1674,8 @@ Messaging:
 - Uses regular &cself-to-char&0 or &ctarg-to-char&0 messages, but will append
   the amount that was restored.
 
+Example restore abilities: 27 Regenerate, 110 Heal Friend, 111 Heal Party
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT RESURRECT ABILITY" "ABILEDIT RESURRECTION" "RESURRECT ABILITIES" "RESURRECTION ABILITIES"
@@ -1671,6 +1703,8 @@ When the resurrection completes, it also sends:
  &cspec-to-room&0 - Sent ot the room the person resurrects in with $n as the
    person being resurrected (not the caster).
 
+Example resurrect abilities: 219 Resurrect, 242 Deathrise
+
 See also: OLC ABILITIES, OFFERS
 #d
 "ABILEDIT ROOM AFFECT ABILITY" "ABILEDIT ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITY" "ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITIES" "ROOM-AFFECT ABILITIES"
@@ -1686,6 +1720,8 @@ Properties of room-affect abilities:
  <&ylongduration&0> How long it lasts (at high skill level).
  <&yaffects&0> Room affect flags to set.
  <&yaffectvnum&0> Which affect (generic) to use for the affect.
+
+Example room-affect abilities: 11 Darkness, 186 Ritual of Defense
 
 See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
 #d
@@ -1748,6 +1784,8 @@ Notes:
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
+
+Example summon abilities: 168 Summon Swift, 34 Summon Animals
 
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
 #d
@@ -1848,6 +1886,8 @@ Messages:
  Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
    &cfail-self-to-room&0
 
+Example teleport abilities: 146 Escape, 153 Shadowstep, 188 City Teleportation
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT TESTING"
@@ -1922,14 +1962,14 @@ Any type with a weight of 0 should still get 1 point worth of effect.
 The following types are available (each has its own help file):
  &cACTION&0 - Executes and action; see ABILEDIT ACTIONS.
  &cATTACK&0 - Perform a normal weapon attack; often paired with STOP-ON-MISS.
- &cAUGMENT&0 - Used for augments/enchanting.
+ &cAUGMENT&0 - Used for augments/enchanting. No inherent properties.
  &cBUFF&0 - Puts affects on characters.
  &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
  &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
  &cCONJURE-LIQUID&0 - Creates liquid in a drink container.
  &cCONJURE-OBJECT&0 - Creates one or more items.
  &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
- &cCRAFT&0 - Used for craft/building recipes.
+ &cCRAFT&0 - Used for craft/building recipes. No inherent properties.
  &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
@@ -1941,7 +1981,7 @@ The following types are available (each has its own help file):
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
  &cRESOURCE&0 - Used for resources, e.g. on interaction restrictions.
  &cRESTORE&0 - Gives some health, move, mana, or blood points.
- &rRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
+ &cRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
  &cROOM-AFFECT&0 - Similar to a buff, for the room.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
