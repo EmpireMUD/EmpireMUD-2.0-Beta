@@ -3349,6 +3349,10 @@ PLAYER_UPDATE_FUNC(b5_166_player_update) {
 	any_vnum BASH = 97;
 	any_vnum BATTLE = 0;
 	
+	any_vnum GIANT_TORTOISE = 506;
+	
+	check_delayed_load(ch);
+	
 	// new affect flags
 	LL_FOREACH(ch->affected, hjp) {
 		if (hjp->type == COUNTERSPELL && hjp->bitvector == NOBITS) {
@@ -3369,6 +3373,9 @@ PLAYER_UPDATE_FUNC(b5_166_player_update) {
 	if (has_ability(ch, BASH) && get_skill_level(ch, BATTLE) < 80) {
 		remove_ability(ch, ability_proto(BASH), FALSE);
 	}
+	
+	// remove giant tortoise companion: it now comes from a different ability
+	remove_companion(ch, GIANT_TORTOISE);
 	
 	// grant free skill resets
 	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
