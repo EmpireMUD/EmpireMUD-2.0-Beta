@@ -10048,6 +10048,7 @@ ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
 	trig_data *trig;
+	struct pursuit_data *purs, *next_purs;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		// stop fighting
@@ -10077,6 +10078,16 @@ ACMD(do_peace) {
 					GET_TRIG_WAIT(trig) = NULL;
 				}
 			}
+		}
+		
+		// cancel pursuit
+		if (IS_NPC(iter) && MOB_PURSUIT(iter)) {
+			return_to_pursuit_location(iter);
+			
+			LL_FOREACH_SAFE(MOB_PURSUIT(iter), purs, next_purs) {
+				free(purs);
+			}
+			MOB_PURSUIT(iter) = NULL;
 		}
 	}
 	

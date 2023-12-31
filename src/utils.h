@@ -2409,6 +2409,7 @@ struct generic_name_data *get_best_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void reschedule_all_despawns();
+bool return_to_pursuit_location(char_data *ch);
 void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
