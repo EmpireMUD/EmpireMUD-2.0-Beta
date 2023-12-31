@@ -4775,6 +4775,7 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_LOOK_AT_ROOM: {
 				look_at_room(ch);
+				data->success = TRUE;
 				break;
 			}
 		}
