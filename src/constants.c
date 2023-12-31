@@ -442,6 +442,8 @@ const char *ability_gain_hooks[] = {
 	"NOT-WHILE-ASLEEP",	// 15
 	"DYING",
 	"DO-HEAL",
+	"ONLY-INDOORS",
+	"ONLY-OUTDOORS",
 	"\n"
 };
 

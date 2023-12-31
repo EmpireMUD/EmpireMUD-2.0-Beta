@@ -1200,26 +1200,30 @@ Usage:  .gainhooks [add | remove] <flags>
 This tells the ability when to trigger skill gain. Abilities with commands also
 gain experience when their commands are used.
 
-Available gain hooks:
- &cONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
-   is on.
- &cMELEE&0 - Gains when you hit in melee combat.
- &cRANGED&0 - Gains when you hit in ranged combat.
- &cDODGE&0 - Gains when you dodge an attack.
+Main gain hooks:
  &cBLOCK&0 - Gains when you block an attack.
- &cTAKE-DAMAGE&0 - Gains when you take damage.
+ &cDO-HEAL&0 - Called when the player performs a healing ability.
+ &cDODGE&0 - Gains when you dodge an attack.
+ &cDYING&0 - Called when the player dies, before auto-resurrect.
+ &cMELEE&0 - Gains when you hit in melee combat.
+ &cMOVING&0 - Gains when the player moves.
  &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
  &cPASSIVE-HOURLY&0 - Gains every 75 seconds (game hour).
- &cONLY-DARK&0 - Only gains if it's dark here.
- &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
- &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &cRANGED&0 - Gains when you hit in ranged combat.
+ &cTAKE-DAMAGE&0 - Gains when you take damage.
  &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
- &cMOVING&0 - Gains when the player moves.
- &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
- &cONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
- &cNOT-WHILE-ASLEEP&0 - Will not trigger skill gain while sleeping.
- &cDYING&0 - Called when the player dies, before auto-resurrect.
- &cDO-HEAL&0 - Called when the player performs a healing ability.
+
+Gain hook modifiers (requires other hooks):
+ &yNOT-WHILE-ASLEEP&0 - Will not trigger skill gain while sleeping.
+ &yONLY-DARK&0 - Only gains if it's dark here.
+ &yONLY-INDOORS&0 - Must be inside.
+ &yONLY-LIGHT&0 - Only gains if it's NOT dark here.
+ &yONLY-OUTDOORS&0 - Must be outside,
+ &yONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
+ &yONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
+ &yONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &yONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
+   is on.
 
 See also: OLC ABILITIES
 #d

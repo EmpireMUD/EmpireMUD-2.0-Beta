@@ -1871,6 +1871,12 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		if (IS_SET(agh->triggers, AGH_NOT_WHILE_ASLEEP) && GET_POS(ch) <= POS_SLEEPING) {
 			continue;	// person is sleeping
 		}
+		if (IS_SET(agh->triggers, AGH_ONLY_INDOORS) && IS_OUTDOORS(ch)) {
+			continue;	// not indoors
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_OUTDOORS) && !IS_OUTDOORS(ch)) {
+			continue;	// not outdoors
+		}
 		if (IS_SET(agh->triggers, AGH_ONLY_WHEN_AFFECTED) && (!(abil = find_ability_by_vnum(agh->ability)) || !affected_by_spell(ch, ABIL_AFFECT_VNUM(abil)))) {
 			continue;	// not currently affected
 		}

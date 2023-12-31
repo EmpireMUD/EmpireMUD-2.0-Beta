@@ -252,6 +252,8 @@
 #define AGH_NOT_WHILE_ASLEEP	BIT(15)	// prevent gains while sleeping (or dying)
 #define AGH_DYING				BIT(16)	// called when the player dies (before auto-resurrect)
 #define AGH_DO_HEAL				BIT(17)	// called when the player heals someone
+#define AGH_ONLY_INDOORS		BIT(18)	// only fires if indoors
+#define AGH_ONLY_OUTDOORS		BIT(19)	// only fires if outdoors
 
 
 // AHOOK_x: Ability hooks (things that cause an ability to run itself)
