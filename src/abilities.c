@@ -3517,8 +3517,32 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				char_data *ch_iter;
 				
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-					if (FIGHTING(ch_iter) == ch) {
-						msg_to_char(ch, "You can't do that someone is attacking you!\r\n");
+					if (FIGHTING(ch_iter) == ch && !AFF_FLAGGED(vict, AFF_STUNNED | AFF_HARD_STUNNED)) {
+						msg_to_char(ch, "You can't do that while someone is attacking you!\r\n");
+						_set_fatal_error(TRUE);
+						return FALSE;
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE: {
+				char_data *ch_iter;
+				
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (FIGHTING(ch_iter) == ch && FIGHT_MODE(ch_iter) == FMODE_MELEE && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED)) {
+						msg_to_char(ch, "You can't do that while someone is in melee combat with you!\r\n");
+						_set_fatal_error(TRUE);
+						return FALSE;
+					}
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE: {
+				char_data *ch_iter;
+				
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+					if (FIGHTING(ch_iter) == ch && FIGHT_MODE(ch_iter) == FMODE_MELEE && !AFF_FLAGGED(ch_iter, AFF_STUNNED | AFF_HARD_STUNNED | AFF_IMMOBILIZED)) {
+						msg_to_char(ch, "You can't do that while someone is in melee combat with you!\r\n");
 						_set_fatal_error(TRUE);
 						return FALSE;
 					}

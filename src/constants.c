@@ -509,6 +509,8 @@ const char *ability_limitations[] = {
 	"target is vampire",
 	"can purify target",
 	"in combat",	// 45
+	"not being attacked melee",
+	"not being attacked mobile melee",
 	"\n"
 };
 
@@ -561,6 +563,8 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_IS_VAMPIRE
 	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_PURIFY_TARGET
 	ABLIM_NOTHING,	// ABIL_LIMIT_IN_COMBAT
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE
 };
 
 

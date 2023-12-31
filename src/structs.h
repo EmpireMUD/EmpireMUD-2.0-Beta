@@ -826,6 +826,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_TARGET_IS_VAMPIRE		43	// requires that the target be a vampire
 #define ABIL_LIMIT_CAN_PURIFY_TARGET		44	// target can be purified
 #define ABIL_LIMIT_IN_COMBAT				45	// must be in combat
+#define ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE	46	// no characters hitting actor in melee
+#define ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE	47	// no characters hitting actor in melee (except immobilized ones)
 
 
 // ABLIM_x: data needed for ability limits:

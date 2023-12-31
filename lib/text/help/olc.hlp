@@ -1253,6 +1253,9 @@ Limitation types:
  &cno witnesses&0 - Nobody is watching.
  &cno witnesses hide&0 - Nobody is watching unless you're good at hiding.
  &cnot being attacked&0 - No characters in combat are targeting the actor.
+ &cnot being attacked melee&0 - Nobody targeting the actor in melee range.
+ &cnot being attacked mobile melee&0 - Nobody targeting the actor in melee range
+   who's not immobilized (for kite).
  &cnot distracted&0 - User does not have DISTRACTED affect.
  &cnot god target&0 - Target player must not be a god or immortal.
  &cnot here&0 - Target cannot be in same room.
