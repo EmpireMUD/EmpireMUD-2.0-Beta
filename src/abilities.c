@@ -162,7 +162,7 @@ struct {
 	
 	// things that run after an attack/damage, in case of STOP-ON-MISS
 	{ ABILT_CONJURE_OBJECT, prep_conjure_object_ability, do_conjure_object_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
-	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
+	{ ABILT_CONJURE_LIQUID, prep_conjure_liquid_ability, do_conjure_liquid_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS | ABILEDIT_COST_PER_AMOUNT },
 	{ ABILT_CONJURE_VEHICLE, prep_conjure_vehicle_ability, do_conjure_vehicle_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_INTERACTIONS },
 	{ ABILT_PAINT_BUILDING, NULL, do_paint_building_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND },
 	{ ABILT_ROOM_AFFECT, prep_room_affect_ability, do_room_affect_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_AFFECTS | ABILEDIT_AFFECT_VNUM | ABILEDIT_COMMAND | ABILEDIT_DURATION },
@@ -2186,13 +2186,20 @@ int wordcount_ability(ability_data *abil) {
 
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(conjure_liquid_interaction) {
-	int amount;
+	int amount, quantity;
+	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	
 	if (!inter_item || !IS_DRINK_CONTAINER(inter_item) || interaction->quantity < 1 || !find_generic(interaction->vnum, GENERIC_LIQUID)) {
 		return FALSE;
 	}
 	
-	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + interaction->quantity;
+	quantity = interaction->quantity;
+	if (data && data->conjure_liquid_max > 0) {
+		// restrict amount if requested
+		quantity = MIN(quantity, data->conjure_liquid_max);
+	}
+	
+	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + quantity;
 	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
 	
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
@@ -3747,6 +3754,7 @@ PREP_ABIL(prep_buff_ability) {
 */
 PREP_ABIL(prep_conjure_liquid_ability) {
 	char buf[256];
+	int avail;
 	struct interaction_item *interact;
 	generic_data *existing, *gen;
 		
@@ -3786,6 +3794,18 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 				CANCEL_ABILITY(data);
 				return;
 			}
+		}
+	}
+	
+	// check costs and set maximum based on available mana/etc
+	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
+		check_available_ability_cost(ch, abil, data, &avail, NULL);
+		data->conjure_liquid_max = avail;
+		
+		if (avail < 1) {
+			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
+			CANCEL_ABILITY(data);
+			return;
 		}
 	}
 	

@@ -762,6 +762,8 @@ cases, it must be set to target an object.
 Conjure-liquid abilities have the following properties:
  <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
     its own command.
+ <&ycostperamount&0> You can optionally base the cost on how much of a liquid
+    is conjured.
  <&yinteractions&0> Determine which liquid will be conjured. You must set at
     least 1 LIQUID-CONJURE interaction, and only 1 should succeed.
  <&ytargets&0> Must target an object.
@@ -769,7 +771,7 @@ Conjure-liquid abilities have the following properties:
 This type of ability uses the &ctarg-to-*&0 custom messages with the &y$p&0 token for
 the targeted object.
 
-Example conjure-liquid abilities: 
+Example conjure-liquid abilities: 107 Veintap
 
 See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d

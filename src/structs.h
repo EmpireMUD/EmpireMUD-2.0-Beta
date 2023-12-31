@@ -4066,6 +4066,7 @@ struct ability_exec {
 	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
 	
 	// data passed by types
+	int conjure_liquid_max;
 	any_vnum ready_weapon_val;
 	int restore_pool;
 	int restore_amount;
