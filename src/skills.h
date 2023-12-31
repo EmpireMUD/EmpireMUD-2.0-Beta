@@ -40,7 +40,6 @@
 
 
 // ABIL_x: ability vnums
-#define ABIL_NULL_MANA  5
 #define ABIL_BOOST  7
 #define ABIL_VAMP_COMMAND  9
 #define ABIL_DISGUISE  13

@@ -1346,6 +1346,7 @@ const char *player_tech_types[] = {
 	"Bite-Regeneration",
 	"Steal-Command",
 	"Use-Honed-Gear",
+	"Redirect-Magical-Damage-to-Mana",	// 100
 	"\n"
 };
 

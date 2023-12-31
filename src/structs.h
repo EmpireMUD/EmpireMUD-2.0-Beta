@@ -2817,6 +2817,7 @@ typedef enum {
 #define PTECH_BITE_REGENERATION  97	// rapid regeneration while drinking blood from humans
 #define PTECH_STEAL_COMMAND  98	// can use 'steal'
 #define PTECH_USE_HONED_GEAR  99	// can use honed gear
+#define PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA  100	// redirect part of magical damage to mana pool instead of health
 
 
 // SM_x: status messages

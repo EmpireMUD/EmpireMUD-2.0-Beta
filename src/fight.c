@@ -671,16 +671,16 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		}
 		
 		// redirect some damage to mana: player only
-		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && has_ability(victim, ABIL_NULL_MANA) && GET_MANA(victim) > 0) {
+		if (damtype == DAM_MAGICAL && !IS_NPC(victim) && has_player_tech(victim, PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA) && GET_MANA(victim) > 0) {
 			int absorb = MIN(dam / 2, GET_MANA(victim));
 		
 			if (absorb > 0) {
 				dam -= absorb;
 				set_mana(victim, GET_MANA(victim) - absorb);
 				if (can_gain_exp_from(victim, attacker)) {
-					gain_ability_exp(victim, ABIL_NULL_MANA, 5);
+					gain_player_tech_exp(victim, PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA, 5);
 				}
-				run_ability_hooks(victim, AHOOK_ABILITY, ABIL_NULL_MANA, 0, attacker, NULL, NULL, NULL, NOBITS);
+				run_ability_hooks_by_player_tech(victim, PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA, attacker, NULL, NULL, NULL);
 			}
 		}
 	}

@@ -1640,6 +1640,7 @@ Available techs are:
  &cBite-Regeneration&0 * - Rapid HMV regeneration while drinking blood.
  &cSteal-Command&0 *^ - Allows 'steal'.
  &cUse-Honed-Gear&0 - Allows the player to used items that have been honed.
+ &cRedirect-Magical-Damage-to-Mana&0 * - Half of magic damage drains mana not hp.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
