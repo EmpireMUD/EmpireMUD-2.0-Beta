@@ -1702,7 +1702,7 @@ const char *affected_bits[] = {
 	"*",	// formerly CLAWS
 	"DEATHSHROUD",
 	"EARTHMELDED",
-	"MUMMIFY",
+	"MUMMIFIED",
 	"SOULMASK",
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
@@ -1753,7 +1753,7 @@ const char *affected_bits_consider[] = {
 	"",	// unused
 	"",	// deathshroud
 	"",	// earthmeld
-	"",	// 25 - mummify
+	"",	// 25 - mummified
 	"$E is soulmasked.",	// soulmask
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs

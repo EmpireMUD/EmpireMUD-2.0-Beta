@@ -1445,7 +1445,7 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (AFF_FLAGGED(ch, AFF_EARTHMELDED) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while earthmelded.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_MUMMIFY) && min_pos >= POS_SLEEPING) {
+	else if (AFF_FLAGGED(ch, AFF_MUMMIFIED) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while mummified.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && min_pos >= POS_SLEEPING) {

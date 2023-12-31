@@ -4507,7 +4507,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	// position must be reset
-	if (AFF_FLAGGED(ch, AFF_EARTHMELDED | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED | AFF_MUMMIFIED | AFF_DEATHSHROUD)) {
 		GET_POS(ch) = POS_SLEEPING;
 	}
 	else {

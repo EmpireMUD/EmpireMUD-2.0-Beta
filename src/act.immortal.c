@@ -10727,9 +10727,9 @@ ACMD(do_restore) {
 	}
 	
 	// affects that could get a person stuck
-	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUD | AFF_MUMMIFY)) {
+	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUD | AFF_MUMMIFIED)) {
 		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUD, TRUE);
-		affects_from_char_by_aff_flag(vict, AFF_MUMMIFY, TRUE);
+		affects_from_char_by_aff_flag(vict, AFF_MUMMIFIED, TRUE);
 	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {

@@ -2568,7 +2568,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 	}
 
-	if (AFF_FLAGGED(victim, AFF_MUMMIFY))
+	if (AFF_FLAGGED(victim, AFF_MUMMIFIED))
 		return FALSE;
 	
 	if (RMT_FLAGGED(IN_ROOM(victim), RMT_PEACEFUL)) {
@@ -4322,7 +4322,7 @@ void frequent_combat(unsigned long pulse) {
 		}
 		
 		// reasons you would not get a round
-		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFIED | AFF_DEATHSHROUD)) {
 			continue;
 		}
 		
