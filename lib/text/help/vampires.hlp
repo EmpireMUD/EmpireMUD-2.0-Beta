@@ -526,7 +526,7 @@ VEINTAP
 
 Veintap (Vampire ability)
 
-Usage:  veintap <amount> <container>
+Usage:  veintap <container> [amount]
 
 Powerful vampires learn to preserve their blood in containers for later use,
 enabling them to travel without a live blood supply sometimes for weeks.
