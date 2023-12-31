@@ -95,6 +95,7 @@ DO_ABIL(do_conjure_vehicle_ability);
 DO_ABIL(do_damage_ability);
 DO_ABIL(do_dot_ability);
 DO_ABIL(do_link_ability);
+DO_ABIL(do_move_ability);
 DO_ABIL(do_paint_building_ability);
 DO_ABIL(do_ready_weapon_ability);
 DO_ABIL(do_restore_ability);
@@ -112,6 +113,7 @@ PREP_ABIL(prep_conjure_liquid_ability);
 PREP_ABIL(prep_conjure_object_ability);
 PREP_ABIL(prep_conjure_vehicle_ability);
 PREP_ABIL(prep_dot_ability);
+PREP_ABIL(prep_move_ability);
 PREP_ABIL(prep_ready_weapon_ability);
 PREP_ABIL(prep_restore_ability);
 PREP_ABIL(prep_resurrect_ability);
@@ -173,8 +175,9 @@ struct {
 	{ ABILT_READY_WEAPONS, prep_ready_weapon_ability, do_ready_weapon_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_MIN_POS | ABILEDIT_WAIT | ABILEDIT_TARGETS },
 	{ ABILT_SUMMON_ANY, prep_summon_any_ability, do_summon_any_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT | ABILEDIT_COMMAND },
 	{ ABILT_SUMMON_RANDOM, prep_summon_random_ability, do_summon_random_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COOLDOWN | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_WAIT | ABILEDIT_COMMAND },
+	{ ABILT_MOVE, prep_move_ability, do_move_ability, NULL, UNSCALED_TYPE, IGNORE_IMMUNE, ABILEDIT_COMMAND | ABILEDIT_COST | ABILEDIT_DIFFICULTY | ABILEDIT_MOVE_TYPE | ABILEDIT_AFFECTS },
 	
-	// alaways run actions last
+	// always run actions last
 	{ ABILT_ACTION, NULL, do_action_ability, NULL, UNSCALED_TYPE, CHECK_IMMUNE, ABILEDIT_COMMAND },
 	
 	{ NOBITS, NULL, NULL, NULL, FALSE, FALSE, NOBITS }	// list terminator
@@ -3772,6 +3775,33 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					if (send_msgs) {
 						msg_to_char(ch, "You're not even fighting anyone!\r\n");
 					}
+					_set_fatal_error(TRUE);
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_AFFECTED_BY: {
+				if (adl->misc && AFF_FLAGGED(ch, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, affected_bits, part, FALSE);
+						msg_to_char(ch, "You can't do that while affected by %s.\r\n", part);
+					}
+					_set_fatal_error(TRUE);
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_TARGET_NOT_AFFECTED_BY: {
+				if (vict && adl->misc && AFF_FLAGGED(vict, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, affected_bits, part, FALSE);
+						if (ch == vict) {
+							msg_to_char(ch, "You can't do that while %s.\r\n", part);
+						}
+						else {
+							act("You can't do that -- $N is $t.", FALSE, ch, part, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+						}
+					}
 					return FALSE;
 				}
 				break;
@@ -4102,6 +4132,11 @@ PREP_ABIL(prep_dot_ability) {
 		data->success = FALSE;
 		return;
 	}
+}
+
+
+// PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+PREP_ABIL(prep_move_ability) {
 }
 
 
@@ -4973,6 +5008,11 @@ DO_ABIL(do_link_ability) {
 	// e.g. if a hooked ability will target self, but something in the middle
 	// needs to check immunities on another target.
 	data->success = TRUE;
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(do_move_ability) {
 }
 
 
@@ -9336,12 +9376,20 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 							ABIL_COST_PER_TARGET(abil) = dbl_in[0];
 							break;
 						}
-						case 9: {	// X+ 5: pool type
+						case 9: {	// X+ 9: pool type
 							if (sscanf(line, "X+ 9 %d", &int_in[0]) != 1) {
 								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
 								exit(1);
 							}
 							ABIL_POOL_TYPE(abil) = int_in[0];
+							break;
+						}
+						case 10: {	// X+ 10: move type
+							if (sscanf(line, "X+ 10 %d", &int_in[0]) != 1) {
+								log("SYSERR: Format error in 'X+%s' line of %s", line+2, error);
+								exit(1);
+							}
+							ABIL_MOVE_TYPE(abil) = int_in[0];
 							break;
 						}
 						default: {
@@ -9605,6 +9653,9 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	if (ABIL_POOL_TYPE(abil)) {
 		fprintf(fl, "X+ 9 %d\n", ABIL_POOL_TYPE(abil));
+	}
+	if (ABIL_MOVE_TYPE(abil)) {
+		fprintf(fl, "X+ 10 %d\n", ABIL_MOVE_TYPE(abil));
 	}
 	// former 'X' type is no longer used; replaced by X+
 	
@@ -10520,6 +10571,11 @@ char *ability_data_display(struct ability_data_list *adl) {
 					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
+				case ABLIM_AFF_FLAG: {
+					sprintbit(adl->misc, affected_bits, part, FALSE);
+					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					break;
+				}
 				case ABLIM_NOTHING:
 				default: {
 					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
@@ -10647,7 +10703,7 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 		fields |= ABILEDIT_DIFFICULTY | ABILEDIT_IMMUNITIES | ABILEDIT_MIN_POS | ABILEDIT_TARGETS | ABILEDIT_COST | ABILEDIT_COOLDOWN | ABILEDIT_TOOL;
 	}
 	
-	// and also show fields it somehow set when it shouldn't have
+	// ABILEDIT_x: and also show fields it somehow set when it shouldn't have
 	if (ABIL_IMMUNITIES(abil)) {
 		fields |= ABILEDIT_IMMUNITIES;
 	}
@@ -10704,6 +10760,9 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 	}
 	if (ABIL_POOL_TYPE(abil) != 0) {
 		fields |= ABILEDIT_POOL_TYPE;
+	}
+	if (ABIL_MOVE_TYPE(abil) != 0) {
+		fields |= ABILEDIT_MOVE_TYPE;
 	}
 	
 	return fields;
@@ -10835,10 +10894,13 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%sPool type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sMove type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), ability_move_types[ABIL_MOVE_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE)) {
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
@@ -11048,10 +11110,13 @@ void olc_show_ability(char_data *ch) {
 	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
 		sprintf(buf + strlen(buf), "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
+		sprintf(buf + strlen(buf), "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
 	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE)) {
+	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
 		sprintf(buf + strlen(buf), "\r\n");
 	}
 	
@@ -11678,6 +11743,15 @@ OLC_MODULE(abiledit_data) {
 								misc = BIT(misc);
 								break;
 							}
+							case ABLIM_AFF_FLAG: {
+								if ((misc = search_block(val_b, affected_bits, FALSE)) == NOTHING) {
+									msg_to_char(ch, "Invalid affect flag '%s'. See HELP AFFECT FLAGS.\r\n", val_b);
+									return;
+								}
+								// convert to flag
+								misc = BIT(misc);
+								break;
+							}
 						}
 						// otherwise pass through and we're good
 					}
@@ -12064,6 +12138,18 @@ OLC_MODULE(abiledit_minposition) {
 	}
 	else {
 		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
+	}
+}
+
+
+OLC_MODULE(abiledit_movetype) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+	
+	if (!IS_SET(ability_shows_fields(abil), ABILEDIT_MOVE_TYPE)) {
+		msg_to_char(ch, "This type of ability does not have that property. Add the MOVE type to use it.\r\n");
+	}
+	else {
+		ABIL_MOVE_TYPE(abil) = olc_process_type(ch, argument, "move type", "movetype", ability_move_types, ABIL_MOVE_TYPE(abil));
 	}
 }
 

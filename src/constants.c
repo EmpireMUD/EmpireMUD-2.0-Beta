@@ -249,6 +249,7 @@ const char *ability_type_flags[] = {
 	"RESTORE",
 	"MASTERY",	// 25
 	"LINK",
+	"MOVE",
 	"\n"
 };
 
@@ -282,6 +283,7 @@ const char *ability_type_notes[] = {
 	"restoration",
 	"mastery",	// 25
 	"links abilities",
+	"movement",
 	"\n"
 };
 
@@ -461,6 +463,14 @@ const char *ability_hook_types[] = {
 };
 
 
+// ABIL_MOVE_x: Move ability types
+const char *ability_move_types[] = {
+	"normal",	// 0
+	"earthmeld",
+	"\n"
+};
+
+
 // ABIL_LIMIT_x (1/2): Limitations when trying to use an ability
 const char *ability_limitations[] = {
 	"on a barrier tile", 	// 0
@@ -511,6 +521,8 @@ const char *ability_limitations[] = {
 	"in combat",	// 45
 	"not being attacked melee",
 	"not being attacked mobile melee",
+	"not affected by",
+	"target not affeced by",
 	"\n"
 };
 
@@ -565,6 +577,8 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_IN_COMBAT
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_NOT_AFFECTED_BY
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_NOT_AFFECTED_BY
 };
 
 

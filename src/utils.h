@@ -124,6 +124,7 @@
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
 #define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
+#define ABIL_MOVE_TYPE(abil)  ((abil)->move_type)
 #define ABIL_NAME(abil)  ((abil)->name)
 #define ABIL_POOL_TYPE(abil)  ((abil)->pool_type)
 #define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)

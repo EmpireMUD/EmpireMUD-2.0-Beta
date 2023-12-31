@@ -1252,6 +1252,7 @@ Limitation types:
  &cmember permission at target&0 - Has member access at the target location.
  &cno witnesses&0 - Nobody is watching.
  &cno witnesses hide&0 - Nobody is watching unless you're good at hiding.
+ &cnot affected by&0 - User is not affected by a given affect flag.
  &cnot being attacked&0 - No characters in combat are targeting the actor.
  &cnot being attacked melee&0 - Nobody targeting the actor in melee range.
  &cnot being attacked mobile melee&0 - Nobody targeting the actor in melee range
@@ -1273,6 +1274,7 @@ Limitation types:
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget is vampire&0 - Target must be a vampire.
+ &ctarget not affeced by&0 - Target is not affected by a given affect flag.
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
  &cterraform approval&0 - Check if the player needs/has approval for this.
  &cusing any poison&0 - Player must have poison ready.
@@ -1368,6 +1370,14 @@ no other properties.
 Example morph abilities: 4 Wolf Form, 215 Animal Forms
 
 See also: OLC ABILITIES, OLC MORPHS, MORPHEDIT REQUIRES ABILITY
+#d
+"ABILEDIT MOVETYPE" "ABILEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+This sets what type of special move the ability will do.
+
+See also: MOVE ABILITY
 #d
 "ABILEDIT MULTI" "ABILEDIT MULTIPLE TARGETS" "MULTIPLE TARGETS ABILITIES"
 
@@ -2064,17 +2074,20 @@ The following types are available (each has its own help file):
  &cLINK&0 - Helper type for complex hook abilities.
  &cMASTERY&0 - No inherent properties; just a label where applicable.
  &cMORPH&0 - Ability has morphs that require it.
+ &cMOVE&0 - Ability is a special type of move.
  &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
  &cPTECH&0 - Various 'techs' that players get from abilities.
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
  &cRESOURCE&0 - Used for resources, e.g. on interaction restrictions.
  &cRESTORE&0 - Gives some health, move, mana, or blood points.
- &cRESURRECT&0 - Offers resurrection; see ABILEDIT RESURRECT.
+ &cRESURRECT&0 - Offers resurrection.
  &cROOM-AFFECT&0 - Similar to a buff, for the room.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
- &cTELEPORT&0 - Teleports the player; see ABILEDIT TELEPORT.
+ &cTELEPORT&0 - Teleports the player.
+
+These types have help files with more details under ABILEDIT <TYPE>.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.

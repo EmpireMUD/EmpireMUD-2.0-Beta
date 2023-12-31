@@ -115,6 +115,7 @@
 #define ABILEDIT_COST_PER_AMOUNT	BIT(17)
 #define ABILEDIT_COST_PER_TARGET	BIT(18)
 #define ABILEDIT_POOL_TYPE		BIT(19)
+#define ABILEDIT_MOVE_TYPE		BIT(20)
 
 
 // TRIG_ARG_x: for trigger editing

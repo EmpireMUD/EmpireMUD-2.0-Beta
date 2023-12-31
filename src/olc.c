@@ -79,6 +79,7 @@ OLC_MODULE(abiledit_longduration);
 OLC_MODULE(abiledit_masteryability);
 OLC_MODULE(abiledit_maxstacks);
 OLC_MODULE(abiledit_minposition);
+OLC_MODULE(abiledit_movetype);
 OLC_MODULE(abiledit_name);
 OLC_MODULE(abiledit_pooltype);
 OLC_MODULE(abiledit_resourcecost);
@@ -636,6 +637,7 @@ const struct olc_command_data olc_data[] = {
 	{ "masteryability", abiledit_masteryability, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "maxstacks", abiledit_maxstacks, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "movetype", abiledit_movetype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "pooltype", abiledit_pooltype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "resourcecost", abiledit_resourcecost, OLC_ABILITY, OLC_CF_EDITOR },

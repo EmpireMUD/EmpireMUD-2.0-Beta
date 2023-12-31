@@ -607,6 +607,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_RESTORE			BIT(24)	// y. restores pools (health, etc)
 #define ABILT_MASTERY		    BIT(25)	// z. no inherent functions; just marks it as mastery of another one
 #define ABILT_LINK				BIT(26)	// A. only serves to link between two other abilities
+#define ABILT_MOVE				BIT(27)	// B. special type of move
 
 
 // ATAR_x: ability targeting flags
@@ -779,6 +780,11 @@ typedef struct vehicle_data vehicle_data;
 #define COMBAT_AHOOKS	(AHOOK_ATTACK | AHOOK_ATTACK_TYPE | AHOOK_DAMAGE_TYPE | AHOOK_KILL | AHOOK_MELEE_ATTACK | AHOOK_RANGED_ATTACK | AHOOK_WEAPON_TYPE | AHOOK_DAMAGE_ANY | AHOOK_ATTACK_MAGE | AHOOK_ATTACK_VAMPIRE)
 
 
+// ABIL_MOVE_x: Move ability types
+#define ABIL_MOVE_NORMAL		0	// just moves them (can combine with affects)
+#define ABIL_MOVE_EARTHMELD		1	// performs an earthmeld move
+
+
 // ABIL_LIMIT_x: Limitations when trying to use an ability
 #define ABIL_LIMIT_ON_BARRIER				0	// must be on a barrier
 #define ABIL_LIMIT_OWN_TILE					1	// must own the tile
@@ -828,6 +834,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_IN_COMBAT				45	// must be in combat
 #define ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE	46	// no characters hitting actor in melee
 #define ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE	47	// no characters hitting actor in melee (except immobilized ones)
+#define ABIL_LIMIT_NOT_AFFECTED_BY			48	// user not affected by aff flag
+#define ABIL_LIMIT_TARGET_NOT_AFFECTED_BY	49	// target is not affected by aff flag
 
 
 // ABLIM_x: data needed for ability limits:
@@ -838,6 +846,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABLIM_DAMAGE_TYPE	4	// requires a damage type (physical, magical, etc)
 #define ABLIM_ROLE			5	// requires a role
 #define ABLIM_OBJ_FLAG		6	// requires object flag
+#define ABLIM_AFF_FLAG		7	// requires affect flag
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -3986,6 +3995,7 @@ struct ability_data {
 	int damage_type;	// damage
 	int pool_type;	// restore
 	int max_stacks;	// dot
+	int move_type;	// for move abilities
 	struct ability_data_list *data;	// LL of additional data
 	struct interaction_item *interactions;	// LL of regular interactions
 	struct ability_hook *hooks;	// LL of hooks for this ability
