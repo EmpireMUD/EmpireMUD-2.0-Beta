@@ -781,7 +781,9 @@ S
 #262
 Hone~
 0 -1 1.00 0 0 0
+D 1 99 0
 T l 1
+T e 1
 S
 #264
 Exquisite Woodworking~
@@ -1098,13 +1100,13 @@ X+ 6 3
 S
 #286
 Evasion~
-0 -1 1.00 0 df 0
-T m 1
+a -1 1.00 0 df 0
+T x 1
 S
 #287
 Weapon Proficiency~
-0 -1 1.00 0 bc 0
-T m 1
+a -1 1.00 0 bc 0
+T x 1
 S
 #288
 Primitive Crafts~
@@ -1180,7 +1182,33 @@ S
 #294
 Kite~
 0 -1 1.00 0 0 0
-T m 0
+C
+kite 7 eg 1 50 0.00 2068 30 0 2 0
+D 64 24 0
+D 16 47 0
+D 16 45 0
+M
+0
+You move back and attempt to kite...~
+M
+1
+$n moves back and attempts to kite...~
+M
+8
+There's nobody you can kite.~
+M
+9
+*~
+M
+25
+You successfully kite $N!~
+M
+26
+$n successfully kites you!~
+M
+27
+*~
+T s 1
 S
 #295
 Bowmaster~

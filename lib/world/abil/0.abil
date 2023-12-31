@@ -61,7 +61,8 @@ S
 #5
 Null Mana~
 0 -1 1.00 0 0 0
-T m 0
+D 1 100 0
+T e 1
 S
 #6
 Ready Blood Weapons~
@@ -224,7 +225,11 @@ S
 #16
 Worm~
 0 -1 1.00 0 0 0
-T m 0
+C
+worm 3 w 0 0 0.00 -1 0 0 7 0
+D 16 52 16777216
+T B 1
+X+ 10 1
 S
 #17
 Terrify~
@@ -432,8 +437,16 @@ T j 0
 S
 #29
 Sneak~
-0 -1 1.00 0 0 0
-T m 0
+G -1 1.00 0 0 0
+C
+sneak 8 w 0 0 0.00 -1 0 0 7 1
+D 16 48 1
+D 16 15 0
+D 2 0 0
+D 16 50 0
+D 16 51 0
+T B 1
+X+ 0 d
 S
 #30
 By the Sun and Stars~
