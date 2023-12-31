@@ -1290,7 +1290,7 @@ bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh
 	// check all lists
 	for (iter = 0; iter < list_size; ++iter) {
 		LL_FOREACH(list[iter], interact) {
-			if (interact->type != interaction_type) {
+			if (interact->type == interaction_type) {
 				depletion_type = determine_depletion_type(interact);
 				if (GET_CHORE_DEPLETION(room, veh, depletion_type) < (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
 					// only needed 1
