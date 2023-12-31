@@ -523,6 +523,10 @@ const char *ability_limitations[] = {
 	"not being attacked mobile melee",
 	"not affected by",
 	"target not affeced by",
+	"not leading mob",	// 50
+	"not leading vehicle",
+	"is affected by",
+	"target is affected by",
 	"\n"
 };
 
@@ -579,6 +583,10 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE
 	ABLIM_AFF_FLAG,	// ABIL_LIMIT_NOT_AFFECTED_BY
 	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_NOT_AFFECTED_BY
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_LEADING_MOB
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_LEADING_VEHICLE
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_IS_AFFECTED_BY
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_IS_AFFECTED_BY
 };
 
 

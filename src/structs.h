@@ -836,6 +836,10 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE	47	// no characters hitting actor in melee (except immobilized ones)
 #define ABIL_LIMIT_NOT_AFFECTED_BY			48	// user not affected by aff flag
 #define ABIL_LIMIT_TARGET_NOT_AFFECTED_BY	49	// target is not affected by aff flag
+#define ABIL_LIMIT_NOT_LEADING_MOB			50	// user isn't leading a mob
+#define ABIL_LIMIT_NOT_LEADING_VEHICLE		51	// user isn't leading a vehicle
+#define ABIL_LIMIT_IS_AFFECTED_BY			52	// user is affected by an aff flag
+#define ABIL_LIMIT_TARGET_IS_AFFECTED_BY	53	// target is affected by an aff flag
 
 
 // ABLIM_x: data needed for ability limits:

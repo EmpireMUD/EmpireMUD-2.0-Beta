@@ -3791,6 +3791,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_IS_AFFECTED_BY: {
+				if (adl->misc && !AFF_FLAGGED(ch, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, affected_bits, part, FALSE);
+						msg_to_char(ch, "You must be %s to do that.\r\n", part);
+					}
+					_set_fatal_error(TRUE);
+					return FALSE;
+				}
+				break;
+			}
 			case ABIL_LIMIT_TARGET_NOT_AFFECTED_BY: {
 				if (vict && adl->misc && AFF_FLAGGED(vict, adl->misc)) {
 					if (send_msgs) {
@@ -3802,6 +3813,41 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 							act("You can't do that -- $N is $t.", FALSE, ch, part, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 						}
 					}
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_TARGET_IS_AFFECTED_BY: {
+				if (vict && adl->misc && !AFF_FLAGGED(vict, adl->misc)) {
+					if (send_msgs) {
+						sprintbit(adl->misc, affected_bits, part, FALSE);
+						if (ch == vict) {
+							msg_to_char(ch, "You must be %s to do that.\r\n", part);
+						}
+						else {
+							act("You can't do that -- $N isn't $t.", FALSE, ch, part, vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+						}
+					}
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_LEADING_MOB: {
+				if (GET_LEADING_MOB(ch)) {
+					if (send_msgs) {
+						msg_to_char(ch, "You can't do that while leading something.\r\n");
+					}
+					_set_fatal_error(TRUE);
+					return FALSE;
+				}
+				break;
+			}
+			case ABIL_LIMIT_NOT_LEADING_VEHICLE: {
+				if (GET_LEADING_VEHICLE(ch)) {
+					if (send_msgs) {
+						msg_to_char(ch, "You can't do that while leading something.\r\n");
+					}
+					_set_fatal_error(TRUE);
 					return FALSE;
 				}
 				break;

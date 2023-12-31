@@ -1248,6 +1248,7 @@ Limitation types:
  &cin combat&0 - Must be fighting someone.
  &cin role&0 - Actor must be in a certain role.
  &cindoors&0 - Must be used indoors (including inside buildings on the map).
+ &cis affected by&0 - User must have an affect flag.
  &citem type <TYPE>&0 - Obj target must be a specific type.
  &cmember permission at target&0 - Has member access at the target location.
  &cno witnesses&0 - Nobody is watching.
@@ -1261,6 +1262,8 @@ Limitation types:
  &cnot god target&0 - Target player must not be a god or immortal.
  &cnot here&0 - Target cannot be in same room.
  &cnot immobilized&0 - User does not have IMMOBILIZED affect.
+ &cnot leading mob&0 - User is not leading a mob.
+ &cnot leading vehicle&0 - User is not leading a vehicle.
  &cobj flagged&0 - Object has a certain flag (see OEDIT FLAGS).
  &cobj not flagged&0 - Object does not have a certain flag.
  &con a barrier tile&0 - Must be used on a barrier (wall) tile.
@@ -1273,6 +1276,7 @@ Limitation types:
  &ctarget has any DoT&0 - Target must be afflicted by a DoT.
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
+ &ctarget is affected by&0 - Target must have an affect flag.
  &ctarget is vampire&0 - Target must be a vampire.
  &ctarget not affeced by&0 - Target is not affected by a given affect flag.
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
