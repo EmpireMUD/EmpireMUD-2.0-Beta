@@ -12,8 +12,9 @@
 
 /**
 * Contents:
-*   Core Definitions
-*   Other Skill Definitions
+*   Ability Definitions
+*   Skill Definitions
+*   Other Definitions
 *   Constants
 *   Ability Prototypes
 *   Class Prototypes
@@ -22,7 +23,7 @@
 */
 
  //////////////////////////////////////////////////////////////////////////////
-//// CORE DEFINITIONS ////////////////////////////////////////////////////////
+//// ABILITY DEFINITIONS /////////////////////////////////////////////////////
 
 #define GAINS_PER_ABILITY		10	// times you can gain skill from each ability -- TODO: should be a config?
 
@@ -353,7 +354,26 @@
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// OTHER SKILL DEFINITONS //////////////////////////////////////////////////
+//// CLASS DEFINITIONS ///////////////////////////////////////////////////////
+
+// CLASSF_x: class flags
+#define CLASSF_IN_DEVELOPMENT  BIT(0)	// a. not available to players
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SKILL DEFINITIONS ///////////////////////////////////////////////////////
+
+// SKILLF_x: skill flags
+#define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
+#define SKILLF_BASIC  BIT(1)	// b. always shows in the list
+#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
+#define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
+#define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
+#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OTHER DEFINITIONS ///////////////////////////////////////////////////////
 
 
 // for restoration abilities: pool type can be any
@@ -395,6 +415,17 @@
 #define RESCUE_NO_MSG  0
 #define RESCUE_RESCUE  1	// traditional rescue message
 #define RESCUE_FOCUS  2		// mob changes focus
+
+
+// ROLE_x: group roles for classes
+#define ROLE_NONE  0	// placeholder
+#define ROLE_TANK  1
+#define ROLE_MELEE  2
+#define ROLE_CASTER  3
+#define ROLE_HEALER  4
+#define ROLE_UTILITY  5
+#define ROLE_SOLO  6
+#define NUM_ROLES  7
 
 
 // SIEGE_x: types for besiege

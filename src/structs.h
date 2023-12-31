@@ -504,15 +504,6 @@ typedef struct vehicle_data vehicle_data;
 #define SHIPPING_WAITING_FOR_SHIP  3	// waiting for a ship
 
 
-// SKILLF_x: skill flags
-#define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
-#define SKILLF_BASIC  BIT(1)	// b. always shows in the list
-#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
-#define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
-#define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
-#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
-
-
 // SPAWN_x: mob spawn flags
 #define SPAWN_NOCTURNAL  BIT(0)	// a. only spawns at night
 #define SPAWN_DIURNAL  BIT(1)	// b. only spawns during day
@@ -538,6 +529,12 @@ typedef struct vehicle_data vehicle_data;
 #define TPD_EXPIRED  BIT(2)	// ended without sale
 #define TPD_OBJ_PENDING  BIT(3)	// obj not received
 #define TPD_COINS_PENDING  BIT(4)	// coins not received
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ABILITY DEFINES /////////////////////////////////////////////////////////
+
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -961,19 +958,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CLASS DEFINES ///////////////////////////////////////////////////////////
 
-// CLASSF_x: class flags
-#define CLASSF_IN_DEVELOPMENT  BIT(0)	// a. not available to players
-
-
-// ROLE_x: group roles for classes
-#define ROLE_NONE  0	// placeholder
-#define ROLE_TANK  1
-#define ROLE_MELEE  2
-#define ROLE_CASTER  3
-#define ROLE_HEALER  4
-#define ROLE_UTILITY  5
-#define ROLE_SOLO  6
-#define NUM_ROLES  7
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
