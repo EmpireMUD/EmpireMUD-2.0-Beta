@@ -2532,10 +2532,20 @@ void nanny(descriptor_data *d, char *arg) {
 			else {
 				if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
 					syslog(SYS_LOGIN, 0, TRUE, "BAD PW: %s [%s]", GET_NAME(d->character), d->host);
-					GET_BAD_PWS(d->character)++;
-					SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);
-					SAVE_CHAR(d->character);
-					if (++(d->bad_pws) >= config_get_int("max_bad_pws")) {	/* 3 strikes and you're out. */
+					if ((temp_char = is_playing(GET_IDNUM(d->character)))) {
+						// update on in-game version instead
+						++GET_BAD_PWS(temp_char);
+						SAVE_CHAR(temp_char);
+					}
+					else {
+						// update on this one (not in-game)
+						++GET_BAD_PWS(d->character);
+						SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);
+						SAVE_CHAR(d->character);
+					}
+					
+					// 3 strikes and you're out.
+					if (++(d->bad_pws) >= config_get_int("max_bad_pws")) {
 						SEND_TO_Q("Wrong password... disconnecting.\r\n", d);
 						STATE(d) = CON_CLOSE;
 					}
