@@ -116,10 +116,18 @@ remote last_phrase %self.id%
 Animal Becomes Hidden Over Time~
 0 ab 20
 ~
-if %self.fighting% || %self.disabled%
-  halt
+eval times_hidden %self.var(times_hidden,0)% + 1
+if %times_hidden% > 50
+  * stop trying to hide -- this would otherwise run forever on some mobs
+  detach 9117 %self.id%
+else
+  * store for next time
+  remote times_hidden %self.id%
 end
-hide
+* try to hide
+if !%self.fighting% && !%self.disabled%
+  hide
+end
 ~
 #9118
 Mob Becomes Hostile on Interaction~
