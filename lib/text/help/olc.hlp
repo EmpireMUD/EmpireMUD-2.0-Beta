@@ -757,7 +757,13 @@ This type of ability must always target objects. If you want to create a liquid
 in the room, use a conjure-object ability instead, with a puddle object.
 
 This ability supports both the 'conjure' command and its own command. In both
-cases, it must be set to target an object.
+cases, it must be set to target an object. It supports the cost-per-amount
+setting, in case the amount of liquid is important.
+
+This type of ability also supports a second argument for the amount of liquid,
+in case the player doesn't wish to conjure the maximum amount. The amount they
+specify cannot be more than the interaction quantity or the amount they can
+afford.
 
 Conjure-liquid abilities have the following properties:
  <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
@@ -765,7 +771,8 @@ Conjure-liquid abilities have the following properties:
  <&ycostperamount&0> You can optionally base the cost on how much of a liquid
     is conjured.
  <&yinteractions&0> Determine which liquid will be conjured. You must set at
-    least 1 LIQUID-CONJURE interaction, and only 1 should succeed.
+    least 1 LIQUID-CONJURE interaction, and only 1 should succeed. The quantity
+    value of this interaction is the maximum that can be conjured.
  <&ytargets&0> Must target an object.
 
 This type of ability uses the &ctarg-to-*&0 custom messages with the &y$p&0 token for
