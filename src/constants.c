@@ -1068,7 +1068,7 @@ const char *mount_flags[] = {
 	"riding",
 	"aquatic",
 	"flying",
-	"waterwalk",
+	"waterwalking",
 	"\n"
 };
 
@@ -1714,7 +1714,7 @@ const char *affected_bits[] = {
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
-	"WATERWALK",
+	"WATERWALKING",
 	"LIGHT",
 	"POOR-REGENS",
 	"SLOWER-ACTIONS",	// 40
@@ -1765,7 +1765,7 @@ const char *affected_bits_consider[] = {
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
 	"",	// !where
-	"",	// waterwalk
+	"",	// waterwalking
 	"",	// light
 	"",	// poor-regens
 	"",	// 40 - slower-actions

@@ -445,7 +445,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 	}
 	
 	// validation
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC) && !HAS_WATERWALK(mob)) {
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC) && !HAS_WATERWALKING(mob)) {
 		msg_to_char(ch, "You can't herd it into the water.\r\n");
 	}
 	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {

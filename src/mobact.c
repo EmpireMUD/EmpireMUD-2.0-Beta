@@ -1021,7 +1021,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 		}
 	}
 	else if (SECT_FLAGGED(sect, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALK(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
+		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALKING(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
 			ok = TRUE;
 		}
 	}

@@ -3321,7 +3321,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_NEW_OFFENSES(ch)) {
 						strcat(i, "\t0O");
 					}
-					if (HAS_WATERWALK(ch)) {
+					if (HAS_WATERWALKING(ch)) {
 						strcat(i, "\t0W");
 					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
@@ -3383,8 +3383,8 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_THIRSTY(ch)) {
 						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
 					}
-					if (HAS_WATERWALK(ch)) {
-						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
+					if (HAS_WATERWALKING(ch)) {
+						sprintf(i + strlen(i), "%swaterwalking", (*i ? " " : ""));
 					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 						int temperature = get_relative_temperature(ch);

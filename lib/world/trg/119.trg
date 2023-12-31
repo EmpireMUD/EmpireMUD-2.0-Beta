@@ -3708,7 +3708,7 @@ Skycleave: Consume handler (long potions and other consumables)~
 switch %self.vnum%
   case 11912
     dg_affect #%self.vnum% %actor% off silent
-    dg_affect #%self.vnum% %actor% WATERWALK on 86400
+    dg_affect #%self.vnum% %actor% WATERWALKING on 86400
     %send% %actor% # Your feet start to tingle!
   break
   case 11924

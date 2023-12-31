@@ -1859,12 +1859,12 @@ people.
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
-WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER"
+WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER" WATERWALKING
 
-The WATERWALK effect allows you to walk normally on water. You will not drown
-or lose movement points from swimming.
+The WATERWALKING effect allows you to walk normally on water. You will not
+drown or lose movement points from swimming.
 
-Normal land mounts do not benefit from WATERWALK on the player -- you still
+Normal land mounts do not benefit from WATERWALKING on the player -- you still
 need the correct mount ability to cross water while mounted.
 
 On mobs, this is different from the AQUATIC mob flag, which allows the mob to

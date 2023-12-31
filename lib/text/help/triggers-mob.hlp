@@ -535,7 +535,7 @@ When using field  - The variable returns:
 &cis_tagged_by(player)&0 - True if the mob is 'tagged' by the player. For NPCs,
    this will check if tagged by the player's leader. Tagging means the player
    has the right to get loot from the mob (their group started the fight).
-&cis_waterwalking&0 - True if the character has any form of waterwalk.
+&cis_waterwalking&0 - True if the character has any form of waterwalking.
 &clastname&0 - The actor's last name (empty for mobs).
 &clast_move_dir&0 - The last direction moved, if any (empty if none).
 &cleader&0 - The leader of the actor (if following), or an empty return.

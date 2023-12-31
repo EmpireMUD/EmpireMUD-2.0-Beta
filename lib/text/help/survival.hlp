@@ -212,7 +212,7 @@ can make a simple saddle with Basic Crafts.
 Flying mounts require All-Terrain Riding, or Fly + Ride. Flying mounts allow
 you to see over blocked terrain that's at the same elevation as you are.
 
-Mounts with the waterwalk effect require All-Terrain Riding.
+Mounts with the waterwalking effect require All-Terrain Riding.
 
 Ride gains experience just from moving around while mounted, but All-Terrain
 Riding only gains experience when you cross water or mountains while mounted.
@@ -382,7 +382,7 @@ wasting movement points or wandering into the mouth of a shark.
 
 Gains experience when you swim around.
 
-See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALK, PASSIVES
+See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALKING, PASSIVES
 #
 THIRST "SATED THIRST"
 

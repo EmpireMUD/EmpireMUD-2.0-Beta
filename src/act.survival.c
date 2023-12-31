@@ -213,7 +213,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
-	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
+	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {

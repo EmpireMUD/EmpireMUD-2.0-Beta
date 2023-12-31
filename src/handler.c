@@ -6253,8 +6253,8 @@ bitvector_t get_mount_flags_by_mob(char_data *mob) {
 	if (MOB_FLAGGED(proto, MOB_AQUATIC)) {
 		SET_BIT(flags, MOUNT_AQUATIC);
 	}
-	if (AFF_FLAGGED(proto, AFF_WATERWALK)) {
-		SET_BIT(flags, MOUNT_WATERWALK);
+	if (AFF_FLAGGED(proto, AFF_WATERWALKING)) {
+		SET_BIT(flags, MOUNT_WATERWALKING);
 	}
 	
 	return flags;

@@ -4038,7 +4038,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (IS_NPC(c) && GET_CURRENT_SCALE_LEVEL(c) > 0) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_waterwalking")) {
-						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
+						snprintf(str, slen, HAS_WATERWALKING(c) ? "1" : "0");
 					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {

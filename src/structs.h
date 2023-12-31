@@ -1234,7 +1234,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
-#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
+#define AFF_WATERWALKING  BIT(37)	// L. won't drown or be affected by water restrictions
 #define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
 #define AFF_POOR_REGENS  BIT(39)	// N. dramatically lower regens
 #define AFF_SLOWER_ACTIONS  BIT(40)	// O. timed actions are slower
@@ -2652,7 +2652,7 @@ typedef enum {
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
 #define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
-#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
+#define MOUNT_WATERWALKING  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system
