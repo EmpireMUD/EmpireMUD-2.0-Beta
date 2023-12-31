@@ -4773,6 +4773,10 @@ DO_ABIL(do_action_ability) {
 				call_do_abil(abil_action_push_back_to_ranged_combat);
 				break;
 			}
+			case ABIL_ACTION_LOOK_AT_ROOM: {
+				look_at_room(ch);
+				break;
+			}
 		}
 	}
 }

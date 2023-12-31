@@ -678,6 +678,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_ACTION_CLOSE_TO_MELEE			22	// immediately drops from ranged combat to melee
 #define ABIL_ACTION_SET_FIGHTING_TARGET		23	// ensures ch is hitting vict
 #define ABIL_ACTION_PUSH_BACK_TO_RANGED_COMBAT	24	// for 'kite', pushes a character away from the user
+#define ABIL_ACTION_LOOK_AT_ROOM			25	// forces a 'look'
 
 
 // ABIL_CUSTOM_x: custom message types

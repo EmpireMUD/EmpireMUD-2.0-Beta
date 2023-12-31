@@ -556,6 +556,7 @@ Action types:
    Sends per-item messages when those interactions give an item.
  &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech. Has its own
    medium difficulty check without the ptech.
+ &clook at room&0 - Character is forced to do a normal 'look'.
  &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
    the evolution works with $1 as the old sector name and $2 as the new one.
  &cpurify&0 - Removes flagged skills and vampire status from the target. Use in
