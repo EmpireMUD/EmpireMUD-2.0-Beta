@@ -1179,7 +1179,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	
 	// these 
 	if ((AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) || (IS_IMMORTAL(i) && PRF_FLAGGED(i, PRF_WIZHIDE))) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-		if (AFF_FLAGGED(i, AFF_EARTHMELD)) {
+		if (AFF_FLAGGED(i, AFF_EARTHMELDED)) {
 			act("...$e is earthmelded.", FALSE, i, 0, ch, TO_VICT);
 		}
 		else {

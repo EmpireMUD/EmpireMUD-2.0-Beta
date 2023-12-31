@@ -838,7 +838,7 @@ ACMD(do_search) {
 
 				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			}
-			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELDED)) {
 				// earthmelded targets (only do once)
 				if (player_tech_skill_check_by_ability_difficulty(ch, PTECH_SEARCH_COMMAND) && CAN_SEE(ch, targ)) {
 					act("You find signs that someone is earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);

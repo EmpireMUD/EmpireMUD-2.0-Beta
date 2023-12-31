@@ -67,8 +67,8 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	}
 	
 	// earthmeld doesn't hit the correct error in char_can_act -- just block all socials in earthmeld
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
+		msg_to_char(ch, "You can't do that while earthmelded.\r\n");
 		return TRUE;
 	}
 	

@@ -1442,8 +1442,8 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't do that while stunned!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_EARTHMELD) && min_pos >= POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_EARTHMELDED) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while earthmelded.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_MUMMIFY) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while mummified.\r\n");
@@ -2901,7 +2901,7 @@ void nanny(descriptor_data *d, char *arg) {
 				show_start = TRUE;
 			}
 			
-			if (AFF_FLAGGED(d->character, AFF_EARTHMELD)) {
+			if (AFF_FLAGGED(d->character, AFF_EARTHMELDED)) {
 				msg_to_char(d->character, "You are earthmelded.\r\n");
 			}
 			else {

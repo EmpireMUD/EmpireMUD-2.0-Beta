@@ -1701,7 +1701,7 @@ const char *affected_bits[] = {
 	"!BLOOD",
 	"*",	// formerly CLAWS
 	"DEATHSHROUD",
-	"EARTHMELD",
+	"EARTHMELDED",
 	"MUMMIFY",
 	"SOULMASK",
 	"NO-TRACKS",

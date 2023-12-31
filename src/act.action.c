@@ -1686,7 +1686,7 @@ void process_digging(char_data *ch) {
 	
 	// look for earthmelders
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
-		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELDED)) {
 			continue;
 		}
 		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
@@ -1781,7 +1781,7 @@ void process_excavating(char_data *ch) {
 	
 	// look for earthmelders
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
-		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELDED)) {
 			continue;
 		}
 		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {

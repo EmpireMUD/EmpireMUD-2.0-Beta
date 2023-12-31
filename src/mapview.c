@@ -1216,7 +1216,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 
-	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
@@ -1743,7 +1743,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "The area is blanketed in an inky darkness.\r\n");
 	}
 
-	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+	if (!AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 		if (can_get_quest_from_room(ch, room, NULL)) {
 			msg_to_char(ch, "\tA...there is a quest here for you!\t0\r\n");
 		}

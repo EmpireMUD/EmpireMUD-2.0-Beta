@@ -191,7 +191,7 @@ bool check_vampire_ability(char_data *ch, any_vnum ability, int cost_pool, int c
 * @return bool TRUE if the ability can proceed, FALSE if sunny
 */
 bool check_vampire_sun(char_data *ch, bool message) {
-	if (IS_NPC(ch) || has_player_tech(ch, PTECH_VAMPIRE_SUN_IMMUNITY) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
+	if (IS_NPC(ch) || has_player_tech(ch, PTECH_VAMPIRE_SUN_IMMUNITY) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELDED) || !check_sunny(IN_ROOM(ch))) {
 		// ok -- not sunny
 		return TRUE;
 	}

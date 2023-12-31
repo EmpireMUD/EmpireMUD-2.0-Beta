@@ -2538,7 +2538,7 @@ DO_ABIL(abil_action_detect_earthmeld) {
 			continue;
 		}
 		
-		if (AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+		if (AFF_FLAGGED(targ, AFF_EARTHMELDED)) {
 			if (CAN_SEE(ch, targ)) {
 				send_ability_per_char_messages(ch, targ, 1, abil, data, NULL);
 				data->success = TRUE;
@@ -3918,7 +3918,7 @@ PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
 	bool was_sleep_aff;
 	
-	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY | AFF_EARTHMELD;
+	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFY | AFF_EARTHMELDED;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	

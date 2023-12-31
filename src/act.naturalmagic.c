@@ -104,9 +104,9 @@ bool has_earthmeld_move_ability(char_data *ch) {
 * @param char_data *ch The earthmelded one.
 */
 void un_earthmeld(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
+		affects_from_char_by_aff_flag(ch, AFF_EARTHMELDED, FALSE);
+		if (!AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			msg_to_char(ch, "You rise from the ground!\r\n");
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
@@ -318,7 +318,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
 		if (has_earthmeld_move_ability(ch) && IS_COMPLETE(IN_ROOM(ch)) && IS_ANY_BUILDING(IN_ROOM(ch)) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
@@ -381,7 +381,7 @@ ACMD(do_earthmeld) {
 	act("$n dissolves into pure mana and sinks right into the ground!", TRUE, ch, 0, 0, TO_ROOM);
 	GET_POS(ch) = POS_SLEEPING;
 
-	af = create_aff(ATYPE_EARTHMELD, UNLIMITED, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELD, ch);
+	af = create_aff(ATYPE_EARTHMELD, UNLIMITED, APPLY_NONE, 0, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_EARTHMELDED, ch);
 	affect_join(ch, af, 0);
 	
 	gain_ability_exp(ch, ABIL_EARTHMELD, 15);

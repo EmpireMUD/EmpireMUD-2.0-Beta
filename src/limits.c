@@ -543,7 +543,7 @@ void real_update_player(char_data *ch) {
 		extract_char(GET_COMPANION(ch));
 	}
 	// earthmeld damage
-	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
+	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
@@ -2285,7 +2285,7 @@ int health_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_HEALTH(ch) + GET_HEALTH_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
@@ -2327,7 +2327,7 @@ int mana_gain(char_data *ch, bool info_only) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MANA(ch) + GET_MANA_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
@@ -2374,7 +2374,7 @@ int move_gain(char_data *ch, bool info_only) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MOVE(ch) + GET_MOVE_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);

@@ -383,7 +383,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
-	if (AFF_FLAGGED(new, AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(new, AFF_EARTHMELDED)) {
 		msg_to_char(new, "You are earthmelded.\r\n");
 	}
 	else {

@@ -113,10 +113,10 @@ bool check_can_still_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 	}
 	
-	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(victim, AFF_NO_ATTACK | AFF_EARTHMELDED)) {
 		return FALSE;
 	}
-	if (AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(ch, AFF_NO_ATTACK | AFF_EARTHMELDED)) {
 		return FALSE;
 	}
 	
