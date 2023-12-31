@@ -2205,6 +2205,8 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
 	
+	request_obj_save_in_world(inter_item);
+	
 	return TRUE;
 }
 
@@ -3797,10 +3799,23 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 		}
 	}
 	
+	// remaining arguments?
+	msg_to_char(ch, "arg: '%s'\r\n", argument);
+	if (*argument && isdigit(*argument)) {
+		// manual limit
+		data->conjure_liquid_max = atoi(argument);
+		
+		if (data->conjure_liquid_max < 1) {
+			msg_to_char(ch, "You'll have to pick an amount larger than 0.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+	
 	// check costs and set maximum based on available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
-		data->conjure_liquid_max = avail;
+		data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
 		
 		if (avail < 1) {
 			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
