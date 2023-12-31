@@ -3819,7 +3819,12 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	// check costs and set maximum based on available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
-		data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
+		if (data->conjure_liquid_max == 0) {
+			data->conjure_liquid_max = avail;
+		}
+		else {
+			data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
+		}
 		
 		if (avail < 1) {
 			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
