@@ -1016,7 +1016,7 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	}
 	
 	// find matching data
-	if (!IS_NPC(killer)) {
+	if (!IS_NPC(killer) && !IS_IMMORTAL(killer)) {
 		if (GET_LOYALTY(killer)) {
 			avenge_solo_offenses_from_player(GET_LOYALTY(killer), ch);
 		}

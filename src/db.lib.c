@@ -3944,7 +3944,7 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	while (IS_NPC(offender) && GET_LEADER(offender)) {
 		offender = GET_LEADER(offender);
 	}
-	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp) {
+	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp || IS_IMMORTAL(offender)) {
 		return;	// no offense
 	}
 	
