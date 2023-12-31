@@ -7412,7 +7412,6 @@ void call_multi_target_ability(char_data *ch, ability_data *abil, char *argument
 	
 	if (!IS_SET(run_mode, RUN_ABIL_OVER_TIME)) {
 		// check cooldowns and cost up front on multis, unless running over-time
-		// TODO: cost checking here does not account for cost-per-scale, which could be estimated from base scale funcs like in estimate_cost
 		if (!can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_TOTAL_COST(abil), ABIL_COOLDOWN(abil))) {
 			// sends own message
 			data->stop = TRUE;
@@ -9677,10 +9676,6 @@ void read_ability_requirements(void) {
 	
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		LL_FOREACH(SKILL_ABILITIES(skill), iter) {
-			// TODO should this be moved up? or be checking ability in-dev?
-			if (IS_SET(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT)) {
-				continue;	// don't count if in-dev
-			}
 			if (!(abil = find_ability_by_vnum(iter->vnum))) {
 				continue;
 			}
