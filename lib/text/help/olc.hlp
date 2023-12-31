@@ -560,6 +560,9 @@ Action types:
    the evolution works with $1 as the old sector name and $2 as the new one.
  &cpurify&0 - Removes flagged skills and vampire status from the target. Use in
    conjuction with the 'can purify target' limitation.
+ &cpush back to ranged combat&0 - For abilities like 'kite', pushes a character
+   away from the user if in combat. Targeting self pushes back everyone;
+   otherwise only the target(s). Anyone pushed back shows a per-char message.
  &cput to sleep&0 - Target is put to sleep.
  &cremove debuffs&0 - Removes debuffs (except self-debuffs and penalties).
  &cremove drunk&0 - Cancels any drunkenness on the target.

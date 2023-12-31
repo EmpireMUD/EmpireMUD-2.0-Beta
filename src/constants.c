@@ -139,6 +139,7 @@ const char *ability_actions[] = {
 	"purify",
 	"close to melee",
 	"set fighting target",
+	"push back to ranged combat",
 	"\n"
 };
 

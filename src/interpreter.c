@@ -217,7 +217,6 @@ ACMD(do_island);
 ACMD(do_islands);
 
 ACMD(do_keep);
-ACMD(do_kite);
 
 ACMD(do_land);
 ACMD(do_last);
@@ -741,7 +740,6 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	STANDARD_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
-	ABILITY_CMD( "kite", POS_FIGHTING, do_kite, NO_MIN, CTYPE_COMBAT, ABIL_KITE ),
 
 	SCMD_CMD( "look", POS_RESTING, do_look, NO_MIN, CTYPE_UTIL, SCMD_LOOK ),
 	STANDARD_CMD( "lay", POS_STANDING, do_lay, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),

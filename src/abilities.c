@@ -2794,6 +2794,93 @@ DO_ABIL(abil_action_purify) {
 
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
+DO_ABIL(abil_action_push_back_to_ranged_combat) {
+	bool any, move_ch_out;
+	char_data *ch_iter;
+	
+	if (!FIGHTING(ch)) {
+		return;	// not in combat
+	}
+	
+	move_ch_out = FALSE;	// maybe
+	
+	if (vict == ch) {
+		// targeting self: move everyone back
+		data->success = TRUE;
+		move_ch_out = TRUE;
+		
+		// move people hitting me out
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter == ch || FIGHTING(ch_iter) != ch) {
+				continue;	// not hitting me
+			}
+			
+			// ok:
+			if (FIGHT_MODE(ch_iter) == FMODE_WAITING) {
+				FIGHT_WAIT(ch_iter) += 4;
+			}
+			else if (GET_EQ(ch_iter, WEAR_RANGED) && GET_OBJ_TYPE(GET_EQ(ch_iter, WEAR_RANGED)) == ITEM_MISSILE_WEAPON) {
+				FIGHT_MODE(ch_iter) = FMODE_MISSILE;
+				FIGHT_WAIT(ch_iter) = 0;
+			}
+			else {
+				FIGHT_MODE(ch_iter) = FMODE_WAITING;
+				FIGHT_WAIT(ch_iter) = 4;
+			}
+			
+			send_ability_per_char_messages(ch, ch_iter, 1, abil, data, NULL);
+		}
+	}
+	else {
+		// target is not me: move back only me and the target
+		if (FIGHTING(vict) == ch) {
+			data->success = TRUE;
+			
+			// ok:
+			if (FIGHT_MODE(vict) == FMODE_WAITING) {
+				FIGHT_WAIT(vict) += 4;
+			}
+			else if (GET_EQ(vict, WEAR_RANGED) && GET_OBJ_TYPE(GET_EQ(vict, WEAR_RANGED)) == ITEM_MISSILE_WEAPON) {
+				FIGHT_MODE(vict) = FMODE_MISSILE;
+				FIGHT_WAIT(vict) = 0;
+			}
+			else {
+				FIGHT_MODE(vict) = FMODE_WAITING;
+				FIGHT_WAIT(vict) = 4;
+			}
+			send_ability_per_char_messages(ch, vict, 1, abil, data, NULL);
+		}
+		
+		// if nobody is hitting me at melee, move me back, too
+		any = FALSE;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (FIGHTING(ch_iter) == ch && FIGHT_MODE(ch_iter) == FMODE_MELEE) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (!any) {
+			move_ch_out = TRUE;
+		}
+	}
+
+	// if requested:
+	if (move_ch_out) {
+		data->success = TRUE;
+		
+		if (GET_EQ(ch, WEAR_RANGED) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_RANGED)) == ITEM_MISSILE_WEAPON) {
+			FIGHT_MODE(ch) = FMODE_MISSILE;
+			FIGHT_WAIT(ch) = 0;
+		}
+		else {
+			FIGHT_MODE(ch) = FMODE_WAITING;
+			FIGHT_WAIT(ch) = 4;
+		}
+	}
+}
+
+
+// DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(abil_action_put_to_sleep) {
 	if (vict) {
 		if (GET_POS(vict) > POS_SLEEPING) {
@@ -4508,6 +4595,10 @@ DO_ABIL(do_action_ability) {
 			}
 			case ABIL_ACTION_SET_FIGHTING_TARGET: {
 				call_do_abil(abil_action_set_fighting_target);
+				break;
+			}
+			case ABIL_ACTION_PUSH_BACK_TO_RANGED_COMBAT: {
+				call_do_abil(abil_action_push_back_to_ranged_combat);
 				break;
 			}
 		}
