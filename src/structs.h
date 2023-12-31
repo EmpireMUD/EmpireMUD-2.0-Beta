@@ -2816,6 +2816,7 @@ typedef enum {
 #define PTECH_REWORK_COMMAND  96	// allows refreshing and restringing gear
 #define PTECH_BITE_REGENERATION  97	// rapid regeneration while drinking blood from humans
 #define PTECH_STEAL_COMMAND  98	// can use 'steal'
+#define PTECH_USE_HONED_GEAR  99	// can use honed gear
 
 
 // SM_x: status messages

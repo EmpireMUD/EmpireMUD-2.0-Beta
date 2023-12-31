@@ -185,6 +185,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					}
 					break;
 				}
+				case PTECH_USE_HONED_GEAR: {
+					remove_honed_gear(ch);
+					need_affect_total = TRUE;
+					break;
+				}
 			}
 		}
 	}
@@ -207,11 +212,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				un_earthmeld(ch);
 				need_affect_total = TRUE;
 			}
-			break;
-		}
-		case ABIL_HONE: {
-			remove_honed_gear(ch);
-			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
@@ -2539,10 +2539,9 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 			honed = TRUE;
 		}
 	}
-	if (honed && !has_ability(ch, ABIL_HONE)) {
+	if (honed && !has_player_tech(ch, PTECH_USE_HONED_GEAR)) {
 		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(ABIL_HONE));
-			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+			act("You don't have the abiltiy to use honed gear like $p.", FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
 	}

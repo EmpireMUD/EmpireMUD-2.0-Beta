@@ -1345,6 +1345,7 @@ const char *player_tech_types[] = {
 	"Rework-Command",
 	"Bite-Regeneration",
 	"Steal-Command",
+	"Use-Honed-Gear",
 	"\n"
 };
 
