@@ -1209,7 +1209,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
-#define AFF_FLY  BIT(12)	// m. person can fly
+#define AFF_FLYING  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
 #define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
 #define AFF_DISARMED  BIT(15)	// p. disarmed

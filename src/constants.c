@@ -1689,7 +1689,7 @@ const char *affected_bits[] = {
 	"!PHYSICAL",
 	"!TARGET",
 	"!SEE",
-	"FLY",
+	"FLYING",
 	"!ATTACK",
 	"IMMUNE-MAGICAL-DEBUFFS",
 	"DISARMED",
@@ -1740,7 +1740,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to physical damage.",	// !physical
 	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
-	"",	// fly
+	"",	// flying
 	"$E cannot be attacked.",	// !attack
 	"$E is immune to magical debuffs.",	// immune-magical-debuffs
 	"",	// 15 - disarmed

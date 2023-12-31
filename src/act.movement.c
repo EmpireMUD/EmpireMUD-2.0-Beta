@@ -316,16 +316,16 @@ bool can_enter_room(char_data *ch, room_data *room) {
 * @return bool TRUE if successful, FALSE if the character is still flying.
 */
 bool check_stop_flying(char_data *ch) {
-	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLYING)) {
 		// cannot override a morph
 		return FALSE;
 	}
 	if (!IS_NPC(ch) && IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_FLYING)) {
 		do_dismount(ch, "", 0, 0);
 	}
-	if (AFF_FLAGGED(ch, AFF_FLY)) {
-		affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_FLY)) {
+	if (AFF_FLAGGED(ch, AFF_FLYING)) {
+		affects_from_char_by_aff_flag(ch, AFF_FLYING, FALSE);
+		if (!AFF_FLAGGED(ch, AFF_FLYING)) {
 			msg_to_char(ch, "You land.\r\n");
 			act("$n lands.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -392,7 +392,7 @@ int determine_move_type(char_data *ch, room_data *to_room) {
 	if (IS_MORPHED(ch)) {
 		type = MORPH_MOVE_TYPE(GET_MORPH(ch));
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY) && !IS_NPC(ch)) {
+	else if (AFF_FLAGGED(ch, AFF_FLYING) && !IS_NPC(ch)) {
 		// only switch to fly if not an npc
 		type = MOB_MOVE_FLY;
 	}
@@ -1205,7 +1205,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 	
 	// were we stuck though?
 	if (needs_help) {
-		af = create_flag_aff(ATYPE_UNSTUCK, 1, AFF_FLY, ch);
+		af = create_flag_aff(ATYPE_UNSTUCK, 1, AFF_FLYING, ch);
 		affect_to_char(ch, af);
 		free(af);
 	}
@@ -2437,20 +2437,20 @@ ACMD(do_gen_door) {
 
 
 ACMD(do_land) {
-	if (!AFF_FLAGGED(ch, AFF_FLY)) {
+	if (!AFF_FLAGGED(ch, AFF_FLYING)) {
 		msg_to_char(ch, "You aren't flying.\r\n");
 		return;
 	}
 	
 	// ensure morph isn't the cause
-	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLYING)) {
 		msg_to_char(ch, "You can't land in this form.\r\n");
 		return;
 	}
 	
-	affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
+	affects_from_char_by_aff_flag(ch, AFF_FLYING, FALSE);
 	
-	if (!AFF_FLAGGED(ch, AFF_FLY)) {
+	if (!AFF_FLAGGED(ch, AFF_FLYING)) {
 		msg_to_char(ch, "You land.\r\n");
 		act("$n lands.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}

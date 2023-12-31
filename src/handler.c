@@ -405,8 +405,8 @@ void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster,
 
 /**
 * Removes all affects that cause a given AFF flag, plus all other affects
-* caused by the same thing (e.g. if something gives +1 Strength and FLY, then
-* calling this function with AFF_FLY will remove both parts).
+* caused by the same thing (e.g. if something gives +1 Strength and FLYING,
+* then calling this function with AFF_FLYING will remove both parts).
 *
 * @param char_data *ch The person to remove from.
 * @param bitvector_t aff_flag Any AFF_ flags to remove.
@@ -6247,7 +6247,7 @@ bitvector_t get_mount_flags_by_mob(char_data *mob) {
 	}
 	
 	// MOUNT_x: detect mount flags
-	if (AFF_FLAGGED(proto, AFF_FLY)) {
+	if (AFF_FLAGGED(proto, AFF_FLYING)) {
 		SET_BIT(flags, MOUNT_FLYING);
 	}
 	if (MOB_FLAGGED(proto, MOB_AQUATIC)) {

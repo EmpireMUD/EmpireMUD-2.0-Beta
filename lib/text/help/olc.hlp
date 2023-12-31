@@ -2688,7 +2688,7 @@ The following affect flags are available:
  &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
  &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
  &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.
- &cFLY&0 - Is flying.
+ &cFLYING&0 - Is flying.
  &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
  &cIMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
  &cDISARMED&0 - Has lost their weapon -- do not use this on items.
@@ -6470,7 +6470,7 @@ an object, and set the object's <value0> field to the vnum of the mount. This
 is a 'use' command trigger that summons the mob.
 
 Types of mounts:
-  FLY affect: Flying mount; requires the Riding-Flying ptech.
+  FLYING affect: Flying mount; requires the Riding-Flying ptech.
   WATERWALKING affect: Ride on water just like land; requires Riding-Upgrade.
   AQUATIC mob flag: Aquatic mount; can only ride on water tiles.
 
@@ -8583,7 +8583,7 @@ The following room template flags are available:
  LIGHT - Never requires a light.
  !MOB - Mobs will not wander into the room (they may still be spawned there).
  PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, waterwalking, or fly.
+ NEED-BOAT - Requires a boat, swimming, waterwalking, or flying.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"

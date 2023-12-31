@@ -400,7 +400,7 @@ switch %random.4%
     %echo% ~%self% sneezes pixy dust all over you!
     set ch %self.room.people%
     while %ch%
-      dg_affect %ch% FLY on 60
+      dg_affect %ch% FLYING on 60
       set ch %ch.next_in_room%
     done
   break
@@ -429,7 +429,7 @@ switch %random.4%
     %echo% ~%self% sprinkles pixy dust all over you!
     set ch %self.room.people%
     while %ch%
-      dg_affect %ch% FLY on 60
+      dg_affect %ch% FLYING on 60
       set ch %ch.next_in_room%
     done
   break

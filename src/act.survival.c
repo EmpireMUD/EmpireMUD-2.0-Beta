@@ -198,7 +198,7 @@ void do_mount_current(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY)) {
+	else if (AFF_FLAGGED(ch, AFF_FLYING)) {
 		msg_to_char(ch, "You can't mount while flying.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {

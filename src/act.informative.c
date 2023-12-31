@@ -1083,7 +1083,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else if (AFF_FLAGGED(i, AFF_DEATHSHROUDED) && GET_POS(i) <= POS_RESTING) {
 				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
-			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
+			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLYING)) {
 				strcpy(buf, "$n is flying here.");
 			}
 			else if (GET_POS(i) == POS_STANDING && !IS_DISGUISED(i) && (ocm = pick_custom_longdesc(i))) {

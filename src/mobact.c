@@ -227,7 +227,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_FLY | AFF_MAJESTY)) {
+	if (AFF_FLAGGED(ch, AFF_FLYING | AFF_MAJESTY)) {
 		return;
 	}
 	
@@ -1012,7 +1012,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
-	else if (AFF_FLAGGED(mob, AFF_FLY)) {
+	else if (AFF_FLAGGED(mob, AFF_FLYING)) {
 		ok = TRUE;
 	}
 	else if (SECT_FLAGGED(sect, SECTF_ROUGH)) {

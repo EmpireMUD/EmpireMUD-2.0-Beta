@@ -176,7 +176,7 @@ else
         %load% mob 16013 %actor.level%
       break
     done
-  elseif %target.aff_flagged(fly)%
+  elseif %target.aff_flagged(FLYING)%
     wait 1
     %echo% As the changes are completed, a monster is born.
     switch %random.2%
