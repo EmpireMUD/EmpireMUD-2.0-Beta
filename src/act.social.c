@@ -55,6 +55,12 @@ bool check_social(char_data *ch, char *string, bool exact) {
 		return FALSE;	// no match to any social
 	}
 	
+	// going to process the social: remove hide first
+	if (AFF_FLAGGED(ch, AFF_HIDE)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	}
+	
 	// does a command trigger override this social?
 	if (strlen(string) < strlen(SOC_COMMAND(soc)) && check_command_trigger(ch, SOC_COMMAND(soc), arg1, CMDTRG_EXACT)) {
 		return TRUE;

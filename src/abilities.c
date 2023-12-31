@@ -6967,6 +6967,12 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 		return FALSE;	// did not match any anything
 	}
 	
+	// going to run the ability: unhide first
+	if (AFF_FLAGGED(ch, AFF_HIDE)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	}
+	
 	// does a command trigger override this ability command?
 	if (strlen(string) < strlen(ABIL_COMMAND(abil)) && check_command_trigger(ch, ABIL_COMMAND(abil), arg1, CMDTRG_EXACT)) {
 		return TRUE;

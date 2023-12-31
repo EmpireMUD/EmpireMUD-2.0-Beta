@@ -1123,12 +1123,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		break;
 	}
 	
-	// reveal hidden
-	if (AFF_FLAGGED(ch, AFF_HIDE) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
-	}
-	
+	// check abilities and socials
 	if (*cmd_info[cmd].command == '\n' && check_ability(ch, argument, FALSE)) {
 		return;
 	}
@@ -1145,7 +1140,14 @@ void command_interpreter(char_data *ch, char *argument) {
 		// do the social instead.
 		return;
 	}
-	else if (*cmd_info[cmd].command == '\n') {
+	
+	// we are locked in, not doing a social, not doing an ability: now reveal hidden
+	if (AFF_FLAGGED(ch, AFF_HIDE) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	}
+	
+	if (*cmd_info[cmd].command == '\n') {
 		// Command trigger (2/3): abbrev match on non-matching command
 		if (check_command_trigger(ch, arg, line, CMDTRG_ABBREV)) {
 			return;
@@ -1153,7 +1155,6 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	
 	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD), IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING))) {
 		// sent own error message
 	}
