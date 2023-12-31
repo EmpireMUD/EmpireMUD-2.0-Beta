@@ -1312,6 +1312,7 @@ void reload_text_string(int type) {
 * @return char* A pointer to the rest of 'string'.
 */
 char *next_help_keyword(char *string, char *next_key) {
+	char *write = next_key;
 	int iter, offset;
 	
 	skip_spaces(&string);
@@ -1319,7 +1320,7 @@ char *next_help_keyword(char *string, char *next_key) {
 	if (*string == '\"') {
 		++string;
 		while (*string && *string != '\"') {
-			*(next_key++) = *string;
+			*(write++) = *string;
 			++string;
 		}
 		if (*string) {
@@ -1329,12 +1330,12 @@ char *next_help_keyword(char *string, char *next_key) {
 	else {
 		// copy to first space
 		while (*string && !isspace(*string)) {
-			*(next_key++) = *string;
+			*(write++) = *string;
 			++string;
 		}
 	}
 
-	*next_key = '\0';
+	*write = '\0';
 	
 	// check for escaped \"
 	for (iter = 0, offset = 0; iter < strlen(next_key); ++iter) {
