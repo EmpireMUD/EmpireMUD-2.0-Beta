@@ -3224,14 +3224,16 @@ char *prompt_str(char_data *ch) {
 		// no fight prompt
 		return "";
 	}
-	else if (FIGHTING(ch)) {
-		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
+	else if (FIGHTING(ch) && GET_FIGHT_PROMPT(REAL_CHAR(ch))) {
+		// show fight prompt if they have one, otherwise fall through to regular prompt
+		str = GET_FIGHT_PROMPT(REAL_CHAR(ch));
 	}
 	else if (!SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_PROMPT)) {
 		// no prompt at all please
 		return "";
 	}
 	else {
+		// shows out of combat; also shows in-combat if there's no fight prompt
 		str = GET_PROMPT(REAL_CHAR(ch));
 	}
 
