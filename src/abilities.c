@@ -2207,6 +2207,11 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	
 	request_obj_save_in_world(inter_item);
 	
+	if (data) {
+		// for pricing
+		data->total_amount += quantity;
+	}
+	
 	return TRUE;
 }
 
