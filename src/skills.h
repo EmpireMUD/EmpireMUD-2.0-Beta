@@ -54,7 +54,6 @@
 #define ABIL_MIRRORIMAGE  177
 #define ABIL_CONFER  240
 #define ABIL_HONE  262
-#define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
 
 
