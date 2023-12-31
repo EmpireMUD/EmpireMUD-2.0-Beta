@@ -363,7 +363,18 @@ or barriers.
 
 Gains experience when you sink into the ground.
 
+The only way to move while earthmelded is the Worm ability.
+
 See also: WORM
+#
+EARTHPEEK "EARTH PEEK"
+
+Usage:  earthpeak
+
+The earthpeek command allows you to look around while earthmelded. This is
+only available with the Worm ability.
+
+See also: EARTHMELD, WORM
 #
 ENTANGLE
 
@@ -1010,6 +1021,9 @@ taking nature burn damage as soon as you end your earthmeld.
 
 Gains experience as you move around underground.
 
-See also: EARTHMELD
+This also grants you the 'earthpeek' command, which can look around while
+earthmelded.
+
+See also: EARTHMELD, EARTHPEEK
 #
 $~
