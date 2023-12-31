@@ -4083,6 +4083,8 @@ struct ability_exec {
 	
 	// data passed by types
 	int conjure_liquid_max;
+	int move_dir;
+	room_data *move_room;
 	any_vnum ready_weapon_val;
 	int restore_pool;
 	int restore_amount;

@@ -4137,6 +4137,58 @@ PREP_ABIL(prep_dot_ability) {
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_move_ability) {
+	bool ignore_entrance = FALSE, no_water = FALSE, stay_on_map = FALSE;
+	int dir = NO_DIR;
+	room_data *to_room = NULL;
+	
+	// ABIL_MOVE_x: type-based properties
+	switch (ABIL_MOVE_TYPE(abil)) {
+		case ABIL_MOVE_NORMAL: {
+			// no properties
+			break;
+		}
+		case ABIL_MOVE_EARTHMELD: {
+			ignore_entrance = TRUE;
+			no_water = TRUE;
+			stay_on_map = TRUE;
+			break;
+		}
+	}
+	
+	// basic arg processing
+	if (!*argument) {
+		msg_to_char(ch, "&Z%s which direction?\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "Move");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	if ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM) {
+		msg_to_char(ch, "That's not a direction!\r\n");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	// find target room
+	if (stay_on_map && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (dir >= NUM_2D_DIRS || !(to_room = SHIFT_DIR(IN_ROOM(ch), dir)))) {
+		msg_to_char(ch, "You can't %s in that direction!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "go");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	if (!to_room && !(to_room = dir_to_room(IN_ROOM(ch), dir, ignore_entrance))) {
+		msg_to_char(ch, "You can't %s in that direction!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "go");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	// type-specific checks
+	if (no_water && (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || SECT_FLAGGED(BASE_SECT(to_room), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER) || IS_SET(get_climate(to_room), CLIM_FRESH_WATER | CLIM_SALT_WATER | CLIM_FROZEN_WATER | CLIM_OCEAN | CLIM_LAKE))) {
+		msg_to_char(ch, "You can't %s through the water!\r\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "move");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
+	// ok
+	data->move_dir = dir;
+	data->move_room = to_room;
 }
 
 
@@ -5013,6 +5065,52 @@ DO_ABIL(do_link_ability) {
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_move_ability) {
+	bitvector_t had_affs = NOBITS, move_type = NOBITS;
+	bool moved = FALSE, simple_move_only = FALSE;
+	room_data *was_in = IN_ROOM(ch);
+	
+	if (!data->move_room) {
+		return;	// somehow
+	}
+	
+	// ABIL_MOVE_x: type-based properties
+	switch (ABIL_MOVE_TYPE(abil)) {
+		case ABIL_MOVE_NORMAL: {
+			// no properties
+			break;
+		}
+		case ABIL_MOVE_EARTHMELD: {
+			simple_move_only = TRUE;
+			move_type = MOVE_EARTHMELD;
+			break;
+		}
+	}
+	
+	// ready to move:
+	// apply affects if present
+	if (ABIL_AFFECTS(abil)) {
+		had_affs = (AFF_FLAGS(ch) & ABIL_AFFECTS(abil));
+		SET_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
+	}
+	
+	// perform the move
+	if (simple_move_only) {
+		moved = do_simple_move(ch, data->move_dir, data->move_room, move_type);
+	}
+	else {
+		moved = perform_move(ch, data->move_dir, data->move_room, move_type);
+	}
+	
+	// remove flags again if needed
+	if (ABIL_AFFECTS(abil)) {
+		REMOVE_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
+		SET_BIT(AFF_FLAGS(ch), had_affs);
+	}
+	
+	// check if we moved
+	if (moved || IN_ROOM(ch) != was_in) {
+		data->success = TRUE;
+	}
 }
 
 

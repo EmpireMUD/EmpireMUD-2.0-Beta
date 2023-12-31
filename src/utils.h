@@ -2142,6 +2142,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following);
 bool check_stop_flying(char_data *ch);
 void clear_recent_moves(char_data *ch);
 int count_recent_moves(char_data *ch);
+bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback);
 room_data *get_exit_room(room_data *from_room);
 int get_north_for_char(char_data *ch);
