@@ -647,7 +647,7 @@ ACMD(do_cast) {
 		if (!found) {
 			strcat(buf, " nothing\r\n");	// always room for this if !found
 			if (subcmd == SCMD_CAST) {
-				msg_to_char(ch, "(Most magical abilities have their own commands rather than 'cast'.)\r\n");
+				strcat(buf, "(Most magical abilities have their own commands rather than 'cast'.)\r\n");
 			}
 		}
 		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
