@@ -60,6 +60,12 @@ const char *health_pool_kws[] = { "health", "hp", "hitpoints", "hits", "\n" };
 const char *move_pool_kws[] = { "moves", "movement", "mv", "\n" };
 const char *mana_pool_kws[] = { "mana", "mp", "magic", "\n" };
 
+// types that check difficulty separately
+const bitvector_t DELAYED_DIFFICULTY_TYPES = ABILT_MOVE;
+
+// types that do not have default messages
+const bitvector_t NO_DEFAULT_MESSAGES_TYPES = ABILT_ATTACK | ABILT_DAMAGE | ABILT_MOVE | ABILT_CRAFT | ABILT_CUSTOM | ABILT_PLAYER_TECH;
+
 // local protos
 OLC_MODULE(abiledit_costtype);
 OLC_MODULE(abiledit_data);
@@ -5136,7 +5142,11 @@ DO_ABIL(do_move_ability) {
 	// apply affects if present
 	if (ABIL_AFFECTS(abil)) {
 		had_affs = (AFF_FLAGS(ch) & ABIL_AFFECTS(abil));
-		SET_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
+		
+		// affects require diff check:
+		if (skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+			SET_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
+		}
 	}
 	
 	// perform the move
@@ -5151,10 +5161,12 @@ DO_ABIL(do_move_ability) {
 	if (ABIL_AFFECTS(abil)) {
 		REMOVE_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
 		SET_BIT(AFF_FLAGS(ch), had_affs);
+		affect_total(ch);
 	}
 	
 	// check if we moved
 	if (moved || IN_ROOM(ch) != was_in) {
+		send_ability_special_messages(ch, NULL, NULL, abil, data, NULL, 0);
 		data->success = TRUE;
 	}
 }
@@ -5781,7 +5793,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 	
 	bitvector_t act_flags = NOBITS;
 	
-	#define _AAM_NO_DEFAULT(abil)	(IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_MOVE | ABILT_ATTACK) || ABILITY_FLAGGED((abil), ABILF_OVER_TIME))
+	#define _AAM_NO_DEFAULT(abil)	(IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES) || ABILITY_FLAGGED((abil), ABILF_OVER_TIME))
 	
 	if (!ch || !abil) {
 		return;	// no work
@@ -6079,7 +6091,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_MOVE)) {
+		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -6091,7 +6103,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_MOVE)) {
+		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
@@ -6107,7 +6119,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_MOVE)) {
+		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
@@ -6119,7 +6131,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_MOVE)) {
+		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
@@ -6131,7 +6143,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 				act(msg, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
 		}
-		else if (!IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_ATTACK | ABILT_MOVE)) {
+		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
 			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
@@ -7655,7 +7667,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	}
 	
 	// check for FAILURE:
-	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+	if (!data->stop && (!vict || _ABIL_VICT_CAN_SEE(vict, ch, abil)) && !IS_SET(ABIL_TYPES(abil), DELAYED_DIFFICULTY_TYPES) && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
 		send_ability_fail_messages(ch, vict, ovict, abil, data);
 		
 		// fun fail functions unless stopped
@@ -8390,7 +8402,7 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "REPEAT-OVER-TIME flag without OVER-TIME");
 		problem = TRUE;
 	}
-	if (!abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR) && ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !IS_SET(ABIL_TYPES(abil), ABILT_ATTACK | ABILT_DAMAGE | ABILT_MOVE | ABILT_CRAFT | ABILT_CUSTOM | ABILT_PLAYER_TECH)) {
+	if (!abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR) && ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No fail messages");
 		problem = TRUE;
 	}
