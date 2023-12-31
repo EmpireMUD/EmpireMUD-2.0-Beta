@@ -868,7 +868,7 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 	}
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
-		if (iter->id == tech) {
+		if (iter->id == tech && (!iter->check_solo || check_solo_role(ch))) {
 			gain_ability_exp(ch, iter->abil, amount);
 			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, ch, NULL, NULL, NULL, NOBITS);
 		}
@@ -1658,6 +1658,8 @@ bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
 
 /**
 * Runs a skill check based on a tech (when you don't know the actual ability).
+* Synergy abilities will check solo role status and may not be valid if the
+* player is in solo role but not solo.
 *
 * @param char_data *ch The person doing the skill check.
 * @param int tech Which PTECH_ type.
@@ -1676,6 +1678,9 @@ bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id != tech) {
 			continue;	// wrong tech
+		}
+		if (iter->check_solo && !check_solo_role(ch)) {
+			continue;	// not solo
 		}
 		
 		lev = get_ability_skill_level(ch, iter->abil);
@@ -1697,7 +1702,8 @@ bool player_tech_skill_check(char_data *ch, int tech, int difficulty) {
 
 /**
 * Runs a skill check based on a tech (when you don't know the actual ability).
-* This uses the ability's own difficulty setting.
+* This uses the ability's own difficulty setting. Synergy abilities will ensure
+* that solo-role characters are solo.
 *
 * @param char_data *ch The person doing the skill check.
 * @param int tech Which PTECH_ type.
@@ -1714,6 +1720,9 @@ bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech) {
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id != tech) {
 			continue;	// wrong tech
+		}
+		if (iter->check_solo && !check_solo_role(ch)) {
+			continue;	// solo role but not solo
 		}
 		if (!(abil = ability_proto(iter->abil))) {
 			continue;	// no data?

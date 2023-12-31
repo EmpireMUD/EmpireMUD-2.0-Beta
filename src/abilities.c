@@ -7635,7 +7635,7 @@ void run_ability_hooks_by_player_tech(char_data *ch, int tech, char_data *vict, 
 	}
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
-		if (iter->id == tech) {
+		if (iter->id == tech && (!iter->check_solo || check_solo_role(ch))) {
 			run_ability_hooks(ch, AHOOK_ABILITY, iter->abil, 0, vict ? vict : ch, ovict, vvict, room_targ, NOBITS);
 		}
 	}
@@ -7815,7 +7815,7 @@ void apply_ability_techs_to_player(char_data *ch, ability_data *abil) {
 		}
 		
 		// ok
-		add_player_tech(ch, ABIL_VNUM(abil), adl->vnum);
+		add_player_tech(ch, abil, adl->vnum);
 	}
 }
 

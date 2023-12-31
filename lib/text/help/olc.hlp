@@ -2639,7 +2639,8 @@ See also: OLC ADVENTURES, OLC BUILDINGS, OLC ROOM TEMPLATES, TEMPERATURE
 
 The following affect flags are available:
  &cBLIND&0 - Unable to see.
- &cMAJESTY&0 - Hard to attack.
+ &cMAJESTY&0 - Hard to attack (based on Charisma or, if from an ability, the
+   linked trait on that ability).
  &cINFRA&0 - Can see in the dark (glowing red eyes).
  &cSNEAK&0 - Cannot be seen while moving.
  &cHIDE&0 - Cannot be seen in room (without search).

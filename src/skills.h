@@ -18,10 +18,6 @@
 #define BASIC_SKILL_CAP			50	// common skills
 
 
-// specific skill checks
-#define CHECK_MAJESTY(ch)  (AFF_FLAGGED((ch), AFF_MAJESTY) && number(0, GET_CHARISMA(ch)))
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// CONSTANTS ///////////////////////////////////////////////////////////////
 
@@ -269,6 +265,7 @@ bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech);
  //////////////////////////////////////////////////////////////////////////////
 //// SPELLLS /////////////////////////////////////////////////////////////////
 
+bool has_majesty_immunity(char_data *ch, char_data *attacker);
 bool trigger_counterspell(char_data *ch, char_data *triggered_by);
 
 

@@ -4721,7 +4721,7 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "\t%c%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id]);
+			snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
 			
 			if (color_strlen(one) + lsize >= 79) {
 				// send line

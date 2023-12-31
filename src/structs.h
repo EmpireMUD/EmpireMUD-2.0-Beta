@@ -4980,6 +4980,7 @@ struct player_slash_channel {
 struct player_tech {
 	int id;	// which PTECH_
 	any_vnum abil;	// which ability it came from
+	bool check_solo;	// if TRUE, need to check solo to allow it
 	struct player_tech *next;	// LL: GET_TECHS(ch)
 };
 

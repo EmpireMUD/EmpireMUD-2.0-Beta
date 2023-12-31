@@ -1853,7 +1853,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 
-	if (CHECK_MAJESTY(vict) || CHAR_MORPH_FLAGGED(vict, MORPHF_ANIMAL)) {
+	if (CHAR_MORPH_FLAGGED(vict, MORPHF_ANIMAL) || has_majesty_immunity(vict, NULL)) {
 		return FALSE;
 	}
 	
@@ -2564,7 +2564,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 		return FALSE;
 
 	// try to hit people through majesty?
-	if (CHECK_MAJESTY(victim) && !AFF_FLAGGED(ch, AFF_IMMUNE_MENTAL_DEBUFFS)) {
+	if (!AFF_FLAGGED(ch, AFF_IMMUNE_MENTAL_DEBUFFS) && has_majesty_immunity(victim, ch)) {
 		return FALSE;
 	}
 

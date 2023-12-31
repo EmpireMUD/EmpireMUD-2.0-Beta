@@ -493,6 +493,64 @@ void do_summon_player(char_data *ch, char *argument) {
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
 /**
+* Determines if a character is protected by the MAJESTY affect, which makes it
+* harder to attack them.
+*
+* @param char_data *ch The person with majesty.
+* @param char_data *attacker Optional: Who is trying to hit them; will allow it if they're 50 levels above. (NULL to ignore)
+* @return bool TRUE if the character is protected by MAJESTY, FALSE if not.
+*/
+bool has_majesty_immunity(char_data *ch, char_data *attacker) {
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	int one_trait, best_trait = 0;
+	
+	const int over_level_ignore = 50;	// attacker this far above the char ignroes majesty
+	
+	// basic checks
+	if (!AFF_FLAGGED(ch, AFF_MAJESTY)) {
+		return FALSE;	// not affected
+	}
+	if (attacker && get_approximate_level(attacker) >= get_approximate_level(ch) + over_level_ignore) {
+		return FALSE;	// over-level
+	}
+	
+	// ok: try to find the majesty ability
+	if (!IS_NPC(ch)) {
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+				continue;	// wrong skill set
+			}
+			if (!(abil = plab->ptr) || !IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+				continue;	// not a buff; not likely to be the source of Majesty
+			}
+			if (!IS_SET(ABIL_AFFECTS(abil), AFF_MAJESTY)) {
+				continue;	// not a majesty ability
+			}
+			if (IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
+				continue;	// can't be one that doesn't target me
+			}
+		
+			// ok, this ability is a likely source of majesty, but is it the best one?
+			if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
+				one_trait = get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil));
+				best_trait = MAX(best_trait, one_trait);
+			}
+		}
+	}
+	
+	// if we failed to detect a trait, we default to Charisma for historical reasons
+	// (NPCs also hit this block)
+	if (best_trait < 1) {
+		best_trait = GET_CHARISMA(ch);
+	}
+	
+	// now the trait roll:
+	return number(0, best_trait) ? TRUE : FALSE;
+}
+
+
+/**
 * This function checks if the character has a counterspell available and
 * pops it if so.
 *

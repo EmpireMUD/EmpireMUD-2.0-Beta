@@ -8525,10 +8525,10 @@ int sort_player_techs(struct player_tech *a, struct player_tech *b) {
 * Adds a player tech (by ability) to the player.
 *
 * @param char_data *ch The player gaining a tech.
-* @param any_vnum abil The ability that's granting it.
+* @param ability_data *abil The ability that's granting it.
 * @param int tech The PTECH_ to gain.
 */
-void add_player_tech(char_data *ch, any_vnum abil, int tech) {
+void add_player_tech(char_data *ch, ability_data *abil, int tech) {
 	struct player_tech *iter, *pt;
 	bool found = FALSE;
 	
@@ -8537,7 +8537,7 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 	}
 	
 	LL_FOREACH(GET_TECHS(ch), iter) {
-		if (iter->abil == abil && iter->id == tech) {
+		if (iter->abil == ABIL_VNUM(abil) && iter->id == tech) {
 			found = TRUE;
 			break;
 		}
@@ -8547,14 +8547,16 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 	if (!found) {
 		CREATE(pt, struct player_tech, 1);
 		pt->id = tech;
-		pt->abil = abil;
+		pt->abil = ABIL_VNUM(abil);
+		pt->check_solo = ABIL_IS_SYNERGY(abil) ? TRUE : FALSE;
 		LL_INSERT_INORDER(GET_TECHS(ch), pt, sort_player_techs);
 	}
 }
 
 
 /**
-* Whether or not a PC has the requested tech.
+* Whether or not a PC has the requested tech. For synergy abilities, this will
+* also check the solo role and deny the ptech.
 *
 * @param char_data *ch The player.
 * @param int tech Which PTECH_ to see if he/she has.
@@ -8576,7 +8578,7 @@ bool has_player_tech(char_data *ch, int tech) {
 	
 	// check player techs
 	LL_FOREACH(GET_TECHS(ch), iter) {
-		if (iter->id == tech) {
+		if (iter->id == tech && (!iter->check_solo || check_solo_role(ch))) {
 			return TRUE;
 		}
 	}
@@ -8610,7 +8612,9 @@ void remove_player_tech(char_data *ch, any_vnum abil) {
 
 /**
 * Runs ability triggers on any ability that's giving a player a certain tech.
-* Stops if any of those triggers blocks it.
+* Stops if any of those triggers blocks it. This ignores techs turned off by
+* the solo role, which should have been checked by has_player_tech before
+* this.
 *
 * @param char_data *ch The person using the ability.
 * @param int tech Which PTECH_ to trigger.
