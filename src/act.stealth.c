@@ -819,24 +819,24 @@ ACMD(do_search) {
 			}
 			
 			// hidden targets
-			if (AFF_FLAGGED(targ, AFF_HIDE)) {
+			if (AFF_FLAGGED(targ, AFF_HIDDEN)) {
 				if (has_player_tech(targ, PTECH_HIDE_UPGRADE)) {
 					gain_player_tech_exp(targ, PTECH_HIDE_UPGRADE, 20);
 					run_ability_hooks_by_player_tech(targ, PTECH_HIDE_UPGRADE, ch, NULL, NULL, NULL);
 					continue;
 				}
 
-				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 
 				if (player_tech_skill_check_by_ability_difficulty(ch, PTECH_SEARCH_COMMAND) && CAN_SEE(ch, targ)) {
 					act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
 					msg_to_char(targ, "You are discovered!\r\n");
-					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
-					affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
+					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDDEN);
+					affects_from_char_by_aff_flag(targ, AFF_HIDDEN, FALSE);
 					found = TRUE;
 				}
 
-				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 			}
 			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELDED)) {
 				// earthmelded targets (only do once)

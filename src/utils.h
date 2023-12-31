@@ -279,7 +279,7 @@
 
 // this all builds up to CAN_SEE
 #define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && can_see_in_dark_room((sub), (IN_ROOM(sub)), TRUE))
-#define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDE) || AFF_FLAGGED((sub), AFF_SENSE_HIDE)))
+#define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDDEN) || AFF_FLAGGED((sub), AFF_SENSE_HIDDEN)))
 
 
 #define MORT_CAN_SEE_NO_DARK(sub, obj)  (INVIS_OK(sub, obj))
@@ -708,7 +708,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
  //////////////////////////////////////////////////////////////////////////////
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
-#define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+#define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDDEN | AFF_INVISIBLE)
 
 
 // for attack messages

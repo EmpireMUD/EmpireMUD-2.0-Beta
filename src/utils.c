@@ -2746,7 +2746,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && GET_LEADER(iter) == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
-				if (!AFF_FLAGGED(iter, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+				if (!AFF_FLAGGED(iter, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 					act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				}
 				extract_char(iter);

@@ -230,7 +230,7 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDDEN) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
@@ -2616,7 +2616,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			remove_companion(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 			if (GET_COMPANION(vict) && GET_MOB_VNUM(GET_COMPANION(vict)) == GET_MOB_VNUM(pet)) {
-				if (!AFF_FLAGGED(vict, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+				if (!AFF_FLAGGED(vict, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 					act("$n leaves.", TRUE, GET_COMPANION(vict), NULL, NULL, TO_ROOM);
 				}
 				extract_char(GET_COMPANION(vict));

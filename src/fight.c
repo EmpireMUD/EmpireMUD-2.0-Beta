@@ -1849,7 +1849,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// visibility
-	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDE))) {
+	if ((AFF_FLAGGED(vict, AFF_INVISIBLE) || AFF_FLAGGED(vict, AFF_HIDDEN))) {
 		return FALSE;
 	}
 
@@ -2748,8 +2748,8 @@ bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_dat
 * @param char_data *ch The person who will appear.
 */
 void appear(char_data *ch) {
-	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE, FALSE);
-	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE | AFF_INVISIBLE);
+	affects_from_char_by_aff_flag(ch, AFF_HIDDEN | AFF_INVISIBLE, FALSE);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
 		act("$n slowly fades into existence.", FALSE, ch, 0, 0, TO_ROOM);

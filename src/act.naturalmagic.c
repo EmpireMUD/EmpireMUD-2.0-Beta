@@ -61,7 +61,7 @@ bool despawn_companion(char_data *ch, mob_vnum vnum) {
 	}
 	
 	// seems despawnable
-	if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+	if (!AFF_FLAGGED(mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 		act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
 	}
 	extract_char(mob);

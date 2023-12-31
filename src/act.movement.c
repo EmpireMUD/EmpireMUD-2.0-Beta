@@ -1543,8 +1543,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// cancel any 'hide' affects
-	affects_from_char_by_aff_flag(ch, AFF_HIDE, TRUE);
-	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+	affects_from_char_by_aff_flag(ch, AFF_HIDDEN, TRUE);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
 	
 	// lastly, check pre-greet trigs
 	if (!pre_greet_mtrigger(ch, to_room, dir, move_flags_to_method(flags))) {

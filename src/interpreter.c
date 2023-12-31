@@ -1138,9 +1138,9 @@ void command_interpreter(char_data *ch, char *argument) {
 	}
 	
 	// we are locked in, not doing a social, not doing an ability: now reveal hidden
-	if (AFF_FLAGGED(ch, AFF_HIDE) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	if (AFF_FLAGGED(ch, AFF_HIDDEN) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
 	}
 	
 	if (*cmd_info[cmd].command == '\n') {
@@ -1178,8 +1178,8 @@ void command_interpreter(char_data *ch, char *argument) {
 
 	/* Unhide after ? */
 	if (ch && IS_SET(cmd_info[cmd].flags, CMD_UNHIDE_AFTER)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
 	}
 }
 

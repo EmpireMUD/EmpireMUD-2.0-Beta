@@ -97,7 +97,7 @@ while %person%
     if %dodged%
       eval dodged %%self.dodged_%person.id%%%
     end
-    if !%person.aff_flagged(HIDE)%
+    if !%person.aff_flagged(HIDDEN)%
       if %dodged%
         %send% %person% &&wYou scramble out of the way as the colossus fires its eye lasers!&&0
         %echoaround% %person% &&w~%person% scrambles out of the way of the colossus's eye lasers!&&0

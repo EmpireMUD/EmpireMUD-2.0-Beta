@@ -4297,7 +4297,7 @@ end
 if %line% >= %no_players_start% && %line% <= %no_players_end%
   set ch %self.room.people%
   while %ch%
-    if %ch.is_pc% && %guard.can_see(%ch%)% && !%ch.aff_flagged(HIDE)%
+    if %ch.is_pc% && %guard.can_see(%ch%)% && !%ch.aff_flagged(HIDDEN)%
       * oops -- kick them out and block this cycle
       %force% %guard% say The queen requires privacy in the chamber. You'll have to leave.
       eval line %line% - 1

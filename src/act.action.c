@@ -447,7 +447,7 @@ void update_actions(void) {
 			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 			
 			// end hide at this point, as if they had typed a command each tick
-			REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+			REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
 			
 			if (action_data[GET_ACTION(ch)].process_function != NULL) {
 				// call the process function

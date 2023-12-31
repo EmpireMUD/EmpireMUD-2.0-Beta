@@ -1201,11 +1201,11 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_MAJESTY  BIT(1)	// b. majesty
 #define AFF_INFRAVISION  BIT(2)	// c. Char can see full in dark
 #define AFF_SNEAK  BIT(3)	// d. Char can move quietly
-#define AFF_HIDE  BIT(4)	// e. Char is hidden
+#define AFF_HIDDEN  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
 #define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
-#define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
+#define AFF_SENSE_HIDDEN  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look

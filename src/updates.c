@@ -395,15 +395,15 @@ void b3_11_ship_fix(void) {
 }
 
 
-// removes AFF_SENSE_HIDE
+// removes AFF_SENSE_HIDDEN
 PLAYER_UPDATE_FUNC(b3_12_update_players) {
-	// only care if they have a permanent sense-hide
-	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDE)) {
+	// only care if they have a permanent sense-hidden
+	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDDEN)) {
 		return;
 	}
 
 	check_delayed_load(ch);
-	REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 	affect_total(ch);	// in case they are getting it from a real affect
 }
 

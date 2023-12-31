@@ -2557,26 +2557,26 @@ DO_ABIL(abil_action_detect_hide) {
 		return;	// nothing to do
 	}
 	
-	had_sense = AFF_FLAGGED(ch, AFF_SENSE_HIDE) ? TRUE : FALSE;
+	had_sense = AFF_FLAGGED(ch, AFF_SENSE_HIDDEN) ? TRUE : FALSE;
 	
 	DL_FOREACH2(ROOM_PEOPLE(room_targ), targ, next_in_room) {
 		if (targ == ch) {
 			continue;
 		}
 		
-		if (AFF_FLAGGED(targ, AFF_HIDE)) {
+		if (AFF_FLAGGED(targ, AFF_HIDDEN)) {
 			// hidden target
-			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 
 			if (CAN_SEE(ch, targ)) {
 				send_ability_per_char_messages(ch, targ, 1, abil, data, NULL);
-				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
-				affects_from_char_by_aff_flag(targ, AFF_HIDE, TRUE);
+				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDDEN);
+				affects_from_char_by_aff_flag(targ, AFF_HIDDEN, TRUE);
 				data->success = TRUE;
 			}
 			
 			if (!had_sense) {
-				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 			}
 		}
 	}
@@ -2733,7 +2733,7 @@ DO_ABIL(abil_action_disenchant_obj) {
 DO_ABIL(abil_action_hide) {
 	// hide uses a simple bit, not an affect
 	if (IS_NPC(ch) || has_player_tech(ch, PTECH_HIDE_UPGRADE) || difficulty_check(get_ability_skill_level(ch, ABIL_VNUM(abil)), DIFF_MEDIUM)) {
-		SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		SET_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
 	}
 	
 	gain_player_tech_exp(ch, PTECH_HIDE_UPGRADE, 15);
@@ -5147,7 +5147,7 @@ DO_ABIL(do_move_ability) {
 	// apply affects if present
 	if (ABIL_AFFECTS(abil)) {
 		had_affs = (AFF_FLAGS(ch) & ABIL_AFFECTS(abil));
-		hidden = (AFF_FLAGGED(ch, AFF_HIDE) ? TRUE : FALSE);
+		hidden = (AFF_FLAGGED(ch, AFF_HIDDEN) ? TRUE : FALSE);
 		
 		// affects require diff check:
 		if (skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
@@ -5171,7 +5171,7 @@ DO_ABIL(do_move_ability) {
 		
 		// restore hide?
 		if (hidden) {
-			SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
+			SET_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
 		}
 	}
 	
@@ -6979,9 +6979,9 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	}
 	
 	// going to run the ability: unhide first
-	if (AFF_FLAGGED(ch, AFF_HIDE) && !ABILITY_FLAGGED(abil, ABILF_STAY_HIDDEN)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	if (AFF_FLAGGED(ch, AFF_HIDDEN) && !ABILITY_FLAGGED(abil, ABILF_STAY_HIDDEN)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
 	}
 	
 	// does a command trigger override this ability command?

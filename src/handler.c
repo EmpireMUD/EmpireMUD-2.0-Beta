@@ -1994,7 +1994,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	}
 	
 	// visibility (shortcuts)
-	if (ch && IS_SET(flags, MATCH_IN_ROOM) && AFF_FLAGGED(target, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && !CAN_SEE(ch, target)) {
+	if (ch && IS_SET(flags, MATCH_IN_ROOM) && AFF_FLAGGED(target, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM) && !CAN_SEE(ch, target)) {
 		Global_ignore_dark = old_ignore_dark;
 		return FALSE;	// hidden
 	}

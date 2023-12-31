@@ -1110,7 +1110,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				strcpy(buf, "$n is here struggling with thin air.");
 		}
 		
-		if (AFF_FLAGGED(i, AFF_HIDE))
+		if (AFF_FLAGGED(i, AFF_HIDDEN))
 			strcat(buf, " (hidden)");
 		if (!IS_NPC(i) && !i->desc)
 			strcat(buf, " (linkless)");
@@ -1138,7 +1138,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_HIDE)) {
+	if (AFF_FLAGGED(i, AFF_HIDDEN)) {
 		act("...$e has attempted to hide $mself.", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_INJURED(i, INJ_TIED))

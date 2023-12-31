@@ -2684,7 +2684,7 @@ The following affect flags are available:
  &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
  &cINVIS&0 - Can't be seen, except by magic.
  &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
- &cSENSE-HIDE&0 - Can see hidden people.
+ &cSENSE-HIDDEN&0 - Can see hidden people.
  &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
  &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
  &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.

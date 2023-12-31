@@ -56,9 +56,9 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	}
 	
 	// going to process the social: remove hide first
-	if (AFF_FLAGGED(ch, AFF_HIDE)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
+	if (AFF_FLAGGED(ch, AFF_HIDDEN)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
 	}
 	
 	// does a command trigger override this social?

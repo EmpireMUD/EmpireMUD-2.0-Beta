@@ -1820,7 +1820,7 @@ void look_in_direction(char_data *ch, int dir) {
 				if (can_see_in_dark_room(ch, to_room, TRUE)) {
 					// find people
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
-						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
+						if (!AFF_FLAGGED(c, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 						}
 					}

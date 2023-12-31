@@ -1173,7 +1173,7 @@ set person %loc.people%
 while %person%
   set next_person %person.next_in_room%
   if %person% != %self% && %person.vnum% == %self.vnum%
-    if !%person.aff_flagged(HIDE)%
+    if !%person.aff_flagged(HIDDEN)%
       if %hide_again%
         %echoaround% %person% ~%person% steps into the shadows and disappears.
       end
@@ -1186,7 +1186,7 @@ if %loc%
   mgoto %loc%
 end
 if %hide_again%
-  dg_affect %self% HIDE on -1
+  dg_affect %self% HIDDEN on -1
 end
 ~
 #10168
