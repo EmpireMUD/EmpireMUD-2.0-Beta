@@ -1040,18 +1040,20 @@ void add_player_kill(char_data *ch, char_data *killer) {
 	}
 	
 	// add data if missing
-	if (!data) {
-		CREATE(data, struct pk_data, 1);
-		data->player_id = IS_NPC(killer) ? NOTHING : GET_IDNUM(killer);
-		LL_PREPEND(GET_ACCOUNT(ch)->killed_by, data);
+	if (!IS_IMMORTAL(killer)) {
+		if (!data) {
+			CREATE(data, struct pk_data, 1);
+			data->player_id = IS_NPC(killer) ? NOTHING : GET_IDNUM(killer);
+			LL_PREPEND(GET_ACCOUNT(ch)->killed_by, data);
+		}
+	
+		// update data
+		data->empire = GET_LOYALTY(killer) ? EMPIRE_VNUM(GET_LOYALTY(killer)) : NOTHING;
+		data->killed_alt = GET_IDNUM(ch);
+		data->last_time = time(0);
+		
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
 	}
-	
-	// update data
-	data->empire = GET_LOYALTY(killer) ? EMPIRE_VNUM(GET_LOYALTY(killer)) : NOTHING;
-	data->killed_alt = GET_IDNUM(ch);
-	data->last_time = time(0);
-	
-	SAVE_ACCOUNT(GET_ACCOUNT(ch));
 }
 
 
