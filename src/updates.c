@@ -3383,6 +3383,9 @@ PLAYER_UPDATE_FUNC(b5_166_player_update) {
 			plsk->resets = MIN(plsk->resets + 1, MAX_SKILL_RESETS);
 		}
 	}
+	
+	// add new status message
+	GET_STATUS_MESSAGES(ch) |= SM_FIGHT_PROMPT;
 }
 
 // applies traits now required for enchanted walls

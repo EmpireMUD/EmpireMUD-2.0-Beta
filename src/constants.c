@@ -1395,6 +1395,7 @@ const char *status_message_types[] = {
 	"travel auto look",
 	"vehicle movement",	// 15
 	"weather",
+	"fight prompt",
 	"\n"
 };
 

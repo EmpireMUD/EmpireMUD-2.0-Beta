@@ -3219,7 +3219,12 @@ char *prompt_color_by_prc(int cur, int max) {
 char *prompt_str(char_data *ch) {
 	char *str;
 	
-	if (FIGHTING(ch)) {
+	// determine what prompt to show
+	if (FIGHTING(ch) && !SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_FIGHT_PROMPT)) {
+		// no fight prompt
+		return "";
+	}
+	else if (FIGHTING(ch)) {
 		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
 	}
 	else if (!SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_PROMPT)) {

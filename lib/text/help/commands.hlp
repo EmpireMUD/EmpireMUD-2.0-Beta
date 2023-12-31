@@ -1948,7 +1948,8 @@ be different from your regular prompt. Using "fprompt default" will cause you
 to see your normal prompt in combat.
 
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
-will restore your default prompt.
+will restore your default prompt. You can also use "smessages" to turn off
+prompts temporarily.
 
 The base prompt is: &&0|%i/%u [&&y%C&&0]> 
 
@@ -1974,7 +1975,7 @@ For immortals:
   %x  immortal conditions abbreviated
   %X  immortal conditions as words
 
-See also: PROMPT SUGGESTIONS
+See also: PROMPT SUGGESTIONS, STATUS MESSAGES
 #
 "PROMPT SUGGESTIONS" "SUGGESTED PROMPTS" "SAMPLE PROMPTS" "PROMPT SAMPLES"
 
