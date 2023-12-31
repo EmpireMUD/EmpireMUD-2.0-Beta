@@ -416,7 +416,6 @@ ACMD(do_withdraw);
 ACMD(do_wizlock);
 ACMD(do_wizutil);
 ACMD(do_workforce);
-ACMD(do_worm);
 ACMD(do_write);
 
 /* DG Script ACMD's */
@@ -1003,7 +1002,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "wizlist", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_WIZLIST ),
 	GRANT_CMD( "wizlock", POS_DEAD, do_wizlock, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_WIZLOCK ),
 	SIMPLE_CMD( "workforce", POS_DEAD, do_workforce, NO_MIN, CTYPE_EMPIRE ),
-	ABILITY_CMD( "worm", POS_STUNNED, do_worm, NO_MIN, CTYPE_MOVE, ABIL_WORM ),
 	SIMPLE_CMD( "write", POS_STANDING, do_write, NO_MIN, CTYPE_COMM ),
 	SCMD_CMD( "wimpy", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_WIMPY ),
 	

@@ -70,6 +70,35 @@ bool despawn_companion(char_data *ch, mob_vnum vnum) {
 
 
 /**
+* Checks if the player has any movement abilities that work in earthmeld. If
+* not, they get special help when trying to un-earthmeld, to avoid being stuck.
+*
+* @param char_data *ch The player to check.
+* @return bool TRUE if the player has any earthmeld-move ability; FALSE if not.
+*/
+bool has_earthmeld_move_ability(char_data *ch) {
+	ability_data *abil;
+	struct player_ability_data *plab, *next_plab;
+	
+	if (!IS_NPC(ch)) {
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			if (!(abil = plab->ptr) || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+				continue;	// does not apply
+			}
+			if (!IS_SET(ABIL_TYPES(abil), ABILT_MOVE) || ABIL_MOVE_TYPE(abil) != ABIL_MOVE_EARTHMELD) {
+				continue;	// not an earthmeld move ability
+			}
+			
+			// found 1!
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// nope
+}
+
+
+/**
 * Ends an earthmeld and sends messages.
 *
 * @param char_data *ch The earthmelded one.
@@ -291,7 +320,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (has_ability(ch, ABIL_WORM) && IS_COMPLETE(IN_ROOM(ch)) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
+		if (has_earthmeld_move_ability(ch) && IS_COMPLETE(IN_ROOM(ch)) && IS_ANY_BUILDING(IN_ROOM(ch)) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
