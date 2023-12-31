@@ -3805,7 +3805,6 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	}
 	
 	// remaining arguments?
-	msg_to_char(ch, "arg: '%s'\r\n", argument);
 	if (*argument && isdigit(*argument)) {
 		// manual limit
 		data->conjure_liquid_max = atoi(argument);
