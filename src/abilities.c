@@ -5123,7 +5123,7 @@ DO_ABIL(do_link_ability) {
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_move_ability) {
 	bitvector_t had_affs = NOBITS, move_type = NOBITS;
-	bool moved = FALSE, simple_move_only = FALSE;
+	bool hidden = FALSE, moved = FALSE, simple_move_only = FALSE;
 	room_data *was_in = IN_ROOM(ch);
 	
 	if (!data->move_room) {
@@ -5147,6 +5147,7 @@ DO_ABIL(do_move_ability) {
 	// apply affects if present
 	if (ABIL_AFFECTS(abil)) {
 		had_affs = (AFF_FLAGS(ch) & ABIL_AFFECTS(abil));
+		hidden = (AFF_FLAGGED(ch, AFF_HIDE) ? TRUE : FALSE);
 		
 		// affects require diff check:
 		if (skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
@@ -5167,6 +5168,11 @@ DO_ABIL(do_move_ability) {
 		REMOVE_BIT(AFF_FLAGS(ch), ABIL_AFFECTS(abil));
 		SET_BIT(AFF_FLAGS(ch), had_affs);
 		affect_total(ch);
+		
+		// restore hide?
+		if (hidden) {
+			SET_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		}
 	}
 	
 	// check if we moved
