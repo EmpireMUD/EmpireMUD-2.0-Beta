@@ -342,7 +342,6 @@ ACMD(do_skin);
 ACMD(do_slash_channel);
 ACMD(do_slay);
 ACMD(do_sleep);
-ACMD(do_sneak);
 ACMD(do_snoop);
 ACMD(do_socials);
 ACMD(do_speak);
@@ -905,7 +904,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "sleep", POS_SLEEPING, do_sleep, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SLAY ),
 	STANDARD_CMD( "smelt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "sneak", POS_STANDING, do_sneak, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_STAY_HIDDEN, ABIL_SNEAK ),
 	GRANT_CMD( "snoop", POS_DEAD, do_snoop, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SNOOP ),
 	SIMPLE_CMD( "socials", POS_DEAD, do_socials, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "speak", POS_DEAD, do_speak, NO_MIN, CTYPE_UTIL ),
@@ -1183,6 +1181,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	/* Unhide after ? */
 	if (ch && IS_SET(cmd_info[cmd].flags, CMD_UNHIDE_AFTER)) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
 	}
 }
 
