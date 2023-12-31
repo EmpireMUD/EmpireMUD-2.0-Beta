@@ -178,6 +178,7 @@ const char *ability_flags[] = {
 	"USE-SKILL-BELOW-MAX",
 	"UNREMOVABLE-BUFF",	// 30
 	"BUFF-SELF-NOT-TARGET",
+	"STAY-HIDDEN",
 	"\n"
 };
 
@@ -216,6 +217,7 @@ const char *ability_flag_notes[] = {
 	"uses skill level if below max",
 	"unremovable",
 	"buffs self not target",
+	"won't cancel hide",
 	"\n"
 };
 

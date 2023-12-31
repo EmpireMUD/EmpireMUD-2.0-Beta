@@ -6968,7 +6968,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 	}
 	
 	// going to run the ability: unhide first
-	if (AFF_FLAGGED(ch, AFF_HIDE)) {
+	if (AFF_FLAGGED(ch, AFF_HIDE) && !ABILITY_FLAGGED(abil, ABILF_STAY_HIDDEN)) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
 	}

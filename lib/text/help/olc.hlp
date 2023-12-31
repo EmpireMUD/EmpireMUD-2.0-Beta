@@ -1134,6 +1134,7 @@ The following ability flags are available:
    cannot be removed with the 'remove debuffs' action.
  &cBUFF-SELF-NOT-TARGET&0 - Buff portion of the ability targets the user while
    everything else hits the ability's target.
+ &cSTAY-HIDDEN&0 - Won't cancel a hide effect when typed.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
