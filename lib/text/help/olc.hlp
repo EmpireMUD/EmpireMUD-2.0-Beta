@@ -675,6 +675,9 @@ wield slot.
 This is often paired with the STOP-ON-MISS flag to apply buffs or conjure items
 only if the attack succeeds.
 
+Messaging: This type of ability does not send default ability messages,
+including fail messages, because those are generally covered by its attacktype.
+
 Example attack abilities: 155 Jab, 209 Outrage
 
 Not to be confused with: ABILEDIT ATTACK TYPE
@@ -1026,9 +1029,12 @@ without a hit/dodge roll or an attack.
 
 You must always set the VIOLENT flag on a damage ability.
 
-DAmage abilities have the following properties:
+Damage abilities have the following properties:
  <&yattacktype&0> Determines the attack messages.
  <&ydamagetype&0> What type of damage it does.
+
+Messaging: This type of ability does not send default ability messages,
+including fail messages, because those are generally covered by its attacktype.
 
 Example damage abilities: 3 Backstab, 39 Critical Backstab, 308 Wilderblaze
 
@@ -1376,6 +1382,28 @@ no other properties.
 Example morph abilities: 4 Wolf Form, 215 Animal Forms
 
 See also: OLC ABILITIES, OLC MORPHS, MORPHEDIT REQUIRES ABILITY
+#d
+"ABILEDIT MOVE ABILITY" "MOVE ABILITY" "MOVE ABILITIES"
+
+The MOVE ability type is a special kind of movement. This should always have
+a command (like "sneak") and use the &gSTRING&0 argument type. The player uses
+a move ability by typing its command with a direction (e.g. "sneak east").
+
+Properties of move abilities:
+ <&yaffects&0> Any affect flags will be temporarily applied while moving.
+ <&ydifficulty&0> This field does not prevent the move itself. Instead, it
+   silently succeeds or fails to apply the effects (e.g. SNEAK).
+ <&ymovetype&0> What kind of special move it is.
+
+Messaging: This type of ability does not send default ability messages,
+including fail messages. You can configure these messages if you want them.
+After moving, it will send &cspec-to-char&0 and &cspec-to-room&0 messages if
+any are set. The move itself well send walking messages unless the SNEAK affect
+is on.
+
+Example move abilities: 16 Worm, 29 Sneak
+
+See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT MOVETYPE" "ABILEDIT MOVE TYPE"
 
