@@ -508,6 +508,7 @@ const char *ability_limitations[] = {
 	"obj not flagged",
 	"target is vampire",
 	"can purify target",
+	"in combat",	// 45
 	"\n"
 };
 
@@ -559,6 +560,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_OBJ_FLAG,	// ABIL_LIMIT_OBJ_NOT_FLAGGED
 	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_IS_VAMPIRE
 	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_PURIFY_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_IN_COMBAT
 };
 
 

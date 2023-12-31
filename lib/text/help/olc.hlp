@@ -1245,6 +1245,7 @@ Limitation types:
  &cguest permission at target&0 - Has guest (or better) access at the target location.
  &chave an empire&0 - Must be a member of any empire.
  &cin a city&0 - Must be in any city (tile must also be claimed).
+ &cin combat&0 - Must be fighting someone.
  &cin role&0 - Actor must be in a certain role.
  &cindoors&0 - Must be used indoors (including inside buildings on the map).
  &citem type <TYPE>&0 - Obj target must be a specific type.

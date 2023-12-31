@@ -825,6 +825,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_LIMIT_OBJ_NOT_FLAGGED			42	// checks for object flag absent
 #define ABIL_LIMIT_TARGET_IS_VAMPIRE		43	// requires that the target be a vampire
 #define ABIL_LIMIT_CAN_PURIFY_TARGET		44	// target can be purified
+#define ABIL_LIMIT_IN_COMBAT				45	// must be in combat
 
 
 // ABLIM_x: data needed for ability limits:

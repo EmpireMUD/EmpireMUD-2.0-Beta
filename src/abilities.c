@@ -3743,6 +3743,15 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_IN_COMBAT: {
+				if (!is_fighting(ch)) {
+					if (send_msgs) {
+						msg_to_char(ch, "You're not even fighting anyone!\r\n");
+					}
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
