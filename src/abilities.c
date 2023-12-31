@@ -2199,8 +2199,8 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 		quantity = MIN(quantity, data->conjure_liquid_max);
 	}
 	
+	quantity = MIN(quantity, GET_DRINK_CONTAINER_CAPACITY(inter_item) - GET_DRINK_CONTAINER_CONTENTS(inter_item));
 	amount = GET_DRINK_CONTAINER_CONTENTS(inter_item) + quantity;
-	amount = MIN(amount, GET_DRINK_CONTAINER_CAPACITY(inter_item));
 	
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_CONTENTS, amount);
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
