@@ -862,7 +862,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 			if (GET_POISON_AFFECT(obj) != NOTHING) {
 				msg_to_char(ch, "Poison type: %s\r\n", get_generic_name_by_vnum(GET_POISON_AFFECT(obj)));
 			}
-			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
+			msg_to_char(ch, "Poison has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
 		case ITEM_RECIPE: {
