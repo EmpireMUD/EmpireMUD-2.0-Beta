@@ -790,7 +790,7 @@ T a 0
 S
 #265
 Chant of Illusions~
-rst -1 1.00 0 0 0
+grst -1 1.00 0 0 0
 C
 chant 8 o 2 0 0.00 -1 0 0 5 0
 D 16 5 0

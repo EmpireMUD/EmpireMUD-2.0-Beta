@@ -101,8 +101,21 @@ X+ 3 10
 S
 #107
 Veintap~
-0 -1 1.00 0 0 0
-T m 0
+nq -1 1.00 0 0 0
+C
+veintap 5 i 3 0 0.00 -1 0 0 1 0
+I 33 6 100.00 500  # LIQUID-CONJURE: Blood
+M
+2
+You drain some of your blood into $p!~
+M
+4
+$n drains some of $s blood into $p!~
+M
+31
+Fill what with blood?~
+T o 1
+X+ 7 1.00
 S
 #108
 Weaken~
@@ -513,7 +526,7 @@ X+ 6 3
 S
 #126
 Chant of Nature~
-stu -1 1.00 0 0 0
+gstu -1 1.00 0 0 0
 C
 chant 8 o 2 0 0.00 -1 0 0 5 0
 D 16 12 0
@@ -939,7 +952,7 @@ T k 1
 S
 #163
 Ritual of Burdens~
-st -1 0.68 0 0 0
+gst -1 0.68 0 0 0
 A
 19 1
 C
@@ -1089,7 +1102,7 @@ T m 0
 S
 #172
 Siege Ritual~
-as -1 1.00 0 0 0
+aghs -1 1.00 0 0 0
 C
 ritual 8 mp 2 30 0.00 -1 0 0 3 0
 D 16 13 0
@@ -1358,7 +1371,7 @@ X+ 5 1
 S
 #179
 Phoenix Rite~
-s -1 1.00 0 aq 0
+gs -1 1.00 0 aq 0
 C
 ritual 8 g 0 0 0.00 -1 0 0 5 0
 M
@@ -1506,7 +1519,7 @@ T l 1
 S
 #186
 Ritual of Defense~
-rst -1 1.00 0 0 0
+grst -1 1.00 0 0 0
 C
 ritual 8 o 2 50 0.00 -1 0 0 5 0
 D 16 0 0
@@ -1563,7 +1576,7 @@ X+ 3 -1
 S
 #187
 Ritual of Teleportation~
-s -1 1.00 0 0 0
+gst -1 1.00 0 0 0
 C
 ritual 8 rF 2 25 0.00 2019 600 0 5 0
 D 16 16 0
@@ -1611,7 +1624,7 @@ T u 1
 S
 #188
 City Teleportation~
-s -1 1.00 0 0 0
+gst -1 1.00 0 0 0
 C
 ritual 8 t 2 15 0.00 2020 900 0 5 0
 D 16 16 0
@@ -1662,7 +1675,7 @@ T u 1
 S
 #191
 Devastation Ritual~
-su -1 1.00 0 0 0
+gsu -1 1.00 0 0 0
 C
 ritual 8 o 2 15 0.00 -1 0 0 5 0
 D 16 10 0
@@ -1720,7 +1733,7 @@ T s 1
 S
 #192
 Sense Life Ritual~
-s -1 1.00 0 0 0
+gst -1 1.00 0 0 0
 C
 ritual 8 o 2 15 0.00 -1 0 0 5 2
 D 64 0 0
@@ -1756,7 +1769,7 @@ T s 1
 S
 #193
 Ritual of Detection~
-s -1 1.00 0 0 0
+gs -1 1.00 0 0 0
 C
 ritual 8 o 2 15 0.00 -1 0 0 5 0
 D 16 1 0
