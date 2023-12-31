@@ -1220,7 +1220,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_STONED  BIT(20)	// u. trippy effects
 #define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
 	#define AFF_UNUSED  BIT(22)	// w. formerly AFF_CLAWS/CLAWS which were reworked in b5.166
-#define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
+#define AFF_DEATHSHROUDED  BIT(23)	// x. deathshrouded
 #define AFF_EARTHMELDED  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFIED  BIT(25)	// z. mummified
 #define AFF_SOULMASK  BIT(26)	// A. shows no details to others on 'affects'

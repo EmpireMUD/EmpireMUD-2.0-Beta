@@ -3918,7 +3918,7 @@ PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
 	bool was_sleep_aff;
 	
-	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUD | AFF_MUMMIFIED | AFF_EARTHMELDED;
+	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUDED | AFF_MUMMIFIED | AFF_EARTHMELDED;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	

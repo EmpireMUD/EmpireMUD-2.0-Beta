@@ -1448,8 +1448,8 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (AFF_FLAGGED(ch, AFF_MUMMIFIED) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while mummified.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && min_pos >= POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that while in deathshroud!\r\n");
+	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUDED) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while deathshrouded!\r\n");
 	}
 	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING && !override_feeding) {
 		msg_to_char(ch, "You can't do that right now!\r\n");

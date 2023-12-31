@@ -1080,7 +1080,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				// show non-crafting action
 				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
-			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {
+			else if (AFF_FLAGGED(i, AFF_DEATHSHROUDED) && GET_POS(i) <= POS_RESTING) {
 				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {

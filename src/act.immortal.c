@@ -10727,8 +10727,8 @@ ACMD(do_restore) {
 	}
 	
 	// affects that could get a person stuck
-	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUD | AFF_MUMMIFIED)) {
-		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUD, TRUE);
+	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUDED | AFF_MUMMIFIED)) {
+		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUDED, TRUE);
 		affects_from_char_by_aff_flag(vict, AFF_MUMMIFIED, TRUE);
 	}
 
