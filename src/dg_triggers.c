@@ -1809,7 +1809,7 @@ void complete_wtrigger(room_data *room) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			sdd.r = room;
-			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
 				break;
 			}
 		}
