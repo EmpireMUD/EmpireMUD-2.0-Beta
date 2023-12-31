@@ -1303,6 +1303,52 @@ void reload_text_string(int type) {
 //// HELP I/O ////////////////////////////////////////////////////////////////
 
 /**
+* Peels off the first term from the string for use as a help keyword. This is
+* similar to any_one_arg and any_one_word except that it only uses "quotes" for
+* grouping multiple words in 1 term, and it allows escaping of the quotes.
+*
+* @param char *string The input string (read only).
+* @param char *next_key A string buffer to write the next keyword to.
+* @return char* A pointer to the rest of 'string'.
+*/
+char *next_help_keyword(char *string, char *next_key) {
+	int iter, offset;
+	
+	skip_spaces(&string);
+
+	if (*string == '\"') {
+		++string;
+		while (*string && *string != '\"') {
+			*(next_key++) = *string;
+			++string;
+		}
+		if (*string) {
+			++string;
+		}
+	}
+	else {
+		// copy to first space
+		while (*string && !isspace(*string)) {
+			*(next_key++) = *string;
+			++string;
+		}
+	}
+
+	*next_key = '\0';
+	
+	// check for escaped \"
+	for (iter = 0, offset = 0; iter < strlen(next_key); ++iter) {
+		if (next_key[iter] == '\\' && (next_key[iter+1] == '\\' || next_key[iter+1] == '"')) {
+			++offset;
+		}
+		next_key[iter] = next_key[iter + offset];
+	}
+
+	return (string);
+}
+
+
+/**
 * Loads one help file.
 *
 * @param FILE *fl The input file.
@@ -1370,12 +1416,12 @@ void load_help(FILE *fl) {
 		/* now, add the entry to the index with each keyword on the keyword line */
 		el.duplicate = 0;
 		el.entry = str_dup(entry);
-		scan = any_one_word(key, next_key);
+		scan = next_help_keyword(key, next_key);
 		while (*next_key) {
 			el.keyword = str_dup(next_key);
 			help_table[top_of_helpt++] = el;
 			el.duplicate++;
-			scan = any_one_word(scan, next_key);
+			scan = next_help_keyword(scan, next_key);
 		}
 
 		/* get next keyword line (or $) */
