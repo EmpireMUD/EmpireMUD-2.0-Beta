@@ -386,7 +386,7 @@ S
 Regenerate~
 0 -1 2.00 0 0 0
 C
-regenerate 8 gw 3 1 0.00 -1 0 0 1 0
+regenerate 1 gw 3 1 0.00 -1 0 0 1 0
 M
 0
 You focus your blood into regeneration.~
@@ -731,7 +731,7 @@ T f 1
 S
 #67
 By Moonlight~
-0 -1 1.00 0 gip 0
+0 -1 1.00 0 gipt 0
 A
 27 1
 D 1 62 0
@@ -971,8 +971,6 @@ Kick~
 ak -1 1.00 0 0 0
 C
 kick 7 bf 1 10 0.00 2011 6 1 2 1
-R
-1416 1 0 0
 T c 1
 X+ 4 54
 S
