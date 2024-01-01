@@ -2112,6 +2112,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature each year");
 	init_config(CONFIG_WORLD, "naturalize_unclaimable", CONFTYPE_BOOL, "if true, naturalize/remember will also work on unclaimable tiles");
 	init_config(CONFIG_WORLD, "nearby_sector_distance", CONFTYPE_INT, "distance for the near-sector evolution");
+	init_config(CONFIG_WORLD, "ignore_island_levels", CONFTYPE_BOOL, "instancer will ignore island levels when spawning adventures");
 	init_config(CONFIG_WORLD, "interlink_distance", CONFTYPE_INT, "how far apart two interlinked buildings can be");
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");

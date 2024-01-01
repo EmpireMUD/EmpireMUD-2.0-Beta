@@ -258,6 +258,7 @@ default_inside_sect 11
 default_interior 1
 default_land_sect 0
 generic_facing bdeklmno
+ignore_island_levels 0
 interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
