@@ -339,7 +339,7 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
 bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int death_mtrigger(char_data *ch, char_data *actor);
-void fight_mtrigger(char_data *ch);
+int fight_mtrigger(char_data *ch, bool will_hit);
 void hitprcnt_mtrigger(char_data *ch);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 int can_fight_mtrigger(char_data *ch, char_data *actor);

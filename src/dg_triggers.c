@@ -688,13 +688,22 @@ void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *v
 }
 
 
-void fight_mtrigger(char_data *ch) {
+/**
+* Called before damage during any hit().
+*
+* @param char_data *ch The mob who is fighting.
+* @param bool will_hit Indicating whether the mob is expected to hit the target.
+* @return int 0 to cancel, 1 to continue the attack.
+*/
+int fight_mtrigger(char_data *ch, bool will_hit) {
 	char_data *actor;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
+	int val = 1;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT) || !FIGHTING(ch))
-		return;
+	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT) || !FIGHTING(ch)) {
+		return val;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -704,16 +713,24 @@ void fight_mtrigger(char_data *ch) {
 			union script_driver_data_u sdd;
 
 			actor = FIGHTING(ch);
-			if (actor)
+			if (actor) {
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			else
+			}
+			else {
+				// this should be impossible since it was pre-checked
 				add_var(&GET_TRIG_VARS(t), "actor", "nobody", 0);
+			}
+			
+			sprintf(buf, "%d", will_hit ? 1 : 0);
+			add_var(&GET_TRIG_VARS(t), "hit", buf, 0);
 
 			sdd.c = ch;
-			script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 			break;
 		}
 	}
+	
+	return val;
 }
 
 

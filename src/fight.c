@@ -3484,7 +3484,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	struct instance_data *inst;
 	int w_type, result, bonus, ret_val;
 	bool success = FALSE, block = FALSE;
-	bool can_gain_skill;
+	bool can_gain_skill, mob_no_attack;
 	empire_data *victim_emp;
 	double attack_speed, cur_speed, dam;
 	attack_message_data *amd;
@@ -3501,7 +3501,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
+	amd = real_attack_message(w_type);
 	victim_emp = GET_LOYALTY(victim);
+	mob_no_attack = MOB_FLAGGED(ch, MOB_NO_ATTACK) ? TRUE : FALSE;
 	
 	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
 	if (AFF_FLAGGED(ch, AFF_DISARMED)) {
@@ -3518,12 +3520,36 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
 		}
 	}
+	
+	// ensure scaling
+	check_scaling(victim, ch);
+	
+	// pre-check success so the trigger will know:
+	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
+	success = check_hit_vs_dodge(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
+	
+	// blockable?
+	if (success && AWAKE(victim)) {
+		if (amd && ATTACK_DAMAGE_TYPE(amd) == DAM_PHYSICAL) {
+			block = check_block(victim, ch, !mob_no_attack);
+		}
+		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && amd && ATTACK_DAMAGE_TYPE(amd) == DAM_MAGICAL) {
+			// half-chance
+			block = check_block(victim, ch, !mob_no_attack) && !number(0, 1);
+			if (!mob_no_attack) {
+				gain_player_tech_exp(victim, PTECH_BLOCK_MAGICAL, 2);
+			}
+		}
+	}
 
 	/* check if the character has a fight trigger */
-	fight_mtrigger(ch);
+	if (!fight_mtrigger(ch, success && !block)) {
+		// canceled by trigger
+		return 0;
+	}
 	
 	// some mobs can run fight triggers when they are hitting, but never actually hit
-	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
+	if (mob_no_attack) {
 		return 0;
 	}
 	
@@ -3535,9 +3561,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
 	}
-	
-	// ensure scaling
-	check_scaling(victim, ch);
 
 	/* Do some sanity checking, in case someone flees, etc. */
 	if (IN_ROOM(ch) != IN_ROOM(victim)) {
@@ -3563,24 +3586,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	
 	// no gaining skill if there's no damage to do
 	can_gain_skill = GET_HEALTH(victim) > 0;
-	
-	// determine hit (if WEAR_HOLD, pass off_hand=TRUE)
-	success = check_hit_vs_dodge(ch, victim, (weapon && weapon->worn_on == WEAR_HOLD));
-	
-	// for messaging
-	amd = real_attack_message(w_type);
-	
-	// blockable?
-	if (success && AWAKE(victim)) {
-		if (amd && ATTACK_DAMAGE_TYPE(amd) == DAM_PHYSICAL) {
-			block = check_block(victim, ch, TRUE);
-		}
-		else if (has_player_tech(victim, PTECH_BLOCK_MAGICAL) && check_solo_role(victim) && amd && ATTACK_DAMAGE_TYPE(amd) == DAM_MAGICAL) {
-			// half-chance
-			block = check_block(victim, ch, TRUE) && !number(0, 1);
-			gain_player_tech_exp(victim, PTECH_BLOCK_MAGICAL, 2);
-		}
-	}
 
 	// outcome:
 	if (!success) {

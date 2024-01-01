@@ -119,14 +119,18 @@ See also: MTRIG CHARMED, ALLOW-MULTIPLE
 Fight (mob trigger)
 
 Argument type:  percent chance to execute
+Return value:  return 0 to cancel the mob's attack
 
-Activated each round of fighting, after the mobile has had all of its attacks.
+Activated each round of fighting, immediately before the mobile attacks. If
+the script replaces an attack, return 0 to cancel the regular attack. Mobs with
+the NO-ATTACK flag still fire this trigger in combat.
 
 Charmed mobs will not activate normal Fight triggers, but you can use add the
 Charmed trigger type to allow this.
 
 Variables:
   &c%actor%&0 - The character this mobile is fighting.
+  &c%hit%&0 - Whether or not the attack is expected to hit.
 
 See also: MTRIG CHARMED
 #d
