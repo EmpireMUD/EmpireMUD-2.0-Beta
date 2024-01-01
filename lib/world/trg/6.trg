@@ -81,10 +81,16 @@ end
 Enchanted forest unclaimed chop~
 0 ab 100
 ~
+* sector lists
+set starwood 601 602 603 604 606 607 608
+set weirdwood 611 612 613 614 621 622 623
+set oasis 616 617 618
+set all_sects %starwood% %weirdwood% %oasis%
+* startup
 set room %self.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted || %room.sector% ~= Weirdwood)
+  if (%self.room% != %room%) || %room.empire% || !(%all_sects% ~= %room.sector_vnum%)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
     %echo% ~%self%, seeing no opportunity for destruction here, starts wandering away.
     nop %self.add_mob_flag(SPAWNED)%
@@ -117,11 +123,11 @@ while %cycles_left% >= 0
     case 0
       %echo% ~%self% completes ^%self% ritual, killing the forest!
       * terraform based on sector
-      if %room.sector_vnum% >= 600 && %room.sector_vnum% <= 604
+      if %starwood% ~= %room.sector_vnum%
         %terraform% %room% 605
-      elseif %room.sector_vnum% >= 610 && %room.sector_vnum% <= 614
+      elseif %weirdwood% ~= %room.sector_vnum%
         %terraform% %room% 615
-      elseif %room.sector_vnum% == 616
+      elseif %oasis% ~= %room.sector_vnum%
         %terraform% %room% 21
       else
         * not a sector we can finish
