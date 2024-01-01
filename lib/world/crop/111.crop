@@ -12,6 +12,9 @@ I 8 11102 20.00 3 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 4 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 5 H  # HARVEST: bunch of carrots
 I 8 11102 20.00 6 H  # HARVEST: bunch of carrots
+U
+0
+You watch as row after row of little green tufts pop from the soil.~
 X
 carrots patch plants crop~
    Rows of vibrant orange carrots stretch out before you, their lush green tops
@@ -46,6 +49,9 @@ I 8 11104 20.00 3 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 4 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 5 H  # HARVEST: bunch of blackberries
 I 8 11104 20.00 6 H  # HARVEST: bunch of blackberries
+U
+0
+Bush after bush pops up from the soil, spotted with sweet blackberries!~
 X
 blackberries blackberry patch plants crop~
    The thorny brambles of blackberry bushes fill your vision, the plump and
@@ -93,6 +99,9 @@ I 6 11107 100.00 1  # FORAGE: ripe pear
 I 7 11106 100.00 14  # PICK: juicy pears
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Trees rise before your eyes and fresh pears begin to fall beneath them!~
 X
 pears fruit trees orchard crop~
    A peaceful orchard of pear trees surrounds you, the plump fruits of golden,

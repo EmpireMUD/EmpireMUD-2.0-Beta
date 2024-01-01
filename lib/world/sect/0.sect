@@ -55,6 +55,9 @@ I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+U
+0
+The grassy plains seem to come to life!~
 X
 plains field grass ground around~
    You stand in the middle of an expansive, flat open plain. The grasses
@@ -107,6 +110,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A tree shoots up and spreads its canopy wide above you!~
 X
 forest trees leaves around~
    You find yourself standing at the edge of a light forest. The trees here are
@@ -161,6 +167,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A second tree sprouts and reaches for the sky!~
 X
 forest trees leaves around~
    The forest air is cool and fresh, scented with earth and greenery. You can
@@ -214,6 +223,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Another tree shoots up toward the sky and joins the growing canopy!~
 X
 forest shade shady trees leaves around~
    You are standing in a shady forest, where the trees grow close together and
@@ -288,6 +300,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+The canopy closes as another tree stretches upward and unfolds!~
 X
 forest trees leaves around~
    You are standing in an overgrown forest, where the underbrush is so thick
@@ -326,6 +341,9 @@ I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
 I 22 174 5.00 1  # PAN: small flake of gold
+U
+0
+The river starts to burble and flow.~
 X
 river water around~
    The water of the river flows steadily downstream, its surface shimmering in
@@ -778,6 +796,9 @@ A Canal~
 D0
 @w&?~~@e~
 &c~
+U
+0
+The canal's waters begin to flow.~
 X
 canal water trench around~
    You are standing next to a wide, gently flowing canal. The water here is
@@ -830,6 +851,9 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 I 9 134 8.00 1 g  # GATHER: thorny sapling
+U
+0
+The desert seems to come to life!~
 X
 desert ground plants cactus cacti around~
    You stand in the midst of a vast, sandy desert, interrupted only by
@@ -869,6 +893,9 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+U
+0
+Water springs from the ground and bushes begin to grow in an instant!~
 X
 oasis plants water vegetation desert around~
    As you approach the oasis, you can feel the air around you become cooler and
@@ -1021,6 +1048,9 @@ I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 46.00 1 g  # GATHER: bundle of long leaves
 I 9 132 46.00 1 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
+U
+0
+Thorny saplings shoot up from the edges of the stumps!~
 X
 copse gnarled desert trees grove around~
    You come across a small copse of trees growing in the midst of the arid
@@ -1073,6 +1103,9 @@ I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 46.00 1 g  # GATHER: bundle of long leaves
 I 9 132 46.00 1 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
+U
+0
+A new shrub unfolds itself as it rises from the dirt!~
 X
 shrub large plant tree sapling desert around~
    You are standing in a barren desert terrain, dotted sparsely with small
@@ -1118,6 +1151,9 @@ I 20 122 5.00 4 c  # CHOP: rough wood
 I 20 122 10.00 3 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood
 I 20 122 35.00 1 c  # CHOP: rough wood
+U
+0
+The scraggly trees unfold leaf after leaf as they grow larger and larger!~
 X
 grove desert shady trees woods around~
    You are standing in a small grove of trees in the middle of the desert. The
@@ -1167,6 +1203,9 @@ E
 I 6 3017 33.00 1  # FORAGE: plump fig
 I 9 133 100.00 1  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+New trees shoot up toward the sky from the soil, soaking up water and threatening to block the sun with fresh leaves!~
 X
 jungle clearing cleared trees forest around~
    The trees here have been selectively cut down to make way for small paths,
@@ -1222,6 +1261,9 @@ E
 I 6 3017 33.00 1  # FORAGE: plump fig
 I 9 133 100.00 1  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Vines overtake the world as they grow down from the rising trees!~
 X
 jungle trees forest around~
    You are standing in a tropical jungle, surrounded by an impenetrable wall of
@@ -1326,6 +1368,9 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1314 25.00 1 f  # FISH: fat catfish
 I 21 1315 25.00 1 f  # FISH: yellow perch
 I 21 1312 100.00 1 f  # FISH: speckled trout
+U
+0
+The sparkling waters of the lake start to shimmer.~
 X
 lake water down around~
    You find yourself on a calm, serene lake. The water is still and glassy,
@@ -1526,6 +1571,9 @@ I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Saplings spring forth from the edges of the stumps!~
 X
 copse small trees stumps wood forest around~
    As you approach the copse, you see small trees sprouting up from old stumps.
@@ -1575,6 +1623,9 @@ I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+The horizon begins to vanish as more and more bushy saplings burst from the stumps!~
 X
 copse young trees wood forest stumps around~
    As you approach the copse, you see small trees sprouting up from old stumps.
@@ -1624,6 +1675,9 @@ I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Small trees spring up from the grass!~
 X
 edge forest trees around~
    You find yourself standing at the edge of the forest, the last vestige of
@@ -1779,6 +1833,9 @@ I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
 I 22 174 5.00 1  # PAN: small flake of gold
+U
+0
+A tree rises from the water, toward the sky!~
 X
 woods flooded flooding trees forest around river water~
    The river has overflowed and flooded the woods, submerging the lower
@@ -1824,6 +1881,9 @@ I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
 I 22 174 5.00 1  # PAN: small flake of gold
+U
+0
+A tree rises from the water and unfolds its canopy in the sky!~
 X
 forest flooded flooding woods trees around river water~
    The river has overflowed and flooded the woods, submerging the lower
@@ -1887,6 +1947,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+New trees burst forth from the riverbank and wend their way toward the sky!~
 X
 trees forest riverbank bank water~
    You are standing at the edge of the forest, with the sounds of rushing water
@@ -1945,6 +2008,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+The sky fills in with green as new trees streak toward the sky and unfurl their leaves!~
 X
 forest trees riverbank bank water river around~
    You are standing at the edge of the forest, with the sounds of rushing water
@@ -2055,6 +2121,9 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Fresh saplings shoot forth from the edges of the stumps!~
 X
 copse riverside riverbank bank trees forest stumps around~
    As you approach the river, a small copse comes into view, nestled on the
@@ -2151,6 +2220,9 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+U
+0
+The sandy beach springs to life!~
 X
 beach sandy shore water ocean sea desert around~
    The hot sand stretches for miles ahead, bordered by the calm waters of the
@@ -2221,6 +2293,9 @@ I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
 I 22 174 5.00 1  # PAN: small flake of gold
+U
+0
+The waters start to flow.~
 X
 estuary river water ocean sea around~
    The water is brackish and murky, reflecting the overcast sky above. Thick
@@ -2279,6 +2354,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A tree rises rapidly by the shore, quickly shading you with new leaves!~
 X
 tree shoreside water ocean around~
    A lone tree stands on the edge of the ocean, its roots entwined in the sandy
@@ -2318,6 +2396,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 133 85.00 1 g  # GATHER: tangle of vines
 I 9 135 15.00 1 g  # GATHER: reaching sapling
 I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+The jungle grows so fast that it rapidly overtakes the view of the sea!~
 X
 jungle edge sea seaside shore tree forest around~
    A large, gnarled tree stands at the edge of the jungle, its roots twisting
@@ -2388,6 +2469,9 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1302 25.00 1 f  # FISH: giant linefish
 I 21 1303 25.00 1 f  # FISH: magenta arrowfish
 I 21 1301 100.00 1 f  # FISH: striped barbfish
+U
+0
+The water seems to come to life!~
 X
 sea shallow coast ocean water around~
    You can see the waves gently lapping against the shoreline of the shallow
@@ -2426,6 +2510,9 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 140 100.00 1  # GATHER: bundle of long grass
+U
+0
+The grassy hills seem to come to life!~
 X
 foothills hills lake mountain around~
    The foothills rise up gently between the lake and the mountains, forming a
@@ -2549,6 +2636,9 @@ I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+New saplings squeak out of the edges of the stumps and grow up toward the sky!~
 X
 copse stumps seaside sea ocean water around forest trees~
    You stand before a seaside copse, the sound of the waves crashing against
@@ -2658,6 +2748,9 @@ E
 15 0 1.00 34
 I 6 3017 33.00 1  # FORAGE: plump fig
 I 20 135 100.00 1  # CHOP: reaching sapling
+U
+0
+A tangle of new saplings spring up from the stumps!~
 X
 copse young jungle trees forest stumps around~
    You find yourself in a lush jungle copse, surrounded by tall trees and thick
@@ -2737,6 +2830,9 @@ I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 135 100.00 1  # CHOP: reaching sapling
+U
+0
+New saplings burst forth from the edges of the stumps!~
 X
 copse jungle seaside ocean trees forest around~
    You find yourself standing at the edge of a jungle copse that reaches down
@@ -2829,6 +2925,9 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+U
+0
+The irrigated field seems to come to life!~
 X
 field irrigation irrigation desert canal around~
    You find yourself standing in a vast expanse of freshly irrigated desert.
@@ -2880,6 +2979,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1 c  # CHOP: large tree
+U
+0
+New trees rise at record pace from the irrigated soil!~
 X
 forest trees irrigated irrigation canal around~
    You are standing in a lush forest that has grown on the irrigated soil
@@ -2936,6 +3038,9 @@ I 9 123 85.00 1 g  # GATHER: small flower
 I 9 135 15.00 1 g  # GATHER: reaching sapling
 I 20 128 50.00 1 c  # CHOP: massive jungle tree
 I 20 128 50.00 2 c  # CHOP: massive jungle tree
+U
+0
+Whole trees curl up from the soil, fully-grown in seconds!~
 X
 jungle forest trees irrigated irrigation canal around~
    As you walk along the irrigation canal in the desert, you notice a lush and
@@ -3033,6 +3138,9 @@ I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Fresh saplings burst up out of the stumps!~
 X
 copse irrigated irrigation trees forest stumps around canal~
    As you walk through the irrigated field, you come across a small copse where
@@ -3133,6 +3241,9 @@ I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 135 100.00 1  # CHOP: reaching sapling
+U
+0
+New saplings twist and curl as they rise out of the stumps!~
 X
 copse jungle forest trees stumps irrigated irrigation canal around~
    As you walk through the irrigated field, you come across a small copse where
@@ -3244,6 +3355,9 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 85.00 1 g  # GATHER: sticks and leaves
 I 9 131 15.00 1 g  # GATHER: green sapling
 I 20 120 100.00 1 c  # CHOP: large tree
+U
+0
+The canopy begins to close as more trees creak up from the irrigated soil!~
 X
 forest trees irrigated irrigation canal around~
    You are standing in a lush forest that has grown on the irrigated soil
@@ -3291,6 +3405,9 @@ I 9 132 35.00 1 g  # GATHER: thorny branches
 I 20 122 85.00 2 c  # CHOP: rough wood
 I 20 122 10.00 3 c  # CHOP: rough wood
 I 20 122 5.00 4 c  # CHOP: rough wood
+U
+0
+Thirsty trees rise from the rich soil around the oasis!~
 X
 oasis plants water vegetation desert around~
    As you approach the oasis, you can feel the air around you become cooler and
@@ -3329,6 +3446,9 @@ I 9 139 50.00 1 g  # GATHER: bundle of long leaves
 I 20 122 25.00 2 c  # CHOP: rough wood
 I 20 122 25.00 3 c  # CHOP: rough wood
 I 20 122 50.00 4 c  # CHOP: rough wood
+U
+0
+Bushy trees grow around the oasis and encircle it!~
 X
 oasis plants water vegetation trees desert around~
    As you approach the oasis, you can feel the air around you become cooler and
@@ -3376,6 +3496,9 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 I 9 134 8.00 1 g  # GATHER: thorny sapling
+U
+0
+The desert seems to come to life!~
 X
 oasis dry desert plants around~
    Ahead of you, you see what appears to be an oasis, but as you draw closer,
@@ -3442,6 +3565,9 @@ An Irrigation Canal~
 D0
 @w&?~~@e~
 &C~
+U
+0
+The canal water starts to flow.~
 X
 canal irrigation water desert around~
    You are standing next to an irrigation canal in the middle of a vast and
@@ -3492,6 +3618,9 @@ A Verdant Canal~
 D0
 @w&?~~@e~
 &C~
+U
+0
+The canal waters start to flow.~
 X
 canal verdant water irrigation irrigated around~
    In the midst of the arid desert, you are struck by the vibrant greenery
@@ -3536,6 +3665,9 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 1 g  # GATHER: thorny sapling
 I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+U
+0
+Water springs from the ground and bushes begin to grow in an instant!~
 X
 oasis irrigated field irrigation desert around water~
    In the heart of the desert lies an oasis, surrounded by lush green fields
@@ -3577,6 +3709,9 @@ I 9 139 92.00 1 g  # GATHER: bundle of long leaves
 I 20 122 25.00 2 c  # CHOP: rough wood
 I 20 122 50.00 3 c  # CHOP: rough wood
 I 20 122 25.00 4 c  # CHOP: rough wood
+U
+0
+Whole trees grow around the oasis and begin to cover the sky as their leaves unfurl!~
 X
 oasis shady irrigated field irrigation around water~
    In the heart of the desert lies an oasis, surrounded by lush green fields

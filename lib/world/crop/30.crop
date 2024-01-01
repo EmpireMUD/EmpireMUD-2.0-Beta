@@ -12,10 +12,13 @@ I 8 3026 20.00 3 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 4 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 5 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 6 H  # HARVEST: basket of tomatoes
+U
+0
+Bright red tomatoes grow almost as fast as the bushy plants that bear them!~
 X
 tomato tomatoes patch crop field~
    You find yourself in the midst of a large tomato patch. The plants are lush
-and verdant, with their vines winding their way up tall stakes or trellises. 
+and verdant, with their vines winding their way up tall stakes or trellises.
 The leaves are bright green and shiny, and the fruit is plump and red, hanging
 heavily from the vines. The air is filled with the sweet, tangy scent of
 ripening tomatoes, a fragrance that is both refreshing and invigorating. As you
@@ -37,6 +40,9 @@ I 8 3028 20.00 3 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 4 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 5 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 6 H  # HARVEST: bunch of bananas
+U
+0
+Banana stalks rise from the ground as you watch, each bearing clusters of precious yellow fruit!~
 X
 bananas grove trees jungle crop~
    You find yourself standing in the midst of a dense jungle, surrounded by
@@ -87,6 +93,9 @@ I 6 3031 100.00 1  # FORAGE: split coconut
 I 7 3030 100.00 14  # PICK: bunch of coconuts
 I 20 122 50.00 1 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood
+U
+0
+Palm trees shoot up into the air as large, brown coconuts form in their crowns!~
 X
 coconuts grove trees crop~
    You find yourself standing in the midst of a coconut orchard, surrounded by
@@ -119,6 +128,9 @@ I 8 3032 20.00 3 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 4 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 5 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 6 H  # HARVEST: bunch of grapes
+U
+0
+Vines twist and grow at record pace as clusters of grapes begin to appear!~
 X
 grapes field vines vineyard crop~
    You find yourself standing in the midst of a vast vineyard, with row upon
@@ -156,11 +168,14 @@ I 8 3034 20.00 3 H  # HARVEST: basket of peppers
 I 8 3034 20.00 4 H  # HARVEST: basket of peppers
 I 8 3034 20.00 5 H  # HARVEST: basket of peppers
 I 8 3034 20.00 6 H  # HARVEST: basket of peppers
+U
+0
+Green bushes pop up across the field, followed by the bright red fruits that cover them!~
 X
 peppers field plants crop~
    You find yourself standing in a parched, arid field, surrounded by row upon
 row of spiky, verdant plants. Each plant is laden with a fiery harvest of ripe,
-red hot peppers, their pungent aroma hanging heavily in the dry desert air. 
+red hot peppers, their pungent aroma hanging heavily in the dry desert air.
 The plants themselves are low-growing, with small leaves and gnarled stems that
 seem to twist and curl in the scorching sun. The peppers themselves are small,
 but they pack a potent punch, their bright red color contrasting sharply with
@@ -185,9 +200,12 @@ I 8 3036 20.00 3 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 4 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 5 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 6 H  # HARVEST: sack of potatoes
+U
+0
+Row after row of leafy plants sprign to life across the field!~
 X
 potato potatoes field plants crop~
-   You find yourself standing amidst a lush, rolling field of potato plants. 
+   You find yourself standing amidst a lush, rolling field of potato plants.
 The earth is soft and loamy underfoot, and the air is rich with the earthy,
 musky scent of growing things. The potato plants themselves are low-growing and
 bushy, with broad, green leaves that rustle in the breeze. Nestled in the rich
@@ -221,6 +239,9 @@ D0
 I 6 3038 100.00 1  # FORAGE: ripe plum
 I 7 3037 100.00 14  # PICK: basket of plums
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Leafy green trees rise from the soil, bursting with ripe plums!~
 X
 plums orchard trees crop~
    You stand amidst a fragrant grove of plum trees, their branches heavy with
@@ -260,6 +281,9 @@ I 8 3039 20.00 3 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 4 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 5 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 6 H  # HARVEST: basket of strawberries
+U
+0
+Leafy bushes spring from the soil as strawberry after strawberry ripens beneath them!~
 X
 strawberry strawberries plants crop field~
    You find yourself standing in a vast, rolling field of vibrant red
@@ -300,6 +324,9 @@ D0
 I 6 3042 100.00 1  # FORAGE: single ripe mango
 I 7 3041 100.00 14  # PICK: basket of mangoes
 I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Bright orange mangoes grow down from the trees even as the trees grow up from the soil!~
 X
 mango mangoes trees grove crop~
    As you approach the mango grove, you can feel the warmth of the sun on your
@@ -337,6 +364,9 @@ I 8 3043 20.00 3 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 4 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 5 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 6 H  # HARVEST: basket of blueberries
+U
+0
+Bright bushes twist and curl from the soil, dotted by already-ripe blueberries!~
 X
 blueberry blueberries field crop plants~
    Walking through the field of blueberries, you can see rows upon rows of low,
@@ -390,6 +420,9 @@ I 8 3045 20.00 3 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 4 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 5 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 6 H  # HARVEST: sack of coffee beans
+U
+0
+You watch in wonder as bright red berries appear in dense clusters on the fast-growing bushes!~
 X
 coffee field beans cherries plants crop~
    Walking through the field of coffee, you can see neat rows of small,
@@ -416,6 +449,9 @@ I 8 3046 20.00 3 H  # HARVEST: sack of oats
 I 8 3046 20.00 4 H  # HARVEST: sack of oats
 I 8 3046 20.00 5 H  # HARVEST: sack of oats
 I 8 3046 20.00 6 H  # HARVEST: sack of oats
+U
+0
+The oat stalks grow all around you as you watch!~
 X
 oats field stems plants crop~
    Standing in the midst of a field of oats, you can see a sea of tall, slender
@@ -472,6 +508,9 @@ I 8 3047 20.00 3 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 4 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 5 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 6 H  # HARVEST: single ripe watermelon
+U
+0
+Heavy watermelons plop out onto the ground as leafy plants rapidly cover the soil!~
 X
 watermelons bed field crop plants~
    You approach a lush bed of watermelons nestled in the heart of the jungle.
@@ -500,6 +539,9 @@ I 8 3049 20.00 5 H  # HARVEST: head of lettuce
 I 8 3049 20.00 6 H  # HARVEST: head of lettuce
 I 8 3050 75.00 2 S  # HARVEST: lettuce seeds
 I 8 3050 25.00 3 S  # HARVEST: lettuce seeds
+U
+0
+You watch in amazement as row after row of leafy lettuce heads burst out of the soil!~
 X
 lettuce field patch plants crop~
    In the lettuce field, neat rows of vibrant green lettuce heads stretch out
@@ -520,6 +562,9 @@ oooo~
 &g~
 I 6 3053 100.00 1  # FORAGE: green calabash
 I 8 3054 100.00 2  # HARVEST: sack of fresh calabash gourds
+U
+0
+Leafy plants spready unimaginably fast across the ground!~
 X
 gourds calabash vines plants crop field~
    A collection of calabash gourds sway in the gentle breeze, their bulbous
@@ -569,6 +614,9 @@ I 6 3071 100.00 1  # FORAGE: couple of apricots
 I 7 3070 100.00 14  # PICK: basket of apricots
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Trees pop up from the soil, dropping bright orange apricots as they rise!~
 X
 apricots orchard fruit trees crop~
    You see an apricot orchard stretching out before you, rows upon rows of
@@ -576,7 +624,7 @@ small trees with delicate, green leaves and clusters of orange fruits. The
 scent of sweet apricots fills the air, and the branches are heavy with ripe,
 plump fruit. As you look closer, you can see the fuzzy skin of the apricots and
 the golden flesh inside, promising a juicy, delicious taste. The trees are
-evenly spaced and well-tended, with each one bearing an abundance of fruit. 
+evenly spaced and well-tended, with each one bearing an abundance of fruit.
 The sound of birds singing and insects buzzing can be heard all around, adding
 to the idyllic atmosphere of the orchard.
 ~
@@ -607,6 +655,9 @@ I 8 3072 20.00 3 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 4 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 5 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 6 H  # HARVEST: bundle of sugarcane
+U
+0
+Tall sugar canes burst from the rich soil!~
 X
 sugarcane canes plants field crop~
    A field of sugarcane stretches out before you, with tall stalks swaying
@@ -614,7 +665,7 @@ gently in the warm, tropical breeze. The bright green leaves of the plants
 rustle softly, their pointed tips reaching towards the sun. Each stalk of
 sugarcane is thick and fibrous, with a pale yellow hue that seems to glow in
 the bright sunlight. As you move closer, you can see the long, segmented stalks
-up close, and you catch a faint whiff of their sweet, slightly earthy aroma. 
+up close, and you catch a faint whiff of their sweet, slightly earthy aroma.
 The field seems to go on endlessly, with row after row of sugarcane swaying
 rhythmically in the warm, humid air.
 ~
@@ -633,6 +684,9 @@ I 8 3074 20.00 3 H  # HARVEST: basket of garlic
 I 8 3074 20.00 4 H  # HARVEST: basket of garlic
 I 8 3074 20.00 5 H  # HARVEST: basket of garlic
 I 8 3074 20.00 6 H  # HARVEST: basket of garlic
+U
+0
+Row upon row of little green plants burst from the dirt!~
 X
 garlic field plants crop~
    A field of garlic spreads out before you, each stalk standing tall and
@@ -666,6 +720,9 @@ I 6 3077 100.00 1  # FORAGE: single ripe lemon
 I 7 3076 100.00 14  # PICK: basket of lemons
 I 9 121 100.00 1  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Dark green trees burst from the ground, dotted by ripe yellow lemons!~
 X
 lemons orchard trees crop~
    The trees are laden with plump, yellow fruit, each one emanating a sweet,
@@ -708,6 +765,9 @@ I 8 3078 20.00 3 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 4 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 5 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 6 H  # HARVEST: basket of cucumbers
+U
+0
+Leafy plants explode from the soil!~
 X
 cucumbers field plants crop~
    The cucumber field spreads out before you, lush and green. Each plant is

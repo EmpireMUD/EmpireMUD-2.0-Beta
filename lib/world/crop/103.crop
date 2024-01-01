@@ -27,6 +27,9 @@ I 8 10303 20.00 3 H  # HARVEST: seething firefruit
 I 8 10303 20.00 4 H  # HARVEST: seething firefruit
 I 8 10303 20.00 5 H  # HARVEST: seething firefruit
 I 8 10303 20.00 6 H  # HARVEST: seething firefruit
+U
+0
+The ground smokes as new bushes rage forth and glowing fruit springs to life from every branch!~
 X
 firefruit fruit patch field crop~
    Firefruit is truly a wonder to behold: rows upon rows of vibrant red,
@@ -78,6 +81,9 @@ I 8 10339 20.00 3 H  # HARVEST: basket of dragonfruit
 I 8 10339 20.00 4 H  # HARVEST: basket of dragonfruit
 I 8 10339 20.00 5 H  # HARVEST: basket of dragonfruit
 I 8 10339 20.00 6 H  # HARVEST: basket of dragonfruit
+U
+0
+Spiny cactus tendrils rise from the ground as scaly red fruits grow along them!~
 X
 dragonfruit fruit cacti cactus field crop~
    As you approach the field, you are immediately struck by the vibrant colors

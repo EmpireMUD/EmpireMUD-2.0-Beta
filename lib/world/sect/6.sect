@@ -237,6 +237,9 @@ M
 615 6.66 c
 M
 616 0.66 c
+U
+0
+The saplings explode upward into beautiful magic trees!~
 X
 starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    You find yourself in the middle of a forest of towering pink trees. Light
@@ -633,6 +636,9 @@ M
 616 0.33 c
 M
 602 100.00 d
+U
+0
+Sprouts of blue and violet begin to grow from the stumps!~
 X
 sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    All around you, the magical starwood stumps have begun sprouting new growth
@@ -747,6 +753,9 @@ M
 616 0.33 c
 M
 602 100.00 d
+U
+0
+Sprouts of blue and violet begin to appear on the starwood trees!~
 X
 sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet thicket~
    The fantastical trees around you have begun sprouting magical branches in
@@ -933,6 +942,9 @@ M
 615 6.66 c
 M
 616 0.66 c
+U
+0
+Sprouts of blue and violet begin to appear on the starwood trees!~
 X
 sprouting starwood forest woods copse enchanted trees around lights boughs blue pink violet~
    The enchanted trees around you have begun to sprout new branches in shades
@@ -1246,6 +1258,9 @@ M
 618 10.00 c
 M
 621 10.00 c
+U
+0
+The saplings spring up into the air as full-sized violet trees!~
 X
 weirdwood weald grove thicket woods weirdwoods trees forest around lights boughs blue pink violet~
    You find yourself in the middle of a forest of twisting, violet trees.
@@ -1804,6 +1819,9 @@ I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 602 100.00 d
+U
+0
+Pink and blue sprouts rise out of the stumps!~
 X
 weirdwood sprouting sprouts stumps grove enchanted forest trees around~
    The violet stumps of the weirdwood trees have started to sprout new pink and
@@ -1946,6 +1964,9 @@ M
 618 10.00 c
 M
 621 10.00 c
+U
+0
+Pink and blue sprouts spring out of the weirdwood trees!~
 X
 weirdwood stand trees sprouting weirdwoods woods forest around~
    The violet trees around you seem to twist and contort themselves as they
@@ -2089,6 +2110,9 @@ M
 618 10.00 c
 M
 621 10.00 c
+U
+0
+Pink and blue sprouts spring out of the weirdwood trees!~
 X
 weirdwood weirdwoods weald grove thicket forest trees around~
    All over, the violet weirdwood trees are covered in pink and blue sprouts.

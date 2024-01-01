@@ -17,6 +17,9 @@ I 8 11009 20.00 5 H  # HARVEST: bundle of zephyr cattails
 I 8 11009 20.00 6 H  # HARVEST: bundle of zephyr cattails
 M
 11007 100.00 d
+U
+0
+Tall stalks spring up near the water as the wind begins to pick up their fluffy seeds!~
 X
 cattails catails tails zephyr patch plants crop~
    The marshland is covered in wispy cattails, ordinary in every way except the
@@ -43,6 +46,9 @@ I 8 11011 20.00 3 H  # HARVEST: eggplant
 I 8 11011 20.00 4 H  # HARVEST: eggplant
 I 8 11011 20.00 5 H  # HARVEST: eggplant
 I 8 11011 20.00 6 H  # HARVEST: eggplant
+U
+0
+Fat purple fruits plop down from the rapidly-growing bushes!~
 X
 eggplants plants bed crop~
    Sprawling field of eggplants spreads out before you, the dark purple and

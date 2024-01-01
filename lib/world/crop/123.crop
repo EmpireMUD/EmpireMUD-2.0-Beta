@@ -19,6 +19,9 @@ I 6 12353 100.00 1  # FORAGE: white berries
 I 8 12351 100.00 1  # HARVEST: hoarfrost-covered seed
 I 8 12352 75.00 1 c  # HARVEST: frost stalk
 I 8 12352 25.00 2 c  # HARVEST: frost stalk
+U
+0
+The ground begins to freeze as an icy stalk shoots up into the sky!~
 X
 stalk stalks frost hoarfrost ice icy leaves patch crop~
    A tall, frosty stalk rises from a blue patch of leaves on the ground. Around
