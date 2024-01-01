@@ -29,6 +29,8 @@ Snake: Constrict (requires 9600, 9601, 9604)~
 if %self.cooldown(9103)%
   halt
 end
+* prevent normal hit
+return 0
 * Find a non-bound target
 set target %actor%
 set person %self.room.people%
@@ -77,7 +79,7 @@ remote scf_free_room %target.id%
 Snake: Venom~
 0 k 100
 ~
-if %actor.has_tech(!Poison)%
+if %actor.has_tech(!Poison)% || !%hit%
   halt
 end
 %dot% #9105 %actor% 100 15 poison 5
@@ -156,7 +158,7 @@ end
 Scorpion: Venom~
 0 k 100
 ~
-if %actor.has_tech(!Poison)%
+if %actor.has_tech(!Poison)% || !%hit%
   halt
 end
 %dot% #9131 %actor% 100 15 poison 5
