@@ -476,6 +476,9 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 S
 #8
 Mountain~
@@ -508,6 +511,9 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1202 100.00 125 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
+U
+0
+The area seems to settle as plants start to grow.~
 X
 mountains peaks cliffs crags rocks around~
    You are standing amongst towering mountains, their jagged peaks reaching
@@ -603,6 +609,9 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 S
 #13
 Seeded Field~
@@ -723,6 +732,9 @@ E
 16 0 100.00 0
 E
 19 0 100.00 27
+U
+0
+The crop grows with astounding speed!~
 S
 #17
 Trench~
@@ -3304,6 +3316,9 @@ E
 I 5 102 15.00 1 X  # DIG: flint stone
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 100 100.00 1 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 S
 #79
 Shady Irrigated Forest~
@@ -3557,6 +3572,9 @@ E
 I 5 101 15.00 1 X  # DIG: lump of clay
 I 5 103 8.00 1 X  # DIG: yellow lightning stone
 I 5 100 100.00 1 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 S
 #85
 Irrigation Canal~
