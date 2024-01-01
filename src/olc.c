@@ -5008,6 +5008,10 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 			olc_audit_msg(ch, vnum, "Extra desc: bad keywords");
 			problem = TRUE;
 		}
+		if (iter->keyword && strlen(iter->keyword) >= 254) {
+			olc_audit_msg(ch, vnum, "Extra desc: keywords too long for file");
+			problem = TRUE;
+		}
 		if (!iter->description || !*iter->description || !str_cmp(iter->description, "Nothing.\r\n")) {
 			olc_audit_msg(ch, vnum, "Extra desc '%s': bad description", NULLSAFE(iter->keyword));
 			problem = TRUE;
