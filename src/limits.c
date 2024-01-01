@@ -719,7 +719,7 @@ void real_update_player(char_data *ch) {
 		return;
 	}
 	else if (IS_BLOOD_STARVED(ch)) {
-		cancel_blood_upkeeps(ch);
+		cancel_blood_upkeeps(ch, TRUE);
 		starving_vampire_aggro(ch);
 	}
 

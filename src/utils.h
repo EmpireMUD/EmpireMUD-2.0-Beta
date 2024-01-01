@@ -2199,7 +2199,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch, bool preventable);
-void cancel_blood_upkeeps(char_data *ch);
+void cancel_blood_upkeeps(char_data *ch, bool send_msgs);
 void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);

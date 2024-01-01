@@ -78,8 +78,9 @@ bool cancel_biting(char_data *ch, bool preventable) {
 * death or when out of blood.
 *
 * @param char_data *ch The vampire paying upkeeps.
+* @param bool send_msgs If TRUE, sends the too low on blood message when removing anything.
 */
-void cancel_blood_upkeeps(char_data *ch) {
+void cancel_blood_upkeeps(char_data *ch, bool send_msgs) {
 	char buf[MAX_STRING_LENGTH];
 	struct affected_type *aff;
 	struct obj_apply *app;
@@ -92,7 +93,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 	}
 	
 	// we'll only send the preface message if they're not dead
-	messaged = (GET_POS(ch) < POS_SLEEPING);
+	messaged = (GET_POS(ch) < POS_SLEEPING) || !send_msgs;
 	
 	// affs: loop because removing multiple affects makes iterating over affects hard
 	do {

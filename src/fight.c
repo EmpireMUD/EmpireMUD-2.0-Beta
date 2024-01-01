@@ -1280,7 +1280,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// disable things
 	perform_morph(ch, NULL);
-	cancel_blood_upkeeps(ch);
+	cancel_blood_upkeeps(ch, FALSE);
 	perform_dismount(ch);
 	
 	// pull from combat
