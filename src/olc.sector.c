@@ -74,7 +74,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (GET_SECT_CLIMATE(sect) == NOBITS) {
+	if (GET_SECT_CLIMATE(sect) == NOBITS && !SECT_FLAGGED(sect, SECTF_INHERIT_BASE_CLIMATE)) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
 		problem = TRUE;
 	}
