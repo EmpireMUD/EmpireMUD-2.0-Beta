@@ -722,7 +722,9 @@ command does NOT end the trigger's execution. The value is returned after all
 the commands have been executed, or a wait or halt command is called.
 
 The help files for individual trigger types will explain what happens when the
-script returns 0, if anything.
+script returns 0, if anything. This result happens as soon as a 'wait' or
+'halt' statement occurs. Setting a return value AFTER a 'wait' will have no
+effect.
 
 See also: HALT, WAIT
 #d

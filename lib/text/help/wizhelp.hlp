@@ -958,6 +958,8 @@ Usage:  return
 
 RETURN returns you to your regular body if you are switched into a mob.
 
+For the script command, see RETURN STATEMENT.
+
 See also: SWITCH
 #d
 ROOMFLAGS "TOGGLE ROOMFLAGS" "ROOM FLAGS"
