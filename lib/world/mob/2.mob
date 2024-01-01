@@ -75,7 +75,6 @@ Farmer #n is working the fields.
 20 50 bdqvI 0 3
 1 0 0 1 -1
 D
-
 This citizen is dilligently working the crops. (workforce farming)
 ~
 S
@@ -471,7 +470,6 @@ A bathing citizen is lounging here.
 20 50 bdqvI 0 3
 1 0 0 15 -1
 D
-
 The citizen is relaxing, and not paying any attention to you.
 ~
 S
