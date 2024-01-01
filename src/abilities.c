@@ -7686,6 +7686,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 		data->stop = TRUE;	// prevent routines from firing
 		data->success = TRUE;	// counts as a successful ability use
 		data->no_msg = TRUE;	// don't show more messages
+		data->engage_anyway = TRUE;	// still start combat
 	}
 	
 	// check for FAILURE:
