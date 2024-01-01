@@ -1332,6 +1332,10 @@ void free_crop(crop_data *cp) {
 		free_icon_set(&GET_CROP_ICONS(cp));
 	}
 	
+	if (GET_CROP_CUSTOM_MSGS(cp) && (!proto || GET_CROP_CUSTOM_MSGS(cp) != GET_CROP_CUSTOM_MSGS(proto))) {
+		free_custom_messages(GET_CROP_CUSTOM_MSGS(cp));
+	}
+	
 	if (GET_CROP_EX_DESCS(cp) && (!proto || GET_CROP_EX_DESCS(cp) != GET_CROP_EX_DESCS(proto))) {
 		free_extra_descs(&GET_CROP_EX_DESCS(cp));
 	}
@@ -1447,6 +1451,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				break;
 			}
 			
+			case 'U': {	// custom messages
+				parse_custom_message(fl, &GET_CROP_CUSTOM_MSGS(crop), buf2);
+				break;
+			}
+			
 			case 'X': {	// extra desc
 				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
 				break;
@@ -1503,6 +1512,9 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// U: custom message
+	write_custom_messages_to_file(fl, 'U', GET_CROP_CUSTOM_MSGS(cp));
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
@@ -6368,6 +6380,10 @@ void free_sector(sector_data *st) {
 		free_icon_set(&GET_SECT_ICONS(st));
 	}
 	
+	if (GET_SECT_CUSTOM_MSGS(st) && (!proto || GET_SECT_CUSTOM_MSGS(st) != GET_SECT_CUSTOM_MSGS(proto))) {
+		free_custom_messages(GET_SECT_CUSTOM_MSGS(st));
+	}
+	
 	if (GET_SECT_EX_DESCS(st) && (!proto || GET_SECT_EX_DESCS(st) != GET_SECT_EX_DESCS(proto))) {
 		free_extra_descs(&GET_SECT_EX_DESCS(st));
 	}
@@ -6506,6 +6522,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				break;
 			}
 			
+			case 'U': {	// custom messages
+				parse_custom_message(fl, &GET_SECT_CUSTOM_MSGS(sect), buf2);
+				break;
+			}
+			
 			case 'X': {	// extra desc
 				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
 				break;
@@ -6605,6 +6626,9 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// U: custom message
+	write_custom_messages_to_file(fl, 'U', GET_SECT_CUSTOM_MSGS(st));
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));

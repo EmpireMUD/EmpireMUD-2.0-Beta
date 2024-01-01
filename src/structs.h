@@ -1038,6 +1038,10 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
 
 
+// CROP_CUSTOM_x: custom messages
+#define CROP_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE DEFINES //////////////////////////////////////////////////////////
 
@@ -2672,6 +2676,10 @@ typedef enum {
 #define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
 #define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
 // note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
+
+
+// SECT_CUSTOM_x: custom messages
+#define SECT_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5135,6 +5143,7 @@ struct crop_data {
 	int y_min;	// y >= this
 	int y_max;	// y <= this
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct extra_descr_data *ex_description;	// extra descriptions
@@ -6142,6 +6151,7 @@ struct sector_data {
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
 	int temperature_type;	// TEMPERATURE_ const modifies the sector
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items

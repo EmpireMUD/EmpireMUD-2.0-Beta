@@ -316,12 +316,16 @@ bool has_custom_message(struct custom_message *list, int type);
 bool has_custom_message_pos(struct custom_message *list, int type, int pos);
 
 // custom message helpers
+#define crop_get_custom_message(crop, type)  get_custom_message(GET_CROP_CUSTOM_MSGS(crop), type)
+#define crop_has_custom_message(crop, type)  has_custom_message(GET_CROP_CUSTOM_MSGS(crop), type)
 #define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define mob_has_custom_message(mob, type)  has_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define obj_get_custom_message(obj, type)  get_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define sect_get_custom_message(sect, type)  get_custom_message(GET_SECT_CUSTOM_MSGS(sect), type)
+#define sect_has_custom_message(sect, type)  has_custom_message(GET_SECT_CUSTOM_MSGS(sect), type)
 #define veh_get_custom_message(veh, type)  get_custom_message(VEH_CUSTOM_MSGS(veh), type)
 #define veh_has_custom_message(veh, type)  has_custom_message(VEH_CUSTOM_MSGS(veh), type)
 

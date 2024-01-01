@@ -432,7 +432,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
-	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
+	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS, find_custom = NOBITS, found_custom;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, vmin = NOTHING, vmax = NOTHING;
@@ -443,6 +443,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	struct icon_data *icon;
 	size_t size;
 	bool match;
+	struct custom_message *cust;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP SECTEDIT FULLSEARCH for syntax.\r\n");
@@ -463,6 +464,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("buildflags", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("buildflagged", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_FLAGS("custom", find_custom, sect_custom_types)
 		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, sector_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, sector_flags)
@@ -508,6 +510,15 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		if (only_roadside != '\0' && GET_SECT_ROADSIDE_ICON(sect) != only_roadside) {
 			continue;
 		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(GET_SECT_CUSTOM_MSGS(sect), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
 		if (find_evos) {	// look up its evolutions
 			found_evos = NOBITS;
 			LL_FOREACH(GET_SECT_EVOS(sect), evo) {
@@ -531,7 +542,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		if (*extra_search && !find_exdesc(extra_search, GET_SECT_EX_DESCS(sect), NULL)) {
 			continue;
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect)) && !search_custom_messages(find_keywords, GET_SECT_CUSTOM_MSGS(sect))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
@@ -715,6 +726,7 @@ void save_olc_sector(descriptor_data *desc) {
 	if (GET_SECT_NOTES(proto)) {
 		free(GET_SECT_NOTES(proto));
 	}
+	free_custom_messages(GET_SECT_CUSTOM_MSGS(proto));
 	free_extra_descs(&GET_SECT_EX_DESCS(proto));
 	while ((spawn = GET_SECT_SPAWNS(proto))) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
@@ -782,6 +794,9 @@ sector_data *setup_olc_sector(sector_data *input) {
 		GET_SECT_COMMANDS(new) = GET_SECT_COMMANDS(input) ? str_dup(GET_SECT_COMMANDS(input)) : NULL;
 		GET_SECT_NOTES(new) = GET_SECT_NOTES(input) ? str_dup(GET_SECT_NOTES(input)) : NULL;
 		
+		// copy customs
+		GET_SECT_CUSTOM_MSGS(new) = copy_custom_messages(GET_SECT_CUSTOM_MSGS(input));
+		
 		// copy extra descs
 		GET_SECT_EX_DESCS(new) = copy_extra_descs(GET_SECT_EX_DESCS(input));
 		
@@ -835,6 +850,7 @@ int wordcount_sector(sector_data *sect) {
 	count += wordcount_string(GET_SECT_NAME(sect));
 	count += wordcount_string(GET_SECT_COMMANDS(sect));
 	count += wordcount_string(GET_SECT_TITLE(sect));
+	count += wordcount_custom_messages(GET_SECT_CUSTOM_MSGS(sect));
 	count += wordcount_extra_descriptions(GET_SECT_EX_DESCS(sect));
 	
 	return count;
@@ -854,6 +870,7 @@ void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
+	struct custom_message *ocm;
 	int count;
 	
 	if (!st) {
@@ -888,6 +905,13 @@ void olc_show_sector(char_data *ch) {
 	if (st->evolution) {
 		get_evolution_display(st->evolution, buf1);
 		strcat(buf, buf1);
+	}
+
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	count = 0;
+	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
 	// exdesc
@@ -971,6 +995,12 @@ OLC_MODULE(sectedit_commands) {
 	else {
 		olc_process_string(ch, argument, "commands", &GET_SECT_COMMANDS(st));
 	}
+}
+
+
+OLC_MODULE(sectedit_custom) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	olc_process_custom_messages(ch, argument, &GET_SECT_CUSTOM_MSGS(st), sect_custom_types, NULL);
 }
 
 

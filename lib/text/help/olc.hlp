@@ -4379,6 +4379,25 @@ Climates:
 
 See also: OLC CROPS, OLC SECTORS, SECTEDIT CHECK TEMPERATURE
 #d
+"CROPEDIT CUSTOM" "CROPEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
+        .custom remove <number | all>
+        .custom sort
+
+You can set custom messages on crops for various actions.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
+   If the sector also has a magic-growth message, only the crop's will show.
+
+See also: OLC CROPS
+#d
 "CROPEDIT FLAGS" "CROP FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -8857,6 +8876,25 @@ color codes in the commands list.
 
 Crop tiles will auto-generate their command lists if no sector commands are
 set. For buildings, the commands list from the building data is used instead.
+
+See also: OLC SECTORS
+#d
+"SECTEDIT CUSTOM" "SECTEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
+        .custom remove <number | all>
+        .custom sort
+
+You can set custom messages on sectors for various actions.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
+   This will not be shown if there is a crop here that has one.
 
 See also: OLC SECTORS
 #d

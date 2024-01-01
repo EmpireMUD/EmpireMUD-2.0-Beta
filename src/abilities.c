@@ -2757,7 +2757,7 @@ DO_ABIL(abil_action_magic_growth) {
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
-	if ((evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
+	if (room_targ && (evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
 		preserve = (BASE_SECT(room_targ) != SECT(room_targ)) ? BASE_SECT(room_targ) : NULL;
 		snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
 		
@@ -2769,6 +2769,16 @@ DO_ABIL(abil_action_magic_growth) {
 		
 		remove_depletion(room_targ, DPLTN_PICK);
 		remove_depletion(room_targ, DPLTN_FORAGE);
+		
+		// check magic growth messages, too:
+		if (ROOM_PEOPLE(room_targ)) {
+			if (ROOM_CROP(room_targ) && crop_has_custom_message(ROOM_CROP(room_targ), CROP_CUSTOM_MAGIC_GROWTH)) {
+				act(crop_get_custom_message(ROOM_CROP(room_targ), CROP_CUSTOM_MAGIC_GROWTH), FALSE, ROOM_PEOPLE(room_targ), NULL, NULL, TO_CHAR | TO_ROOM);
+			}
+			else if (sect_has_custom_message(SECT(room_targ), SECT_CUSTOM_MAGIC_GROWTH)) {
+				act(sect_get_custom_message(SECT(room_targ), SECT_CUSTOM_MAGIC_GROWTH), FALSE, ROOM_PEOPLE(room_targ), NULL, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
 	}
 	
 	// always a success (no expected outcome)

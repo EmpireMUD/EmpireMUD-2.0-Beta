@@ -237,6 +237,7 @@ OLC_MODULE(cedit_volume);
 
 // crop modules
 OLC_MODULE(cropedit_climate);
+OLC_MODULE(cropedit_custom);
 OLC_MODULE(cropedit_extra_desc);
 OLC_MODULE(cropedit_flags);
 OLC_MODULE(cropedit_icons);
@@ -493,6 +494,7 @@ OLC_MODULE(sectedit_buildflags);
 OLC_MODULE(sectedit_checktemperature);
 OLC_MODULE(sectedit_climate);
 OLC_MODULE(sectedit_commands);
+OLC_MODULE(sectedit_custom);;
 OLC_MODULE(sectedit_evolution);
 OLC_MODULE(sectedit_extra_desc);
 OLC_MODULE(sectedit_flags);
@@ -800,6 +802,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// crop commands
 	{ "climate", cropedit_climate, OLC_CROP, OLC_CF_EDITOR },
+	{ "custom", cropedit_custom, OLC_CROP, OLC_CF_EDITOR },
 	{ "extra", cropedit_extra_desc, OLC_CROP, OLC_CF_EDITOR },
 	{ "flags", cropedit_flags, OLC_CROP, OLC_CF_EDITOR },
 	{ "icons", cropedit_icons, OLC_CROP, OLC_CF_EDITOR },
@@ -1066,6 +1069,7 @@ const struct olc_command_data olc_data[] = {
 	{ "checktemperature", sectedit_checktemperature, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "climate", sectedit_climate, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "commands", sectedit_commands, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "custom", sectedit_custom, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "evolution", sectedit_evolution, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "extra", sectedit_extra_desc, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "flags", sectedit_flags, OLC_SECTOR, OLC_CF_EDITOR },

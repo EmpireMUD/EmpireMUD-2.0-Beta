@@ -3864,6 +3864,13 @@ const char *crop_flags[] = {
 };
 
 
+// CROP_CUSTOM_x: custom messages
+const char *crop_custom_types[] = {
+	"magic-growth",	// 0
+	"\n"
+};
+
+
 // DPLTN_x
 const char *depletion_type[] = {
 	"dig",
@@ -4348,6 +4355,13 @@ const char *sector_flags[] = {
 	"SEPARATE-NOT-NEARS",
 	"INHERIT-BASE-CLIMATE",
 	"IRRIGATES-AREA",
+	"\n"
+};
+
+
+// SECT_CUSTOM_x: custom messages
+const char *sect_custom_types[] = {
+	"magic-growth",	// 0
 	"\n"
 };
 

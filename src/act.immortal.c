@@ -6925,6 +6925,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param crop_data *cp The crop to stat.
 */
 void do_stat_crop(char_data *ch, crop_data *cp) {
+	struct custom_message *ocm;
+	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
@@ -6941,6 +6943,13 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	}
 	
 	msg_to_char(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
+	
+	if (GET_CROP_CUSTOM_MSGS(cp)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+		}
+	}
 	
 	if (GET_CROP_EX_DESCS(cp)) {
 		struct extra_descr_data *desc;
@@ -7892,6 +7901,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 void do_stat_sector(char_data *ch, sector_data *st) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
+	struct custom_message *ocm;
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -7921,6 +7931,13 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 		msg_to_char(ch, "Evolution information:\r\n");
 		get_evolution_display(st->evolution, buf1);
 		send_to_char(buf1, ch);
+	}
+	
+	if (GET_SECT_CUSTOM_MSGS(st)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+		}
 	}
 	
 	if (GET_SECT_EX_DESCS(st)) {
