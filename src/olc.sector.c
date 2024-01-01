@@ -49,6 +49,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	int iter;
+	sector_data *sect_iter, *next_sect;
 	
 	// flags to audit for
 	const bitvector_t odd_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_START_LOCATION | SECTF_MAP_BUILDING | SECTF_INSIDE;
@@ -109,6 +110,15 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	if (!GET_SECT_EX_DESCS(sect)) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Sector has no extra descriptions");
 		problem = TRUE;
+	}
+	
+	// look for things that magic-grow to me:
+	HASH_ITER(hh, sector_table, sect_iter, next_sect) {
+		if (has_evolution_type_to(sect_iter, EVO_MAGIC_GROWTH, GET_SECT_VNUM(sect)) && !sect_has_custom_message(sect, SECT_CUSTOM_MAGIC_GROWTH)) {
+			olc_audit_msg(ch, GET_SECT_VNUM(sect), "No custom magic-growth message (MAGIC-GROWTH from sector %d %s)", GET_SECT_VNUM(sect_iter), GET_SECT_NAME(sect_iter));
+			problem = TRUE;
+			break;	// just show first one
+		}
 	}
 	
 	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
@@ -590,7 +600,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
-	struct evolution_data *evo;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -661,13 +670,11 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		for (evo = GET_SECT_EVOS(sect); evo; evo = evo->next) {
-			if (evo->becomes == vnum || (evo_val_types[evo->type] == EVO_VAL_SECTOR && evo->value == vnum)) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
-				// only report once per sect
-				break;
-			}
+		any = has_evolution_to(sect, vnum);
+		any |= has_evolution_value(sect, EVO_VAL_SECTOR, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	

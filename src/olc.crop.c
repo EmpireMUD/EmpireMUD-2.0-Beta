@@ -113,6 +113,10 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Crop has no extra descriptions");
 		problem = TRUE;
 	}
+	if (!crop_has_custom_message(cp, CROP_CUSTOM_MAGIC_GROWTH)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No custom magic-growth message");
+		problem = TRUE;
+	}
 	
 	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);

@@ -10120,6 +10120,29 @@ struct evolution_data *get_evolution_by_type(sector_data *st, int type) {
 
 /**
 * @param sector_data *st The sector to check.
+* @param any_vnum to_sect A sector to find an evolution to.
+* @return bool TRUE if the sector has at least one evolution to the other sector.
+*/
+bool has_evolution_to(sector_data *st, any_vnum to_sect) {
+	struct evolution_data *evo;
+	bool found = FALSE;
+	
+	if (!st) {
+		return found;
+	}
+	
+	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
+		if (evo->becomes == to_sect) {
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* @param sector_data *st The sector to check.
 * @param int type The EVO_ type to check.
 * @return bool TRUE if the sector has at least one evolution of this type.
 */
@@ -10133,6 +10156,54 @@ bool has_evolution_type(sector_data *st, int type) {
 	
 	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
 		if (evo->type == type) {
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* @param sector_data *st The sector to check.
+* @param int type The EVO_ type to check.
+* @param any_vnum to_sect Looks for an evo of 'type' that evolves to this vnum.
+* @return bool TRUE if the sector has at least one evolution of this type and vnum.
+*/
+bool has_evolution_type_to(sector_data *st, int type, any_vnum to_sect) {
+	struct evolution_data *evo;
+	bool found = FALSE;
+	
+	if (!st) {
+		return found;
+	}
+	
+	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
+		if (evo->type == type && evo->becomes == to_sect) {
+			found = TRUE;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
+* @param sector_data *st The sector to check.
+* @param int val_type What EVO_VAL_ type of value to look for (EVO_VAL_SECTOR).
+* @param any_vnum vnum A vnum of that type.
+* @return bool TRUE if the sector has at least one evolution whose value (not 'becomes' field) is that vnum.
+*/
+bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum) {
+	struct evolution_data *evo;
+	bool found = FALSE;
+	
+	if (!st) {
+		return found;
+	}
+	
+	for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
+		if (evo_val_types[evo->type] == val_type && evo->value == vnum) {
 			found = TRUE;
 		}
 	}

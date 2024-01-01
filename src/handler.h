@@ -439,7 +439,10 @@ room_data *parse_room_from_coords(char *string);
 // sector handlers
 bool check_evolution_percent(struct evolution_data *evo);
 struct evolution_data *get_evolution_by_type(sector_data *st, int type);
+bool has_evolution_to(sector_data *st, any_vnum to_sect);
 bool has_evolution_type(sector_data *st, int type);
+bool has_evolution_type_to(sector_data *st, int type, any_vnum to_sect);
+bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
