@@ -985,7 +985,7 @@ S
 #24
 Desert Copse~
 A Gnarled Desert Copse~
-'w' 11 k 6 ad p
+'w' 11 k 6 adl p
 C
 chop, dig, gather, pick~
 D0
@@ -1034,7 +1034,7 @@ S
 #25
 Desert Shrub~
 A Large Shrub in the Desert~
-'.' 11 k 5 ad p
+'.' 11 k 5 adl p
 C
 chop, dig, gather, pick~
 D0
@@ -1490,7 +1490,7 @@ S
 #37
 Small Copse~
 A Small Copse~
-'.' 13 jr 2 d p
+'.' 13 jr 2 dl p
 C
 chop, dig~
 D1
@@ -1588,7 +1588,7 @@ S
 #39
 Forest Edge~
 The Edge of the Forest~
-'w' 13 jr 2 d np
+'w' 13 jr 2 dl np
 C
 chop, dig~
 D1
@@ -2005,7 +2005,7 @@ S
 #47
 Riverside Copse~
 A Copse on the Riverbank~
-'w' 13 jrv 3 d p
+'w' 13 jrv 3 dl p
 C
 chop, dig, pick~
 D1

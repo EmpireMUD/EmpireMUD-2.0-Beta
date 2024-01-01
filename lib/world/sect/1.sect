@@ -378,7 +378,7 @@ S
 #137
 Small Copse~
 A Small Copse on the Newbie Island~
-'.' 13 jr 1 d p
+'.' 13 jr 1 dl p
 C
 chop, dig~
 D1
@@ -466,7 +466,7 @@ S
 #139
 Forest Edge~
 The Edge of the Forest on the Newbie Island~
-'w' 13 jr 1 d np
+'w' 13 jr 1 dl np
 C
 chop, dig~
 D1
@@ -722,7 +722,7 @@ S
 #147
 Riverside Copse~
 A Copse on the Riverbank on the Newbie Island~
-'w' 13 jrv 1 d p
+'w' 13 jrv 1 dl p
 C
 chop, dig, pick~
 D1
