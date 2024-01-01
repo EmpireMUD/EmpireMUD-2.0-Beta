@@ -649,19 +649,19 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
 	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
 	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
-
-	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
-	count = 0;
-	LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, crop_custom_types[ocm->type], ocm->msg);
-	}
 	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
 	if (GET_CROP_EX_DESCS(cp)) {
 		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
+	}
+
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
+	count = 0;
+	LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, crop_custom_types[ocm->type], ocm->msg);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));

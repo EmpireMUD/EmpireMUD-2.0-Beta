@@ -907,18 +907,18 @@ void olc_show_sector(char_data *ch) {
 		strcat(buf, buf1);
 	}
 
-	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
-	count = 0;
-	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
-	}
-
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
 	if (GET_SECT_EX_DESCS(st)) {
 		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
+	}
+
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	count = 0;
+	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));

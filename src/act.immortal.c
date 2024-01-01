@@ -6944,13 +6944,6 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	
 	msg_to_char(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 	
-	if (GET_CROP_CUSTOM_MSGS(cp)) {
-		msg_to_char(ch, "Custom messages:\r\n");
-		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
-		}
-	}
-	
 	if (GET_CROP_EX_DESCS(cp)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
@@ -6959,6 +6952,13 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_CROP_CUSTOM_MSGS(cp)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+		}
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
@@ -7933,13 +7933,6 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 		send_to_char(buf1, ch);
 	}
 	
-	if (GET_SECT_CUSTOM_MSGS(st)) {
-		msg_to_char(ch, "Custom messages:\r\n");
-		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
-		}
-	}
-	
 	if (GET_SECT_EX_DESCS(st)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
@@ -7948,6 +7941,13 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_SECT_CUSTOM_MSGS(st)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+		}
 	}
 
 	if (st->interactions) {
