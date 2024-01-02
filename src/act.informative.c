@@ -2195,11 +2195,16 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		}
 		
 		// determine length to show
-		num = color_code_length(out);
-		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
-		strcpy(buf1, out);
+		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			num = color_code_length(out);
+			sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
+			strcpy(buf1, out);
 		
-		size = snprintf(out, sizeof(out), buf, buf1);
+			size = snprintf(out, sizeof(out), buf, buf1);
+		}
+		else {
+			size = snprintf(out, sizeof(out), "%s", buf1);
+		}
 		return out;
 	}
 	
@@ -2337,7 +2342,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		
 		// columnar spacing
 		if (shortlist) {
-			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(count % 2) ? "\r\n" : " ");
+			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", (!(count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : " ");
 		}
 		
 		free(entry->string);
@@ -2374,7 +2379,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		
 		size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n%s\r\n%s", buf, whobuf);
 		
-		if (shortlist && (count % 2)) {
+		if (shortlist && (count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n");
 		}
 	}

@@ -1440,17 +1440,11 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'o': {
-					if (IAF(ACT_NON_OBJ_OBJ)) {
-						log("SYSERR: Using $o with a non-obj obj flag: %s", orig);
-					}
 					i = PERS(ch, (char_data*)to, TRUE);
 					real_ch = TRUE;
 					break;
 				}
 				case 'O': {
-					if (!IAF(ACT_OBJ_VICT)) {
-						log("SYSERR: Using $O without ACT_OBJ_VICT: %s", orig);
-					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
 					real_vict = TRUE;

@@ -1853,9 +1853,8 @@ ACMD(do_companions) {
 	
 	if (abil) {
 		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
 	}
-	
-	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
 }
 
 
