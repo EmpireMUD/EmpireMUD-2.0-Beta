@@ -1945,12 +1945,17 @@ ACMD(do_skills) {
 	
 	// mode based on args
 	if (!*arg) {
-		// no argument? list all
+		// no remaining argument? basic skill list:
+		
+		// level portion
 		if (min_level != -1 && max_level != -1) {
 			sprintf(lbuf, "level %d-%d", min_level, max_level);
 		}
 		else if (min_level != -1) {
-			sprintf(lbuf, "level %d+", min_level);
+			sprintf(lbuf, "level %d and higher", min_level);
+		}
+		else if (max_level != -1) {
+			sprintf(lbuf, "up to level %d", max_level);
 		}
 		else {
 			sprintf(lbuf, "(skill level %d)", GET_SKILL_LEVEL(ch));
@@ -2314,6 +2319,11 @@ ACMD(do_skills) {
 		*outbuf = '\0';
 		size = 0;
 		
+		// if no levels were requested, default to only showing up to the next cap
+		if (min_level == -1 && max_level == -1) {
+			max_level = NEXT_CAP_LEVEL(ch, SKILL_VNUM(skill));
+		}
+		
 		// header
 		size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_row_display(ch, skill));
 		
@@ -2323,7 +2333,7 @@ ACMD(do_skills) {
 		}
 		
 		// list
-		get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha || max_level != -1 || min_level != -1) ? -1 : 1, min_level, max_level);
+		get_skill_abilities_display(&skdat_list, ch, skill, NO_PREREQ, (sort_level || sort_alpha || min_level != -1) ? -1 : 1, min_level, max_level);
 		
 		// sort if needed?
 		if (sort_level) {
