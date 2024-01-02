@@ -3,7 +3,7 @@
 *  Usage: Script-related commands for mobs                                *
 *                                                                         *
 *  DG Scripts code came with the attributions in the next two blocks      *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -1018,7 +1018,7 @@ ACMD(do_mpurge) {
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(veh);
 	}
@@ -1569,15 +1569,26 @@ ACMD(do_mdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *vict;
-	int type;
+	int type, show_attack_message = NOTHING;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_ORDERED))
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
+	}
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			mob_log(ch, "mdamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
@@ -1623,14 +1634,14 @@ ACMD(do_mdamage) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage(vict, ch, get_approximate_level(ch), type, modifier);
+	script_damage(vict, ch, get_approximate_level(ch), type, modifier, show_attack_message);
 }
 
 
 ACMD(do_maoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
 	char_data *vict, *next_vict;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1638,9 +1649,20 @@ ACMD(do_maoe) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_ORDERED))
+	if (AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
+	}
 
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			mob_log(ch, "maoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
+	}
+	
 	two_arguments(argument, modarg, typearg);
 	
 	if (*modarg) {
@@ -1672,7 +1694,7 @@ ACMD(do_maoe) {
 			continue;	// out of combat, only hit players
 		}
 		
-		script_damage(vict, ch, level, type, modifier);
+		script_damage(vict, ch, level, type, modifier, show_attack_message);
 	}
 }
 
@@ -2565,7 +2587,7 @@ ACMD(do_mscale) {
 			scale_item_to_level(obj, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(obj, level);
+			fresh = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, fresh);
 			extract_obj(obj);
 		}

@@ -3,7 +3,7 @@ cat black familiar~
 a black cat~
 A black cat sits perfectly still, watching everything. (familiar)
 ~
-1 50 doG cfmG 2
+1 100 doG cfmG 2
 0 0 0 10 -1
 D
    This appears on first glance to be an ordinary black housecat, but upon
@@ -15,7 +15,7 @@ saber-toothed sabertoothed toothed cat familiar~
 a saber-toothed cat~
 A saber-toothed cat glares around hungrily. (familiar)
 ~
-50 100 doG cfmG 4
+50 0 doG cfmG 4
 0 0 0 10 -1
 D
    This is a large feline, about the size of a lion or tiger. It can be
@@ -29,7 +29,7 @@ sphinx familiar~
 a sphinx~
 A deadly sphinx paces back and forth. (familiar)
 ~
-75 100 dopG cfmG 4
+75 0 dopG cfmsG 4
 0 0 0 10 -1
 D
    The sphinx is a strange beast with the head of a human, and the body of a
@@ -91,8 +91,8 @@ tortoise giant familiar~
 a giant tortoise~
 A giant tortoise eyes you placidly. (familiar)
 ~
-100 0 dnopyG cfmG 3
-0 0 16 10 -1
+75 0 dnopyG cfmG 3
+0 0 16 9 -1
 D
    This man-sized, hard-shelled testudon makes up for what it lacks in ferocity
 with sheer implacable persistence. The glint of magic in its eye suggests that

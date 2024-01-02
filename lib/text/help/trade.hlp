@@ -19,7 +19,7 @@ which other skills you have at high levels. Use the 'role' command to choose
 which set of skills to use.
 
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
-  REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
+  REWORK, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
 "ADVANCED WOODWORKING"
 
@@ -137,16 +137,6 @@ This ability also allows you to:
 
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
-#
-BRONZE "BRONZE INGOT"
-
-Used for:  forge
-Stored in:  Foundry
-
-Bronze is a metal that was once so common that there is an entire Age named
-after it. Bronze is made by smelting copper and tin ingots together.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -576,18 +566,6 @@ You can hone the following item slots:
 
 See also: RECIPES
 #
-IRON "IRON INGOT" "IRON ORE"
-
-Used for:  forge, build, manufacture
-Stored in:  Foundry
-
-Iron ore is found by mining in the mountains. It is useful in building and
-forging equipment, as well as manufacturing ships.
-
-You can learn about getting iron via HELP IRON GUIDE.
-
-See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
-#
 "IMPERIAL ARMORS" "IMPERIAL ARMORSMITHING"
 
 Imperial Armors (Trade ability)
@@ -612,17 +590,6 @@ Shield:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
-#
-IMPERIUM "IMPERIUM ORE"
-
-Used for:  forge
-Stored in:  Foundry
-
-Imperium is a rare, strong metal with a bright white color. It is used to make
-powerful weapons and armor. Smelting imperium ingots requires mixing it with
-tin.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "IRON BLADES"
 
@@ -702,16 +669,6 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
-#
-"LETHEIAN ICON"
-
-usage: use <icon> <skill name>
-
-Letheian icons are consumable trinkets which grant an extra skill reset for a
-skill of your choice, allowing you to choose new abilities for that skill. They
-are crafted using the Master Craftsman ability.
-
-See also: MASTER CRAFTSMAN, SKILL RESET
 #
 "MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
@@ -812,17 +769,6 @@ eventide metals, respectively.
 These metals are generally used in crafts in the 200-300 level range.
 
 See also: RARE METALS, SMELT
-#
-NOCTURNIUM "NOCTURNIUM ORE"
-
-Used for:  forge, sew
-Stored in:  Foundry
-
-Nocturnium is a deep black metal, its surface swirling with mana. It is often
-plated onto powerful magical objects. Smelting stable nocturnium requires that
-you mix it with copper.
-
-See also: FORGE, METALS, MINE, SEW, SMELT
 #
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
@@ -964,35 +910,36 @@ you know that require the item.
 
 See also: LEARN
 #
-REFORGE REFASHION
+REWORK REFORGE REFASHION
 
-Refashion (Trade ability)
-Reforge (Trade ability)
+Rework (Trade ability)
 
-Usage:  reforge <item | person> name <new name>
-        reforge <item | person> <renew | superior>
+Usage:  rework <item | person> name <new name>
+        rework <item | person> <renew | superior>
 
-A great blacksmith (weapons) or tailor (armors, clothing, shields) can use this
-ability in three ways:
+A great craftsman can use this ability in three ways:
 
-Name: You can take a generic item and give it a name. The name must contain
-the main keyword of the original item (like 'sword', 'clothes', etc, depending
-on the item). Requires 1 blue iris per 3 gear rating on the item.
+Name: You can take a generic item and give it a name. The name must contain at
+least part of the original item's name; usually this is its primary keyword
+(like 'sword' or 'clothes') but may be longer, depending upon the item.
 
-Renew: This undoes any enchantments, disenchantments, name, superior quality, 
-and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear rating on the base (unmodified) item.
+Renew: This undoes any enchantments, name, superior quality, and all other
+effects that have been applied to an item, and restores the item to its base
+stats.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear rating on the
-item. If the item came from a hard, group, or boss mob, it will lose this
-quality when you make it superior.
+the correct mastery ability. If the item came from a hard, group, or boss mob,
+it will lose this quality when you make it superior.
 
-An item must be in your inventory to reforge it. However, if another player
-"shares" an item, you can reforge that item by targeting that player by name
-(e.g. "reforge Lyra superior").
+An item must be in your inventory to rework it. However, if another player
+"shares" an item, you can rework that item by targeting that player by name
+(e.g. "rework Lyra superior").
+
+Reworking an item always costs 1 magic gem per 3 gear rating on the item. You
+can only renew an item or make it superior if you have the ability to craft it
+in the first place (but can rename most gear).
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
@@ -1184,16 +1131,6 @@ You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
 See also: SKIN, LEATHER
-#
-TIN "TIN INGOT" "TIN ORE"
-
-Used for:  smelting bronze
-Stored in:  Foundry
-
-Tin is an uncommon white metal used since ancient times to create bronze. It
-can also be smelted with imperium ore to make imperium ingots.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "TINKER CRAFTS"
 

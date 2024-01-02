@@ -2,7 +2,7 @@
 *   File: protocol.c                                      EmpireMUD 2.0b5 *
 *  Usage: KaVir's protocol snippet                                        *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -2768,7 +2768,7 @@ static const char *GetMSSP_IP() {
 static const char *GetMSSP_Levels() {
 	adv_data *iter, *next_iter;
 	static char buf[256];
-	int max = CLASS_SKILL_CAP;	// to start
+	int max = MAX_SKILL_CAP;	// to start
 	
 	// find highest level adventure zone:
 	HASH_ITER(hh, adventure_table, iter, next_iter) {
@@ -3253,7 +3253,7 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 		MSDPSetNumber(ch->desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, GET_BONUS_HEALING(ch));
 		MSDPSetNumber(ch->desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 		MSDPSetNumber(ch->desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 		

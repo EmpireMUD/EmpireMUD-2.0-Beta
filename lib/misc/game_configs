@@ -136,6 +136,8 @@ scale_points_at_100 4.000000
 *
 * Mobs configs
 default_language_vnum 150
+default_magical_attack 28
+default_physical_attack 15
 max_npc_attribute 15
 mob_despawn_radius 3
 mob_pursuit_distance 25
@@ -187,6 +189,9 @@ num_daily_skill_points 15
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
+skills_at_max_level 2
+skills_at_specialty_level 2
+skills_per_char 6
 slash_message_log_days 7
 temperature_discomfort 20
 temperature_extreme 30
@@ -253,6 +258,7 @@ default_inside_sect 11
 default_interior 1
 default_land_sect 0
 generic_facing bdeklmno
+ignore_island_levels 0
 interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0

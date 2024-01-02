@@ -2,7 +2,7 @@
 *   File: act.other.c                                     EmpireMUD 2.0b5 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -48,169 +48,6 @@ char_data *find_minipet(char_data *ch);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* For the "adventure summon <player>" command.
-*
-* @param char_data *ch The player doing the summoning.
-* @param char *argument The typed argument.
-*/
-void adventure_summon(char_data *ch, char *argument) {
-	char arg[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
-	char_data *vict;
-	
-	one_argument(argument, arg);
-	
-	if (GET_POS(ch) < POS_STANDING) {
-		send_low_pos_msg(ch);
-	}
-	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
-		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Summon whom to the adventure?\r\n");
-	}
-	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (vict == ch) {
-		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
-	}
-	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
-		msg_to_char(ch, "You can only summon members of your own group.\r\n");
-	}
-	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
-		msg_to_char(ch, "Your target is already here.\r\n");
-	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(vict))) {
-		msg_to_char(ch, "You cannot summon someone who is already in an adventure.\r\n");
-	}
-	else if (!vict->desc) {
-		msg_to_char(ch, "You can't summon someone who is linkdead.\r\n");
-	}
-	else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
-		msg_to_char(ch, "You can't summon your own alts.\r\n");
-	}
-	else if (IS_DEAD(vict)) {
-		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
-	}
-	else if (!can_enter_instance(vict, inst)) {
-		msg_to_char(ch, "Your target can't enter this instance.\r\n");
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
-		msg_to_char(ch, "Your target can't be summoned here.\r\n");
-	}
-	else if (PLR_FLAGGED(vict, PLR_ADVENTURE_SUMMONED)) {
-		msg_to_char(ch, "You can't summon someone who is already adventure-summoned.\r\n");
-	}
-	else {
-		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
-		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(INST_ADVENTURE(inst)), get_room_name(IN_ROOM(ch), FALSE));
-		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
-		command_lag(ch, WAIT_OTHER);
-	}
-}
-
-
-/**
-* Sends a player back to where they came from, if they were adventure-summoned
-* and they left the adventure.
-*
-* @param char_data *ch The person to return back where they came from.
-*/
-void adventure_unsummon(char_data *ch) {
-	room_data *room, *map, *was_in;
-	struct follow_type *fol, *next_fol;
-	bool reloc = FALSE;
-	
-	// safety first
-	if (!ch || IS_NPC(ch) || !PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
-		return;
-	}
-	
-	REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
-	
-	was_in = IN_ROOM(ch);
-	room = real_room(GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
-	map = real_room(GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
-	
-	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
-	
-	/*
-	*/
-	
-	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
-		char_to_room(ch, room);
-	}
-	else {
-		// nowhere safe to send back to
-		char_to_room(ch, find_load_room(ch));
-		reloc = TRUE;
-	}
-	
-	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
-	GET_LAST_DIR(ch) = NO_DIR;
-	qt_visit_room(ch, IN_ROOM(ch));
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
-
-	look_at_room(ch);
-	if (reloc) {
-		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
-	}
-	else {
-		msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
-	}
-	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
-	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR, "summon");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "summon");
-	
-	msdp_update_room(ch);
-	
-	// followers?
-	LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
-		if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
-			act("$n vanishes in a wisp of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
-			char_to_room(fol->follower, IN_ROOM(ch));
-			GET_LAST_DIR(fol->follower) = NO_DIR;
-			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
-			look_at_room(fol->follower);
-			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
-			
-			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
-			entry_memory_mtrigger(fol->follower);
-			greet_mtrigger(fol->follower, NO_DIR, "summon");
-			greet_memory_mtrigger(fol->follower);
-			greet_vtrigger(fol->follower, NO_DIR, "summon");
-		}
-	}
-}
-
-
-/**
-* Ensures a character won't be returned home by adventure_unsummon()
-*
-* @param char_data *ch The person to cancel the return-summon data for.
-*/
-void cancel_adventure_summon(char_data *ch) {
-	if (!IS_NPC(ch)) {
-		REMOVE_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
-		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
-		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
-		GET_ADVENTURE_SUMMON_INSTANCE_ID(ch) = NOTHING;
-	}
-}
-
-
-/**
 * Dismisses all minipets controlled by the character, if any.
 *
 * @param char_data *ch The player whose pet(s) to purge.
@@ -221,7 +58,7 @@ bool dismiss_any_minipet(char_data *ch) {
 	char_data *mob;
 	
 	while ((mob = find_minipet(ch))) {	// ensures there aren't more than 1
-		if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+		if (!AFF_FLAGGED(mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 			act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
 		}
 		extract_char(mob);
@@ -333,8 +170,8 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	}
 	else {
 		if (cont) {
-			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR);
-			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM);
+			act("You douse $p with $P.", FALSE, ch, obj, cont, TO_CHAR | ACT_OBJ_VICT);
+			act("$n douses $p with $P.", FALSE, ch, obj, cont, TO_ROOM | ACT_OBJ_VICT);
 			
 			// use the water
 			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
@@ -421,53 +258,6 @@ char_data *find_minipet(char_data *ch) {
 	}
 	
 	return found;	// if any
-}
-
-
-/**
-* Skips past the word 'summon ' or 'summons ' (case-insensitive).
-*
-* @param char *input The string to strip of 'summon(s) ', if present.
-* @return char* A pointer to the position in the string after the word 'summon(s) '.
-*/
-char *format_summon_name(char *input) {
-	char *start = input;
-	
-	skip_spaces(&start);
-	if (!strn_cmp(start, "summon ", 7)) {
-		start += 7;
-	}
-	else if (!strn_cmp(start, "summons ", 7)) {
-		start += 8;
-	}
-	
-	return start;
-}
-
-
-/**
-* Gets the line display for one summonable thing.
-*
-* @param char_data *ch The player.
-* @param const char *name The ability or mob name to show.
-* @param int min_level The required level, if any.
-* @param ability_data *from_abil The ability that grants the summon, if any.
-* @return char* The text for the summon list.
-*/
-char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_data *from_abil) {
-	static char output[256];
-	size_t size;
-	
-	size = snprintf(output, sizeof(output), "%s", name);
-	
-	if (from_abil && ABIL_COST(from_abil) > 0) {
-		size += snprintf(output + size, sizeof(output) - size, " (%d %s)", ABIL_COST(from_abil), pool_types[ABIL_COST_TYPE(from_abil)]);
-	}
-	if (min_level > 0 && (from_abil ? get_player_level_for_ability(ch, ABIL_VNUM(from_abil)) : get_approximate_level(ch)) < min_level) {
-		size += snprintf(output + size, sizeof(output) - size, " \trrequires level %d\t0", min_level);
-	}
-	
-	return output;
 }
 
 
@@ -593,7 +383,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
-	if (AFF_FLAGGED(new, AFF_EARTHMELD)) {
+	if (AFF_FLAGGED(new, AFF_EARTHMELDED)) {
 		msg_to_char(new, "You are earthmelded.\r\n");
 	}
 	else {
@@ -655,7 +445,7 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 	}
 	
 	// validation
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC) && !HAS_WATERWALK(mob)) {
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC) && !HAS_WATERWALKING(mob)) {
 		msg_to_char(ch, "You can't herd it into the water.\r\n");
 	}
 	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
@@ -677,8 +467,8 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 		
 		if (perform_move(mob, dir, to_room, MOVE_HERD | (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 			if (into_veh) {
-				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEHICLE_OBJ);
-				act("$n skillfully herds $N into $v.", FALSE, ch, into_veh, mob, TO_ROOM | ACT_VEHICLE_OBJ);
+				act("You skillfully herd $N into $v.", FALSE, ch, into_veh, mob, TO_CHAR | ACT_VEH_OBJ);
+				act("$n skillfully herds $N into $v.", FALSE, ch, into_veh, mob, TO_ROOM | ACT_VEH_OBJ);
 			}
 			else if (out) {
 				act("You skillfully herd $N out.", FALSE, ch, NULL, mob, TO_CHAR);
@@ -693,104 +483,14 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, to_room, (out ? MOVE_EXIT : (into_veh ? (MOVE_ENTER_VEH | MOVE_NO_COST) : NOBITS)))) {
 				char_to_room(mob, IN_ROOM(ch));
 			}
-			gain_player_tech_exp(ch, PTECH_HERD, 5);
+			gain_player_tech_exp(ch, PTECH_HERD_COMMAND, 5);
+			run_ability_hooks_by_player_tech(ch, PTECH_HERD_COMMAND, mob, NULL, NULL, NULL);
 		}
 		else {
 			act("You try to herd $N, but $E refuses to move!", FALSE, ch, NULL, mob, TO_CHAR);
 			act("$n tries to herd $N away, but $E refuses to move!", FALSE, ch, NULL, mob, TO_ROOM);
 		}
 	}
-}
-
-
-/**
-* Attempts to summon 1 mob. This does some final checks if you pass the
-* 'checks' var, which only needs to happen once if you're summoning several of
-* something.
-*
-* @param char_data *ch The player summoning.
-* @param ability_data *abil Which ability they are summoning with.
-* @param any_vnum vnum The mob vnum to summon.
-* @param bool checks If TRUE, checks a bunch of things and sends error messages. This is only for the first call in a loop.
-* @return bool TRUE if anything was summoned; FALSE if we sent an error.
-*/
-bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
-	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
-	char_data *proto = mob_proto(vnum);
-	char_data *mob;
-	
-	if (!proto || !abil) {
-		msg_to_char(ch, "That summon is not implemented yet.\r\n");
-		return FALSE;
-	}
-	if (checks && level < GET_MIN_SCALE_LEVEL(proto)) {
-		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
-		return FALSE;
-	}
-	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT), FALSE)) {
-		return FALSE;
-	}
-	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to summon that in the solo role.\r\n");
-		return FALSE;
-	}
-	if (checks && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
-		return FALSE;
-	}
-	if (checks && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
-		return FALSE;
-	}
-	if (checks && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
-		return FALSE;
-	}
-	
-	// proceed:
-	if (checks) {
-		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
-		pre_ability_message(ch, NULL, abil);
-	}
-	
-	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
-	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		if (checks) {
-			ability_fail_message(ch, NULL, abil);
-			gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-		}
-		return FALSE;
-	}
-	
-	// load/update mob:
-	mob = read_mobile(vnum, TRUE);
-	
-	set_mob_flags(mob, MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
-	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
-	scale_mob_as_companion(mob, ch, level);
-	char_to_room(mob, IN_ROOM(ch));
-	add_follower(mob, ch, FALSE);
-	
-	// messaging to char
-	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
-	}
-	else {
-		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
-	}
-	
-	// messaging to room
-	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
-	}
-	else {
-		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
-	}
-	
-	load_mtrigger(mob);
-	
-	if (checks) {
-		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
-	}
-	
-	return TRUE;
 }
 
 
@@ -862,6 +562,7 @@ static void print_group(char_data *ch) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
 	int iter, amt, obj_ok = 0;
@@ -913,6 +614,7 @@ INTERACTION_FUNC(shear_interact) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
@@ -939,98 +641,21 @@ INTERACTION_FUNC(skin_interact) {
 	
 	// only show loot to the skinner
 	if (!obj_ok) {
-		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR);
-		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM);
+		act("You carefully skin $P.", FALSE, ch, NULL, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else if (interaction->quantity > 1) {
 		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
-		act(buf, FALSE, ch, obj, inter_item, TO_CHAR);
+		act(buf, FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
 		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
-		act(buf, FALSE, ch, obj, inter_item, TO_ROOM);
+		act(buf, FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else {
-		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR);
-		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM);
+		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	
 	return TRUE;
-}
-
-
-/**
-* Begins a summon for a player -- see do_summon.
-*
-* @param char_data *ch The summoner.
-* @param char *argument The typed-in arg.
-*/
-void summon_player(char_data *ch, char *argument) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	char_data *vict, *ch_iter;
-	bool found;
-	
-	one_argument(argument, arg);
-	
-	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
-		msg_to_char(ch, "You can't summon players here.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must complete the building first.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to summon players here.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Summon whom?\r\n");
-	}
-	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
-		send_config_msg(ch, "no_person");
-	}
-	else if (vict == ch) {
-		msg_to_char(ch, "You summon yourself! Look, you're already here.\r\n");
-	}
-	else if (!GROUP(ch) || GROUP(ch) != GROUP(vict)) {
-		msg_to_char(ch, "You can only summon members of your own group.\r\n");
-	}
-	else if (IN_ROOM(vict) == IN_ROOM(ch)) {
-		msg_to_char(ch, "Your target is already here.\r\n");
-	}
-	else if (IS_DEAD(vict)) {
-		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
-	}
-	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
-		msg_to_char(ch, "Your target can't be summoned here.\r\n");
-	}
-	else {
-		// mostly-valid by now... just a little bit more to check
-		// requires a 2nd group member present IF the target is from a different empire
-		if (GET_LOYALTY(vict) != GET_LOYALTY(ch) || !GET_LOYALTY(ch)) {
-			found = FALSE;
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
-				if (IS_DEAD(ch_iter) || !ch_iter->desc) {
-					continue;
-				}
-			
-				if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
-					found = TRUE;
-					break;
-				}
-			}
-		
-			if (!found) {
-				msg_to_char(ch, "You need a second group member present to help summon.\r\n");
-				return;
-			}
-		}
-		
-		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s%s -- use 'accept/reject summon'.", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
-		add_offer(vict, ch, OFFER_SUMMON, SUMMON_PLAYER);
-		command_lag(ch, WAIT_OTHER);
-	}
 }
 
 
@@ -2142,14 +1767,14 @@ ACMD(do_companions) {
 		else if (!cmod && !multi_isname(argument, GET_PC_NAME(proto))) {
 			continue;	// no custom keywords and doesn't match mob's keywords
 		}
-		if ((cd->from_abil && GET_MIN_SCALE_LEVEL(proto) < CLASS_SKILL_CAP) && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
+		if ((cd->from_abil && GET_MIN_SCALE_LEVEL(proto) < MAX_SKILL_CAP) && get_player_level_for_ability(ch, cd->from_abil) < GET_MIN_SCALE_LEVEL(proto)) {
 			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
 				found_low_level = GET_MIN_SCALE_LEVEL(proto);
 				low_in_skill = ABIL_ASSIGNED_SKILL(find_ability_by_vnum(cd->from_abil)) ? TRUE : FALSE;
 			}
 			continue;	// low skill
 		}
-		if ((!cd->from_abil || GET_MIN_SCALE_LEVEL(proto) > CLASS_SKILL_CAP) && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
+		if ((!cd->from_abil || GET_MIN_SCALE_LEVEL(proto) > MAX_SKILL_CAP) && get_approximate_level(ch) < GET_MIN_SCALE_LEVEL(proto)) {
 			if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
 				found_low_level = GET_MIN_SCALE_LEVEL(proto);
 			}
@@ -2199,12 +1824,12 @@ ACMD(do_companions) {
 	}
 	
 	// pre-message, if any
-	pre_ability_message(ch, NULL, abil);
+	send_pre_ability_messages(ch, NULL, NULL, abil, NULL);
 	
 	// proceed:
 	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, abil ? ABIL_WAIT_TYPE(abil) : WAIT_OTHER);
 	if (abil && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		ability_fail_message(ch, NULL, abil);
+		send_ability_fail_messages(ch, NULL, NULL, abil, NULL);
 		return;
 	}
 	
@@ -2229,6 +1854,8 @@ ACMD(do_companions) {
 	if (abil) {
 		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
 	}
+	
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VNUM(abil), 0, mob, NULL, NULL, NULL, NOBITS);
 }
 
 
@@ -2788,7 +2415,7 @@ ACMD(do_herd) {
 
 	if (IS_NPC(ch))
 		return;
-	else if (!has_player_tech(ch, PTECH_HERD)) {
+	else if (!has_player_tech(ch, PTECH_HERD_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to herd animals.\r\n");
 	}
 	else if (!*mob_arg || !*dir_arg) {
@@ -2824,6 +2451,9 @@ ACMD(do_herd) {
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
+	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL)) {
+		// triggered
 	}
 	
 	// herd out of vehicle:
@@ -3055,7 +2685,7 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!has_player_tech(ch, PTECH_MILK)) {
+	if (!has_player_tech(ch, PTECH_MILK_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to milk animals.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE))
@@ -3081,6 +2711,9 @@ ACMD(do_milk) {
 		msg_to_char(ch, "It's already full of something else.\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) >= GET_DRINK_CONTAINER_CAPACITY(cont))
 		msg_to_char(ch, "It's already full.\r\n");
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont)) {
+		// triggered
+	}
 	else {
 		act("You milk $N into $p.", FALSE, ch, cont, mob, TO_CHAR);
 		act("$n milks $N into $p.", FALSE, ch, cont, mob, TO_ROOM);
@@ -3090,7 +2723,8 @@ ACMD(do_milk) {
 		set_obj_val(cont, VAL_DRINK_CONTAINER_TYPE, LIQ_MILK);
 		GET_OBJ_TIMER(cont) = 72;	// mud hours
 		schedule_obj_timer_update(cont, FALSE);
-		gain_player_tech_exp(ch, PTECH_MILK, 33);
+		gain_player_tech_exp(ch, PTECH_MILK_COMMAND, 33);
+		run_ability_hooks_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont, NULL, NULL);
 		request_obj_save_in_world(cont);
 	}
 }
@@ -3702,7 +3336,7 @@ ACMD(do_shear) {
 	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_player_tech(ch, PTECH_SHEAR)) {
+	else if (!has_player_tech(ch, PTECH_SHEAR_COMMAND)) {
 		msg_to_char(ch, "You don't have the correct ability to shear animals.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
@@ -3732,6 +3366,9 @@ ACMD(do_shear) {
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL)) {
+		// triggered
+	}
 	else {
 		check_scaling(mob, ch);	// ensure mob is scaled -- this matters for global interactions
 		
@@ -3739,8 +3376,9 @@ ACMD(do_shear) {
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
-			gain_player_tech_exp(ch, PTECH_SHEAR, 33);
+			gain_player_tech_exp(ch, PTECH_SHEAR_COMMAND, 33);
 			gain_player_tech_exp(ch, PTECH_SHEAR_UPGRADE, 33);
+			run_ability_hooks_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL, NULL, NULL);
 		}
 		else {
 			act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3794,238 +3432,11 @@ ACMD(do_skin) {
 		}
 		else {
 			gain_player_tech_exp(ch, PTECH_SKINNING_UPGRADE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_SKINNING_UPGRADE, NULL, obj, NULL, NULL);
 		}
 		
 		set_obj_val(obj, VAL_CORPSE_FLAGS, GET_CORPSE_FLAGS(obj) | CORPSE_SKINNED);
 		command_lag(ch, WAIT_OTHER);
-	}
-}
-
-
-ACMD(do_summon) {
-	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
-	struct player_ability_data *plab, *next_plab;
-	int count, num = 0, fol_count, to_summon, found_low_level = 0;
-	struct ability_data_list *adl;
-	char_data *mob, *proto = NULL;
-	any_vnum summon_vnum;
-	ability_data *abil;
-	size_t size, lsize;
-	bool found, full, low_in_skill = FALSE;
-	
-	// maximum npcs present when summoning
-	int max_npcs = config_get_int("summon_npc_limit");
-	int max_followers = config_get_int("npc_follower_limit");
-	
-	arg2 = one_argument(argument, arg);	// split out first word for certain special summons
-	skip_spaces(&argument);	// most of the command uses this full argument
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs can't use this command.\r\n");
-		return;
-	}
-	
-	#define VALID_SUMMON_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM))
-	
-	// sepecial summons first
-	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "materials")) {
-		summon_materials(ch, arg2);
-		return;
-	}
-	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "player")) {
-		summon_player(ch, arg2);
-		return;
-	}
-	
-	// no-arg: show summonable list
-	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "You can summon the following things:\r\n");
-		
-		found = full = FALSE;
-		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-			abil = plab->ptr;
-			if (!VALID_SUMMON_ABIL(ch, plab)) {
-				continue;
-			}
-			
-			// show it
-			if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_ANY)) {
-				// summon-any lists the mobs themselves
-				LL_FOREACH(ABIL_DATA(abil), adl) {
-					if (adl->type == ADL_SUMMON_MOB && (proto = mob_proto(adl->vnum))) {
-						line = one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil);
-						lsize = strlen(line);
-						if (size + lsize + 3 < sizeof(buf)) {
-							size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
-						}
-						else {
-							full = TRUE;
-							break;
-						}
-					}
-				}
-			}
-			else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
-				// summon-random just shows the ability name, minus the word 'summon'
-				line = one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil);
-				lsize = strlen(line);
-				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
-				}
-				else {
-					full = TRUE;
-				}
-			}
-			else {
-				continue;
-			}
-			
-			// if we got here, we did find one
-			found = TRUE;
-			
-			if (full) {
-				break;
-			}
-		}
-		
-		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
-		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
-		return;
-	}
-	
-	// things that alway block, unrelated to the mob/ability
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_START_LOCATION) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
-		msg_to_char(ch, "You can't summon anyone here.\r\n");
-		return;
-	}
-	
-	// count mobs and check limit
-	count = 0;
-	fol_count = 0;
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
-		if (IS_NPC(mob)) {
-			++count;
-			
-			if (!GET_COMPANION(mob) && GET_LEADER(mob) == ch) {
-				++fol_count;
-			}
-		}
-	}
-	if (count >= max_npcs) {
-		msg_to_char(ch, "There are too many NPCs here to summon more.\r\n");
-		return;
-	}
-	if (fol_count >= max_followers) {
-		msg_to_char(ch, "You have too many npcs folowers already.\r\n");
-		return;
-	}
-	
-	// lookup
-	found = FALSE;
-	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
-		abil = plab->ptr;
-		if (!VALID_SUMMON_ABIL(ch, plab)) {
-			continue;
-		}
-		
-		// show it
-		if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_ANY)) {
-			// summon by mob name
-			LL_FOREACH(ABIL_DATA(abil), adl) {
-				if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
-					continue;	// no match
-				}
-				if (!multi_isname(argument, GET_PC_NAME(proto))) {
-					continue;	// no string match
-				}
-				if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
-					if (found_low_level == 0 || found_low_level < GET_MIN_SCALE_LEVEL(proto)) {
-						found_low_level = GET_MIN_SCALE_LEVEL(proto);
-						low_in_skill = ABIL_ASSIGNED_SKILL(abil) ? TRUE : FALSE;
-					}
-					continue;
-				}
-				
-				// else: summon it!
-				to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
-				to_summon = MIN((max_followers - fol_count), MAX(1, to_summon));	// safety limits
-				
-				found = TRUE;
-				for (num = 0; num < to_summon; ++num) {
-					if (!perform_summon(ch, abil, adl->vnum, (num == 0))) {
-						return;	// received an error
-					}
-				}
-				break;
-			}
-			
-			if (num == 0 && found_low_level > 0) {
-				msg_to_char(ch, "You must be level %d%s to summon that.\r\n", found_low_level, (low_in_skill ? " in the skill" : ""));
-				return;
-			}
-		}
-		else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
-			// summon-random by ability name (minus the word summon)
-			if (!multi_isname(argument, format_summon_name(ABIL_NAME(abil)))) {
-				continue;	// no name match
-			}
-			
-			// else: summon it! but, have to go through the list at random
-			found = TRUE;
-			to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
-			to_summon = MIN((max_followers - fol_count), MAX(1, to_summon));	// safety limits
-			
-			// main summon loop: counting number to summon
-			for (num = 0; num < to_summon; ++num) {
-				// inner loop: determining who to summon at random
-				summon_vnum = NOTHING;
-				count = 0;
-				LL_FOREACH(ABIL_DATA(abil), adl) {
-					if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
-						continue;	// not a mob
-					}
-					if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
-						continue;	// pre-checking level failed
-					}
-					
-					// presumably this is ok
-					if (!number(0, count++)) {
-						summon_vnum = adl->vnum;
-					}
-				}
-				
-				if (summon_vnum != NOTHING) {
-					// do it!
-					if (!perform_summon(ch, abil, summon_vnum, (num == 0))) {
-						return;	// received an error
-					}
-				}
-				else if (num == 0) {
-					// failed to find a summon on the first round
-					msg_to_char(ch, "You can't seem to summon anything from that ability.\r\n");
-					return;
-				}
-			}
-		}
-		else {
-			continue;
-		}
-		
-		if (found) {
-			break;	// only 1 successful match
-		}
-	}
-	
-	if (!found) {
-		msg_to_char(ch, "You don't know how to summon %s '%s'.\r\n", AN(argument), argument);
-		return;
 	}
 }
 

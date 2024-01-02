@@ -406,7 +406,7 @@ switch %random.3%
       %echo% The comet crashes to the ground, hitting nobody.
       halt
     end
-    if %actor.trigger_counterspell%
+    if %actor.trigger_counterspell(%self%)%
       set counterspell 1
     end
     if %heroic_mode%
@@ -504,7 +504,7 @@ switch %random.3%
     * Blind and stun tank
     * Normal/Hard: 5 seconds
     * Group/Boss: 20 seconds, and adds 50% DoT
-    * If too easy, consider adding HIDE and looking for a new target...
+    * If too easy, consider adding HIDDEN and looking for a new target...
     %send% %actor% &&r~%self% makes an arcane gesture at you, and the snow beneath your feet swallows you!
     %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and the snow beneath ^%actor% feet swallows *%actor%!
     if %heroic_mode%
@@ -946,7 +946,7 @@ if %actor.currency(10550)% < %cheapest_item_cost%
   halt
 end
 nop %self.remove_mob_flag(SILENT)%
-if %self.aff_flagged(HIDE)%
+if %self.aff_flagged(HIDDEN)%
   visible
   wait 1
   %echo% ~%self% shuffles out of the portal and sets up a shop on the ice.

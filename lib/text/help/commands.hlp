@@ -65,12 +65,21 @@ See also: TOGGLE
 #
 AFFECTS
 
-Usage:  affects
+Usage:  affects [person]
 
 This command shows a list of spells and abilities that are currently affecting
-you, along with their durations and a short summary of what they modify.
+you, along with their durations and a short summary of what they modify. Or,
+if you use it on someone else, you will see a simpler view of their affects.
 
-Affects are automatically shown at the bottom of the score.
+Your affects are also automatically shown at the bottom of the score.
+
+Buffs are shown in cyan for users with color displays. Debuffs are shown in red
+and, for screen-reader users, will also say (debuff) after the name. DoTs are
+similarly marked.
+
+When using this on another person, affects caused by you are marked with a
+(you) tag so that you can tell which are yours and which came from someone
+else.
 
 See also: SCORE
 #
@@ -399,6 +408,17 @@ To light torches or other items, use 'light'.
 
 See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
 #
+BUTCHER
+
+Usage:  butcher <corpse>
+Tool:  knife
+
+With a little practice, you can butcher a corpse into smaller cuts of meat.
+This command succeeds about 60% of the time unskilled, and 100% of the time
+with the Huntsman ability. Not all corpses can be butchered.
+
+See also: HUNTSMAN, SKIN COMMAND
+#
 BUY LIST SHOP SHOPS
 
 Usage:  list [keywords]
@@ -435,6 +455,19 @@ This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
 
 See also: SLASH-CHANNELS, STATUS MESSAGES
+#
+CHANT CHANTS
+
+Usage:  chant [name] [target]
+        chant "<name>" [target]
+
+There are several ancient chants whose power you can still wield today. Type
+chant by itself to see if you know any chants. If a chant has multiple words
+in the name, you can use "quotes" around the name.
+
+Type "stop" to cancel a chant. Some chants do not end on their own.
+
+See also: help for individual chants, like HELP CHANT OF NATURE
 #
 CHART CHARTS
 
@@ -562,6 +595,17 @@ Usage:  confirm
 When a reboot has been set to a specific time, players are allowed to speed it
 up. If everyone types 'confirm,' it will reboot early. This should only be
 done when you're ready for the reboot, because you can't take it back.
+#
+CONJURE CONJURATION
+
+Usage:  conjure [object]
+        conjure [liquid] [container]
+
+Some abilities allow you to conjure items, or even fill drink containers with
+liquids. Typing this command without any arguments will tell you what you know
+how to conjure.
+
+Try "helpsearch conjure" to look for abilities like this.
 #
 CONSIDER
 
@@ -820,7 +864,7 @@ Examples:
   
 Some vampires can also taste the blood of others.
 
-See also: FILL, HUNGER, POUR, TASTE BLOOD
+See also: FILL, HUNGER, POUR
 #
 EMOTE :
 
@@ -1029,6 +1073,24 @@ Example:
   > fill canteen fountain
 
 See also: POUR, DRINK
+#
+FIRE CATAPULT CANNONS
+
+Usage:  fire <vehicle> <direction | target vehicle> 
+
+Certain vehicles are siege weapons and can fire at buildings or at other
+vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
+rooms, or at vehicles in the same room.
+
+If you're aboard a ship with cannons, you can fire from onboard the ship, but
+it still fires only at vehicles in the room the ship is in, or at adjacent
+rooms from there.
+
+Example:  
+  > fire catapult north
+  > fire brigantine 2.brigantine
+
+See also: COOKING FIRE, DOUSE, HARNESS
 #
 FLEE
 
@@ -1790,8 +1852,8 @@ target empire and ally portals by portal number, but the -all list can't be
 targeted this way.
 
 Portals can only connect two locations on the same land mass (continent or
-island) unless your empire has a Portal Master. You can't open a portal at all
-if there isn't at least a Portal Mage.
+island) unless your empire has the Astral Cartography progress goal. You can't
+open a portal at all unless your empire has the Portalmancy progression.
 
 You can't enter a portal of any kind if it's on a tile you don't have
 permission to use, such as one owned by an enemy empire. Infiltrate can get
@@ -1799,7 +1861,7 @@ around this (you still use the 'enter' command).
 
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS, COLLAPSE, INFILTRATE
+See also: PORTAL SICKNESS, COLLAPSE, INFILTRATE
 #
 "PORTAL SICKNESS" "PORTALING SICKNESS" "PORTALLING SICKNESS"
 
@@ -1812,13 +1874,12 @@ before it wears off, you'll get five minutes of portal sickness instead. After
 that, you can portal again as soon as your portal sickness is below one minute.
 You can see your current portal sickness by typing 'cooldowns'.
 
-Portal mages only get four minutes of portal sickness instead of five. City-to-
-city portals cause just two minutes instead of five.
+City-to-city portals cause just two minutes instead of five.
 
 Only entering portals causes portal sickness. You can still open portals while
 you have portal sickness.
 
-See also: COOLDOWNS, ENTER, PORTALS, PORTAL MAGE
+See also: COOLDOWNS, ENTER, PORTALS
 #
 POUR
 
@@ -1887,7 +1948,8 @@ be different from your regular prompt. Using "fprompt default" will cause you
 to see your normal prompt in combat.
 
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
-will restore your default prompt.
+will restore your default prompt. You can also use "smessages" to turn off
+prompts temporarily.
 
 The base prompt is: &&0|%i/%u [&&y%C&&0]> 
 
@@ -1913,7 +1975,7 @@ For immortals:
   %x  immortal conditions abbreviated
   %X  immortal conditions as words
 
-See also: PROMPT SUGGESTIONS
+See also: PROMPT SUGGESTIONS, STATUS MESSAGES
 #
 "PROMPT SUGGESTIONS" "SUGGESTED PROMPTS" "SAMPLE PROMPTS" "PROMPT SAMPLES"
 
@@ -2079,6 +2141,28 @@ your group members, try the 'group' command by itself or the 'summary' command.
 If you want to see your own stats from combat, use 'meters'.
 
 See also: GROUP, METERS, SUMMARY
+#
+RESPAWN
+
+Usage:  respawn
+
+When your character has died, you can still observe for a short time. When you
+are ready to respawn, use this command.
+
+See also: BRIEF RESPITE, DEATH, TOMB
+#
+RITUAL RITE
+
+Usage:  ritual [type] [target]
+        ritual "<type>" [target]
+
+Sorcerers can learn powerful rituals. Type the ritual command by itself to see
+which ones you know. If a ritual has multiple words in the name, you can put
+quotes around it when using the ritual, or abbreviate it to one word.
+
+Type "stop" to cancel a ritual.
+
+See also: help for individual rituals, like HELP RITUAL OF BURDENS
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -2340,6 +2424,23 @@ some people for features like the WHO list.
 
 See also: TOGGLE
 #
+SEARCH "SEARCH COMMAND"
+
+Usage:  search
+Cooldown:  10 seconds
+
+When you know where to look, it's easier to find hidden thieves and assassins.
+This ability reveals people who use the hide command, although it doesn't
+always find them on the first try, and it won't find anyone who has Cling to
+Shadow.
+
+You can also find out if someone is earthmelded beneath you.
+
+To use this command effectively, you need an ability that grants it such as
+the "Search" ability.
+
+See also: HIDE, SEARCH ABILITY, SENSE LIFE RITUAL
+#
 SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS" "SEED COMMAND"
 
 Usage:  seed <fruit>
@@ -2550,6 +2651,12 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+SUMMARY "COMBAT SUMMARY"
+
+Usage:  summary
+
+This command shows a summary of you, your allies, and your enemies in combat.
 #
 "SUMMON PLAYERS"
 
@@ -2799,7 +2906,7 @@ This setting causes you to automatically 'look' after each time you move when
 running or when driving, piloting, or sailing a vehicle. With this message off,
 you only see a short message indicating you moved.
 
-See alos: STATUS MESSAGES
+See also: STATUS MESSAGES
 #
 TUNNEL "TUNNEL COMMAND"
 

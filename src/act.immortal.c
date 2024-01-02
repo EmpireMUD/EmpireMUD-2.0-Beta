@@ -2,7 +2,7 @@
 *   File: act.immortal.c                                  EmpireMUD 2.0b5 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -46,7 +46,6 @@ extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 extern int total_accounts, active_accounts, active_accounts_week;
 
 // external functions
-char *ability_color(char_data *ch, ability_data *abil);
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
 void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
@@ -231,7 +230,7 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDDEN) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
@@ -1034,7 +1033,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	}
 	
 	GET_CLASS_ROLE(ch) = ROLE_NONE;
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
 		msg_to_char(ch, "Your group role has been reset.\r\n");
@@ -1115,7 +1114,7 @@ ADMIN_UTIL(util_exportcsv) {
 			// wear, type, flags, attack
 			sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, str1, TRUE);
 			sprintbit(GET_OBJ_EXTRA(obj), extra_bits, str2, TRUE);
-			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
+			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)) : "");
 			
 			// applies, affects, triggers
 			fprintf(fl, "\"");	// leading quote for applies
@@ -2617,7 +2616,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			remove_companion(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
 			if (GET_COMPANION(vict) && GET_MOB_VNUM(GET_COMPANION(vict)) == GET_MOB_VNUM(pet)) {
-				if (!AFF_FLAGGED(vict, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+				if (!AFF_FLAGGED(vict, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 					act("$n leaves.", TRUE, GET_COMPANION(vict), NULL, NULL, TO_ROOM);
 				}
 				extract_char(GET_COMPANION(vict));
@@ -2708,8 +2707,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> skill <skill> <level>\r\n");
 			return 0;
 		}
-		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", CLASS_SKILL_CAP);
+		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > MAX_SKILL_CAP) {
+			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", MAX_SKILL_CAP);
 			return 0;
 		}
 		else if (!(skill = find_skill(skillname))) {
@@ -2719,9 +2718,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 
 		// victory
 		set_skill(vict, SKILL_VNUM(skill), level);
-		update_class(vict);
+		update_class_and_abilities(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
-		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("language") {
@@ -4246,14 +4244,30 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
-		// ALWAYS use current set for class abilities
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
-			continue;
+			continue;	// not in current set
 		}
-		if (ABIL_IS_PURCHASE(abil)) {
-			continue;	// only looking for non-skill abilities
+		if (!ABIL_IS_SYNERGY(abil)) {
+			continue;	// only looking for synergy abilities
 		}
 
+		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+		found = TRUE;
+	}
+	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
+	
+	msg_to_char(ch, "&yOther&0: &g");
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
+			continue;	// not in current set
+		}
+		if (!has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// only looking for abilities with parents
+		}
+		
 		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
 		found = TRUE;
 	}
@@ -4707,7 +4721,7 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "\t%c%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id]);
+			snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
 			
 			if (color_strlen(one) + lsize >= 79) {
 				// send line
@@ -6638,7 +6652,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));
 		sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(k), 0), GET_BONUS_MAGICAL(k));
-		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(total_bonus_healing(k), 0), total_bonus_healing(k));
+		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 		// dex is removed from to-hit to make it easier to compare to caps
@@ -6662,7 +6676,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		sprintf(buf + strlen(buf), ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
@@ -6911,6 +6925,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param crop_data *cp The crop to stat.
 */
 void do_stat_crop(char_data *ch, crop_data *cp) {
+	struct custom_message *ocm;
+	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
@@ -6936,6 +6952,13 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_CROP_CUSTOM_MSGS(cp)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+		}
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
@@ -7081,6 +7104,12 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
 			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			break;
+		}
+		case GLOBAL_OBJ_INTERACTIONS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, buf2, TRUE);
+			msg_to_char(ch, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
@@ -7241,7 +7270,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(j)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(j)].damage_type]);
+			msg_to_char(ch, "Damage type: %d %s (%s/%s)\r\n", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
@@ -7285,7 +7314,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(j)].name);
+			msg_to_char(ch, "Damage type: %s\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
 			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:
@@ -7463,7 +7492,7 @@ void do_stat_room(char_data *ch) {
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
-	int found, num, zenith;
+	int duration, found, num, zenith;
 	bool comma;
 	adv_data *adv;
 	obj_data *j;
@@ -7752,17 +7781,34 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->expire_time - time(0)), get_generic_name_by_vnum(aff->type));
+			// duration setup
+			if (aff->expire_time == UNLIMITED) {
+				strcpy(buf3, "infinite");
+			}
+			else {
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				if (duration >= 60 * 60) {
+					sprintf(buf3, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+				}
+				else {
+					sprintf(buf3, "%d:%02d", (duration / 60), (duration % 60));
+				}
+			}
+
+			sprintf(buf, "Affect: (%s) &c%s&0", buf3, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
-				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
+				sprintf(buf2, " %+d to %s", aff->modifier, apply_types[(int) aff->location]);
 				strcat(buf, buf2);
 			}
 			if (aff->bitvector) {
-				if (*buf2)
+				if (*buf2) {
 					strcat(buf, ", sets ");
-				else
-					strcat(buf, "sets ");
+				}
+				else {
+					strcat(buf, " sets ");
+				}
 				sprintbit(aff->bitvector, room_aff_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
@@ -7855,6 +7901,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 void do_stat_sector(char_data *ch, sector_data *st) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
+	struct custom_message *ocm;
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -7894,6 +7941,13 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_SECT_CUSTOM_MSGS(st)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+		}
 	}
 
 	if (st->interactions) {
@@ -8036,6 +8090,11 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					break;
+				}
+				case GLOBAL_OBJ_INTERACTIONS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), extra_bits, flags, TRUE);
 					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
@@ -8605,7 +8664,7 @@ ACMD(do_autostore) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		else if (veh) {
-			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
@@ -9813,8 +9872,8 @@ ACMD(do_load) {
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		get_vehicle_interior(veh);	// ensure inside is loaded
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
-		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
-		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 		
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
@@ -10006,6 +10065,7 @@ ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
 	trig_data *trig;
+	struct pursuit_data *purs, *next_purs;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		// stop fighting
@@ -10035,6 +10095,16 @@ ACMD(do_peace) {
 					GET_TRIG_WAIT(trig) = NULL;
 				}
 			}
+		}
+		
+		// cancel pursuit
+		if (IS_NPC(iter) && MOB_PURSUIT(iter)) {
+			return_to_pursuit_location(iter);
+			
+			LL_FOREACH_SAFE(MOB_PURSUIT(iter), purs, next_purs) {
+				free(purs);
+			}
+			MOB_PURSUIT(iter) = NULL;
 		}
 	}
 	
@@ -10219,9 +10289,9 @@ ACMD(do_purge) {
 				request_vehicle_save_in_world(veh);
 			}
 			
-			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			}
 			extract_vehicle(veh);
 		}
@@ -10473,8 +10543,8 @@ ACMD(do_rescale) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
-		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 	}
 	else if (obj) {
 		// item mode
@@ -10482,7 +10552,7 @@ ACMD(do_rescale) {
 			scale_item_to_level(obj, level);
 		}
 		else {
-			new = fresh_copy_obj(obj, level);
+			new = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 			obj = new;
@@ -10506,7 +10576,6 @@ ACMD(do_restore) {
 	struct cooldown_data *cool;
 	generic_data *gen, *next_gen;
 	vehicle_data *veh;
-	empire_data *emp;
 	char_data *vict;
 	int i, iter;
 	
@@ -10529,13 +10598,13 @@ ACMD(do_restore) {
 	if (veh) {
 		// found vehicle target here
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 
 		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		else {
-			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
@@ -10684,6 +10753,12 @@ ACMD(do_restore) {
 		reset_player_temperature(vict);
 		sprintf(types + strlen(types), "%s temperature", *types ? "," : "");
 	}
+	
+	// affects that could get a person stuck
+	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUDED | AFF_MUMMIFIED)) {
+		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUDED, TRUE);
+		affects_from_char_by_aff_flag(vict, AFF_MUMMIFIED, TRUE);
+	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
 		for (i = 0; i < NUM_CONDS; i++)
@@ -10696,26 +10771,15 @@ ACMD(do_restore) {
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 		}
-		update_class(vict);
-		assign_class_abilities(vict, NULL, NOTHING);
 		
-		// temporarily remove empire abilities
-		emp = GET_LOYALTY(vict);
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, FALSE);
-		}
+		update_class_and_abilities(vict);
 		
 		HASH_ITER(hh, ability_table, abil, next_abil) {
 			// add abilities to set 0
 			add_ability_by_set(vict, abil, 0, TRUE);
 		}
-
-		affect_total(vict);
 		
-		// re-add abilities
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, TRUE);
-		}
+		affect_total(vict);
 		
 		// languages
 		HASH_ITER(hh, generic_table, gen, next_gen) {
@@ -11029,7 +11093,7 @@ ACMD(do_slay) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
-			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
+			if (!IS_NPC(vict)) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
@@ -11042,8 +11106,10 @@ ACMD(do_slay) {
 			tag_mob(vict, ch);	// ensures loot binding if applicable
 
 			// this would prevent the death
-			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
+			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {
+				// remove ALL (unlike normal auto-rez)
+				affects_from_char_by_aff_flag(vict, AFF_AUTO_RESURRECT, FALSE);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_AUTO_RESURRECT);
 			}
 
 			die(vict, ch);
@@ -11470,14 +11536,14 @@ ACMD(do_trans) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		send_config_msg(ch, "ok_string");
 	}
@@ -11770,6 +11836,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No archetypes by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		extern int vnum_attack_message(char *searchname, char_data *ch);
+		if (!vnum_attack_message(buf2, ch)) {
+			msg_to_char(ch, "No attack messages by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "augment")) {
 		extern int vnum_augment(char *searchname, char_data *ch);
 		if (!vnum_augment(buf2, ch)) {
@@ -11889,7 +11961,7 @@ ACMD(do_vstat) {
 	obj_data *obj;
 	any_vnum number;
 
-	two_arguments(argument, buf, buf2);
+	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
 		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
@@ -11925,6 +11997,16 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_archetype(ch, arch);
+	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full);
+		attack_message_data *amd = real_attack_message(number);
+		if (!amd) {
+			msg_to_char(ch, "There is no attack message with that number.\r\n");
+			return;
+		}
+		half_chop(buf2, buf1, arg);
+		do_stat_attack_message(ch, amd, !str_cmp(arg, "-d") ? TRUE : FALSE);
 	}
 	else if (is_abbrev(buf, "augment")) {
 		void do_stat_augment(char_data *ch, augment_data *aug);

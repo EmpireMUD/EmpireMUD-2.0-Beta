@@ -3,7 +3,7 @@
 *  Usage: contains the command_interpreter for rooms, room commands.      *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 03:27:07, revision 3.12          *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -1090,7 +1090,7 @@ WCMD(do_wpurge) {
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg, NULL))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(veh);
 	}
@@ -1317,7 +1317,17 @@ WCMD(do_wdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, show_attack_message = NOTHING;
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			wld_log(room, "wdamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
@@ -1356,7 +1366,7 @@ WCMD(do_wdamage) {
 		type = DAM_PHYSICAL;
 	}
 
-	script_damage(ch, NULL, get_room_scale_level(room, ch), type, modifier);
+	script_damage(ch, NULL, get_room_scale_level(room, ch), type, modifier, show_attack_message);
 }
 
 
@@ -1364,7 +1374,17 @@ WCMD(do_waoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	char_data *vict, *next_vict;
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
+
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			wld_log(room, "waoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	two_arguments(argument, modarg, typearg);
 	if (*modarg) {
@@ -1386,7 +1406,7 @@ WCMD(do_waoe) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
-			script_damage(vict, NULL, level, type, modifier);
+			script_damage(vict, NULL, level, type, modifier, show_attack_message);
 		}
 	}
 }
@@ -1635,7 +1655,7 @@ WCMD(do_wscale) {
 			scale_item_to_level(obj, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(obj))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(obj, level);
+			fresh = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, fresh);
 			extract_obj(obj);
 		}

@@ -2,7 +2,7 @@
 *   File: olc.crop.c                                      EmpireMUD 2.0b5 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -111,6 +111,10 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 	
 	if (!GET_CROP_EX_DESCS(cp)) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Crop has no extra descriptions");
+		problem = TRUE;
+	}
+	if (!crop_has_custom_message(cp, CROP_CUSTOM_MAGIC_GROWTH)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No custom magic-growth message");
 		problem = TRUE;
 	}
 	
@@ -278,7 +282,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 */
 void olc_fullsearch_crop(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
-	bitvector_t  find_interacts = NOBITS, found_interacts;
+	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct interaction_item *inter;
@@ -286,6 +290,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 	struct icon_data *icon;
 	size_t size;
 	bool match;
+	struct custom_message *cust;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP CROPEDIT FULLSEARCH for syntax.\r\n");
@@ -304,6 +309,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_FLAGS("custom", find_custom, crop_custom_types)
 		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, crop_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, crop_flags)
@@ -365,6 +371,15 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		if (*extra_search && !find_exdesc(extra_search, GET_CROP_EX_DESCS(crop), NULL)) {
 			continue;
 		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(GET_CROP_CUSTOM_MSGS(crop), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
 			LL_FOREACH(GET_CROP_INTERACTIONS(crop), inter) {
@@ -376,7 +391,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 
 		// string search
-		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop)) && !search_extra_descs(find_keywords, GET_CROP_EX_DESCS(crop))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_CROP_NAME(crop)) && !multi_isname(find_keywords, GET_CROP_TITLE(crop)) && !search_extra_descs(find_keywords, GET_CROP_EX_DESCS(crop)) && !search_custom_messages(find_keywords, GET_CROP_CUSTOM_MSGS(crop))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_CROP_ICONS(crop), icon) {
@@ -497,6 +512,7 @@ void save_olc_crop(descriptor_data *desc) {
 	if (GET_CROP_TITLE(proto)) {
 		free(GET_CROP_TITLE(proto));
 	}
+	free_custom_messages(GET_CROP_CUSTOM_MSGS(proto));
 	free_extra_descs(&GET_CROP_EX_DESCS(proto));
 	while ((spawn = GET_CROP_SPAWNS(proto))) {
 		GET_CROP_SPAWNS(proto) = spawn->next;
@@ -550,6 +566,9 @@ crop_data *setup_olc_crop(crop_data *input) {
 		GET_CROP_NAME(new) = GET_CROP_NAME(input) ? str_dup(GET_CROP_NAME(input)) : NULL;
 		GET_CROP_TITLE(new) = GET_CROP_TITLE(input) ? str_dup(GET_CROP_TITLE(input)) : NULL;
 		
+		// copy customs
+		GET_CROP_CUSTOM_MSGS(new) = copy_custom_messages(GET_CROP_CUSTOM_MSGS(input));
+		
 		// copy extra descs
 		GET_CROP_EX_DESCS(new) = copy_extra_descs(GET_CROP_EX_DESCS(input));
 		
@@ -587,6 +606,7 @@ int wordcount_crop(crop_data *crop) {
 	
 	count += wordcount_string(GET_CROP_NAME(crop));
 	count += wordcount_string(GET_CROP_TITLE(crop));
+	count += wordcount_custom_messages(GET_CROP_CUSTOM_MSGS(crop));
 	count += wordcount_extra_descriptions(GET_CROP_EX_DESCS(crop));
 	
 	return count;
@@ -605,6 +625,7 @@ int wordcount_crop(crop_data *crop) {
 void olc_show_crop(char_data *ch) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
 	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	struct custom_message *ocm;
 	struct spawn_info *spawn;
 	int count;
 	
@@ -632,12 +653,19 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
 	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
 	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
-
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
 	if (GET_CROP_EX_DESCS(cp)) {
 		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
+	}
+
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
+	count = 0;
+	LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, crop_custom_types[ocm->type], ocm->msg);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
@@ -665,6 +693,12 @@ void olc_show_crop(char_data *ch) {
 OLC_MODULE(cropedit_climate) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
 	GET_CROP_CLIMATE(cp) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_CROP_CLIMATE(cp));
+}
+
+
+OLC_MODULE(cropedit_custom) {
+	crop_data *cp = GET_OLC_CROP(ch->desc);
+	olc_process_custom_messages(ch, argument, &GET_CROP_CUSTOM_MSGS(cp), crop_custom_types, NULL);
 }
 
 

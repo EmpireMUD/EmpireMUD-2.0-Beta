@@ -109,6 +109,21 @@ else
   return 0
 end
 ~
+#9807
+No pickpocket while unkillable~
+0 c 0
+pickpocket~
+if !%arg% || %actor.char_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+if %self.aff_flagged(!ATTACK)%
+  %send% %actor% You can't pick ^%self% pockets right now.
+  return 1
+else
+  return 0
+end
+~
 #9850
 Equip imm-only~
 1 j 0

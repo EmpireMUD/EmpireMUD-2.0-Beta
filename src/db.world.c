@@ -2,7 +2,7 @@
 *   File: db.world.c                                      EmpireMUD 2.0b5 *
 *  Usage: Modify functions for the map, interior, and game world          *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -791,11 +791,13 @@ GLB_FUNCTION(run_global_mine_data) {
 		multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 		if (ch) {
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_DEEP_MINES, NULL, NULL, NULL, IN_ROOM(ch));
 		}
 	}
 	
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
+		run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, room, NOBITS);
 	}
 	
 	return TRUE;
@@ -1207,6 +1209,7 @@ void annual_update_depletions(struct depletion_data **list) {
 * @param struct map_data *tile The map tile to update.
 */
 void annual_update_map_tile(struct map_data *tile) {
+	struct affected_type *aff, *next_aff;
 	struct resource_data *old_list;
 	sector_data *old_sect;
 	int trenched, amount;
@@ -1222,7 +1225,7 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
-				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_ABANDON_WHEN_RUINED)) {
 					abandon_room(room);
 				}
 				disassociate_building(room);
@@ -1276,6 +1279,15 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
 			// this will tear it back down to its base type
 			disassociate_building(room);
+		}
+		
+		// random chance to lose permanent affs
+		if (!ROOM_OWNER(room)) {
+			LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+				if (aff->expire_time == UNLIMITED && number(1, 100) <= 5) {
+					affect_remove_room(room, aff);
+				}
+			}
 		}
 	}
 	
@@ -1612,7 +1624,7 @@ EVENTFUNC(burn_down_event) {
 		}
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!IS_NPC(ch)) {
-				death_log(ch, ch, TYPE_SUFFERING);
+				death_log(ch, ch, ATTACK_SUFFERING);
 			}
 			die(ch, ch);
 		}
@@ -3494,6 +3506,8 @@ void init_room(room_data *room, room_vnum vnum) {
 * Interaction function for building-ruins-to-building. This replaces the
 * building, ignoring interaction quantity, and transfers built-with resources
 * and contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;
@@ -3524,7 +3538,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3588,6 +3602,8 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 * Interaction function for building-ruins-to-vehicle. This loads a new vehicle,
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;
@@ -3650,7 +3666,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3731,7 +3747,7 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		if (!bld || !BLD_FLAGGED(bld, BLD_NO_AUTO_ABANDON_WHEN_RUINED)) {
+		if (!bld || !BLD_FLAGGED(bld, BLD_NO_ABANDON_WHEN_RUINED)) {
 			abandon_room(room);
 		}
 		disassociate_building(room);

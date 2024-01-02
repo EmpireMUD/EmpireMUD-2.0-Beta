@@ -38,21 +38,15 @@ decreasing the victim's magical resistance.
 
 Ancestral Healing (Natural Magic ability)
 
-This passive ability channels the power of your ancestors to add your Greatness
-attribute to your Bonus-Healing trait, which affects all of your healing
-abilities. This Greatness effect gets more powerful as your level goes up.
+This passive ability channels the power of your ancestors to boost your healing
+power. The size of this boost is based on your Greatness trait, and is higher
+in the healer role.
 
-The amount of Bonus-Healing added is a proportion of your Greatness: your total
-Greatness is added per 150 player levels, with a proportion of your Greatness
-for any portion under 150 levels. For example, if you are level 75, you gain
-half your Greatness. At level 150, it's your full Greatness. At level 300, it's
-2x Greatness.
-
-This ability gains experience when you use an ability that's boosted by it.
+This ability gains experience when you heal someone.
 
 Note: Bonus healing does not add to the cost of healing spells.
 
-See also: HEAL, REJUVENATE
+See also: HEAL, REJUVENATE, PASSIVES
 #
 "ANIMAL FORMS"
 
@@ -103,6 +97,17 @@ The banshee familiar will use the following abilities in combat:
 
 See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
 #
+"BY THE SUN AND STARS" "SUN AND STARS"
+
+By the Sun and Stars (Natural Magic ability)
+
+Nature mages can learn to draw mana from the bountiful light above. Your mana
+regeneration is always higher; moreso in the healer or caster roles.
+
+This ability gains experience passively over time.
+
+See also: CASTER ROLE, HEALER ROLE, PASSIVES
+#
 "ASTRAL WEREWOLF FORM"
 
 Astral Werewolf Form
@@ -147,20 +152,6 @@ To brew potions you will require:
 See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS,
 RECIPES, CRAFTING ABILITIES
 #
-CHANT
-
-Usage:  chant <type>
-
-There are several ancient chants whose power you can still wield today.
-Chants have no beginning or end, but you can stop chanting by typing the
-command again.
-
-Unlike most timed actions, chants are not running on a timer. Their effect,
-if any, happens at random as you chant. Some chants have a higher random chance
-than others.
-
-See also: help for individual chants, like HELP CHANT OF NATURE
-#
 "CHANT OF ILLUSIONS"
 
 Chant of Illusions
@@ -170,8 +161,7 @@ Natural Magic Synergy Ability: 100 Stealth
 Cost:  1 nocturnium spike and 1 iridescent iris per road
 
 This chant allows you to hide a road tile behind an illusion, making it more
-difficult to see from a distance. You will not get your resources back if you
-cancel the chant; they are spent immediately.
+difficult to see from a distance.
 
 See also: CHANT, FORGE, LAY
 #
@@ -272,6 +262,18 @@ before it expires.
 You can confer: block, dodge, health, health-regen, mana, mana-regen,
   move, move-regen, resist-magical, resist-physical, to-hit
 #
+"CONJURE FRUIT"
+
+Conjure Fruit (Natural Magic ability)
+
+Usage:  conjure fruit
+Cooldown:  30 seconds
+Cost:  25 mana
+
+Turn mana into food with this simple spell.
+
+See also: CONJURE
+#
 COUNTERSPELL "COUNTER SPELL"
 
 Counterspell (Natural Magic ability)
@@ -339,7 +341,7 @@ it.
 
 See also: RESIST-PHYSICAL
 #
-EARTHMELD "EARTH MELD"
+EARTHMELD "EARTH MELD" EARTHMELDED
 
 Earthmeld (Natural Magic ability)
 
@@ -361,7 +363,18 @@ or barriers.
 
 Gains experience when you sink into the ground.
 
+The only way to move while earthmelded is the Worm ability.
+
 See also: WORM
+#
+EARTHPEEK "EARTH PEEK"
+
+Usage:  earthpeak
+
+The earthpeek command allows you to look around while earthmelded. This is
+only available with the Worm ability.
+
+See also: EARTHMELD, WORM
 #
 ENTANGLE
 
@@ -386,7 +399,16 @@ Gain experience when you cast this spell.
 #
 FAMILIAR
 
-Familiar (Natural Magic ability)
+Usage:  companion [name]
+
+A familiar is a type of companion summoned by a practicioner of Natural Magic.
+See help files for individual familiar abilities for more information.
+
+See also: COMPANION, DISMISS, ORDEr
+#
+"FELINE FAMILIARS"
+
+Feline Familiars (Natural Magic ability)
 
 Usage:  companion <familiar type>
 Cost:  40 mana
@@ -397,22 +419,20 @@ a familiar, it appears, follows you, and prepares to take orders. Familiars
 are a type of companion.
 
 The power and abilities of the familiar are based on your prowess in Natural
-Magic and your total level.
+Magic and your level.
 
 This ability gains experience when you summon these familiars or have one of
 them as your active companion.
 
 Available familiars:
-  cat - A low-level familiar for novice mages.
-  saber-toothed cat - A larger cat with a bigger bite. (requires level 50)
-  sphinx - A familiar that will tank for you in combat. (requires 75)
-  giant tortoise - A stronger tank who deals no damage, but protects better.
-    (requires 100)
+  cat - A low-level familiar for novice mages (level 1-100).
+  saber-toothed cat - A larger cat with a bigger bite (level 50+).
+  sphinx - A familiar that will rescue you in combat (level 75+).
 
 Each natural magic synergy has its own familiars, too. Use "dismiss" to get rid
 of your familiar.
 
-See also: COMPANION, SYNERGY FAMILIARS, DISMISS, ORDER
+See also: COMPANION, GIANT TORTOISE FAMILIAR, SYNERGY FAMILIARS, DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 
@@ -429,7 +449,7 @@ Wits, down to 0.75 seconds.
 
 See also: COMMAND LAG, HEALER
 #
-FLY FLIGHT
+FLY FLIGHT FLYING
 
 Fly (Natural Magic ability)
 
@@ -450,6 +470,19 @@ experience when you take off.
 
 See also: RIDE
 #
+"GIANT TORTOISE FAMILIAR"
+
+Giant Tortoise Familiar (Natural Magic ability)
+
+Usage:  companion giant tortoise
+Cost:  50 mana
+
+The giant tortoise familiar is a powerful boon to Natural Magic users. It may
+not do any damage in combat, but it will rescue you and steal the attention of
+whoever is hitting you -- and it can take a serious beating.
+
+See also: COMPANION, SYNERGY FAMILIARS, DISMISS, ORDER
+#
 "GIFT OF NATURE"
 
 Gift of Nature (Natural Magic ability)
@@ -459,7 +492,7 @@ it. Your total mana increases based on your level and role.
 
 Gift of Nature gains experience passively over time.
 
-See also: ARCANE POWER, ROLE
+See also: ARCANE POWER, PASSIVES, ROLE
 #
 "GRIFFIN FAMILIAR"
 
@@ -516,17 +549,6 @@ Each ability will only gain experience when you heal the target it allows you
 to heal (self, ally or party).
 
 See also: HEALER
-#
-"HEALING BOOST"
-
-Healing Boost
-Requires: 100 Natural Magic, Healer/Solo role
-
-This ability increases the amount healed by abilities such as Heal and
-Rejuvenate, making the user more effective at healing. This ability is
-automatic.
-
-See also: HEAL, HEALER, REJUVENATE
 #
 "HEALING POTIONS" "HEALING ELIXIRS"
 
@@ -835,15 +857,14 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
+Linked trait:  Intelligence
 Cost:  based on damage and skill level
 Debuff type:  magical
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.
 
-In caster or solo role, damage is based on total level, Intelligence, and
-Bonus-Magical damage. In all other roles, it is based on skill level and
-Intelligence only.
+Damage is higher in the caster role.
 
 If you cast this spell with no target, it will target the person you are
 fighting.
@@ -852,33 +873,16 @@ Gains experience when you cast this spell.
 
 See also: CASTER, SOLO
 #
-"SOLAR POWER"
-
-Solar Power (Natural Magic ability)
-
-Nature mages can learn to draw mana from the sunlight, as plants do. With this
-ability, mana regeneration doubles as long as it's sunny. This ability scales
-with your Natural Magic skill, and as a level 76+ skill it works even without
-the sun.
-
-Solar Power gains experience every time you benefit from its effect.
-#
 SOULSIGHT "SOUL SIGHT"
 
 Soulsight (Natural Magic ability)
 
-Usage:  soulsight <target>
-Cost:  5 mana
+This ability allows you to see more details about the affects on enemies with
+the 'affects' command.
 
-By looking into a person's soul, a nature mage can learn more about them. This
-will reveal if the target has any spells affecting him.
+Gain experience when you view affects on others.
 
-Soulsight can be blocked by Soulmask. In this case, it will not show affects,
-or whether the target is a vampire.
-
-Gains experience when you use it on someone.
-
-See also: SOULMASK
+See also: AFFECTS, SOULMASK
 #
 "SPIRIT WOLF FAMILIAR"
 
@@ -985,12 +989,27 @@ bonuses are also lower).
 
 See also: MORPH
 #
+WILDERBLAZE "WILDER BLAZE" WILDBLAZE "WILD BLAZE"
+
+Wilderblaze (Natural Magic ability)
+
+Usage:  wilderblaze
+Linked trait:  intelligence
+Cost:  50 mana +25 per additional target
+Cooldown: 30 seconds
+Duration: 20 seconds
+
+This spell unleashes your mana as a wave of nigh-unstoppable fire that burns
+everyone in the area. It is stronger in the caster role.
+
+See also: CASTER ROLE
+#
 WORM
 
 Worm (Natural Magic ability)
 
 Usage:  worm <direction>
-        worm look
+        earthpeek
 
 Particularly powerful nature mages can move while earthmelded, worming their
 way through the ground. You cannot worm through water tiles, and you cannot
@@ -1002,6 +1021,9 @@ taking nature burn damage as soon as you end your earthmeld.
 
 Gains experience as you move around underground.
 
-See also: EARTHMELD
+This also grants you the 'earthpeek' command, which can look around while
+earthmelded.
+
+See also: EARTHMELD, EARTHPEEK
 #
 $~

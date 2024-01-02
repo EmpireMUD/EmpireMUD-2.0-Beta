@@ -662,7 +662,7 @@ end
 if !%leader.ability(Hide)%
   halt
 end
-dg_affect %self% HIDE on -1
+dg_affect %self% HIDDEN on -1
 ~
 #515
 Banshee Familiar Debuffs~

@@ -49,7 +49,7 @@ If you have the Vampire skill at level 100, the amount of blood will continue
 to rise with your level. You will gain experience with this ability when
 drinking blood.
 
-See also: BITE
+See also: BITE, PASSIVES
 #
 "BAT FORM"
 
@@ -101,19 +101,43 @@ Blood Fortitude
 Vampire Synergy Ability: 100 Battle
 Type:  passive
 
-The vampire's blood-fueled form is more resilient against physical damage.
+The vampire's blood-fueled form is more resilient against damage. This is
+especially effective in the tank role.
+
+See also: TANK ROLE
+#
+"BLOODBOUND ARCANUM"
+
+Bloodbound Arcanum (Vampire ability)
+
+Some vampires develop the ability to draw mana directly from their own
+unnatural blood. This ability passively increases mana regeneration and is
+stronger in the caster and healer roles.
+
+See also: CASTER ROLE, HEALER ROLE, MANA REGEN, PASSIVES
+#
+"BLOODBORNE TENACITY"
+
+Bloodborne Tenacity (Vampire ability)
+
+The blood that sustains a vampire can also be used to keep going long after
+other bodies would have given out. This bloodborne tenacity passively increases
+move regeneration. It is stronger in the melee role.
+
+See also: MELEE ROLE, MOVE REGEN, PASSIVES
 #
 BLOODSWEAT "BLOOD SWEAT"
 
 Bloodsweat
 Vampire Synergy Ability: 100 Battle
 Usage:  bloodsweat
-Cost:  50 blood
+Cost:  20 blood
 Cooldown:  30 seconds
 
-This power purges a vampire's blood of any poisons, by sweating them out.
+This power purges a vampire's blood of any poisons, including alcohol, by
+sweating them out.
 #
-"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF
+"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF BLOODAXE BLOODWHIP BLOODMATTOCK
 
 Ready Blood Weapons (Vampire ability)
 
@@ -143,6 +167,8 @@ When you activate this power, you will automatically wield the weapon of your
 choice, and it will disappear when unequipped.
 
 Gains experience when you create the blood weapon, or fight with it.
+
+See also: RED MIST
 #
 BOOST
 
@@ -164,7 +190,7 @@ At high skill levels, you may get a stronger boost at the same cost. You can
 end your boosts early by typing "boost end". Gains experience when you activate
 your boosts.
 
-See also: ROLE
+See also: PASSIVES, ROLE
 #
 CLAWS
 
@@ -178,6 +204,8 @@ The vampire can turn his fingers into huge, deadly claws that do grievous
 melee damage.
 
 Claws gains experience when toggled on and when you attack with them.
+
+See also: RED MIST
 #
 COMMAND
 
@@ -210,7 +238,22 @@ Gains experience passively while you're outdoors during the day.
 
 See also: PURIFY
 #
-DEATHSHROUD "DEATH SHROUD"
+DEATHRISE
+
+Deathrise (Vampire ability)
+
+Usage:  deathrise
+Cost:  50 blood and 1 grave cloth
+Cooldown:  10 minutes
+
+This ability allows a vampire to rise from the dead. It must be used before
+respawning.
+
+It also allows you to weave a grave cloth, which is required for resurrection.
+
+See also: WEAVE
+#
+DEATHSHROUD "DEATH SHROUD" DEATHSHROUDED
 
 Deathshroud (Vampire ability)
 
@@ -347,22 +390,27 @@ live creatures in the dark and raises your light radius. However, it doesn't
 enable you to see items on the ground.
 
 Gains experience passively when you're standing in a dark room.
+
+See also: PASSIVES
+#
+"RED MIST"
+
+Red Mist (Vampire ability)
+
+With this ability, you gain a chance to absorb blood from the air after any
+physical attack. Your claws and blood weapons are also upgraded in quality.
+
+See also: CLAWS, READY BLOOD WEAPONS
 #
 REGENERATE
 
 Regenerate (Vampire ability)
 
-Usage:  regenerate [health | move | mana] [amount]
-Cost:  10 blood per 10/15/25 regenerated (see below)
+Usage:  regenerate [health | move | mana]
 
 Vampires have the ability to regenerate themselves using blood. This process
-heals them, but makes them hungrier. The command defaults to health, unless
-you specify otherwise.
-
-You can specify an amount to heal.
-
-With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
-it regenerates 1.5. And higher than that, it regenerates 2.5.
+heals them, but makes them hungrier. This power can also restore mana and
+moves.
 
 Gains experience whenever you use this ability.
 
@@ -379,7 +427,7 @@ Sanguine Restoration also grants you a larger blood pool.
 
 You will gain experience with this ability when drinking blood.
 
-See also: BITE
+See also: BITE, PASSIVES
 #
 "SAVAGE BITE"
 
@@ -425,11 +473,11 @@ Soulmask (Vampire ability)
 Usage:  soulmask
 
 The soulmask protects the vampire from certain spells and abilities, such as
-Soulsight.
+Soulsight, which would show details about the vampire's affects and status.
 
 Soulmask gains experience when you turn it on.
 
-See also: SOULSIGHT
+See also: AFFECTS, SOULSIGHT
 #
 STAKE UNSTAKE
 
@@ -462,18 +510,6 @@ Gains experience when you try to summon humans.
 
 See also: COMMAND
 #
-"TASTE BLOOD"
-
-Taste Blood (Vampire ability)
-
-Usage:  taste <person>
-
-Your target must be asleep or permitting for you to taste their blood. You can
-learn about the particular characteristics of their blood through a single
-drop.
-
-Gains experience when used.
-#
 "UNNATURAL THIRST"
 
 Unnatural Thirst (Vampire ability)
@@ -490,7 +526,7 @@ VEINTAP
 
 Veintap (Vampire ability)
 
-Usage:  veintap <amount> <container>
+Usage:  veintap <container> [amount]
 
 Powerful vampires learn to preserve their blood in containers for later use,
 enabling them to travel without a live blood supply sometimes for weeks.

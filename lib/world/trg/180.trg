@@ -148,7 +148,7 @@ if %phase%==3
       %echoaround% %target% ~%self% makes a heretical gesture at ~%target%!
       wait 5 sec
       if %target%&&(%target.room%==%self.room%)
-        if %target.trigger_counterspell%
+        if %target.trigger_counterspell(%self%)%
           %send% %target% A tornado of harmless smoke briefly surrounds you!
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else

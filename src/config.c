@@ -2,7 +2,7 @@
 *   File: config.c                                        EmpireMUD 2.0b5 *
 *  Usage: Configuration of various aspects of CircleMUD operation         *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -591,6 +591,47 @@ const char *config_get_string(char *key) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: EDITORS //////////////////////////////////////////////////
 
+// basic handler for attack types
+CONFIG_HANDLER(config_edit_attack) {
+	attack_message_data *old_amd, *new_amd;
+	int input;
+	
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_edit_attack called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	if (config->type != CONFTYPE_INT) {
+		log("SYSERR: config_edit_attack called on non-int key %s", config->key);
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	
+	if (sscanf(argument, "%d", &input) != 1) {
+		msg_to_char(ch, "Invalid argument '%s', expecting a number.\r\n", argument);
+		return;
+	}
+	
+	if (!(new_amd = real_attack_message(input))) {
+		msg_to_char(ch, "Invalid attack message vnum '%s'.\r\n", argument);
+		return;
+	}
+	
+	old_amd = real_attack_message(config->data.int_val);
+	config->data.int_val = input;
+	
+	if (old_amd != new_amd) {
+		save_config_system();
+		syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s set %s to %s, from %s", GET_NAME(ch), config->key, ATTACK_NAME(new_amd), old_amd ? ATTACK_NAME(old_amd) : "UNKNOWN");
+		msg_to_char(ch, "%s: set to %s, from %s.\r\n", config->key, ATTACK_NAME(new_amd), old_amd ? ATTACK_NAME(old_amd) : "UNKNOWN");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+	}
+}
+
+
 // Custom config handler for editing a bitvector list, for CONFTYPE_BITVECTOR.
 CONFIG_HANDLER(config_edit_bitvector) {
 	char add_buf[MAX_STRING_LENGTH], remove_buf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
@@ -1059,6 +1100,23 @@ CONFIG_HANDLER(config_edit_mob_spawn_interval) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: SHOW FUNCS ///////////////////////////////////////////////
+
+// basic handler for attack types
+CONFIG_HANDLER(config_show_attack) {
+	attack_message_data *amd;
+	
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_show_attack called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error showing type.\r\n");
+		return;
+	}
+	
+	amd = real_attack_message(config->data.int_val);
+	
+	msg_to_char(ch, "Attack type: %d %s\r\n", config->data.int_val, amd ? ATTACK_NAME(amd) : "UNKNOWN");
+}
+
 
 // Custom config handler for showing a bitvector, for CONFTYPE_BITVECTOR
 CONFIG_HANDLER(config_show_bitvector) {	
@@ -1928,6 +1986,10 @@ void init_config_system(void) {
 
 	// mobs
 	init_config(CONFIG_MOBS, "default_language_vnum", CONFTYPE_INT, "language (generic) mobs speak with by default");
+	init_config(CONFIG_MOBS, "default_magical_attack", CONFTYPE_INT, "vnum of the default attack for magical damage");
+		init_config_custom("default_magical_attack", config_show_attack, config_edit_attack, NULL);
+	init_config(CONFIG_MOBS, "default_physical_attack", CONFTYPE_INT, "vnum of the default attack for physical damage");
+		init_config_custom("default_physical_attack", config_show_attack, config_edit_attack, NULL);
 	init_config(CONFIG_MOBS, "max_npc_attribute", CONFTYPE_INT, "how high primary attributes go on mobs");
 	init_config(CONFIG_MOBS, "mob_spawn_interval", CONFTYPE_INT, "how often mobs spawn/last");
 		init_config_custom("mob_spawn_interval", config_show_int, config_edit_mob_spawn_interval, NULL);
@@ -1982,6 +2044,9 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "max_map_while_moving", CONFTYPE_INT, "maximum mapsize if the player is moving quickly");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
+	init_config(CONFIG_PLAYERS, "skills_at_max_level", CONFTYPE_INT, "how many skill trees players can have at 100");
+	init_config(CONFIG_PLAYERS, "skills_at_specialty_level", CONFTYPE_INT, "how many skill trees players can have at 75 (not counting 100s)");
+	init_config(CONFIG_PLAYERS, "skills_per_char", CONFTYPE_INT, "how many total skill trees players may learn at once");
 	init_config(CONFIG_PLAYERS, "slash_message_log_days", CONFTYPE_INT, "number of days messages are kept in slash-channel and global history log files");
 	init_config(CONFIG_PLAYERS, "temperature_discomfort", CONFTYPE_INT, "temperature after which penalties begin");
 	init_config(CONFIG_PLAYERS, "temperature_extreme", CONFTYPE_INT, "temperature after which players take damage");
@@ -1993,8 +2058,8 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");
 	init_config(CONFIG_SKILLS, "morph_timer", CONFTYPE_INT, "ticks to morph between forms");
 	init_config(CONFIG_SKILLS, "tracks_lifespan", CONFTYPE_INT, "minutes that a set of tracks lasts");
-	init_config(CONFIG_SKILLS, "greater_enchantments_bonus", CONFTYPE_DOUBLE, "multiplier for enchant points with Greater Enchants ability");
-	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting at level 100");
+	init_config(CONFIG_SKILLS, "greater_enchantments_bonus", CONFTYPE_DOUBLE, "multiplier for augment scale points when the player has a mastery ability");
+	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting/augments at level 100");
 	init_config(CONFIG_SKILLS, "min_exp_to_roll_skillup", CONFTYPE_INT, "minimum skill experience to roll for gains");
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
@@ -2047,6 +2112,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature each year");
 	init_config(CONFIG_WORLD, "naturalize_unclaimable", CONFTYPE_BOOL, "if true, naturalize/remember will also work on unclaimable tiles");
 	init_config(CONFIG_WORLD, "nearby_sector_distance", CONFTYPE_INT, "distance for the near-sector evolution");
+	init_config(CONFIG_WORLD, "ignore_island_levels", CONFTYPE_BOOL, "instancer will ignore island levels when spawning adventures");
 	init_config(CONFIG_WORLD, "interlink_distance", CONFTYPE_INT, "how far apart two interlinked buildings can be");
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");

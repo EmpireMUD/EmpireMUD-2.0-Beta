@@ -2,7 +2,7 @@
 *   File: mapview.c                                       EmpireMUD 2.0b5 *
 *  Usage: Map display functions                                           *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -79,7 +79,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 /**
 * @param room_data *room The room to check.
-* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_MAGIC_DARKNESS -- presumably because you already checked it.
 * @return bool TRUE if any adjacent room is light; otherwise FALSE.
 */
 bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness) {
@@ -469,6 +469,31 @@ char *get_mine_type_name(room_data *room) {
 }
 
 
+/**
+* @param room_data *room The room to get a paint color for.
+* @param char_data *ch The person viewing it, optionally, for no-paint preferences. (May be NULL.)
+* @return char* The color code if any, e.g. "&r", or NULL if not painted.
+*/
+char *get_paint_color_string(room_data *room, char_data *ch) {
+	static char color[8];
+	
+	if (!ROOM_PAINT_COLOR(room)) {
+		return NULL;	// not painted
+	}
+	if (ch && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+		return NULL;	// no paint
+	}
+	
+	// otherwise...
+	sprinttype(ROOM_PAINT_COLOR(room), paint_colors, color, sizeof(color), "&0");
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT)) {
+		strtoupper(color);
+	}
+	
+	return color;
+}
+
+
 char *get_room_description(room_data *room) {
 	static char desc[MAX_STRING_LENGTH];
 
@@ -507,11 +532,6 @@ char *get_room_name(room_data *room, bool color) {
 	/* Names by type */
 	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room)))
 		strcat(name, GET_CROP_TITLE(cp));
-
-	/* Custom names by type */
-	else if (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH)) {
-		strcat(name, "A Winding Path");
-	}
 
 	/* Building */
 	else if (GET_BUILDING(room)) {
@@ -575,9 +595,8 @@ void replace_color_codes(char *string, char *new_color) {
 void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int tileset) {
 	struct icon_data *icon;
 	sector_data *sect;
-	bool enchanted;
 	char temp[256];
-	char *str;
+	char *str, *paint_code;
 	
 	// icon_buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(icon_buf, '@')) {
@@ -615,13 +634,13 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		// west (@u) barrier attachment
 		if (strstr(icon_buf, "@u") || strstr(icon_buf, "@U")) {
 			if (!r_west || ATTACHES_TO_BARRIER(r_west)) {
-				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				paint_code = r_west ? get_paint_color_string(r_west, ch) : NULL;
 				// west is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sv", paint_code ? paint_code : "&0");
 				str = str_replace("@u", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sV", paint_code ? paint_code : "&0");
 				str = str_replace("@U", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -641,13 +660,13 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		//  east (@v) barrier attachment
 		if (strstr(icon_buf, "@v") || strstr(icon_buf, "@V")) {
 			if (!r_east || ATTACHES_TO_BARRIER(r_east)) {
-				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				paint_code = r_east ? get_paint_color_string(r_east, ch) : NULL;
 				// east is a barrier
-				sprintf(temp, "%sv", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sv", paint_code ? paint_code : "&0");
 				str = str_replace("@v", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
-				sprintf(temp, "%sV", enchanted ? "&m" : "&0");
+				sprintf(temp, "%sV", paint_code ? paint_code : "&0");
 				str = str_replace("@V", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -1197,7 +1216,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 
-	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
@@ -1429,7 +1448,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						// nothing to show?
 						send_to_char(blocked_tile, ch);
 					}
-					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) && !show_blocked) {
+					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_MAGIC_DARKNESS) && !show_blocked) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
@@ -1648,7 +1667,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (ROOM_PAINT_COLOR(room)) {
 		sprinttype(ROOM_PAINT_COLOR(room), paint_names, col_buf, sizeof(col_buf), "UNDEFINED");
 		*col_buf = LOWER(*col_buf);
-		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
+		msg_to_char(ch, "The building %s %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_PERMANENT_PAINT) ? "is" : "has been painted"), (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
 	
 	if (emp && GET_LOYALTY(ch) == emp && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
@@ -1720,11 +1739,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\t[B300]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
 	}
 	
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK)) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS)) {
 		msg_to_char(ch, "The area is blanketed in an inky darkness.\r\n");
 	}
 
-	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+	if (!AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 		if (can_get_quest_from_room(ch, room, NULL)) {
 			msg_to_char(ch, "\tA...there is a quest here for you!\t0\r\n");
 		}
@@ -1801,7 +1820,7 @@ void look_in_direction(char_data *ch, int dir) {
 				if (can_see_in_dark_room(ch, to_room, TRUE)) {
 					// find people
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
-						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
+						if (!AFF_FLAGGED(c, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							add_string_hash(&str_hash, PERS(c, ch, FALSE), 1);
 						}
 					}
@@ -2177,10 +2196,12 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 		strcpy(temp, GET_SECT_NAME(BASE_SECT(to_room)));
 		partial_dark = show_dark;
 	}
+	/* not showing this anymore
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
 		sprintf(temp, "Enchanted %s", GET_BLD_NAME(GET_BUILDING(to_room)));
 		whole_dark = show_dark;
 	}
+	*/
 	else if (GET_BUILDING(to_room)) {
 		strcpy(temp, GET_BLD_NAME(GET_BUILDING(to_room)));
 		whole_dark = show_dark;
@@ -2191,10 +2212,6 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room))) {
 		strcpy(temp, GET_CROP_NAME(cp));
 		CAP(temp);
-		partial_dark = show_dark;
-	}
-	else if (IS_ROAD(to_room) && SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
-		strcpy(temp, "Winding Path");
 		partial_dark = show_dark;
 	}
 	else {
@@ -2313,7 +2330,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 				strcpy(roombuf, "Blocked");
 			}
 		}
-		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+		else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_MAGIC_DARKNESS)) {
 			// magic dark
 			strcpy(roombuf, "Dark");
 		}
@@ -2645,6 +2662,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 				msg_to_char(ch, "%s -%s %s, %d tile%s %s\r\n", PERS(found, ch, FALSE), coord_display_room(ch, IN_ROOM(found), FALSE), get_room_name(IN_ROOM(found), FALSE), closest, PLURAL(closest), (*dir_str ? dir_str : "away"));
 			}
 			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
+			run_ability_hooks_by_player_tech(ch, PTECH_WHERE_UPGRADE, NULL, NULL, NULL, NULL);
 		}
 		else {
 			send_to_char("No-one around by that name.\r\n", ch);

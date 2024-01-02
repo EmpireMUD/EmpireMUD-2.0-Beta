@@ -2,7 +2,7 @@
 *   File: updates.c                                       EmpireMUD 2.0b5 *
 *  Usage: Handles versioning and auto-repair updates for live MUDs        *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -247,14 +247,14 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -304,7 +304,7 @@ void b3_2_map_and_gear(void) {
 	log(" - disenchanting the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -314,7 +314,7 @@ void b3_2_map_and_gear(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 			}
@@ -324,7 +324,7 @@ void b3_2_map_and_gear(void) {
 	log(" - disenchanting trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -395,15 +395,15 @@ void b3_11_ship_fix(void) {
 }
 
 
-// removes AFF_SENSE_HIDE
+// removes AFF_SENSE_HIDDEN
 PLAYER_UPDATE_FUNC(b3_12_update_players) {
-	// only care if they have a permanent sense-hide
-	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDE)) {
+	// only care if they have a permanent sense-hidden
+	if (!AFF_FLAGGED(ch, AFF_SENSE_HIDDEN)) {
 		return;
 	}
 
 	check_delayed_load(ch);
-	REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDDEN);
 	affect_total(ch);	// in case they are getting it from a real affect
 }
 
@@ -854,6 +854,8 @@ void b5_1_global_update(void) {
 void b5_3_missile_update(void) {
 	obj_data *obj, *next_obj;
 	
+	int TYPE_BOW = 29;	// bow type at the time of this patch
+	
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (!IS_MISSILE_WEAPON(obj)) {
 			continue;
@@ -878,14 +880,14 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -903,7 +905,7 @@ void b5_14_superior_items(void) {
 	log(" - refreshing superiors in the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -913,7 +915,7 @@ void b5_14_superior_items(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 			}
@@ -923,7 +925,7 @@ void b5_14_superior_items(void) {
 	log(" - refreshing superiors in trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -938,7 +940,7 @@ void b5_19_world_fix(void) {
 	room_data *room;
 	bld_data *bld;
 	
-	bitvector_t flags_to_wipe = ROOM_AFF_DARK | ROOM_AFF_SILENT | ROOM_AFF_NO_WEATHER | ROOM_AFF_NO_TELEPORT;
+	bitvector_t flags_to_wipe = ROOM_AFF_MAGIC_DARKNESS | ROOM_AFF_SILENT | ROOM_AFF_NO_WEATHER | ROOM_AFF_NO_TELEPORT;
 	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_ABANDON;
 	
 	LL_FOREACH(land_map, map) {
@@ -1022,14 +1024,14 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1047,7 +1049,7 @@ void b5_23_potion_update(void) {
 	log(" - updating the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1064,7 +1066,7 @@ void b5_23_potion_update(void) {
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 					eus->obj = new;
 				}
 				
@@ -1077,7 +1079,7 @@ void b5_23_potion_update(void) {
 	log(" - updating trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1094,14 +1096,14 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1119,7 +1121,7 @@ void b5_24_poison_update(void) {
 	log(" - updating the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1136,7 +1138,7 @@ void b5_24_poison_update(void) {
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
-					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 					eus->obj = new;
 				}
 				
@@ -1149,7 +1151,7 @@ void b5_24_poison_update(void) {
 	log(" - updating trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1696,14 +1698,14 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if ((obj = GET_EQ(ch, iter)) && IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
 	}
 	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1733,7 +1735,7 @@ void b5_86_update(void) {
 	log(" - refreshing the object list...");
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 		}
@@ -1743,7 +1745,7 @@ void b5_86_update(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && IS_MISSILE_WEAPON(obj)) {
-				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 				eus->obj = new;
 				extract_obj(obj);
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -1754,7 +1756,7 @@ void b5_86_update(void) {
 	log(" - refreshing trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_MISSILE_WEAPON(obj)) {
-			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			tpd->obj = new;
 			extract_obj(obj);
 		}
@@ -1858,6 +1860,141 @@ void b5_87_crop_and_old_growth(void) {
 			}
 		}
 	}
+}
+
+
+/**
+* This convertions the pre-b5.88 components to the new versions.
+*
+* @param int old_type The old component type, previously CMP_x.
+* @param bitvector_t old_flags Any flags that were set on the old component, callled CMPF_x.
+* @return any_vnum The new generic vnum component that matches it.
+*/
+any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags) {
+	// first, we need the pre-b5.88 component types (ones not listed do not need conversion)
+	const int cmp_BONE = 2, cmp_BLOCK = 3, cmp_CLAY = 4, cmp_FIBERS = 7,
+		cmp_FLOUR = 8, cmp_FRUIT = 9, cmp_FUR = 10, cmp_GEM = 11,
+		cmp_GRAIN = 12, cmp_HANDLE = 13, cmp_HERB = 14, cmp_LEATHER = 15,
+		cmp_LUMBER = 16, cmp_MEAT = 17, cmp_METAL = 18, cmp_NAILS = 19,
+		cmp_OIL = 20, cmp_PILLAR = 21, cmp_ROCK = 22, cmp_SEEDS = 23,
+		cmp_SKIN = 24, cmp_SAPLING = 25, cmp_TEXTILE = 26, cmp_VEGETABLE = 27,
+		cmp_ROPE = 28, cmp_PAINT = 29, cmp_WAX = 30, cmp_SWEETENER = 31,
+		cmp_SAND = 32, cmp_GLASS = 33;
+	// and old component flags
+	const int cmpf_ANIMAL = BIT(0), cmpf_BUNCH = BIT(1), cmpf_DESERT = BIT(2),
+		cmpf_FINE = BIT(3), cmpf_HARD = BIT(4), cmpf_LARGE = BIT(5),
+		cmpf_MAGIC = BIT(6), cmpf_PLANT = BIT(8), cmpf_POOR = BIT(9),
+		cmpf_RARE = BIT(10), cmpf_RAW = BIT(11), cmpf_REFINED = BIT(12),
+		cmpf_SINGLE = BIT(13), cmpf_SMALL = BIT(14), cmpf_SOFT = BIT(15),
+		cmpf_TEMPERATE = BIT(16), cmpf_TROPICAL = BIT(17),
+		cmpf_COMMON = BIT(18), cmpf_AQUATIC = BIT(19);
+	
+	const struct {
+		int type, flags;
+		any_vnum new_comp;
+	} b5_88_conversion[] = {
+		// This will run in order from top to bottom, matching component +
+		// exact flags, and returning the number on the right
+		{ cmp_BONE, cmpf_LARGE | cmpf_MAGIC | cmpf_RARE, 6565 },	// dragon bone
+		{ cmp_BONE, cmpf_LARGE | cmpf_RARE, 6563 },	// ivory
+		{ cmp_BONE, cmpf_MAGIC, 6564 },	// magic bone
+		{ cmp_BONE, NOBITS, 6560 },	// bone
+		{ cmp_BLOCK, cmpf_BUNCH, 6076 },	// bricks
+		{ cmp_BLOCK, cmpf_SINGLE, 6077 },	// large block
+		{ cmp_BLOCK, NOBITS, 6075 },	// block
+		{ cmp_CLAY, NOBITS, 6090 },	// clay (no variants)
+		{ cmp_FIBERS, cmpf_HARD | cmpf_PLANT, 6422 },	// hard plant fibers
+		{ cmp_FIBERS, cmpf_SOFT | cmpf_PLANT, 6421 },	// soft plant fibers
+		{ cmp_FIBERS, cmpf_SOFT | cmpf_ANIMAL, 6441 },	// wool
+		{ cmp_FIBERS, NOBITS, 6400 },	// basic fibers
+		{ cmp_FLOUR, NOBITS, 6300 },	// basic flour
+		{ cmp_FRUIT, cmpf_MAGIC | cmpf_SINGLE, 6121 },	// small magic fruit
+		{ cmp_FRUIT, cmpf_MAGIC | cmpf_BUNCH, 6131 },	// large magic fruit
+		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_SINGLE, 6122 },	// small temperate fruit
+		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_BUNCH, 6132 },	// large temperate fruit
+		{ cmp_FRUIT, cmpf_DESERT | cmpf_SINGLE, 6124 },	// small desert fruit
+		{ cmp_FRUIT, cmpf_DESERT | cmpf_BUNCH, 6134 },	// large desert fruit
+		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_SINGLE, 6123 },	// small tropical fruit
+		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_BUNCH, 6133 },	// large tropical fruit
+		{ cmp_FRUIT, cmpf_SINGLE, 6120 },	// small fruit
+		{ cmp_FRUIT, cmpf_BUNCH, 6130 },	// large fruit
+		{ cmp_FRUIT, NOBITS, 6120 },	// small fruit
+		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_SINGLE, 6141 },	// small magic veg
+		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_BUNCH, 6151 },	// large magic veg
+		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_SINGLE, 6142 },	// small temperate veg
+		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_BUNCH, 6152 },	// large temperate veg
+		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_SINGLE, 6144 },	// small desert veg
+		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_BUNCH, 6154 },	// large desert veg
+		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_SINGLE, 6143 },	// small tropical veg
+		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_BUNCH, 6153 },	// large tropical veg
+		{ cmp_VEGETABLE, cmpf_SINGLE, 6140 },	// small veg
+		{ cmp_VEGETABLE, cmpf_BUNCH, 6150 },	// large veg
+		{ cmp_VEGETABLE, NOBITS, 6140 },	// small veg
+		{ cmp_GRAIN, cmpf_SINGLE, 6160 },	// small grain
+		{ cmp_GRAIN, cmpf_BUNCH, 6170 },	// large grain
+		{ cmp_GRAIN, NOBITS, 6160 },	// small grain
+		{ cmp_SEEDS, NOBITS, 6181 },	// edible seeds
+		{ cmp_GEM, cmpf_REFINED, 6601 },	// powerful magic gem
+		{ cmp_GEM, NOBITS, 6600 },	// magic gem
+		{ cmp_HERB, cmpf_REFINED, 6651 },	// refined herb
+		{ cmp_HERB, NOBITS, 6650 },	// herb
+		{ cmp_SWEETENER, NOBITS, 6340 },	// basic sweetener
+		{ cmp_OIL, NOBITS, 6320 },	// basic oil -- there are more types but no way to tell from flags
+		{ cmp_GLASS, cmpf_RAW, 6831 },	// glass ingot
+		{ cmp_GLASS, NOBITS, 6830 },	// glass
+		{ cmp_SAND, NOBITS, 6085 },	// only 1 type of sand
+		{ cmp_WAX, NOBITS, 6891 },	// basic wax
+		{ cmp_PAINT, NOBITS, 6890 },	// basic paint
+		{ cmp_ROPE, NOBITS, 6880 },	// basic rope
+		{ cmp_HANDLE, cmpf_MAGIC, 6851 },	// magic handle
+		{ cmp_HANDLE, NOBITS, 6850 },	// basic handle
+		{ cmp_TEXTILE, cmpf_MAGIC, 6810 },	// magic cloth
+		{ cmp_TEXTILE, NOBITS, 6800 },	// basic cloth
+		{ cmp_NAILS, NOBITS, 6790 },	// only 1 type
+		{ cmp_METAL, cmpf_POOR, 6710 },	// poor metal
+		{ cmp_METAL, cmpf_COMMON, 6720 },	// common metal
+		{ cmp_METAL, cmpf_HARD, 6740 },	// hardened metal
+		{ cmp_METAL, cmpf_FINE, 6750 },	// precious metal 1
+		{ cmp_METAL, cmpf_REFINED, 6750 },	// precious metal 2
+		{ cmp_METAL, cmpf_MAGIC, 6760 },	// magic metal
+		{ cmp_METAL, cmpf_RARE, 6730 },	// rare metal
+		{ cmp_METAL, NOBITS, 6700 },	// basic metal
+		{ cmp_ROCK, NOBITS, 6050 },	// basic rock
+		{ cmp_SAPLING, cmpf_FINE, 6026 },	// fine sapling
+		{ cmp_SAPLING, NOBITS, 6025 },	// basic sapling
+		{ cmp_LUMBER, cmpf_MAGIC, 6001 },	// magic lumber
+		{ cmp_LUMBER, cmpf_FINE, 6002 },	// fine lumber
+		{ cmp_LUMBER, NOBITS, 6000 },	// basic lumber
+		{ cmp_PILLAR, cmpf_LARGE, 6017 },	// large pillar
+		{ cmp_PILLAR, cmpf_FINE, 6016 },	// fine pillar
+		{ cmp_PILLAR, NOBITS, 6015 },	// basic pillar
+		{ cmp_FUR, cmpf_LARGE, 6550 },	// large fur
+		{ cmp_FUR, cmpf_SMALL, 6541 },	// small fur
+		{ cmp_FUR, NOBITS, 6540 },	// basic fur
+		{ cmp_SKIN, cmpf_MAGIC, 6511 },	// magic skin
+		{ cmp_SKIN, cmpf_LARGE, 6510 },	// thick skin
+		{ cmp_SKIN, cmpf_SMALL, 6501 },	// thin skin
+		{ cmp_SKIN, NOBITS, 6500 },	// basic skin
+		{ cmp_LEATHER, cmpf_MAGIC, 6531 },	// magic leather
+		{ cmp_LEATHER, cmpf_LARGE, 6530 },	// thick leather
+		{ cmp_LEATHER, cmpf_SMALL, 6521 },	// thin leather
+		{ cmp_LEATHER, NOBITS, 6520 },	// basic leather
+		{ cmp_MEAT, cmpf_AQUATIC, 6203 },	// raw fish
+		{ cmp_MEAT, NOBITS, 6200 },	// raw meat
+		
+		{ -1, -1, -1 }	// LAST
+	};
+	
+	int iter;
+	
+	for (iter = 0; b5_88_conversion[iter].type != -1; ++iter) {
+		if (b5_88_conversion[iter].type == old_type && (b5_88_conversion[iter].flags == NOBITS || IS_SET_STRICT(old_flags, b5_88_conversion[iter].flags))) {
+			return b5_88_conversion[iter].new_comp;
+		}
+	}
+	
+	// didn't find it? no valid component type
+	return NOTHING;
 }
 
 
@@ -2659,7 +2796,7 @@ obj_data *b5_130b_check_replace_obj(obj_data *obj) {
 		for (iter = 0; stop_list[iter] != -1; ++iter) {
 			if (GET_OBJ_VNUM(obj) == stop_list[iter]) {
 				// copy obj
-				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 			
 				// check scripts
 				found = FALSE;
@@ -3333,6 +3470,73 @@ PLAYER_UPDATE_FUNC(b5_165_fight_messages) {
 }
 
 
+// updates with the new required affect on counterspell and phoenix rite plus heal friend
+PLAYER_UPDATE_FUNC(b5_166_player_update) {
+	struct affected_type *hjp;
+	struct player_skill_data *plsk, *next_plsk;
+	
+	any_vnum COUNTERSPELL = 3021;
+	any_vnum PHOENIX_RITE = 3017;
+	
+	any_vnum HEAL_FRIEND = 110;
+	any_vnum NATURAL_MAGIC = 3;
+	
+	any_vnum BASH = 97;
+	any_vnum BATTLE = 0;
+	
+	any_vnum GIANT_TORTOISE = 506;
+	
+	check_delayed_load(ch);
+	
+	// new affect flags
+	LL_FOREACH(ch->affected, hjp) {
+		if (hjp->type == COUNTERSPELL && hjp->bitvector == NOBITS) {
+			hjp->bitvector = AFF_COUNTERSPELL;
+		}
+	
+		if (hjp->type == PHOENIX_RITE && hjp->bitvector == NOBITS) {
+			hjp->bitvector = AFF_AUTO_RESURRECT;
+		}
+	}
+	
+	// heal friend increased in level
+	if (has_ability(ch, HEAL_FRIEND) && get_skill_level(ch, NATURAL_MAGIC) < 55) {
+		remove_ability(ch, ability_proto(HEAL_FRIEND), FALSE);
+	}
+	
+	// bash increased in level
+	if (has_ability(ch, BASH) && get_skill_level(ch, BATTLE) < 80) {
+		remove_ability(ch, ability_proto(BASH), FALSE);
+	}
+	
+	// remove giant tortoise companion: it now comes from a different ability
+	remove_companion(ch, GIANT_TORTOISE);
+	
+	// grant free skill resets
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->level > 0) {
+			plsk->resets = MIN(plsk->resets + 1, MAX_SKILL_RESETS);
+		}
+	}
+	
+	// add new status message
+	GET_STATUS_MESSAGES(ch) |= SM_FIGHT_PROMPT;
+}
+
+// applies traits now required for enchanted walls
+void b5_166_barrier_magentafication(void) {
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY) && ROOM_BLD_FLAGGED(room, BLD_BARRIER) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_PERMANENT_PAINT)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PERMANENT_PAINT);
+			set_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR, 11);
+			affect_total_room(room);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3431,6 +3635,7 @@ const struct {
 	{ "b5.153", NULL, b5_153_player_repair, "Repairing hunger/thirst on players" },
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
+	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

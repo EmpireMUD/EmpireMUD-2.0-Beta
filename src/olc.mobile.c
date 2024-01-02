@@ -2,7 +2,7 @@
 *   File: olc.mobile.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for mobs                                                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -51,6 +51,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
+	attack_message_data *amd = NULL;
 
 	if (!str_cmp(GET_PC_NAME(mob), default_mob_keywords)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Keywords not set");
@@ -115,8 +116,12 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "No maximum scale level on non-adventure mob");
 		problem = TRUE;
 	}
-	if (MOB_ATTACK_TYPE(mob) == TYPE_RESERVED) {
+	if (MOB_ATTACK_TYPE(mob) == ATTACK_RESERVED || !(amd = real_attack_message(MOB_ATTACK_TYPE(mob)))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Invalid attack type");
+		problem = TRUE;
+	}
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Attack type %d is not valid (it is missing the MOBILE flag)", MOB_ATTACK_TYPE(mob));
 		problem = TRUE;
 	}
 	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
@@ -300,7 +305,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_territory_data *ter, *next_ter;
-	struct ability_data_list *adl, *next_adl;
 	char_data *proto, *mob_iter, *next_mob;
 	struct empire_npc_data *end, *next_end;
 	descriptor_data *desc;
@@ -392,13 +396,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-				LL_DELETE(ABIL_DATA(abil), adl);
-				free(adl);
-				found = TRUE;
-			}
-		}
+		found |= delete_from_ability_data_list(abil, ADL_SUMMON_MOB, vnum);
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_MOB, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related mob", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -539,16 +538,11 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
-					free(adl);
-					found = TRUE;
-				}
-			}
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUMMON_MOB, vnum);
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_MOB, vnum);
 		
 			if (found) {
-				msg_to_desc(desc, "A mob listed in the data for the ability you're editing has been removed.\r\n");
+				msg_to_desc(desc, "A mob listed in the data or interactions for the ability you're editing has been removed.\r\n");
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
@@ -667,9 +661,10 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
-	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;
+	int only_move = NOTHING, only_nameset = NOTHING;
 	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
+	attack_message_data *only_attack = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	char_data *mob, *next_mob;
@@ -692,7 +687,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_FUNC("allegiance", only_fct, find_faction(val_arg))
 		FULLSEARCH_FUNC("faction", only_fct, find_faction(val_arg))
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
-		FULLSEARCH_FUNC("attack", only_attack, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("attack", only_attack, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_FLAGS("custom", find_custom, mob_custom_types)
 		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
@@ -743,7 +738,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		if (only_flags != NOBITS && (MOB_FLAGS(mob) & only_flags) != only_flags) {
 			continue;
 		}
-		if (only_attack != NOTHING && MOB_ATTACK_TYPE(mob) != only_attack) {
+		if (only_attack && MOB_ATTACK_TYPE(mob) != ATTACK_VNUM(only_attack)) {
 			continue;
 		}
 		if (only_move != NOTHING && MOB_MOVE_TYPE(mob) != only_move) {
@@ -814,7 +809,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	char_data *proto, *mob, *next_mob;
-	struct ability_data_list *adl;
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
@@ -844,12 +838,20 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		any = FALSE;
+		if (find_ability_data_entry_for(abil, ADL_SUMMON_MOB, vnum)) {
+			any = TRUE;
+		}
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+				any = TRUE;
 				break;
 			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -1217,7 +1219,6 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
 		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
-		MOB_ATTACK_TYPE(new) = TYPE_HIT;
 
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
@@ -1295,7 +1296,7 @@ void olc_show_mobile(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), TYPE_HIT), attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
+	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
 	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
 	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
@@ -1311,7 +1312,7 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
 	count = 0;
 	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
 	}
 	
 	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(mob->proto_script));
@@ -1356,13 +1357,27 @@ OLC_MODULE(medit_allegiance) {
 
 OLC_MODULE(medit_attack) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_ATTACK_TYPE(mob) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MOB_ATTACK_TYPE(mob));
+	attack_message_data *amd;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		msg_to_char(ch, "That attack type is not available on mobs.\r\n");
+	}
+	else {
+		MOB_ATTACK_TYPE(mob) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "Attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
 }
 
 
 OLC_MODULE(medit_custom) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types);
+	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types, mob_custom_type_help);
 }
 
 

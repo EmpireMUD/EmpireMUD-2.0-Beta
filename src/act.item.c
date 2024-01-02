@@ -2,7 +2,7 @@
 *   File: act.item.c                                      EmpireMUD 2.0b5 *
 *  Usage: object handling routines -- get/drop and container handling     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -72,6 +72,48 @@ bitvector_t show_obj_flags = OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIN
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Apply the actual effects of a potion. This does NOT extract the potion.
+*
+* @param obj_data *obj the potion
+* @param char_data *ch the quaffer
+*/
+void apply_potion(obj_data *obj, char_data *ch) {
+	any_vnum aff_type = GET_POTION_AFFECT(obj) != NOTHING ? GET_POTION_AFFECT(obj) : ATYPE_POTION;
+	struct affected_type *af;
+	struct obj_apply *apply;
+	
+	act("A swirl of light passes over you!", FALSE, ch, NULL, NULL, TO_CHAR);
+	act("A swirl of light passes over $n!", FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	// ensure scaled
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+		scale_item_to_level(obj, 1);	// minimum level
+	}
+	
+	// remove any old buffs (if adding a new one)
+	if (GET_OBJ_AFF_FLAGS(obj) || GET_OBJ_APPLIES(obj)) {
+		affect_from_char(ch, aff_type, FALSE);
+	}
+	
+	if (GET_OBJ_AFF_FLAGS(obj)) {
+		af = create_flag_aff(aff_type, 30 * SECS_PER_REAL_MIN, GET_OBJ_AFF_FLAGS(obj), ch);
+		affect_to_char(ch, af);
+		free(af);
+	}
+
+	LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+		af = create_mod_aff(aff_type, 30 * SECS_PER_REAL_MIN, apply->location, apply->modifier, ch);
+		affect_to_char(ch, af);
+		free(af);
+	}
+	
+	if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && GET_POTION_COOLDOWN_TIME(obj) > 0) {
+		add_cooldown(ch, GET_POTION_COOLDOWN_TYPE(obj), GET_POTION_COOLDOWN_TIME(obj));
+	}
+}
+
+
+/**
 * @param char_data *ch Prospective taker.
 * @param obj_data *obj The item he's trying to take.
 * @return bool TRUE if ch can take obj.
@@ -92,6 +134,8 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 /**
 * Interaction func for "combine". This almost always extracts the original
 * item, so it should basically always return TRUE.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(combine_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -479,6 +523,8 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 
 /**
 * Interaction func for "identify".
+* 
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(identifies_to_interact) {
 	char to_char[MAX_STRING_LENGTH];
@@ -816,7 +862,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 			if (GET_POISON_AFFECT(obj) != NOTHING) {
 				msg_to_char(ch, "Poison type: %s\r\n", get_generic_name_by_vnum(GET_POISON_AFFECT(obj)));
 			}
-			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
+			msg_to_char(ch, "Poison has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
 		case ITEM_RECIPE: {
@@ -827,7 +873,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		case ITEM_WEAPON: {
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(obj)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(obj)].damage_type]);
+			msg_to_char(ch, "Damage type is %s (%s/%s).\r\n", get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(obj))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(obj))]);
 			break;
 		}
 		case ITEM_ARMOR:
@@ -899,7 +945,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", get_weapon_speed(obj));
 			msg_to_char(ch, "Damage: %d (%s+%.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
-			msg_to_char(ch, "Damage type is %s.\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			msg_to_char(ch, "Damage type is %s.\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(obj)));
 			break;
 		case ITEM_AMMO:
 			if (GET_AMMO_QUANTITY(obj) > 0) {
@@ -1094,7 +1140,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	player_index_data *index;
 	
 	// basic info
-	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
+	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	
 	if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
@@ -1138,6 +1184,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(light_obj_interact) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *new = NULL;
@@ -1279,19 +1326,19 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	}
 	
 	if (GET_OBJ_CARRYING_N(cont) + obj_carry_size(obj) > GET_MAX_CONTAINER_CONTENTS(cont)) {
-		act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
+		act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR | ACT_OBJ_VICT);
 		return 0;
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_LARGE) && !OBJ_FLAGGED(cont, OBJ_LARGE) && CAN_WEAR(cont, ITEM_WEAR_TAKE)) {
-		act("$p is far too large to fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
+		act("$p is far too large to fit in $P.", FALSE, ch, obj, cont, TO_CHAR | ACT_OBJ_VICT);
 		return 1;	// is this correct? I added it because it was implied by the drop-thru here -pc
 	}
 	else {
 		obj_to_obj(obj, cont);
 
-		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
+		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE | ACT_OBJ_VICT);
 
-		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
+		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE | ACT_OBJ_VICT);
 
 		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
@@ -1489,6 +1536,8 @@ void remove_honed_gear(char_data *ch) {
 
 /**
 * Interaction func for "seed".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(seed_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -1539,6 +1588,8 @@ INTERACTION_FUNC(seed_obj_interact) {
 
 /**
 * Interaction func for "separate".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -2411,8 +2462,8 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			}
 			
 			obj_to_char(obj, ch);
-			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE);
-			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE);
+			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE | ACT_OBJ_VICT);
+			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE | ACT_OBJ_VICT);
 			
 			if (stealing) {
 				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
@@ -2420,7 +2471,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 				if (emp && IS_IMMORTAL(ch)) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 				}
-				else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+				else if (emp && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_STEAL_COMMAND)) {
 					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 				}
 				
@@ -2428,9 +2479,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 					GET_STOLEN_TIMER(obj) = time(0);
 					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 					trigger_distrust_from_stealth(ch, emp);
-					gain_ability_exp(ch, ABIL_STEAL, 50);
+					gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
 					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 				}
+				run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 			}
 			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 				// un-steal if this was the original owner
@@ -2556,7 +2608,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			if (emp && IS_IMMORTAL(ch)) {
 				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
 			}
-			else if (emp && !skill_check(ch, ABIL_STEAL, DIFF_HARD)) {
+			else if (emp && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_STEAL_COMMAND)) {
 				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			
@@ -2564,9 +2616,11 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 				GET_STOLEN_TIMER(obj) = time(0);
 				GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 				trigger_distrust_from_stealth(ch, emp);
-				gain_ability_exp(ch, ABIL_STEAL, 50);
+				gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
 				add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
 			}
+			
+			run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 		}
 		else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 			// un-steal if this was the original owner
@@ -2590,20 +2644,27 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 static void get_from_room(char_data *ch, char *arg, int howmany) {
 	obj_data *obj, *next_obj;
 	int dotmode, found = 0;
+	vehicle_data *veh;
 
 	dotmode = find_all_dots(arg);
 
 	if (dotmode == FIND_INDIV) {
 		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			sprintf(buf, "You don't see %s %s here.\r\n", AN(arg), arg);
-			send_to_char(buf, ch);
+			// was it a vehicle, not an object?
+			if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+				act("$V: you can't take that!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			}
+			else {
+				msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+			}
 		}
 		else {
 			obj_data *obj_next;
-			while(obj && howmany--) {
+			while (obj && howmany--) {
 				obj_next = obj->next_content;
-				if (!perform_get_from_room(ch, obj))
+				if (!perform_get_from_room(ch, obj)) {
 					break;
+				}
 				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
@@ -2616,13 +2677,19 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = 1;
-				if (!perform_get_from_room(ch, obj))
+				if (!perform_get_from_room(ch, obj)) {
 					break;
+				}
 			}
 		}
 		if (!found) {
-			if (dotmode == FIND_ALL)
-				send_to_char("There doesn't seem to be anything here.\r\n", ch);
+			if (dotmode == FIND_ALL) {
+				msg_to_char(ch, "There doesn't seem to be anything here%s.\r\n", (ROOM_VEHICLES(IN_ROOM(ch)) ? " you can take" : ""));
+			}
+			else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+				// tried to get a vehicle
+				act("$V: you can't take that!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			}
 			else {
 				sprintf(buf, "You don't see any %ss here.\r\n", arg);
 				send_to_char(buf, ch);
@@ -2826,7 +2893,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 				act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			}
 			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
-				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR);
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_CHAR | ACT_STR_VICT);
 			}
 			else {
 				msg_to_char(ch, "You drink the %s.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
@@ -3057,7 +3124,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			total_share += ABSOLUTE(val); \
 		} \
 		else if ((val) < 0) { \
-			bonus += -1 * (val); \
+			bonus += ceil(ABSOLUTE(val) * apply_values[(int)apply->location]); \
 		} \
 	}
 	// end helper
@@ -3719,7 +3786,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
 	vehicle_from_room(boat);
@@ -3727,7 +3794,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
 	VEH_SHIPPING_ID(boat) = -1;
@@ -3859,7 +3926,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
 	vehicle_from_room(boat);
@@ -3867,7 +3934,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
-		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
+		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -5215,7 +5282,7 @@ ACMD(do_compare) {
 	if (to_obj) {
 		msg_to_char(ch, "\r\n");
 		identify_obj_to_char(to_obj, ch, TRUE);
-		act("$n compares $p to $P.", TRUE, ch, obj, to_obj, TO_ROOM);
+		act("$n compares $p to $P.", TRUE, ch, obj, to_obj, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else {
 		// detect?
@@ -5225,14 +5292,14 @@ ACMD(do_compare) {
 				if (GET_EQ(ch, pos)) {
 					msg_to_char(ch, "\r\n");
 					identify_obj_to_char(GET_EQ(ch, pos), ch, TRUE);
-					act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
+					act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM | ACT_OBJ_VICT);
 				}
 				// cascade?
 				while ((pos = wear_data[pos].cascade_pos) != NO_WEAR) {
 					if (GET_EQ(ch, pos)) {
 						msg_to_char(ch, "\r\n");
 						identify_obj_to_char(GET_EQ(ch, pos), ch, TRUE);
-						act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM);
+						act("$n compares $p to $P.", TRUE, ch, obj, GET_EQ(ch, pos), TO_ROOM | ACT_OBJ_VICT);
 					}
 				}
 			}
@@ -5789,19 +5856,9 @@ ACMD(do_eat) {
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			// special case: Taste Blood
-			char_data *vict;
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM))) {
-				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
-					taste_blood(ch, vict);
-				}
-				return;
-			}
-			else {
-				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-				send_to_char(buf, ch);
-				return;
-			}
+			sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+			send_to_char(buf, ch);
+			return;
 		}
 	}
 	if (GET_OBJ_TYPE(food) == ITEM_DRINKCON) {
@@ -6488,7 +6545,7 @@ ACMD(do_identify) {
 		}
 		else if (veh) {
 			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-			act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			identify_vehicle_to_char(veh, ch);
 		}
 	}
@@ -6661,27 +6718,28 @@ ACMD(do_light) {
 			act("You light $p!", FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n lights $p!", FALSE, ch, obj, NULL, TO_ROOM);
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, obj, NULL, NULL);
 		}
 		else if (lighter) {
 			// obj message to char
 			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
-				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, lighter, obj, TO_CHAR);
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, lighter, obj, TO_CHAR | ACT_OBJ_VICT);
 			}
 			else {
-				act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR);
+				act("You use $p to light $P.", FALSE, ch, lighter, obj, TO_CHAR | ACT_OBJ_VICT);
 			}
 			
 			// obj message to room
 			if (obj_has_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
-				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, lighter, obj, TO_ROOM);
+				act(obj_get_custom_message(lighter, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, lighter, obj, TO_ROOM | ACT_OBJ_VICT);
 			}
 			else {
-				act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM);
+				act("$n uses $p to light $P.", FALSE, ch, lighter, obj, TO_ROOM | ACT_OBJ_VICT);
 			}
 		}
 		else { // somehow?
-			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR);
-			act("$n lights $P.", FALSE, ch, NULL, obj, TO_ROOM);
+			act("You light $P.", FALSE, ch, NULL, obj, TO_CHAR | ACT_OBJ_VICT);
+			act("$n lights $P.", FALSE, ch, NULL, obj, TO_ROOM | ACT_OBJ_VICT);
 		}
 		
 		if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT) && IS_LIGHT(obj) && !GET_LIGHT_IS_LIT(obj) && GET_LIGHT_HOURS_REMAINING(obj) != 0) {
@@ -7092,8 +7150,8 @@ ACMD(do_pour) {
 		msg_to_char(ch, "You pour the %s into %s.\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(from_obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), GET_OBJ_SHORT_DESC(to_obj));
 	}
 	if (subcmd == SCMD_FILL) {
-		act("You gently fill $p from $P.", FALSE, ch, to_obj, from_obj, TO_CHAR);
-		act("$n gently fills $p from $P.", TRUE, ch, to_obj, from_obj, TO_ROOM);
+		act("You gently fill $p from $P.", FALSE, ch, to_obj, from_obj, TO_CHAR | ACT_OBJ_VICT);
+		act("$n gently fills $p from $P.", TRUE, ch, to_obj, from_obj, TO_ROOM | ACT_OBJ_VICT);
 	}
 
 	/* First same type liq. */
@@ -7252,6 +7310,56 @@ ACMD(do_put) {
 			}
 		}
 	}
+}
+
+
+ACMD(do_quaff) {
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Which potion would you like to quaff?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!IS_POTION(obj)) {
+		msg_to_char(ch, "You can only quaff potions.\r\n");
+	}
+	else if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)) > 0) {
+		msg_to_char(ch, "You can't quaff that until your %s cooldown expires.\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)));
+	}
+	else {
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+			scale_item_to_level(obj, 1);	// just in case
+		}
+		
+		if (!consume_otrigger(obj, ch, OCMD_QUAFF, NULL)) {
+			return;	// check trigger last
+		}
+
+		// message to char
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You quaff $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// message to room
+		if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
+			act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		
+		apply_potion(obj, ch);
+		
+		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
+		extract_obj(obj);
+	}	
 }
 
 
@@ -7516,6 +7624,9 @@ ACMD(do_roadsign) {
 	else if (color_strlen(argument) > max_length) {
 		msg_to_char(ch, "Road signs can't be more than %d characters long.\r\n", max_length);
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		if (ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 			old_sign = TRUE;
@@ -7530,6 +7641,7 @@ ACMD(do_roadsign) {
 		}
 
 		gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
+		run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL, IN_ROOM(ch));
 		extract_obj(sign);
 	}
 }

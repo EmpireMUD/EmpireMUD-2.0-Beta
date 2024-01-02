@@ -2,7 +2,7 @@
 *   File: act.social.c                                    EmpireMUD 2.0b5 *
 *  Usage: Functions to handle socials                                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -55,14 +55,20 @@ bool check_social(char_data *ch, char *string, bool exact) {
 		return FALSE;	// no match to any social
 	}
 	
+	// going to process the social: remove hide first
+	if (AFF_FLAGGED(ch, AFF_HIDDEN)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
+	}
+	
 	// does a command trigger override this social?
 	if (strlen(string) < strlen(SOC_COMMAND(soc)) && check_command_trigger(ch, SOC_COMMAND(soc), arg1, CMDTRG_EXACT)) {
 		return TRUE;
 	}
 	
 	// earthmeld doesn't hit the correct error in char_can_act -- just block all socials in earthmeld
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
+		msg_to_char(ch, "You can't do that while earthmelded.\r\n");
 		return TRUE;
 	}
 	
@@ -420,7 +426,7 @@ ACMD(do_point) {
 		if (ch->desc) {
 			clear_last_act_message(ch->desc);
 		}
-		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR);
+		act(to_char, FALSE, ch, obj ? (const void*)obj : (const void*)veh, NULL, TO_CHAR | (obj ? NOBITS : ACT_VEH_OBJ));
 		if (ch->desc && ch->desc->last_act_message) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, ch->desc->last_act_message, FALSE, 0, NOTHING);
 		}
@@ -433,7 +439,7 @@ ACMD(do_point) {
 				
 				color = CUSTOM_COLOR_CHAR(pers, CUSTOM_COLOR_EMOTE);
 				sprintf(buf, "\t%c%s", color, to_room);
-				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING);
+				act(buf, FALSE, ch, obj ? (const void*)obj : (const void*)veh, pers, TO_VICT | TO_NOT_IGNORING | (obj ? NOBITS : ACT_VEH_OBJ));
 				
 				// channel history
 				if (pers->desc && pers->desc->last_act_message) {

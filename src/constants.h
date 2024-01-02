@@ -2,7 +2,7 @@
 *   File: constants.h                                     EmpireMUD 2.0b5 *
 *  Usage: Externs for the many consts in constants.c                      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -18,15 +18,22 @@ extern const char *reboot_type[];
 extern const char *version;
 
 // ability constants
+extern const char *ability_actions[];
 extern const char *ability_flags[];
 extern const char *ability_flag_notes[];
 extern const char *ability_type_flags[];
 extern const char *ability_type_notes[];
 extern const char *ability_target_flags[];
 extern const char *ability_custom_types[];
+extern const char *ability_custom_type_help;
 extern const char *ability_data_types[];
 extern const char *ability_effects[];
 extern const char *ability_gain_hooks[];
+extern const char *ability_hook_types[];
+extern const char *ability_move_types[];
+extern const char *ability_limitations[];
+extern const int ability_limitation_misc[];
+extern const char *conjure_words[];
 
 // adventure constants
 extern const char *adventure_flags[];
@@ -41,6 +48,11 @@ extern const char *room_template_flags[];
 extern const char *archetype_flags[];
 extern const char *archetype_types[];
 extern const struct archetype_menu_type archetype_menu[];
+
+// attack message constants
+extern const char *attack_message_flags[];
+extern const char *attack_speed_types[];
+extern const char *weapon_types[];
 
 // augment constants
 extern const char *augment_types[];
@@ -160,6 +172,7 @@ extern const char *liquid_flags[];
 // mob constants
 extern const char *action_bits[];
 extern const char *mob_custom_types[];
+extern const char *mob_custom_type_help;
 extern const char *mob_move_types[];
 extern const char *name_sets[];
 
@@ -183,6 +196,7 @@ extern const struct material_data materials[NUM_MATERIALS];
 extern const char *container_bits[];
 extern const char *corpse_flags[];
 extern const char *fullness[];
+extern const char *item_rename_keywords[];
 extern const char *light_flags[];
 extern const char *light_flags_for_identify[];
 extern const char *mint_flags[];
@@ -193,6 +207,7 @@ extern const char *resource_types[];
 extern const char *storage_bits[];
 extern const char *tool_flags[];
 extern const char *obj_custom_types[];
+extern const char *obj_custom_type_help;
 extern const double basic_speed;
 
 // olc constants
@@ -220,6 +235,7 @@ extern const struct climate_temperature_t climate_temperature[];
 extern const bitvector_t climate_flags_order[];
 extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
+extern const char *crop_custom_types[];
 extern const char *depletion_type[];
 extern const char *designate_flags[];
 extern const char *evo_types[];
@@ -235,6 +251,7 @@ extern const char *road_types[];
 extern const char *room_aff_bits[];
 extern const char *room_extra_types[];
 extern const char *sector_flags[];
+extern const char *sect_custom_types[];
 extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *seasons[];
@@ -257,7 +274,6 @@ extern const char *damage_types[];
 extern const int damage_type_to_dot_attack[];
 extern const char *skill_check_difficulty[];
 extern const char *skill_flags[];
-extern const char *weapon_types[];
 
 // social constants
 extern const char *social_flags[];

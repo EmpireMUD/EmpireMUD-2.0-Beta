@@ -1,54 +1,131 @@
 #100
 Mage Armor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 3 0
 T e 1
 S
 #101
 Archery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 38 0
 T e 1
 S
 #102
 Quick Draw~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 93 0
+T e 1
 S
 #103
 Firstaid~
-0 -1 1.00 0 0
-T m 0
+q -1 1.50 0 0 0
+C
+firstaid 5 b 1 20 0.00 -1 0 0 7 0
+D 64 8 0
+D 64 11 0
+D 64 10 0
+M
+0
+You apply first aid to your wounds.~
+M
+1
+$n applies first aid to $s wounds.~
+M
+2
+You apply first aid to $N's wounds.~
+M
+3
+$n applies first aid to your wounds.~
+M
+4
+$n applies first aid to $N's wounds.~
+M
+8
+You don't have any wounds to tend.~
+M
+9
+*~
+M
+10
+$E doesn't have any wounds to tend.~
+M
+11
+*~
+M
+12
+*~
+T y 3
+T s 1
 S
 #104
 Fleet~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 91 0
+T e 1
 S
 #105
 Finesse~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 92 0
+T e 1
 S
 #106
 Stunning Blow~
-0 -1 1.00 0 0
-T m 0
+av -1 1.00 hE 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+H 128 0 10.00 0
+M
+2
+That last blow seems to stun $N!~
+M
+3
+$n's last blow hit you hard! You're knocked to the floor, stunned.~
+M
+4
+$n's last blow seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 t
+X+ 1 3049
+X+ 2 5
+X+ 3 10
 S
 #107
 Veintap~
-0 -1 1.00 0 0
-T m 0
+nq -1 1.00 0 0 0
+C
+veintap 5 i 3 0 0.00 -1 0 0 1 0
+I 33 6 100.00 500  # LIQUID-CONJURE: Blood
+M
+2
+You drain some of your blood into $p!~
+M
+4
+$n drains some of $s blood into $p!~
+M
+31
+Fill what with blood?~
+T o 1
+X+ 7 1.00
 S
 #108
 Weaken~
-a -1 0.50 h 0
+a -1 0.50 h 0 0
 A
 1 -1
 A
 8 -1
 C
-weaken 0 bf 3 50 0 2043 75 0 2 0
+weaken 7 bf 3 50 0.00 2043 75 0 2 0
 M
 2
 You spread your dead blood on $N...~
@@ -59,74 +136,269 @@ M
 4
 $n spreads some of $s blood on $N...~
 T b 1
-X b
-3014 75 75 0
+X+ 1 3014
+X+ 2 75
+X+ 3 75
 S
 #109
 Heal~
-0 -1 1.00 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 g 2 1 0.00 -1 0 8 5 0
+D 512 110 0
+M
+0
+You swirl your mana around your body to heal your wounds.~
+M
+1
+$n's body swirls with mana and $s wounds seem to heal.~
+M
+8
+You don't need any healing.~
+M
+9
+*~
+T y 1
+X+ 7 0.75
 S
 #110
 Heal Friend~
-0 -1 1.00 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 beD 2 1 0.00 -1 0 0 5 0
+D 512 111 0
+M
+8
+You don't need any healing.~
+M
+9
+*~
+M
+0
+You swirl your mana around your body to heal your wounds.~
+M
+1
+$n's body swirls with mana and $s wounds seem to heal.~
+M
+2
+You let your mana pulse and wave around $N, healing $S wounds.~
+M
+3
+$n sends forth a wave of mana, which pulses through your body and heals your wounds.~
+M
+4
+A wave of mana shoots from $n to $N, healing $S wounds.~
+M
+10
+$N doesn't need any healing.~
+M
+11
+*~
+M
+12
+*~
+T y 1
+X+ 7 0.50
 S
 #111
 Heal Party~
-0 -1 1.00 0 0
-T m 0
+j -1 1.00 0 0 0
+C
+heal 5 beyD 2 1 0.00 -1 0 8 5 0
+M
+0
+The mana swirls around your body and heals your wounds.~
+M
+1
+The mana swirls around $n's body and heals $s wounds.~
+M
+2
+The mana washes over $N, healing $S wounds.~
+M
+3
+The mana washes over you, healing your wounds.~
+M
+4
+The mana washes over $N, healing $S wounds.~
+M
+8
+You don't need any healing.~
+M
+9
+*~
+M
+10
+$N doesn't need any healing.~
+M
+11
+*~
+M
+12
+*~
+M
+13
+You let loose a pulse of healing mana...~
+M
+14
+$n lets loose a pulse of healing mana...~
+T y 1
+X+ 7 0.25
 S
 #112
 Healing Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #113
 Healing Elixirs~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #114
 Rejuvenate~
-0 -1 1.00 0 0
-T m 0
+dfj -1 1.00 0 0 0
+A
+14 1
+C
+rejuvenate 5 beD 2 15 1.25 -1 0 8 5 0
+M
+0
+You surround yourself with the bright white mana of rejuvenation.~
+M
+1
+$n surrounds $mself with the bright white mana of rejuvenation.~
+M
+2
+You surround $N with the bright white mana of rejuvenation.~
+M
+3
+$n surrounds you with the bright white mana of rejuvenation.~
+M
+4
+$n surrounds $N with the bright white mana of rejuvenation.~
+T b 1
+X+ 1 3023
+X+ 2 30
+X+ 3 30
 S
 #115
 Purify~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 o 0 0
+C
+purify 8 b 2 50 0.00 -1 0 0 1 0
+D 16 44 0
+D 64 21 0
+M
+0
+You let your mana wash over your body and purify your form.~
+M
+1
+$n seems to dance as $s mana washes over $s body and purifies $m.~
+M
+2
+You let your mana wash over $N, purifying $M.~
+M
+3
+$n holds out $s hands and $s mana washes over you, purifying you.~
+M
+4
+$n holds out $s hands and $s mana washes over $N, purifying $M.~
+M
+8
+Nothing seems to happen.~
+M
+9
+*~
+M
+10
+Nothing seems to happen.~
+M
+11
+Nothing seems to happen.~
+M
+12
+*~
+T s 1
 S
 #116
 Cleanse~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+cleanse 7 be 2 30 0.00 2022 9 0 5 0
+D 64 13 0
+D 64 8 0
+D 64 11 0
+D 64 14 0
+M
+0
+You shine brightly as your mana cleanses you.~
+M
+1
+$n shines brightly for a moment as $s mana cleanses $m.~
+M
+2
+You shoot a bolt of white mana at $N, cleansing $M.~
+M
+3
+$n shoots a bolt of white mana at you, cleansing you.~
+M
+4
+$n shoots a bolt of white mana at $N, cleansing $M.~
+M
+8
+You shine brightly as your mana cleanses you.~
+M
+9
+$n shines brightly for a moment as $s mana cleanses $m.~
+M
+10
+You shoot a bolt of white mana at $N, cleansing $M.~
+M
+11
+$n shoots a bolt of white mana at you, cleansing you.~
+M
+12
+$n shoots a bolt of white mana at $N, cleansing $M.~
+T s 1
 S
 #117
 Ready Fireball~
-0 -1 1.00 0 bcn
+0 -1 1.00 0 bcn 0
 C
-unknown 5 0 2 30 0 -1 0 0 3 0
+unknown 5 a 2 30 0.00 -1 0 0 3 0
 D 4 1105 0
+M
+0
+*~
+M
+1
+*~
+M
+20
+Mana twists and swirls around your hand and becomes $p!~
+M
+21
+Mana twists and swirls around $n's hand and becomes $p!~
 T g 1
 S
 #118
 Lightningbolt~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
-lightningbolt 7 bf 2 10 3 2023 9 8 3 0
+lightningbolt 7 bf 2 10 3.00 2023 9 8 3 0
 T c 8
 T d 2
-X c
-60 1
-X d
-3019 15 15 1 1
+X+ 1 3019
+X+ 2 15
+X+ 3 15
+X+ 4 60
+X+ 5 1
 S
 #119
 Hasten~
-d -1 1.00 0 abc
+d -1 1.00 0 abc 0
 C
-hasten 5 be 2 15 0 -1 0 0 5 0
+hasten 5 be 2 15 0.00 -1 0 0 5 0
 M
 0
 You concentrate and veins of red mana streak down your skin.~
@@ -143,21 +415,35 @@ M
 4
 $n touches $N on the arm. Veins of red mana streak down $S skin and $E seems to move a little faster.~
 T b 1
-X b
-3022 450 1800 q
+X+ 0 q
+X+ 1 3022
+X+ 2 450
+X+ 3 1800
 S
 #120
 Counterspell~
-0 -1 1.00 0 0
-T m 0
+dr -1 1.00 0 0 0
+C
+counterspell 7 g 2 15 0.00 -1 0 0 3 0
+M
+0
+You ready a counterspell.~
+M
+1
+$n flickers momentarily with a blue-white aura.~
+T b 1
+X+ 0 T
+X+ 1 3021
+X+ 2 1800
+X+ 3 1800
 S
 #121
 Entangle~
-abfop -1 1.00 o 0
+abfop -1 1.00 o 0 0
 A
 2 -1
 C
-entangle 7 bf 2 20 0 2025 30 0 3 0
+entangle 7 bf 2 20 0.00 2025 30 0 3 0
 M
 2
 You shoot out vines of green mana, which entangle $N!~
@@ -177,18 +463,19 @@ M
 7
 $n sends out vines of green mana to entangle $N, but they can't seem to grasp $M.~
 T b 1
-X b
-3024 20 20 r
+X+ 0 r
+X+ 1 3024
+X+ 2 20
+X+ 3 20
 S
 #122
-Familiar~
-0 -1 1.00 0 o
+Feline Familiars~
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 500 0
 D 8 501 0
 D 8 502 0
-D 8 506 0
 M
 2
 You send up a jet of sparkling blue mana and $N appears!~
@@ -199,126 +486,364 @@ T h 0
 S
 #123
 Nature Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #124
 Wrath of Nature Potions~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #125
 Skybrand~
-0 -1 1.00 0 0
-T m 0
+abi -1 1.00 o 0 0
+C
+skybrand 7 bf 2 13 1.00 2024 6 8 1 0
+M
+5
+You can't seem to mark $N with the skybrand!~
+M
+6
+$n tries to mark you with a skybrand, but fails!~
+M
+7
+$n tries to mark $N with a skybrand, but fails!~
+M
+2
+You mark $N with a glowing blue skybrand!~
+M
+3
+$n marks you with a glowing blue skybrand!~
+M
+4
+$n marks $N with a glowing blue skybrand!~
+T d 1
+X+ 1 3020
+X+ 2 30
+X+ 3 30
+X+ 5 1
+X+ 6 3
 S
 #126
 Chant of Nature~
-0 -1 1.00 0 0
-T m 0
+gstu -1 1.00 0 0 0
+C
+chant 8 o 2 0 0.00 -1 0 0 5 0
+D 16 12 0
+D 64 5 0
+M
+22
+$n is loudly reciting a chant.~
+M
+28
+As you chant, things begin to happen...~
+M
+30
+As $n chants, something begins to happen...~
+M
+32
+You start the chant of nature...~
+M
+32
+You chant, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+32
+*~
+M
+32
+You chant, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+32
+*~
+M
+32
+You chant, 'O Viridius, greenest father, god of vines that coil...'~
+M
+32
+*~
+M
+32
+You chant, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+32
+*~
+M
+33
+$n starts the chant of nature...~
+M
+33
+$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'~
+M
+33
+*~
+M
+33
+$n chants, 'O great Ceres, mother of seeds, rise above the dew...'~
+M
+33
+*~
+M
+33
+$n chants, 'O Viridius, greenest father, god of vines that coil...'~
+M
+33
+*~
+M
+33
+$n chants, 'O Chloris, Elysian spring, lift us from the soil!'~
+M
+33
+*~
+T s 1
+S
+#127
+Heavy Bash~
+aky -1 1.00 0 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 1 0 3
+D 256 97 0
+H 1 97 100.00 0
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T c 1
+X+ 4 81
 S
 #136
 Inspire~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #137
 Customize Building~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 10 0
 T e 1
 S
 #138
 Bodyguard~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 1 25 0 2030 0 0 1 0
+unknown 8 0 1 25 0.00 2030 0 0 1 0
 D 8 205 0
 T h 0
 S
 #142
 Pickpocket~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 1
 D 1 33 0
 T e 1
 S
 #143
 Steal~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
+D 1 98 0
+T e 1
 S
 #144
 Infiltrate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 21 0
 T e 1
 S
 #145
 Improved Infiltrate~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 22 0
 T e 1
 S
 #146
 Escape~
-0 -1 1.00 0 0
-T m 0
+sz -1 1.00 0 0 0
+C
+escape 8 qv 1 10 0.00 -1 0 0 8 0
+D 16 9 0
+D 128 1 0
+M
+8
+You can't seem to escape!~
+M
+9
+*~
+M
+22
+$n is running for the exit!~
+M
+28
+*~
+M
+30
+$n dives in out of nowhere, sweating!~
+M
+31
+There's nothing to escape here.~
+M
+32
+You run for the nearest exit...~
+M
+32
+You dive out!~
+M
+33
+$n runs toward the nearest exit...~
+M
+33
+$n dives out the exit!~
+T u 1
 S
 #147
 Appraisal~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 45 0
 T e 1
 S
 #148
 Concealment~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 89 0
+D 1 90 0
+T e 1
 S
 #149
 Secret Cache~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #150
 Cling to Shadow~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 2
 D 1 20 0
 T e 1
 S
 #151
 Unseen Passing~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 31 0
 T e 1
 S
 #152
 Cloak of Darkness~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 25 0
 T e 1
 S
 #153
 Shadowstep~
-0 -1 1.00 0 0
-T m 0
+s -1 1.00 0 0 0
+C
+shadowstep 8 dhE 1 50 0.00 2037 60 0 1 0
+D 2 0 0
+D 128 7 0
+D 16 16 0
+D 16 14 0
+D 16 15 0
+D 16 17 0
+D 16 18 0
+D 16 22 0
+D 16 23 0
+D 16 24 0
+M
+10
+*~
+M
+11
+... but nothing happens~
+M
+12
+... but nothing happens~
+M
+15
+You gather the shadows around yourself...~
+M
+16
+The shadows gather around you...~
+M
+17
+$n gathers the shadows around $mself...~
+M
+22
+The shadows cling to $n before you.~
+M
+28
+*~
+M
+29
+$n steps out of the shadows!~
+M
+30
+$n steps out of the shadows!~
+M
+31
+Shadowstep to whom?~
+M
+34
+*~
+M
+34
+You step into the shadows and emerge at $N!~
+M
+35
+*~
+M
+35
+*~
+M
+36
+*~
+M
+36
+$n steps into the shadows!~
+T u 1
 S
 #154
 Vaultcracking~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 47 0
 T e 1
 S
 #155
 Jab~
-0 -1 1.00 0 0
-T m 0
+akB -1 1.00 0 0 0
+C
+jab 7 bfh 1 15 0.00 2039 9 0 2 0
+D 16 28 4
+M
+15
+You move close to jab $N with your weapon...~
+M
+16
+$n moves in close to jab you with $s weapon...~
+M
+17
+$n moves in close to jab $N with $s weapon...~
+T x 1
+T d 3
+X+ 1 3027
+X+ 2 15
+X+ 3 15
+X+ 6 2
 S
 #156
 Blind~
-a -1 1.00 h 0
+a -1 1.00 h 0 0
 C
-blind 7 bf 1 15 0 2040 10 0 2 2
+blind 7 bf 1 15 0.00 2040 10 0 2 2
 M
 2
 You toss a handful of sand into $N's eyes!~
@@ -338,65 +863,166 @@ M
 12
 $n tosses a handful of sand but misses $N's eyes!~
 T b 1
-X b
-3028 5 10 a
+X+ 0 a
+X+ 1 3028
+X+ 2 5
+X+ 3 10
 S
 #157
 Sap~
-0 -1 1.00 0 0
-T m 0
+aekpq -1 1.00 hE 0 0
+C
+sap 8 b 1 15 0.00 2041 9 0 1 2
+M
+2
+You sap $N in the back of the head.~
+M
+3
+$n saps you in the back of the head. That hurt!~
+M
+4
+$n saps $N in the back of the head.~
+M
+10
+You sap $N in the back of the head.~
+M
+11
+$n saps you in the back of the head. That hurt!~
+M
+12
+$n saps $N in the back of the head.~
+T b 1
+X+ 0 t
+X+ 1 3007
+X+ 2 60
+X+ 3 60
 S
 #158
 Dagger Mastery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #159
 Poisons~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
 D 1 34 0
 T a 1
 T e 0
 S
 #160
 Deadly Poisons~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 35 0
 T a 1
 T e 0
 S
 #161
 Prick~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 C 0 0
+C
+prick 7 bfh 1 10 0.00 2042 9 0 2 0
+D 16 33 0
+D 64 7 0
+M
+2
+You quickly prick $N with poison!~
+M
+3
+$n pricks you with poison!~
+M
+4
+$n pricks $N with poison!~
+M
+10
+You quickly prick $N but it doesn't seem to have any effect.~
+M
+11
+$n pricks you!~
+M
+12
+$n pricks $N!~
+T s 1
 S
 #162
 Bat Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #163
 Ritual of Burdens~
-0 -1 1.00 0 0
-T m 0
+gst -1 0.68 0 0 0
+A
+19 1
+C
+ritual 8 g 2 5 0.00 -1 0 0 5 0
+M
+0
+You feel the weight of the world lift from your shoulders!~
+M
+1
+$n seems uplifted!~
+M
+22
+$n is whispering something into the air.~
+M
+32
+You whisper your burdens into the air...~
+M
+32
+*~
+M
+33
+$n whispers $s burdens into the air...~
+M
+33
+*~
+T b 1
+X+ 1 3052
+X+ 2 1800
+X+ 3 1800
 S
 #164
 Staffmaking~
-0 170 1.00 0 0
+0 170 1.00 0 0 0
 T a 0
 S
 #165
 Manashield~
-0 -1 1.00 0 0
-T m 0
+c -1 1.00 0 af 0
+A
+16 -1
+A
+12 2
+A
+24 2
+C
+manashield 5 eg 2 25 0.00 -1 0 8 5 0
+M
+0
+You pull out a grease pencil and draw a series of arcane symbols down your left arm...~
+M
+1
+$n pulls out a grease pencil and draws a series of arcane symbols down $s left arm.~
+M
+23
+You wipe the symbols off your arm.~
+M
+24
+$n wipes the arcane symbols off $s arm.~
+T b 1
+X+ 1 3008
+X+ 2 1800
+X+ 3 1800
 S
 #166
 Foresight~
-0 -1 0.50 0 adf
+0 -1 0.50 0 adf 0
 A
 18 1
 C
-foresight 5 be 2 30 0 -1 0 8 5 0
+foresight 5 be 2 30 0.00 -1 0 8 5 0
 M
 0
 You pull out a grease pencil and mark each of your eyelids with an X...~
@@ -413,66 +1039,206 @@ M
 4
 $n pulls out a grease pencil and marks each of $N's eyelids with an X.~
 T b 1
-X b
-3009 900 900 0
+X+ 1 3009
+X+ 2 900
+X+ 3 900
 S
 #167
 Enchant Weapons~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #168
 Summon Swift~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0 2032 60 0 5 2
+summon 8 w 2 10 0.00 2032 60 0 5 2
 D 8 400 0
 D 8 401 0
 D 8 402 0
 D 8 403 0
 D 8 404 0
 M
-2
-You open a portal and $N dashes out!~
+0
+*~
 M
-4
-$n opens a portal and $N dashes out!~
+1
+*~
 M
 8
-You open a portal but nobody comes out.~
+... but nothing comes out before it closes.~
 M
 9
-$n opens a portal but nothing comes out.~
+... but nothing comes out before it closes.~
+M
+13
+You open a portal...~
+M
+14
+$n opens a portal...~
+M
+25
+$N comes dashing out!~
+M
+27
+$N comes dashing out!~
 T i 0
 S
 #169
 Summon Materials~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 77 0
 T e 0
 S
 #170
 Powerful Staves~
-0 170 1.00 0 0
+0 170 1.00 0 0 0
 T a 0
 S
 #171
 Staff Mastery~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #172
 Siege Ritual~
-0 -1 1.00 0 0
-T m 0
+aghs -1 1.00 0 0 0
+C
+ritual 8 mp 2 30 0.00 -1 0 0 3 0
+D 16 13 0
+D 2 1 0
+M
+8
+Your ritual fails.~
+M
+9
+$n's ritual fails.~
+M
+10
+Your ritual fails.~
+M
+12
+$n's ritual fails.~
+M
+22
+$n is conjuring a huge fireball!~
+M
+32
+You draw mana to yourself...~
+M
+32
+*~
+M
+32
+You concentrate your power into a ball of fire...~
+M
+32
+*~
+M
+32
+You summon the full force of your magic...~
+M
+32
+*~
+M
+32
+You twist and grow the ball of fire in your hands...~
+M
+32
+*~
+M
+32
+You shoot one powerful fireball...~
+M
+33
+$n begins drawing mana to $mself...~
+M
+33
+*~
+M
+33
+$n concentrates $s power into a fireball...~
+M
+33
+*~
+M
+33
+$n draws more mana...~
+M
+33
+*~
+M
+33
+$n twists and grows the ball of fire in $s hands...~
+M
+33
+*~
+M
+33
+$n shoots one powerful fireball...~
+M
+34
+You draw mana to yourself as you focus on $V...~
+M
+34
+*~
+M
+34
+You concentrate your power into a ball of fire...~
+M
+34
+*~
+M
+34
+You summon the full force of your magic...~
+M
+34
+*~
+M
+34
+You twist and grow the ball of fire in your hands...~
+M
+34
+*~
+M
+34
+You shoot one powerful fireball at $V...~
+M
+36
+$n begins drawing mana to $mself as $e focuses on $V...~
+M
+36
+*~
+M
+36
+$n concentrates $s power into a fireball...~
+M
+36
+*~
+M
+36
+$n draws more mana...~
+M
+36
+*~
+M
+36
+$n twists and grows the ball of fire in $s hands...~
+M
+36
+*~
+M
+36
+$n shoots one powerful fireball at $V...~
+T t 1
 S
 #173
 Colorburst~
-ab -1 0.50 o 0
+abf -1 0.50 o 0 0
 A
 17 -1
 C
-ccolorburst 7 bf 2 13 2 2013 30 8 3 0
+colorburst 7 bf 2 13 2.00 2013 30 8 3 0
 M
 5
 You fire a burst of color at $N, but $E deflects it!~
@@ -492,142 +1258,591 @@ M
 4
 $n whips $s hand forward and fires a burst of color at $N!~
 T b 1
-X b
-3015 30 30 0
+X+ 1 3015
+X+ 2 30
+X+ 3 30
 S
 #174
 Enervate~
-0 -1 1.00 0 0
-T m 0
+afi -1 1.00 o 0 0
+A
+6 -1
+A
+11 -1
+C
+enervate 7 bfh 2 20 0.00 2014 75 8 3 0
+M
+6
+$n attempts to hex you with enervate, but it's deflected by your counterspell!~
+M
+7
+$n attempts to hex $N with enervate, but it fails!~
+M
+2
+$N starts to glow red as you shout the enervate hex at $M! You feel your own stamina grow as you drain $S.~
+M
+3
+$n shouts something at you... The world takes on a reddish hue and you feel your stamina drain.~
+M
+4
+$n shouts some kind of hex at $N, who starts to glow red and seems weakened!~
+T b 1
+X+ 1 3032
+X+ 2 75
+X+ 3 75
 S
 #175
 Slow~
-0 -1 1.00 0 0
-T m 0
+abf -1 1.00 o 0 0
+C
+slow 7 bfh 2 20 0.00 2015 75 0 5 0
+M
+2
+$N grows lethargic and starts to glow gray as you shout the slow hex at $M!~
+M
+3
+$n shouts something at you... The world takes on a gray tone and you become more lethargic.~
+M
+4
+$n shouts some kind of hex at $N, who starts to move sluggishly and starts to glow gray!~
+M
+5
+You try to use a slow hex on $N, but $E deflects it!~
+M
+6
+$n tries to hex you, but it's deflected by your counterspell!~
+M
+7
+$n tries to hex $N, but $E deflects it.~
+T b 1
+X+ 0 s
+X+ 2 35
+X+ 3 75
 S
 #176
 Siphon~
-0 -1 1.00 0 0
-T m 0
+abf -1 1.00 o 0 0
+A
+7 -1
+C
+siphon 7 bfh 2 10 0.00 2016 20 0 3 0
+D 16 32 0
+M
+2
+$N starts to glow violet as you shout the mana siphon hex at $M! You feel your own mana grow as you drain $S.~
+M
+3
+$n shouts something at you... The world takes on a violet glow and you feel your mana siphoned away.~
+M
+4
+$n shouts some kind of hex at $N, who starts to glow violet as mana flows away from $S skin!~
+M
+5
+You try to siphon mana from $N, but are deflected by a counterspell!~
+M
+6
+$n tries to siphon mana from you, but it's deflected by your counterspell!~
+M
+7
+$n tries to siphon mana from $N, but it fails!~
+T b 1
+X+ 1 3038
+X+ 2 20
+X+ 3 20
 S
 #177
 Mirrorimage~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #178
 Sunshock~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
-sunshock 7 bf 2 11 4 2018 9 8 3 0
+sunshock 7 bf 2 11 4.00 2018 9 8 3 0
 T c 3
 T b 2
-X b
-3036 5 5 a
-X c
-63 1
+X+ 0 a
+X+ 1 3036
+X+ 2 5
+X+ 3 5
+X+ 4 63
+X+ 5 1
 S
 #179
 Phoenix Rite~
-0 -1 1.00 0 0
-T m 0
+gs -1 1.00 0 aq 0
+C
+ritual 8 g 0 0 0.00 -1 0 0 5 0
+M
+22
+$n is sitting in a circle of candles.~
+M
+32
+You light some candles and begin the Phoenix Rite.~
+M
+32
+You sit and place the candles in a circle around you.~
+M
+32
+*~
+M
+32
+You focus on the flame of the candles...~
+M
+32
+*~
+M
+32
+You reach out to the sides and grab the flame of the candles in your hands!~
+M
+32
+The flames on the remaining candles shoot toward you and form the crest of the Phoenix!~
+M
+33
+$n lights some candles.~
+M
+33
+$n sits and places the candles in a circle around $mself.~
+M
+33
+*~
+M
+33
+$n moves back and forth as if in a trance.~
+M
+33
+*~
+M
+33
+$n's hands shoot out to the sides and grab the flames of the candles!~
+M
+33
+The flames on the remaining candles shoot toward $n and form a huge fiery bird around $m!~
+T b 1
+X+ 0 S
+X+ 1 3017
+X+ 2 -1
+X+ 3 -1
 S
 #180
 Disenchant~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+disenchant 8 i 2 5 0.00 -1 0 0 5 0
+D 16 40 0
+D 16 41 512
+D 64 20 0
+M
+2
+There is a burst of red light from $p and then it fizzles and is disenchanted.~
+M
+4
+*~
+M
+15
+You hold $p over your head and shout 'KA!' as you release the mana bound to it!~
+M
+17
+$n shouts 'KA!' and cracks $p, which blasts out red light, and then fizzles.~
+M
+20
+You manage to weave the freed mana into $p!~
+M
+21
+$n weaves the freed mana into $p!~
+T s 1
 S
 #181
 Greater Enchantments~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #182
 Dangerous Leathers~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #183
 Vigor~
-0 -1 1.00 0 0
-T m 0
+drE -1 2.00 0 0 0
+A
+6 -1
+C
+vigor 7 be 2 12 1.50 -1 0 8 5 0
+M
+0
+You focus your thoughts and say the word 'maktso', and you feel a burst of vigor!~
+M
+1
+$n closes $s eyes and says the word 'maktso', and $e seems suddenly refreshed.~
+M
+2
+You focus your thoughts and say the word 'maktso', and $N suddenly seems refreshed.~
+M
+3
+$n closes $s eyes and says the word 'maktso', and you feel a sudden burst of vigor!~
+M
+4
+$n closes $s eyes and says the word 'maktso', and $N suddenly seems refreshed.~
+M
+8
+You already have full movement points.~
+M
+9
+*~
+M
+10
+$E already has full movement points.~
+M
+11
+*~
+M
+12
+*~
+T y 1
+T b 2
+X+ 1 3031
+X+ 2 75
+X+ 3 75
+X+ 9 1
 S
 #184
 Enchant Armor~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #185
 Enchant Tools~
-0 181 1.00 0 0
+0 181 1.00 0 0 0
 T l 1
 S
 #186
 Ritual of Defense~
-0 -1 1.00 0 0
-T m 0
+grst -1 1.00 0 0 0
+C
+ritual 8 o 2 50 0.00 -1 0 0 5 0
+D 16 0 0
+D 16 1 0
+D 32 11 0
+M
+22
+$n is performing the ritual of defense.~
+M
+32
+You begin the incantation for the Ritual of Defense.~
+M
+32
+You say, 'Empower now this wall of stone...'~
+M
+32
+You say, 'With wisdom of the sages...'~
+M
+32
+You say, 'Ward against the foes above...'~
+M
+32
+You say, 'And strong, withstand the ages!'~
+M
+32
+You finish the ritual and the walls take on a strange magenta glow!~
+M
+33
+*~
+M
+33
+$n says, 'Empower now this wall of stone...'~
+M
+33
+$n says, 'With wisdom of the sages...'~
+M
+33
+$n says, 'Ward against the foes above...'~
+M
+33
+$n says, 'And strong, withstand the ages!'~
+M
+33
+$n finishes the ritual and the walls take on a strange magenta glow!~
+R
+1114 1 0 0
+R
+104 1 0 0
+T q 1
+T r 1
+X+ 0 jA
+X+ 2 -1
+X+ 3 -1
 S
 #187
 Ritual of Teleportation~
-0 -1 1.00 0 0
-T m 0
+gst -1 1.00 0 0 0
+C
+ritual 8 rF 2 25 0.00 2019 600 0 5 0
+D 16 16 0
+D 16 22 0
+D 128 7 0
+D 16 2 0
+D 16 19 0
+M
+8
+... but nothing seems to happen.~
+M
+9
+... but nothing seems to happen.~
+M
+22
+$n is glowing bright blue!~
+M
+28
+*~
+M
+30
+$n appears with a brilliant flash of light!~
+M
+32
+You wrap yourself up and begin chanting...~
+M
+32
+There is a bright blue glow all around you...~
+M
+32
+There's a bright flash of light all around you...~
+M
+33
+$n wraps $mself up and begins chanting...~
+M
+33
+$n begins to glow bright blue, like a flame...~
+M
+33
+$n vanishes in a brilliant flash of light!~
+M
+39
+You can't teleport there with this ritual.~
+T u 1
 S
 #188
 City Teleportation~
-0 -1 1.00 0 0
-D 1 49 0
-T e 1
-S
-#189
-Portal Magic~
-0 -1 1.00 0 0
-D 1 36 0
-T e 0
-S
-#190
-Portal Master~
-0 -1 1.00 0 0
-D 1 37 0
-T e 0
+gst -1 1.00 0 0 0
+C
+ritual 8 t 2 15 0.00 2020 900 0 5 0
+D 16 16 0
+D 16 22 0
+D 16 25 0
+D 16 2 0
+D 16 19 0
+M
+8
+... but nothing seems to happen.~
+M
+9
+... but nothing seems to happen.~
+M
+22
+$n is glowing bright blue!~
+M
+28
+*~
+M
+30
+$n appears with a brilliant flash of light!~
+M
+32
+You wrap yourself up and begin chanting...~
+M
+32
+There is a bright blue glow all around you...~
+M
+32
+There's a bright flash of light all around you...~
+M
+33
+$n wraps $mself up and begins chanting...~
+M
+33
+$n begins to glow bright blue, like a flame...~
+M
+33
+$n vanishes in a brilliant flash of light!~
+M
+31
+Teleport to which city?~
+M
+39
+Unknown city.~
+T u 1
 S
 #191
 Devastation Ritual~
-0 -1 1.00 0 0
-T m 0
+gsu -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0.00 -1 0 0 5 0
+D 16 10 0
+D 16 4 0
+D 16 11 0
+D 64 4 0
+D 128 3 0
+D 16 21 0
+M
+8
+The Devastation Ritual has ended.~
+M
+9
+*~
+M
+20
+You devastate the $1 and collect $p!~
+M
+21
+$n devastates the $1 and collects $p!~
+M
+22
+$n has $s staff planted in the ground, focusing mana!~
+M
+32
+You plant your staff hard into the ground and begin focusing mana...~
+M
+32
+*~
+M
+32
+You send out shockwaves of mana from your staff...~
+M
+32
+*~
+M
+32
+*~
+M
+33
+$n plants $s staff hard into the ground and begins drawing mana toward $mself...~
+M
+33
+*~
+M
+33
+$n's staff sends out shockwaves of mana...~
+M
+33
+*~
+M
+33
+*~
+T s 1
 S
 #192
 Sense Life Ritual~
-0 -1 1.00 0 0
-T m 0
+gst -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0.00 -1 0 0 5 2
+D 64 0 0
+D 64 1 0
+M
+8
+You sense no unseen presence.~
+M
+9
+*~
+M
+22
+$n is murmuring something.~
+M
+25
+You sense $N here!~
+M
+26
+You are discovered!~
+M
+32
+You murmur the words to the Sense Life Ritual...~
+M
+32
+You finish the ritual and your eyes are opened...~
+M
+33
+$n murmurs some arcane words...~
+M
+33
+$n finishes the ritual and $s eyes flash a bright white.~
+T s 1
 S
 #193
 Ritual of Detection~
-0 -1 1.00 0 0
-T m 0
+gs -1 1.00 0 0 0
+C
+ritual 8 o 2 15 0.00 -1 0 0 5 0
+D 16 1 0
+D 16 7 0
+D 16 8 0
+D 64 2 0
+D 64 3 0
+M
+22
+$n is writing on the ground with chalk.~
+M
+25
+You detect $N at $1~
+M
+28
+You detect $2 at $1~
+M
+32
+You pull a piece of chalk from your pocket and begin drawing circles on the ground.~
+M
+32
+*~
+M
+32
+You make crossed lines through the circles you've drawn.~
+M
+32
+*~
+M
+32
+You begin writing the words 'where', 'find', and 'reveal' on the ground.~
+M
+33
+$n pulls out a piece of chalk and begins drawing circles on the ground.~
+M
+33
+*~
+M
+33
+$n makes crossed lines through the circles $e has drawn.~
+M
+33
+*~
+M
+33
+$n begins writing words in the circles on the ground.~
+T s 1
 S
 #194
 Master Tailor~
-0 -1 1.00 0 0
-T a 0
+0 -1 1.00 0 0 0
+T z 1
+T a 1
 S
 #195
 Master Blacksmith~
-0 -1 1.00 0 0
-T a 0
+0 -1 1.00 0 0 0
+T z 1
+T a 1
 S
 #196
 Deadly Weapons~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #197
 Imperial Armors~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #198
 Basic Crafts~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 D 1 66 0
 D 1 67 0
 T a 0
@@ -635,7 +1850,7 @@ T e 0
 S
 #199
 Magical Vestments~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 $

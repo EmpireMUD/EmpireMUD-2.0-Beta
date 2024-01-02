@@ -2,7 +2,7 @@
 *   File: act.empire.c                                    EmpireMUD 2.0b5 *
 *  Usage: stores all of the empire-related commands                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -3036,6 +3036,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 		msg_to_char(vict, "You feel inspired!\r\n");
 		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_INSPIRE, 0, vict, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -3689,8 +3690,8 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 		if (GET_LOYALTY(ch) != VEH_OWNER(veh)) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s abandoned %s owned by %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(ch)));
 		}
-		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		perform_abandon_vehicle(veh);
 	}
 }
@@ -3722,7 +3723,7 @@ ACMD(do_abandon) {
 	else if (!GET_LOYALTY(ch) && !imm_access) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE) && !imm_access) {
+	else if (!imm_access && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
@@ -3786,6 +3787,9 @@ ACMD(do_barde) {
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		// find interact
 		found = FALSE;
@@ -3836,6 +3840,7 @@ ACMD(do_barde) {
 			if (!IS_NPC(ch)) {
 				extract_resources(ch, res, TRUE, NULL);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_BARDE, NULL, NULL, NULL, NULL);
 		}
 		else {
 			act("You can't barde $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3910,6 +3915,7 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 		}
 		else {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL, NULL, room);
 		}
 	
 		// and an offense
@@ -4214,10 +4220,10 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
 		send_config_msg(ch, "ok_string");
 		if (GET_LOYALTY(ch) != emp) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has claimed %s for %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(emp), room_log_identifier(IN_ROOM(ch)));
-			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		else {
-			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		perform_claim_vehicle(veh, emp);
 	}
@@ -7392,7 +7398,7 @@ void process_reclaim(char_data *ch) {
 		abandon_room(target);
 		claim_room(target, emp);
 		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -7436,7 +7442,7 @@ ACMD(do_reclaim) {
 	if (!*arg && GET_ACTION(ch) == ACT_RECLAIMING) {
 		msg_to_char(ch, "You stop trying to reclaim this area.\r\n");
 		act("$n stops trying to reclaim this area.", FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little busy right now.\r\n");

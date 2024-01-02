@@ -2,7 +2,7 @@
 *   File: utils.h                                         EmpireMUD 2.0b5 *
 *  Usage: header file: utility macros and prototypes of utility funcs     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -105,7 +105,9 @@
 #define ABIL_COOLDOWN(abil)  ((abil)->cooldown)
 #define ABIL_COOLDOWN_SECS(abil)  ((abil)->cooldown_secs)
 #define ABIL_COST(abil)  ((abil)->cost)
+#define ABIL_COST_PER_AMOUNT(abil)  ((abil)->cost_per_amount)
 #define ABIL_COST_PER_SCALE_POINT(abil)  ((abil)->cost_per_scale_point)
+#define ABIL_COST_PER_TARGET(abil)  ((abil)->cost_per_target)
 #define ABIL_COST_TYPE(abil)  ((abil)->cost_type)
 #define ABIL_CUSTOM_MSGS(abil)  ((abil)->custom_msgs)
 #define ABIL_DAMAGE_TYPE(abil)  ((abil)->damage_type)
@@ -113,14 +115,20 @@
 #define ABIL_DIFFICULTY(abil)  ((abil)->difficulty)
 #define ABIL_FLAGS(abil)  ((abil)->flags)
 #define ABIL_GAIN_HOOKS(abil)  ((abil)->gain_hooks)
+#define ABIL_HOOKS(abil)  ((abil)->hooks)
+#define ABIL_HOOK_FLAGS(abil)  ((abil)->hook_flags)
 #define ABIL_IMMUNITIES(abil)  ((abil)->immunities)
+#define ABIL_INTERACTIONS(abil)  ((abil)->interactions)
 #define ABIL_LINKED_TRAIT(abil)  ((abil)->linked_trait)
 #define ABIL_LONG_DURATION(abil)  ((abil)->long_duration)
 #define ABIL_MASTERY_ABIL(abil)  ((abil)->mastery_abil)
 #define ABIL_MAX_STACKS(abil)  ((abil)->max_stacks)
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
+#define ABIL_MOVE_TYPE(abil)  ((abil)->move_type)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_POOL_TYPE(abil)  ((abil)->pool_type)
 #define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)
+#define ABIL_RESOURCE_COST(abil)  ((abil)->resource_cost)
 #define ABIL_SCALE(abil)  ((abil)->scale)
 #define ABIL_SHORT_DURATION(abil)  ((abil)->short_duration)
 #define ABIL_SKILL_LEVEL(abil)  ((abil)->skill_level)
@@ -136,9 +144,12 @@
 
 // utils
 #define ABILITY_FLAGGED(abil, flag)  IS_SET(ABIL_FLAGS(abil), (flag))
+#define ABIL_HAS_HOOK(abil, type)  (IS_SET(ABIL_HOOK_FLAGS(abil), (type)) ? TRUE : FALSE)
 #define ABIL_IS_CLASS(abil)  ((abil)->is_class)
 #define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
 #define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
+#define ABIL_IS_VIOLENT(abil)  (ABILITY_FLAGGED(abil, ABILF_VIOLENT) || IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT))
+#define ABIL_TOTAL_COST(abil)	(ABIL_COST(abil) + ABIL_COST_PER_SCALE_POINT(abil) + ABIL_COST_PER_AMOUNT(abil) + ABIL_COST_PER_TARGET(abil))
 #define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "the ability")
 
 
@@ -268,7 +279,7 @@
 
 // this all builds up to CAN_SEE
 #define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && can_see_in_dark_room((sub), (IN_ROOM(sub)), TRUE))
-#define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDE) || AFF_FLAGGED((sub), AFF_SENSE_HIDE)))
+#define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDDEN) || AFF_FLAGGED((sub), AFF_SENSE_HIDDEN)))
 
 
 #define MORT_CAN_SEE_NO_DARK(sub, obj)  (INVIS_OK(sub, obj))
@@ -369,7 +380,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_EXTRA_BLOOD(ch)  GET_EXTRA_ATT(ch, ATT_EXTRA_BLOOD)
 #define GET_BONUS_PHYSICAL(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_PHYSICAL)
 #define GET_BONUS_MAGICAL(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_MAGICAL)
-#define GET_BONUS_HEALING(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_HEALING)	// use total_bonus_healing(ch) for most uses
+#define GET_BONUS_HEALING(ch)  GET_EXTRA_ATT(ch, ATT_BONUS_HEALING)
 #define GET_HEAL_OVER_TIME(ch)  GET_EXTRA_ATT(ch, ATT_HEAL_OVER_TIME)
 #define GET_CRAFTING_BONUS(ch)  GET_EXTRA_ATT(ch, ATT_CRAFTING_BONUS)
 #define GET_AGE_MODIFIER(ch)  GET_EXTRA_ATT(ch, ATT_AGE_MODIFIER)
@@ -394,6 +405,8 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_MANA_REGEN(ch)  ((ch)->char_specials.mana_regen)
 #define GET_MOVE_REGEN(ch)  ((ch)->char_specials.move_regen)
 #define GET_ROPE_VNUM(ch)  ((ch)->char_specials.rope_vnum)
+#define GET_RUNNING_ABILITY_DATA(ch)  ((ch)->char_specials.running_ability_data)
+#define GET_RUNNING_ABILITY_LIMITER(ch)  ((ch)->char_specials.running_ability_limiter)
 #define GET_SITTING_ON(ch)  ((ch)->char_specials.sitting_on)
 #define GET_POS(ch)  ((ch)->char_specials.position)
 #define SET_SIZE(ch)  ((ch)->char_specials.size)	// notice "SET_SIZE" -- the simple version of the macro
@@ -410,22 +423,22 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
-#define CAN_RIDE_MOUNT(ch, mob)  (MOB_FLAGGED((mob), MOB_MOUNTABLE) && (!AFF_FLAGGED((mob), AFF_FLY) || CAN_RIDE_FLYING_MOUNT(ch)) && (!AFF_FLAGGED((mob), AFF_WATERWALK) || CAN_RIDE_WATERWALK_MOUNT(ch)))
+#define CAN_RIDE_MOUNT(ch, mob)  (MOB_FLAGGED((mob), MOB_MOUNTABLE) && (!AFF_FLAGGED((mob), AFF_FLYING) || CAN_RIDE_FLYING_MOUNT(ch)) && (!AFF_FLAGGED((mob), AFF_WATERWALKING) || CAN_RIDE_WATERWALK_MOUNT(ch)))
 #define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
-#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
+#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_player_tech((ch), PTECH_SEE_IN_MAGIC_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
-#define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
-#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALK(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
+#define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLYING))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALKING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
-#define HAS_WATERWALK(ch)  (AFF_FLAGGED((ch), AFF_WATERWALK) || MOUNT_FLAGGED((ch), MOUNT_WATERWALK))
+#define HAS_WATERWALKING(ch)  (AFF_FLAGGED((ch), AFF_WATERWALKING) || MOUNT_FLAGGED((ch), MOUNT_WATERWALKING))
 #define IS_HASTENED(ch)  (AFF_FLAGGED((ch), AFF_HASTE) && !AFF_FLAGGED((ch), AFF_SLOW))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_SLOWED(ch)  (AFF_FLAGGED((ch), AFF_SLOW) && !AFF_FLAGGED((ch), AFF_HASTE))
-#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALK(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? ((GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? PRF_FLAGGED(GET_LEADER(ch), PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -490,6 +503,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 //// CROP UTILS //////////////////////////////////////////////////////////////
 
 #define GET_CROP_CLIMATE(crop)  ((crop)->climate)
+#define GET_CROP_CUSTOM_MSGS(crop)  ((crop)->custom_msgs)
 #define GET_CROP_EX_DESCS(crop)  ((crop)->ex_description)
 #define GET_CROP_FLAGS(crop)  ((crop)->flags)
 #define GET_CROP_ICONS(crop)  ((crop)->icons)
@@ -527,6 +541,8 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_OLC_ABILITY(desc)  ((desc)->olc_ability)
 #define GET_OLC_ADVENTURE(desc)  ((desc)->olc_adventure)
 #define GET_OLC_ARCHETYPE(desc)  ((desc)->olc_archetype)
+#define GET_OLC_ATTACK(desc)  ((desc)->olc_attack)
+#define GET_OLC_ATTACK_NUM(desc)  ((desc)->olc_attack_num)
 #define GET_OLC_AUGMENT(desc)  ((desc)->olc_augment)
 #define GET_OLC_BOOK(desc)  ((desc)->olc_book)
 #define GET_OLC_BUILDING(desc)  ((desc)->olc_building)
@@ -693,7 +709,28 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
  //////////////////////////////////////////////////////////////////////////////
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
-#define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+#define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDDEN | AFF_INVISIBLE)
+
+
+// for attack messages
+#define ATTACK_VNUM(amd)			((amd)->vnum)
+#define ATTACK_COUNTS_AS(amd)		((amd)->counts_as)
+#define ATTACK_DAMAGE_TYPE(amd)		((amd)->damage_type)
+#define ATTACK_DEATH_LOG(amd)		((amd)->death_log)
+#define ATTACK_FIRST_PERSON(amd)	((amd)->first_pers)
+#define ATTACK_FLAGS(amd)			((amd)->flags)
+#define ATTACK_MSG_LIST(amd)		((amd)->msg_list)
+#define ATTACK_NAME(amd)			((amd)->name)
+#define ATTACK_NOUN(amd)			((amd)->noun)
+#define ATTACK_NUM_MSGS(amd)		((amd)->num_msgs)
+#define ATTACK_SPEED(amd, type)		((amd)->speed[(type)])
+#define ATTACK_THIRD_PERSON(amd)	((amd)->third_pers)
+#define ATTACK_WEAPON_TYPE(amd)		((amd)->weapon_type)
+
+#define ATTACK_FLAGGED(amd, flag)		IS_SET(ATTACK_FLAGS(amd), (flag))
+#define ATTACK_HAS_EXTENDED_DATA(amd)	(ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA) || ATTACK_DAMAGE_TYPE(amd) != 0 || ATTACK_FIRST_PERSON(amd) || ATTACK_NOUN(amd) || ATTACK_THIRD_PERSON(amd) || ATTACK_WEAPON_TYPE(amd) != 0)
+#define ATTACK_MSG(amd, func, deflt)	(((amd) && (func)) ? (func) : (deflt))
+#define IS_MAGIC_ATTACK(vnum)  (get_attack_damage_type_by_vnum((vnum)) == DAM_MAGICAL)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -742,26 +779,20 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_COOLDOWN_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_COOLDOWN ? GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF) : NULL)
 
 // GENERIC_AFFECT
+#define GVAL_AFFECT_DOT_ATTACK  0
 #define GSTR_AFFECT_WEAR_OFF_TO_CHAR  0
 #define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
 #define GSTR_AFFECT_APPLY_TO_CHAR  2
 #define GSTR_AFFECT_APPLY_TO_ROOM  3
 #define GSTR_AFFECT_LOOK_AT_CHAR  4
 #define GSTR_AFFECT_LOOK_AT_ROOM  5
-#define GSTR_AFFECT_DOT_TO_CHAR  6
-#define GSTR_AFFECT_DOT_TO_ROOM  7
-#define GSTR_AFFECT_DEATH_TO_CHAR  8
-#define GSTR_AFFECT_DEATH_TO_ROOM  9
+#define GET_AFFECT_DOT_ATTACK(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_VALUE((gen), GVAL_AFFECT_DOT_ATTACK) : NOTHING)
 #define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
 #define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 #define GET_AFFECT_APPLY_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_CHAR) : NULL)
 #define GET_AFFECT_APPLY_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_APPLY_TO_ROOM) : NULL)
 #define GET_AFFECT_LOOK_AT_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_CHAR) : NULL)
 #define GET_AFFECT_LOOK_AT_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_LOOK_AT_ROOM) : NULL)
-#define GET_AFFECT_DOT_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DOT_TO_CHAR) : NULL)
-#define GET_AFFECT_DOT_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DOT_TO_ROOM) : NULL)
-#define GET_AFFECT_DEATH_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DEATH_TO_CHAR) : NULL)
-#define GET_AFFECT_DEATH_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_DEATH_TO_ROOM) : NULL)
 
 // GENERIC_CURRENCY
 #define GSTR_CURRENCY_SINGULAR  0
@@ -869,6 +900,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
+#define MOB_INTERACTIONS(ch)  ((ch)->interactions)
 #define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
@@ -1013,10 +1045,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VAL_WEAPON_DAMAGE_BONUS  1
 #define VAL_WEAPON_TYPE  2
 #define GET_WEAPON_DAMAGE_BONUS(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_DAMAGE_BONUS) : 0)
-#define GET_WEAPON_TYPE(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_TYPE) : TYPE_UNDEFINED)
+#define GET_WEAPON_TYPE(obj)  (IS_WEAPON(obj) ? GET_OBJ_VAL((obj), VAL_WEAPON_TYPE) : ATTACK_UNDEFINED)
 
 #define IS_ANY_WEAPON(obj)  (IS_WEAPON(obj) || IS_MISSILE_WEAPON(obj))
-#define IS_STAFF(obj)  (GET_WEAPON_TYPE(obj) == TYPE_LIGHTNING_STAFF || GET_WEAPON_TYPE(obj) == TYPE_BURN_STAFF || GET_WEAPON_TYPE(obj) == TYPE_AGONY_STAFF || TOOL_FLAGGED((obj), TOOL_STAFF))
 
 // ITEM_ARMOR subtype
 #define IS_ARMOR(obj)  (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
@@ -1170,18 +1201,26 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // ch->player_specials: player_special_data
 #define AFFECTS_CONVERTED(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->affects_converted))
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
-#define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
 #define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
 #define DONT_SAVE_DELAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->dont_save_delay))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))
 #define GET_ABILITY_GAIN_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gain_hooks))
+#define GET_ABILITY_TRAIT_HOOKS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->trait_hooks))
 #define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))
 #define GET_ACTION_CYCLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_cycle))
 #define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_room))
+#define GET_ACTION_STRING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_string))
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
 #define GET_ACTION_RESOURCES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_resources))
+#define GET_ACTION_CHAR_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_char))
+#define GET_ACTION_TEMPORARY_CHAR_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_char_targ))
+#define GET_ACTION_MULTI_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_multi))
+#define GET_ACTION_OBJ_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_obj))
+#define GET_ACTION_VEH_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_veh))
+#define GET_ACTION_TEMPORARY_VEH_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->temporary_veh_targ))
+#define GET_ACTION_ROOM_TARG(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_targ_room))
 #define GET_ADVENTURE_SUMMON_INSTANCE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_instance_id))
 #define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_location))
 #define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_map))
@@ -1266,7 +1305,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MOUNT_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_list))
 #define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))
 #define GET_MOVE_TIME(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->move_time[(pos)]))
-#define GET_MOVEMENT_STRING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->movement_string))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
 #define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
@@ -1465,7 +1503,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
 #define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
-#define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
+#define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_MAGIC_DARKNESS))
 #define NO_LOCATION(room)  (RMT_FLAGGED(room, RMT_NO_LOCATION) || RMT_FLAGGED(IN_VEHICLE_IN_ROOM(room), RMT_NO_LOCATION))
 #define ROOM_CAN_EXIT(room)  (ROOM_BLD_FLAGGED((room), BLD_EXIT) || (GET_ROOM_VEHICLE(room) && room == HOME_ROOM(room)))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
@@ -1565,6 +1603,7 @@ static inline int GET_SEASON(room_data *room) {
 #define GET_SECT_BUILD_FLAGS(sect)  ((sect)->build_flags)
 #define GET_SECT_CLIMATE(sect)  ((sect)->climate)
 #define GET_SECT_COMMANDS(sect)  ((sect)->commands)
+#define GET_SECT_CUSTOM_MSGS(sect)  ((sect)->custom_msgs)
 #define GET_SECT_EVOS(sect)  ((sect)->evolution)
 #define GET_SECT_EX_DESCS(sect)  ((sect)->ex_description)
 #define GET_SECT_FLAGS(sect)  ((sect)->flags)
@@ -1743,7 +1782,6 @@ static inline int GET_SEASON(room_data *room) {
  //////////////////////////////////////////////////////////////////////////////
 //// CONST EXTERNS ///////////////////////////////////////////////////////////
 
-extern FILE *logfile;	// comm.c
 extern struct weather_data weather_info;	// db.c
 
 
@@ -1863,6 +1901,7 @@ char *one_word(char *argument, char *first_arg);
 char *quoted_arg_or_all(char *argument, char *found_arg);
 int reserved_word(char *argument);
 int search_block(char *arg, const char **list, int exact);
+int search_block_multi_isname(char *arg, const char **list);
 void skip_spaces(char **string);
 char *two_arguments(char *argument, char *first_arg, char *second_arg);
 void ucwords(char *string);
@@ -1905,6 +1944,7 @@ double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
+bool affect_is_beneficial(struct affected_type *aff);
 bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light);
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
@@ -1972,6 +2012,7 @@ void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvect
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
 const char *skip_filler(const char *string);
+const char *skip_wordlist(const char *string, const char **wordlist, bool also_skip_filler);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
 char *time_length_string(int seconds);
@@ -2013,30 +2054,11 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 
-// abilities.c
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-void add_ability_gain_hook(char_data *ch, ability_data *abil);
-void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-void apply_one_passive_buff(char_data *ch, ability_data *abil);
-bool check_ability(char_data *ch, char *string, bool exact);
-ability_data *find_ability_on_skill(char *name, skill_data *skill);
-ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
-void get_ability_type_display(struct ability_type *list, char *save_buffer, bool for_players);
-int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
-bool is_class_ability(ability_data *abil);
-char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
-void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-void read_ability_requirements();
-void refresh_passive_buffs(char_data *ch);
-void remove_passive_buff(char_data *ch, struct affected_type *aff);
-void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
-void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
-void setup_ability_companions(char_data *ch);
-
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
 void do_burn_area(char_data *ch);
+void end_action(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void process_build_action(char_data *ch);
@@ -2072,10 +2094,6 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
-
-// act.highsorcery.c
-double get_enchant_scale_for_char(char_data *ch, int max_scale);
-void summon_materials(char_data *ch, char *argument);
 
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
@@ -2126,6 +2144,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following);
 bool check_stop_flying(char_data *ch);
 void clear_recent_moves(char_data *ch);
 int count_recent_moves(char_data *ch);
+bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback);
 room_data *get_exit_room(room_data *from_room);
 int get_north_for_char(char_data *ch);
@@ -2137,15 +2156,13 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 
 // act.naturalmagic.c
 bool despawn_companion(char_data *ch, mob_vnum vnum);
-char *report_healing(char_data *healed, int amount, char_data *report_to);
-int total_bonus_healing(char_data *ch);
 void un_earthmeld(char_data *ch);
 
 // act.other.c
-void adventure_summon(char_data *ch, char *argument);
 void adventure_unsummon(char_data *ch);
 void cancel_adventure_summon(char_data *ch);
 bool dismiss_any_minipet(char_data *ch);
+void do_adventure_summon(char_data *ch, char *argument);
 void do_douse_room(char_data *ch, room_data *room, obj_data *cont);
 
 // act.quest.c
@@ -2184,8 +2201,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch, bool preventable);
-void cancel_blood_upkeeps(char_data *ch);
-bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
+void cancel_blood_upkeeps(char_data *ch, bool send_msgs);
 void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
@@ -2193,9 +2209,6 @@ void retract_claws(char_data *ch);
 void sire_char(char_data *ch, char_data *victim);
 void start_drinking_blood(char_data *ch, char_data *victim);
 bool starving_vampire_aggro(char_data *ch);
-void taste_blood(char_data *ch, char_data *vict);
-void un_deathshroud(char_data *ch);
-void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
 bool vampire_kill_feeding_target(char_data *ch, char *argument);
@@ -2282,7 +2295,7 @@ void update_reputations(char_data *ch);
 void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
 void check_combat_end(char_data *ch);
-void check_combat_start(char_data *ch);
+void check_start_combat_meters(char_data *ch);
 bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 void death_log(char_data *ch, char_data *killer, int type);
 void death_restore(char_data *ch);
@@ -2301,6 +2314,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 obj_data *player_death(char_data *ch);
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 void reset_combat_meters(char_data *ch);
+int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
@@ -2397,6 +2411,7 @@ struct generic_name_data *get_best_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void reschedule_all_despawns();
+bool return_to_pursuit_location(char_data *ch);
 void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
@@ -2427,6 +2442,9 @@ bool morph_affinity_ok(room_data *location, morph_data *morph);
 
 // olc.c
 bool validate_icon(char *icon);
+
+// olc.attack.c
+bool match_attack_type(any_vnum type, any_vnum match_to);
 
 // olc.building.c
 bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);

@@ -1,11 +1,11 @@
 #300
 Architect~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #301
 Savage Bite~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 59 0
 D 1 60 0
 D 1 61 0
@@ -13,8 +13,371 @@ T e 1
 S
 #302
 Cartography~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 83 0
 T e 1
+S
+#303
+Trick Shots: Slow Leg~
+akx -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 29 10.00 0
+M
+2
+That shot to the leg seems to slow $N!~
+M
+3
+$n's last shot hit your leg! You feel slower.~
+M
+4
+$n's last shot seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 s
+X+ 1 3081
+X+ 2 10
+X+ 3 10
+S
+#304
+Trick Shots: Artery Bleed~
+akx -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 30 10.00 0
+H 4 32 10.00 0
+H 4 35 10.00 0
+M
+2
+Your shot opens a deep artery in $N -- $E is bleeding!~
+M
+3
+$n's shot opens a deep artery -- you are bleeding!~
+M
+4
+$n's shot opens a deep artery -- $N is bleeding!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T d 1
+X+ 1 3081
+X+ 2 25
+X+ 3 25
+X+ 6 5
+S
+#305
+Trick Shots: Dodgey Arm~
+akx -1 1.00 h 0 0
+A
+18 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 2 0 0
+D 256 296 0
+H 4 31 10.00 0
+M
+2
+That shot to the arm seems to shake $N!~
+M
+3
+$n's last shot hit your arm! You feel shaken.~
+M
+4
+$n's last shot seems to shake $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3081
+X+ 2 10
+X+ 3 10
+S
+#306
+Trick Shots: Head Stun~
+akx -1 1.00 htEI 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 296 0
+H 4 34 10.00 0
+M
+2
+That shot to the head seems to stun $N!~
+M
+3
+$n's last shot hit your head! You feel stunned.~
+M
+4
+$n's last shot seems to stun $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 t
+X+ 1 3081
+X+ 2 5
+X+ 3 5
+S
+#307
+Darkshroud~
+afk -1 1.30 0 0 0
+C
+darkshroud 7 A 1 25 0.00 2092 30 9 2 2
+M
+10
+The darkshroud seems to miss $N.~
+M
+11
+Thankfully, the darkshroud seems to miss you.~
+M
+12
+*~
+M
+13
+The shadows draw close to you and then strike out with a dark fury!~
+M
+14
+The shadows draw close to $n and then strike out with a dark fury!~
+T c 1
+T d 3
+X+ 1 3112
+X+ 2 20
+X+ 3 20
+X+ 4 307
+X+ 5 4
+X+ 8 25.00
+S
+#308
+Wilderblaze~
+afi -1 1.50 0 0 0
+C
+wilderblaze 7 A 2 25 0.00 2093 30 8 3 2
+M
+10
+$N takes cover at the last second as the wilderblaze misses $M.~
+M
+11
+You take cover just in time as the wilderblaze misses you!~
+M
+12
+*~
+M
+13
+The air around you begins to ignite as you channel mana into the air!~
+M
+14
+The air begins to ignite around $n as $e glares with a fiery focus...~
+T c 2
+T d 5
+X+ 1 3113
+X+ 2 20
+X+ 3 20
+X+ 4 308
+X+ 5 2
+X+ 8 25.00
+S
+#309
+Bloodbound Arcanum~
+ij -1 0.75 0 h 0
+A
+7 1
+T f 1
+S
+#310
+Bloodborne Tenacity~
+k -1 0.75 0 h 0
+A
+6 1
+T f 1
+S
+#311
+Magivore~
+dij -1 3.00 0 0 0
+A
+7 1
+C
+magivore 5 g 0 0 0.00 2094 360 0 5 0
+M
+0
+The air ripples around you as you voraciously consume all the free mana in the area!~
+M
+1
+The air ripples and distorts around $n!~
+T b 1
+X+ 1 3114
+X+ 2 30
+X+ 3 30
+S
+#312
+Surge~
+dkl -1 3.00 0 0 0
+A
+6 1
+C
+surge 5 g 0 0 0.00 2095 360 0 1 0
+M
+0
+You grit your teeth, clench your muscles, and give it all you've got!~
+M
+1
+$n grits $s teeth and digs in!~
+T b 1
+X+ 1 3115
+X+ 2 30
+X+ 3 30
+S
+#313
+Charge Attack~
+af -1 1.00 0 0 0
+C
+unknown 7 bfh 1 0 0.00 -1 0 0 0 0
+D 64 22 0
+D 64 23 0
+D 16 15 0
+D 256 297 0
+H 1 297 100.00 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T x 1
+T s 0
+S
+#314
+Red Mist~
+0 -1 0.25 0 0 0
+C
+unknown 7 g 0 0 0.00 -1 0 0 0 0
+H 1 315 100.00 0
+M
+0
+A fine red mist sprays across your skin.~
+M
+0
+You bathe in the red mist of battle!~
+M
+0
+You feel refreshed by the red mist of battle!~
+M
+0
+The red mist feels good on your skin.~
+M
+1
+*~
+M
+8
+*~
+M
+9
+*~
+T y 1
+T z 1
+X+ 9 3
+S
+#315
+Red Mist: Splash Blood~
+a -1 1.00 G 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 314 0
+H 8 0 10.00 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+38
+*~
+T A 1
+S
+#316
+Giant Tortoise Familiar~
+0 -1 1.00 0 ho 0
+C
+unknown 8 0 2 50 0.00 -1 0 0 5 0
+D 8 506 0
+M
+2
+You send out a burst of shimmering green mana and $N appears!~
+M
+4
+$n sends out a burst of shimmering green mana and $N appears!~
+T h 0
+S
+#317
+Earthpeek~
+0 -1 1.00 0 0 0
+C
+earthpeek 3 a 0 0 0.00 -1 0 0 7 0
+D 16 52 16777216
+D 256 16 0
+D 64 25 0
+M
+0
+*~
+M
+1
+*~
+M
+8
+*~
+M
+9
+*~
+T s 1
 S
 $

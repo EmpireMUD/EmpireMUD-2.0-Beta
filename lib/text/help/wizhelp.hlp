@@ -801,7 +801,6 @@ any immortal:
 - prompt/display: additional options available
 - pursuit: mobs won't pursue imms
 - quit: not restricted by pvp timer
-- refashion: doesn't require a tailor
 - reply: still works after the target alternates
 - score: can target others
 - shops, quests, crafts, socials, morphs: Can use things with IN-DEV on them
@@ -946,6 +945,9 @@ If a full restore (all) is performed on an immortal, it also sets all skill
 levels to 100, gives all abilities (on the main skill set only), and grants
 all languages.
 
+Restoring a player will remove deathshroud and mummify effects. This helps
+prevent an immortal from being stuck in those states.
+
 This command is grantable.
 
 See also: GRANT, SKILL SWAP
@@ -955,6 +957,8 @@ RETURN
 Usage:  return
 
 RETURN returns you to your regular body if you are switched into a mob.
+
+For the script command, see RETURN STATEMENT.
 
 See also: SWITCH
 #d
@@ -1892,14 +1896,14 @@ VNUM
 
 Usage:  vnum <type> <keywords>
 
-Gives a list of the virtual numbers of objects or mobiles which have the
-specified name. If you specify more than one keyword, it will find things
+Gives a list of the virtual numbers (vnums) of objects or mobiles which have
+the specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, event, faction, global, generic, mob, morph, obj, 
-                 progress, quest, roomtemplate, sector, shop, skill, social,
-                 trigger, vehicle
+Valid types are: adventure, ability, archetype, attack, augment, book,
+                 building, craft, class, crop, event, faction, global, generic,
+                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
+                 skill, social, trigger, vehicle
 
 Examples:
 
@@ -1917,12 +1921,14 @@ VSTAT
 
 Usage:  vstat <type> <vnum>
 
-Used to stat a prototypical object by virtual number.
+Used to stat a prototypical object (or thing) by virtual number (vnum).
 
-Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                class, crop, empire, event, faction, global, generic, mob,
-                morph, obj, progress, quest, roomtemplate, sector, shop, skill,
-                social, trigger, vehicle
+Valid types are: adventure, ability, archetype, attack, augment, book,
+                 building, craft, class, crop, event, faction, global, generic,
+                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
+                 skill, social, trigger, vehicle
+
+For attack messages, this supports the -d option to see the full messages.
 
 Examples:
 

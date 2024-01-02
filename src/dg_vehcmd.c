@@ -3,7 +3,7 @@
 *  Usage: contains the command_interpreter for vehicles, vehicle commands *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -685,7 +685,7 @@ VCMD(do_vpurge) {
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(v);
 	}
@@ -1216,7 +1216,17 @@ VCMD(do_vdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, show_attack_message = NOTHING;
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			veh_log(veh, "vdamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
@@ -1256,20 +1266,30 @@ VCMD(do_vdamage) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage(ch, NULL, get_vehicle_scale_level(veh, ch), type, modifier);
+	script_damage(ch, NULL, get_vehicle_scale_level(veh, ch), type, modifier, show_attack_message);
 }
 
 
 VCMD(do_vaoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
 	room_data *orm = IN_ROOM(veh);
 	char_data *vict, *next_vict;
 	
 	// no room == no work
 	if (!orm) {
 		return;
+	}
+
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			veh_log(veh, "vaoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
 	}
 
 	two_arguments(argument, modarg, typearg);
@@ -1292,7 +1312,7 @@ VCMD(do_vaoe) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
-			script_damage(vict, NULL, level, type, modifier);
+			script_damage(vict, NULL, level, type, modifier, show_attack_message);
 		}
 	}
 }
@@ -1680,7 +1700,7 @@ VCMD(do_vscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(otarg, level);
+			fresh = fresh_copy_obj(otarg, level, TRUE, TRUE);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}

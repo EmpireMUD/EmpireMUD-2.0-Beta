@@ -2,7 +2,7 @@
 *   File: utils.c                                         EmpireMUD 2.0b5 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -49,7 +49,6 @@
 *   Type Utils
 *   World Utils
 *   Misc Utils
-*   Converter Utils
 */
 
 // local prototypes
@@ -408,6 +407,10 @@ void run_delayed_refresh(void) {
 	// player portion
 	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
 		// CDU_x: functionality for delayed update types
+		if (IS_SET(cdu->type, CDU_TRAIT_HOOKS)) {
+			check_trait_hooks(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_TRAIT_HOOKS);
+		}
 		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
 			refresh_passive_buffs(cdu->ch);
 			REMOVE_BIT(cdu->type, CDU_PASSIVE_BUFFS);
@@ -2389,7 +2392,7 @@ int search_block(char *arg, const char **list, int exact) {
 
 	l = strlen(arg);
 
-	for (i = 0; **(list + i) != '\n'; i++) {
+	for (i = 0; **(list + i) != '\n'; ++i) {
 		if (!str_cmp(arg, *(list + i))) {
 			return i;	// exact or otherwise
 		}
@@ -2399,6 +2402,30 @@ int search_block(char *arg, const char **list, int exact) {
 	}
 
 	return part;	// if any
+}
+
+
+/**
+* Variant of search_block that uses multi_isname for matches. This simpilfies
+* typing some text, especially in OLC. It still prefers exact matches.
+*
+* @param char *arg The input.
+* @param const char **list A "\n"-terminated name list.
+* @return int The entry in the list, or NOTHING if not found.
+*/
+int search_block_multi_isname(char *arg, const char **list) {
+	int iter, partial = NOTHING;
+	
+	for (iter = 0; **(list + iter) != '\n'; ++iter) {
+		if (!str_cmp(arg, *(list + iter))) {
+			return iter;	// exact match
+		}
+		else if (partial == NOTHING && multi_isname(arg, *(list + iter))) {
+			partial = iter;
+		}
+	}
+	
+	return partial;	// if any
 }
 
 
@@ -2718,7 +2745,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && GET_LEADER(iter) == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
-				if (!AFF_FLAGGED(iter, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+				if (!AFF_FLAGGED(iter, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 					act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				}
 				extract_char(iter);
@@ -2810,7 +2837,7 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 			return GET_BONUS_MAGICAL(ch);
 		}
 		case APPLY_BONUS_HEALING: {
-			return total_bonus_healing(ch);
+			return GET_BONUS_HEALING(ch);
 		}
 		case APPLY_RESIST_MAGICAL: {
 			return GET_RESIST_MAGICAL(ch);
@@ -3013,6 +3040,33 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if an effect appears to be bad for you or not.
+*
+* @param struct affected_type *aff Which aff.
+* @return bool TRUE if it's a good aff, FALSE if it's a bad one.
+*/
+bool affect_is_beneficial(struct affected_type *aff) {
+	bitvector_t bitv;
+	int pos;
+	
+	if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+		return FALSE;	// bad apply
+	}
+	if ((bitv = aff->bitvector) != NOBITS) {
+		// check each bit
+		for (pos = 0; bitv; ++pos, bitv >>= 1) {
+			if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+				return FALSE;
+			}
+		}
+	}
+	
+	// otherwise default to TRUE
+	return TRUE;
+}
+
+
+/**
 * Player's carry limit. This was formerly a macro.
 *
 * @param char_data *ch The player/character.
@@ -3094,7 +3148,7 @@ EVENTFUNC(check_leading_event) {
 	
 	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
-		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
@@ -3132,6 +3186,7 @@ void command_lag(char_data *ch, int wait_type) {
 	// base
 	wait = universal_wait;
 	
+	// WAIT_x: functionality for wait states
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
 			if (has_player_tech(ch, PTECH_FASTCASTING)) {
@@ -3140,6 +3195,8 @@ void command_lag(char_data *ch, int wait_type) {
 				
 				// ensure minimum of 0.5 seconds
 				wait = MAX(wait, 0.5 RL_SEC);
+				
+				gain_player_tech_exp(ch, PTECH_FASTCASTING, 5);
 			}
 			break;
 		}
@@ -3161,6 +3218,14 @@ void command_lag(char_data *ch, int wait_type) {
 			else {
 				wait = 0;	// indoors
 			}
+			break;
+		}
+		case WAIT_LONG: {
+			wait = 2 RL_SEC;
+			break;
+		}
+		case WAIT_VERY_LONG: {
+			wait = 4 RL_SEC;
 			break;
 		}
 	}
@@ -3468,22 +3533,22 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			}
 			case APPLY_RES_CRAFT: {
 				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
 			}
 			case APPLY_RES_REPAIR: {
 				if (!messaged_char) {
-					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room) {
-					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
@@ -3509,10 +3574,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3543,10 +3608,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3643,19 +3708,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
 				case APPLY_RES_REPAIR: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -5269,6 +5334,55 @@ const char *skip_filler(const char *string) {
 }
 
 
+/**
+* This function gets just the portion of a string after removing any initial
+* word that was on the conjure_words[] list.
+*
+* If you want to save the result somewhere, you should str_dup() it
+*
+* @param const char *string The original string.
+* @param const char **wordlist The list of words to skip.
+* @param bool also_skip_filler If TRUE, also skips fill words and reserved words.
+*/
+const char *skip_wordlist(const char *string, const char **wordlist, bool also_skip_filler) {
+	static char remainder[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH];
+	char *ptr, *ot;
+	int pos = 0;
+	
+	*remainder = '\0';
+	
+	if (!string || !wordlist) {
+		log("SYSERR: skip_wordlist received a NULL %s pointer.", string ? "string" : "wordlist");
+		return (const char *)remainder;
+	}
+	
+	do {
+		string += pos;
+		ot = (char*)string;	// just to skip_spaces on it, which won't modify the string
+		skip_spaces(&ot);
+		string = ot;
+		
+		if ((ptr = strchr(string, ' '))) {
+			pos = ptr - string;
+		}
+		else {
+			pos = 0;
+		}
+		
+		if (pos > 0) {
+			strncpy(temp, string, pos);
+		}
+		temp[pos] = '\0';
+	} while (search_block(temp, wordlist, TRUE) != NOTHING && (also_skip_filler || fill_word(temp) || reserved_word(temp)));
+	
+	// when we get here, string is a pointer to the start of the real name
+	strcpy(remainder, string);
+	
+	return (const char *)remainder;
+}
+
+
 /*
  * If you don't have a 'const' array, just cast it as such.  It's safer
  * to cast a non-const array as const than to cast a const one as non-const.
@@ -5324,7 +5438,7 @@ void sprinttype(int type, const char *names[], char *result, size_t max_result_s
 		snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		snprintf(result, max_result_size, "%s", error_value);
+		snprintf(result, max_result_size, "%s", NULLSAFE(error_value));
 	}
 }
 
@@ -5807,7 +5921,7 @@ sector_data *get_sect_by_name(char *name) {
 */
 bool check_sunny(room_data *room) {
 	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
-	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
+	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS));
 }
 
 
@@ -6754,7 +6868,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 *
 * @param room_data *room The room to check (which may be light).
 * @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
-* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_DARK -- presumably because you already checked it.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_MAGIC_DARKNESS -- presumably because you already checked it.
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
@@ -7401,142 +7515,4 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 			queue_delayed_update(ch, CDU_SAVE);
 		}
 	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// CONVERTER UTILS /////////////////////////////////////////////////////////
-
-/**
-* This convertions the pre-b5.88 components to the new versions.
-*
-* @param int old_type The old component type, previously CMP_x.
-* @param bitvector_t old_flags Any flags that were set on the old component, callled CMPF_x.
-* @return any_vnum The new generic vnum component that matches it.
-*/
-any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags) {
-	// first, we need the pre-b5.88 component types (ones not listed do not need conversion)
-	const int cmp_BONE = 2, cmp_BLOCK = 3, cmp_CLAY = 4, cmp_FIBERS = 7,
-		cmp_FLOUR = 8, cmp_FRUIT = 9, cmp_FUR = 10, cmp_GEM = 11,
-		cmp_GRAIN = 12, cmp_HANDLE = 13, cmp_HERB = 14, cmp_LEATHER = 15,
-		cmp_LUMBER = 16, cmp_MEAT = 17, cmp_METAL = 18, cmp_NAILS = 19,
-		cmp_OIL = 20, cmp_PILLAR = 21, cmp_ROCK = 22, cmp_SEEDS = 23,
-		cmp_SKIN = 24, cmp_SAPLING = 25, cmp_TEXTILE = 26, cmp_VEGETABLE = 27,
-		cmp_ROPE = 28, cmp_PAINT = 29, cmp_WAX = 30, cmp_SWEETENER = 31,
-		cmp_SAND = 32, cmp_GLASS = 33;
-	// and old component flags
-	const int cmpf_ANIMAL = BIT(0), cmpf_BUNCH = BIT(1), cmpf_DESERT = BIT(2),
-		cmpf_FINE = BIT(3), cmpf_HARD = BIT(4), cmpf_LARGE = BIT(5),
-		cmpf_MAGIC = BIT(6), cmpf_PLANT = BIT(8), cmpf_POOR = BIT(9),
-		cmpf_RARE = BIT(10), cmpf_RAW = BIT(11), cmpf_REFINED = BIT(12),
-		cmpf_SINGLE = BIT(13), cmpf_SMALL = BIT(14), cmpf_SOFT = BIT(15),
-		cmpf_TEMPERATE = BIT(16), cmpf_TROPICAL = BIT(17),
-		cmpf_COMMON = BIT(18), cmpf_AQUATIC = BIT(19);
-	
-	const struct {
-		int type, flags;
-		any_vnum new_comp;
-	} b5_88_conversion[] = {
-		// This will run in order from top to bottom, matching component +
-		// exact flags, and returning the number on the right
-		{ cmp_BONE, cmpf_LARGE | cmpf_MAGIC | cmpf_RARE, 6565 },	// dragon bone
-		{ cmp_BONE, cmpf_LARGE | cmpf_RARE, 6563 },	// ivory
-		{ cmp_BONE, cmpf_MAGIC, 6564 },	// magic bone
-		{ cmp_BONE, NOBITS, 6560 },	// bone
-		{ cmp_BLOCK, cmpf_BUNCH, 6076 },	// bricks
-		{ cmp_BLOCK, cmpf_SINGLE, 6077 },	// large block
-		{ cmp_BLOCK, NOBITS, 6075 },	// block
-		{ cmp_CLAY, NOBITS, 6090 },	// clay (no variants)
-		{ cmp_FIBERS, cmpf_HARD | cmpf_PLANT, 6422 },	// hard plant fibers
-		{ cmp_FIBERS, cmpf_SOFT | cmpf_PLANT, 6421 },	// soft plant fibers
-		{ cmp_FIBERS, cmpf_SOFT | cmpf_ANIMAL, 6441 },	// wool
-		{ cmp_FIBERS, NOBITS, 6400 },	// basic fibers
-		{ cmp_FLOUR, NOBITS, 6300 },	// basic flour
-		{ cmp_FRUIT, cmpf_MAGIC | cmpf_SINGLE, 6121 },	// small magic fruit
-		{ cmp_FRUIT, cmpf_MAGIC | cmpf_BUNCH, 6131 },	// large magic fruit
-		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_SINGLE, 6122 },	// small temperate fruit
-		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_BUNCH, 6132 },	// large temperate fruit
-		{ cmp_FRUIT, cmpf_DESERT | cmpf_SINGLE, 6124 },	// small desert fruit
-		{ cmp_FRUIT, cmpf_DESERT | cmpf_BUNCH, 6134 },	// large desert fruit
-		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_SINGLE, 6123 },	// small tropical fruit
-		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_BUNCH, 6133 },	// large tropical fruit
-		{ cmp_FRUIT, cmpf_SINGLE, 6120 },	// small fruit
-		{ cmp_FRUIT, cmpf_BUNCH, 6130 },	// large fruit
-		{ cmp_FRUIT, NOBITS, 6120 },	// small fruit
-		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_SINGLE, 6141 },	// small magic veg
-		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_BUNCH, 6151 },	// large magic veg
-		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_SINGLE, 6142 },	// small temperate veg
-		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_BUNCH, 6152 },	// large temperate veg
-		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_SINGLE, 6144 },	// small desert veg
-		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_BUNCH, 6154 },	// large desert veg
-		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_SINGLE, 6143 },	// small tropical veg
-		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_BUNCH, 6153 },	// large tropical veg
-		{ cmp_VEGETABLE, cmpf_SINGLE, 6140 },	// small veg
-		{ cmp_VEGETABLE, cmpf_BUNCH, 6150 },	// large veg
-		{ cmp_VEGETABLE, NOBITS, 6140 },	// small veg
-		{ cmp_GRAIN, cmpf_SINGLE, 6160 },	// small grain
-		{ cmp_GRAIN, cmpf_BUNCH, 6170 },	// large grain
-		{ cmp_GRAIN, NOBITS, 6160 },	// small grain
-		{ cmp_SEEDS, NOBITS, 6181 },	// edible seeds
-		{ cmp_GEM, cmpf_REFINED, 6601 },	// powerful magic gem
-		{ cmp_GEM, NOBITS, 6600 },	// magic gem
-		{ cmp_HERB, cmpf_REFINED, 6651 },	// refined herb
-		{ cmp_HERB, NOBITS, 6650 },	// herb
-		{ cmp_SWEETENER, NOBITS, 6340 },	// basic sweetener
-		{ cmp_OIL, NOBITS, 6320 },	// basic oil -- there are more types but no way to tell from flags
-		{ cmp_GLASS, cmpf_RAW, 6831 },	// glass ingot
-		{ cmp_GLASS, NOBITS, 6830 },	// glass
-		{ cmp_SAND, NOBITS, 6085 },	// only 1 type of sand
-		{ cmp_WAX, NOBITS, 6891 },	// basic wax
-		{ cmp_PAINT, NOBITS, 6890 },	// basic paint
-		{ cmp_ROPE, NOBITS, 6880 },	// basic rope
-		{ cmp_HANDLE, cmpf_MAGIC, 6851 },	// magic handle
-		{ cmp_HANDLE, NOBITS, 6850 },	// basic handle
-		{ cmp_TEXTILE, cmpf_MAGIC, 6810 },	// magic cloth
-		{ cmp_TEXTILE, NOBITS, 6800 },	// basic cloth
-		{ cmp_NAILS, NOBITS, 6790 },	// only 1 type
-		{ cmp_METAL, cmpf_POOR, 6710 },	// poor metal
-		{ cmp_METAL, cmpf_COMMON, 6720 },	// common metal
-		{ cmp_METAL, cmpf_HARD, 6740 },	// hardened metal
-		{ cmp_METAL, cmpf_FINE, 6750 },	// precious metal 1
-		{ cmp_METAL, cmpf_REFINED, 6750 },	// precious metal 2
-		{ cmp_METAL, cmpf_MAGIC, 6760 },	// magic metal
-		{ cmp_METAL, cmpf_RARE, 6730 },	// rare metal
-		{ cmp_METAL, NOBITS, 6700 },	// basic metal
-		{ cmp_ROCK, NOBITS, 6050 },	// basic rock
-		{ cmp_SAPLING, cmpf_FINE, 6026 },	// fine sapling
-		{ cmp_SAPLING, NOBITS, 6025 },	// basic sapling
-		{ cmp_LUMBER, cmpf_MAGIC, 6001 },	// magic lumber
-		{ cmp_LUMBER, cmpf_FINE, 6002 },	// fine lumber
-		{ cmp_LUMBER, NOBITS, 6000 },	// basic lumber
-		{ cmp_PILLAR, cmpf_LARGE, 6017 },	// large pillar
-		{ cmp_PILLAR, cmpf_FINE, 6016 },	// fine pillar
-		{ cmp_PILLAR, NOBITS, 6015 },	// basic pillar
-		{ cmp_FUR, cmpf_LARGE, 6550 },	// large fur
-		{ cmp_FUR, cmpf_SMALL, 6541 },	// small fur
-		{ cmp_FUR, NOBITS, 6540 },	// basic fur
-		{ cmp_SKIN, cmpf_MAGIC, 6511 },	// magic skin
-		{ cmp_SKIN, cmpf_LARGE, 6510 },	// thick skin
-		{ cmp_SKIN, cmpf_SMALL, 6501 },	// thin skin
-		{ cmp_SKIN, NOBITS, 6500 },	// basic skin
-		{ cmp_LEATHER, cmpf_MAGIC, 6531 },	// magic leather
-		{ cmp_LEATHER, cmpf_LARGE, 6530 },	// thick leather
-		{ cmp_LEATHER, cmpf_SMALL, 6521 },	// thin leather
-		{ cmp_LEATHER, NOBITS, 6520 },	// basic leather
-		{ cmp_MEAT, cmpf_AQUATIC, 6203 },	// raw fish
-		{ cmp_MEAT, NOBITS, 6200 },	// raw meat
-		
-		{ -1, -1, -1 }	// LAST
-	};
-	
-	int iter;
-	
-	for (iter = 0; b5_88_conversion[iter].type != -1; ++iter) {
-		if (b5_88_conversion[iter].type == old_type && (b5_88_conversion[iter].flags == NOBITS || IS_SET_STRICT(old_flags, b5_88_conversion[iter].flags))) {
-			return b5_88_conversion[iter].new_comp;
-		}
-	}
-	
-	// didn't find it? no valid component type
-	return NOTHING;
 }

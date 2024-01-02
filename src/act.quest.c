@@ -2,7 +2,7 @@
 *   File: act.quest.c                                     EmpireMUD 2.0b5 *
 *  Usage: commands related to questing                                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -148,7 +148,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	qt_lose_quest(ch, pq->vnum);
 	
 	msg_to_char(ch, "You have finished %s%s\t0!\r\n%s", QUEST_LEVEL_COLOR(ch, quest), QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
-	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);
+	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM | ACT_STR_OBJ);
 	
 	// add quest completion
 	vnum = pq->vnum;
@@ -1068,9 +1068,9 @@ QCMD(qcmd_share) {
 		
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
-		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR);
+		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR | ACT_STR_OBJ);
 		snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
-		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
+		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT | ACT_STR_OBJ);
 	}
 	
 	if (!any && same_room) {

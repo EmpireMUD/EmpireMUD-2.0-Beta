@@ -2,7 +2,7 @@
 *   File: quest.c                                         EmpireMUD 2.0b5 *
 *  Usage: quest loading, saving, OLC, and processing                      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -78,7 +78,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 		// QG_x: find quest giver here
 		switch (giver->type) {
 			case QG_BUILDING: {
-				if (GET_BUILDING(loc) && GET_BLD_VNUM(GET_BUILDING(loc)) == giver->vnum) {
+				if (GET_BUILDING(loc) && GET_BLD_VNUM(GET_BUILDING(loc)) == giver->vnum && IS_COMPLETE(loc)) {
 					*giver_emp = ROOM_OWNER(loc);
 					return TRUE;
 				}
@@ -117,7 +117,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_VEHICLE: {
 				DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-					if (VEH_VNUM(veh) == giver->vnum && !VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh)) {
+					if (VEH_VNUM(veh) == giver->vnum && !VEH_IS_EXTRACTED(veh) && VEH_IS_COMPLETE(veh) && CAN_SEE_VEHICLE(ch, veh)) {
 						*giver_emp = VEH_OWNER(veh);
 						return TRUE;
 					}
@@ -755,7 +755,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				break;
 			}
 			case QR_SET_SKILL: {
-				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
+				int val = MAX(0, MIN(MAX_SKILL_CAP, reward->amount));
 				bool loss;
 				
 				loss = (val < get_skill_level(ch, reward->vnum));
@@ -2181,7 +2181,7 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 	struct player_quest *pq;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}
 	
@@ -2243,7 +2243,7 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 	int complete, total;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
+	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !VEH_IS_COMPLETE(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 		return FALSE;
 	}
 	

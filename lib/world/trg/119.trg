@@ -2075,80 +2075,10 @@ end
 Skycleave: Search ability for hints and secret passages~
 2 p 100
 ~
+* This was Skycleave: Search ability for hints and secret passages
+* It is no longer used because search is handled by command triggers (#11936)
 return 1
-if %ability% != 18 && %abilityname% != Search
-  * wrong ability
-  halt
-end
-set spirit %instance.mob(11900)%
-switch %room.template%
-  case 11815
-  case 11915
-    * goblin cages (both phases)
-    if %room.north(room)%
-      * Already open
-      halt
-    end
-    * Not already open
-    %send% %actor% You search around and find a hidden switch on the side of the bin...
-    %echoaround% %actor% ~%actor% seems to have found something while searching around...
-    %load% mob 11923
-    return 0
-  break
-  case 11817
-  case 11917
-    * Back of the passage
-    if !%room.northwest(room)%
-      %send% %actor% You search around and notice a note by the exit to the passage.
-      %send% %actor% It reads: Secret Pass Phrase 'O ala lilo'
-      %echoaround% %actor% ~%actor% searches around and finds a note.
-      return 0
-    end
-  break
-  case 11822
-  case 11922
-    * Outside the passage, walkway side
-    if !%room.southeast(room)%
-      %send% %actor% It looks like there's a secret passage in the wall. Perhaps one of the portraits has a hint on how to open it.
-      %echoaround% %actor% ~%actor% searches around.
-      return 0
-    end
-  break
-  case 11835
-    * Eruditorium
-    if %room.people(11847)%
-      %send% %actor% It doesn't look like it would be a good idea to get in Kara Virduke's way as she searches the room.
-    else
-      %send% %actor% You search the room, but can't figure out what Kara Virduke was looking for in here.
-      %echoaround% %actor% ~%actor% searches around the room.
-    end
-    return 0
-  break
-  case 11836
-    * Lich labs
-    if !%spirit.lich_released%
-      %send% %actor% You search around but keep noticing the lich's repository rattling, and the instructions on the blackboard.
-      %echoaround% %actor% ~%actor% searches around the room.
-      return 0
-    end
-  break
-  case 11839
-  case 11939
-    * Enchanting lab
-    if !%room.east(room)%
-      %send% %actor% You search around the illusory wall, trying to figure out how to open it, but can't find a way.
-      %send% %actor% Perhaps there's a clue in the painting's name.
-      %echoaround% %actor% ~%actor% searches around the wall.
-      return 0
-    end
-  break
-  case 11841
-    * Attunement lab 3A
-    %send% %actor% You're not sure how anybody finds anything in this place... it's a mess.
-    %echoaround% %actor% ~%actor% searches around fruitlessly.
-    return 0
-  break
-done
+halt
 ~
 #11922
 Skycleave: Secret passage levers~
@@ -2432,7 +2362,7 @@ while %ch%
   set ch %next_ch%
 done
 wait 1
-%echo% ~%self% grabs something from the table and then vanishes into the shadows!
+%echo% ~%self% grabs something from the floor and then vanishes into the shadows!
 %purge% %self%
 ~
 #11929
@@ -2713,6 +2643,7 @@ end
 Skycleave: Room commands (Pixy Races, Lich Labs, Goblin Cages, Gate, Ossuary)~
 2 c 0
 touch open disturb wake awaken search attune look bet wager~
+set search_list 11815 11817 11822 11835 11836 11839 11841 11915 11917 11922 11939
 set lich_cmds touch open disturb wake awaken search
 return 0
 if attune /= %cmd% && %room.template% == 11841
@@ -2740,12 +2671,107 @@ elseif open /= %cmd% && (%room.template% == 11839 || %room.template% == 11939)
     end
     return 1
   end
-elseif search /= %cmd% && (%room.template% == 11815 || %room.template% == 11915)
+elseif search /= %cmd% && %search_list% ~= %room.template%
   * goblin cages: searching without skill?
-  if !%actor.ability(Search)%
+  if !%actor.has_tech(Search-Command)% && (%room.template% == 11815 || %room.template% == 11915)
     %send% %actor% You try to search around the bin, but whatever you're looking for, you don't have the skill to find it.
     %echoaround% %actor% ~%actor% searches around the room.
     return 1
+  elseif !%actor.has_tech(Search-Command)%
+    %send% %actor% You don't see anything interesting.
+    %echoaround% %actor% ~%actor% searches around the room.
+    return 1
+  else
+    * can search
+    return 1
+    set spirit %instance.mob(11900)%
+    switch %room.template%
+      case 11815
+      case 11915
+        * goblin cages (both phases)
+        if %room.north(room)%
+          * Already open
+          return 0
+          halt
+        end
+        * Not already open
+        %send% %actor% You search around and find a hidden switch on the side of the bin...
+        %echoaround% %actor% ~%actor% seems to have found something while searching around...
+        %load% mob 11923
+      break
+      case 11817
+      case 11917
+        * Back of the passage
+        if !%room.northwest(room)%
+          %send% %actor% You search around and notice a note by the exit to the passage.
+          %send% %actor% It reads: Secret Pass Phrase 'O ala lilo'
+          %echoaround% %actor% ~%actor% searches around and finds a note.
+        else
+          return 0
+        end
+      break
+      case 11822
+      case 11922
+        * Outside the passage, walkway side
+        if !%room.southeast(room)%
+          %send% %actor% It looks like there's a secret passage in the wall. Perhaps one of the portraits has a hint on how to open it.
+          %echoaround% %actor% ~%actor% searches around.
+        else
+          return 0
+        end
+      break
+      case 11835
+        * Eruditorium
+        if %room.people(11847)%
+          %send% %actor% It doesn't look like it would be a good idea to get in Kara Virduke's way as she searches the room.
+        else
+          %send% %actor% You search the room, but can't figure out what Kara Virduke was looking for in here.
+          %echoaround% %actor% ~%actor% searches around the room.
+        end
+      break
+      case 11836
+        * Lich labs
+        if (desk /= %arg% || antique /= %arg%)
+          %send% %actor% You make the mistake of touching the antique desk...
+          %echoaround% %actor% ~%actor% tries to open the antique desk...
+          %echo% An ethereal spirit flies out of the desk and swirls around the room, howling as it goes!
+          set ch %room.people%
+          while %ch%
+            set next_ch %ch.next_in_room%
+            if !%ch.aff_flagged(!ATTACK)%
+              %dot% #11936 %ch% 1000 30 magical
+              %damage% %ch% 100 magical
+            end
+            set ch %next_ch%
+          done
+          %echo% The spirit returns to the desk, which slams shut with a thud!
+        elseif !%spirit.lich_released%
+          %send% %actor% You search around but keep noticing the lich's repository rattling, and the instructions on the blackboard.
+          %echoaround% %actor% ~%actor% searches around the room.
+        else
+          return 0
+        end
+      break
+      case 11839
+      case 11939
+        * Enchanting lab
+        if !%room.east(room)%
+          %send% %actor% You search around the illusory wall, trying to figure out how to open it, but can't find a way.
+          %send% %actor% Perhaps there's a clue in the painting's name.
+          %echoaround% %actor% ~%actor% searches around the wall.
+        else
+          return 0
+        end
+      break
+      case 11841
+        * Attunement lab 3A
+        %send% %actor% You're not sure how anybody finds anything in this place... it's a mess.
+        %echoaround% %actor% ~%actor% searches around fruitlessly.
+      break
+      default
+        return 0
+      break
+    done
   end
 elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% == 11936)
   * lich desk
@@ -3682,7 +3708,7 @@ Skycleave: Consume handler (long potions and other consumables)~
 switch %self.vnum%
   case 11912
     dg_affect #%self.vnum% %actor% off silent
-    dg_affect #%self.vnum% %actor% WATERWALK on 86400
+    dg_affect #%self.vnum% %actor% WATERWALKING on 86400
     %send% %actor% # Your feet start to tingle!
   break
   case 11924
@@ -4185,7 +4211,7 @@ switch %line%
     %force% %mob% say Please, great Queen, anything.
   break
   case 10
-    %echo% ~%self% turns to guard, who bends down and turns his ear to her.
+    %echo% ~%self% turns to the guard, who bends down and turns his ear to her.
     wait 9 sec
     %echo% The royal guard and ~%self% exchange hushed whispers for a few moments.
     wait 9 sec
@@ -4271,7 +4297,7 @@ end
 if %line% >= %no_players_start% && %line% <= %no_players_end%
   set ch %self.room.people%
   while %ch%
-    if %ch.is_pc% && %guard.can_see(%ch%)% && !%ch.aff_flagged(HIDE)%
+    if %ch.is_pc% && %guard.can_see(%ch%)% && !%ch.aff_flagged(HIDDEN)%
       * oops -- kick them out and block this cycle
       %force% %guard% say The queen requires privacy in the chamber. You'll have to leave.
       eval line %line% - 1
@@ -4826,7 +4852,11 @@ if %self.vnum% == 11890
   halt
 end
 * otherwise: Time-traveler's diary:
-if !%actor%
+if %actor%
+  set ch %actor%
+elseif %self.carried_by%
+  set ch %self.carried_by%
+else
   halt
 end
 * gives the pages in order if not owned, or at random if owned
@@ -4834,13 +4864,12 @@ set diary_list 11918 11920 11919
 set list_size 3
 return 1
 wait 0
-set ch %self.carried_by%
 * check owned list
 set list %diary_list%
 while %list%
   set vnum %list.car%
   set list %list.cdr%
-  if !%actor.inventory(%vnum%)% && !%actor.on_quest(%vnum%)% && !%actor.completed_quest(%vnum%)%
+  if !%ch.inventory(%vnum%)% && !%ch.on_quest(%vnum%)% && !%ch.completed_quest(%vnum%)%
     if %ch%
       %load% obj %vnum% %ch% inv
       set obj %ch.inventory(%vnum%)%
@@ -5883,6 +5912,7 @@ if %self.cooldown(11800)% || %self.disabled%
 end
 set room %self.room%
 set diff %self.diff%
+dg_affect #3021 %self% COUNTERSPELL on 15
 dg_affect #3021 %self% SOULMASK on 15
 set m_l %self.var(m_l)%
 set n_m %self.var(n_m,0)%
@@ -6006,7 +6036,7 @@ elseif %move% == 2
               dg_affect #11856 %ch% TO-HIT 25 20
             end
           else
-            if %ch.trigger_counterspell%
+            if %ch.trigger_counterspell(%self%)%
               %send% %ch% Your counterspell does nothing against the Iskip!
             end
             * hit
@@ -6639,7 +6669,7 @@ elseif %move% == 4
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %send% %ch% &&m... your counterspell does nothing against the scalding air!&&0
           end
           * hit!

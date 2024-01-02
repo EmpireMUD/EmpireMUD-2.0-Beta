@@ -41,82 +41,91 @@ S
 #3106
 freezing~
 4 0
-0 0 0 0
+3106 0 0 0
 T0
 You finally start to feel warm again.~
 T4
 $e is shivering uncontrollably!~
 T5
 ...$e is shivering from the cold.~
-T6
-You shiver as you slowly freeze.~
-T7
-$N shivers as $E slowly freezes.~
-T8
-Oh no... you froze to death!~
-T9
-$N is frozen solid in place as $E dies of the cold!~
 S
 #3107
 sweltering~
 4 0
-0 0 0 0
+3107 0 0 0
 T0
 You finally start to cool down.~
 T4
 $e is sweating and turning red.~
 T5
 ...$e is sweating profusely.~
-T6
-You sweat profusely as you suffer in the heat.~
-T7
-$N sweats profusely as $E suffers in the heat.~
-T8
-The world goes dark as you pass out from the heat... and die!~
-T9
-$N falls over from the heat, dead!~
 S
 #3108
 chilly~
 4 0
-0 0 0 0
+3106 0 0 0
 T0
 You finally start to feel warm again.~
 T4
 $e is shivering uncontrollably!~
 T5
 ...$e is shivering from the cold.~
-T6
-You shiver as you slowly freeze.~
-T7
-$N shivers as $E slowly freezes.~
-T8
-Oh no... you froze to death!~
-T9
-$N is frozen solid in place as $E dies of the cold!~
 S
 #3109
 warm~
 4 0
-0 0 0 0
+3107 0 0 0
 T0
 You finally feel some relief from that hot weather.~
 T4
 $e is sweating and turning red.~
 T5
 ...$e is sweating profusely.~
-T6
-You sweat profusely as you suffer in the heat.~
-T7
-$N sweats profusely as $E suffers in the heat.~
-T8
-The world goes dark as you pass out from the heat... and die!~
-T9
-$N falls over from the heat, dead!~
 S
 #3110
 brief respite~
 4 0
 0 0 0 0
+S
+#3111
+master survivalist~
+4 0
+0 0 0 0
+S
+#3112
+darkshroud~
+4 0
+306 0 0 0
+T0
+The darkshroud finally fades and you breathe a sigh of relief.~
+T4
+Shards of darkness pierce $s body!~
+S
+#3113
+wilderblaze~
+4 0
+65 0 0 0
+T0
+The scorch of the wilderblaze fades from your skin, but you won't soon forget it.~
+T4
+$s skin blazes with wildfire.~
+S
+#3114
+magivore~
+4 0
+0 0 0 0
+T0
+You've consumed as much mana as possible for the moment.~
+T4
+The air around him is distorted and rippling frenetically.~
+T5
+...the air ripples and distorts around $m!~
+S
+#3115
+surge~
+4 0
+0 0 0 0
+T0
+You feel your surge of energy come to an end.~
 S
 $

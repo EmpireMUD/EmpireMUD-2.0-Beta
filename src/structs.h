@@ -2,7 +2,7 @@
 *   File: structs.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -51,6 +51,7 @@
 *     Ability Structs
 *     Adventure Structs
 *     Archetype Structs
+*     Attack Message Structs
 *     Augment Structs
 *     Book Structs
 *     Building Structs
@@ -66,7 +67,7 @@
 *     Event Structs
 *     Event Structs (Timed Event System)
 *     Faction Structs
-*     Fight Structs
+*     Fight Message Structs
 *     Game Structs
 *     Generic Structs
 *     Object Structs
@@ -216,13 +217,15 @@
 #define MAGIC_NUMBER  (0x06)	// Arbitrary number that won't be in a string
 
 
-// for things that hold more than one type of thing:
+// TYPE_x: for things that hold more than one type of thing:
 #define TYPE_OBJ  0
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
 #define TYPE_MINE_DATA  3
 #define TYPE_BLD  4
 #define TYPE_VEH  5
+#define TYPE_ABIL  6
+#define TYPE_LIQUID  7
 
 
 // basic types
@@ -264,6 +267,7 @@ typedef struct ability_data ability_data;
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
 typedef struct archetype_data archetype_data;
+typedef struct attack_message_data attack_message_data;
 typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
@@ -365,6 +369,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLOBAL_MINE_DATA  1
 #define GLOBAL_NEWBIE_GEAR  2
 #define GLOBAL_MAP_SPAWNS  3
+#define GLOBAL_OBJ_INTERACTIONS  4
 
 
 // GLB_FLAG_x flags for global_data
@@ -413,7 +418,11 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RUINS_TO_VEH  30
 #define INTERACT_PRODUCTION  31
 #define INTERACT_SKILLED_LABOR  32
-#define NUM_INTERACTS  33
+#define INTERACT_LIQUID_CONJURE  33
+#define INTERACT_OBJECT_CONJURE  34
+#define INTERACT_VEHICLE_CONJURE  35
+#define INTERACT_DISENCHANT  36
+#define NUM_INTERACTS  37
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -495,15 +504,6 @@ typedef struct vehicle_data vehicle_data;
 #define SHIPPING_WAITING_FOR_SHIP  3	// waiting for a ship
 
 
-// SKILLF_x: skill flags
-#define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
-#define SKILLF_BASIC  BIT(1)	// b. always shows in the list
-#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
-#define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
-#define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
-#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
-
-
 // SPAWN_x: mob spawn flags
 #define SPAWN_NOCTURNAL  BIT(0)	// a. only spawns at night
 #define SPAWN_DIURNAL  BIT(1)	// b. only spawns during day
@@ -534,123 +534,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY DEFINES /////////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
-#define ABILF_VIOLENT  BIT(0)	// a. hostile ability (can't target self, etc)
-#define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
-#define ABILF_TOGGLE  BIT(2)	// c. can be toggled off by re-using (buffs)
-#define ABILF_INVISIBLE  BIT(3)	// d. act messages don't show if char can't be seen
-#define ABILF_NO_ENGAGE  BIT(4)	// e. won't cause you to enter combat
-#define ABILF_RANGED  BIT(5)	// f. allows use in ranged combat
-#define ABILF_NO_ANIMAL  BIT(6)	// g. can't be used in animal form
-#define ABILF_NO_INVULNERABLE  BIT(7)	// h. can't be used in invulnerable form
-#define ABILF_CASTER_ROLE  BIT(8)	// i. bonus if in 'caster' role
-#define ABILF_HEALER_ROLE  BIT(9)	// j. bonus if in 'healer' role
-#define ABILF_MELEE_ROLE  BIT(10)	// k. bonus if in 'melee' role
-#define ABILF_TANK_ROLE  BIT(11)	// l. bonus if in 'tank' role
-#define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
-#define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
-#define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
-#define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
-
-#define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
-
-// ABILT_x: ability type flags
-#define ABILT_CRAFT  BIT(0)	// related to crafting/building
-#define ABILT_BUFF  BIT(1)	// applies an affect
-#define ABILT_DAMAGE  BIT(2)	// deals damage
-#define ABILT_DOT  BIT(3)	// damage over time effect
-#define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
-#define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
-#define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
-#define ABILT_COMPANION  BIT(7)	// grants companions
-#define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
-#define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
-#define ABILT_MORPH  BIT(10)	// ability has morphs that require it
-#define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
-#define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
-/*
-#define ABILT_UNAFFECTS  BIT(2)
-#define ABILT_POINTS  BIT(3)	// e.g. heal?
-#define ABILT_ALTER_OBJS  BIT(4)
-#define ABILT_GROUPS  BIT(5)
-#define ABILT_MASSES  BIT(6)
-#define ABILT_AREAS  BIT(7)
-#define ABILT_CREATIONS  BIT(9)
-#define ABILT_MANUAL  BIT(10)
-#define ABILT_ROOMS  BIT(11)
-*/
-
-
-// ATAR_x: ability targeting flags
-#define ATAR_IGNORE	BIT(0)	// ignore target
-#define ATAR_CHAR_ROOM	BIT(1)	// pc/npc in room
-#define ATAR_CHAR_WORLD  BIT(2)	// pc/npc in the world
-#define ATAR_CHAR_CLOSEST  BIT(3)	// closest pc/npc in the world
-#define ATAR_FIGHT_SELF  BIT(4)	// if fighting and no arg, targets self
-#define ATAR_FIGHT_VICT  BIT(5)	// if fighting and no arg, targets opponent
-#define ATAR_SELF_ONLY  BIT(6)	// targets self if no arg, and only allows self
-#define ATAR_NOT_SELF  BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
-#define ATAR_OBJ_INV  BIT(8)	// object in inventory
-#define ATAR_OBJ_ROOM  BIT(9)	// object in the room
-#define ATAR_OBJ_WORLD  BIT(10)	// object in the world
-#define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
-#define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
-#define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
-
-
-// ABIL_CUSTOM_x: custom message types
-#define ABIL_CUSTOM_SELF_TO_CHAR  0
-#define ABIL_CUSTOM_SELF_TO_ROOM  1
-#define ABIL_CUSTOM_TARGETED_TO_CHAR  2
-#define ABIL_CUSTOM_TARGETED_TO_VICT  3
-#define ABIL_CUSTOM_TARGETED_TO_ROOM  4
-#define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
-#define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
-#define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
-#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR  8
-#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM  9
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
-#define ABIL_CUSTOM_PRE_SELF_TO_CHAR  13
-#define ABIL_CUSTOM_PRE_SELF_TO_ROOM  14
-#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
-#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
-#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
-
-
-// ABIL_EFFECT_x: things that happen when an ability is used
-#define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
-
-
-// ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
-#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
-#define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
-#define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
-#define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
-
-
-// AGH_x: ability gain hooks
-#define AGH_ONLY_WHEN_AFFECTED  BIT(0)	// modifies other types: only when affected by this abil
-#define AGH_MELEE  BIT(1)	// gains when actor hits in melee
-#define AGH_RANGED  BIT(2)	// gains when actor hits at range
-#define AGH_DODGE  BIT(3)	// gains when actor dodges
-#define AGH_BLOCK  BIT(4)	// gains when actor blocks
-#define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
-#define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
-#define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
-#define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
-#define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
-#define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
-#define AGH_MOVING  BIT(12)	// gain when moving
-#define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
-#define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
-#define AGH_NOT_WHILE_ASLEEP  BIT(15)	// prevent gains while sleeping (or dying)
-
-
-// RUN_ABIL_x: modes for activating abilities
-#define RUN_ABIL_NORMAL  0	// normal command activation
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -672,7 +556,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
 #define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
 #define ADV_GLOBAL_NEARBY  BIT(14)	// o. will show the closest one no matter how far away
-#define ADV_DETECTABLE  BIT(15)	// p. can be found e.g. with ritual of detection
+#define ADV_DETECTABLE  BIT(15)	// p. can be found with the ability action "detect adventures around"
 
 
 // ADV_LINK_x: adventure link rule types
@@ -803,7 +687,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
 #define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
-#define BLD_NO_AUTO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
+#define BLD_NO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)
 // #define BLD_UNUSED13  BIT(25)
@@ -905,7 +789,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
 #define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
 #define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
-#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_FORGE  BIT(7)	// can use the forge command here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
 #define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
 	#define FNC_UNUSED  BIT(10)	// formerly "HENGE" which now uses a script
@@ -922,7 +806,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_SMELT  BIT(21)	// allows smelting here
 #define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
 #define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
-#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TAILOR  BIT(24)	// counts as tailor for crafts like weaving
 #define FNC_TANNERY  BIT(25)	// allows tanning here
 #define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
 #define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
@@ -992,15 +876,15 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_MAJESTY  BIT(1)	// b. majesty
 #define AFF_INFRAVISION  BIT(2)	// c. Char can see full in dark
 #define AFF_SNEAK  BIT(3)	// d. Char can move quietly
-#define AFF_HIDE  BIT(4)	// e. Char is hidden
+#define AFF_HIDDEN  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
 #define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
-#define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
+#define AFF_SENSE_HIDDEN  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
-#define AFF_FLY  BIT(12)	// m. person can fly
+#define AFF_FLYING  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
 #define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
 #define AFF_DISARMED  BIT(15)	// p. disarmed
@@ -1010,11 +894,11 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
 #define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
-#define AFF_CLAWS  BIT(22)	// w. claws
-#define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
-#define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
-#define AFF_MUMMIFY  BIT(25)	// z. mummified
-#define AFF_SOULMASK  BIT(26)	// A. soulmask
+	#define AFF_UNUSED  BIT(22)	// w. formerly AFF_CLAWS/CLAWS which were reworked in b5.166
+#define AFF_DEATHSHROUDED  BIT(23)	// x. deathshrouded
+#define AFF_EARTHMELDED  BIT(24)	// y. interred in the earth
+#define AFF_MUMMIFIED  BIT(25)	// z. mummified
+#define AFF_SOULMASK  BIT(26)	// A. shows no details to others on 'affects'
 #define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
@@ -1025,13 +909,15 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
-#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
+#define AFF_WATERWALKING  BIT(37)	// L. won't drown or be affected by water restrictions
 #define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
 #define AFF_POOR_REGENS  BIT(39)	// N. dramatically lower regens
 #define AFF_SLOWER_ACTIONS  BIT(40)	// O. timed actions are slower
 #define AFF_HUNGRIER  BIT(41)	// P. character becomes hungry faster
 #define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
 #define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
+#define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
+#define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
 
 
 // Injury flags -- IS_INJURED
@@ -1072,19 +958,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CLASS DEFINES ///////////////////////////////////////////////////////////
 
-// CLASSF_x: class flags
-#define CLASSF_IN_DEVELOPMENT  BIT(0)	// a. not available to players
-
-
-// ROLE_x: group roles for classes
-#define ROLE_NONE  0	// placeholder
-#define ROLE_TANK  1
-#define ROLE_MELEE  2
-#define ROLE_CASTER  3
-#define ROLE_HEALER  4
-#define ROLE_UTILITY  5
-#define ROLE_SOLO  6
-#define NUM_ROLES  7
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1138,6 +1012,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
+#define CRAFT_DISMANTLE_WITHOUT_ABILITY  BIT(20)	// buildings and vehicles can be dismantled without the ability
 
 
 // For find_building_list_entry
@@ -1161,6 +1036,10 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 #define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
+
+
+// CROP_CUSTOM_x: custom messages
+#define CROP_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2126,13 +2005,13 @@ typedef enum {
 #define ACT_MORPHING		19
 #define ACT_SCRAPING		20
 #define ACT_BATHING			21
-#define ACT_CHANTING		22
+	#define ACT_CHANTING		22	// deprecated as of b5.166
 #define ACT_PROSPECTING		23
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
-#define ACT_ESCAPING		26
+	#define ACT_ESCAPING		26	// deprecated as of b5.166
 #define ACT_RUNNING			27
-#define ACT_RITUAL			28
+	#define ACT_RITUAL			28	// deprecated as of b5.166
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
 #define ACT_DRIVING			31
@@ -2148,6 +2027,7 @@ typedef enum {
 #define ACT_HUNTING			41
 #define ACT_FORAGING		42
 #define ACT_DISMANTLE_VEHICLE  43
+#define ACT_OVER_TIME_ABILITY  44
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2163,6 +2043,8 @@ typedef enum {
 #define ACTF_VEHICLE_SPEEDS BIT(10)  // signals that this action accelerates based on vehicle speeds
 #define ACTF_EVEN_FASTER  BIT(11)	// another speed boost for various actions
 #define ACTF_IGNORE_COND  BIT(12)	// not slowed by hunger/thirst/slow
+#define ACTF_FIGHTING  BIT(13)	// may be performed in combat
+#define ACTF_RESTING  BIT(14)	// may be used while resting
 
 
 // BONUS_x: bonus traits
@@ -2209,6 +2091,7 @@ typedef enum {
 #define CDU_MSDP_EMPIRE_ALL  BIT(7)	// runs update_MSDP_empire_data()
 #define CDU_MSDP_EMPIRE_CLAIMS  BIT(8)	// runs update_MSDP_empire_claims()
 #define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
+#define CDU_TRAIT_HOOKS  BIT(10)	// runs check_trait_hooks()
 
 
 // CHANNEL_HISTORY_x: types of channel histories -- act.comm.c
@@ -2436,7 +2319,7 @@ typedef enum {
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
 #define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
-#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
+#define MOUNT_WATERWALKING  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system
@@ -2532,10 +2415,10 @@ typedef enum {
 #define PTECH_FAST_WOOD_PROCESSING  13	// saw/scrape go faster
 #define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
 #define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
-#define PTECH_FISH  16	// can use the 'fish' command/interaction
-#define PTECH_FORAGE  17	// can use the 'forage' command/interaction
+#define PTECH_FISH_COMMAND  16	// can use the 'fish' command/interaction
+#define PTECH_FORAGE_COMMAND  17	// can use the 'forage' command/interaction
 #define PTECH_HARVEST_UPGRADE  18	// more results from harvest
-#define PTECH_HEALING_BOOST  19	// increases healing effects
+	#define PTECH_UNUSED  19	// deprecated: was HEALING_BOOST
 #define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
 #define PTECH_INFILTRATE  21	// can enter buildings without permission
 #define PTECH_INFILTRATE_UPGRADE  22	// better infiltrates
@@ -2565,16 +2448,16 @@ typedef enum {
 #define PTECH_SHEAR_UPGRADE  46	// more results from shear
 #define PTECH_STEAL_UPGRADE  47	// can steal from vaults
 #define PTECH_SWIMMING  48	// player can enter water tiles
-#define PTECH_TELEPORT_CITY  49	// teleports can target cities
+#define PTECH_SEARCH_COMMAND  49	// allows 'search' command
 #define PTECH_TWO_HANDED_MASTERY  50	// bonus damage from 2H weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
 #define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
 #define PTECH_BARDE  54	// can barde animals
-#define PTECH_HERD  55	// can herd animals
-#define PTECH_MILK  56	// can milk animals (at a stable)
-#define PTECH_SHEAR  57	// can shear animals (at a stable)
-#define PTECH_TAME  58	// can tame animals
+#define PTECH_HERD_COMMAND  55	// can herd animals
+#define PTECH_MILK_COMMAND  56	// can milk animals (at a stable)
+#define PTECH_SHEAR_COMMAND  57	// can shear animals (at a stable)
+#define PTECH_TAME_ANIMALS  58	// can tame animals
 #define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
@@ -2582,16 +2465,16 @@ typedef enum {
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 #define PTECH_CLOCK  64	// can tell time
 #define PTECH_CALENDAR  65	// can tell the date
-#define PTECH_MINT  66	// can mint coins
-#define PTECH_TAN  67	// can use the 'tan' command
+#define PTECH_MINT_COMMAND  66	// can mint coins
+#define PTECH_TAN_COMMAND  67	// can use the 'tan' command
 #define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
 #define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
-#define PTECH_GATHER  70	// can 'gather'
-#define PTECH_CHOP  71	// can 'chop'
-#define PTECH_DIG  72	// can 'dig'
-#define PTECH_HARVEST  73	// can 'harvest'
-#define PTECH_PICK  74	// can 'pick'
-#define PTECH_QUARRY  75	// can 'quarry'
+#define PTECH_GATHER_COMMAND  70	// can 'gather'
+#define PTECH_CHOP_COMMAND  71	// can 'chop'
+#define PTECH_DIG_COMMAND  72	// can 'dig'
+#define PTECH_HARVEST_COMMAND  73	// can 'harvest'
+#define PTECH_PICK_COMMAND  74	// can 'pick'
+#define PTECH_QUARRY_COMMAND  75	// can 'quarry'
 #define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
 #define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 #define PTECH_CUSTOMIZE_VEHICLE  78	// can use 'customize vehicle'
@@ -2600,6 +2483,23 @@ typedef enum {
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
+#define PTECH_SEE_IN_MAGIC_DARKNESS  84	// sees through darkness room affect
+#define PTECH_TRACK_COMMAND  85	// can use 'track'
+#define PTECH_RESIST_POISON  86	// minor resistance
+#define PTECH_VAMPIRE_BITE  87	// can use 'bite' for blood instead of the social
+#define PTECH_ENEMY_BUFF_DETAILS  88	// can see details when using 'affects' on others
+#define PTECH_CONCEAL_EQUIPMENT  89	// others can't see your equipment
+#define PTECH_CONCEAL_INVENTORY  90	// others can't see your inventory
+#define PTECH_FLEE_UPGRADE  91	// increased chance to flee
+#define PTECH_FASTER_MELEE_COMBAT  92	// slight speed boost in melee
+#define PTECH_FASTER_RANGED_COMBAT  93	// slight speed boost in ranged combat
+#define PTECH_RIDING_SWAP_ANYWHERE  94	// can swap in any location
+#define PTECH_RIDING_RELEASE_MOUNT  95	// can release your mounts
+#define PTECH_REWORK_COMMAND  96	// allows refreshing and restringing gear
+#define PTECH_BITE_REGENERATION  97	// rapid regeneration while drinking blood from humans
+#define PTECH_STEAL_COMMAND  98	// can use 'steal'
+#define PTECH_USE_HONED_GEAR  99	// can use honed gear
+#define PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA  100	// redirect part of magical damage to mana pool instead of health
 
 
 // SM_x: status messages
@@ -2620,9 +2520,10 @@ typedef enum {
 #define SM_TRAVEL_AUTO_LOOK  BIT(14)	// auto-look when running
 #define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
 #define SM_WEATHER  BIT(16)	// weather change messages
+#define SM_FIGHT_PROMPT  BIT(17)	// show or hide fprompt
 
 // flags set at character creation
-#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_FIGHT_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2654,6 +2555,8 @@ typedef enum {
 #define WAIT_MOVEMENT  4	// normal move lag
 #define WAIT_SPELL  5	// general spells
 #define WAIT_OTHER  6	// not covered by other categories
+#define WAIT_LONG  7	// longer than the others
+#define WAIT_VERY_LONG  8	// longest wait
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2773,6 +2676,10 @@ typedef enum {
 #define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
 #define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
 // note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
+
+
+// SECT_CUSTOM_x: custom messages
+#define SECT_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2970,7 +2877,7 @@ typedef enum {
 
 
 // EVO_x: world evolutions
-#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping, chant of nature, etc
+#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping
 #define EVO_CROP_GROWS  1	// e.g. 'seeded field' crop-grows to 'crop' [no value]
 #define EVO_ADJACENT_ONE  2	// called when adjacent to at least 1 of [value=sector]
 #define EVO_ADJACENT_MANY  3	// called when adjacent to at least 6 of [value=sector]
@@ -3025,7 +2932,7 @@ typedef enum {
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
-#define ROOM_AFF_DARK  BIT(0)	// a. Torches don't work
+#define ROOM_AFF_MAGIC_DARKNESS  BIT(0)	// a. Torches don't work; requires a ptech to see
 #define ROOM_AFF_SILENT  BIT(1)	// b. Can't speak/hear
 #define ROOM_AFF_HAS_INSTANCE  BIT(2)	// c. an instance is linked here
 #define ROOM_AFF_CHAMELEON  BIT(3)	// d. Appears to be plains/desert
@@ -3051,6 +2958,7 @@ typedef enum {
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 #define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
+#define ROOM_AFF_PERMANENT_PAINT  BIT(26)	// A. paint displays different and cannot be repainted; removed automatically on dismantle
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -3110,6 +3018,7 @@ typedef enum {
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
+#define MAX_ACTION_STRING  245	// any longer and it cannot be read from file
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
@@ -3128,7 +3037,6 @@ typedef enum {
 #define MAX_ITEM_DESCRIPTION  4000
 #define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
-#define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
 #define MAX_OBJ_AFFECT  6
@@ -3744,7 +3652,10 @@ struct ability_data {
 	bitvector_t targets;	// ATAR_ flags
 	int cost_type;	// HEALTH, MANA, etc.
 	int cost;	// amount of h/v/m
-	int cost_per_scale_point;	// cost modifier when scaled
+	double cost_per_amount;		// cost modifier for healing/damage
+	double cost_per_scale_point;	// cost modifier when scaled
+	double cost_per_target;		// cost modifier with multiple targets
+	struct resource_data *resource_cost;	// additional costs
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
@@ -3760,15 +3671,20 @@ struct ability_data {
 	struct apply_data *applies;	// affects
 	int attack_type;	// damage
 	int damage_type;	// damage
+	int pool_type;	// restore
 	int max_stacks;	// dot
+	int move_type;	// for move abilities
 	struct ability_data_list *data;	// LL of additional data
+	struct interaction_item *interactions;	// LL of regular interactions
+	struct ability_hook *hooks;	// LL of hooks for this ability
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
+	bitvector_t hook_flags;	// quick reference for hook types
 	bool is_class;	// assignment comes from a class
-	bool is_synergy;	// assignemtn comes from a synergy
+	bool is_synergy;	// assignemnt comes from a synergy
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
@@ -3779,7 +3695,7 @@ struct ability_data {
 struct ability_data_list {
 	int type;	// ADL_ type of data list
 	any_vnum vnum;	// number of the list entry thing
-	int misc;	// future use?
+	signed long long misc;	// used by some types
 	struct ability_data_list *next;
 };
 
@@ -3792,11 +3708,75 @@ struct ability_gain_hook {
 };
 
 
+// Ability hooks (things that cause an ability to run itself)
+struct ability_hook {
+	bitvector_t type;	// AHOOK_ const
+	any_vnum value;	// depends on type
+	double percent;	// chance to execute
+	int misc;	// for expansion
+	
+	struct ability_hook *next;	// LL
+};
+
+
+// used to detect changes in attributes
+struct ability_trait_hook {
+	any_vnum ability;	// which ability to update
+	int linked_trait;	// which trait to watch
+	int last_value;		// last known value of the trait
+	
+	UT_hash_handle hh;	// GET_ABILITY_TRAIT_HOOKS(ch)
+};
+
+
 // determines the weight for each type, to affect scaling
 struct ability_type {
 	bitvector_t type;	// a single ABILT_ flag
 	int weight;	// how much weight to give that type
 	struct ability_type *next;
+};
+
+
+// passes data throughout an ability call
+struct ability_exec {
+	ability_data *abil;	// which ability (pointer)
+	bool stop;	// indicates no further types should process
+	bool success;	// indicates the player should be charged
+	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
+	bool sent_fail_msg;	// if TRUE, it sent at least one fail
+	bool no_msg;	// indicates you shouldn't send messages
+	bool engage_anyway;	// we engage combat if !stop || engage_anyway
+	
+	// costs
+	int cost;	// for types that raise the cost later
+	bool should_charge_cost;	// if TRUE, will charge regardless of success
+	int total_amount;	// for cost-per-amount
+	int total_targets;	// for cost-per-target
+	double max_scale;	// for cost-per-scale-point
+	
+	// core scaling data
+	bool has_mastery;	// TRUE if the player has the mastery ability
+	bool matching_role;	// if FALSE, has penalties from no matching role
+	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
+	
+	// data passed by types
+	int conjure_liquid_max;
+	int move_dir;
+	room_data *move_room;
+	any_vnum ready_weapon_val;
+	int restore_pool;
+	int restore_amount;
+	any_vnum summon_vnum;
+	
+	struct ability_exec_type *types;	// LL of type data
+};
+
+
+// preliminary data from ability setup
+struct ability_exec_type {
+	bitvector_t type;
+	double scale_points;
+	struct ability_exec_type *next;
 };
 
 
@@ -3985,6 +3965,78 @@ struct archetype_menu_type {
 	int type;
 	char *name;
 	char *description;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ATTACK MESSAGE STRUCTS //////////////////////////////////////////////////
+
+// AMDF_x: Attack message flags
+#define AMDF_WEAPON			BIT(0)	// a. allowed on weapons
+#define AMDF_MOBILE			BIT(1)	// b. allowed on mobiles
+#define AMDF_DISARMABLE		BIT(2)	// c. can be disarmed
+#define AMDF_APPLY_POISON	BIT(3)	// d. can trigger poison
+#define AMDF_IGNORE_MISSING	BIT(4)	// e. auditor won't warn on missing messages
+
+#define AMDF_FLAGS_REQUIRE_EXTENDED_DATA  (AMDF_WEAPON | AMDF_MOBILE)
+
+
+// MSG_x: each fight message has these 4 types
+#define MSG_DIE		0	// messages when death
+#define MSG_MISS	1	// messages when miss
+#define MSG_HIT		2	// messages when hit
+#define MSG_GOD		3	// messages when hit on god
+#define NUM_MSG_TYPES  4	// total
+
+
+// SPD_x: speeds for attacks
+#define SPD_FAST	0
+#define SPD_NORMAL	1
+#define SPD_SLOW	2
+#define NUM_ATTACK_SPEEDS  3
+
+
+// WEAPON_x: Weapon types
+#define WEAPON_BLUNT	0
+#define WEAPON_SHARP	1	// like wolverine
+#define WEAPON_MAGIC	2
+
+
+// fight message list
+struct attack_message_data {
+	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
+	char *name;	// for display purposes
+	char *death_log;	// optional message for how death is displayed
+	bitvector_t flags;	// AMDF_ flags
+	any_vnum counts_as;	// if it counts as another attack type, for ability requirements etc
+	
+	// used by attack types:
+	char *first_pers;	// You "slash"
+	char *third_pers;	// $n "slashes"
+	char *noun;		// ... with your "swing"
+	double speed[NUM_ATTACK_SPEEDS];	// SPD_ { fast, normal, slow }
+	int weapon_type;	// WEAPON_ type
+	int damage_type;	// DAM_ type
+	
+	struct attack_message_set *msg_list;	// Linked list of messages
+	int num_msgs;	// How many attack messages are in the list
+	
+	UT_hash_handle hh;	// attack_message_table hash (by vnum)
+};
+
+
+// individual trio of fight messages
+struct attack_message_type {
+	char *attacker_msg;	// message to attacker
+	char *victim_msg;	// message to victim
+	char *room_msg;	// message to room
+};
+
+
+// part of fight messages
+struct attack_message_set {
+	struct attack_message_type msg[NUM_MSG_TYPES];	// the 4 message types
+	struct attack_message_set *next;	// to next messages of this kind
 };
 
 
@@ -4466,6 +4518,8 @@ struct descriptor_data {
 	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
+	attack_message_data *olc_attack;	// attack message being edited
+	int olc_attack_num;		// which message in the attack set is being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	class_data *olc_class;	// class being edited
@@ -4623,6 +4677,7 @@ struct player_slash_channel {
 struct player_tech {
 	int id;	// which PTECH_
 	any_vnum abil;	// which ability it came from
+	bool check_solo;	// if TRUE, need to check solo to allow it
 	struct player_tech *next;	// LL: GET_TECHS(ch)
 };
 
@@ -4717,7 +4772,14 @@ struct player_special_data {
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
-	char *movement_string;	// for run/etc
+	char *action_string;	// for run, abilities, etc
+	char_data *action_targ_char;	// action targets this char (saved as id)
+	int temporary_char_targ;	// helps when loading action_targ_char
+	bitvector_t action_targ_multi;	// action targets group/etc
+	obj_data *action_targ_obj;	// unsaved: action targets this object
+	vehicle_data *action_targ_veh;	// action targets this vehicle
+	int temporary_veh_targ;	// helps when loading action_targ_veh
+	room_vnum action_targ_room;	// action targets this room
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in
@@ -4744,18 +4806,16 @@ struct player_special_data {
 	struct player_ability_data *ability_hash;
 	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
-	bool can_get_bonus_skills;	// can buy extra 75's
-	sh_int skill_level;  // levels computed based on class skills
+	sh_int skill_level;  // levels computed based on skills above level 75
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	any_vnum speaking;	// current language
 	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
-	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
 	struct empire_unique_storage *home_storage;	// DLL: items stored in the home
 	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
@@ -4796,6 +4856,8 @@ struct player_special_data {
 	bool map_memory_loaded;	// whether or not it has been loaded yet
 	int map_memory_count;	// how many tiles are currently remembered
 	
+	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
+	struct ability_trait_hook *trait_hooks;	// hash table to watch for trait changes
 	struct combat_meters meters;	// combat meter data
 	
 	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp
@@ -4902,6 +4964,8 @@ struct char_special_data {
 	
 	int carry_items;	// Number of items carried
 	
+	struct ability_exec *running_ability_data;	// while running an ability, its data is here for reference anywhere
+	struct vnum_hash **running_ability_limiter;	// while running a chain of abilities, stores the limiter here
 	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
@@ -5079,6 +5143,7 @@ struct crop_data {
 	int y_min;	// y >= this
 	int y_max;	// y <= this
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct extra_descr_data *ex_description;	// extra descriptions
@@ -5775,42 +5840,6 @@ struct player_faction_data {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// FIGHT STRUCTS ///////////////////////////////////////////////////////////
-
-// part of fight messages
-struct msg_type {
-	char *attacker_msg;	// message to attacker
-	char *victim_msg;	// message to victim
-	char *room_msg;	// message to room
-};
-
-
-// MSG_x: each fight message has these 4 types
-#define MSG_DIE  0	// messages when death
-#define MSG_MISS  1	// messages when miss
-#define MSG_HIT  2	// messages when hit
-#define MSG_GOD  3	// messages when hit on god
-#define NUM_MSG_TYPES  4	// total
-
-
-// part of fight messages
-struct message_type {
-	struct msg_type msg[NUM_MSG_TYPES];	// the 4 message types
-	struct message_type *next;	// to next messages of this kind
-};
-
-
-// fight message list
-struct message_list {
-	int a_type;	// Attack type
-	int number_of_attacks;	// How many attack messages to chose from
-	struct message_type *msg;	// List of messages
-	
-	UT_hash_handle hh;	// fight_messages hash (by a_type)
-};
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// GAME STRUCTS ////////////////////////////////////////////////////////////
 
 // For reboots/shutdowns
@@ -6122,6 +6151,7 @@ struct sector_data {
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
 	int temperature_type;	// TEMPERATURE_ const modifies the sector
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items

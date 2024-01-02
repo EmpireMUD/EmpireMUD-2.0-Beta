@@ -2,7 +2,7 @@
 *   File: db.lib.c                                        EmpireMUD 2.0b5 *
 *  Usage: Primary read/write functions for game world data                *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -1332,6 +1332,10 @@ void free_crop(crop_data *cp) {
 		free_icon_set(&GET_CROP_ICONS(cp));
 	}
 	
+	if (GET_CROP_CUSTOM_MSGS(cp) && (!proto || GET_CROP_CUSTOM_MSGS(cp) != GET_CROP_CUSTOM_MSGS(proto))) {
+		free_custom_messages(GET_CROP_CUSTOM_MSGS(cp));
+	}
+	
 	if (GET_CROP_EX_DESCS(cp) && (!proto || GET_CROP_EX_DESCS(cp) != GET_CROP_EX_DESCS(proto))) {
 		free_extra_descs(&GET_CROP_EX_DESCS(cp));
 	}
@@ -1447,6 +1451,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				break;
 			}
 			
+			case 'U': {	// custom messages
+				parse_custom_message(fl, &GET_CROP_CUSTOM_MSGS(crop), buf2);
+				break;
+			}
+			
 			case 'X': {	// extra desc
 				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
 				break;
@@ -1503,6 +1512,9 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// U: custom message
+	write_custom_messages_to_file(fl, 'U', GET_CROP_CUSTOM_MSGS(cp));
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
@@ -2036,7 +2048,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 		GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
 		
 		if (!EXTRACTED(npc->mob) && !IS_DEAD(npc->mob)) {
-			if (!AFF_FLAGGED(npc->mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+			if (!AFF_FLAGGED(npc->mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 				act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
 			}
 			extract_char(npc->mob);
@@ -3944,7 +3956,7 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 	while (IS_NPC(offender) && GET_LEADER(offender)) {
 		offender = GET_LEADER(offender);
 	}
-	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp) {
+	if (IS_NPC(offender) || GET_LOYALTY(offender) == emp || IS_IMMORTAL(offender)) {
 		return;	// no offense
 	}
 	
@@ -6368,6 +6380,10 @@ void free_sector(sector_data *st) {
 		free_icon_set(&GET_SECT_ICONS(st));
 	}
 	
+	if (GET_SECT_CUSTOM_MSGS(st) && (!proto || GET_SECT_CUSTOM_MSGS(st) != GET_SECT_CUSTOM_MSGS(proto))) {
+		free_custom_messages(GET_SECT_CUSTOM_MSGS(st));
+	}
+	
 	if (GET_SECT_EX_DESCS(st) && (!proto || GET_SECT_EX_DESCS(st) != GET_SECT_EX_DESCS(proto))) {
 		free_extra_descs(&GET_SECT_EX_DESCS(st));
 	}
@@ -6406,6 +6422,9 @@ void init_sector(sector_data *st) {
 
 /**
 * Read one sector from file.
+*
+* WARNING: The evolve.c utility has a near-identical version of this and any
+* new changes here must also be readable by that utility.
 *
 * @param FILE *fl The open .bld file
 * @param sector_vnum vnum The sector vnum
@@ -6458,6 +6477,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			/*
+			* WARNING: The evolve.c utility has a near-identical version of this and any
+			* new changes here must also be readable by that utility.
+			*/
+			
 			// commands
 			case 'C': {
 				GET_SECT_COMMANDS(sect) = fread_string(fl, buf2);
@@ -6506,6 +6530,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				break;
 			}
 			
+			case 'U': {	// custom messages
+				parse_custom_message(fl, &GET_SECT_CUSTOM_MSGS(sect), buf2);
+				break;
+			}
+			
 			case 'X': {	// extra desc
 				parse_extra_desc(fl, &GET_SECT_EX_DESCS(sect), buf2);
 				break;
@@ -6540,6 +6569,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
 				break;
 			}
+			
+			/*
+			* WARNING: The evolve.c utility has a near-identical version of this and any
+			* new changes here must also be readable by that utility.
+			*/
 
 			// end
 			case 'S': {
@@ -6605,6 +6639,9 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// U: custom message
+	write_custom_messages_to_file(fl, 'U', GET_SECT_CUSTOM_MSGS(st));
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_SECT_EX_DESCS(st));
@@ -8368,7 +8405,7 @@ void free_whole_library(void) {
 	struct global_data *glb, *next_glb;
 	struct int_hash *int_iter, *next_int_iter;
 	struct island_info *island, *next_island;
-	struct message_list *msg_set, *next_msg_set;
+	attack_message_data *amd, *next_amd;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
 	player_index_data *pid, *next_pid;
@@ -8573,9 +8610,9 @@ void free_whole_library(void) {
 		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
-	HASH_ITER(hh, fight_messages, msg_set, next_msg_set) {
-		HASH_DEL(fight_messages, msg_set);
-		free_message_list(msg_set);
+	HASH_ITER(hh, attack_message_table, amd, next_amd) {
+		HASH_DEL(attack_message_table, amd);
+		free_attack_message(amd);
 	}
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		remove_morph_from_table(morph);

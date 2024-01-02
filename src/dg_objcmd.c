@@ -3,7 +3,7 @@
 *  Usage: contains the command_interpreter for objects, object commands.  *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -876,7 +876,7 @@ OCMD(do_opurge) {
 	// purge vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(veh);
 	}
@@ -1433,8 +1433,18 @@ OCMD(do_odamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
-
+	int type, show_attack_message = NOTHING;
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			obj_log(obj, "odamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
+	
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
 
@@ -1473,20 +1483,30 @@ OCMD(do_odamage) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage(ch, NULL, get_obj_scale_level(obj, ch), type, modifier);
+	script_damage(ch, NULL, get_obj_scale_level(obj, ch), type, modifier, show_attack_message);
 }
 
 
 OCMD(do_oaoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
 	room_data *orm = obj_room(obj);
 	char_data *vict, *next_vict;
 	
 	// no room == no work
 	if (!orm) {
 		return;
+	}
+
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			obj_log(obj, "oaoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
 	}
 
 	two_arguments(argument, modarg, typearg);
@@ -1509,7 +1529,7 @@ OCMD(do_oaoe) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
-			script_damage(vict, NULL, level, type, modifier);
+			script_damage(vict, NULL, level, type, modifier, show_attack_message);
 		}
 	}
 }
@@ -1823,7 +1843,7 @@ OCMD(do_oscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(otarg, level);
+			fresh = fresh_copy_obj(otarg, level, TRUE, TRUE);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}

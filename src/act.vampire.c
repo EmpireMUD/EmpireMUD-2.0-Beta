@@ -2,7 +2,7 @@
 *   File: act.vampire.c                                   EmpireMUD 2.0b5 *
 *  Usage: Code related to the Vampire ability and its commands            *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -78,8 +78,9 @@ bool cancel_biting(char_data *ch, bool preventable) {
 * death or when out of blood.
 *
 * @param char_data *ch The vampire paying upkeeps.
+* @param bool send_msgs If TRUE, sends the too low on blood message when removing anything.
 */
-void cancel_blood_upkeeps(char_data *ch) {
+void cancel_blood_upkeeps(char_data *ch, bool send_msgs) {
 	char buf[MAX_STRING_LENGTH];
 	struct affected_type *aff;
 	struct obj_apply *app;
@@ -92,7 +93,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 	}
 	
 	// we'll only send the preface message if they're not dead
-	messaged = (GET_POS(ch) < POS_SLEEPING);
+	messaged = (GET_POS(ch) < POS_SLEEPING) || !send_msgs;
 	
 	// affs: loop because removing multiple affects makes iterating over affects hard
 	do {
@@ -135,8 +136,22 @@ void cancel_blood_upkeeps(char_data *ch) {
 					messaged = TRUE;
 				}
 				
-				act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				// char message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				else {
+					act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				}
+	
+				// room message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				else {
+					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				
 				// this may extract it
 				unequip_char_to_inventory(ch, iter);
 				determine_gear_level(ch);
@@ -154,18 +169,6 @@ void cancel_blood_upkeeps(char_data *ch) {
 */
 void cancel_siring(char_data *ch) {
 	cancel_biting(ch, FALSE);
-}
-
-
-// checks for Blood Fortitude and does skill gain
-bool check_blood_fortitude(char_data *ch, bool can_gain_skill) {
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && check_vampire_sun(ch, FALSE) && has_ability(ch, ABIL_BLOOD_FORTITUDE) && check_solo_role(ch)) {
-		if (can_gain_skill) {
-			gain_ability_exp(ch, ABIL_BLOOD_FORTITUDE, 1);
-		}
-		return TRUE;
-	}
-	return FALSE;
 }
 
 
@@ -189,7 +192,7 @@ bool check_vampire_ability(char_data *ch, any_vnum ability, int cost_pool, int c
 * @return bool TRUE if the ability can proceed, FALSE if sunny
 */
 bool check_vampire_sun(char_data *ch, bool message) {
-	if (IS_NPC(ch) || has_player_tech(ch, PTECH_VAMPIRE_SUN_IMMUNITY) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELD) || !check_sunny(IN_ROOM(ch))) {
+	if (IS_NPC(ch) || has_player_tech(ch, PTECH_VAMPIRE_SUN_IMMUNITY) || IS_GOD(ch) || IS_IMMORTAL(ch) || AFF_FLAGGED(ch, AFF_EARTHMELDED) || !check_sunny(IN_ROOM(ch))) {
 		// ok -- not sunny
 		return TRUE;
 	}
@@ -311,18 +314,6 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 }
 
 
-// for do_claws
-void retract_claws(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_CLAWS)) {
-			msg_to_char(ch, "Your claws meld back into your fingers!\r\n");
-			act("$n's claws meld back into $s fingers!", TRUE, ch, 0, 0, TO_ROOM);
-		}
-	}
-}
-
-
 // for do_sire
 void sire_char(char_data *ch, char_data *victim) {
 	struct player_skill_data *plsk, *next_plsk;
@@ -383,7 +374,7 @@ void sire_char(char_data *ch, char_data *victim) {
 		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
 		/* Turn off that SIRING action */
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 
 		queue_delayed_update(ch, CDU_SAVE);
 		queue_delayed_update(victim, CDU_SAVE);
@@ -391,7 +382,7 @@ void sire_char(char_data *ch, char_data *victim) {
 	else {
 		// can't gain a vampire skills: guess I'll just die then
 		if (!IS_NPC(victim)) {
-			death_log(victim, ch, TYPE_SUFFERING);
+			death_log(victim, ch, ATTACK_SUFFERING);
 		}
 		die(victim, ch);	// returns a corpse but we don't need it
 	}
@@ -559,83 +550,6 @@ void sun_message(char_data *ch) {
 
 
 /**
-* This comes from a special case of do_eat() subcmd SCMD_TASTE.
-* At the start of this function, we're only sure they typed "taste <vict>"
-*
-* char_data *ch the person doing the tasting
-* char_data *vict the person being tasted
-*/
-void taste_blood(char_data *ch, char_data *vict) {
-	if (GET_FEEDING_FROM(ch) && GET_FEEDING_FROM(ch) != vict)
-		msg_to_char(ch, "You've already got your fangs in someone else.\r\n");
-	else if (GET_ACTION(ch) != ACT_NONE)
-		msg_to_char(ch, "You're a bit busy right now.\r\n");
-	else if (ch == vict)
-		msg_to_char(ch, "It seems redundant to taste your own blood.\r\n");
-	else if (!IS_NPC(vict) && AWAKE(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE))
-		act("You don't have permission to taste $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
-	else {
-		act("You taste a sample of $N's blood!", FALSE, ch, 0, vict, TO_CHAR);
-		act("$n tastes a sample of your blood!", FALSE, ch, 0, vict, TO_VICT);
-		act("$n tastes a sample of $N's blood!", FALSE, ch, 0, vict, TO_NOTVICT);
-		
-		if (IS_VAMPIRE(vict)) {
-			act("$E is a vampire.", FALSE, ch, NULL, vict, TO_CHAR);
-		}
-
-		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
-			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
-			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-		}
-		
-		if (!IS_NPC(vict)) {
-			sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
-			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-		}
-		
-		command_lag(ch, WAIT_ABILITY);
-		if (can_gain_exp_from(ch, vict)) {
-			gain_ability_exp(ch, ABIL_TASTE_BLOOD, 20);
-		}
-	}
-}
-
-
-/**
-* Ends the mummify affect.
-*
-* @param char_data *ch The mummified person.
-*/
-void un_mummify(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-			msg_to_char(ch, "Your flesh softens and the mummified layers flake off!\r\n");
-			act("$n sheds a layer of skin and appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_STANDING;
-		}
-	}
-}
-
-
-/**
-* Ends the deathshroud effect.
-*
-* @param char_data *ch The deathshrouded player.
-*/
-void un_deathshroud(char_data *ch) {
-	if (AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD, FALSE);
-		if (!AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-			msg_to_char(ch, "Your flesh returns to normal!\r\n");
-			act("$n appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_STANDING;
-		}
-	}
-}
-
-
-/**
 * Checks if a person is not a vampire and, if not, clears certain vampire
 * traits and restores the player's blood (since non-vampires cannot drink
 * blood).
@@ -699,8 +613,8 @@ void update_biting_char(char_data *ch) {
 	}
 	set_blood(ch, GET_BLOOD(ch) + amount);
 	
-	// sanguine restoration: 10% heal to h/m/v per drink when biting humans
-	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
+	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {
 		hamt = GET_MAX_HEALTH(ch) / 10;
 		heal(ch, ch, hamt);
 		
@@ -761,27 +675,24 @@ void update_biting_char(char_data *ch) {
 		}
 	}
 	
-	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
+	gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 5);
+	gain_player_tech_exp(ch, PTECH_BITE_REGENERATION, 5);
 	run_ability_gain_hooks(ch, victim, AGH_VAMPIRE_FEEDING);
-	gain_ability_exp(ch, ABIL_BITE, 5);
+	run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL, NULL);
+	run_ability_hooks_by_player_tech(ch, PTECH_BITE_REGENERATION, ch, NULL, NULL, NULL);
 }
 
 
 void update_vampire_sun(char_data *ch) {
 	bool repeat, found = FALSE;
+	int iter;
+	obj_data *obj;
 	struct affected_type *af;
+	struct obj_apply *app;
 	
 	// only applies if vampire and not an NPC
 	if (IS_NPC(ch) || !IS_VAMPIRE(ch) || check_vampire_sun(ch, FALSE)) {
 		return;
-	}
-	
-	if (affected_by_spell(ch, ATYPE_CLAWS)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		retract_claws(ch);
 	}
 	
 	// look for things that cause blood upkeep and remove them
@@ -801,6 +712,43 @@ void update_vampire_sun(char_data *ch) {
 		}
 	} while (repeat);
 	
+	// gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!wear_data[iter].count_stats || !(obj = GET_EQ(ch, iter))) {
+			continue;	// skippable
+		}
+
+		LL_FOREACH(obj->applies, app) {
+			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
+				if (!found) {
+					sun_message(ch);
+					found = TRUE;
+				}
+
+				// char message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				else {
+					act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				}
+	
+				// room message
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+					act(obj_get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				else {
+					act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				}
+				
+				// this may extract it
+				unequip_char_to_inventory(ch, iter);
+				determine_gear_level(ch);
+			}
+		}
+	}
+	
+	
 	// revert vampire morphs
 	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
@@ -815,14 +763,6 @@ void update_vampire_sun(char_data *ch) {
 
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to your natural form!\r\n");
-	}
-
-	if (affected_by_spell(ch, ATYPE_BOOST)) {
-		if (!found) {
-			sun_message(ch);
-		}
-		found = TRUE;
-		affect_from_char(ch, ATYPE_BOOST, FALSE);
 	}
 	
 	// lastly
@@ -941,7 +881,7 @@ ACMD(do_bite) {
 	else if (GET_FEEDING_FROM(ch)) {
 		msg_to_char(ch, "You are already biting someone!\r\n");
 	}
-	else if (!IS_VAMPIRE(ch)) {
+	else if (!IS_VAMPIRE(ch) || !has_player_tech(ch, PTECH_VAMPIRE_BITE)) {
 		if ((soc = find_social(ch, "bite", TRUE))) {
 			// perform a bite social if possible (pass through args)
 			perform_social(ch, soc, argument);
@@ -992,7 +932,7 @@ ACMD(do_bite) {
 	else if (NOT_MELEE_RANGE(ch, victim)) {
 		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_BITE)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL)) {
 		return;
 	}
 	else {
@@ -1037,7 +977,7 @@ ACMD(do_bite) {
 			melee = (has_player_tech(ch, PTECH_BITE_MELEE_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			tank = (has_player_tech(ch, PTECH_BITE_TANK_UPGRADE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch));
 			attacked = TRUE;
-			success = IS_SPECIALTY_ABILITY(ch, ABIL_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
+			success = player_tech_skill_check_by_ability_difficulty(ch, PTECH_VAMPIRE_BITE) || check_hit_vs_dodge(ch, victim, FALSE);
 			
 			// only cools down if it's an attack bite
 			add_cooldown(ch, COOLDOWN_BITE, melee ? 9 : 12);
@@ -1073,13 +1013,20 @@ ACMD(do_bite) {
 			}
 			
 			if (can_gain_exp_from(ch, victim)) {
-				gain_ability_exp(ch, ABIL_BITE, 10);
+				gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 10);
 				if (melee) {
 					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
 				}
 				if (tank) {
 					gain_player_tech_exp(ch, PTECH_BITE_TANK_UPGRADE, 10);
 				}
+			}
+			run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL, NULL);
+			if (melee) {
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_MELEE_UPGRADE, victim, NULL, NULL, NULL);
+			}
+			if (tank) {
+				run_ability_hooks_by_player_tech(ch, PTECH_BITE_TANK_UPGRADE, victim, NULL, NULL, NULL);
 			}
 		}
 		
@@ -1093,46 +1040,6 @@ ACMD(do_bite) {
 			// also clear the bite cooldown in this case (they can do non-attack bites during the cooldown)
 			remove_cooldown_by_type(ch, COOLDOWN_BITE);
 		}
-	}
-}
-
-
-ACMD(do_bloodsweat) {
-	struct over_time_effect_type *dot, *next_dot;
-	bool any = FALSE;
-	int cost = 50;
-	
-	if (!can_use_ability(ch, ABIL_BLOODSWEAT, BLOOD, cost, COOLDOWN_BLOODSWEAT)) {
-		return;
-	}
-	else if (!check_solo_role(ch)) {
-		msg_to_char(ch, "You must be alone to use that ability in the solo role.\r\n");
-	}
-	else {
-		// remove first (to ensure there are some
-		for (dot = ch->over_time_effects; dot; dot = next_dot) {
-			next_dot = dot->next;
-
-			if (dot->damage_type == DAM_POISON) {
-				dot_remove(ch, dot);
-				any = TRUE;
-			}
-		}
-		
-		if (affected_by_spell(ch, ATYPE_POISON)) {
-			affect_from_char(ch, ATYPE_POISON, FALSE);
-			any = TRUE;
-		}
-		
-		if (!any) {
-			msg_to_char(ch, "You are not even poisoned!\r\n");
-			return;
-		}
-		
-		// ok go
-		charge_ability_cost(ch, BLOOD, cost, COOLDOWN_BLOODSWEAT, 30, WAIT_ABILITY);
-		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
-		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -1234,57 +1141,11 @@ ACMD(do_boost) {
 	free(af);
 	
 	if (boost_data[pos].msg) {
-		act(boost_data[pos].msg, FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
+		act(boost_data[pos].msg, FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
 	}
 	
 	gain_ability_exp(ch, ABIL_BOOST, 20);
-}
-
-
-ACMD(do_claws) {
-	struct affected_type *af;
-	int cost = 10;
-	
-	if (affected_by_spell(ch, ATYPE_CLAWS)) {
-		retract_claws(ch);
-		command_lag(ch, WAIT_OTHER);
-		return;
-	}
-	
-	if (!check_vampire_ability(ch, ABIL_CLAWS, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_CLAWS)) {
-		return;
-	}
-
-	// attempt to remove existing wield
-	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			return;
-		}
-	}
-
-	act("You focus your blood into your hands...", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
-	act("Your fingers grow into grotesque claws!", FALSE, ch, NULL, NULL, TO_CHAR | TO_BUFF);
-	act("$n's fingers grow into giant claws!", TRUE, ch, NULL, NULL, TO_ROOM | TO_BUFF);
-	
-	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
-	affect_join(ch, af, 0);
-			
-	af = create_mod_aff(ATYPE_CLAWS, UNLIMITED, APPLY_BLOOD_UPKEEP, 2, ch);
-	affect_to_char(ch, af);
-	free(af);
-
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	gain_ability_exp(ch, ABIL_CLAWS, 20);
+	run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOOST, 0, ch, NULL, NULL, NULL, NOBITS);
 }
 
 
@@ -1359,56 +1220,14 @@ ACMD(do_command) {
 			if (un_charm && !EXTRACTED(victim)) {
 				REMOVE_BIT(AFF_FLAGS(victim), AFF_CHARM);
 			}
+			
+			if (!IS_DEAD(victim) && !EXTRACTED(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
+				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_VAMP_COMMAND, 0, victim, NULL, NULL, NULL, NOBITS);
+			}
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
 		free(to_do);
-	}
-}
-
-
-ACMD(do_deathshroud) {
-	struct affected_type *af;
-	int cost = 20;
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot deathshroud.\r\n");
-	}
-	else if (GET_POS(ch) < POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
-		un_deathshroud(ch);
-		command_lag(ch, WAIT_OTHER);
-	}
-	else if (!check_vampire_ability(ch, ABIL_DEATHSHROUD, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (FIGHTING(ch) || GET_POS(ch) < POS_RESTING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING)
-		msg_to_char(ch, "You can't use deathshroud while fighting!\r\n");
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_DEATHSHROUD)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "You fall to the ground, dead!\r\n");
-		act("$n falls to the ground, dead!", TRUE, ch, 0, 0, TO_ROOM);
-
-		af = create_flag_aff(ATYPE_DEATHSHROUD, UNLIMITED, AFF_DEATHSHROUD, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_DEATHSHROUD, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
-		affect_to_char(ch, af);
-		free(af);
-
-		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_ability_exp(ch, ABIL_DEATHSHROUD, 50);
 	}
 }
 
@@ -1451,204 +1270,6 @@ ACMD(do_feed) {
 }
 
 
-ACMD(do_mummify) {
-	int cost = 20;
-	struct affected_type *af;
-
-	if (GET_POS(ch) < POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
-		un_mummify(ch);
-		command_lag(ch, WAIT_OTHER);
-	}
-	else if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot mummify.\r\n");
-	}
-	else if (!check_vampire_ability(ch, ABIL_MUMMIFY, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	else if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	else if (FIGHTING(ch) || GET_POS(ch) < POS_RESTING) {
-		msg_to_char(ch, "You can't do that right now.\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING)
-		msg_to_char(ch, "You can't mummify yourself while fighting!\r\n");
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MUMMIFY)) {
-		return;
-	}
-	else {
-		msg_to_char(ch, "Your flesh hardens as you mummify yourself!\r\n");
-		act("$n's flesh hardens and $e falls to the ground!", TRUE, ch, 0, 0, TO_ROOM);
-		GET_POS(ch) = POS_SLEEPING;
-		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-
-		af = create_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK, ch);
-		affect_join(ch, af, 0);
-			
-		af = create_mod_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
-		affect_to_char(ch, af);
-		free(af);
-		
-		gain_ability_exp(ch, ABIL_MUMMIFY, 50);
-	}
-}
-
-
-ACMD(do_regenerate) {
-	#define REGEN_HEALTH	0
-	#define REGEN_MANA		1
-	#define REGEN_MOVE		2
-	
-	#define REGEN_PER_BLOOD_AT_50	1
-	#define REGEN_PER_BLOOD_AT_75	1.5
-	#define REGEN_PER_BLOOD_AT_100	2.5
-
-	int cost = 10, mode, amount = -1;
-	char arg2[MAX_INPUT_LENGTH];
-	double per;
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use regenerate.\r\n");
-		return;
-	}
-	
-	two_arguments(argument, arg, arg2);
-	// allow args in either order
-	if (is_number(arg)) {
-		strcpy(buf, arg2);
-		strcpy(arg2, arg);
-		strcpy(arg, buf);
-	}
-	
-	// basic checks
-	
-	if (!check_vampire_ability(ch, ABIL_REGENERATE, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	if (!CAN_SPEND_BLOOD(ch)) {
-		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
-		return;
-	}
-	// can't heal the dead
-	if (IS_DEAD(ch)) {
-		msg_to_char(ch, "You can't regenerate from death.\r\n");
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_REGENERATE)) {
-		return;
-	}
-
-	// detect type
-	if (!*arg || is_abbrev(arg, "health") || is_abbrev(arg, "hitpoints")) {
-		if (GET_HEALTH(ch) >= GET_MAX_HEALTH(ch)) {
-			msg_to_char(ch, "You don't seem to be injured.\r\n");
-			return;
-		}
-		
-		mode = REGEN_HEALTH;
-	}
-	else if (is_abbrev(arg, "mana") || is_abbrev(arg, "magic")) {
-		if (GET_MANA(ch) >= GET_MAX_MANA(ch)) {
-			msg_to_char(ch, "You don't seem to need mana.\r\n");
-			return;
-		}
-		
-		mode = REGEN_MANA;
-	}
-	else if (is_abbrev(arg, "moves") || is_abbrev(arg, "stamina") || is_abbrev(arg, "movement")) {
-		if (GET_MOVE(ch) >= GET_MAX_MOVE(ch)) {
-			msg_to_char(ch, "You don't seem to need movement points.\r\n");
-			return;
-		}
-		
-		mode = REGEN_MOVE;
-	}
-	else {
-		msg_to_char(ch, "Regenerate health, moves, or mana?\r\n");
-		return;
-	}
-
-	// determine amount/cost
-	if (*arg2 && (amount = atoi(arg2)) <= 0) {
-		// don't save amount in this case; detect it
-		amount = -1;
-	}
-
-	// determine actual amount to heal
-	per = get_ability_level(ch, ABIL_REGENERATE) <= 50 ? REGEN_PER_BLOOD_AT_50 : (get_ability_level(ch, ABIL_REGENERATE) <= 75 ? REGEN_PER_BLOOD_AT_75 : REGEN_PER_BLOOD_AT_100);
-	if (amount == -1) {
-		// default value -- spend 10 blood
-		amount = per * 10;
-	}
-	else {
-		amount = per * ((amount / per) + 1);
-	}
-	
-	// limit on how much they needi
-	switch (mode) {
-		case REGEN_HEALTH: {
-			amount = MIN(amount, GET_MAX_HEALTH(ch) - GET_HEALTH(ch));
-			break;
-		}
-		case REGEN_MOVE: {
-			amount = MIN(amount, GET_MAX_MOVE(ch) - GET_MOVE(ch));
-			break;
-		}
-		case REGEN_MANA: {
-			amount = MIN(amount, GET_MAX_MANA(ch) - GET_MANA(ch));
-			break;
-		}
-	}
-	
-	// final cost
-	cost = amount / per;
-
-	if (GET_BLOOD(ch) < cost + 1) {
-		msg_to_char(ch, "You need %d blood to regenerate.\r\n", cost);
-		return;
-	}
-	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	
-	if (skill_check(ch, ABIL_REGENERATE, DIFF_EASY)) {
-		switch (mode) {
-			case REGEN_HEALTH: {
-				snprintf(buf, sizeof(buf), "You focus your blood into regeneration.%s", report_healing(ch, amount, ch));
-				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n's wounds seem to seal themselves.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				heal(ch, ch, amount);
-				break;
-			}
-			case REGEN_MANA: {
-				act("You draw out the mystical energy from your blood.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n's skin flushes red.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				set_mana(ch, GET_MANA(ch) + amount);
-				break;
-			}
-			case REGEN_MOVE: {
-				act("You focus your blood into your sore muscles.", FALSE, ch, NULL, NULL, TO_CHAR | TO_HEAL);
-				act("$n seems invigorated.", TRUE, ch, NULL, NULL, TO_ROOM | TO_HEAL);
-				set_move(ch, GET_MOVE(ch) + amount);
-				break;
-			}
-		}
-	}
-	else {
-		msg_to_char(ch, "You focus your blood but fail to regenerate yourself.\r\n");
-	}
-	
-	gain_ability_exp(ch, ABIL_REGENERATE, 15);
-	command_lag(ch, WAIT_ABILITY);
-}
-
-
 ACMD(do_sire) {
 	char_data *victim;
 
@@ -1679,58 +1300,5 @@ ACMD(do_sire) {
 		if (GET_FEEDING_FROM(ch) == victim) {
 			start_action(ch, ACT_SIRING, -1);
 		}
-	}
-}
-
-
-ACMD(do_veintap) {
-	obj_data *container;
-	int amt = 0;
-
-	argument = two_arguments(argument, buf, buf1);
-
-	/*
-	 * buf = amount
-	 * buf1 = countainer
-	 */
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot veintap.\r\n");
-	}
-	else if (!check_vampire_ability(ch, ABIL_VEINTAP, NOTHING, 0, NOTHING)) {
-		return;
-	}
-	else if (!*buf || !*buf1)
-		msg_to_char(ch, "Usage: veintap <amount> <container>\r\n");
-	else if (!IS_VAMPIRE(ch))
-		msg_to_char(ch, "Only vampire blood may be stored with blood essence.\r\n");
-	else if ((amt = atoi(buf)) <= 0)
-		msg_to_char(ch, "Drain how much blood?\r\n");
-	else if (GET_BLOOD(ch) < amt + 1)
-		msg_to_char(ch, "You can't drain THAT much!\r\n");
-	else if (!(container = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)))
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(buf1), buf1);
-	else if (GET_OBJ_TYPE(container) != ITEM_DRINKCON)
-		msg_to_char(ch, "You can't drain blood into that!\r\n");
-	else if (GET_DRINK_CONTAINER_CONTENTS(container) > 0 && GET_DRINK_CONTAINER_TYPE(container) != LIQ_BLOOD)
-		act("$p already contains something else!", FALSE, ch, container, 0, TO_CHAR);
-	else if (GET_DRINK_CONTAINER_CONTENTS(container) >= GET_DRINK_CONTAINER_CAPACITY(container))
-		act("$p is already full.", FALSE, ch, container, 0, TO_CHAR);
-	else if (ABILITY_TRIGGERS(ch, NULL, container, ABIL_VEINTAP)) {
-		return;
-	}
-	else {
-		act("You drain some of your blood into $p!", FALSE, ch, container, 0, TO_CHAR);
-		act("$n drains some of $s blood into $p!", TRUE, ch, container, 0, TO_ROOM);
-
-		amt = MIN(amt, GET_DRINK_CONTAINER_CAPACITY(container) - GET_DRINK_CONTAINER_CONTENTS(container));
-
-		charge_ability_cost(ch, BLOOD, amt, NOTHING, 0, WAIT_ABILITY);
-		set_obj_val(container, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(container) + amt);
-		set_obj_val(container, VAL_DRINK_CONTAINER_TYPE, LIQ_BLOOD);
-		GET_OBJ_TIMER(container) = UNLIMITED;
-		request_obj_save_in_world(container);
-		
-		gain_ability_exp(ch, ABIL_VEINTAP, 33.4);
 	}
 }

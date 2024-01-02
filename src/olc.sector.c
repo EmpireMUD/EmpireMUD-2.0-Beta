@@ -2,7 +2,7 @@
 *   File: olc.sector.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for sector prototypes                                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -49,6 +49,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	int iter;
+	sector_data *sect_iter, *next_sect;
 	
 	// flags to audit for
 	const bitvector_t odd_flags = SECTF_ADVENTURE | SECTF_NON_ISLAND | SECTF_START_LOCATION | SECTF_MAP_BUILDING | SECTF_INSIDE;
@@ -73,7 +74,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (GET_SECT_CLIMATE(sect) == NOBITS) {
+	if (GET_SECT_CLIMATE(sect) == NOBITS && !SECT_FLAGGED(sect, SECTF_INHERIT_BASE_CLIMATE)) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
 		problem = TRUE;
 	}
@@ -109,6 +110,15 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	if (!GET_SECT_EX_DESCS(sect)) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Sector has no extra descriptions");
 		problem = TRUE;
+	}
+	
+	// look for things that magic-grow to me:
+	HASH_ITER(hh, sector_table, sect_iter, next_sect) {
+		if (has_evolution_type_to(sect_iter, EVO_MAGIC_GROWTH, GET_SECT_VNUM(sect)) && !sect_has_custom_message(sect, SECT_CUSTOM_MAGIC_GROWTH)) {
+			olc_audit_msg(ch, GET_SECT_VNUM(sect), "No custom magic-growth message (MAGIC-GROWTH from sector %d %s)", GET_SECT_VNUM(sect_iter), GET_SECT_NAME(sect_iter));
+			problem = TRUE;
+			break;	// just show first one
+		}
 	}
 	
 	problem |= audit_interactions(GET_SECT_VNUM(sect), GET_SECT_INTERACTIONS(sect), TYPE_ROOM, ch);
@@ -432,7 +442,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
-	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
+	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS, find_custom = NOBITS, found_custom;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, vmin = NOTHING, vmax = NOTHING;
@@ -443,6 +453,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	struct icon_data *icon;
 	size_t size;
 	bool match;
+	struct custom_message *cust;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP SECTEDIT FULLSEARCH for syntax.\r\n");
@@ -463,6 +474,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("buildflags", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("buildflagged", only_build, bld_on_flags)
 		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_FLAGS("custom", find_custom, sect_custom_types)
 		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, sector_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, sector_flags)
@@ -508,6 +520,15 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		if (only_roadside != '\0' && GET_SECT_ROADSIDE_ICON(sect) != only_roadside) {
 			continue;
 		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(GET_SECT_CUSTOM_MSGS(sect), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
 		if (find_evos) {	// look up its evolutions
 			found_evos = NOBITS;
 			LL_FOREACH(GET_SECT_EVOS(sect), evo) {
@@ -531,7 +552,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		if (*extra_search && !find_exdesc(extra_search, GET_SECT_EX_DESCS(sect), NULL)) {
 			continue;
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect)) && !search_custom_messages(find_keywords, GET_SECT_CUSTOM_MSGS(sect))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
@@ -579,7 +600,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
-	struct evolution_data *evo;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -650,13 +670,11 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		for (evo = GET_SECT_EVOS(sect); evo; evo = evo->next) {
-			if (evo->becomes == vnum || (evo_val_types[evo->type] == EVO_VAL_SECTOR && evo->value == vnum)) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
-				// only report once per sect
-				break;
-			}
+		any = has_evolution_to(sect, vnum);
+		any |= has_evolution_value(sect, EVO_VAL_SECTOR, vnum);
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
@@ -715,6 +733,7 @@ void save_olc_sector(descriptor_data *desc) {
 	if (GET_SECT_NOTES(proto)) {
 		free(GET_SECT_NOTES(proto));
 	}
+	free_custom_messages(GET_SECT_CUSTOM_MSGS(proto));
 	free_extra_descs(&GET_SECT_EX_DESCS(proto));
 	while ((spawn = GET_SECT_SPAWNS(proto))) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
@@ -782,6 +801,9 @@ sector_data *setup_olc_sector(sector_data *input) {
 		GET_SECT_COMMANDS(new) = GET_SECT_COMMANDS(input) ? str_dup(GET_SECT_COMMANDS(input)) : NULL;
 		GET_SECT_NOTES(new) = GET_SECT_NOTES(input) ? str_dup(GET_SECT_NOTES(input)) : NULL;
 		
+		// copy customs
+		GET_SECT_CUSTOM_MSGS(new) = copy_custom_messages(GET_SECT_CUSTOM_MSGS(input));
+		
 		// copy extra descs
 		GET_SECT_EX_DESCS(new) = copy_extra_descs(GET_SECT_EX_DESCS(input));
 		
@@ -835,6 +857,7 @@ int wordcount_sector(sector_data *sect) {
 	count += wordcount_string(GET_SECT_NAME(sect));
 	count += wordcount_string(GET_SECT_COMMANDS(sect));
 	count += wordcount_string(GET_SECT_TITLE(sect));
+	count += wordcount_custom_messages(GET_SECT_CUSTOM_MSGS(sect));
 	count += wordcount_extra_descriptions(GET_SECT_EX_DESCS(sect));
 	
 	return count;
@@ -854,6 +877,7 @@ void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
+	struct custom_message *ocm;
 	int count;
 	
 	if (!st) {
@@ -895,6 +919,13 @@ void olc_show_sector(char_data *ch) {
 	if (GET_SECT_EX_DESCS(st)) {
 		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
 		strcat(buf, lbuf);
+	}
+
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	count = 0;
+	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
 	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
@@ -971,6 +1002,12 @@ OLC_MODULE(sectedit_commands) {
 	else {
 		olc_process_string(ch, argument, "commands", &GET_SECT_COMMANDS(st));
 	}
+}
+
+
+OLC_MODULE(sectedit_custom) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+	olc_process_custom_messages(ch, argument, &GET_SECT_CUSTOM_MSGS(st), sect_custom_types, NULL);
 }
 
 

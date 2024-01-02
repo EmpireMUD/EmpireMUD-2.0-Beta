@@ -3,7 +3,7 @@
 *  Usage: contains general functions for using scripts.                   *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/24 03:48:42, revision 3.25          *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -3101,7 +3101,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bonus_healing")) {
-						snprintf(str, slen, "%d", total_bonus_healing(c));
+						snprintf(str, slen, "%d", GET_BONUS_HEALING(c));
 					}
 					else if (!str_cmp(field, "bonus_magical")) {
 						snprintf(str, slen, "%d", GET_BONUS_MAGICAL(c));
@@ -3468,36 +3468,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 						if (subfield && *subfield && IS_NPC(c)) {
 							char arg1[256], arg2[256];
-							int ctype, count = 0, pos = -1;
-							struct custom_message *mcm, *found_mcm = NULL;
+							char *msg;
+							int ctype, pos = -1;
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && (ctype = search_block(arg1, mob_custom_types, FALSE)) != NOTHING) {
 								if (*arg2) {	// optional message pos
 									pos = atoi(arg2);
+									msg = get_custom_message_pos(MOB_CUSTOM_MSGS(c), ctype, pos);
 								}
-								
-								// valid type
-								LL_FOREACH(MOB_CUSTOM_MSGS(c), mcm) {
-									if (mcm->type != ctype) {
-										continue;
-									}
-									
-									// seems valid
-									if (pos != -1 && pos-- <= 0) {
-										// only looking for 1
-										found_mcm = mcm;
-										break;
-									}
-									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
-										// picking at random
-										found_mcm = mcm;
-									}
+								else {
+									msg = get_custom_message(MOB_CUSTOM_MSGS(c), ctype);
 								}
 								
 								// did we find one
-								if (found_mcm) {
-									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								if (msg) {
+									snprintf(str, slen, "%s", NULLSAFE(msg));
 								}
 							}
 						}
@@ -4052,7 +4038,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (IS_NPC(c) && GET_CURRENT_SCALE_LEVEL(c) > 0) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_waterwalking")) {
-						snprintf(str, slen, HAS_WATERWALK(c) ? "1" : "0");
+						snprintf(str, slen, HAS_WATERWALKING(c) ? "1" : "0");
 					}
 
 					else if (!str_cmp(field, "int") || !str_cmp(field, "intelligence")) {
@@ -4477,7 +4463,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_RESIST_PHYSICAL(c));
 					}
 					else if (!str_cmp(field, "resist_poison")) {
-						if (has_ability(c, ABIL_RESIST_POISON)) {
+						if (has_player_tech(c, PTECH_RESIST_POISON)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -4561,7 +4547,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int sk_lev = 0;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= CLASS_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
+							if (*arg1 && *arg2 && (sk = find_skill(arg1)) && (sk_lev = atoi(arg2)) >= 0 && sk_lev <= MAX_SKILL_CAP && (sk_lev < get_skill_level(c, SKILL_VNUM(sk)) || noskill_ok(c, SKILL_VNUM(sk)))) {
 								// TODO skill cap checking! need a f() like can_set_skill_to(c, sk, lev)
 								set_skill(c, SKILL_VNUM(sk), sk_lev);
 								snprintf(str, slen, "1");
@@ -4611,7 +4597,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
-						if (trigger_counterspell(c)) {
+						// optional target
+						char_data *trig_by = NULL;
+						if (subfield && *subfield) {
+							trig_by = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
+						}
+						
+						// trigger it with or without a valid target; that arg can be NULL
+						if (trigger_counterspell(c, trig_by)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -4767,32 +4760,33 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "attack")) {
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
+							attack_message_data *amd = real_attack_message(type);
 							if (!subfield || !*subfield || !str_cmp(subfield, "0") || is_abbrev(subfield, "name")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].name);
+								snprintf(str, slen, "%s", amd ? ATTACK_NAME(amd) : "");
 							}
 							else if (!str_cmp(subfield, "1") || is_abbrev(subfield, "first-person")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].first_pers);
+								snprintf(str, slen, "%s", amd ? ATTACK_FIRST_PERSON(amd) : "");
 							}
 							else if (!str_cmp(subfield, "3") || is_abbrev(subfield, "third-person")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].third_pers);
+								snprintf(str, slen, "%s", amd ? ATTACK_THIRD_PERSON(amd) : "");
 							}
 							else if (is_abbrev(subfield, "noun")) {
-								snprintf(str, slen, "%s", attack_hit_info[type].noun);
+								snprintf(str, slen, "%s", amd ? ATTACK_NOUN(amd) : "");
 							}
 							else if (is_abbrev(subfield, "sharp")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_SHARP ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_SHARP) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "blunt")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_BLUNT ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_BLUNT) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "magic")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].weapon_type == WEAPON_MAGIC ? 1 : 0);
+								snprintf(str, slen, "%d", (amd && ATTACK_WEAPON_TYPE(amd) == WEAPON_MAGIC) ? 1 : 0);
 							}
 							else if (is_abbrev(subfield, "damage")) {
-								snprintf(str, slen, "%s", damage_types[attack_hit_info[type].damage_type]);
+								snprintf(str, slen, "%s", damage_types[amd ? ATTACK_DAMAGE_TYPE(amd) : 0]);
 							}
 							else if (is_abbrev(subfield, "disarmable")) {
-								snprintf(str, slen, "%d", attack_hit_info[type].disarmable);
+								snprintf(str, slen, "%d", (amd && ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) ? 1 : 0);
 							}
 						}
 						else {	// not a weapon
@@ -4898,36 +4892,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 						if (subfield && *subfield) {
 							char arg1[256], arg2[256];
-							int ctype, count = 0, pos = -1;
-							struct custom_message *mcm, *found_mcm = NULL;
+							char *msg;
+							int ctype, pos = -1;
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && (ctype = search_block(arg1, obj_custom_types, FALSE)) != NOTHING) {
 								if (*arg2) {	// optional message pos
 									pos = atoi(arg2);
+									msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(o), ctype, pos);
 								}
-								
-								// valid type
-								LL_FOREACH(GET_OBJ_CUSTOM_MSGS(o), mcm) {
-									if (mcm->type != ctype) {
-										continue;
-									}
-									
-									// seems valid
-									if (pos != -1 && pos-- <= 0) {
-										// only looking for 1
-										found_mcm = mcm;
-										break;
-									}
-									else if (pos == -1 && (!number(0, count++) || !found_mcm)) {
-										// picking at random
-										found_mcm = mcm;
-									}
+								else {
+									msg = get_custom_message(GET_OBJ_CUSTOM_MSGS(o), ctype);
 								}
 								
 								// did we find one
-								if (found_mcm) {
-									snprintf(str, slen, "%s", NULLSAFE(found_mcm->msg));
+								if (msg) {
+									snprintf(str, slen, "%s", NULLSAFE(msg));
 								}
 							}
 						}

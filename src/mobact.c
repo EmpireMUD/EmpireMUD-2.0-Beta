@@ -2,7 +2,7 @@
 *   File: mobact.c                                        EmpireMUD 2.0b5 *
 *  Usage: Functions for generating intelligent (?) behavior in mobiles    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -187,6 +187,7 @@ int mob_coins(char_data *mob) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(run_one_encounter) {
 	char_data *aggr;
 	int iter;
@@ -226,7 +227,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_FLY | AFF_MAJESTY)) {
+	if (AFF_FLAGGED(ch, AFF_FLYING | AFF_MAJESTY)) {
 		return;
 	}
 	
@@ -1011,7 +1012,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
-	else if (AFF_FLAGGED(mob, AFF_FLY)) {
+	else if (AFF_FLAGGED(mob, AFF_FLYING)) {
 		ok = TRUE;
 	}
 	else if (SECT_FLAGGED(sect, SECTF_ROUGH)) {
@@ -1020,7 +1021,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 		}
 	}
 	else if (SECT_FLAGGED(sect, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALK(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
+		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALKING(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
 			ok = TRUE;
 		}
 	}
@@ -1034,7 +1035,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	// overrides: things that cancel previous oks
 	
 	// non-humans won't enter buildings (open buildings only count if finished)
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && (!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) || IS_COMPLETE(to_room))) {
+	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && ROOM_IS_CLOSED(to_room)) {
 		ok = FALSE;
 	}
 	
@@ -1091,9 +1092,10 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 * @return bool TRUE if the mobile moved successfully
 */
 bool try_mobile_movement(char_data *ch) {
-	int dir, count;
+	bool try_vehicle = FALSE;
+	int dir = -1, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
-	struct room_direction_data *ex;
+	struct room_direction_data *ex_iter, *use_exit = NULL;
 	vehicle_data *veh;
 	
 	// animals don't move indoors
@@ -1101,24 +1103,38 @@ bool try_mobile_movement(char_data *ch) {
 		return FALSE;
 	}
 	
-	// 40% random chance to attempt a move indoors or 20% outdoors
-	if (number(1, 100) > 20 * (COMPLEX_DATA(IN_ROOM(ch)) ? 2 : 1)) {
+	if (number(1, 100) > 20 * (ROOM_IS_CLOSED(IN_ROOM(ch)) ? 1.5 : 1)) {
 		return FALSE;
 	}
 	
 	// pick a random direction
-	if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	if (IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		dir = number(-1, NUM_2D_DIRS-1);
+		try_vehicle = (dir == -1);
+	}
+	else if (COMPLEX_DATA(IN_ROOM(ch))) {
+		if (number(1, 100) <= 10) {
+			try_vehicle = TRUE;
+		}
+		else {
+			count = 0;
+			LL_FOREACH(COMPLEX_DATA(IN_ROOM(ch))->exits, ex_iter) {
+				if (!number(0, count++)) {
+					use_exit = ex_iter;
+				}
+			}
+		}
 	}
 	else {
-		dir = number(-1, NUM_NATURAL_DIRS-1);
+		// nowhere to go, nothing to do
+		return FALSE;
 	}
 	
-	// -1 will attempt to enter/exit a vehicle instead
-	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
+	// vehicle?
+	if (try_vehicle && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
 		do_exit(ch, "", 0, 0);
 	}
-	else if (dir == -1) {	// look for a vehicle to enter
+	else if (try_vehicle) {	// look for a vehicle to enter
 		to_room = NULL;
 		count = 0;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
@@ -1146,7 +1162,7 @@ bool try_mobile_movement(char_data *ch) {
 			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 		}
 	}	// end attempt enter/exit
-	else if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	else if (dir != -1 && IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		// map movement:
 		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 		
@@ -1160,12 +1176,12 @@ bool try_mobile_movement(char_data *ch) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir)) && CAN_GO(ch, ex)) {
+	else if (use_exit && CAN_GO(ch, use_exit)) {
 		// indoor movement
-		to_room = ex->room_ptr;
+		to_room = use_exit->room_ptr;
 		
-		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, dir, to_room)) {
-			perform_move(ch, dir, to_room, MOVE_WANDER);
+		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room)) {
+			perform_move(ch, use_exit->dir, to_room, MOVE_WANDER);
 		}
 	}
 
@@ -1359,13 +1375,22 @@ void run_mob_echoes(void) {
 			// ok now find a random message to show?
 			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
 				// MOB_CUSTOM_x: types we use here
-				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
+				if (mcm->type == MOB_CUSTOM_ECHO) {
 					// ok = true
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (sun == SUN_LIGHT || sun == SUN_RISE)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_DAY && (sun == SUN_LIGHT || sun == SUN_RISE)) {
 					// day ok
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (sun == SUN_DARK || sun == SUN_SET)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_NIGHT && (sun == SUN_DARK || sun == SUN_SET)) {
+					// night ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// ok = true
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_DAY && (sun == SUN_LIGHT || sun == SUN_RISE) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// day ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_NIGHT && (sun == SUN_DARK || sun == SUN_SET) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
 					// night ok
 				}
 				else {
@@ -2027,7 +2052,7 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	int iter, level = 0;
 	
 	// level caps for sub-100 scaling -- TODO this is very similar to what's done in can_wear_item()
-	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
+	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, MAX_SKILL_CAP, -1 };	// terminate with -1
 	
 	// determine who we're really scaling to (ONLY if check_group)
 	if (check_group) {
@@ -2050,7 +2075,7 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 		level = GET_COMPUTED_LEVEL(scale_to);
 		
 		// for people under the class cap, also cap scaling on their level range
-		if (GET_SKILL_LEVEL(scale_to) < CLASS_SKILL_CAP) {
+		if (GET_SKILL_LEVEL(scale_to) < MAX_SKILL_CAP) {
 			for (iter = 0; level_ranges[iter] != -1; ++iter) {
 				if (GET_SKILL_LEVEL(scale_to) <= level_ranges[iter]) {
 					level = MIN(level, level_ranges[iter]);
@@ -2091,9 +2116,9 @@ void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level) {
 		scale_level = get_approximate_level(leader);
 	}
 	
-	if (scale_level > CLASS_SKILL_CAP) {
+	if (scale_level > MAX_SKILL_CAP) {
 		// 25 levels lower if over 100
-		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
+		scale_level = MAX(MAX_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
 	set_mob_flags(mob, MOB_NO_RESCALE);	// ensure it doesn't rescale itself
@@ -2125,6 +2150,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	int room_lev = 0, room_min = 0, room_max = 0;
 	int pools_down[NUM_POOLS];
 	int iter;
+	attack_message_data *amd;
 	
 	// sanity
 	if (!IS_NPC(mob)) {
@@ -2172,8 +2198,8 @@ void scale_mob_to_level(char_data *mob, int level) {
 	// set up: determine how many levels the mob gets in each level range
 	low_level = MAX(0, MIN(level, BASIC_SKILL_CAP));
 	mid_level = MAX(0, MIN(level, SPECIALTY_SKILL_CAP) - BASIC_SKILL_CAP);
-	high_level = MAX(0, MIN(level, CLASS_SKILL_CAP) - SPECIALTY_SKILL_CAP);
-	over_level = MAX(0, level - CLASS_SKILL_CAP);
+	high_level = MAX(0, MIN(level, MAX_SKILL_CAP) - SPECIALTY_SKILL_CAP);
+	over_level = MAX(0, level - MAX_SKILL_CAP);
 	
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
@@ -2253,11 +2279,12 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// damage
 	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 9.5);
-	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
+	amd = real_attack_message(MOB_ATTACK_TYPE(mob));
+	value = target * ((amd && ATTACK_SPEED(amd, SPD_NORMAL) > 0.0) ? ATTACK_SPEED(amd, SPD_NORMAL) : basic_speed);
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
-	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_DISARMABLE)) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
 	if (MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {

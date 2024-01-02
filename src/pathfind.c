@@ -2,7 +2,7 @@
 *   File: pathfind.c                                      EmpireMUD 2.0b5 *
 *  Usage: code for detecting paths between two locations                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -224,7 +224,7 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 * end node.
 *
 * @param struct pathfind_node *end_node The final node in the path.
-* @param char *buffer A string buffer of at least MAX_MOVEMENT_STRING+1 in length.
+* @param char *buffer A string buffer of at least MAX_ACTION_STRING+1 in length.
 * @return bool TRUE if it managed to build a string, even an empty one. FALSE if the string ended up too long.
 */
 bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
@@ -259,7 +259,7 @@ bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
 	
 	// now build the final string
 	LL_FOREACH_SAFE(bps_list, bps, next_bps) {
-		if (!full && size + bps->size < MAX_MOVEMENT_STRING) {
+		if (!full && size + bps->size < MAX_ACTION_STRING) {
 			strcat(buffer, bps->str);
 		}
 		else {
@@ -390,7 +390,7 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 * it builds a movement string (like "2n3w") for running/sailing.
 *
 * This will fail if the movement string it builds is somehow longer than
-* MAX_MOVEMENT_STRING (the longest string that can be saved to file).
+* MAX_ACTION_STRING (the longest string that can be saved to file).
 *
 * @param room_data *start The start room.
 * @param room_data *end The end room.

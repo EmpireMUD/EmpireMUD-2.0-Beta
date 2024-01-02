@@ -2,7 +2,7 @@
 *   File: db.player.c                                     EmpireMUD 2.0b5 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -53,9 +53,7 @@ extern int top_account_id;
 
 // external funcs
 ACMD(do_slash_channel);
-void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
-void apply_all_ability_techs(char_data *ch);
 EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);
@@ -941,8 +939,8 @@ void free_char(char_data *ch) {
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
 		}
-		if (GET_MOVEMENT_STRING(ch)) {
-			free(GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
 		}
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
@@ -1055,6 +1053,7 @@ void free_char(char_data *ch) {
 			free(mount);
 		}
 		free_player_event_data(GET_EVENT_DATA(ch));
+		free_trait_hooks(&GET_ABILITY_TRAIT_HOOKS(ch));
 		
 		while ((eq_set = GET_EQ_SETS(ch))) {
 			GET_EQ_SETS(ch) = eq_set->next;
@@ -1346,6 +1345,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_ACTION_ROOM(ch) = i_in[3];
 					}
 				}
+				else if (!strn_cmp(line, "Actstr: ", 8)) {
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
+					}
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
+				}
 				else if (!strn_cmp(line, "Action-res: ", 12)) {
 					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// argument order is for consistency with other resource lists
@@ -1362,6 +1367,17 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 							GET_ACTION_RESOURCES(ch) = res;
 						}
 						last_res = res;
+					}
+				}
+				else if (!strn_cmp(line, "Action-targets: ", 16)) {
+					if (sscanf(line + 16, "%d %lld %d %d", &i_in[0], &bit_in, &i_in[2], &i_in[3]) == 4) {
+						// character and vehicle must be converted once in the game
+						GET_ACTION_TEMPORARY_CHAR_ID(ch) = i_in[0];
+						GET_ACTION_MULTI_TARG(ch) = bit_in;
+						GET_ACTION_TEMPORARY_VEH_ID(ch) = i_in[2];
+						GET_ACTION_ROOM_TARG(ch) = i_in[3];
+						
+						// object targets are lost in this process
 					}
 				}
 				else if (!strn_cmp(line, "Action-vnum: ", 13)) {
@@ -1467,7 +1483,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CAN_GAIN_NEW_SKILLS(ch) = atoi(line + 21) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Can Get Bonus Skills: ", 22)) {
-					CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
+					// this property is no longer used
+					// CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Class: ", 7)) {
 					GET_CLASS(ch) = find_class_by_vnum(atoi(line + 7));
@@ -1947,10 +1964,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_MOUNT_VNUM(ch) = atoi(line + 12);
 				}
 				else if (!strn_cmp(line, "Mvstring: ", 10)) {
-					if (GET_MOVEMENT_STRING(ch)) {
-						free(GET_MOVEMENT_STRING(ch));
+					// old version of "Actstr:"
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
 					}
-					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + 10));
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2643,6 +2661,15 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			// argument order is for consistency with other resource lists
 			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
+		if (GET_ACTION_CHAR_TARG(ch) || GET_ACTION_MULTI_TARG(ch) || GET_ACTION_VEH_TARG(ch) || GET_ACTION_ROOM_TARG(ch) != NOWHERE || GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0 || GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
+			// object targets are not quit-safe and are not saved
+			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_VNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
+		}
+	}
+	if (GET_ACTION_STRING(ch)) {
+		strcpy(temp, GET_ACTION_STRING(ch));
+		temp[MAX_ACTION_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
+		fprintf(fl, "Actstr: %s\n", temp);
 	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {
 		fprintf(fl, "Adventure Summon Instance: %d\n", GET_ADVENTURE_SUMMON_INSTANCE_ID(ch));
@@ -2681,9 +2708,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'C'
 	if (CAN_GAIN_NEW_SKILLS(ch)) {
 		fprintf(fl, "Can Gain New Skills: 1\n");
-	}
-	if (CAN_GET_BONUS_SKILLS(ch)) {
-		fprintf(fl, "Can Get Bonus Skills: 1\n");
 	}
 	fprintf(fl, "Class: %d\n", GET_CLASS(ch) ? CLASS_VNUM(GET_CLASS(ch)) : NOTHING);
 	fprintf(fl, "Class Progression: %d\n", GET_CLASS_PROGRESSION(ch));
@@ -2827,11 +2851,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOUNT_VNUM(ch) != NOTHING) {
 		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
-	}
-	if (GET_MOVEMENT_STRING(ch)) {
-		strcpy(temp, GET_MOVEMENT_STRING(ch));
-		temp[MAX_MOVEMENT_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
-		fprintf(fl, "Mvstring: %s\n", temp);
 	}
 	
 	// 'O'
@@ -3782,15 +3801,16 @@ void announce_login(char_data *ch) {
 				continue;
 			}
 			
+			// header divider
 			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
-			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			msg_to_char(desc->character, "- %s ", buf);
 			
 			// rest of the divider
 			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
 				buf2[iter] = '-';
 			}
 			buf2[iter] = '\0';	// terminate
-			msg_to_char(desc->character, "%s\r\n", buf2);
+			msg_to_char(desc->character, "%s\r\n%s", buf2, GET_ACCOUNT(ch)->notes);
 		}
 	}
 	
@@ -3946,7 +3966,7 @@ void check_skills_and_abilities(char_data *ch) {
 			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
-	update_class(ch);
+	update_class_and_abilities(ch);
 	check_ability_levels(ch, NOTHING);
 }
 
@@ -4009,6 +4029,7 @@ void clear_player(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
 	GET_SPEAKING(ch) = NOTHING;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 }
 
 
@@ -4401,14 +4422,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// remove stale coins
 	cleanup_coins(ch);
 	
-	// verify abils
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, FALSE);
-	}
-	assign_class_abilities(ch, NULL, NOTHING);
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, TRUE);
-	}
+	// verify abils}
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
 
 	// script/trigger stuff
@@ -4492,7 +4507,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	// position must be reset
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED | AFF_MUMMIFIED | AFF_DEATHSHROUDED)) {
 		GET_POS(ch) = POS_SLEEPING;
 	}
 	else {
@@ -4514,6 +4529,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
 		load_companion_mob(ch, compan);
 	}
+	// redetect targets afterwards in case the companion was the target
+	redetect_ability_targets_on_login(ch);
 	
 	// ensure these are fresh
 	if (GET_LOYALTY(ch)) {
@@ -4955,7 +4972,7 @@ void start_new_character(char_data *ch) {
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 			level = get_skill_level(ch, sk->skill) + sk->level;
-			level = MIN(level, CLASS_SKILL_CAP);
+			level = MIN(level, MAX_SKILL_CAP);
 			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
@@ -4998,7 +5015,7 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// set up class/level data
-	update_class(ch);
+	update_class_and_abilities(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
 	set_health(ch, GET_MAX_HEALTH(ch));
@@ -6002,10 +6019,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 					EMPIRE_MIN_LEVEL(e) = level;
 				}
 				EMPIRE_MAX_LEVEL(e) = MAX(EMPIRE_MAX_LEVEL(e), level);
-
-				if (read_techs) {
-					adjust_abilities_to_empire(ch, e, TRUE);
-				}
 			}
 			
 			// update next timeout check
@@ -6342,7 +6355,7 @@ PROMO_APPLY(promo_skillups) {
 				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level + 10));
 			}
 			else {
-				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level + 10));
+				set_skill(ch, skill->vnum, MIN(MAX_SKILL_CAP, skill->level + 10));
 			}
 		}
 	}

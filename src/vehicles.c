@@ -2,7 +2,7 @@
 *   File: vehicles.c                                      EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for vehicles (including ships)                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -463,8 +463,8 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	char_data *iter;
 	
 	if (ch) {
-		act("You finish dismantling $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n finishes dismantling $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You finish dismantling $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n finishes dismantling $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	}
 	
 	if (IN_ROOM(veh)) {
@@ -555,12 +555,12 @@ void fully_empty_vehicle(vehicle_data *veh, room_data *to_room) {
 			
 			// remove people
 			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
-				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
+				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 				if (to_room) {
 					char_to_room(ch, to_room);
 					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
-					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
+					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 					msdp_update_room(ch);
 				}
 				else {
@@ -829,6 +829,8 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 * Interaction function for vehicle-ruins-to-vehicle. This loads a new vehicle,
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
@@ -945,7 +947,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	}
 	
 	if (message && ROOM_PEOPLE(IN_ROOM(veh))) {
-		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 	}
 	
 	// delete the NPCs who live here first so they don't do an 'ejected-then-leave'
@@ -996,6 +998,11 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
 		level = MIN(level, VEH_MAX_SCALE_LEVEL(veh));
+	}
+	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
 	}
 	
 	// set the level
@@ -1239,7 +1246,7 @@ void start_vehicle_burning(vehicle_data *veh) {
 		do_unseat_from_vehicle(VEH_SITTING_ON(veh));
 	}
 	if (VEH_LED_BY(veh)) {
-		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR);
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
 		VEH_LED_BY(veh) = NULL;
 	}
@@ -1857,6 +1864,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh_iter, *next_veh_iter;
 	struct obj_storage_type *store;
 	struct interaction_item *inter;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -1877,6 +1885,22 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		any = FALSE;
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+	}
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
@@ -2079,37 +2103,37 @@ void process_dismantle_vehicle(char_data *ch) {
 			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from $V.", get_obj_name_by_proto(res->vnum));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n removes %s from $V.", get_obj_name_by_proto(res->vnum));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_LIQUID: {
 				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from $V.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves some %s from $V.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_COINS: {
 				snprintf(buf, sizeof(buf), "You retrieve %s from $V.", money_amount(real_empire(res->vnum), res->amount));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", res->amount == 1 ? "a coin" : "some coins");
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_POOL: {
 				snprintf(buf, sizeof(buf), "You regain %d %s point%s from $V.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", pool_types[res->vnum]);
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_CURRENCY: {
 				snprintf(buf, sizeof(buf), "You retrieve %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 				snprintf(buf, sizeof(buf), "$n retrieves %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 		}
@@ -3260,6 +3284,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3286,7 +3311,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(iter))) {
-			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM);
+			act("$V vanishes.", FALSE, ROOM_PEOPLE(IN_ROOM(iter)), NULL, iter, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(iter);
 	}
@@ -3300,6 +3325,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// save index and vehicle file now
 	save_index(DB_BOOT_VEH);
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
+	
+	// update abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		found = FALSE;
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_VEH, vnum);
+		
+		if (found) {
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related vehicle", ABIL_VNUM(abil), ABIL_NAME(abil));
+			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
+		}
+	}
 	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
@@ -3412,6 +3448,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_VEH, vnum);
+		
+			if (found) {
+				msg_to_desc(desc, "An vehicle listed in the interactions for the ability you're editing has been removed.\r\n");
+			}
+		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
@@ -4000,6 +4044,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	size_t size;
 	bool comma;
 	int found;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!veh) {
 		return;
@@ -4095,12 +4140,22 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (VEH_CONTAINS(veh)) {
-		sprintf(part, "Contents:\tg");
-		found = 0;
 		DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
-			sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+			add_string_hash(&str_hash, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), 1);
+		}
+		
+		found = 0;
+		sprintf(part, "Contents:\tg");
+		HASH_ITER(hh, str_hash, str_iter, next_str) {
+			if (str_iter->count == 1) {
+				sprintf(part + strlen(part), "%s %s", found++ ? "," : "", skip_filler(str_iter->str));
+			}
+			else {
+				sprintf(part + strlen(part), "%s %s (x%d)", found++ ? "," : "", skip_filler(str_iter->str), str_iter->count);
+			}
+			
 			if (strlen(part) >= 62) {
-				if (obj->next_content) {
+				if (next_str) {
 					strcat(part, ",");
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", part);
@@ -4114,6 +4169,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		else {
 			size += snprintf(buf + size, sizeof(buf) - size, "\t0");
 		}
+		
+		free_string_hash(&str_hash);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
@@ -4172,7 +4229,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
 	}
 	else {
-		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
 	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
@@ -4318,7 +4375,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
 	count = 0;
 	LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
 	}
 	
 	// scripts
@@ -4387,7 +4444,7 @@ OLC_MODULE(vedit_capacity) {
 OLC_MODULE(vedit_custom) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	
-	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);
+	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types, NULL);
 }
 
 

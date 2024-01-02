@@ -2,7 +2,7 @@
 *   File: archetypes.c                                    EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for character creation archetype                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -2130,7 +2130,7 @@ OLC_MODULE(archedit_skill) {
 	}
 	else if (is_abbrev(cmd_arg, "add") || is_abbrev(cmd_arg, "change")) {
 		// add and change are actually the same
-		if (!*num_arg || !isdigit(*num_arg) || (num = atoi(num_arg)) < 0 || num > CLASS_SKILL_CAP) {
+		if (!*num_arg || !isdigit(*num_arg) || (num = atoi(num_arg)) < 0 || num > MAX_SKILL_CAP) {
 			msg_to_char(ch, "Invalid skill level '%s'.\r\n", num_arg);
 			return;
 		}

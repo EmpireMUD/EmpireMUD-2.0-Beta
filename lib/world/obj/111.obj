@@ -117,7 +117,7 @@ I 14 11106 100.00 4 x  # COMBINE: juicy pears
 O+ 1 6122
 S
 #11108
-scarlet-feathered feathered scarlet hood~
+hood scarlet-feathered feathered scarlet~
 a scarlet-feathered hood~
 A scarlet-feathered hood flutters on the ground nearby.~
 Obviously, this is a trophy worthy of someone who's bested a Scarlet-Hooded Raptor!
@@ -149,7 +149,7 @@ C
 75 175
 S
 #11110
-colossal tooth club~
+club colossal tooth~
 a colossal tooth club~
 A colossal tooth club bobs nearby.~
 It's not very sharp, but it'll make a great blunt weapon!
@@ -469,7 +469,7 @@ T 11137
 T 11142
 S
 #11132
-closed sarcophagus~
+sarcophagus closed~
 a closed sarcophagus~
 A closed sarcophagus rests here.~
    The legacy of the occupant has been completely obscured by the same creeping
@@ -492,7 +492,7 @@ fragments do not appear to have made a successful breach.
 T 11135
 S
 #11133
-opal carapace~
+carapace opal~
 an opal carapace~
 A shard of opal carapace shines nearby.~
    The carapace -- tough as plate mail -- swirls in blends of gold, green, and
@@ -544,7 +544,7 @@ C
 100 200
 S
 #11136
-catfish dorsal spine~
+spine catfish dorsal~
 a catfish dorsal spine~
 The dorsal spine of a catfish floats nearby.~
    This bonified spike is heavy as a spearhead, and will inflict substantial
@@ -593,7 +593,7 @@ C
 100 200
 S
 #11139
-wooden staff branch~
+branch wooden staff~
 a wooden staff~
 A branch, the length of a walking staff, is lying nearby.~
    The stained outer bark has fallen away to reveal the pale, smooth heart of
@@ -611,7 +611,7 @@ C
 100 200
 S
 #11140
-wooden cube hex box~
+box wooden cube hex~
 the locked hex box~
 There is a locked hex box in the open sarcophagus.~
    Except for a faint crease an inch from the top, there are no visible seams
@@ -642,7 +642,7 @@ T 11133
 T 11134
 S
 #11141
-hex box openhexbox~
+box hex openhexbox~
 the hex box~
 There is an open hex box in the sarcophagus.~
    With a faint hissing sound, the lid of the hex box dissolves into ash as it
@@ -673,7 +673,7 @@ C
 1 1
 S
 #11143
-star anise pod~
+pod star anise~
 a star anise pod~
 A star anise pod is here.~
    An almost pleasant breeze stirs the air, and the dried seeds rattle in their

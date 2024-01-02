@@ -270,7 +270,7 @@ T 11021
 T 11022
 S
 #11022
-carcass~
+carcass cow half-eaten~
 a half-eaten cow carcass~
 A half-eaten cow carcass is rotting on the ground.~
    This carcass appears to be most of a cow, although something has already
@@ -282,7 +282,7 @@ the smell is foul enough to make you retch.
 7 144
 S
 #11023
-carcass~
+carcass horse rotting~
 a rotting horse carcass~
 A rotting horse carcass is lying on the ground.~
    What remains of the horse is lying on the ground, rotting, covered in flies
@@ -313,6 +313,7 @@ pattern downy rucksack sack~
 the downy rucksack pattern~
 The downy rucksack pattern is lying here.~
 This pattern is used to make the downy rucksack, a great pack item.
+Sew (Magical Vestments): downy rucksack
 ~
 7 0 a 0 0 4
 11024 0 0
@@ -343,6 +344,7 @@ pattern feathered saddle~
 the feathered saddle pattern~
 The feathered saddle pattern is lying here.~
 This pattern can be used to craft a feathered saddle.
+Sew (Dangerous Leathers): feathered saddle
 ~
 7 0 a 0 0 5
 11026 0 0
@@ -372,6 +374,7 @@ the roc earrings schematic~
 The roc earrings schematic is lying here.~
    This schematic can be used to make incredible earrings, which bestow
 greatness upon the wearer. It teaches you to forge roc earrings.
+Forge (Jewelry): roc earrings
 ~
 7 0 a 0 0 7
 11028 0 0
@@ -410,7 +413,7 @@ Craft (level 100): magnificent feathered headdress
 10 0
 S
 #11032
-daedalus wings~
+wings daedalus~
 the wings of Daedalus~
 The wings of Daedalus lie here.~
    These wings are made from magnificent, oversized roc feathers. The skill
@@ -433,6 +436,7 @@ the wings of Daedalus schematic~
 The wings of Daedalus schematic is lying here.~
    This incredible schematic depicts the wings of Daedalus, an incredible
 artifact that bestows flight upon its wearer for a short time.
+Craft (Master Craftsman): wings of Daedalus
 ~
 7 0 a 0 0 8
 11032 0 0
@@ -480,6 +484,7 @@ the feathered arm guards pattern~
 The feathered arm guards pattern is lying here.~
    This pattern can be used to make a great melee dps armpiece. It teaches you
 to sew feathered arm guards.
+Sew (Dangerous Leathers): feathered arm guards
 ~
 7 0 a 0 0 9
 11035 0 0
@@ -521,6 +526,7 @@ the stonefeather arm plates pattern~
 The stonefeather arm plates pattern is lying here.~
    This pattern shows how to create a powerful tank armpiece. It teaches you to
 forge stonefeather arm plates.
+Forge (Imperial Armors): stonefeather arm plates
 ~
 7 0 a 0 0 10
 11037 0 0
@@ -556,6 +562,7 @@ the roc feather sleeves pattern~
 The roc feather sleeves pattern is lying here.~
    This pattern shows you how to make a great caster dps armpiece. It teaches
 you to sew roc feather sleeves.
+Sew (Magical Vestments): roc feather sleeves
 ~
 7 0 a 0 0 11
 11039 0 0
@@ -592,6 +599,7 @@ the downy white sleeves pattern~
 The downy white sleeves pattern is lying here.~
    This pattern shows you how to make a fantastic healer armpiece. It teaches
 you to sew downy white sleeves.
+Sew (Magical Vestments): downy white sleeves
 ~
 7 0 a 0 0 12
 11041 0 0
@@ -629,6 +637,7 @@ the razor feather gauntlets pattern~
 The razor feather gauntlets pattern is lying here.~
    This pattern shows you how to make powerful melee dps gauntlets. It teaches
 you to sew razor feather gauntlets.
+Sew (Dangerous Leathers): razor feather gauntlets
 ~
 7 0 a 0 0 13
 11043 0 0
@@ -666,6 +675,7 @@ the feathered imperium gauntlets pattern~
 The feathered imperium gauntlets pattern is lying here.~
    This pattern shows you how to create incredible tank gauntlets. It teaches
 you to forge feathered imperium gauntlets.
+Forge (Imperial Armors): feathered imperium gauntlets
 ~
 7 0 a 0 0 14
 11045 0 0
@@ -701,6 +711,7 @@ the wondrous feather gloves pattern~
 The wondrous feather gloves pattern is lying here.~
    This pattern shows how to make a powerful pair of caster dps gloves. It
 teaches you to sew wondrous feather gloves.
+Sew (Magical Vestments): wondrous feather gloves
 ~
 7 0 a 0 0 16
 11047 0 0
@@ -735,6 +746,7 @@ the roc quill finger caps pattern~
 The roc quill finger caps pattern is lying here.~
    This pattern shows you how to make incredible healer handgear. It teaches
 you to sew roc quill finger caps.
+Sew (Magical Vestments): roc quill finger caps
 ~
 7 0 a 0 0 16
 11049 0 0
@@ -750,7 +762,7 @@ A huge capstone sits on the ground.~
 the peak of a gigantic dome. Looking at the stone, you can't imagine how big
 the final dome will be. But it's safe to say, you'll be impressed. Type 'build
 rocdome <exit direction>' to begin construction, or 'build info rocdome' to see
-the requirements.
+the requirements. Needs an Architect.
 ~
 3 e a 0 0 2
 0 0 0

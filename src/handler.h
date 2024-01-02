@@ -2,7 +2,7 @@
 *   File: handler.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -72,6 +72,7 @@ void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster,
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, any_vnum type);
 void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_room_by_caster(room_data *room, any_vnum type, char_data *caster, bool show_msg);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
@@ -81,14 +82,18 @@ void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 void affect_total_room(room_data *room);
+int affected_by_dot_from_caster(char_data *ch, any_vnum type, char_data *caster);
 bool affected_by_spell(char_data *ch, any_vnum type);
 bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
 struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
 void apply_dot_effect(char_data *ch, any_vnum type, int seconds_duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
+void cancel_permanent_affects_room(room_data *room);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 void free_freeable_dots();
+void remove_first_aff_flag_from_char(char_data *ch, bitvector_t aff_flag, bool show_msg);
 bool room_affected_by_spell(room_data *room, any_vnum type);
+bool room_affected_by_spell_from_caster(room_data *room, any_vnum type, char_data *caster);
 void schedule_affect_expire(char_data *ch, struct affected_type *af);
 void schedule_dot_update(char_data *ch, struct over_time_effect_type *dot);
 void show_wear_off_msg(char_data *ch, int atype);
@@ -238,6 +243,7 @@ int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *r
 bool has_interaction(struct interaction_item *list, int type);
 bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
+bool run_global_obj_interactions(char_data *ch, obj_data *obj, int type, INTERACTION_FUNC(*func));
 bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
 bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, int access_type, INTERACTION_FUNC(*func));
 
@@ -267,7 +273,7 @@ obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 room_data *find_room_obj_saves_in(obj_data *obj);
-obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level, bool keep_strings, bool keep_augments);
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
 void remove_from_object_list(obj_data *obj);
@@ -301,17 +307,25 @@ obj_data *unequip_char_to_room(char_data *ch, int pos);
 
 // custom message handlers
 struct custom_message *copy_custom_messages(struct custom_message *from);
+int count_custom_messages(struct custom_message *list, int type);
 void free_custom_messages(struct custom_message *mes);
 char *get_custom_message(struct custom_message *list, int type);
+char *get_custom_message_pos(struct custom_message *list, int type, int pos);
+int get_custom_message_random_pos_number(struct custom_message *list, int type);
 bool has_custom_message(struct custom_message *list, int type);
+bool has_custom_message_pos(struct custom_message *list, int type, int pos);
 
 // custom message helpers
+#define crop_get_custom_message(crop, type)  get_custom_message(GET_CROP_CUSTOM_MSGS(crop), type)
+#define crop_has_custom_message(crop, type)  has_custom_message(GET_CROP_CUSTOM_MSGS(crop), type)
 #define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define mob_has_custom_message(mob, type)  has_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define obj_get_custom_message(obj, type)  get_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define sect_get_custom_message(sect, type)  get_custom_message(GET_SECT_CUSTOM_MSGS(sect), type)
+#define sect_has_custom_message(sect, type)  has_custom_message(GET_SECT_CUSTOM_MSGS(sect), type)
 #define veh_get_custom_message(veh, type)  get_custom_message(VEH_CUSTOM_MSGS(veh), type)
 #define veh_has_custom_message(veh, type)  has_custom_message(VEH_CUSTOM_MSGS(veh), type)
 
@@ -346,7 +360,7 @@ void remove_learned_craft(char_data *ch, any_vnum vnum);
 void remove_minipet(char_data *ch, any_vnum vnum);
 
 // player tech handlers
-void add_player_tech(char_data *ch, any_vnum abil, int tech);
+void add_player_tech(char_data *ch, ability_data *abil, int tech);
 bool has_player_tech(char_data *ch, int tech);
 void remove_player_tech(char_data *ch, any_vnum abil);
 bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
@@ -425,7 +439,10 @@ room_data *parse_room_from_coords(char *string);
 // sector handlers
 bool check_evolution_percent(struct evolution_data *evo);
 struct evolution_data *get_evolution_by_type(sector_data *st, int type);
+bool has_evolution_to(sector_data *st, any_vnum to_sect);
 bool has_evolution_type(sector_data *st, int type);
+bool has_evolution_type_to(sector_data *st, int type, any_vnum to_sect);
+bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
@@ -520,7 +537,7 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep);
 // fight.c
 void appear(char_data *ch);
 bool can_fight(char_data *ch, char_data *victim);
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, struct message_list *custom_fight_messages);
+int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype, attack_message_data *custom_fight_messages);
 obj_data *die(char_data *ch, char_data *killer);
 void engage_combat(char_data *ch, char_data *vict, bool melee);
 void heal(char_data *ch, char_data *vict, int amount);

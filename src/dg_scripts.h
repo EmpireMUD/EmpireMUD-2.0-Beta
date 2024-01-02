@@ -4,7 +4,7 @@
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/24 03:48:42, revision 3.6           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e5.0.1"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e5.0.2"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
@@ -339,7 +339,7 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
 bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int death_mtrigger(char_data *ch, char_data *actor);
-void fight_mtrigger(char_data *ch);
+int fight_mtrigger(char_data *ch, bool will_hit);
 void hitprcnt_mtrigger(char_data *ch);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 int can_fight_mtrigger(char_data *ch, char_data *actor);
@@ -451,7 +451,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp);
 void do_dg_terraform(room_data *target, sector_data *sect);
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument);
 void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
-void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
+void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier, int show_attack_message);
 void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 void script_heal(void *thing, int type, char *argument);
 bool script_message_should_queue(char **string);

@@ -2,7 +2,7 @@
 *   File: weather.c                                       EmpireMUD 2.0b5 *
 *  Usage: functions handling time, the weather, and temperature           *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -906,7 +906,7 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		// ok: show it
 		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
-		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM);
+		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM | ACT_STR_OBJ);
 		return TRUE;
 	}
 	

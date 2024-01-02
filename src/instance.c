@@ -2,7 +2,7 @@
 *   File: instance.c                                      EmpireMUD 2.0b5 *
 *  Usage: code related to instantiating adventure zones                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -728,7 +728,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
 	}
 	if (isle && isle->id != NO_ISLAND) {
-		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {	// not continent: check levels
+		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT) && !config_get_bool("ignore_island_levels")) {	// not continent: check levels
 			if (GET_ADV_MIN_LEVEL(adv) > 0 && (!isle->max_level || isle->max_level + 50 < GET_ADV_MIN_LEVEL(adv))) {
 				// island's max level is more than 50 below the adventure's minimum
 				return FALSE;
@@ -1066,7 +1066,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 				set_mob_flags(mob, MOB_SPAWNED);
 			}
 			else {
-				if (!AFF_FLAGGED(mob, AFF_HIDE | AFF_NO_SEE_IN_ROOM)) {
+				if (!AFF_FLAGGED(mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
 					act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
 				}
 				char_to_room(mob, extraction_room);
@@ -1148,7 +1148,7 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 		// but this purge CANNOT be prevented by the trigger
 		if (destroy_vtrigger(veh, "despawn")) {		
 			if (ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 		}
 		
@@ -1332,7 +1332,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 							scale_vehicle_to_level(veh, INST_LEVEL(inst));
 						}
 						if (ROOM_PEOPLE(IN_ROOM(veh))) {
-							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 						}
 						load_vtrigger(veh);
 					}

@@ -25,6 +25,9 @@ I 6 3015 100.00 1  # FORAGE: red berries
 I 8 10956 60.00 4 H  # HARVEST: sack of bog cranberries
 I 8 10956 30.00 3 H  # HARVEST: sack of bog cranberries
 I 8 10956 10.00 2 H  # HARVEST: sack of bog cranberries
+U
+0
+Small bushes start popping out of the ground, each covered in red fruit!~
 X
 cranberries bog cranberry bushes rows crop~
    You come across a bog full of low-growing cranberry plants, their deep red

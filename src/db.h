@@ -2,7 +2,7 @@
 *   File: db.h                                            EmpireMUD 2.0b5 *
 *  Usage: header file for database handling                               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -167,7 +167,7 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define IDEA_FILE  LIB_MISC"ideas"	// for the 'idea'-command
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
-#define MESS_FILE  LIB_MISC"messages"	// damage messages
+#define ATTACK_MESSAGES_FILE  LIB_MISC"messages"	// damage messages
 #define TIPS_OF_THE_DAY_FILE  LIB_MISC"tips"	// one-line tips shown on login
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
@@ -283,18 +283,6 @@ extern struct time_info_data main_time_info;
 extern byte y_coord_to_season[MAP_HEIGHT];
 
 
-// abilities
-extern ability_data *ability_table;
-extern ability_data *sorted_abilities;
-
-ability_data *find_ability(char *argument);
-ability_data *find_ability_by_name_exact(char *name, bool allow_abbrev);
-#define find_ability_by_name(name)  find_ability_by_name_exact(name, TRUE)
-ability_data *find_ability_by_vnum(any_vnum vnum);
-void free_ability(ability_data *abil);
-char *get_ability_name_by_vnum(any_vnum vnum);
-void remove_ability_from_table(ability_data *abil);
-
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
 account_data *create_account_for_player(char_data *ch);
@@ -378,16 +366,6 @@ int count_cities(empire_data *emp);
 int count_city_points_used(empire_data *emp);
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 void write_city_data_file();
-
-// classes
-extern class_data *class_table;
-extern class_data *sorted_classes;
-
-class_data *find_class(char *argument);
-class_data *find_class_by_name(char *name);
-class_data *find_class_by_vnum(any_vnum vnum);
-void free_class(class_data *cls);
-void remove_class_from_table(class_data *cls);
 
 // communication
 extern struct slash_channel *slash_channel_list;
@@ -531,15 +509,25 @@ void free_faction(faction_data *fct);
 void remove_faction_from_table(faction_data *fct);
 
 // fight messages
-extern struct message_list *fight_messages;
+extern attack_message_data *attack_message_table;
 
-void add_fight_message(struct message_list *add_to, struct message_type *messages);
-struct message_list *create_fight_message(int a_type);
-struct message_type *create_fight_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
-struct message_list *find_fight_message(int a_type, bool create_if_missing);
-void free_message_list(struct message_list *list);
-void free_message_type(struct message_type *type);
+int get_attack_damage_type_by_vnum(any_vnum vnum);
+const char *get_attack_first_person_by_vnum(any_vnum vnum);
+const char *get_attack_name_by_vnum(any_vnum vnum);
+const char *get_attack_noun_by_vnum(any_vnum vnum);
+const char *get_attack_third_person_by_vnum(any_vnum vnum);
+int get_attack_weapon_type_by_vnum(any_vnum vnum);
+bool is_attack_flagged_by_vnum(any_vnum vnum, bitvector_t amdf_flags);
+
+void add_attack_message(attack_message_data *add_to, struct attack_message_set *messages);
+attack_message_data *create_attack_message(any_vnum vnum);
+struct attack_message_set *create_attack_message_entry(bool duplicate_strings, char *die_to_attacker, char *die_to_victim, char *die_to_room, char *miss_to_attacker, char *miss_to_victim, char *miss_to_room, char *hit_to_attacker, char *hit_to_victim, char *hit_to_room, char *god_to_attacker, char *god_to_victim, char *god_to_room);
+attack_message_data *find_attack_message(any_vnum a_type, bool create_if_missing);
+attack_message_data *find_attack_message_by_name_or_vnum(char *name, bool exact);
+void free_attack_message(attack_message_data *amd);
+struct attack_message_set *get_one_attack_message(attack_message_data *amd, int num);
 void load_fight_messages();
+attack_message_data *real_attack_message(any_vnum vnum);
 
 // generics
 extern generic_data *generic_table;
@@ -828,19 +816,6 @@ void free_shop(shop_data *shop);
 void free_shop_lookups(struct shop_lookup *list);
 shop_data *real_shop(any_vnum vnum);
 void remove_shop_from_table(shop_data *shop);
-
-// skills
-extern skill_data *skill_table;
-extern skill_data *sorted_skills;
-
-skill_data *find_skill(char *argument);
-skill_data *find_skill_by_name_exact(char *name, bool allow_abbrev);
-#define find_skill_by_name(name)  find_skill_by_name_exact(name, TRUE)
-skill_data *find_skill_by_vnum(any_vnum vnum);
-void free_skill(skill_data *skill);
-char *get_skill_abbrev_by_vnum(any_vnum vnum);
-char *get_skill_name_by_vnum(any_vnum vnum);
-void remove_skill_from_table(skill_data *skill);
 
 // socials
 extern social_data *social_table;

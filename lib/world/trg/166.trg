@@ -198,7 +198,9 @@ switch %questvnum%
     %teleport% %SnowmanInRoom% %self%
     %force% %actor% follow snowman
     set PlayerOnAbominableQuest %actor%
+    set PlayerOnAbominableQuest_id %actor.id%
     remote PlayerOnAbominableQuest %SnowmanInRoomID%
+    remote PlayerOnAbominableQuest_id %SnowmanInRoomID%
   break
   case 16676
     %load% obj 16676 %actor% inv
@@ -1384,7 +1386,9 @@ done
 %teleport% %self% %self.room%
 %force% %AbominableSnowman% kill %self.pc_name%
 wait 1
-%send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+if %self.PlayerOnAbominableQuest% && %self.PlayerOnAbominableQuest.id% == %self.PlayerOnAbominableQuest_id%
+  %send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+end
 ~
 #16631
 snowman target will not escape~
@@ -1401,7 +1405,9 @@ abominable kills regular snowman~
 0 z 100
 ~
 if %actor.vnum% == 16600
-  %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  if %actor.PlayerOnAbominableQuest% && %actor.PlayerOnAbominableQuest.id% == %actor.PlayerOnAbominableQuest_id%
+    %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  end
   wait 1
   %echo% ~%self% runs off!
   %purge% %self%
@@ -2125,7 +2131,7 @@ if !%lighter% && !%actor.has_tech(Light-Fire)%
   halt
 end
 * chance to fail
-if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDE)% && !%self.aff_flagged(IMMOBILIZED)% && %self.position% == Standing
+if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDDEN)% && !%self.aff_flagged(IMMOBILIZED)% && %self.position% == Standing
   %send% %actor% You try to light the little straw goat on fire but it darts away!
   %echoaround% %actor% ~%actor% tries to light the little straw goat on fire but it darts away!
   * replace with fresh copy
@@ -2155,7 +2161,7 @@ if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 * check witnesses
-if !%ch.aff_flagged(HIDE)% && %ch.skill(Stealth)% < 100
+if !%ch.aff_flagged(HIDDEN)% && %ch.skill(Stealth)% < 100
   set witnesses 0
   set ch %actor.room.people%
   while %ch% && %witnesses% < 2
@@ -2452,7 +2458,7 @@ if %move% == 1
   end
   set id %targ.id%
   * random obj
-  set object_1 a gaudy neck ties
+  set object_1 a gaudy neck tie
   set object_2 a hideous Christmas sweater
   set object_3 fluffy woolen socks
   set object_4 a pet rock
@@ -2640,6 +2646,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Upgrade Glitter: upgrade Winter Wonderland items~
 1 c 2
 upgrade~
+set max_level 400
 if !%arg%
   * Pass through to upgrade command
   return 0
@@ -2665,22 +2672,26 @@ end
 %send% %actor% You sprinkle @%self% onto @%target%...
 %echoaround% %actor% ~%actor% sprinkles @%self% onto @%target%...
 %echo% @%target% begins to shimmer and glow!
+* determine level
+set level %actor.highest_level%
+if %level% > %max_level%
+  * cap for this
+  set level %max_level%
+end
+* apply it
 if %target.vnum% == 16653
   * sweater version: replace item
   %load% obj 16654 %actor% inv
   set sweat %actor.inventory%
-  if %sweat% && %sweat.vnum% == %16654
+  if %sweat% && %sweat.vnum% == 16654
+    %scale% %sweat% %level%
     nop %sweat.bind(%target%)%
   end
   %purge% %target%
 else
   * non-sweater: just make superior
   nop %target.flag(SUPERIOR)%
-  if %target.level% > 0
-    %scale% %target% %target.level%
-  else
-    %scale% %target% 1
-  end
+  %scale% %target% %level%
 end
 %purge% %self%
 ~
@@ -3502,7 +3513,8 @@ while %cycles_left% >= 0
   end
   switch %cycles_left%
     case 3
-      %echo% You invoke the demon and start to look for a good hiding place to observe from.
+      %send% %actor% You invoke the demon and start to look for a good hiding place to observe from.
+      %echoaround% %actor% ~%actor% invokes the demon and you start to look for a good hiding place to observe from.
     break
     case 2
       %echo% A thump, a bump, and a clunk can be heard.

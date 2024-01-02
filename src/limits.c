@@ -2,7 +2,7 @@
 *   File: limits.c                                        EmpireMUD 2.0b5 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -286,11 +286,11 @@ void check_should_dismount(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		ok = FALSE;
 	}
-	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
+	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
-	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
-		// has a waterwalk mount, in deep water, but is missing the riding upgrade
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		// has a waterwalking mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}
 	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
@@ -305,6 +305,8 @@ void check_should_dismount(char_data *ch) {
 
 /**
 * Interaction func for "decays-to" and "consumes-to".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
 	obj_data *new_obj;
@@ -442,10 +444,6 @@ bool point_update_player(char_data *ch) {
 		gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
 	}
 	
-	if (GET_MOUNT_LIST(ch)) {
-		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
-	}
-	
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
 	
 	// death count decrease after 3 minutes without a death
@@ -545,7 +543,7 @@ void real_update_player(char_data *ch) {
 		extract_char(GET_COMPANION(ch));
 	}
 	// earthmeld damage
-	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
+	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
@@ -649,7 +647,7 @@ void real_update_player(char_data *ch) {
 		if (GET_POS(ch) == POS_DEAD) {
 			msg_to_char(ch, "You die from your wounds!\r\n");
 			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}
@@ -679,7 +677,7 @@ void real_update_player(char_data *ch) {
 		if (GET_MOVE(ch) <= 0) {
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
 			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}
@@ -721,7 +719,7 @@ void real_update_player(char_data *ch) {
 		return;
 	}
 	else if (IS_BLOOD_STARVED(ch)) {
-		cancel_blood_upkeeps(ch);
+		cancel_blood_upkeeps(ch, TRUE);
 		starving_vampire_aggro(ch);
 	}
 
@@ -1633,7 +1631,7 @@ EVENTFUNC(obj_hour_event) {
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
 					if (ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM);
+						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 					}
 					start_vehicle_burning(veh);
 					
@@ -2021,7 +2019,7 @@ void point_update_vehicle(vehicle_data *veh) {
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		if (!besiege_vehicle(NULL, veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING, NULL)) {
 			// extracted
@@ -2287,7 +2285,7 @@ int health_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_HEALTH(ch) + GET_HEALTH_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
@@ -2313,8 +2311,6 @@ int health_gain(char_data *ch, bool info_only) {
 int mana_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
 	
-	double solar_power_levels[] = { 2, 2.5, 2.5 };
-	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
 	}
@@ -2327,21 +2323,11 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
 		
-		if (has_ability(ch, ABIL_SOLAR_POWER)) {
-			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
-				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
-			
-				if (!info_only) {
-					gain_ability_exp(ch, ABIL_SOLAR_POWER, 1);
-				}
-			}
-		}
-		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MANA(ch) + GET_MANA_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
@@ -2388,7 +2374,7 @@ int move_gain(char_data *ch, bool info_only) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MOVE(ch) + GET_MOVE_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);

@@ -124,6 +124,13 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
 #
+AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
+
+An area-of-effect ability is one that hits multiple targets in the room. In
+general, these abilities only target NPCs.
+
+Examples: OUTRAGE
+#
 ATTRIBUTES STATS
 
 Current stat implementations are as follows:
@@ -1123,7 +1130,7 @@ The mana pool is the amount of magical energy you can channel before you must
 stop to recover some. All players begin with 50 mana points. Some abilities and
 gear give you a larger mana pool, and you can enchant gear to get even more.
 
-See also: ARCANE POWER, GIFT OF NATURE, SOLAR POWER
+See also: ARCANE POWER, GIFT OF NATURE, BY THE SUN AND STARS
 #
 MAP-MEMORY "MAP MEMORY"
 
@@ -1428,7 +1435,7 @@ You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
 #
-REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION"
+REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION" MANA-REGEN MOVE-REGEN
 
 'Regens' refer to the rate at which a character regenerates health, moves, or
 mana. For example, your 'mana regen' is the amount of mana you gain every 5
@@ -1654,6 +1661,20 @@ head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
 #
+SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
+
+On EmpireMUD, combat is speed-based, not round-based or turn-based. Each
+weapon or other attack has an associated speed, which determines how long or
+short your character waits between attacks.
+
+Your current speed is shown on your score display. A lower speed is better,
+since it is the time between attacks.
+
+Things that boost your speed, such as Wits and Hasten, increase your damage
+proportionally.
+
+See also: SCORE, WITS, HASTEN, SLOW
+#
 STRENGTH STR
 
 Strength (physical attribute)
@@ -1838,12 +1859,12 @@ people.
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
-WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER"
+WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER" WATERWALKING
 
-The WATERWALK effect allows you to walk normally on water. You will not drown
-or lose movement points from swimming.
+The WATERWALKING effect allows you to walk normally on water. You will not
+drown or lose movement points from swimming.
 
-Normal land mounts do not benefit from WATERWALK on the player -- you still
+Normal land mounts do not benefit from WATERWALKING on the player -- you still
 need the correct mount ability to cross water while mounted.
 
 On mobs, this is different from the AQUATIC mob flag, which allows the mob to

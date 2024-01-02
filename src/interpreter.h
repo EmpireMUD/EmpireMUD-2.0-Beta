@@ -2,7 +2,7 @@
 *   File: interpreter.h                                   EmpireMUD 2.0b5 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -229,7 +229,7 @@ struct alias_data {
 #define SCMD_FASTMORPH  1
 
 // do_no_cmd
-#define NOCMD_CAST  1
+#define NOCMD_CAST  1	// cast is actually a real command again as of b5.166
 #define NOCMD_GOSSIP  2
 #define NOCMD_LEVELS  3
 #define NOCMD_PRACTICE  4
@@ -247,13 +247,10 @@ struct alias_data {
 #define SCMD_REBOOT			0
 #define SCMD_SHUTDOWN		1
 
-// do_reforge
-#define SCMD_REFORGE  0
-#define SCMD_REFASHION  1
-
-// do_ritual
-#define SCMD_RITUAL  0
-#define SCMD_CHANT  1
+// do_cast
+#define SCMD_CAST	0
+#define SCMD_RITUAL	1
+#define SCMD_CHANT	2
 
 // do_library
 #define SCMD_LIBRARY  0

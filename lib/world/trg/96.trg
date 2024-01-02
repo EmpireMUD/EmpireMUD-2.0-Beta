@@ -488,4 +488,11 @@ if %self.carried_by% && %self.carried_by.position% != Sleeping
 end
 %purge% %self%
 ~
+#9681
+Vehicle: Set load time on-load~
+5 n 100
+~
+set load_time %timestamp%
+remote load_time %self.id%
+~
 $

@@ -2,7 +2,7 @@
 *   File: workforce.c                                     EmpireMUD 2.0b5 *
 *  Usage: functions related to npc chores and workforce                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -95,26 +95,26 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "weaving", WEAVER, FALSE, NOTHING },
 	{ "production", PRODUCTION_ASSISTANT, FALSE, NOTHING },
 	{ "crafting", CRAFTING_APPRENTICE, FALSE, NOTHING },
-		{ "unused", BRICKMAKER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "abandon-dismantled", NOTHING, FALSE, NOTHING },
-		{ "unused", GARDENER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "fire-brigade", FIRE_BRIGADE, FALSE, NOTHING },
-		{ "unused", TRAPPER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "tanning", TANNER, FALSE, NOTHING },
 	{ "shearing", SHEARER, FALSE, NOTHING },
 	{ "minting", COIN_MAKER, FALSE, TECH_SKILLED_LABOR },
 	{ "dismantle-mines", MINE_SUPERVISOR, FALSE, NOTHING },
 	{ "abandon-chopped", NOTHING, FALSE, NOTHING },
 	{ "abandon-farmed", NOTHING, FALSE, NOTHING },
-		{ "unused", APPRENTICE_EXARCH, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "milling", MILL_WORKER, FALSE, NOTHING },
-		{ "unused", VEHICLE_REPAIRMAN, TRUE, NOTHING },	// note: formerly repair-vehicles, which merged with maintenance
+		{ "unused", NOTHING, TRUE, NOTHING },	// note: formerly repair-vehicles, which merged with maintenance
 	{ "oilmaking", PRESS_WORKER, FALSE, NOTHING },
 	{ "general", NOTHING, TRUE, NOTHING },
 	{ "fishing", FISHERMAN, FALSE, NOTHING },
 	{ "burn-stumps", STUMP_BURNER, FALSE, NOTHING },
 	{ "prospecting", PROSPECTOR, FALSE, TECH_WORKFORCE_PROSPECTING },
-		{ "unused", GLASSMAKER, TRUE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 };
 
 
@@ -1290,10 +1290,12 @@ bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh
 	// check all lists
 	for (iter = 0; iter < list_size; ++iter) {
 		LL_FOREACH(list[iter], interact) {
-			depletion_type = determine_depletion_type(interact);
-			if (GET_CHORE_DEPLETION(room, veh, depletion_type) < (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
-				// only needed 1
-				return TRUE;
+			if (interact->type == interaction_type) {
+				depletion_type = determine_depletion_type(interact);
+				if (GET_CHORE_DEPLETION(room, veh, depletion_type) < (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
+					// only needed 1
+					return TRUE;
+				}
 			}
 		}
 	}
@@ -2074,6 +2076,7 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_chop_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
@@ -2165,6 +2168,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_dig_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH], amtbuf[256];
@@ -2192,7 +2196,7 @@ INTERACTION_FUNC(one_dig_chore) {
 			else {
 				sprintf(buf, "$n digs up %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
-			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 		}
 		return TRUE;
 	}
@@ -2329,7 +2333,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 	if (worker && can_do) {
 		charge_workforce(emp, CHORE_DISMANTLE_MINES, room, worker, 1, NOTHING, 0);
 		if (veh) {
-			act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			start_dismantle_vehicle(veh);
 		}
 		else {
@@ -2348,6 +2352,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_einv_interaction_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
@@ -2451,6 +2456,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_farming_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	obj_data *proto = obj_proto(interaction->vnum);
@@ -2614,6 +2620,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_fishing_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
@@ -2713,6 +2720,7 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_mining_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	struct global_data *mine;
@@ -2903,6 +2911,7 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(one_production_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH], amtbuf[256];
@@ -2938,7 +2947,7 @@ INTERACTION_FUNC(one_production_chore) {
 			else {
 				sprintf(buf, "$n produces %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
 			}
-			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 		}
 		return TRUE;
 	}
@@ -3229,17 +3238,17 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		if (!VEH_NEEDS_RESOURCES(veh)) {
 			if (chore == CHORE_MAINTENANCE) {
 				add_workforce_production_log(emp, WPLOG_MAINTENANCE, 0, 1);
-				act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+				act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			}
 			else {
 				add_workforce_production_log(emp, WPLOG_VEHICLE_DONE, VEH_VNUM(veh), 1);
-				act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+				act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			}
 			complete_vehicle(veh);
 		}
 		else {
 			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
-			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 			request_vehicle_save_in_world(veh);
 		}
 	}
@@ -3323,7 +3332,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 			}
 		}
 		else {	// still working on it
-			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
+			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 		}
 	}
 	else if (can_do) {

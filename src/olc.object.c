@@ -2,7 +2,7 @@
 *   File: olc.object.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -55,6 +55,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
 	obj_data *obj_iter, *next_obj;
 	bool problem = FALSE, found;
+	attack_message_data *amd = NULL;
 	
 	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), default_obj_keywords)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
@@ -223,8 +224,12 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED) {
+			if (GET_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_WEAPON_TYPE(obj)))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type %d is not valid (it is missing WEAPON)", GET_WEAPON_TYPE(obj));
 				problem = TRUE;
 			}
 			if (GET_WEAPON_DAMAGE_BONUS(obj) == 0) {
@@ -255,6 +260,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
+			if (GET_MISSILE_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(obj)))) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type %d is not valid (it is missing WEAPON)", GET_MISSILE_WEAPON_TYPE(obj));
+				problem = TRUE;
+			}
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Damage amount not set");
 				problem = TRUE;
@@ -404,29 +417,6 @@ obj_data *create_obj_table_entry(obj_vnum vnum) {
 
 
 /**
-* @return char** A "\n"-terminated list of weapon types.
-*/
-char **get_weapon_types_string(void) {
-	static char **wtypes = NULL;
-	int iter;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!wtypes) {
-		CREATE(wtypes, char*, NUM_ATTACK_TYPES+1);
-		
-		for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-			wtypes[iter] = str_dup(attack_hit_info[iter].name);
-		}
-		
-		// must terminate
-		wtypes[NUM_ATTACK_TYPES] = str_dup("\n");
-	}
-	
-	return wtypes;
-}
-
-
-/**
 * For the .list command.
 *
 * @param obj_data *obj The thing to list.
@@ -464,7 +454,6 @@ char *list_one_object(obj_data *obj, bool detail) {
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct empire_trade_data *trade, *next_trade;
-	struct ability_data_list *adl, *next_adl;
 	struct trading_post_data *tpd, *next_tpd;
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
@@ -638,13 +627,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-				LL_DELETE(ABIL_DATA(abil), adl);
-				free(adl);
-				found = TRUE;
-			}
-		}
+		found |= delete_from_ability_data_list(abil, ADL_READY_WEAPON, vnum);
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_OBJ, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related object", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -896,16 +880,11 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
-					free(adl);
-					found = TRUE;
-				}
-			}
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_READY_WEAPON, vnum);
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_OBJ, vnum);
 		
 			if (found) {
-				msg_to_desc(desc, "An object listed in the data for the ability you're editing has been removed.\r\n");
+				msg_to_desc(desc, "An object listed in the data or interactions for the ability you're editing has been removed.\r\n");
 			}
 		}
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -1118,10 +1097,11 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
+	int vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
+	attack_message_data *only_weapontype = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1171,7 +1151,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
 		FULLSEARCH_BOOL("unstorable", not_storable)
-		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("weapontype", only_weapontype, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
@@ -1266,7 +1246,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
 			continue;
 		}
-		if (only_weapontype != NOTHING && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != only_weapontype)) {
+		if (only_weapontype && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != ATTACK_VNUM(only_weapontype))) {
 			continue;
 		}
 		if (*extra_search && !find_exdesc(extra_search, GET_OBJ_EX_DESCS(obj), NULL)) {
@@ -1346,7 +1326,6 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	morph_data *morph, *next_morph;
 	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
-	struct ability_data_list *adl;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -1375,12 +1354,20 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		any = FALSE;
+		if (find_ability_data_entry_for(abil, ADL_READY_WEAPON, vnum)) {
+			any = TRUE;
+		}
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
 				break;
 			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -2166,7 +2153,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), GET_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj));
 			}
@@ -2202,7 +2189,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), GET_MISSILE_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj));
 			}
@@ -2426,7 +2413,7 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
 	count = 0;
 	for (ocm = GET_OBJ_CUSTOM_MSGS(obj); ocm; ocm = ocm->next) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
@@ -2901,7 +2888,7 @@ OLC_MODULE(oedit_currency) {
 
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types);
+	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types, obj_custom_type_help);
 }
 
 
@@ -3533,7 +3520,6 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_WEAPON: {
 				// do not set a default, or it shows as 'changed' in the editor/auditor even if it was missed
-				// set_obj_val(obj, VAL_WEAPON_TYPE, TYPE_SLASH);
 				break;
 			}
 			case ITEM_POTION: {
@@ -3633,6 +3619,7 @@ OLC_MODULE(oedit_wealth) {
 
 OLC_MODULE(oedit_weapontype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	attack_message_data *amd;
 	int pos = 0;
 	
 	switch (GET_OBJ_TYPE(obj)) {
@@ -3650,7 +3637,20 @@ OLC_MODULE(oedit_weapontype) {
 		}
 	}
 	
-	set_obj_val(obj, pos, olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos)));
+	if (!*argument) {
+		msg_to_char(ch, "Set the weapon type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+		msg_to_char(ch, "That attack type is not available on weapons.\r\n");
+	}
+	else {
+		set_obj_val(obj, pos, ATTACK_VNUM(amd));
+		msg_to_char(ch, "Weapon type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
+
 }
 
 

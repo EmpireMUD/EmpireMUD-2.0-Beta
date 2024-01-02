@@ -2,7 +2,7 @@
 *   File: books.c                                         EmpireMUD 2.0b5 *
 *  Usage: data and functions for libraries and books                      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -762,11 +762,11 @@ void process_reading(char_data *ch) {
 	
 	if (!found) {
 		msg_to_char(ch, "You seem to have lost your book.\r\n");
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else if (!(book = book_proto(GET_ACTION_VNUM(ch, 0)))) {
 		msg_to_char(ch, "The book is too badly damaged to read.\r\n");
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else {
 		GET_ACTION_TIMER(ch) += 1;
@@ -791,7 +791,7 @@ void process_reading(char_data *ch) {
 			if (!found_obj || finish_otrigger(found_obj, ch)) {
 				msg_to_char(ch, "You close the book.\r\n");
 			}
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 		}
 	}
 }

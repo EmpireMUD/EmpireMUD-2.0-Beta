@@ -3,7 +3,7 @@
 *  Usage: handler.c-like functionality for DG Scripts                     *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -545,6 +545,7 @@ void add_to_lookup_table(int uid, void *ptr, int type) {
 		find->type = type;
 		HASH_ADD_INT(master_uid_lookup_table, uid, find);
 		
+		// TYPE_x: script lookup tables
 		switch (type) {
 			case TYPE_MOB: {
 				find->data.ch = ptr;

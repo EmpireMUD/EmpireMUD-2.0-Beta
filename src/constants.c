@@ -2,7 +2,7 @@
 *   File: constants.c                                     EmpireMUD 2.0b5 *
 *  Usage: Numeric and string contants used by the MUD                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -26,6 +26,7 @@
 *   Ability Constants
 *   Adventure Constants
 *   Archetype Constants
+*   Attack Message Constants
 *   Augment Constants
 *   Class Constants
 *   Player Constants
@@ -62,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.165";
+const char *version = "EmpireMUD 2.0 beta 5.166";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -112,6 +113,38 @@ const char *reboot_type[] = { "reboot", "shutdown" };
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY CONSTANTS ///////////////////////////////////////////////////////
 
+// ABIL_ACTION_x: ability actions
+const char *ability_actions[] = {
+	"detect hide",	// 0
+	"detect earthmeld",
+	"detect players around",
+	"detect adventures around",
+	"devastate area",
+	"magic growth",	// 5
+	"close portal",
+	"apply poison",
+	"remove physical DoTs",
+	"remove magical DoTs",
+	"remove fire DoTs",	// 10
+	"remove poison DoTs",
+	"remove all DoTs",
+	"remove debuffs",
+	"remove drunk",
+	"taunt",	// 15
+	"rescue one",
+	"rescue all",
+	"hide",
+	"put to sleep",
+	"disenchant obj",	// 20
+	"purify",
+	"close to melee",
+	"set fighting target",
+	"push back to ranged combat",
+	"look at room",		// 25
+	"\n"
+};
+
+
 // ABILF_x (1/2): ability flags
 const char *ability_flags[] = {
 	"VIOLENT",	// 0
@@ -129,7 +162,24 @@ const char *ability_flags[] = {
 	"RANGED-ONLY",
 	"IGNORE-SUN",
 	"UNSCALED-BUFF",
-	"LIMIT-CROWD-CONTROL",
+	"LIMIT-CROWD-CONTROL",	// 15
+	"NOT-IN-COMBAT",
+	"ONE-AT-A-TIME",
+	"OVER-TIME",
+	"SPOKEN",
+	"REPEAT-OVER-TIME",	// 20
+	"CUMULATIVE-BUFF",
+	"CUMULATIVE-DURATION",
+	"WEAPON-HIT",
+	"DIFFICULT-ANYWAY",
+	"NOT-IN-DARK",	// 25
+	"UNSCALED-PENALTY",
+	"STOP-ON-MISS",
+	"REDUCED-ON-EXTRA-TARGETS",
+	"USE-SKILL-BELOW-MAX",
+	"UNREMOVABLE-BUFF",	// 30
+	"BUFF-SELF-NOT-TARGET",
+	"STAY-HIDDEN",
 	"\n"
 };
 
@@ -151,7 +201,24 @@ const char *ability_flag_notes[] = {
 	"can only be used at range",
 	"unaffected by sun",
 	"",	// UNSCALED-BUFF
-	"limited crowd control",
+	"limited crowd control",	// 15
+	"",	// NOT-IN-COMBAT
+	"",	// ONE-AT-A-TIME
+	"long action",
+	"spoken aloud",
+	"auto-repeating",	// 20
+	"cumulative",
+	"extendable",
+	"hits with weapon",
+	"",	// ABILF_DIFFICULT_ANYWAY
+	"",	// 25 - ABILF_NOT_IN_DARK
+	"",	// ABILF_UNSCALED_PENALTY
+	"",	// ABILF_STOP_ON_MISS
+	"reduced on extra targets",
+	"uses skill level if below max",
+	"unremovable",
+	"buffs self not target",
+	"won't cancel hide",
 	"\n"
 };
 
@@ -168,21 +235,24 @@ const char *ability_type_flags[] = {
 	"COMPANION",
 	"SUMMON-ANY",
 	"SUMMON-RANDOM",
-	"MORPH",
+	"MORPH",	// 10
 	"AUGMENT",
 	"CUSTOM",
-/*
-	"UNAFFECTS",
-	"POINTS",
-	"ALTER-OBJS",
-	"GROUPS",
-	"MASSES",
-	"AREAS",
-	"CREATIONS",
-	"MANUAL",
-	"ROOMS",
-	"CRAFT",
-*/
+	"CONJURE-OBJECT",
+	"CONJURE-LIQUID",
+	"CONJURE-VEHICLE",	// 15
+	"ROOM-AFFECT",
+	"PAINT-BUILDING",
+	"ACTION",
+	"BUILDING-DAMAGE",
+	"TELEPORT",		// 20
+	"RESURRECT",
+	"RESOURCE",
+	"ATTACK",
+	"RESTORE",
+	"MASTERY",	// 25
+	"LINK",
+	"MOVE",
 	"\n"
 };
 
@@ -192,28 +262,31 @@ const char *ability_type_notes[] = {
 	"crafting",	// 0
 	"buff",
 	"damage",
-	"damage-over-time",
+	"DoT",
 	"player tech",
 	"passive buff",	// 5
 	"ready weapon",
 	"companion",
 	"summon",
 	"summon",
-	"morphing",
+	"morphing",	// 10
 	"augment",
 	"custom",
-/*
-	"UNAFFECTS",
-	"POINTS",
-	"ALTER-OBJS",
-	"GROUPS",
-	"MASSES",
-	"AREAS",
-	"CREATIONS",
-	"MANUAL",
-	"ROOMS",
-	"CRAFT",
-*/
+	"conjure",	// actually conjure object
+	"conjure liquid",
+	"conjure",	// 15, actually conjure vehicle (shown to players as conjure as it can conjure furniture and buildings too)
+	"room affect",
+	"paint",
+	"action",
+	"building damage",
+	"teleportation",	// 20
+	"resurrection",
+	"resource gathering",
+	"attack",
+	"restoration",
+	"mastery",	// 25
+	"links abilities",
+	"movement",
 	"\n"
 };
 
@@ -234,20 +307,38 @@ const char *ability_target_flags[] = {
 	"OBJ-EQUIP",
 	"VEH-ROOM",
 	"VEH-WORLD",
+	"ROOM-HERE",
+	"ROOM-ADJACENT",	// 15
+	"ROOM-EXIT",
+	"ROOM-HOME",
+	"ROOM-RANDOM",
+	"ROOM-CITY",
+	"ROOM-COORDS",	// 20
+	"ROOM-NOT-HERE",
+	"STRING",
+	"ALLIES-MULTI",
+	"GROUP-MULTI",
+	"ANY-MULTI",	// 25
+	"ENEMIES-MULTI",
+	"MULTI-CAN-SEE",
+	"NOT-ALLY",
+	"NOT-ENEMY",
+	"DEAD-OK",	// 30
+	"ROOM-RANDOM-CAN-USE",
 	"\n"
 };
 
 
-// ABIL_CUSTOM_x
+// ABIL_CUSTOM_x (1/2): custom types for abilities
 const char *ability_custom_types[] = {
 	"self-to-char",	// 0
 	"self-to-room",
 	"targ-to-char",
 	"targ-to-vict",
 	"targ-to-room",
-	"counterspell-to-char",	// 5
-	"counterspell-to-vict",
-	"counterspell-to-room",
+	"counter-to-char",	// 5
+	"counter-to-vict",
+	"counter-to-room",
 	"fail-self-to-char",
 	"fail-self-to-room",
 	"fail-targ-to-char",	// 10
@@ -258,8 +349,53 @@ const char *ability_custom_types[] = {
 	"pre-targ-to-char",	// 15
 	"pre-targ-to-vict",
 	"pre-targ-to-room",
+	"per-veh-to-char",
+	"per-veh-to-room",
+	"per-item-to-char",	// 20
+	"per-item-to-room",
+	"over-time-longdesc",
+	"toggle-to-char",
+	"toggle-to-room",
+	"per-char-to-char",	// 25
+	"per-char-to-vict",
+	"per-char-to-room",
+	"spec-to-char",
+	"spec-to-vict",
+	"spec-to-room",	// 30
+	"no-argument",
+	"ot-self-to-char",
+	"ot-self-to-room",
+	"ot-targ-to-char",
+	"ot-targ-to-vict",	// 35
+	"ot-targ-to-room",
+	"immune-self-to-char",
+	"immune-targ-to-char",
+	"no-target",
 	"\n"
 };
+
+
+// ABIL_CUSTOM_x (2/2): how they're shown in olc
+const char *ability_custom_type_help =
+"Types of messages:\r\n"
+"&w Ability that targets yourself or no one: self-to-char self-to-room&0\r\n"
+" Targets a character: targ-to-char targ-to-vict targ-to-room\r\n"
+"&w Shown before activation, targeting self: pre-self-to-char pre-self-to-room&0\r\n"
+" Shown before activation, targeting character: pre-targ-to-char pre-targ-to-vict pre-targ-to-room\r\n"
+"&w Fails when targeting self or no one: fail-self-to-char fail-self-to-room&0\r\n"
+" Fails targeting a character: fail-targ-to-char fail-targ-to-vict fail-targ-to-room\r\n"
+"&w Is counterspelled: counter-to-char counter-to-vict counter-to-room&0\r\n"
+" For each vehicle on some types: per-veh-to-char per-veh-to-room\r\n"
+"&w For each item on some types: per-item-to-char per-item-to-room&0\r\n"
+" For each target/creature for some abilities: per-char-to-char per-char-to-vict per-char-to-room\r\n"
+"&w Special messaging for some abilities: spec-to-char spec-to-vict spec-to-room&0\r\n"
+" When turning off a 'toggle' ability: toggle-to-char toggle-to-room\r\n"
+"&w Long description when performing an over-tiem ability: over-time-longdesc&0\r\n"
+" Over time messages with no target: ot-self-to-char ot-self-to-room\r\n"
+"&w Over time messsages with target: ot-targ-to-char ot-targ-to-vict ot-targ-to-room&0\r\n"
+" Message shown to the user when the target is immune: immune-self-to-char, immune-targ-to-char\r\n"
+"&w Other messages: no-argument, no-target&0\r\n";
+
 
 
 // ADL_x: for adding to ability_data_list
@@ -268,6 +404,12 @@ const char *ability_data_types[] = {
 	"EFFECT",
 	"READY-WEAPON",
 	"SUMMON-MOB",
+	"LIMITATION",
+	"PAINT-COLOR",	// 5
+	"ACTION",
+	"RANGE",
+	"PARENT",
+	"SUPERCEDED-BY",
 	"\n"
 };
 
@@ -275,6 +417,7 @@ const char *ability_data_types[] = {
 // ABIL_EFFECT_x: things that happen when an ability is used
 const char *ability_effects[] = {
 	"dismount",	// 0
+	"distrust from hostile",
 	"\n"
 };
 
@@ -297,6 +440,166 @@ const char *ability_gain_hooks[] = {
 	"ONLY-USING-READY-WEAPON",
 	"ONLY-USING-COMPANIONS",
 	"NOT-WHILE-ASLEEP",	// 15
+	"DYING",
+	"DO-HEAL",
+	"ONLY-INDOORS",
+	"ONLY-OUTDOORS",
+	"\n"
+};
+
+
+// AHOOK_x: Ability hooks (things that cause an ability to run itself)
+const char *ability_hook_types[] = {
+	"Ability",	// 0
+	"Attack",
+	"Attack-Type",
+	"Damage-Type",
+	"Kill",
+	"Melee-Attack",	// 5
+	"Ranged-Attack",
+	"Weapon-Type",
+	"Dying",
+	"Respawn",
+	"Resurrect",	// 10
+	"Damage-Any",
+	"Attack-Mage",
+	"Attack-Vampire",
+	"\n"
+};
+
+
+// ABIL_MOVE_x: Move ability types
+const char *ability_move_types[] = {
+	"normal",	// 0
+	"earthmeld",
+	"\n"
+};
+
+
+// ABIL_LIMIT_x (1/2): Limitations when trying to use an ability
+const char *ability_limitations[] = {
+	"on a barrier tile", 	// 0
+	"own the tile",
+	"can use as guest",
+	"can use as ally",
+	"can use as member",
+	"on a road",		// 5
+	"paintable building",
+	"in a city",
+	"have an empire",
+	"indoors",
+	"outdoors",		// 10
+	"on the map",
+	"terraform approval",
+	"valid siege target",
+	"not distracted",
+	"not immobilized",	// 15
+	"can teleport here",
+	"within range",
+	"not god target",
+	"guest permission at target",
+	"ally permission at target",	// 20
+	"member permission at target",
+	"can teleport target",
+	"target not foreign empire npc",
+	"not here",
+	"check city found time",	// 25
+	"item type",
+	"wield any weapon",
+	"wield attack type",
+	"wield weapon type",
+	"not being attacked",	// 30
+	"disarmable target",
+	"target has mana",
+	"using any poison",
+	"target has DoT type",
+	"target has any DoT",	// 35
+	"target being attacked",
+	"in role",
+	"no witnesses",
+	"no witnesses hide",
+	"check obj binding",	// 40
+	"obj flagged",
+	"obj not flagged",
+	"target is vampire",
+	"can purify target",
+	"in combat",	// 45
+	"not being attacked melee",
+	"not being attacked mobile melee",
+	"not affected by",
+	"target not affeced by",
+	"not leading mob",	// 50
+	"not leading vehicle",
+	"is affected by",
+	"target is affected by",
+	"\n"
+};
+
+
+// ABIL_LIMIT_x (2/2): Type needed for "misc" data
+const int ability_limitation_misc[] = {
+	ABLIM_NOTHING,	// ABIL_LIMIT_ON_BARRIER
+	ABLIM_NOTHING,	// ABIL_LIMIT_OWN_TILE
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_USE_GUEST
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_USE_ALLY
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_USE_MEMBER
+	ABLIM_NOTHING,	// ABIL_LIMIT_ON_ROAD
+	ABLIM_NOTHING,	// ABIL_LIMIT_PAINTABLE_BUILDING
+	ABLIM_NOTHING,	// ABIL_LIMIT_IN_CITY
+	ABLIM_NOTHING,	// ABIL_LIMIT_HAVE_EMPIRE
+	ABLIM_NOTHING,	// ABIL_LIMIT_INDOORS
+	ABLIM_NOTHING,	// ABIL_LIMIT_OUTDOORS
+	ABLIM_NOTHING,	// ABIL_LIMIT_ON_MAP
+	ABLIM_NOTHING,	// ABIL_LIMIT_TERRAFORM_APPROVAL
+	ABLIM_NOTHING,	// ABIL_LIMIT_VALID_SIEGE_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_DISTRACTED
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_IMMOBILIZED
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_TELEPORT_HERE
+	ABLIM_NOTHING,	// ABIL_LIMIT_WITHIN_RANGE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_GOD_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_GUEST_PERMISSION_AT_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_ALLY_PERMISSION_AT_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_MEMBER_PERMISSION_AT_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_TELEPORT_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_NOT_FOREIGN_EMPIRE_NPC
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_HERE
+	ABLIM_NOTHING,	// ABIL_LIMIT_CHECK_CITY_FOUND_TIME
+	ABLIM_ITEM_TYPE,	// ABIL_LIMIT_ITEM_TYPE
+	ABLIM_NOTHING,	// ABIL_LIMIT_WIELD_ANY_WEAPON
+	ABLIM_ATTACK_TYPE,	// ABIL_LIMIT_WIELD_ATTACK_TYPE
+	ABLIM_WEAPON_TYPE,	// ABIL_LIMIT_WIELD_WEAPON_TYPE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED
+	ABLIM_NOTHING,	// ABIL_LIMIT_DISARMABLE_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_MANA
+	ABLIM_NOTHING,	// ABIL_LIMIT_USING_ANY_POISON
+	ABLIM_DAMAGE_TYPE,	// ABIL_LIMIT_TARGET_HAS_DOT_TYPE
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_HAS_ANY_DOT
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_BEING_ATTACKED
+	ABLIM_ROLE,	// ABIL_LIMIT_IN_ROLE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NO_WITNESSES
+	ABLIM_NOTHING,	// ABIL_LIMIT_NO_WITNESSES_HIDE
+	ABLIM_NOTHING,	// ABIL_LIMIT_CHECK_OBJ_BINDING
+	ABLIM_OBJ_FLAG,	// ABIL_LIMIT_OBJ_FLAGGED
+	ABLIM_OBJ_FLAG,	// ABIL_LIMIT_OBJ_NOT_FLAGGED
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_IS_VAMPIRE
+	ABLIM_NOTHING,	// ABIL_LIMIT_CAN_PURIFY_TARGET
+	ABLIM_NOTHING,	// ABIL_LIMIT_IN_COMBAT
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MELEE
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_BEING_ATTACKED_MOBILE_MELEE
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_NOT_AFFECTED_BY
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_NOT_AFFECTED_BY
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_LEADING_MOB
+	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_LEADING_VEHICLE
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_IS_AFFECTED_BY
+	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_IS_AFFECTED_BY
+};
+
+
+// used to filter words out of conjure/summon names, e.g. "Conjure Food" lists as "Food" in do_conjure.
+const char *conjure_words[] = {
+	"conjure",
+	"create",
+	"summon",
 	"\n"
 };
 
@@ -455,6 +758,38 @@ const struct archetype_menu_type archetype_menu[] = {
 	},
 	
 	{ NOTHING, "\n", "\n" }	// this goes last
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ATTACK MESSAGE CONSTANTS ////////////////////////////////////////////////
+
+// AMDF_x: Attack message flags
+const char *attack_message_flags[] = {
+	"WEAPON",	// 0
+	"MOBILE",
+	"DISARMABLE",
+	"APPLY-POISON",
+	"IGNORE-MISSING",
+	"\n"
+};
+
+
+// SPD_x: speeds for attacks
+const char *attack_speed_types[] = {
+	"Fast",
+	"Normal",
+	"Slow",
+	"\n"
+};
+
+
+// WEAPON_x: Weapon types
+const char *weapon_types[] = {
+	"blunt",	// 0
+	"sharp",
+	"magic",
+	"\n"
 };
 
 
@@ -735,7 +1070,7 @@ const char *mount_flags[] = {
 	"riding",
 	"aquatic",
 	"flying",
-	"waterwalk",
+	"waterwalking",
 	"\n"
 };
 
@@ -954,10 +1289,10 @@ const char *player_tech_types[] = {
 	"Fast-Wood-Processing",
 	"Fastcasting",
 	"Fast-Find",	// 15
-	"Fish",
-	"Forage",
+	"Fish-Command",
+	"Forage-Command",
 	"Harvest-Upgrade",
-	"Healing-Boost",
+	"*",
 	"Hide-Upgrade",	// 20
 	"Infiltrate",
 	"Infiltrate-Upgrade",
@@ -987,16 +1322,16 @@ const char *player_tech_types[] = {
 	"Shear-Upgrade",
 	"Steal-Upgrade",
 	"Swimming",
-	"Teleport-City",
+	"Search-Command",
 	"Two-Handed-Mastery",	// 50
 	"Where-Upgrade",
 	"Dodge-Cap",
 	"Skinning-Upgrade",
 	"Barde",
-	"Herd",	// 55
-	"Milk",
-	"Shear",
-	"Tame",
+	"Herd-Command",	// 55
+	"Milk-Command",
+	"Shear-Command",
+	"Tame-Command",
 	"Bite-Melee-Upgrade",
 	"Bite-Tank-Upgrade",	// 60
 	"Bite-Steal-Blood",
@@ -1004,16 +1339,16 @@ const char *player_tech_types[] = {
 	"Hunt-Animals",
 	"Clock",
 	"Calendar",	// 65
-	"Mint",
-	"Tan",
+	"Mint-Command",
+	"Tan-Command",
 	"No-Purify",
 	"Vampire-Sun-Immunity",
-	"Gather",	// 70
-	"Chop",
-	"Dig",
-	"Harvest",
-	"Pick",
-	"Quarry",	// 75
+	"Gather-Command",	// 70
+	"Chop-Command",
+	"Dig-Command",
+	"Harvest-Command",
+	"Pick-Command",
+	"Quarry-Command",	// 75
 	"Drink-Blood-Faster",
 	"Summon-Materials",
 	"Customize-Vehicle",
@@ -1022,6 +1357,23 @@ const char *player_tech_types[] = {
 	"Saw-Command",
 	"Scrape-Command",
 	"Map-Memory",
+	"See-In-Magic-Darkness",
+	"Track-Command",	// 85
+	"Resist-Poison",
+	"Vampire-Bite",
+	"Enemy-Buff-Details",
+	"Conceal-Equipment",
+	"Conceal-Inventory",	// 90
+	"Flee-Upgrade",
+	"Faster-Melee-Combat",
+	"Faster-Ranged-Combat",
+	"Riding-Swap-Anywhere",
+	"Riding-Release-Mount",	// 95
+	"Rework-Command",
+	"Bite-Regeneration",
+	"Steal-Command",
+	"Use-Honed-Gear",
+	"Redirect-Magical-Damage-to-Mana",	// 100
 	"\n"
 };
 
@@ -1045,6 +1397,7 @@ const char *status_message_types[] = {
 	"travel auto look",
 	"vehicle movement",	// 15
 	"weather",
+	"fight prompt",
 	"\n"
 };
 
@@ -1331,15 +1684,15 @@ const char *affected_bits[] = {
 	"MAJESTY",
 	"INFRA",
 	"SNEAK",
-	"HIDE",
+	"HIDDEN",
 	"*CHARM",
 	"INVIS",
 	"IMMUNE-PHYSICAL-DEBUFFS",
-	"SENSE-HIDE",
+	"SENSE-HIDDEN",
 	"!PHYSICAL",
 	"!TARGET",
 	"!SEE",
-	"FLY",
+	"FLYING",
 	"!ATTACK",
 	"IMMUNE-MAGICAL-DEBUFFS",
 	"DISARMED",
@@ -1349,10 +1702,10 @@ const char *affected_bits[] = {
 	"STUNNED",
 	"STONED",
 	"!BLOOD",
-	"CLAWS",
-	"DEATHSHROUD",
-	"EARTHMELD",
-	"MUMMIFY",
+	"*",	// formerly CLAWS
+	"DEATHSHROUDED",
+	"EARTHMELDED",
+	"MUMMIFIED",
 	"SOULMASK",
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
@@ -1364,13 +1717,15 @@ const char *affected_bits[] = {
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
 	"!WHERE",
-	"WATERWALK",
+	"WATERWALKING",
 	"LIGHT",
 	"POOR-REGENS",
 	"SLOWER-ACTIONS",	// 40
 	"HUNGRIER",
 	"THIRSTIER",
 	"IMMUNE-TEMPERATURE",
+	"AUTO-RESURRECT",
+	"COUNTERSPELL",		// 45
 	"\n"
 };
 
@@ -1388,7 +1743,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to physical damage.",	// !physical
 	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
-	"",	// fly
+	"",	// flying
 	"$E cannot be attacked.",	// !attack
 	"$E is immune to magical debuffs.",	// immune-magical-debuffs
 	"",	// 15 - disarmed
@@ -1398,10 +1753,10 @@ const char *affected_bits_consider[] = {
 	"",	// stunned
 	"",	// 20 - stoned
 	"",	// can't spend blood
-	"",	// claws
-	"",	// deathshroud
+	"",	// unused
+	"",	// deathshrouded
 	"",	// earthmeld
-	"",	// 25 - mummify
+	"",	// 25 - mummified
 	"$E is soulmasked.",	// soulmask
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
@@ -1413,13 +1768,15 @@ const char *affected_bits_consider[] = {
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
 	"",	// !where
-	"",	// waterwalk
+	"",	// waterwalking
 	"",	// light
 	"",	// poor-regens
 	"",	// 40 - slower-actions
 	"",	// hungrier
 	"",	// thirstier
 	"",	// immune-temperature
+	"",	// auto-resurrect
+	"",	// counterspell
 	"\n"
 };
 
@@ -1469,6 +1826,8 @@ const bool aff_is_bad[] = {
 	TRUE,
 	TRUE,
 	FALSE,
+	FALSE,
+	FALSE,	// 45 - counterspell
 };
 
 
@@ -1678,9 +2037,9 @@ const double apply_values[] = {
 	1,	// "WITS",
 	0.1,	// "AGE",
 	0.025,	// "MAX-MOVE",
-	0.5,	// RESIST-PHYSICAL
+	0.3,	// RESIST-PHYSICAL
 	0.25,	// "BLOCK",
-	3,	// "HEAL-OVER-TIME",
+	0.25,	// "HEAL-OVER-TIME",
 	0.020,	// "HEALTH",
 	0.025,	// "MAX-MANA",
 	0.15,	// "TO-HIT",
@@ -1690,7 +2049,7 @@ const double apply_values[] = {
 	1,	// BONUS-PHYSICAL
 	1,	// BONUS-MAGICAL
 	1,	// BONUS-HEALING
-	0.5,	// RESIST-MAGICAL
+	0.3,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
 	1,	// NIGHT-VISION
@@ -1864,6 +2223,7 @@ const char *craft_flags[] = {
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
 	"TAKE-REQUIRED-OBJ",
+	"DISMANTLE-WITHOUT-ABILITY",
 	"\n"
 };
 
@@ -1890,6 +2250,7 @@ const char *craft_flag_for_info[] = {
 	"must be by a river",
 	"",	// remove-production
 	"",	// take-required-obj
+	"", // CRAFT_DISMANTLE_WITHOUT_ABILITY
 	"\n"
 };
 
@@ -2366,7 +2727,7 @@ const char *action_bits[] = {
 };
 
 
-// MOB_CUSTOM_x
+// MOB_CUSTOM_x (1/2): type names
 const char *mob_custom_types[] = {
 	"echo",
 	"say",
@@ -2383,6 +2744,16 @@ const char *mob_custom_types[] = {
 	"scavenge-corpse",
 	"\n"
 };
+
+
+// MOB_CUSTOM_x (2/2): how they're shown in olc
+const char *mob_custom_type_help =
+"Types of messages:\r\n"
+"&w Echo messages: echo echo-day echo-night&0\r\n"
+" Speak text: say say-day say-night\r\n"
+"&w Varying lond descriptions: long-desc&0\r\n"
+" Shown when a scavenger mob eats a corpse: scavenge-corpse\r\n"
+"&w Available for scripts: script1 script2 script3 script4 script5&0\r\n";
 
 
 // MOB_MOVE_x: mob/vehicle move types
@@ -2945,7 +3316,7 @@ const char *tool_flags[] = {
 };
 
 
-// OBJ_CUSTOM_x
+// OBJ_CUSTOM_x (1/2): message types
 const char *obj_custom_types[] = {
 	"build-to-char",	// 0
 	"build-to-room",
@@ -2981,53 +3352,73 @@ const char *obj_custom_types[] = {
 };
 
 
-// Weapon attack texts -- TYPE_x
-struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
-	// * lower numbers are better for speeds (seconds between attacks)
-	// name, first-pers, 2nd-pers, noun, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
-	{ "RESERVED", "hit", "hits", "hit", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "slash", "slash", "slashes", "slash", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "slice", "slice", "slices", "swing", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "jab", "jab", "jabs", "jab", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "stab", "stab", "stabs", "stab", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "pound", "pound", "pounds", "swing", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "hammer", "hammer", "hammers", "hammer", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "whip", "whip", "whips", "whip", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "pick", "jab", "jabs", "pick", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "bite", "bite", "bites", "bite", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "claw", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "kick", "kick", "kicks", "kick", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "fire", "burn", "burns", "fire", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
-	{ "vampire claws", "claw", "claws", "claw", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "crush", "crush", "crushes", "blow", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "hit", "hit", "hits", "hit", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "magic fire", "blast", "blasts", "blast", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "lightning staff", "zap", "zaps", "staff", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "burn staff", "burn", "burns", "staff", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "agony staff", "agonize", "agonizes", "staff", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic frost", "chill", "chills", "frost", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic shock", "shock", "shocks", "shock", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "magic light", "flash", "flashes", "light", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
-	{ "sting", "sting", "stings", "sting", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
-	{ "swipe", "swipe", "swipes", "swipe", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "tail swipe", "swipe", "swipes", "tail swipe", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "peck", "peck", "pecks", "peck", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "gore", "gore", "gores", "gore", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "mana blast", "blast", "blasts", "blast", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
-	{ "bow", "shoot", "shoots", "shot", { 2.2, 2.6, 3.2 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "crossbow", "shoot", "shoots", "shot", { 3.7, 3.9, 4.3 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "fire breath", "breathe fire at", "breathes fire at", "fire breath", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
-	{ "sling", "shoot", "shoots", "shot", { 3.0, 3.5, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
-	{ "spear-thrower", "shoot", "shoots", "shot", { 3.5, 4.0, 4.5 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
-	{ "animal whip", "whip", "whips", "whip", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-};
+// OBJ_CUSTOM_x (2/2): how they're shown in olc
+const char *obj_custom_type_help =
+"Types of messages:\r\n"
+"&w Changes the player's long description: longdesc longdesc-female longdesc-male&0\r\n"
+" Shown when you wear it as equipment: wear-to-char wear-to-room\r\n"
+"&w Shown when you remove it from equipment: remove-to-char remove-to-room&0\r\n"
+" Shown when using it to build a building: build-to-char build-to-room\r\n"
+"&w Shown when using it to build a vehicle: craft-to-char craft-to-room&0\r\n"
+" Shown when you eat/drink/quaff/light it: consume-to-char consume-to-room\r\n"
+"&w Shown when it decays in your inventory: decays-on-char&0\r\n"
+" Shown when it decays on the ground: decays-in-room\r\n"
+"&w Shown when gained as a resource (chopped): resource-to-char resource-to-room&0\r\n"
+" Shown when using the item to fish: fish-to-char fish-to-room\r\n"
+"&w Shown when you use it to mine ore: mine-to-char mine-to-room&0\r\n"
+" Shown when you use it to chop trees: chop-to-char chop-to-room\r\n"
+"&w Shown in order when playing it: instrument-to-char instrument-to-room&0\r\n"
+" Available for scripts: script1 script2 script3 script4 script5\r\n";
 
 
 // basic speed is the theoretical average weapon speed without wits/haste,
 // and is used to apply bonus-physical/magical evenly by adjusting for speed
 const double basic_speed = 4.0;	// seconds between attacks
+
+
+// rework: if the first keyword of an item is in this list, it's safe to rename
+const char *item_rename_keywords[] = {
+	"aegis", "aklys", "amulet", "antlers", "apparatus", "armband", "armbands",
+	"armguards", "armor", "axe", "backpack", "bag", "bags", "band", "bands",
+	"bangles", "barbette", "battlegear", "baubles", "beads", "bedknob",
+	"bells", "belt", "bindings", "blouse", "bodysuit", "bone", "bonnet",
+	"book", "boots", "bow", "bracelet", "bracelets", "bracer", "bracers",
+	"braces", "breastplate", "breeches", "broom", "buckler", "bulwark",
+	"candlestick", "cannon", "cannons", "cap", "cape", "caps", "carapace",
+	"cauldron", "censer", "chain", "chains", "chaps", "charm", "chisel",
+	"choker", "chopper", "chrysanthemum", "cincture", "circlet", "claws",
+	"claymore", "cloak", "clothes", "clothing", "club", "coat", "coif", "coil",
+	"collar", "counterweight", "cowl", "crown", "cuffs", "cuirass",
+	"cumberbund", "dagger", "doublet", "dress", "earcuff", "earcuffs",
+	"earplates", "earring", "earrings", "edge", "effigy", "ensemble", "eye",
+	"eyepiece", "falchion", "fang", "fetish", "fiddle", "flail", "fleece",
+	"flute", "focus", "footwraps", "garb", "garments", "garter", "gauntlet",
+	"gauntlets", "girdle", "glaive", "gloves", "goggles", "gourd", "gown",
+	"greatbow", "greatstaff", "greaves", "grimoire", "guard", "guards",
+	"hammer", "hand", "handaxe", "handguards", "handwraps", "hat", "hatchet",
+	"hauberk", "headdress", "helm", "helmet", "hides", "hole", "hood", "hoop",
+	"horn", "hose", "idol", "jacket", "jerkin", "kilt", "knapsack", "kneecap",
+	"knife", "kris", "lantern", "leathers", "leggings", "legguards",
+	"legplates", "locket", "loincloth", "longsword", "lyre", "mace", "mantle",
+	"mask", "mattock", "maul", "moccasins", "necklace", "net", "orb", "outfit",
+	"pack", "pan", "pantaloons", "pants", "pauldrons", "pearls", "pelts",
+	"pendant", "pendulum", "pestle", "pick", "pickaxe", "pike", "pipes",
+	"plate", "plates", "pocket", "post", "pouch", "raiment", "raiments",
+	"regalia", "ring", "robe", "robes", "rucksack", "sabatons", "sack",
+	"saddle", "sandals", "sash", "satchel", "scepter", "sceptre", "scythe",
+	"shackles", "shawl", "shield", "shinguards", "shirt", "shiv", "shoe",
+	"shoes", "shoestring", "shovel", "sickle", "sigil", "skean", "skin",
+	"skirt", "skull", "skullcap", "sleeves", "slippers", "spear", "spellbook",
+	"spike", "staff", "stake", "statuette", "stick", "stiletto", "stockings",
+	"strands", "strap", "stud", "studs", "suit", "surcoat", "sweater", "sword",
+	"talisman", "talon", "tambourine", "timepiece", "toga", "tome", "torch",
+	"totem", "trappings", "trident", "trousers", "tuba", "tunic", "tusk",
+	"vambraces", "vest", "waistband", "waistcoat", "wand", "warhammer",
+	"warstaff", "watch", "weapon", "whip", "wimple", "wings", "wraps",
+	"wristband", "wristbands", "wristblade", "wristcuff", "wristguard",
+	"wristguards", "wristplate", "wristplates", "xylophone",
+	"\n"	// this must be last
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3062,6 +3453,7 @@ const char *olc_flag_bits[] = {
 	"!SHOPS",
 	"!PROGRESS",
 	"!EVENTS",
+	"!ATTACKS",
 	"\n"
 };
 
@@ -3094,6 +3486,7 @@ const char *olc_type_bits[] = {
 	"shop",
 	"progression",
 	"event",
+	"attackmessage",
 	"\n"
 };
 
@@ -3289,7 +3682,7 @@ const char *bld_flags[] = {
 	"ROAD-ICON-WIDE",
 	"ATTACH-BARRIER",	// 20
 	"NO-CUSTOMIZE",
-	"NO-AUTO-ABANDON-WHEN-RUINED",
+	"NO-ABANDON-WHEN-RUINED",
 	"*",
 	"*",
 	"*",	// 25
@@ -3467,6 +3860,13 @@ const char *crop_flags[] = {
 	"!NEWBIE",
 	"ANY-LISTED-CLIMATE",	// 5
 	"NO-GLOBAL-SPAWNS",
+	"\n"
+};
+
+
+// CROP_CUSTOM_x: custom messages
+const char *crop_custom_types[] = {
+	"magic-growth",	// 0
 	"\n"
 };
 
@@ -3864,7 +4264,7 @@ const char *road_types[] = {
 
 /* ROOM_AFF_x: */
 const char *room_aff_bits[] = {
-	"DARK",	// 0
+	"MAGIC-DARKNESS",	// 0
 	"SILENT",
 	"*HAS-INSTANCE",
 	"CHAMELEON",
@@ -3890,6 +4290,7 @@ const char *room_aff_bits[] = {
 	"HIDE-REAL-NAME",
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
+	"PERMANENT-PAINT",
 	"\n"
 };
 
@@ -3954,6 +4355,13 @@ const char *sector_flags[] = {
 	"SEPARATE-NOT-NEARS",
 	"INHERIT-BASE-CLIMATE",
 	"IRRIGATES-AREA",
+	"\n"
+};
+
+
+// SECT_CUSTOM_x: custom messages
+const char *sect_custom_types[] = {
+	"magic-growth",	// 0
 	"\n"
 };
 
@@ -4134,8 +4542,8 @@ const char *skill_check_difficulty[] = {
 // DIFF_x (2/2): modifiers to your skill level before a skill check
 double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 	100,	// trivial (always passes)
-	1.5,  // easy
-	1,  // medium
+	2.0,  // easy
+	1.0,  // medium
 	0.66,  // hard
 	0.1  // rarely
 };
@@ -4149,15 +4557,6 @@ const char *skill_flags[] = {
 	"VAMPIRE",
 	"CASTER",
 	"REMOVED-BY-PURIFY",	// 5
-	"\n"
-};
-
-
-// WEAPON_x: Weapon types
-const char *weapon_types[] = {
-	"blunt",	// 0
-	"sharp",
-	"magic",
 	"\n"
 };
 
@@ -4519,6 +4918,7 @@ const char *global_types[] = {
 	"Mine Data",
 	"Newbie Gear",
 	"Map Spawns",
+	"Obj Interactions",
 	"\n"
 };
 
@@ -4569,6 +4969,10 @@ const char *interact_types[] = {
 	"RUINS-TO-VEH",	// 30
 	"PRODUCTION",
 	"SKILLED-LABOR",
+	"LIQUID-CONJURE",
+	"OBJECT-CONJURE",
+	"VEHICLE-CONJURE",	// 35
+	"DISENCHANT",
 	"\n"
 };
 
@@ -4608,6 +5012,10 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// RUINS-TO-VEH
 	TYPE_ROOM,	// PRODUCTION
 	TYPE_ROOM,	// SKILLED-LABOR
+	TYPE_ABIL,	// LIQUID-CONJURE
+	TYPE_ABIL,	// OBJECT-CONJURE
+	TYPE_ABIL,	// VEHICLE-CONJURE
+	TYPE_OBJ,	// DISENCHANT
 };
 
 
@@ -4646,6 +5054,10 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_VEH,	// RUINS-TO-VEH
 	TYPE_OBJ,	// PRODUCTION
 	TYPE_OBJ,	// SKILLED-LABOR
+	TYPE_LIQUID,	// LIQUID-CONJURE
+	TYPE_OBJ,	// OBJECT-CONJURE
+	TYPE_VEH,	// VEHICLE-CONJURE
+	TYPE_OBJ,	// DISENCHANT
 };
 
 
@@ -4686,6 +5098,10 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
 	TRUE,	// PRODUCTION
 	TRUE,	// SKILLED_LABOR
+	FALSE,	// LIQUID_CONJURE
+	FALSE,	// OBJECT_CONJURE
+	FALSE,	// VEHICLE_CONJURE
+	FALSE,	// DISENCHANT
 };
 
 
@@ -5054,5 +5470,7 @@ const char *wait_types[] = {
 	"MOVEMENT",
 	"SPELL",	// 5
 	"OTHER",
+	"LONG",
+	"VERY-LONG",
 	"\n"
 };

@@ -689,7 +689,7 @@ end
 nop %self.set_cooldown(12657, 30)%
 wait 1 sec
 dg_affect #12670 %self% HARD-STUNNED on 5
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% launches a bolt of fire at you, but your counterspell blocks it completely.
   %echoaround% %actor% ~%self% launches a bolt of fire at ~%actor%, but it fizzles out in the air in front of *%actor%.
   halt
@@ -763,7 +763,7 @@ if %self.morph%
   %echo% %current% rapidly morphs into ~%self%!
 end
 wait 1 sec
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they meet your counterspell!
   %echoaround% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they near ~%actor%!
   halt
@@ -803,7 +803,7 @@ if !%actor%
 end
 %send% %actor% ~%self% hurls the grand fireball at you!
 %echoaround% %actor% ~%self% hurls the grand fireball at ~%actor%!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The fireball strikes your counterspell and explodes with a fiery roar!
   %echoaround% %actor% The fireball explodes in front of ~%actor% with a fiery roar!
 else
@@ -1345,7 +1345,7 @@ nop %self.set_cooldown(12657, 30)%
 dg_affect #12670 %self% HARD-STUNNED on 5
 %send% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at you!
 %echoaround% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at ~%actor%!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The water blast hits your counterspell and dissipates.
   %echoaround% %actor% The water blast dissipates in front of ~%actor%.
   halt

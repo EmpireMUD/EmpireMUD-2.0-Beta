@@ -2,7 +2,7 @@
 *   File: act.fight.c                                     EmpireMUD 2.0b5 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -250,7 +250,7 @@ ACMD(do_execute) {
 		act("You can't execute $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else {
-		perform_execute(ch, victim, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, victim, ATTACK_UNDEFINED, DAM_PHYSICAL);
 	}
 }
 
@@ -259,7 +259,7 @@ ACMD(do_flee) {
 	int i, attempt, try;
 	room_data *to_room = NULL;
 	char_data *was_fighting;
-	bool inside = ROOM_IS_CLOSED(IN_ROOM(ch));
+	bool upgrade, inside = ROOM_IS_CLOSED(IN_ROOM(ch));
 	struct room_direction_data *ex;
 
 	if (GET_POS(ch) < POS_FIGHTING) {
@@ -271,11 +271,13 @@ ACMD(do_flee) {
 		msg_to_char(ch, "You are immobilized and can't flee.\r\n");
 		return;
 	}
+	
+	upgrade = !IS_NPC(ch) && has_player_tech(ch, PTECH_FLEE_UPGRADE);
 
 	// try more times if FLEET
-	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && has_ability(ch, ABIL_FLEET)) ? 2 : 1); i++) {
+	for (i = 0; i < NUM_2D_DIRS * (upgrade ? 2 : 1); i++) {
 		// chance to fail if not FLEET
-		if ((IS_NPC(ch) || !has_ability(ch, ABIL_FLEET)) && number(0, 2) == 0) {
+		if (!upgrade && number(0, 2) == 0) {
 			continue;
 		}
 
@@ -305,9 +307,10 @@ ACMD(do_flee) {
 			if (perform_move(ch, attempt, NULL, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
 				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
-					gain_ability_exp(ch, ABIL_FLEET, 5);
+					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
+				run_ability_hooks_by_player_tech(ch, PTECH_FLEE_UPGRADE, NULL, NULL, NULL, NULL);
 			}
 			else {
 				act("$n tries to flee, but can't!", TRUE, ch, 0, 0, TO_ROOM);
@@ -496,6 +499,7 @@ ACMD(do_respawn) {
 		RESET_LAST_MESSAGED_TEMPERATURE(ch);
 		
 		msdp_update_room(ch);
+		run_ability_hooks(ch, AHOOK_RESPAWN, 0, 0, NULL, NULL, NULL, NULL, NOBITS);
 	}
 }
 

@@ -1000,7 +1000,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %verify_target% != %actor.id%
@@ -1052,13 +1052,13 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %verify_target% != %actor.id%
   halt
 end
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% shouts some kind of hex at you, but your counterspell dispels it!
   %echoaround% %actor% ~%self% shouts some kind of hex at ~%actor%, but nothing seems to happen!
 else
@@ -1083,7 +1083,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 %echo% ~%self% begins drawing mana to *%self%self...
@@ -1105,7 +1105,7 @@ if %verify_target% != %actor.id%
 end
 %send% %actor% &&r~%self% cracks the blazing whip at you, blowing you off your feet!
 %echoaround% %actor% ~%self% cracks the blazing whip at ~%actor%, blowing *%actor% off ^%actor% feet!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The fiery whip crashes through your counterspell unimpeded, breaking it!
 end
 %damage% %actor% 200 magical
@@ -1140,7 +1140,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 wait 1 sec
 if !%self.morph%
   set current %self.name%
@@ -1167,7 +1167,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set verify_target %actor.id%
 wait 1 sec
 if %self.morph%
@@ -1180,7 +1180,7 @@ if %verify_target% != %actor.id%
   halt
 end
 %echo% ~%self% makes a sweeping skyward gesture with both arms!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The dust around your feet swirls gently in a circle, then your counterspell stops it.
   %echoaround% %actor% The dust around |%actor% feet swirls gently in a circle, then stops.
 else
@@ -1216,7 +1216,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 wait 1 sec
 if %self.morph%
   set current %self.name%
@@ -1256,7 +1256,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 say Don't think of this as ruining your chances for a date. Think of it as your only chance to kiss a princess!
@@ -1267,7 +1267,7 @@ if !%actor% || %actor.id% != %id% || %actor.morph% == 10992
   %echo% ~%self% looks confused.
   halt
 end
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %echo% Nothing seems to happen.
   halt
 end
@@ -1300,7 +1300,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 if !%actor% || %actor.id% != %id% || !%self.fighting%
@@ -1309,7 +1309,7 @@ end
 %send% %actor% &&r~%self% pulls out a gnarled wooden staff and smacks you over the head with it!
 %echoaround% %actor% ~%self% pulls out a gnarled wooden staff and smacks ~%actor% over the head with it!
 %damage% %actor% 25 physical
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% Your counterspell protects you from the staff's enchantment.
   halt
 end
@@ -1330,7 +1330,7 @@ if %self.affect(3021)%
 else
   %echo% ~%self% flickers momentarily with a blue-white aura.
 end
-dg_affect #3021 %self% RESIST-MAGICAL 1 35
+dg_affect #3021 %self% COUNTERSPELL on 35
 set id %actor.id%
 wait 1 sec
 if !%actor% || %actor.id% != %id%
@@ -1348,7 +1348,7 @@ end
 %send% %actor% ~%self% pulls out a small wand and points it at you.
 %echoaround% %actor% ~%self% pulls out a small wand and points it at ~%actor%.
 say Expelliarmus!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% Your weapon twitches in your hand, then stops.
 else
   %send% %actor% Your weapon flies out of your hand!

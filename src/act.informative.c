@@ -2,7 +2,7 @@
 *   File: act.informative.c                               EmpireMUD 2.0b5 *
 *  Usage: Player-level commands of an informative nature                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -240,7 +240,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev) {
 	}
 	else if (!IS_NPC(ch)) {
 		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-			if (plsk->level >= CLASS_SKILL_CAP) {
+			if (plsk->level >= MAX_SKILL_CAP) {
 				sprintf(buffer + strlen(buffer), "%s%s", (*buffer ? (abbrev ? "/" : ", ") : ""), abbrev ? SKILL_ABBREV(plsk->ptr) : SKILL_NAME(plsk->ptr));
 			}
 		}
@@ -341,6 +341,12 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 	}
 	
 	return found;
+}
+
+
+// quick alpha sorter for the passives command
+int sort_passives(struct affected_type *a, struct affected_type *b) {
+	return strcmp(get_ability_name_by_vnum(a->type), get_ability_name_by_vnum(b->type));
 }
 
 
@@ -489,7 +495,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	// was the target a vehicle?
 	if (found_veh != NULL) {
 		look_at_vehicle(found_veh, ch);
-		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM | ACT_VEH_VICT);
 		if (look_inside && VEH_FLAGGED(found_veh, VEH_CONTAINER)) {
 			look_in_obj(ch, NULL, NULL, found_veh);
 		}
@@ -508,7 +514,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			act("$n looks at $p.", TRUE, ch, ex_obj, NULL, TO_ROOM);
 		}
 		if (ex_veh) {
-			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM);
+			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		send_to_char(exdesc, ch);
 		found = TRUE;
@@ -585,11 +591,11 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 	else if (veh) {
 		// vehicle section
 		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
-			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		else {
 			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
 		}
 	}
@@ -798,7 +804,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
 	sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(ch), 0), GET_BONUS_MAGICAL(ch));
-	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(total_bonus_healing(ch), 0), total_bonus_healing(ch));
+	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(ch), 0), GET_BONUS_HEALING(ch));
 	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 	
 	// row 3 (dex is removed from to-hit to make the display easier to read)
@@ -960,6 +966,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
+	ability_data *abil;
 	struct custom_message *ocm;
 	struct affected_type *aff;
 	generic_data *gen;
@@ -1065,14 +1072,18 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 					sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 				}
 			}
+			else if (!IS_NPC(i) && GET_ACTION(i) == ACT_OVER_TIME_ABILITY && (abil = ability_proto(GET_ACTION_VNUM(i, 0))) && abil_has_custom_message(abil, ABIL_CUSTOM_OVER_TIME_LONGDESC)) {
+				// custom message
+				strcpy(buf, abil_get_custom_message(abil, ABIL_CUSTOM_OVER_TIME_LONGDESC));
+			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				// show non-crafting action
 				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
-			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {
+			else if (AFF_FLAGGED(i, AFF_DEATHSHROUDED) && GET_POS(i) <= POS_RESTING) {
 				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
-			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
+			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLYING)) {
 				strcpy(buf, "$n is flying here.");
 			}
 			else if (GET_POS(i) == POS_STANDING && !IS_DISGUISED(i) && (ocm = pick_custom_longdesc(i))) {
@@ -1099,7 +1110,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				strcpy(buf, "$n is here struggling with thin air.");
 		}
 		
-		if (AFF_FLAGGED(i, AFF_HIDE))
+		if (AFF_FLAGGED(i, AFF_HIDDEN))
 			strcat(buf, " (hidden)");
 		if (!IS_NPC(i) && !i->desc)
 			strcat(buf, " (linkless)");
@@ -1127,7 +1138,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
-	if (AFF_FLAGGED(i, AFF_HIDE)) {
+	if (AFF_FLAGGED(i, AFF_HIDDEN)) {
 		act("...$e has attempted to hide $mself.", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_INJURED(i, INJ_TIED))
@@ -1168,7 +1179,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	
 	// these 
 	if ((AFF_FLAGGED(i, AFF_NO_SEE_IN_ROOM) || (IS_IMMORTAL(i) && PRF_FLAGGED(i, PRF_WIZHIDE))) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
-		if (AFF_FLAGGED(i, AFF_EARTHMELD)) {
+		if (AFF_FLAGGED(i, AFF_EARTHMELDED)) {
 			act("...$e is earthmelded.", FALSE, i, 0, ch, TO_VICT);
 		}
 		else {
@@ -1314,7 +1325,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
-	bool disguise;
+	bool disguise, show_inv = show_eq, conceal_eq = FALSE, conceal_inv = FALSE;
 	int j, found;
 	struct affected_type *aff;
 	generic_data *gen;
@@ -1326,9 +1337,16 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	
 	disguise = !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
-	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
-		show_eq = FALSE;
-		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
+	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i)) {
+		if (has_player_tech(i, PTECH_CONCEAL_EQUIPMENT)) {
+			show_eq = FALSE;
+			conceal_eq = TRUE;
+		}
+		if (has_player_tech(i, PTECH_CONCEAL_INVENTORY)) {
+			show_inv = FALSE;
+			conceal_inv = TRUE;
+		}
+	
 	}
 
 	if (ch != i) {
@@ -1399,7 +1417,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				found = TRUE;
 			}
 		}
-	
+		
 		// show eq
 		if (found) {
 			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
@@ -1410,9 +1428,10 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				}
 			}
 		}
-	
+	}
+	if (show_inv && !disguise) {
 		// show inventory
-		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying) {
+		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying && !run_ability_triggers_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL)) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
@@ -1420,9 +1439,20 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				if (can_gain_exp_from(ch, i)) {
 					gain_player_tech_exp(ch, PTECH_SEE_INVENTORY, 5);
 				}
+				run_ability_hooks_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL, NULL, NULL);
 				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
 		}
+	}
+	
+	// tech gains and hooks
+	if (conceal_eq) {
+		gain_player_tech_exp(i, PTECH_CONCEAL_EQUIPMENT, 5);
+		run_ability_hooks_by_player_tech(i, PTECH_CONCEAL_EQUIPMENT, ch, NULL, NULL, NULL);
+	}
+	if (conceal_inv) {
+		gain_player_tech_exp(i, PTECH_CONCEAL_INVENTORY, 5);
+		run_ability_hooks_by_player_tech(i, PTECH_CONCEAL_INVENTORY, ch, NULL, NULL, NULL);
 	}
 }
 
@@ -1436,12 +1466,14 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 void show_character_affects(char_data *ch, char_data *to) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
+	bool beneficial;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], lbuf[MAX_INPUT_LENGTH];
 	int duration;
 
 	/* Routine to show what spells a char is affected by */
 	for (aff = ch->affected; aff; aff = aff->next) {
 		*buf2 = '\0';
+		beneficial = affect_is_beneficial(aff);
 
 		// duration setup
 		if (aff->expire_time == UNLIMITED) {
@@ -1459,7 +1491,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main entry
-		sprintf(buf, "   &c%s&0 (%s) ", get_generic_name_by_vnum(aff->type), lbuf);
+		sprintf(buf, "   \t%c%s\t0%s (%s) ", beneficial ? 'c' : 'r', get_generic_name_by_vnum(aff->type), (!beneficial && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
 
 		if (aff->modifier) {
 			sprintf(buf2, "- %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1481,8 +1513,154 @@ void show_character_affects(char_data *ch, char_data *to) {
 		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
 		
 		// main body
-		msg_to_char(to, "   &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
+}
+
+
+/**
+* Mortal view of other people's affects. This shows very little; it shows a
+* little more if you have the right ptech.
+* 
+* @param char_data *ch Whose effects
+* @param char_data *to Who to send to
+*/
+void show_character_affects_simple(char_data *ch, char_data *to) {
+	bool good, is_ally, details;
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
+	char *temp;
+	int duration;
+	size_t size;
+	struct affected_type *aff;
+	struct over_time_effect_type *dot;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
+	
+	if (IS_NPC(to) || !to->desc) {
+		return;	// nobody to show to
+	}
+	
+	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
+	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_SOULMASK));
+		
+	// build affects
+	LL_FOREACH(ch->affected, aff) {
+		good = affect_is_beneficial(aff);
+		
+		if (details) {
+			// duration setup
+			if (aff->expire_time == UNLIMITED) {
+				strcpy(lbuf, "infinite");
+			}
+			else {
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				if (duration >= 60 * 60) {
+					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
+				}
+				else {
+					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
+				}
+			}
+			
+			// main entry
+			snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
+			
+			if (aff->modifier) {
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
+			}
+			if (aff->bitvector) {
+				prettier_sprintbit(aff->bitvector, affected_bits, lbuf);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : " -"), lbuf);
+			}
+			
+			// caster?
+			if (aff->cast_by == CAST_BY_ID(to)) {
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
+			}
+			
+			// add to hash
+			add_string_hash(&str_hash, line, 1);
+		}
+		else {
+			// simple version
+			snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			add_string_hash(&str_hash, line, 1);
+		}
+	}
+	
+	// build DoTs
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->max_stack > 1) {
+			snprintf(lbuf, sizeof(lbuf), " (%d/%d)", dot->stack, dot->max_stack);
+		}
+		else {
+			*lbuf = '\0';
+		}
+		
+		if (details) {
+			snprintf(line, sizeof(line), "&r%s&0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+		}
+		else {	// simple version
+			snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
+		}
+		
+		// caster?
+		if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
+			snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
+		}
+		
+		add_string_hash(&str_hash, line, 1);
+	}
+	
+	// extra info?
+	if (details) {
+		if (MOB_FLAGGED(ch, MOB_ANIMAL) || CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+			add_string_hash(&str_hash, "&canimal&0", 1);
+		}
+		if (IS_MAGE(ch)) {
+			add_string_hash(&str_hash, "&ccaster&0", 1);
+		}
+		if (IS_VAMPIRE(ch)) {
+			add_string_hash(&str_hash, "&cvampire&0", 1);
+		}
+	}
+	
+	// build display
+	size = snprintf(output, sizeof(output), "Affects on %s:%s%s", PERS(ch, to, FALSE), details ? "\r\n" : "", (str_hash ? "" : " none"));
+	HASH_ITER(hh, str_hash, str_iter, next_str) {
+		if (details) {
+			if (size + strlen(str_iter->str) + 3 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, " %s\r\n", str_iter->str);
+			}
+		}
+		else {	// simple version
+			if (size + strlen(str_iter->str) + 4 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s %s", (str_iter != str_hash ? "," : ""), str_iter->str);
+			}
+			else {
+				// full
+				break;
+			}
+		}
+	}
+	
+	free_string_hash(&str_hash);
+	
+	if (details) {
+		// just show it
+		page_string(to->desc, output, TRUE);
+	}
+	else {
+		// formatting for simple view:
+		strcat(output, "\r\n");	// space reserved
+		
+		temp = strdup(output);
+		format_text(&temp, 0, to->desc, MAX_STRING_LENGTH);
+		page_string(to->desc, temp, TRUE);
+		free(temp);
+	}
+	
+	gain_player_tech_exp(to, PTECH_ENEMY_BUFF_DETAILS, 15);
 }
 
 
@@ -2218,7 +2396,7 @@ ACMD(do_adventure) {
 	if (*argument) {
 		argument = any_one_arg(argument, arg);
 		if (is_abbrev(arg, "summon")) {
-			adventure_summon(ch, argument);
+			do_adventure_summon(ch, argument);
 			return;
 		}
 		// otherwise fall through to the rest of the command
@@ -2241,11 +2419,32 @@ ACMD(do_adventure) {
 }
 
 
-ACMD(do_affects) {	
+ACMD(do_affects) {
+	char_data *vict;
 	int i;
 	
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
+	
+	// targeted version?
+	one_argument(argument, arg);
+	if (*arg) {
+		if (GET_POS(ch) < POS_RESTING) {
+			send_low_pos_msg(ch);
+		}
+		else if (!generic_find(arg, NULL, FIND_CHAR_ROOM | (IS_IMMORTAL(ch) ? FIND_CHAR_WORLD : NOBITS), ch, &vict, NULL, NULL)) {
+			send_config_msg(ch, "no_person");
+		}
+		else if (IS_IMMORTAL(ch)) {
+			msg_to_char(ch, "Affects on %s:\r\n", PERS(vict, ch, FALSE));
+			show_character_affects(vict, ch);
+		}
+		else {
+			show_character_affects_simple(vict, ch);
+		}
+		return;
+	}
 
 	msg_to_char(ch, "  Affects:\r\n");
 
@@ -2327,7 +2526,7 @@ ACMD(do_buffs) {
 		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
 			continue;	// no buff we can detect
 		}
-		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM)) {
+		if (!IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY)) {
 			continue;	// not a targeted character buff
 		}
 		
@@ -3810,6 +4009,7 @@ ACMD(do_nearby) {
 ACMD(do_no_cmd) {
 	switch (subcmd) {
 		case NOCMD_CAST: {
+			// this one is no longer used because we have the 'cast' command again as of b5.166
 			msg_to_char(ch, "EmpireMUD doesn't use the 'cast' command. You use most abilities by typing their name.\r\n");
 			break;
 		}
@@ -3894,6 +4094,7 @@ ACMD(do_passives) {
 		msg_to_char(ch, "Passive buffs for %s:\r\n", PERS(vict, ch, TRUE));
 	}
 	
+	LL_SORT(GET_PASSIVE_BUFFS(vict), sort_passives);
 	LL_FOREACH(GET_PASSIVE_BUFFS(vict), aff) {
 		*buf2 = '\0';
 		

@@ -3,7 +3,7 @@
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -539,7 +539,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 			
 			// found
 			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 			
 			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
@@ -821,10 +821,10 @@ void send_char_pos(char_data *ch, int dam) {
 			break;
 		default: {                        /* >= POSITION SLEEPING */
 			if (dam > (GET_MAX_HEALTH(ch) / 4)) {
-				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
 			}
 			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4)) {
-				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | TO_COMBAT_HIT);
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
 			}
 			break;
 		}
@@ -887,8 +887,9 @@ void run_reboot_triggers(void) {
 * @param int level The level to scale damage to.
 * @param int dam_type The DAM_x type of damage.
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
+* @param int show_attack_message Optional: VNUM of an attack message to show (NOTHING/0 to ignore).
 */
-void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
+void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier, int show_attack_message) {
 	double dam;
 	
 	// no point damaging the dead
@@ -948,7 +949,16 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		combat_meter_heal_taken(vict, -dam);
 	}
 	
+	// lethal damage?? check abilities like Master Survivalist
+	if ((vict != killer) && dam >= GET_HEALTH(vict)) {
+		run_ability_hooks(vict, AHOOK_DYING, 0, 0, killer, NULL, NULL, NULL, NOBITS);
+	}
+	
 	set_health(vict, GET_HEALTH(vict) - dam);
+	
+	if (show_attack_message > 0) {
+		skill_message(dam, killer ? killer : vict, vict, show_attack_message, NULL);
+	}
 
 	update_pos(vict);
 	send_char_pos(vict, dam);
@@ -956,7 +966,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (GET_POS(vict) == POS_DEAD) {
 		if (!IS_NPC(vict)) {
 			syslog(SYS_DEATH, 0, TRUE, "%s killed by script at %s", GET_NAME(vict), get_room_name(IN_ROOM(vict), FALSE));
-			death_log(vict, vict, TYPE_SUFFERING);
+			death_log(vict, vict, ATTACK_SUFFERING);
 		}
 		die(vict, killer ? killer : vict);
 	}

@@ -33,6 +33,7 @@ See also: WAIT
 Complete (trigger type)
 
 Argument type:  percent chance to execute
+Return value:  return 0 to prevent further Complete triggers
 
 This trigger happens when a building is completed.
 

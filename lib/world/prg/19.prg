@@ -100,4 +100,21 @@ P 1003
 P 3000
 P 2013
 S
+#1907
+Portalmancy~
+   Your community has grown to include sorcerers unaccustomed to the rigors of
+overland travel. With them, they bring the promise of a new form of magic:
+portals. Your empire can now build the structures that anchor portals and allow
+travel across the land.
+   Building a portal costs 20x (pillars), 12x (large blocks), and 20x nexus
+crystals. Once built, any member of the empire can open a portal between two
+such buildings on the same island or continent.
+~
+3 1 50 0 b
+K 0 8
+K 2 1115
+K 2 5185
+P 1901
+P 1040
+S
 $

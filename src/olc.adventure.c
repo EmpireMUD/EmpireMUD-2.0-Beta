@@ -2,7 +2,7 @@
 *   File: olc.adventure.c                                 EmpireMUD 2.0b5 *
 *  Usage: OLC for adventure zones                                         *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -161,6 +161,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
 		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
 		// OLC_x: auto-auditors
+		msg_to_char(ch, "Attack messages:\r\n");
+		olc_audit(ch, OLC_ATTACK, buf);
 		msg_to_char(ch, "Crafts:\r\n");
 		olc_audit(ch, OLC_CRAFT, buf);
 		msg_to_char(ch, "Mobs:\r\n");

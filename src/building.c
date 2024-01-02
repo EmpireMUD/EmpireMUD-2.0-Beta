@@ -2,7 +2,7 @@
 *   File: building.c                                      EmpireMUD 2.0b5 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -227,7 +227,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 			if (VEH_FLAGGED(veh_iter, VEH_NO_BUILDING)) {
 				if (ch) {
 					sprintf(buf, "You can't %s that around $V.", command);
-					act(buf, FALSE, ch, NULL, veh_iter, TO_CHAR);
+					act(buf, FALSE, ch, NULL, veh_iter, TO_CHAR | ACT_VEH_VICT);
 				}
 				return FALSE;
 			}
@@ -588,7 +588,8 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL, TRUE);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME | ROOM_AFF_PERMANENT_PAINT);
+	cancel_permanent_affects_room(room);
 	affect_total_room(room);
 
 	// free up the customs
@@ -838,6 +839,7 @@ void finish_building(char_data *ch, room_data *room) {
 			if (!emp || GET_LOYALTY(c) == emp) {
 				if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 					gain_ability_exp(c, GET_CRAFT_ABILITY(type), 3);
+					run_ability_hooks(c, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, NULL, NULL, room, NOBITS);
 				}
 			}
 		}
@@ -1111,7 +1113,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	// Check if there's no longer a building in that place. 
 	if (!GET_BUILDING(room)) {
 		// Fail silently
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	
@@ -1143,6 +1145,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 			// skillups (building only)
 			if (type && act_type == ACT_BUILDING && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 				gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
+				run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, NULL, NULL, room, NOBITS);
 			}
 		}
 		else {
@@ -1158,7 +1161,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 				msg_to_char(ch, "You run out of resources and stop working.\r\n");
 			}
 			act("$n runs out of resources and stops working.", FALSE, ch, 0, 0, TO_ROOM);
-			GET_ACTION(ch) = ACT_NONE;
+			end_action(ch);
 			return;
 		}
 	}
@@ -1480,7 +1483,6 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_MINING);
 	stop_room_action(loc, ACT_MINTING);
 	stop_room_action(loc, ACT_BATHING);
-	stop_room_action(loc, ACT_ESCAPING);
 	stop_room_action(loc, ACT_SAWING);
 	stop_room_action(loc, ACT_QUARRYING);
 	stop_room_action(loc, ACT_MAINTENANCE);
@@ -1654,8 +1656,8 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		in_room = IN_ROOM(from_veh);
 		
 		if (ch) {
-			act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
-			act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM);
+			act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		
 		// look up original recipe
@@ -2070,14 +2072,14 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (VEH_IS_DISMANTLING(veh)) {
 		// already being dismantled: RESUME
 		if (can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
-			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 			start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
 			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 	}
 	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
@@ -2092,7 +2094,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (!HAS_DISMANTLE_PRIV_FOR_VEHICLE(ch, veh)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
-	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	else if ((craft = find_craft_for_vehicle(veh)) && !CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_WITHOUT_ABILITY) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
@@ -2125,8 +2127,8 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		}
 		
 		// ok: start dismantle
-		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		
 		start_dismantle_vehicle(veh);
 		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
@@ -2169,13 +2171,13 @@ ACMD(do_dismantle) {
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	if (GET_ACTION(ch) == ACT_DISMANTLE_VEHICLE) {
 		msg_to_char(ch, "You stop dismantling.\r\n");
 		act("$n stops dismantling.", FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 		return;
 	}
 	
@@ -2256,7 +2258,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
+	if (!CRAFT_FLAGGED(type, CRAFT_DISMANTLE_WITHOUT_ABILITY) && GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle this building properly.\r\n");
 		return;
 	}
@@ -2328,6 +2330,9 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You are not allowed to customize.\r\n");
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+		// triggered
+	}
 	else if (is_abbrev(arg, "name")) {
 		if (!*arg2) {
 			msg_to_char(ch, "What would you like to name this room (or \"none\")?\r\n");
@@ -2353,6 +2358,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL, IN_ROOM(ch));
 			set_room_custom_name(IN_ROOM(ch), arg2);
 			
 			// they lose hide-real-name if they rename it themselves
@@ -2380,6 +2386,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL, IN_ROOM(ch));
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 			ch->desc->save_room_id = GET_ROOM_VNUM(IN_ROOM(ch));
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);
@@ -2446,11 +2453,11 @@ ACMD(do_dedicate) {
 		return;
 	}
 	if (ded_veh && !can_use_vehicle(ch, ded_veh, MEMBERS_ONLY)) {
-		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (ded_veh && !VEH_FLAGGED(ded_veh, VEH_DEDICATE)) {
-		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -2491,9 +2498,9 @@ ACMD(do_dedicate) {
 	}
 	if (ded_veh) {
 		snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
 		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM | ACT_VEH_VICT);
 		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		// update strs:
@@ -2762,7 +2769,6 @@ ACMD(do_interlink) {
 ACMD(do_lay) {
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
-	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS, get_climate(IN_ROOM(ch)));
 	struct resource_data *charged = NULL;
 	
@@ -2786,10 +2792,6 @@ ACMD(do_lay) {
 		msg_to_char(ch, "You can't lay road in someone else's territory!\r\n");
 	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)))
 		msg_to_char(ch, "You don't have permission to lay road.\r\n");
-	else if (SECT_FLAGGED(check_sect, SECTF_LAY_ROAD) && SECT_FLAGGED(check_sect, SECTF_ROUGH) && !has_ability(ch, ABIL_PATHFINDING)) {
-		// rough requires Pathfinding
-		msg_to_char(ch, "You don't have the skill to properly do that.\r\n");
-	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD)) {
 		// already a road -- attempt to un-lay it
 		if (COMPLEX_DATA(IN_ROOM(ch)) && GET_BUILT_WITH(IN_ROOM(ch))) {
@@ -2817,11 +2819,6 @@ ACMD(do_lay) {
 
 		msg_to_char(ch, "You lay a road here.\r\n");
 		act("$n lays a road here.", FALSE, ch, 0, 0, TO_ROOM);
-
-		// skillup before sect change
-		if (SECT_FLAGGED(check_sect, SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_PATHFINDING, 15);
-		}
 				
 		// change it over
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(road_sect), GET_SECT_VNUM(original_sect));
@@ -2883,8 +2880,8 @@ ACMD(do_maintain) {
 		else {
 			start_action(ch, ACT_REPAIR_VEHICLE, -1);
 			GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
-			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
-			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 	}
 	else if (*arg && !multi_isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
@@ -2982,18 +2979,18 @@ ACMD(do_paint) {
 		msg_to_char(ch, "You don't have permission to paint it.\r\n");
 		return;
 	}
-	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
+	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_PERMANENT_PAINT) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
 		msg_to_char(ch, "You can't paint that.\r\n");
 		return;
 	}
 	
 	// validate painting: vehicle
 	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
-		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -3036,8 +3033,8 @@ ACMD(do_paint) {
 		set_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
 	}
 	if (paint_veh) {
-		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR);
-		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM);
+		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM | ACT_VEH_VICT);
 		
 		// brighten if same color or remove bright if not
 		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
@@ -3201,11 +3198,11 @@ ACMD(do_unpaint) {
 	
 	// validate unpainting: vehicle
 	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (paint_veh && !VEH_PAINT_COLOR(paint_veh)) {
-		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	
@@ -3217,8 +3214,8 @@ ACMD(do_unpaint) {
 		REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 	}
 	if (paint_veh) {
-		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
-		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
+		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM | ACT_VEH_VICT);
 		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_flags(paint_veh, VEH_BRIGHT_PAINT);
 	}
@@ -3363,7 +3360,7 @@ ACMD(do_upgrade) {
 	
 	// validate upgrade: vehicle
 	if (from_veh && !can_use_vehicle(ch, from_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
+		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, from_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
 	if (from_veh && VEH_FLAGGED(from_veh, VEH_ON_FIRE)) {
