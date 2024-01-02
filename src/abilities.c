@@ -1993,13 +1993,13 @@ double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitv
 	
 	// lower with lower trait, higher with higher trait
 	if (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) {
-		// trait range is 0.6x to 1.1x
-		points *= 0.6 + (data->trait_modifier / 2.0);
+		// trait range is 0.75x to 1.25x
+		points *= 0.75 + (data->trait_modifier / 2.0);
 	}
 	
 	// apply matching role if over level 100
 	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS) && get_approximate_level(ch) >= MAX_SKILL_CAP) {
-		points *= data->matching_role ? 1.10 : 0.60;
+		points *= data->matching_role ? 1.20 : 0.70;
 	}
 	
 	// check mastery ability
