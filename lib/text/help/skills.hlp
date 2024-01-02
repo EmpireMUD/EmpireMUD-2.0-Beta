@@ -579,7 +579,7 @@ See also: APPROACH, USE
 SKILL SKILLS "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
-        skill <name> -- see details about a skill or ability
+        skill <name> [-all] -- see a skill's details and abilities 
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
