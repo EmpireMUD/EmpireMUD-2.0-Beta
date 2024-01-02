@@ -615,6 +615,12 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				get_line(fl, line);	// 1 extra line
 				break;
 			}
+			case 'U': {	// custom messages -- unneeded
+				get_line(fl, line);	// message number line
+				tmp = fread_string(fl, error);	// message itself
+				free(tmp);
+				break;
+			}
 			case 'X': {	// extra desc -- unneeded
 				tmp = fread_string(fl, error);
 				free(tmp);

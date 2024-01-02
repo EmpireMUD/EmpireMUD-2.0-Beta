@@ -6423,6 +6423,9 @@ void init_sector(sector_data *st) {
 /**
 * Read one sector from file.
 *
+* WARNING: The evolve.c utility has a near-identical version of this and any
+* new changes here must also be readable by that utility.
+*
 * @param FILE *fl The open .bld file
 * @param sector_vnum vnum The sector vnum
 */
@@ -6474,6 +6477,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			/*
+			* WARNING: The evolve.c utility has a near-identical version of this and any
+			* new changes here must also be readable by that utility.
+			*/
+			
 			// commands
 			case 'C': {
 				GET_SECT_COMMANDS(sect) = fread_string(fl, buf2);
@@ -6561,6 +6569,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
 				break;
 			}
+			
+			/*
+			* WARNING: The evolve.c utility has a near-identical version of this and any
+			* new changes here must also be readable by that utility.
+			*/
 
 			// end
 			case 'S': {
