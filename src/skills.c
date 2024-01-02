@@ -1820,7 +1820,7 @@ ACMD(do_skills) {
 	ability_data *abil;
 	int points, level, iter;
 	bool found, any, line;
-	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE;
+	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE, want_all = FALSE;
 	int min_level = -1, max_level = -1;
 	size_t size;
 	
@@ -1920,6 +1920,9 @@ ACMD(do_skills) {
 						want_max = TRUE;
 					}
 				}
+			}
+			else if (is_abbrev(arg, "-all")) {
+				want_all = TRUE;
 			}
 			else if (is_abbrev(arg, "-alphabetical")) {
 				sort_alpha = TRUE;
@@ -2320,7 +2323,7 @@ ACMD(do_skills) {
 		size = 0;
 		
 		// if no levels were requested, default to only showing up to the next cap
-		if (min_level == -1 && max_level == -1) {
+		if (min_level == -1 && max_level == -1 && !want_all) {
 			max_level = NEXT_CAP_LEVEL(ch, SKILL_VNUM(skill));
 		}
 		
