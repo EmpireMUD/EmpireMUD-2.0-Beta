@@ -2362,7 +2362,7 @@ while %ch%
   set ch %next_ch%
 done
 wait 1
-%echo% ~%self% grabs something from the table and then vanishes into the shadows!
+%echo% ~%self% grabs something from the floor and then vanishes into the shadows!
 %purge% %self%
 ~
 #11929
