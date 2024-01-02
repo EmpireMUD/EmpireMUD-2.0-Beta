@@ -295,6 +295,9 @@ E
 I 5 102 33.33 1 X  # DIG: flint stone
 I 5 101 16.67 1 X  # DIG: lump of clay
 I 5 100 50.00 1 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 _
 Newbie version of sect 7 Crop
 ~
