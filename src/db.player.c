@@ -4462,6 +4462,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_friends(ch);
 	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);

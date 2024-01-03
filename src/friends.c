@@ -111,6 +111,53 @@ bool add_account_friend_id(account_data *acct, int acct_id, int status, char *na
 
 
 /**
+* Updates last-seen name on the friends' list when a player logs in.
+*
+* @param char_data *ch The player to update.
+*/
+void check_friends(char_data *ch) {
+	bool any = FALSE;
+	char_data *plr;
+	struct friend_data *friend, *next_friend;
+	
+	if (!ch || IS_NPC(ch) || !GET_ACCOUNT(ch) || !GET_ACCOUNT_FRIENDS(ch)) {
+		return;	// no work
+	}
+	
+	// update online names
+	DL_FOREACH2(player_character_list, plr, next_plr) {
+		if (plr == ch || !GET_ACCOUNT(plr)) {
+			continue;	// self or invalid player
+		}
+		if (PRF_FLAGGED(plr, PRF_NO_FRIENDS)) {
+			continue;	// no-friends toggle
+		}
+		if (GET_INVIS_LEV(plr) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// can't see
+		}
+		if (account_friend_status(ch, plr) != FRIEND_FRIENDSHIP) {
+			continue;	// not friends;
+		}
+		
+		// ok? update name
+		any |= add_account_friend_id(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr), NOTHING, GET_NAME(plr));
+	}
+	
+	// clear out stale friends?
+	HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
+		if (friend->status == FRIEND_NONE || !find_account(friend->account_id)) {
+			// gone baby
+			any |= remove_account_friend(GET_ACCOUNT(ch), friend->account_id);
+		}
+	}
+	
+	if (any) {
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+}
+
+
+/**
 * Finds an entry for a friend already on the account.
 *
 * @param account_data *acct The account to check.
@@ -308,8 +355,16 @@ void mortlog_friends(char_data *ch, const char *str, ...) {
 		if (PRF_FLAGGED(desc->character, PRF_NO_FRIENDS)) {
 			continue;	// no friends on this character
 		}
+		if (GET_INVIS_LEV(ch) > GET_ACCESS_LEVEL(desc->character)) {
+			continue;	// can't see
+		}
 		if (account_friend_status(ch, desc->character) != FRIEND_FRIENDSHIP) {
 			continue;	// not valid friends
+		}
+		
+		// update their last-seen name
+		if (add_account_friend_id(GET_ACCOUNT(desc->character), GET_ACCOUNT_ID(ch), NOTHING, GET_NAME(ch))) {
+			SAVE_ACCOUNT(GET_ACCOUNT(desc->character));
 		}
 		
 		// ok
