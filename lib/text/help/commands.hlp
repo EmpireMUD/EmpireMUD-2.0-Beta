@@ -2849,6 +2849,7 @@ Toggles:
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
   no-empire - will not create a new empire when you try to claim or build
+  no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
   political - shows empire colors instead of terrain colors
@@ -2876,7 +2877,7 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, STATUS MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
