@@ -349,7 +349,7 @@ void mortlog_friends(char_data *ch, const char *str, ...) {
 	vsprintf(output, str, tArgList);
 	
 	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !desc->character || !SHOW_STATUS_MESSAGES(desc->character, SM_MORTLOG)) {
+		if (STATE(desc) != CON_PLAYING || !desc->character) {
 			continue;	// invalid or no mortlog
 		}
 		if (PRF_FLAGGED(desc->character, PRF_NO_FRIENDS)) {
@@ -365,6 +365,14 @@ void mortlog_friends(char_data *ch, const char *str, ...) {
 		// update their last-seen name
 		if (add_account_friend_id(GET_ACCOUNT(desc->character), GET_ACCOUNT_ID(ch), NOTHING, GET_NAME(ch))) {
 			SAVE_ACCOUNT(GET_ACCOUNT(desc->character));
+		}
+		
+		// AFTER updating name: see if we should suppress the message
+		if (!SHOW_STATUS_MESSAGES(desc->character, SM_MORTLOG)) {
+			continue;	// does not want to see the mortlog
+		}
+		if (GET_LOYALTY(ch) == GET_LOYALTY(desc->character) && SHOW_STATUS_MESSAGES(desc->character, SM_EMPIRE_LOGS)) {
+			continue;	// same empire and should see empire logs
 		}
 		
 		// ok
@@ -443,7 +451,7 @@ ACMD(do_friends_all) {
 			}
 			else {
 				// last online?
-				ssize += snprintf(status + ssize, sizeof(status) - ssize, " %s ago",simple_time_since(acct->last_logon));
+				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)",simple_time_since(acct->last_logon));
 			}
 		}
 		
