@@ -612,6 +612,14 @@ ACMD(do_friend_accept) {
 		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && !str_cmp(GET_NAME(plr), friend->original_name)) {
 			// only if it's the same alt who sent the offer
 			msg_to_char(ch, "That player has toggled no-friends on since sending this offer; you cannot accept it.\r\n");
+			
+			// cancel it
+			if (remove_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) {
+				SAVE_ACCOUNT(GET_ACCOUNT(ch));
+			}
+			if (remove_account_friend(GET_ACCOUNT(plr), GET_ACCOUNT_ID(ch))) {
+				SAVE_ACCOUNT(GET_ACCOUNT(plr));
+			}
 		}
 		else {
 			// lie (they may be friends but we are not allowed to know this alt)
