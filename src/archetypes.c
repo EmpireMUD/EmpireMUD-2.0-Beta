@@ -1378,7 +1378,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	if (!*arg1) {
 		display_archetype_menu(desc, pos);
 	}
-	else if (is_abbrev(arg1, "info")) {
+	else if (is_abbrev(arg1, "info") && strlen(arg1) >= 3) {
 		if (!*arg2) {
 			msg_to_desc(desc, "Usage: info <archetype name>\r\n");
 		}
@@ -1394,7 +1394,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 			display_archetype_info(desc, arch);
 		}
 	}
-	else if (is_abbrev(arg1, "list")) {
+	else if (!str_cmp(arg1, "list")) {
 		display_archetype_list(desc, archetype_menu[pos].type, arg2);
 	}
 	else {	// picking one
