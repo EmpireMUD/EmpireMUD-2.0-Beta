@@ -2125,6 +2125,7 @@ struct set_struct {
 		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
+		{ "nofriends", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
@@ -2414,6 +2415,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
+	}
+	else if SET_CASE("nofriends") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_NO_FRIENDS);
 	}
 	else if SET_CASE("loadroom") {
 		if (!str_cmp(val_arg, "off")) {
