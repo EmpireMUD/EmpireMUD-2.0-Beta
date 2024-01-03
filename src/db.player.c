@@ -374,7 +374,7 @@ void free_account(account_data *acct) {
 * @param int nr The id of the account.
 */
 void parse_account(FILE *fl, int nr) {
-	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256];
+	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256], str_in2[256];
 	struct account_player *plr;
 	account_data *acct, *find;
 	struct pk_data *pk;
@@ -441,12 +441,16 @@ void parse_account(FILE *fl, int nr) {
 				break;
 			}
 			case 'F': {	// friend
-				if (sscanf(line, "F%d %d %s~", &int_in[0], &int_in[1], str_in) != 3) {
+				if (sscanf(line, "F%d %d %s %s", &int_in[0], &int_in[1], str_in, str_in2) != 4) {
 					log("SYSERR: Format error in F line of %s", err_buf);
 					exit(1);
 				}
 				
-				add_account_friend_id(acct, int_in[1], int_in[0], str_in);
+				// runs twice: import original name, import current name
+				if (strcmp(str_in, "*")) {
+					add_account_friend_id(acct, int_in[1], int_in[0], str_in);
+				}
+				add_account_friend_id(acct, int_in[1], int_in[0], str_in2);
 				break;
 			}
 			case 'K': {	// killed by
@@ -623,7 +627,7 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	
 	// F: friends
 	HASH_ITER(hh, acct->friends, friend, next_friend) {
-		fprintf(fl, "F%d %d %s~\n", friend->status, friend->account_id, friend->name ? friend->name : "Unknown");
+		fprintf(fl, "F%d %d %s %s\n", friend->status, friend->account_id, (friend->original_name ? friend->original_name : "*"), (friend->name ? friend->name : "Unknown"));
 	}
 	
 	// K: player kills

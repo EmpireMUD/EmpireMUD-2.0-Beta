@@ -4384,9 +4384,10 @@ struct companion_mod {
 // account-wide friends list
 struct friend_data {
 	int account_id;			// id of the friend's account
-	int status;			// FRIEND_ status
-	char *name;			// last name seen
-	UT_hash_handle hh;	// hash handle for account->friends
+	int status;				// FRIEND_ status
+	char *name;				// last name seen
+	char *original_name;	// name we added with
+	UT_hash_handle hh;		// hash handle for account->friends
 };
 
 

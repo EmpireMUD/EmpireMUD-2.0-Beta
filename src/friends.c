@@ -87,6 +87,7 @@ bool add_account_friend_id(account_data *acct, int acct_id, int status, char *na
 	if (!(friend = find_account_friend(acct, acct_id))) {
 		CREATE(friend, struct friend_data, 1);
 		friend->account_id = acct_id;
+		friend->original_name = (name && *name) ? strdup(name) : NULL;
 		HASH_ADD_INT(acct->friends, account_id, friend);
 		change = TRUE;
 	}
@@ -98,7 +99,7 @@ bool add_account_friend_id(account_data *acct, int acct_id, int status, char *na
 	}
 	
 	// update name
-	if (name && (!friend->name || strcmp(name, friend->name))) {
+	if (name && *name && (!friend->name || strcmp(name, friend->name))) {
 		if (friend->name) {
 			free(friend->name);
 		}
@@ -324,6 +325,9 @@ void free_account_friends(struct friend_data **hash) {
 			if (friend->name) {
 				free(friend->name);
 			}
+			if (friend->original_name) {
+				free(friend->original_name);
+			}
 			free(friend);
 		}
 	}
@@ -397,6 +401,9 @@ bool remove_account_friend(account_data *acct, int acct_id) {
 		if (friend->name) {
 			free(friend->name);
 		}
+		if (friend->original_name) {
+			free(friend->original_name);
+		}
 		free(friend);
 		return TRUE;
 	}
@@ -415,7 +422,7 @@ ACMD(do_friends_all) {
 	bool need_save = FALSE;
 	char output[MAX_STRING_LENGTH * 2], color[16], line[256], name[256], status[256];
 	int count;
-	size_t size, lsize, ssize;
+	size_t size, lsize, nsize, ssize;
 	account_data *acct;
 	char_data *plr;
 	struct friend_data *friend, *next_friend;
@@ -437,10 +444,14 @@ ACMD(do_friends_all) {
 		*color = '\0';
 		plr = find_online_friend(ch, friend->account_id);
 		if (plr) {
-			snprintf(name, sizeof(name), "%s", GET_NAME(plr));
+			nsize = snprintf(name, sizeof(name), "%s", GET_NAME(plr));
 		}
 		else {
-			snprintf(name, sizeof(name), "%s", (friend->name ? friend->name : "Unknown"));
+			nsize = snprintf(name, sizeof(name), "%s", (friend->name ? friend->name : "Unknown"));
+		}
+		
+		if (friend->original_name && strcmp(name, friend->original_name)) {
+			nsize += snprintf(name + nsize, sizeof(name) - nsize, " (%s)", friend->original_name);
 		}
 		
 		ssize = snprintf(status, sizeof(status), " - %s", friend_status_types[friend->status]);
@@ -489,6 +500,7 @@ ACMD(do_friends_online) {
 	int count, status;
 	size_t size, lsize;
 	char_data *plr;
+	struct friend_data *friend;
 	
 	size = snprintf(output, sizeof(output), "Friends online:\r\n");
 	count = 0;
@@ -507,8 +519,12 @@ ACMD(do_friends_online) {
 		}
 		
 		// seems ok to show
-		lsize = snprintf(line, sizeof(line), " %s\r\n", GET_NAME(plr));
 		++count;
+		lsize = snprintf(line, sizeof(line), " %s\r\n", GET_NAME(plr));
+		
+		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && strcmp(GET_NAME(plr), friend->original_name)) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s)", friend->original_name);
+		}
 		
 		if (size + lsize + 80 < sizeof(output)) {
 			strcat(output, line);
