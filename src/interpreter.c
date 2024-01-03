@@ -173,6 +173,7 @@ ACMD(do_follow);
 ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_forgive);
+ACMD(do_friend);
 ACMD(do_fullsave);
 
 ACMD(do_gather);
@@ -387,6 +388,7 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
+ACMD(do_unfriend);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
@@ -683,6 +685,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "forge", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),
 	SCMD_CMD( "fprompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_FPROMPT ),
+	SIMPLE_CMD( "friends", POS_DEAD, do_friend, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "fullsave", POS_DEAD, do_fullsave, LVL_TOP, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
@@ -957,6 +960,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "unalias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_UNALIAS ),
 	STANDARD_CMD( "unapprove", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_UNAPPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
+	STANDARD_CMD( "unfriend", POS_DEAD, do_unfriend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),

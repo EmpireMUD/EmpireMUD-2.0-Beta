@@ -360,6 +360,7 @@ void free_account(account_data *acct) {
 	}
 	
 	// free unlocks
+	free_account_friends(&acct->friends);
 	free_unlocked_archetypes(acct);
 	
 	free(acct);
@@ -437,6 +438,15 @@ void parse_account(FILE *fl, int nr) {
 						exit(1);
 					}
 				}
+				break;
+			}
+			case 'F': {	// friend
+				if (scanf(line, "F%d %d %s~", &int_in[0], &int_in[1], str_in) != 3) {
+					log("SYSERR: Format error in F line of %s", err_buf);
+					exit(1);
+				}
+				
+				add_account_friend_id(acct, int_in[1], int_in[0], str_in);
 				break;
 			}
 			case 'K': {	// killed by
@@ -589,6 +599,7 @@ void write_account_index(FILE *fl) {
 void write_account_to_file(FILE *fl, account_data *acct) {
 	char temp[MAX_STRING_LENGTH];
 	struct account_player *plr;
+	struct friend_data *friend, *next_friend;
 	struct pk_data *pk;
 	struct unlocked_archetype *unarch, *next_unarch;
 	
@@ -608,6 +619,11 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	// D0: unlocked archetypes
 	HASH_ITER(hh, acct->unlocked_archetypes, unarch, next_unarch) {
 		fprintf(fl, "D0 %d\n", unarch->vnum);
+	}
+	
+	// F: friends
+	HASH_ITER(hh, acct->friends, friend, next_friend) {
+		fprintf(fl, "F%d %d %s~\n", friend->status, friend->account_id, friend->name ? friend->name : "Unknown");
 	}
 	
 	// K: player kills

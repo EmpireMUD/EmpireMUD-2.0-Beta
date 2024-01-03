@@ -32,12 +32,12 @@ OBJFILES = abilities.o act.action.o act.battle.o act.comm.o act.empire.o \
 	building.o class.o comm.o config.o constants.o data.o db.o db.lib.o \
 	db.player.o db.world.o dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o \
 	dg_misc.o dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o dg_vehcmd.o \
-	dg_wldcmd.o eedit.o event.o faction.o fight.o generic.o handler.o \
-	instance.o interpreter.o limits.o mail.o mapview.o mobact.o modify.o \
-	morph.o objsave.o olc.adventure.o olc.building.o olc.o olc.attack.o \
-	olc.craft.o olc.crop.o olc.global.o olc.map.o olc.mobile.o olc.object.o \
-	olc.roomtemplate.o olc.sector.o olc.trigger.o pathfind.o progress.o \
-	protocol.o quest.o random.o shop.o skills.o social.o spells.o \
+	dg_wldcmd.o eedit.o event.o faction.o fight.o friends.o generic.o \
+	handler.o instance.o interpreter.o limits.o mail.o mapview.o mobact.o \
+	modify.o morph.o objsave.o olc.adventure.o olc.building.o olc.o \
+	olc.attack.o olc.craft.o olc.crop.o olc.global.o olc.map.o olc.mobile.o \
+	olc.object.o olc.roomtemplate.o olc.sector.o olc.trigger.o pathfind.o \
+	progress.o protocol.o quest.o random.o shop.o skills.o social.o spells.o \
 	statistics.o updates.o utils.o vehicles.o weather.o workforce.o
 
 CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
@@ -48,12 +48,12 @@ CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	building.c class.c comm.c config.c constants.c data.c db.c db.lib.c \
 	db.player.c db.world.c dg_comm.c dg_db_scripts.c dg_event.c dg_handler.c \
 	dg_misc.c dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c dg_vehcmd.c \
-	dg_wldcmd.c eedit.c event.c faction.c fight.c generic.c handler.c \
-	instance.c interpreter.c limits.c mail.c mapview.c mobact.c modify.c \
-	morph.c objsave.c olc.adventure.c olc.building.c olc.c olc.attack.c \
-	olc.craft.c olc.crop.c olc.global.c olc.map.c olc.mobile.c olc.object.c \
-	olc.roomtemplate.c olc.sector.c olc.trigger.c pathfind.c progress.c \
-	protocol.c quest.c random.c shop.c skills.c social.c spells.c \
+	dg_wldcmd.c eedit.c event.c faction.c fight.c friends.c generic.c \
+	handler.c instance.c interpreter.c limits.c mail.c mapview.c mobact.c \
+	modify.c morph.c objsave.c olc.adventure.c olc.building.c olc.c \
+	olc.attack.c olc.craft.c olc.crop.c olc.global.c olc.map.c olc.mobile.c \
+	olc.object.c olc.roomtemplate.c olc.sector.c olc.trigger.c pathfind.c \
+	progress.c protocol.c quest.c random.c shop.c skills.c social.c spells.c \
 	statistics.c updates.c utils.c vehicles.c weather.c workforce.c
 
 default: all
@@ -270,6 +270,9 @@ faction.o: faction.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
 fight.o: fight.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   handler.h interpreter.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) fight.c
+friends.o: friends.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h
+	$(CC) -c $(CFLAGS) friends.c
 generic.o: generic.c conf.h sysdep.h structs.h protocol.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h \
   vnums.h constants.h

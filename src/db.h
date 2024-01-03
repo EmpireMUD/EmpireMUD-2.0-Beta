@@ -290,6 +290,11 @@ account_data *find_account(int id);
 void free_account(account_data *acct);
 void remove_player_from_account(char_data *ch);
 
+// account friends
+int account_friend_status(char_data *ch, char_data *vict);
+bool add_account_friend_id(account_data *acct, int acct_id, int status, char *name);
+void free_account_friends(struct friend_data **hash);
+
 // adventures
 extern adv_data *adventure_table;
 
