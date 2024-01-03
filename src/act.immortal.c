@@ -3283,6 +3283,66 @@ SHOW(show_fmessages) {
 }
 
 
+SHOW(show_friends) {
+	bool file = FALSE;
+	char output[MAX_STRING_LENGTH * 2], line[256];
+	int count;
+	size_t size, lsize;
+	char_data *plr = NULL;
+	account_data *acct;
+	struct friend_data *friend, *next_friend;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Show friends for whom?\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(plr) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Friends list for %s%s:\r\n", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
+		count = 0;
+		
+		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(plr), friend, next_friend) {
+			if (friend->status == FRIEND_NONE) {
+				continue;	// not a friend
+			}
+			if (!(acct = find_account(friend->account_id))) {
+				continue;	// no such account?
+			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), " %s - %s\r\n", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
+			++count;
+			
+			if (size + lsize + 80 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			else {
+				// space reserved for this
+				strcat(output, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, " none\r\n");
+		}
+		
+		page_string(ch->desc, output, TRUE);
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_home) {
 	char name[MAX_INPUT_LENGTH];
 	bool file = FALSE;
@@ -11034,6 +11094,7 @@ ACMD(do_show) {
 		{ "fmessages", LVL_START_IMM, show_fmessages },
 		{ "smessages", LVL_START_IMM, show_smessages },
 		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
+		{ "friends", LVL_START_IMM, show_friends },
 
 		// last
 		{ "\n", 0, NULL }
