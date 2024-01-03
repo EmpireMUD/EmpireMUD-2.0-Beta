@@ -441,7 +441,7 @@ int sort_friends_by_last_logon(struct friend_data *a, struct friend_data *b) {
 	}
 	else {
 		// dividing by seconds per day helps keep from using list order to detect secret no-friends alts
-		return ((time(0) - a_acc->last_logon) / SECS_PER_REAL_DAY) - ((time(0) - b_acc->last_logon) / SECS_PER_REAL_DAY);
+		return ((time(0) - a_acc->last_logon) / SECS_PER_REAL_HOUR) - ((time(0) - b_acc->last_logon) / SECS_PER_REAL_HOUR);
 	}
 }
 
