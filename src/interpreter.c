@@ -1961,11 +1961,17 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
 			
+			// copy referral
 			if ((!GET_REFERRED_BY(d->character) || !*GET_REFERRED_BY(d->character)) && GET_REFERRED_BY(alt)) {
 				if (GET_REFERRED_BY(d->character)) {
 					free(GET_REFERRED_BY(d->character));
 				}
 				GET_REFERRED_BY(d->character) = str_dup(GET_REFERRED_BY(alt));
+			}
+			
+			// copy no-friends pref
+			if (PRF_FLAGGED(alt, PRF_NO_FRIENDS)) {
+				SET_BIT(PRF_FLAGS(d->character), PRF_NO_FRIENDS);
 			}
 			
 			next_creation_step(d);
