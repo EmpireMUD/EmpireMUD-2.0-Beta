@@ -341,7 +341,7 @@ void perform_alternate(char_data *old, char_data *new) {
 		}
 	}
 	else {	// not public logins -- use elogs
-		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART) && !PRF_FLAGGED(new, PRF_NO_FRIENDS)) {
+		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART) && !PRF_FLAGGED(new, PRF_NO_FRIENDS) && !PRF_FLAGGED(old, PRF_NO_FRIENDS)) {
 			mortlog_friends(new, "%s", mort_alt);
 		}
 		else if (old_invis == 0) {
