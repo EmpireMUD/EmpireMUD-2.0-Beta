@@ -760,10 +760,10 @@ ACMD(do_friend) {
 	else if (!ch->desc) {
 		// nothing to show if no desc
 	}
-	else if (!*arg) {
+	else if (!*arg || !str_cmp(arg, "list")) {
 		do_friends_online(ch, "", 0, 0);
 	}
-	else if (!str_cmp(arg, "all") || !str_cmp(arg, "-all")) {
+	else if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
 		do_friends_all(ch, "", 0, 0);
 	}
 	else if ((is_abbrev(arg, "approve") || is_abbrev(arg, "accept")) && strlen(arg) >= 3) {
@@ -775,7 +775,7 @@ ACMD(do_friend) {
 	else if (!str_cmp(arg, "deny") || !str_cmp(arg, "decline")) {
 		do_friend_deny(ch, arg2, 0, 0);
 	}
-	else if (is_abbrev(arg, "request") && strlen(arg) >= 3) {
+	else if ((is_abbrev(arg, "request") || is_abbrev(arg, "add")) && strlen(arg) >= 3) {
 		do_friend_request(ch, arg2, 0, 0);
 	}
 	else {
