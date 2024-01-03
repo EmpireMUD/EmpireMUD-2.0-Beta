@@ -928,7 +928,7 @@ ACMD(do_unfriend) {
 	else if (!*arg) {
 		msg_to_char(ch, "Unfriend whom?\r\n");
 	}
-	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
+	else if (!(plr = find_or_load_player(arg, &file)) && !(plr = find_friend_player_by_stored_name(ch, arg, &file, &secret))) {
 		msg_to_char(ch, "No such player.\r\n");
 	}
 	else if (PRF_FLAGGED(plr, PRF_NO_FRIENDS) || !GET_ACCOUNT(plr)) {
