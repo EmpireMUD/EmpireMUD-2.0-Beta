@@ -520,10 +520,13 @@ ACMD(do_friends_online) {
 		
 		// seems ok to show
 		++count;
-		lsize = snprintf(line, sizeof(line), " %s\r\n", GET_NAME(plr));
+		lsize = snprintf(line, sizeof(line), " %s", GET_NAME(plr));
 		
 		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && strcmp(GET_NAME(plr), friend->original_name)) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s)", friend->original_name);
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s)\r\n", friend->original_name);
+		}
+		else {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "\r\n");
 		}
 		
 		if (size + lsize + 80 < sizeof(output)) {
