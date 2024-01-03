@@ -349,6 +349,10 @@ void perform_alternate(char_data *old, char_data *new) {
 			mortlog_friends(old, "%s", mort_out);
 		}
 		
+		if (!PRF_FLAGGED(new, PRF_NO_FRIENDS) && PRF_FLAGGED(old, PRF_NO_FRIENDS)) {
+			mortlog_friends(new, "%s", mort_in);
+		}
+		
 		if (old_emp && GET_LOYALTY(new) == old_emp && old_invis == 0) {
 			// both in same empire
 			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_alt);
