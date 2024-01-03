@@ -2161,7 +2161,7 @@ if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 * check witnesses
-if !%ch.aff_flagged(HIDDEN)% && %ch.skill(Stealth)% < 100
+if !%actor.aff_flagged(HIDDEN)% && %actor.skill(Stealth)% < 100
   set witnesses 0
   set ch %actor.room.people%
   while %ch% && %witnesses% < 2
