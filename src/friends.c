@@ -284,6 +284,42 @@ void free_account_friends(struct friend_data **hash) {
 
 
 /**
+* Mortlogs but only to the person's friends list.
+*
+* @param char_data *ch The person whose friends will see this.
+* @param const char *str... The string and arguments.
+*/
+void mortlog_friends(char_data *ch, const char *str, ...) {
+	char output[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	va_list tArgList;
+
+	if (!str || !ch || IS_NPC(ch) || PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
+		return;
+	}
+
+	va_start(tArgList, str);
+	vsprintf(output, str, tArgList);
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character || !SHOW_STATUS_MESSAGES(desc->character, SM_MORTLOG)) {
+			continue;	// invalid or no mortlog
+		}
+		if (PRF_FLAGGED(desc->character, PRF_NO_FRIENDS)) {
+			continue;	// no friends on this character
+		}
+		if (account_friend_status(ch, desc->character) != FRIEND_FRIENDSHIP) {
+			continue;	// not valid friends
+		}
+		
+		// ok
+		msg_to_desc(desc, "&c[ %s ]&0\r\n", output);
+	}
+	va_end(tArgList);
+}
+
+
+/**
 * Removes a friend from the account. This does not save the account itself;
 * you should save it if this function returns TRUE.
 *

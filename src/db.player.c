@@ -3831,12 +3831,15 @@ void announce_login(char_data *ch) {
 	}
 	
 	// mortlog
-	if (GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins") && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+	if (GET_INVIS_LEV(ch) == 0 && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+		if (config_get_bool("public_logins")) {
 			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
 		}
-		else if (GET_LOYALTY(ch)) {
-			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+		else {
+			mortlog_friends(ch, "%s has entered the game", PERS(ch, ch, TRUE));
+			if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+			}
 		}
 	}
 }

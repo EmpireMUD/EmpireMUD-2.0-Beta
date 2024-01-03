@@ -2327,6 +2327,9 @@ void combat_meter_damage_taken(char_data *ch, int amt);
 void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
 
+// friends.c
+void mortlog_friends(char_data *ch, const char *str, ...) __attribute__((format(printf, 2, 3)));
+
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag);

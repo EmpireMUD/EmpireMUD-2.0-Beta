@@ -10153,8 +10153,11 @@ ACMD(do_playerdelete) {
 				if (config_get_bool("public_logins")) {
 					mortlog("%s has left the game", PERS(victim, victim, TRUE));
 				}
-				else if (GET_LOYALTY(victim)) {
-					log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+				else {
+					mortlog_friends(victim, "%s has left the game", PERS(victim, victim, TRUE));
+					if (GET_LOYALTY(victim)) {
+						log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+					}
 				}
 			}
 			msg_to_char(victim, "Your character has been deleted. Goodbye...\r\n");
