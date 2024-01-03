@@ -460,8 +460,13 @@ ACMD(do_friends_all) {
 				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (online)");
 				strcpy(color, "\tc");
 			}
+			else if (time(0) - acct->last_logon < SECS_PER_REAL_HOUR) {
+				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (online recently)");
+			}
+			else if (time(0) - acct->last_logon < 24 * SECS_PER_REAL_HOUR) {
+				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (less than 1 day ago)");
+			}
 			else {
-				// last online?
 				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)", simple_time_since(acct->last_logon));
 			}
 		}
