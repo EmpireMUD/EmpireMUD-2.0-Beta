@@ -440,7 +440,7 @@ int sort_friends_by_last_logon(struct friend_data *a, struct friend_data *b) {
 		return 1;
 	}
 	else {
-		return a_acc->last_logon - b_acc->last_logon;
+		return b_acc->last_logon - a_acc->last_logon;
 	}
 }
 
