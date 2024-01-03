@@ -451,7 +451,7 @@ ACMD(do_friends_all) {
 			}
 			else {
 				// last online?
-				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)",simple_time_since(acct->last_logon));
+				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)", simple_time_since(acct->last_logon));
 			}
 		}
 		
@@ -803,6 +803,11 @@ ACMD(do_friend_status) {
 				msg_to_char(ch, "You are not friends with %s.\r\n", GET_NAME(plr));
 				break;
 			}
+		}
+		
+		// and:
+		if (PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
+			msg_to_char(ch, "(You have toggled no-friends on for this character.)\r\n");
 		}
 	}
 	
