@@ -441,7 +441,7 @@ void parse_account(FILE *fl, int nr) {
 				break;
 			}
 			case 'F': {	// friend
-				if (scanf(line, "F%d %d %s~", &int_in[0], &int_in[1], str_in) != 3) {
+				if (scanf(line, "F%d %d %s ", &int_in[0], &int_in[1], str_in) != 3) {
 					log("SYSERR: Format error in F line of %s", err_buf);
 					exit(1);
 				}
@@ -623,7 +623,7 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	
 	// F: friends
 	HASH_ITER(hh, acct->friends, friend, next_friend) {
-		fprintf(fl, "F%d %d %s~\n", friend->status, friend->account_id, friend->name ? friend->name : "Unknown");
+		fprintf(fl, "F%d %d %s \n", friend->status, friend->account_id, friend->name ? friend->name : "Unknown");
 	}
 	
 	// K: player kills
