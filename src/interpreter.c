@@ -2407,7 +2407,7 @@ int _parse_name(char *arg, char *name, descriptor_data *desc, bool reduced_restr
 */
 void nanny(descriptor_data *d, char *arg) {
 	char tmp_name[MAX_INPUT_LENGTH];
-	int load_result, i, iter;
+	int load_result, i, iter, num;
 	bitvector_t bit;
 	bool show_start = FALSE;
 	char_data *temp_char;
@@ -2942,6 +2942,9 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			if (GET_MAIL_PENDING(d->character)) {
 				send_to_char("\trYou have mail waiting.\t0\r\n", d->character);
+			}
+			if ((num = has_pending_friend_requests(d->character))) {
+				msg_to_char(d->character, "\tAYou have %d friend request%s waiting.\t0\r\n", num, PLURAL(num));
 			}
 			if (has_uncollected_event_rewards(d->character)) {
 				msg_to_char(d->character, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");

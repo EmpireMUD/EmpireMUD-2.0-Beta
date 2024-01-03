@@ -335,6 +335,26 @@ void free_account_friends(struct friend_data **hash) {
 
 
 /**
+* Determines if a player has any friend requests waiting.
+*
+* @param char_data *ch The player.
+* @return int How many friend requests are waiting for the player (may be 0).
+*/
+int has_pending_friend_requests(char_data *ch) {
+	int count = 0;
+	struct friend_data *friend, *next_friend;
+	
+	HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
+		if (friend->status == FRIEND_REQUEST_RECEIVED) {
+			++count;
+		}
+	}
+	
+	return count;	// if any
+}
+
+
+/**
 * Mortlogs but only to the person's friends list.
 *
 * @param char_data *ch The person whose friends will see this.
@@ -412,6 +432,19 @@ bool remove_account_friend(account_data *acct, int acct_id) {
 }
 
 
+// quick sorter for friends
+int sort_friends_by_last_logon(struct friend_data *a, struct friend_data *b) {
+	account_data *a_acc = find_account(a->account_id);
+	account_data *b_acc = find_account(b->account_id);
+	if (!a_acc || !b_acc) {
+		return 1;
+	}
+	else {
+		return a_acc->last_logon - b_acc->last_logon;
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
@@ -426,6 +459,8 @@ ACMD(do_friends_all) {
 	account_data *acct;
 	char_data *plr;
 	struct friend_data *friend, *next_friend;
+	
+	HASH_SORT(GET_ACCOUNT(ch)->friends, sort_friends_by_last_logon);
 	
 	size = snprintf(output, sizeof(output), "Your friends list:\r\n");
 	count = 0;

@@ -294,6 +294,7 @@ void remove_player_from_account(char_data *ch);
 bool add_account_friend_id(account_data *acct, int acct_id, int status, char *name);
 void check_friends(char_data *ch);
 void free_account_friends(struct friend_data **hash);
+int has_pending_friend_requests(char_data *ch);
 
 // adventures
 extern adv_data *adventure_table;
