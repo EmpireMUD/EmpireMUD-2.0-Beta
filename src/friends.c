@@ -684,14 +684,21 @@ ACMD(do_friend_request) {
 	else {
 		// all other statusses: send a request
 		msg_to_char(ch, "You send %s a friend request.\r\n", GET_NAME(plr));
-		msg_to_char(plr, "%s has sent you a friend request. Use 'friend accept %s' or 'friend deny %s'.\r\n", GET_NAME(ch), GET_NAME(ch), GET_NAME(ch));
 		
-		if (add_account_friend_id(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr), FRIEND_REQUEST_SENT, GET_NAME(plr))) {
-			SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		if (!PRF_FLAGGED(plr, PRF_NO_FRIENDS)) {
+			msg_to_char(plr, "%s has sent you a friend request. Use 'friend accept %s' or 'friend deny %s'.\r\n", GET_NAME(ch), GET_NAME(ch), GET_NAME(ch));
+		
+			if (add_account_friend_id(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr), FRIEND_REQUEST_SENT, GET_NAME(plr))) {
+				SAVE_ACCOUNT(GET_ACCOUNT(ch));
+			}
+		
+			if (add_account_friend_id(GET_ACCOUNT(plr), GET_ACCOUNT_ID(ch), FRIEND_REQUEST_RECEIVED, GET_NAME(ch))) {
+				SAVE_ACCOUNT(GET_ACCOUNT(plr));
+			}
 		}
-		
-		if (add_account_friend_id(GET_ACCOUNT(plr), GET_ACCOUNT_ID(ch), FRIEND_REQUEST_RECEIVED, GET_NAME(ch))) {
-			SAVE_ACCOUNT(GET_ACCOUNT(plr));
+		else {
+			// auto-deny
+			msg_to_char(plr, "%s tried to send you a friend request but you have no-friends toggled on.\r\n", GET_NAME(ch));
 		}
 	}
 }
