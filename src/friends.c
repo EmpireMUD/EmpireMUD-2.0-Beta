@@ -594,6 +594,7 @@ ACMD(do_friend_accept) {
 	bool file = FALSE, secret = FALSE;
 	int status;
 	char_data *plr = NULL;
+	struct friend_data *friend;
 	
 	if (PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
 		msg_to_char(ch, "You cannot accept or deny friend requests while you have no-friends toggled on.\r\n");
@@ -604,12 +605,18 @@ ACMD(do_friend_accept) {
 	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
 		msg_to_char(ch, "No such player.\r\n");
 	}
-	else if (PRF_FLAGGED(plr, PRF_NO_FRIENDS) || !GET_ACCOUNT(plr)) {
-		// lie (they may be friends but we are not allowed to know this alt)
-		msg_to_char(ch, "You do not have an open friend request from %s.\r\n", secret ? "them" : GET_NAME(plr));
-	}
 	else if ((status = account_friend_status(ch, plr)) != FRIEND_REQUEST_RECEIVED) {
 		msg_to_char(ch, "You do not have an open friend request from %s.\r\n", secret ? "them" : GET_NAME(plr));
+	}
+	else if (PRF_FLAGGED(plr, PRF_NO_FRIENDS)) {
+		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && !str_cmp(GET_NAME(plr), friend->original_name)) {
+			// only if it's the same alt who sent the offer
+			msg_to_char(ch, "That player has toggled no-friends on since sending this offer; you cannot accept it.\r\n");
+		}
+		else {
+			// lie (they may be friends but we are not allowed to know this alt)
+			msg_to_char(ch, "You do not have an open friend request from %s.\r\n", secret ? "them" : GET_NAME(plr));
+		}
 	}
 	else {
 		// looks ok
