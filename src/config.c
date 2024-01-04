@@ -1911,7 +1911,6 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT, "number of times you can chop a tile that has no chop evolution");
 	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile");
-	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "depletion from gathering");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion from forage, etc");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
@@ -2134,9 +2133,11 @@ void init_config_system(void) {
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 	
 	// deprecated configs: no longer used/shown
-	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
 		init_config_flags("garden_depletion", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "deprecated: do not set");
+	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
+		init_config_flags("gather_depletion", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
 		init_config_flags("pick_depletion", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
