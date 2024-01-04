@@ -990,7 +990,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		}
 	}
 	if ( !proto ) {
-		msg_to_char(ch, "This empire has no item by that name.\r\n");
+		msg_to_char(ch, "This empire has no stored item by that name.\r\n");
 		return;
 	}
 	
