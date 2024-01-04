@@ -701,7 +701,7 @@ void update_biting_char(char_data *ch) {
 		act("$n shudders with ecstasy as $e feeds from $N!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("A surge of ecstasy fills your body as $n feeds from your veins!", FALSE, ch, 0, victim, TO_VICT);
 		
-		if ((GET_BLOOD(victim) * 100 / GET_MAX_BLOOD(victim)) < 20) {
+		if (amount >= GET_BLOOD(victim) || (GET_BLOOD(victim) * 100 / GET_MAX_BLOOD(victim)) < 20) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 	}
