@@ -3861,7 +3861,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			can_room_but_no_permit = TRUE;	// error later
 		}
-		else if (data->depletion && get_depletion(room, data->depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
+		else if (data->depletion != NOTHING && get_depletion(room, data->depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
 			can_room_but_depleted = TRUE;	// error later
 		}
 		else {
@@ -3982,7 +3982,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	}
 	
 	// check depletion
-	if (data->depletion) {
+	if (data->depletion != NOTHING) {
 		if (inter_veh) {
 			add_vehicle_depletion(inter_veh, data->depletion, TRUE);
 		}
