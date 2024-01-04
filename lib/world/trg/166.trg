@@ -2165,7 +2165,7 @@ if !%actor.aff_flagged(HIDDEN)% && %actor.skill(Stealth)% < 100
   set witnesses 0
   set ch %actor.room.people%
   while %ch% && %witnesses% < 2
-    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && !%ch.leader% && %ch.mob_flagged(HUMAN)% && !ch.aff_flagged(STUNNED)%
+    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && %ch.mob_flagged(HUMAN)% && !%ch.aff_flagged(STUNNED)%
       eval witnesses %witnesses% + 1
     end
     set ch %ch.next_in_room%
