@@ -32,12 +32,12 @@ E
 4 0 0.50 16698
 E
 22 0 25.00 36
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 X
 stumps nordlys grove trees forest around~
@@ -107,12 +107,12 @@ E
 4 0 0.50 16699
 E
 22 0 0.40 10562
-I 5 103 6.00 1 d  # DIG: yellow lightning stone
-I 5 104 6.00 1 d  # DIG: red bloodstone
-I 5 1300 6.00 1 d  # DIG: glowing green seashell
-I 5 1206 6.00 1 d  # DIG: iridescent blue iris
-I 5 106 18.00 1 d  # DIG: rough piece of obsidian
-I 5 100 58.00 1 d  # DIG: rock
+I 5 103 6.00 125 d  # DIG: yellow lightning stone
+I 5 104 6.00 125 d  # DIG: red bloodstone
+I 5 1300 6.00 125 d  # DIG: glowing green seashell
+I 5 1206 6.00 125 d  # DIG: iridescent blue iris
+I 5 106 18.00 125 d  # DIG: rough piece of obsidian
+I 5 100 58.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M
@@ -240,12 +240,12 @@ E
 0 0 100.00 16698
 E
 22 0 0.40 10564
-I 5 103 6.00 1 d  # DIG: yellow lightning stone
-I 5 104 6.00 1 d  # DIG: red bloodstone
-I 5 1300 6.00 1 d  # DIG: glowing green seashell
-I 5 1206 6.00 1 d  # DIG: iridescent blue iris
-I 5 106 18.00 1 d  # DIG: rough piece of obsidian
-I 5 100 58.00 1 d  # DIG: rock
+I 5 103 6.00 125 d  # DIG: yellow lightning stone
+I 5 104 6.00 125 d  # DIG: red bloodstone
+I 5 1300 6.00 125 d  # DIG: glowing green seashell
+I 5 1206 6.00 125 d  # DIG: iridescent blue iris
+I 5 106 18.00 125 d  # DIG: rough piece of obsidian
+I 5 100 58.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M

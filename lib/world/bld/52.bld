@@ -294,9 +294,9 @@ to touch. Despite the heat, it's a peaceful and quiet place.
 ~
 F
 f
-I 5 100 4.00 1 x  # DIG: rock
-I 5 102 4.00 1 x  # DIG: flint stone
-I 5 107 92.00 1 x  # DIG: bag of sand
+I 5 100 4.00 250 x  # DIG: rock
+I 5 102 4.00 250 x  # DIG: flint stone
+I 5 107 92.00 250 x  # DIG: bag of sand
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0

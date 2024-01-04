@@ -196,8 +196,8 @@ E
 4 0 0.80 10563
 E
 9 0 50.00 10563
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -270,8 +270,8 @@ E
 4 0 0.80 10564
 E
 9 0 50.00 10564
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -321,8 +321,8 @@ E
 4 0 0.20 10565
 E
 9 0 50.00 10565
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -372,8 +372,8 @@ E
 17 4 0.01 10565
 E
 17 0 0.10 10562
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 10552 75.00 1  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -437,8 +437,8 @@ E
 16 0 100.00 0
 E
 23 0 100.00 0
-I 5 10552 9.00 1 X  # DIG: arctic brambleberries
-I 5 100 100.00 1 X  # DIG: rock
+I 5 10552 9.00 125 X  # DIG: arctic brambleberries
+I 5 100 100.00 125 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
 M
 10556 5.00 0

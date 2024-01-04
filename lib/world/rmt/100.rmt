@@ -10,10 +10,10 @@ ad 0 0
 D14
 ~
 0 10001
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
@@ -52,10 +52,10 @@ D14
 D14
 ~
 0 10002
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
@@ -95,10 +95,10 @@ D14
 D14
 ~
 0 10003
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
@@ -140,10 +140,10 @@ D14
 D14
 ~
 0 10004
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
@@ -186,10 +186,10 @@ D14
 D14
 thicket~
 ab 10005
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange
@@ -228,10 +228,10 @@ ad 0 0
 D14
 thicket~
 ab 10004
-I 5 104 3.00 1 X  # DIG: a red bloodstone
-I 5 103 3.00 1 X  # DIG: a yellow lightning stone
-I 5 102 8.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
+I 5 104 3.00 125 X  # DIG: a red bloodstone
+I 5 103 3.00 125 X  # DIG: a yellow lightning stone
+I 5 102 8.00 125 X  # DIG: a flint stone
+I 5 100 100.00 125 X  # DIG: a rock
 I 6 1254 1.00 1 X  # FORAGE: a mana potion
 I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: an orange

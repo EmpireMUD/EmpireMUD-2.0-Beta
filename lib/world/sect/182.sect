@@ -12,8 +12,8 @@ D0
 &A~
 E
 4 0 0.01 18294
-I 5 100 50.00 1 x  # DIG: rock
-I 5 102 50.00 1 x  # DIG: flint stone
+I 5 100 50.00 125 x  # DIG: rock
+I 5 102 50.00 125 x  # DIG: flint stone
 I 6 10338 75.00 1  # FORAGE: scaly dragonfruit
 M
 18299 5.00 0
@@ -46,8 +46,8 @@ D0
 &J~
 E
 0 1 100.00 18293
-I 5 100 50.00 1 x  # DIG: rock
-I 5 102 50.00 1 x  # DIG: flint stone
+I 5 100 50.00 125 x  # DIG: rock
+I 5 102 50.00 125 x  # DIG: flint stone
 I 6 10338 75.00 1  # FORAGE: scaly dragonfruit
 I 20 18296 100.00 1  # CHOP: great dragon tree
 M

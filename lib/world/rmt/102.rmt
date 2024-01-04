@@ -197,13 +197,13 @@ them. The gate is tall, but it doesn't look strong enough to protect the camp
 from the animals you can hear calling in the distance. Only the sorcerers'
 magic is holding them back.
 ~
-I 5 100 60.00 1 X  # DIG: rock
-I 5 106 20.00 1 X  # DIG: rough piece of obsidian
-I 5 102 10.00 1 X  # DIG: flint stone
-I 5 103 2.50 1 X  # DIG: yellow lightning stone
-I 5 104 2.50 1 X  # DIG: red bloodstone
-I 5 1206 2.50 1 X  # DIG: iridescent blue iris
-I 5 1300 2.50 1 X  # DIG: glowing green seashell
+I 5 100 60.00 125 X  # DIG: rock
+I 5 106 20.00 125 X  # DIG: rough piece of obsidian
+I 5 102 10.00 125 X  # DIG: flint stone
+I 5 103 2.50 125 X  # DIG: yellow lightning stone
+I 5 104 2.50 125 X  # DIG: red bloodstone
+I 5 1206 2.50 125 X  # DIG: iridescent blue iris
+I 5 1300 2.50 125 X  # DIG: glowing green seashell
 M 0 10250 100.00 1
 M 0 10251 100.00 1
 T 10274
@@ -412,13 +412,13 @@ volcano eruption smoke ash~
 stretches clear to the heavens, and even the sun seems to have trouble breaking
 through its dooming shadow.
 ~
-I 5 100 60.00 1 X  # DIG: rock
-I 5 106 20.00 1 X  # DIG: rough piece of obsidian
-I 5 102 10.00 1 X  # DIG: flint stone
-I 5 103 2.50 1 X  # DIG: yellow lightning stone
-I 5 104 2.50 1 X  # DIG: red bloodstone
-I 5 1206 2.50 1 X  # DIG: iridescent blue iris
-I 5 1300 2.50 1 X  # DIG: glowing green seashell
+I 5 100 60.00 125 X  # DIG: rock
+I 5 106 20.00 125 X  # DIG: rough piece of obsidian
+I 5 102 10.00 125 X  # DIG: flint stone
+I 5 103 2.50 125 X  # DIG: yellow lightning stone
+I 5 104 2.50 125 X  # DIG: red bloodstone
+I 5 1206 2.50 125 X  # DIG: iridescent blue iris
+I 5 1300 2.50 125 X  # DIG: glowing green seashell
 M 1 10264 100.00 1
 T 10274
 T 10255

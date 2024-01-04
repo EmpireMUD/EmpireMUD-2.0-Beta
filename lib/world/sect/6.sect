@@ -73,12 +73,12 @@ E
 9 0 100.00 606
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
@@ -131,12 +131,12 @@ E
 9 0 100.00 607
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
@@ -213,12 +213,12 @@ E
 9 0 100.00 608
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
@@ -450,12 +450,12 @@ E
 0 0 100.00 603
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
@@ -542,8 +542,8 @@ E
 4 0 0.80 1
 E
 9 0 50.00 3
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 91.00 1 d  # DIG: rock
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 91.00 125 d  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
 X
@@ -612,12 +612,12 @@ E
 20 480 100.00 602
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
@@ -729,12 +729,12 @@ E
 20 360 100.00 603
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
@@ -918,12 +918,12 @@ E
 20 240 100.00 604
 E
 22 0 50.00 605
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
@@ -1026,12 +1026,12 @@ E
 9 0 100.00 621
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
@@ -1084,12 +1084,12 @@ E
 9 0 100.00 622
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
@@ -1230,12 +1230,12 @@ E
 9 0 100.00 623
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
@@ -1435,12 +1435,12 @@ E
 17 21 0.50 616
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
@@ -1531,8 +1531,8 @@ E
 4 0 0.80 25
 E
 9 0 50.00 26
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 91.00 1 d  # DIG: rock
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 91.00 125 d  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
 X
@@ -1568,12 +1568,12 @@ E
 10 614 5.00 21
 E
 22 0 50.00 21
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 101 9.00 1 d  # DIG: lump of clay
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 101 9.00 125 d  # DIG: lump of clay
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
@@ -1641,12 +1641,12 @@ E
 10 614 5.00 80
 E
 22 0 50.00 80
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 101 9.00 1 d  # DIG: lump of clay
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 101 9.00 125 d  # DIG: lump of clay
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
@@ -1713,12 +1713,12 @@ E
 10 614 5.00 81
 E
 22 0 50.00 81
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 101 9.00 1 d  # DIG: lump of clay
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 101 9.00 125 d  # DIG: lump of clay
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
@@ -1809,12 +1809,12 @@ E
 20 480 100.00 612
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
@@ -1936,12 +1936,12 @@ E
 20 360 100.00 613
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
@@ -2082,12 +2082,12 @@ E
 20 240 100.00 614
 E
 22 0 50.00 615
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
 I 6 606 100.00 1  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M

@@ -38,9 +38,9 @@ E
 16 0 100.00 0
 E
 23 0 100.00 0
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
 I 6 3013 75.00 1  # FORAGE: handful of nuts
 I 20 121 25.00 4 a  # CHOP: sticks and leaves
 I 20 121 25.00 6 a  # CHOP: sticks and leaves

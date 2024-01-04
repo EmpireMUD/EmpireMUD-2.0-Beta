@@ -20,9 +20,9 @@ E
 8 0 100.00 113
 E
 9 0 100.00 139
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3013 33.00 1  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -65,9 +65,9 @@ E
 4 0 2.00 102
 E
 9 0 100.00 102
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -117,9 +117,9 @@ E
 4 0 2.00 103
 E
 9 0 100.00 103
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -168,9 +168,9 @@ E
 4 0 2.00 104
 E
 9 0 100.00 104
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -244,9 +244,9 @@ E
 17 140 0.50 44
 E
 17 100 0.50 139
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
@@ -292,9 +292,9 @@ E
 16 0 100.00 100
 E
 19 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 U
 0
 The crop grows with astounding speed!~
@@ -319,8 +319,8 @@ E
 16 0 100.00 100
 E
 19 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 100 66.67 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 100 66.67 125 X  # DIG: rock
 I 6 3003 100.00 1  # FORAGE: handful of grain
 X
 field seeded seeds plants crop around~
@@ -374,9 +374,9 @@ E
 16 0 100.00 100
 E
 23 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3013 33.00 1  # FORAGE: handful of nuts
 X
 stumps field forest trees around~
@@ -416,9 +416,9 @@ E
 4 0 1.00 138
 E
 9 0 100.00 138
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
@@ -463,9 +463,9 @@ E
 4 0 0.50 102
 E
 9 0 100.00 102
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
@@ -510,9 +510,9 @@ E
 4 0 1.00 101
 E
 9 0 100.00 101
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
 I 6 3015 33.00 1  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
@@ -554,9 +554,9 @@ E
 8 0 100.00 113
 E
 9 0 100.00 144
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3013 25.00 1  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -612,9 +612,9 @@ E
 4 0 1.00 145
 E
 9 0 100.00 145
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3015 25.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -676,9 +676,9 @@ E
 17 140 1.00 139
 E
 17 100 1.00 139
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3015 25.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -728,9 +728,9 @@ E
 16 0 100.00 140
 E
 23 0 100.00 140
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 82.00 1 X  # DIG: lump of clay
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 82.00 125 X  # DIG: lump of clay
 I 6 3013 25.00 1  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -787,9 +787,9 @@ E
 4 0 1.00 144
 E
 9 0 100.00 144
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 82.00 1 X  # DIG: lump of clay
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 82.00 125 X  # DIG: lump of clay
 I 6 3015 25.00 1  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -833,8 +833,8 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 107 75.00 1 x  # DIG: bag of sand
-I 5 101 25.00 1 x  # DIG: lump of clay
+I 5 107 75.00 125 x  # DIG: bag of sand
+I 5 101 25.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -890,9 +890,9 @@ E
 17 150 1.00 154
 E
 17 100 0.60 139
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3051 40.00 1 x  # FORAGE: sea urchin
 I 6 3052 40.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -938,9 +938,9 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -980,9 +980,9 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3013 33.00 1  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
@@ -1041,9 +1041,9 @@ E
 16 0 100.00 150
 E
 23 0 100.00 150
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -1102,9 +1102,9 @@ E
 4 0 1.00 154
 E
 9 0 100.00 154
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 82.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 1 x  # FORAGE: sea urchin
 I 6 3052 50.00 1 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris

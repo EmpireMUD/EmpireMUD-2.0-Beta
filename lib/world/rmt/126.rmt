@@ -22,10 +22,10 @@ acdi 0 0 12650
 D14
 ~
 0 12651
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -66,10 +66,10 @@ D14
 D14
 ~
 0 12652
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -113,10 +113,10 @@ D14
 D14
 ~
 0 12653
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -158,10 +158,10 @@ E
 fog dense canopy trees path~
 Nope, it's just fog. All fog.
 ~
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -198,10 +198,10 @@ ai 0 0 12650
 D14
 ~
 0 12653
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -248,10 +248,10 @@ undergrowth burrow roots~
    Hidden in the undergrowth around the roots of an old oak tree is a rather
 large burrow.
 ~
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -291,10 +291,10 @@ D14
 D9
 ~
 0 12659
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 M 0 12658 50.00 3
 T 12657
 S
@@ -311,10 +311,10 @@ D8
 D14
 ~
 0 12660
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 M 0 12658 50.00 3
 M 0 12653 75.00 1
 T 12657
@@ -340,10 +340,10 @@ E
 walls roots exposed strange symbols glow~
 Odd runes have been scratched into the roots by some three-clawed creature.
 ~
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 M 0 12654 100.00 1
 M 0 12658 25.00 3
 T 12657
@@ -364,10 +364,10 @@ D14
 D14
 ~
 0 12663
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -462,10 +462,10 @@ D14
 D14
 ~
 0 12674
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -500,10 +500,10 @@ adi 0 0 12650
 D14
 ~
 0 12669
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -545,10 +545,10 @@ stairs staircase wooden trunk tree~
    The staircase appears to be made from bent saplings and upturned roots. It
 leads up into the canopy, but you can't see through the fog.
 ~
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -698,10 +698,10 @@ D14
 D14
 ~
 0 12675
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -742,10 +742,10 @@ ab 12676
 D14
 ~
 0 12674
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange
@@ -783,10 +783,10 @@ adi 0 0 12650
 D14
 thicket hidden path~
 ab 12675
-I 5 104 3.00 1 X  # DIG: red bloodstone
-I 5 103 3.00 1 X  # DIG: yellow lightning stone
-I 5 102 8.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 104 3.00 125 X  # DIG: red bloodstone
+I 5 103 3.00 125 X  # DIG: yellow lightning stone
+I 5 102 8.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 I 6 1254 1.00 1 X  # FORAGE: mana potion
 I 6 3013 25.00 1 X  # FORAGE: handful of nuts
 I 6 3009 25.00 1 X  # FORAGE: orange

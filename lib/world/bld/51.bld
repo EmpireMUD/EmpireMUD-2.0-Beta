@@ -173,9 +173,9 @@ waiting for the next miners to venture into its depths.
 ~
 F
 o
-I 5 106 4.00 1 X  # DIG: rough piece of obsidian
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 106 4.00 125 X  # DIG: rough piece of obsidian
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 M
 232 5.00 c
 R
@@ -537,8 +537,8 @@ materials can be transformed into something magnificent.
 ~
 F
 f
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 250 X  # DIG: flint stone
+I 5 100 100.00 250 X  # DIG: rock
 I 23 105 100.00 125  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 I 31 105 10.00 125  # PRODUCTION: huge stone block
@@ -570,7 +570,7 @@ transformed into something beautiful and useful.
 ~
 F
 f
-I 5 101 100.00 1 X  # DIG: lump of clay
+I 5 101 100.00 250 X  # DIG: lump of clay
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0

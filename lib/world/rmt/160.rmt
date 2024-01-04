@@ -9,11 +9,11 @@ cd 0 0
 D9
 ~
 0 16001
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -35,11 +35,11 @@ D14
 D14
 ~
 0 16003
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -56,11 +56,11 @@ b 0 0
 D14
 ~
 0 16001
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -81,11 +81,11 @@ D14
 D1
 ~
 0 16004
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -106,11 +106,11 @@ D3
 D1
 ~
 0 16005
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -179,11 +179,11 @@ D1
 D5
 ~
 0 16009
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -204,11 +204,11 @@ D0
 D4
 ~
 0 16006
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
@@ -229,11 +229,11 @@ D6
 D2
 ~
 0 16008
-I 5 101 1.00 1 g  # DIG: lump of clay
-I 5 103 3.00 1 g  # DIG: yellow lightning stone
-I 5 104 3.00 1 g  # DIG: red bloodstone
-I 5 102 10.00 1 g  # DIG: flint stone
-I 5 100 83.00 1 g  # DIG: rock
+I 5 101 1.00 125 g  # DIG: lump of clay
+I 5 103 3.00 125 g  # DIG: yellow lightning stone
+I 5 104 3.00 125 g  # DIG: red bloodstone
+I 5 102 10.00 125 g  # DIG: flint stone
+I 5 100 83.00 125 g  # DIG: rock
 I 6 16001 10.00 3 r  # FORAGE: oversized earthworm
 I 6 16001 35.00 2 r  # FORAGE: oversized earthworm
 I 6 16001 55.00 1 r  # FORAGE: oversized earthworm
