@@ -175,7 +175,6 @@ ACMD(do_forgive);
 ACMD(do_friend);
 ACMD(do_fullsave);
 
-ACMD(do_gather);
 ACMD(do_gecho);
 ACMD(do_gen_augment);
 ACMD(do_gen_craft);
@@ -689,7 +688,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
 	SIMPLE_CMD( "get", POS_RESTING, do_get, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "gather", POS_STANDING, do_gather, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "gather", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_GATHER, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "gecho", POS_DEAD, do_gecho, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_GECHO ),
 	SIMPLE_CMD( "give", POS_RESTING, do_give, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "goto", POS_SLEEPING, do_goto, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_GOTO ),

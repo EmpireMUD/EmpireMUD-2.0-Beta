@@ -3238,7 +3238,8 @@ struct gen_interact_data_t {
 	int action;	// ACT_ type
 	char *command;	// 'quarry'
 	char *verb;	// 'quarrying'
-	int timer;	// number of action ticks
+	char *timer_config;	// optional: config to get the timer (NULL to not use)
+	int timer;	// number of action ticks to use if a config is not set
 	int ptech;	// required ptech (may be NOTHING)
 	int depletion;	// DPLTN_ type (may be NOTHING)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)

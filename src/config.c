@@ -1900,6 +1900,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
 	init_config(CONFIG_ACTIONS, "chip_timer", CONFTYPE_INT, "ticks to chip flint");
 	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "weapon damage to chop 1 tree");
+	init_config(CONFIG_ACTIONS, "dig_base_timer", CONFTYPE_INT, "ticks, sped up by Finder and/or shovel");
 	init_config(CONFIG_ACTIONS, "fishing_timer", CONFTYPE_INT, "time per fish, halved by high Survival");
 	init_config(CONFIG_ACTIONS, "forage_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");
 	init_config(CONFIG_ACTIONS, "gather_base_timer", CONFTYPE_INT, "ticks, halved by Finder");
@@ -1913,6 +1914,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "depletion from gathering");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion from forage, etc");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
+	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
@@ -2132,8 +2134,6 @@ void init_config_system(void) {
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 	
 	// deprecated configs: no longer used/shown
-	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("pick_base_timer", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("garden_depletion", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "deprecated: do not set");
@@ -2144,8 +2144,6 @@ void init_config_system(void) {
 		init_config_flags("max_chore_resource_skilled", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("trench_full_value", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "dig_base_timer", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("dig_base_timer", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("bonus_city_point_techs", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");

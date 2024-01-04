@@ -62,7 +62,6 @@ void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
 void process_fishing(char_data *ch);
 void process_foraging(char_data *ch);
-void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_gen_interact_room(char_data *ch);
 void process_harvesting(char_data *ch);
@@ -107,7 +106,7 @@ ACMD(do_tan);
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_DIGGING
-	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
+	{ "gathering", "is gathering material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
@@ -157,8 +156,8 @@ const struct action_data_struct action_data[] = {
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
 const struct gen_interact_data_t gen_interact_data[] = {
-	// { interact, action, command, verb, timer
-	//	ptech, depletion, approval_config, spec-proc
+	// { interact, action, command, verb, timer_config, timer
+	//	ptech, depletion, approval_config, spec_proc
 	//	{ { start-to-char, start-to-room }, { finish-to-char, finish-to-room },
 	//		empty-to-char
 	//		chance-of-random-tick-msg,
@@ -169,7 +168,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	#define END_RANDOM_TICK_MSGS  { NULL, NULL }
 	#define NO_RANDOM_TICK_MSGS  { END_RANDOM_TICK_MSGS }
 	
-	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", 4,
+	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", "pick_base_timer", 4,
 		PTECH_PICK_COMMAND, DPLTN_PICK, "gather_approval",
 		NULL,
 		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
@@ -180,7 +179,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			END_RANDOM_TICK_MSGS
 		}}
 	},
-	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", 12,
+	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", NULL, 12,
 		PTECH_QUARRY_COMMAND, DPLTN_QUARRY, "gather_approval",
 		gen_proc_nature_burn,
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
@@ -193,7 +192,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			END_RANDOM_TICK_MSGS
 		}}
 	},
-	{ INTERACT_DIG, ACT_DIGGING, "dig", "digging", 4,
+	{ INTERACT_DIG, ACT_DIGGING, "dig", "digging", "dig_base_timer", 4,
 		PTECH_DIG_COMMAND, DPLTN_DIG, "gather_approval",
 		gen_proc_nature_burn,
 		{ /* start msg */ { "You begin to dig into the ground.", "$n kneels down and begins to dig." },
@@ -204,8 +203,19 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			END_RANDOM_TICK_MSGS
 		}}
 	},
+	{ INTERACT_GATHER, ACT_GATHERING, "gather", "gathering", "gather_base_timer", 4,
+		PTECH_GATHER_COMMAND, DPLTN_GATHER, "gather_approval",
+		NULL,
+		{ /* start msg */ { "You begin looking around for material.", "$n starts looking for something to on the ground." },
+		/* finish msg */ { "You gather $p!", "$n gathers $p!" },
+		/* empty msg */ "There's no good material left for you to gather here.",
+		100, { // random tick messages:
+			{ "You search the ground for useful material...", "$n searches around on the ground..." },
+			END_RANDOM_TICK_MSGS
+		}}
+	},
 	
-	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
+	{ -1, -1, "\n", "\n", NULL, 0, NOTHING, NOTHING, NULL, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
 };
 
 
@@ -989,57 +999,6 @@ INTERACTION_FUNC(finish_foraging) {
 	}
 	
 	return TRUE;
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(finish_gathering) {
-	obj_data *obj = NULL;
-	char *cust;
-	int iter, obj_ok = 0;
-	
-	for (iter = 0; iter < interaction->quantity; ++iter) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
-		add_depletion(IN_ROOM(ch), DPLTN_GATHER, TRUE);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	if (obj_ok && obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (interaction->quantity > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", interaction->quantity);
-		}
-		else {
-			strcpy(buf, cust ? cust : "You find $p!");
-		}
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
-		
-		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		
-		gain_player_tech_exp(ch, PTECH_GATHER_COMMAND, 10);
-		run_ability_hooks_by_player_tech(ch, PTECH_GATHER_COMMAND, NULL, NULL, NULL, NULL);
-		
-		// action does not end normally
-		
-		return TRUE;
-	}
-	
-	return FALSE;
 }
 
 
@@ -1873,46 +1832,6 @@ void process_foraging(char_data *ch) {
 			}
 			else if (!found) {
 				msg_to_char(ch, "You couldn't find anything to eat here.\r\n");
-			}
-		}
-	}
-}
-
-
-/**
-* Tick update for gather action.
-*
-* @param char_data *ch The gatherer.
-*/
-void process_gathering(char_data *ch) {
-	int gather_base_timer = config_get_int("gather_base_timer");
-	int gather_depletion = config_get_int("gather_depletion");
-	
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You search the ground for useful material...\r\n", ch);
-	}
-	act("$n searches around on the ground...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	// done ?
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
-			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
-			end_action(ch);
-		}
-		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, NULL, GUESTS_ALLOWED, finish_gathering)) {
-				// check repeatability
-				if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
-					GET_ACTION_TIMER(ch) = gather_base_timer;
-				}
-				else {
-					end_action(ch);
-				}
-			}
-			else {
-				msg_to_char(ch, "You don't seem to be able to gather anything here.\r\n");
-				end_action(ch);
 			}
 		}
 	}
@@ -3138,43 +3057,6 @@ ACMD(do_forage) {
 }
 
 
-ACMD(do_gather) {
-	int gather_base_timer = config_get_int("gather_base_timer");
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot gather.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_GATHERING) {
-		send_to_char("You stop gathering.\r\n", ch);
-		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_GATHER_COMMAND)) {
-		msg_to_char(ch, "You don't have the correct ability to gather anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
-		send_to_char("You can't really gather anything useful here.\r\n", ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to gather here.\r\n");
-	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_GATHER_COMMAND, NULL, NULL)) {
-		// triggered
-	}
-	else {
-		start_action(ch, ACT_GATHERING, gather_base_timer);
-		
-		send_to_char("You begin looking around for plant material.\r\n", ch);
-	}
-}
-
-
 ACMD(do_harvest) {
 	int harvest_timer = config_get_int("harvest_timer");
 	
@@ -4024,12 +3906,17 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 * @param const struct gen_interact_data_t *data A pointer to the gen_interact_data[].
 */
 void start_gen_interact_room(char_data *ch, const struct gen_interact_data_t *data) {
+	int timer;
+	
 	if (!data || !can_gen_interact_room(ch, IN_ROOM(ch), data)) {
 		// fails silently if !data but that shouldn't even be possible; messages otherwise
 		return;
 	}
 	
-	start_action(ch, data->action, data->timer);
+	timer = (data->timer_config && *data->timer_config) ? config_get_int(data->timer_config) : data->timer;
+	timer = MAX(1, timer);	// for safety
+	
+	start_action(ch, data->action, timer);
 	if (data->msg.start[0]) {
 		msg_to_char(ch, "%s\r\n", data->msg.start[0]);
 	}
