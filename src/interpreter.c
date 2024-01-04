@@ -116,7 +116,6 @@ ACMD(do_demote);
 ACMD(do_deposit);
 ACMD(do_designate);
 ACMD(do_diagnose);
-ACMD(do_dig);
 ACMD(do_diplomacy);
 ACMD(do_disembark);
 ACMD(do_disguise);
@@ -621,7 +620,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "distance", POS_DEAD, do_distance, NO_MIN, CTYPE_IMMORTAL ),
-	STANDARD_CMD( "dig", POS_STANDING, do_dig, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "dig", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_DIG, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "dispatch", POS_RESTING, do_dispatch, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),

@@ -36,6 +36,7 @@
 *   Action Finishers
 *   Action Processes
 *   Action Commands
+*   Generic Interaction Special Procedures
 *   Generic Interactions: do_gen_interact_room
 */
 
@@ -56,7 +57,6 @@ void process_bathing(char_data *ch);
 void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
-void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
@@ -87,6 +87,7 @@ void process_swap_skill_sets(char_data *ch);
 void process_tanning(char_data *ch);
 
 // other local protos
+GEN_INTERACT_SPECIAL(gen_proc_nature_burn);
 INTERACTION_FUNC(finish_foraging);
 
 // external variables
@@ -105,7 +106,7 @@ ACMD(do_tan);
 // ACT_x: main data for all chores
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
-	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
+	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_DIGGING
 	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
@@ -157,7 +158,7 @@ const struct action_data_struct action_data[] = {
 // INTERACT_x: interactions that are processed by do_gen_interact_room
 const struct gen_interact_data_t gen_interact_data[] = {
 	// { interact, action, command, verb, timer
-	//	ptech, depletion, approval_config
+	//	ptech, depletion, approval_config, spec-proc
 	//	{ { start-to-char, start-to-room }, { finish-to-char, finish-to-room },
 	//		empty-to-char
 	//		chance-of-random-tick-msg,
@@ -170,6 +171,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	
 	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", 4,
 		PTECH_PICK_COMMAND, DPLTN_PICK, "gather_approval",
+		NULL,
 		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
 		/* finish msg */ { "You find $p!", "$n finds $p!" },
 		/* empty msg */ "You can't find anything here left to pick.",
@@ -180,6 +182,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", 12,
 		PTECH_QUARRY_COMMAND, DPLTN_QUARRY, "gather_approval",
+		gen_proc_nature_burn,
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
 		/* finish msg */ { "You give the plug drill one final swing and pry loose $p!", "$n hits the plug drill hard with a hammer and pries loose $p!" },
 		/* empty msg */ "You don't seem to find anything of use.",
@@ -190,8 +193,19 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			END_RANDOM_TICK_MSGS
 		}}
 	},
+	{ INTERACT_DIG, ACT_DIGGING, "dig", "digging", 4,
+		PTECH_DIG_COMMAND, DPLTN_DIG, "gather_approval",
+		gen_proc_nature_burn,
+		{ /* start msg */ { "You begin to dig into the ground.", "$n kneels down and begins to dig." },
+		/* finish msg */ { "You pull $p from the ground!", "$n pulls $p from the ground!" },
+		/* empty msg */ "You don't seem to be able to find anything worth digging for.",
+		100, { // random tick messages:
+			{ "You dig vigorously at the ground.", "$n digs vigorously at the ground." },
+			END_RANDOM_TICK_MSGS
+		}}
+	},
 	
-	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
+	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
 };
 
 
@@ -774,23 +788,6 @@ void start_chopping(char_data *ch) {
 
 
 /**
-* begins the digging action if able
-*
-* @param char_data *ch The player to start digging.
-*/
-static void start_digging(char_data *ch) {
-	int dig_base_timer = config_get_int("dig_base_timer");
-	
-	if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
-		start_action(ch, ACT_DIGGING, dig_base_timer);
-
-		send_to_char("You begin to dig into the ground.\r\n", ch);
-		act("$n kneels down and begins to dig.", TRUE, ch, 0, 0, TO_ROOM);
-	}
-}
-
-
-/**
 * begins the "forage" action
 *
 * @param char_data *ch The future forager.
@@ -885,62 +882,6 @@ INTERACTION_FUNC(finish_chopping) {
 		
 		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-	}
-	
-	return TRUE;
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(finish_digging) {	
-	obj_vnum vnum = interaction->vnum;
-	obj_data *obj = NULL;
-	char *cust;
-	int num, obj_ok = 0;
-	
-	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
-		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
-		return FALSE;
-	}
-	else {
-		for (num = 0; num < interaction->quantity; ++num) {
-			obj = read_object(vnum, TRUE);
-			scale_item_to_level(obj, 1);	// minimum level
-			obj_to_char_or_room(obj, ch);
-			obj_ok = load_otrigger(obj);
-			if (obj_ok) {
-				get_otrigger(obj, ch, FALSE);
-			}
-			
-			// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
-			add_depletion(inter_room, DPLTN_DIG, TRUE);
-		}
-		
-		// mark gained
-		if (GET_LOYALTY(ch)) {
-			add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-		}
-		
-		if (obj_ok && obj) {
-			// to-char
-			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-			if (interaction->quantity > 1) {
-				sprintf(buf1, "%s (x%d)", cust ? cust : "You pull $p from the ground!", interaction->quantity);
-			}
-			else {
-				strcpy(buf1, cust ? cust : "You pull $p from the ground!");
-			}
-			act(buf1, FALSE, ch, obj, 0, TO_CHAR);
-			
-			// to-room
-			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
-			
-			if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-				act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
-			}
 		}
 	}
 	
@@ -1634,68 +1575,6 @@ void process_chop(char_data *ch) {
 				start_chopping(ch_iter);
 			}
 		}
-	}
-}
-
-
-/**
-* Tick update for digging action.
-*
-* @param char_data *ch The digger.
-*/
-void process_digging(char_data *ch) {
-	room_data *in_room;
-	char_data *iter;
-	
-	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to dig here.\r\n");
-		cancel_action(ch);
-		return;
-	}
-
-	// decrement timer
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	// done?
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		end_action(ch);
-		in_room = IN_ROOM(ch);
-		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
-			// success
-			gain_player_tech_exp(ch, PTECH_DIG_COMMAND, 10);
-			run_ability_hooks_by_player_tech(ch, PTECH_DIG_COMMAND, NULL, NULL, NULL, NULL);
-		
-			// character is still there and not digging?
-			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
-				start_digging(ch);
-			}
-		}
-		else {
-			msg_to_char(ch, "You don't seem to be able to find anything to dig for.\r\n");
-			cancel_action(ch);
-		}
-	}
-	else {
-		// normal tick message
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			send_to_char("You dig vigorously at the ground.\r\n", ch);
-		}
-		act("$n digs vigorously at the ground.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-	}
-	
-	// look for earthmelders
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
-		if (!AFF_FLAGGED(iter, AFF_EARTHMELDED)) {
-			continue;
-		}
-		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
-			continue;
-		}
-		
-		// earthmeld damage
-		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
-		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -3042,44 +2921,6 @@ ACMD(do_chop) {
 }
 
 
-ACMD(do_dig) {
-	skip_spaces(&argument);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs can't dig.\r\n");
-	}
-	else if (*argument) {
-		msg_to_char(ch, "You can't dig for specific items. Just type 'dig' and see what you get.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_DIGGING) {
-		send_to_char("You stop digging.\r\n", ch);
-		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_DIG_COMMAND)) {
-		msg_to_char(ch, "You don't have the correct ability to dig anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
-		send_to_char("You can't dig here.\r\n", ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to dig here.\r\n");
-	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_DIG_COMMAND, NULL, NULL)) {
-		// triggered
-	}
-	else {
-		start_digging(ch);
-	}
-}
-
-
 /**
 * do_light passes control here after finding that the target is the room.
 *
@@ -3932,6 +3773,28 @@ ACMD(do_tan) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC INTERACTION SPECIAL PROCEDURES //////////////////////////////////
+
+// GEN_INTERACT_SPECIAL provides: ch, data
+GEN_INTERACT_SPECIAL(gen_proc_nature_burn) {
+	char_data *iter;
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELDED)) {
+			continue;
+		}
+		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
+			continue;
+		}
+		
+		// earthmeld damage
+		msg_to_char(iter, "You feel nature burning at your earthmelded form from someone %s above you!\r\n", data->verb);
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 30, DAM_MAGICAL, 5, 60, iter);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// GENERIC INTERACTIONS: do_gen_interact_room //////////////////////////////
 /**
 * This system uses the gen_interact_data config array to manage chores that
@@ -4093,10 +3956,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	if (!data) {
 		return FALSE;
 	}
-	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;	// depleted vehicle
 	}
-	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;	// depleted room
 	}
 	
@@ -4233,6 +4096,11 @@ void process_gen_interact_room(char_data *ch) {
 			end_action(ch);
 			msg_to_char(ch, "You find nothing.\r\n");
 		}
+	}
+	
+	// special procedure?
+	if (data->spec_proc) {
+		(data->spec_proc)(ch, data);
 	}
 }
 

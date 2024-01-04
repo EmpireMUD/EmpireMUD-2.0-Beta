@@ -424,6 +424,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_DISENCHANT  36
 #define NUM_INTERACTS  37
 
+// for do_gen_interact
+#define GEN_INTERACT_SPECIAL(name)	void (name)(char_data *ch, const struct gen_interact_data_t *data)
+
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
 #define INTERACT_RESTRICT_ABILITY  0	// player must have an ability
@@ -3239,6 +3242,7 @@ struct gen_interact_data_t {
 	int ptech;	// required ptech (may be NOTHING)
 	int depletion;	// DPLTN_ type (may be NOTHING)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	GEN_INTERACT_SPECIAL(*spec_proc);	// optional spec to run during the process such as gen_proc_nature_burn
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action
 		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p

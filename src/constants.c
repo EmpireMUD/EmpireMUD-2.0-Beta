@@ -5084,7 +5084,7 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// SHEAR  -- definitely cannot support this
 	FALSE,	// BARDE  -- definitely cannot support this
 	FALSE,	// LOOT  -- definitely cannot support this
-	FALSE,	// DIG
+	TRUE,	// DIG
 	FALSE,	// FORAGE
 	TRUE,	// PICK
 	FALSE,	// HARVEST  -- PROBABLY cannot support this
@@ -5112,10 +5112,10 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
 	TRUE,	// PRODUCTION
 	TRUE,	// SKILLED_LABOR
-	FALSE,	// LIQUID_CONJURE
-	FALSE,	// OBJECT_CONJURE
-	FALSE,	// VEHICLE_CONJURE
-	FALSE,	// DISENCHANT
+	FALSE,	// LIQUID_CONJURE  -- definitely cannot support this
+	FALSE,	// OBJECT_CONJURE  -- definitely cannot support this
+	FALSE,	// VEHICLE_CONJURE  -- definitely cannot support this
+	FALSE,	// DISENCHANT  -- definitely cannot support this
 };
 
 
