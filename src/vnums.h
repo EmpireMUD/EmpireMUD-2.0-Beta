@@ -183,4 +183,3 @@
 #define LIQ_ALE  3
 #define LIQ_CIDER  4
 #define LIQ_MILK  5
-#define LIQ_BLOOD  6

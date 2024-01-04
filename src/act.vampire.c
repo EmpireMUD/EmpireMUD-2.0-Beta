@@ -462,7 +462,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	
 	// look for blood to drink
 	DL_FOREACH2(ch->carrying, obj, next_content) {
-		if (!IS_DRINK_CONTAINER(obj) || GET_DRINK_CONTAINER_TYPE(obj) != LIQ_BLOOD || GET_DRINK_CONTAINER_CONTENTS(obj) < 1) {
+		if (!IS_DRINK_CONTAINER(obj) || GET_DRINK_CONTAINER_CONTENTS(obj) < 1 || !liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_BLOOD)) {
 			continue;	// not a drink container
 		}
 		

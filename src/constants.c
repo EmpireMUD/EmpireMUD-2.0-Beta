@@ -2689,6 +2689,7 @@ const char *liquid_flags[] = {
 	"WATER",	// 0
 	"COOLING",
 	"WARMING",
+	"BLOOD",
 	"\n"
 };
 

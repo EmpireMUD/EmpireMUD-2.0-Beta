@@ -5543,7 +5543,7 @@ ACMD(do_drink) {
 	}
 	
 	// "amount" will be how many gulps to take from the CAPACITY
-	if (liquid == LIQ_BLOOD) {
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_BLOOD)) {
 		// drinking blood?
 		amount = GET_MAX_BLOOD(ch) - GET_BLOOD(ch);
 	}
@@ -5587,7 +5587,7 @@ ACMD(do_drink) {
 	}
 	
 	// apply effects
-	if (liquid == LIQ_BLOOD) {
+	if (liq_generic && IS_SET(GET_LIQUID_FLAGS(liq_generic), LIQF_BLOOD)) {
 		set_blood(ch, GET_BLOOD(ch) + amount);
 	}
 	

@@ -5086,6 +5086,7 @@ The following flags are available for liquids:
  &cWATER&0 - Counts as water for certain game commands (douse).
  &cCOOLING&0 - Drinking this liquid makes the player cooler, if warm.
  &cWARMING&0 - Drinking this liquid makes the player warmer, if cold.
+ &cBLOOD&0 - Counts as blood for vampires.
 
 See also: OLC GENERICS, GENERIC LIQUIDS
 #d
