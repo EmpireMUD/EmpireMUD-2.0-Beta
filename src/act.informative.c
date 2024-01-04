@@ -2153,7 +2153,7 @@ WHO_SORTER(sort_who_role_level) {
 */
 char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	static char out[MAX_STRING_LENGTH];
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], show_role[24], part[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH], show_role[24], part[MAX_STRING_LENGTH];
 	int num, size = 0;
 	
 	*out = '\0';
@@ -2197,13 +2197,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		// determine length to show
 		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			num = color_code_length(out);
-			sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 			strcpy(buf1, out);
-		
-			size = snprintf(out, sizeof(out), buf, buf1);
-		}
-		else {
-			size = snprintf(out, sizeof(out), "%s", buf1);
+			size = snprintf(out, sizeof(out), "%-*.*s", 35 + num, 35 + num, buf1);
 		}
 		return out;
 	}
