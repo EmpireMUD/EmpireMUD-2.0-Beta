@@ -5526,11 +5526,16 @@ void save_olc_quest(descriptor_data *desc) {
 	}
 	
 	// update daily cycles
-	if (old_cycle != NOTHING) {
-		setup_daily_quest_cycles(old_cycle);
-	}
-	if (QUEST_DAILY_CYCLE(proto) != NOTHING && QUEST_DAILY_CYCLE(proto) != old_cycle) {
-		setup_daily_quest_cycles(QUEST_DAILY_CYCLE(proto));
+	if (QUEST_DAILY_CYCLE(proto) != old_cycle) {
+		if (old_cycle != NOTHING) {
+			setup_daily_quest_cycles(old_cycle);
+		}
+		if (QUEST_DAILY_CYCLE(proto) != NOTHING) {
+			setup_daily_quest_cycles(QUEST_DAILY_CYCLE(proto));
+		}
+		if (QUEST_DAILY_CYCLE(proto) == NOTHING) {
+			QUEST_DAILY_ACTIVE(proto) = TRUE;
+		}
 	}
 }
 
