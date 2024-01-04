@@ -595,7 +595,7 @@ if !%SelfRoom.in_city%
 end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
-  nop %actor.set_cooldown(16611, 20)%
+  nop %actor.set_cooldown(16611, 5)%
   halt
 end
 if !%MoveDir%
