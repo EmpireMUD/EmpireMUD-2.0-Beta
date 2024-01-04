@@ -94,7 +94,6 @@
 #define FELLER  207
 #define MINER  208
 #define BUILDER  209
-#define DIGGER  224
 #define STUMP_BURNER  226
 #define SCRAPER  227
 #define REPAIRMAN  229

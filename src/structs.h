@@ -1084,12 +1084,12 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_CHOPPING  3
 #define CHORE_MAINTENANCE  4
 #define CHORE_MINING  5
-#define CHORE_DIGGING  6
+	#define CHORE_UNUSED6  6	// formerly digging; merged into productions
 #define CHORE_SAWING  7
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_PRODUCTION  11	// formerly quarry, trapping, beekeeping, herb-gardening
+#define CHORE_PRODUCTION  11	// formerly digging, quarry, trapping, beekeeping, herb-gardening
 #define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
 	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14

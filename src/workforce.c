@@ -41,7 +41,6 @@
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
-void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_dismantle(empire_data *emp, room_data *room);
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *veh, int chore, int interact_type);
@@ -88,7 +87,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "chopping", FELLER, FALSE, NOTHING },
 	{ "maintenance", REPAIRMAN, FALSE, NOTHING },
 	{ "mining", MINER, FALSE, NOTHING },
-	{ "digging", DIGGER, FALSE, NOTHING },
+		{ "unused", NOTHING, TRUE, NOTHING },
 	{ "sawing", SAWYER, FALSE, NOTHING },
 	{ "scraping", SCRAPER, FALSE, NOTHING },
 	{ "smelting", SMELTER, FALSE, NOTHING },
@@ -222,9 +221,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// function chores
-	if (HAS_FUNCTION(room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
-		do_chore_digging(emp, room, NULL);
-	}
 	if (HAS_FUNCTION(room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 		do_chore_shearing(emp, room, NULL);
 	}
@@ -344,9 +340,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// function chores:
-	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
-		do_chore_digging(emp, room, veh);
-	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 		do_chore_shearing(emp, room, veh);
 	}
@@ -2164,85 +2157,6 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 	}
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_CHOPPING, WF_PROB_OVER_LIMIT, FALSE);
-	}
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(one_dig_chore) {
-	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
-	char buf[MAX_STRING_LENGTH], amtbuf[256];
-	int amt;
-	
-	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_DIGGING, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
-		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
-		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
-		add_production_total(emp, interaction->vnum, amt);
-		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
-		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_DIG, TRUE);
-		// only send message if someone else is present (don't bother verifying it's a player)
-		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			if (amt > 1) {
-				snprintf(amtbuf, sizeof(amtbuf), " (x%d)", amt);
-			}
-			else {
-				*amtbuf = '\0';
-			}
-			
-			if (inter_veh) {
-				sprintf(buf, "$n digs up %s%s from $V.", get_obj_name_by_proto(interaction->vnum), amtbuf);
-			}
-			else {
-				sprintf(buf, "$n digs up %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
-			}
-			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
-		}
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-
-/**
-* @param empire_data *emp The empire for the chore.
-* @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
-*/
-void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {	
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DIGGING].mob);
-	bool depleted = (GET_CHORE_DEPLETION(room, veh, DPLTN_DIG) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
-	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_DIGGING, VEH_INTERACTIONS(veh), INTERACT_DIG, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_DIGGING, INTERACT_DIG);
-	bool can_do = !depleted && can_gain;
-	
-	if (can_do) {
-		// not able to ewt_mark_resource_worker() until we're inside the interact
-		if (worker) {
-			charge_workforce(emp, CHORE_DIGGING, room, worker, 1, NOTHING, 0);
-			if (veh) {
-				run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_DIG, room, worker, NULL, veh, one_dig_chore);
-			}
-			else {	// non-vehicle
-				run_room_interactions(worker, room, INTERACT_DIG, veh, NOTHING, one_dig_chore);
-			}
-		}
-		else {
-			if ((worker = place_chore_worker(emp, CHORE_DIGGING, room))) {
-				ewt_mark_for_interactions(emp, room, INTERACT_DIG);
-				charge_workforce(emp, CHORE_DIGGING, room, worker, 1, NOTHING, 0);
-			}
-		}
-	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_DIGGING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_DEPLETED, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_DIGGING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 

@@ -4075,7 +4075,7 @@ void process_gen_interact_room(char_data *ch) {
 		// do not un-set GET_ACTION before running interactions
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room)) {
-		end_action(ch);
+			end_action(ch);
 			in_room = IN_ROOM(ch);
 			
 			if (data->ptech) {
