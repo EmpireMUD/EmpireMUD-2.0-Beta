@@ -517,7 +517,7 @@ S
 Quarry~
 A Quarry~
 &0|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig, quarry~
@@ -541,8 +541,12 @@ I 5 102 15.00 250 X  # DIG: flint stone
 I 5 100 100.00 250 X  # DIG: rock
 I 23 105 100.00 125  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 105 10.00 125  # PRODUCTION: huge stone block
+I 31 105 10.00 125 X  # PRODUCTION: huge stone block
 I+ 7 5  # Depletion: quarry
+I 31 102 15.00 250 X  # PRODUCTION: flint stone
+I+ 7 0  # Depletion: dig
+I 31 100 75.00 250 X  # PRODUCTION: rock
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S
@@ -550,7 +554,7 @@ S
 Clay Pit~
 A Clay Pit~
 &y|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig~
@@ -572,6 +576,8 @@ F
 f
 I 5 101 100.00 250 X  # DIG: lump of clay
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 101 100.00 250 X  # PRODUCTION: lump of clay
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S

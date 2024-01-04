@@ -279,7 +279,7 @@ S
 Sand Pit~
 A Sand Pit~
 &Y|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig~
@@ -298,6 +298,12 @@ I 5 100 4.00 250 x  # DIG: rock
 I 5 102 4.00 250 x  # DIG: flint stone
 I 5 107 92.00 250 x  # DIG: bag of sand
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 100 4.00 250 X  # PRODUCTION: rock
+I+ 7 0  # Depletion: dig
+I 31 102 4.00 250 X  # PRODUCTION: flint stone
+I+ 7 0  # Depletion: dig
+I 31 107 92.00 250 X  # PRODUCTION: bag of sand
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S
