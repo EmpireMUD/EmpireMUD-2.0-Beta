@@ -4033,7 +4033,7 @@ const char *function_flags[] = {
 	"BATHS",
 	"BEDROOM",
 	"CARPENTER",
-	"DIGGING",	// 5
+	"*",	// 5
 	"DOCKS",
 	"FORGE",
 	"GLASSBLOWER",
@@ -4078,7 +4078,7 @@ const char *function_flags_long[] = {
 	"at the baths",
 	"in a bedroom",
 	"at a carpenter",
-	"somewhere that can be dug",	// 5
+	"",	// 5
 	"at the docks",
 	"at a forge",
 	"at a glassblower",

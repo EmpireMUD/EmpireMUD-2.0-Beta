@@ -790,7 +790,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
-#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+	#define FNC_UNUSED5  BIT(5)	// formerly DIGGING; no longer needed for workforce
 #define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
 #define FNC_FORGE  BIT(7)	// can use the forge command here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
