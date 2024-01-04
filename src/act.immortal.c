@@ -5344,18 +5344,22 @@ SHOW(show_notes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
 			return;
 		}
+		if (get_highest_access_level(acct) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(argument))) {
 			msg_to_char(ch, "There is no such player.\r\n");
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You can't show notes for players of that level.\r\n");
-			return;
-		}
 		if (!(acct = find_account(index->account_id))) {
 			msg_to_char(ch, "There are no notes for that player.\r\n");
+			return;
+		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
 			return;
 		}
 	}

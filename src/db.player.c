@@ -4608,8 +4608,10 @@ int get_highest_access_level(account_data *acct) {
 	struct account_player *plr;
 	int highest = 0;
 	
-	LL_FOREACH(acct->players, plr) {
-		highest = MAX(highest, plr->player->access_level);
+	if (acct) {
+		LL_FOREACH(acct->players, plr) {
+			highest = MAX(highest, plr->player->access_level);
+		}
 	}
 	
 	return highest;
