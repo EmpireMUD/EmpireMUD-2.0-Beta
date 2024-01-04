@@ -330,7 +330,8 @@ S
 20 50 bdqvI 0 3
 1 0 0 6 -1
 D
-This citizen is digging for resources. (workforce digging)
+   This citizen used to dig for resources, but a production assistant does that
+now.
 ~
 S
 #225

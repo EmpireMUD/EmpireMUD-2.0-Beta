@@ -2833,7 +2833,7 @@ INTERACTION_FUNC(one_production_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
@@ -2888,13 +2888,12 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 		charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
 		
 		if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
-			// depletions are now set inside one_production_chore
-			// ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
+			// successful vehicle interact
 		}
 		else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
-			// depletions are now set inside one_production_chore
-			// ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
+			// successful room interact
 		}
+		// no else: these interactions may fail due to low percentages
 	}
 	else if (can_do) {
 		// place worker

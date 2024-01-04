@@ -46,8 +46,8 @@ stone blocks and clay bricks. Any recipes that call for (blocks) allow the use
 of either, while some buildings require a specific one.
 
 Common types of blocks are:
-  huge stone block (large block, basic)
-  pile of bricks (bricks, basic)
+  huge stone block (large block, basic) - stored at Gravel Pit or Quarry
+  pile of bricks (bricks, basic) - stored at Gravel Pit or Potter
 
 You can quarry stone blocks from the ground at a quarry. They are used in
 monumental architecture.
@@ -283,7 +283,7 @@ See also: COMPONENT, GATHER
 FLINT FLINTS "FLINT STONE"
 
 Used for:  basic tool crafting
-Stored at:  Gravel Pit
+Stored at:  Gravel Pit, Quarry, Sand Pit
 
 Flint is a hard, sedimentary form of quartz that has long been used for tool-
 making by people all over the world. You can dig it up almost anywhere.
@@ -773,7 +773,7 @@ ROCKS "ROCK COMPONENT"
 Rock (component)
 
 Used for:  basic crafting, basic building
-Stored at:  Gravel Pit
+Stored at:  Gravel Pit, Quarry, Sand Pit
 
 You can find rocks by digging in the ground. They can be used as a primitive
 hammer for chipping flint, for laying roads, and as filler for many building.
@@ -892,6 +892,7 @@ SAND "SAND COMPONENT"
 Sand (component)
 
 Used for:  glassmaking
+Stored at:  Gravel Pit, Glass Blower, Sand Pit
 
 Sand can be made into glass ingots at the glass blower.
 
