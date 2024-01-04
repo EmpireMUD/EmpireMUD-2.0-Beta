@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.166";
+const char *version = "EmpireMUD 2.0 beta 5.167";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -1002,6 +1002,16 @@ const char *combat_message_types[] = {
 };
 
 
+// FRIEND_x: status on the friends list
+const char *friend_status_types[] = {
+	"not friends",	// 0
+	"request sent",
+	"requesting friendship",
+	"friends",
+	"\n"
+};
+
+
 // GRANT_x
 const char *grant_bits[] = {
 	"advance",
@@ -1146,6 +1156,7 @@ const char *preference_bits[] = {
 	"ITEM-DETAILS",
 	"!EXITS",
 	"SHORT-EXITS",
+	"NO-FRIENDS",
 	"\n"
 };
 
@@ -1220,6 +1231,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
+	
+	{ "no-friends", TOG_ONOFF, PRF_NO_FRIENDS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -2676,6 +2689,7 @@ const char *liquid_flags[] = {
 	"WATER",	// 0
 	"COOLING",
 	"WARMING",
+	"BLOOD",
 	"\n"
 };
 

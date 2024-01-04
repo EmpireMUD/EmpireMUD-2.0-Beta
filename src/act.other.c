@@ -331,13 +331,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	new->desc->character = new;
 	old->desc = NULL;
 	
-	// remove old character
-	extract_all_items(old);
-	extract_char(old);
-	
-	// ensure character is gone right away
-	extract_pending_chars();
-	
 	if (config_get_bool("public_logins")) {
 		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART)) {
 			mortlog("%s", mort_alt);
@@ -348,6 +341,18 @@ void perform_alternate(char_data *old, char_data *new) {
 		}
 	}
 	else {	// not public logins -- use elogs
+		if (GET_INVIS_LEV(new) == 0 && !PLR_FLAGGED(new, PLR_INVSTART) && !PRF_FLAGGED(new, PRF_NO_FRIENDS) && !PRF_FLAGGED(old, PRF_NO_FRIENDS)) {
+			mortlog_friends(new, "%s", mort_alt);
+		}
+		else if (old_invis == 0) {
+			// only mortlog logout
+			mortlog_friends(old, "%s", mort_out);
+		}
+		
+		if (!PRF_FLAGGED(new, PRF_NO_FRIENDS) && PRF_FLAGGED(old, PRF_NO_FRIENDS)) {
+			mortlog_friends(new, "%s", mort_in);
+		}
+		
 		if (old_emp && GET_LOYALTY(new) == old_emp && old_invis == 0) {
 			// both in same empire
 			log_to_empire(old_emp, ELOG_LOGINS, "%s", mort_alt);
@@ -360,6 +365,13 @@ void perform_alternate(char_data *old, char_data *new) {
 			log_to_empire(GET_LOYALTY(new), ELOG_LOGINS, "%s", mort_in);
 		}
 	}
+	
+	// remove old character
+	extract_all_items(old);
+	extract_char(old);
+	
+	// ensure character is gone right away
+	extract_pending_chars();
 	
 	// if new is NOT already in-game
 	if (!IN_ROOM(new)) {
@@ -3226,8 +3238,11 @@ ACMD(do_quit) {
 			if (config_get_bool("public_logins")) {
 				mortlog("%s has left the game", PERS(ch, ch, 1));
 			}
-			else if (GET_LOYALTY(ch)) {
-				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			else {
+				mortlog_friends(ch, "%s has left the game", PERS(ch, ch, 1));
+				if (GET_LOYALTY(ch)) {
+					log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+				}
 			}
 		}
 		send_to_char("Goodbye, friend... Come back soon!\r\n", ch);
@@ -3312,8 +3327,11 @@ ACMD(do_selfdelete) {
 			if (config_get_bool("public_logins")) {
 				mortlog("%s has left the game", PERS(ch, ch, 1));
 			}
-			else if (GET_LOYALTY(ch)) {
-				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+			else {
+				mortlog_friends(ch, "%s has left the game", PERS(ch, ch, 1));
+				if (GET_LOYALTY(ch)) {
+					log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
+				}
 			}
 		}
 		msg_to_char(ch, "You have deleted your character. Goodbye...\r\n");

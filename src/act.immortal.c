@@ -2121,10 +2121,11 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
-		{ "account",	LVL_START_IMM,	PC,		MISC },
+		{ "account",	LVL_TO_SEE_ACCOUNTS, PC,MISC },
 		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
+		{ "nofriends", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
@@ -2295,10 +2296,18 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Better not -- could be a long winter!\r\n", ch);
 			return (0);
 		}
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("muted") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
@@ -2307,6 +2316,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
@@ -2414,6 +2427,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
+	}
+	else if SET_CASE("nofriends") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_NO_FRIENDS);
 	}
 	else if SET_CASE("loadroom") {
 		if (!str_cmp(val_arg, "off")) {
@@ -3203,9 +3219,6 @@ SHOW(show_factions) {
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
 	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
-	}
 	else {
 		check_delayed_load(vict);
 		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
@@ -3279,6 +3292,66 @@ SHOW(show_fmessages) {
 }
 
 
+SHOW(show_friends) {
+	bool file = FALSE;
+	char output[MAX_STRING_LENGTH * 2], line[256];
+	int count;
+	size_t size, lsize;
+	char_data *plr = NULL;
+	account_data *acct;
+	struct friend_data *friend, *next_friend;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Show friends for whom?\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (get_highest_access_level(GET_ACCOUNT(plr)) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Friends list for %s%s:\r\n", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
+		count = 0;
+		
+		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(plr), friend, next_friend) {
+			if (friend->status == FRIEND_NONE) {
+				continue;	// not a friend
+			}
+			if (!(acct = find_account(friend->account_id))) {
+				continue;	// no such account?
+			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), " %s - %s\r\n", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
+			++count;
+			
+			if (size + lsize + 80 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			else {
+				// space reserved for this
+				strcat(output, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, " none\r\n");
+		}
+		
+		page_string(ch->desc, output, TRUE);
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_home) {
 	char name[MAX_INPUT_LENGTH];
 	bool file = FALSE;
@@ -3289,9 +3362,6 @@ SHOW(show_home) {
 	
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else {
 		home = find_home(vict);
@@ -3638,7 +3708,7 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+	if (get_highest_access_level(GET_ACCOUNT(plr)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
@@ -3755,9 +3825,6 @@ SHOW(show_quests) {
 	
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*arg2 || is_abbrev(arg2, "active")) {
 		// active quest list
@@ -4149,6 +4216,9 @@ SHOW(show_site) {
 	size = 0;
 	k = 0;
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (get_highest_access_level(find_account(index->account_id)) > GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
 		if (str_str(index->last_host, argument)) {
 			snprintf(line, sizeof(line), " %-15.15s %s", index->name, ((++k % 3)) ? "|" : "\r\n");
 			line[1] = UPPER(line[1]);	// cap name
@@ -4372,12 +4442,17 @@ SHOW(show_commons) {
 	descriptor_data *d, *nd;
 	
 	*buf = '\0';
-	for (d = descriptor_list; d; d = d->next)
-		for (nd = descriptor_list; nd; nd = nd->next)
+	for (d = descriptor_list; d; d = d->next) {
+		if (d->character && get_highest_access_level(GET_ACCOUNT(d->character)) > GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
+		for (nd = descriptor_list; nd; nd = nd->next) {
 			if (!str_cmp(d->host, nd->host) && d != nd && (!d->character || !PLR_FLAGGED(d->character, PLR_IPMASK))) {
 				sprintf(buf + strlen(buf), "%s\r\n", d->character ? GET_NAME(d->character) : "<No Player>");
 				break;
 			}
+		}
+	}
 	msg_to_char(ch, "Common sites:\r\n");
 	if (*buf)
 		send_to_char(buf, ch);
@@ -4830,9 +4905,6 @@ SHOW(show_tomb) {
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
 	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
-	}
 	else {
 		tomb = real_room(GET_TOMB_ROOM(vict));
 		
@@ -5280,18 +5352,22 @@ SHOW(show_notes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(argument))) {
 			msg_to_char(ch, "There is no such player.\r\n");
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You can't show notes for players of that level.\r\n");
-			return;
-		}
 		if (!(acct = find_account(index->account_id))) {
 			msg_to_char(ch, "There are no notes for that player.\r\n");
+			return;
+		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
 			return;
 		}
 	}
@@ -6625,7 +6701,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
-		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+		if (get_highest_access_level(GET_ACCOUNT(k)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
@@ -8233,13 +8309,17 @@ ACMD(do_addnotes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't add notes for accounts above your access level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(arg))) {
 			send_to_char("There is no such player.\r\n", ch);
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+		if (index->access_level > GET_ACCESS_LEVEL(ch)) {
 			msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
 			return;
 		}
@@ -9133,18 +9213,22 @@ ACMD(do_editnotes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't edit notes for accounts above your access level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(arg))) {
 			send_to_char("There is no such player.\r\n", ch);
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
-			return;
-		}
 		if (!(acct = find_account(index->account_id))) {
 			msg_to_char(ch, "Unable to find account for that player.\r\n");
+			return;
+		}
+		if (get_highest_access_level(acct) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot edit notes for accounts above your access level.\r\n");
 			return;
 		}
 	}
@@ -10132,7 +10216,7 @@ ACMD(do_playerdelete) {
 	else if (!(victim = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "Unknown player '%s'.\r\n", name);
 	}
-	else if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch)) {
+	else if (get_highest_access_level(GET_ACCOUNT(victim)) >= GET_ACCESS_LEVEL(ch) && GET_ACCOUNT(victim) != GET_ACCOUNT(ch)) {
 		msg_to_char(ch, "No, no, no, no, no, no, no.\r\n");
 	}
 	else if (PLR_FLAGGED(victim, PLR_NODELETE)) {
@@ -10153,8 +10237,11 @@ ACMD(do_playerdelete) {
 				if (config_get_bool("public_logins")) {
 					mortlog("%s has left the game", PERS(victim, victim, TRUE));
 				}
-				else if (GET_LOYALTY(victim)) {
-					log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+				else {
+					mortlog_friends(victim, "%s has left the game", PERS(victim, victim, TRUE));
+					if (GET_LOYALTY(victim)) {
+						log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+					}
 				}
 			}
 			msg_to_char(victim, "Your character has been deleted. Goodbye...\r\n");
@@ -11027,6 +11114,7 @@ ACMD(do_show) {
 		{ "fmessages", LVL_START_IMM, show_fmessages },
 		{ "smessages", LVL_START_IMM, show_smessages },
 		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
+		{ "friends", LVL_START_IMM, show_friends },
 
 		// last
 		{ "\n", 0, NULL }
@@ -12282,8 +12370,9 @@ ACMD(do_wizutil) {
 		send_to_char("There is no such player.\r\n", ch);
 	else if (IS_NPC(vict))
 		send_to_char("You can't do that to a mob!\r\n", ch);
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch))
+	else if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch) && subcmd != SCMD_THAW) {
 		send_to_char("Hmmm... you'd better not.\r\n", ch);
+	}
 	else {
 		switch (subcmd) {
 			case SCMD_NOTITLE:

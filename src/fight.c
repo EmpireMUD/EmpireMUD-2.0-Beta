@@ -3016,7 +3016,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// champion
-		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_leader == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
+		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_leader == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && !MOB_FLAGGED(FIGHTING(ch), MOB_NO_ATTACK) && IS_NPC(ch_iter)) {
 			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
 				// can rescue only in melee
 				perform_rescue(ch_iter, ch, FIGHTING(ch), RESCUE_RESCUE);

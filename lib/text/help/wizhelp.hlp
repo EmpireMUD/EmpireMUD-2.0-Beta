@@ -1044,6 +1044,7 @@ muted          PC      BINARY       Player is muted
 nocustomize    PC      BINARY       Player cannot use 'customize'
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
+nofriends      PC      BINARY       Set no-friends toggle for offline player.
 notitle        PC      BINARY       Can't change title
 nowizlist      PC      BINARY       Doesn't show on wizlist
 siteok         PC      BINARY       Can log in through ban
@@ -1151,6 +1152,7 @@ dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
 fmessages  Immort   Shows a player's fight message toggles.
+friends    Immort   Shows another player's friends list.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
@@ -1273,6 +1275,14 @@ Usage:  show fmessages <player>
 This command shows which fight messages a player has toggled on or off.
 
 See also: FMESSAGES
+#e
+"SHOW FRIENDS" "SHOW FRIENDS LIST" "SHOW FRIEND LIST"
+
+Usage:  show friends <player>
+
+This command views another player's friends list.
+
+See also: FRIENDS
 #e
 "SHOW HOME"
 

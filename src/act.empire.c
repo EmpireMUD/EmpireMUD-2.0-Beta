@@ -990,7 +990,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		}
 	}
 	if ( !proto ) {
-		msg_to_char(ch, "This empire has no item by that name.\r\n");
+		msg_to_char(ch, "This empire has no stored item by that name.\r\n");
 		return;
 	}
 	
@@ -1155,7 +1155,12 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				last_vnum = vnum;
 			}
 			
-			if (proto && *argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {	// add an entry
+			// ensure storable
+			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_STORE) || !GET_OBJ_STORAGE(proto)) {
+				continue;
+			}
+			
+			if (*argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {	// add an entry
 				CREATE(einv, struct einv_type, 1);
 				einv->vnum = vnum;
 				einv->total = edi->count;

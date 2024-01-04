@@ -1122,6 +1122,30 @@ Examples:
 
 See also: AVOID, BECKON, GROUP, SNEAK
 #
+FRIEND FRIENDS UNFRIEND "FRIEND LIST" "FRIENDS LIST" "TOGGLE NO-FRIENDS" "TOGGLE NOFRIENDS" "NO-FRIENDS" "NOFRIENDS" "FRIEND REQUEST"
+
+Usage:  friends [-all]
+        friend <request | cancel> <name>
+        friend <accept | deny> <name>
+        unfriend <name>
+        toggle no-friends
+
+These commands allow you to view and manage your friends list. This list is
+account-wide and helps you and your friends keep track of each other when you
+have a lot of characters.
+
+Friends will see when you log in or out, and can see when you were last online.
+
+If you have some characters who you keep secret for any reason, use 'toggle
+no-friends' to keep those particular characters hidden from friends lists. To
+create a new secret character without it showing up as a friend to anyone, link
+it to an alt that already has no-friends toggled on. It will inherit this
+setting.
+
+If a player is bothering you with friend requests, 'ignore' will silence them.
+
+See also: IGNORE
+#
 GET TAKE
 
 "Get" and "take" are exactly the same and can be used interchangeably.
@@ -2829,6 +2853,7 @@ Toggles:
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
   no-empire - will not create a new empire when you try to claim or build
+  no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
   political - shows empire colors instead of terrain colors
@@ -2856,7 +2881,7 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, STATUS MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

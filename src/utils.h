@@ -1346,6 +1346,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ACCOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && GET_ACCOUNT(ch) && IS_SET(GET_ACCOUNT(ch)->flags, (flag)))
 #define ACCOUNT_UNLOCKED_ARCHETYPES(ch)  (GET_ACCOUNT(ch)->unlocked_archetypes)
 #define CUSTOM_COLOR_CHAR(ch, which)  ((!IS_NPC(ch) && GET_CUSTOM_COLOR((ch), (which))) ? GET_CUSTOM_COLOR((ch), (which)) : '0')
+#define GET_ACCOUNT_FRIENDS(ch)  (GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->friends : NULL)
+#define GET_ACCOUNT_ID(ch)  (GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0)
+#define GET_HIGHEST_ACCESS_LEVEL(ch)  (GET_ACCOUNT(ch) ? get_highest_access_level(GET_ACCOUNT(ch)) : 0)
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define HAS_NEW_OFFENSES(ch) (!IS_NPC(ch) && GET_LOYALTY(ch) && EMPIRE_OFFENSES(GET_LOYALTY(ch)) && EMPIRE_OFFENSES(GET_LOYALTY(ch))->timestamp > GET_LAST_OFFENSE_SEEN(ch))
 #define INFORMATIVE_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_INFORMATIVE_FLAGS(ch), (flag)))
@@ -2324,6 +2327,9 @@ void combat_meter_damage_dealt(char_data *ch, int amt);
 void combat_meter_damage_taken(char_data *ch, int amt);
 void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
+
+// friends.c
+void mortlog_friends(char_data *ch, const char *str, ...) __attribute__((format(printf, 2, 3)));
 
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);

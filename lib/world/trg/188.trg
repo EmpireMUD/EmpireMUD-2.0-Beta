@@ -1426,7 +1426,7 @@ end
 ~
 #18842
 Macabre Menagerie: Despawn creature later~
-0 b 10
+0 ab 10
 ~
 * allows a despawn after 3 days
 if %timestamp% - %self.var(spawn_time,0)% > 259200

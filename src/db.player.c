@@ -360,6 +360,7 @@ void free_account(account_data *acct) {
 	}
 	
 	// free unlocks
+	free_account_friends(&acct->friends);
 	free_unlocked_archetypes(acct);
 	
 	free(acct);
@@ -373,7 +374,7 @@ void free_account(account_data *acct) {
 * @param int nr The id of the account.
 */
 void parse_account(FILE *fl, int nr) {
-	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256];
+	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256], str_in2[256];
 	struct account_player *plr;
 	account_data *acct, *find;
 	struct pk_data *pk;
@@ -437,6 +438,19 @@ void parse_account(FILE *fl, int nr) {
 						exit(1);
 					}
 				}
+				break;
+			}
+			case 'F': {	// friend
+				if (sscanf(line, "F%d %d %s %s", &int_in[0], &int_in[1], str_in, str_in2) != 4) {
+					log("SYSERR: Format error in F line of %s", err_buf);
+					exit(1);
+				}
+				
+				// runs twice: import original name, import current name
+				if (strcmp(str_in, "*")) {
+					add_account_friend_id(acct, int_in[1], int_in[0], str_in);
+				}
+				add_account_friend_id(acct, int_in[1], int_in[0], str_in2);
 				break;
 			}
 			case 'K': {	// killed by
@@ -589,6 +603,7 @@ void write_account_index(FILE *fl) {
 void write_account_to_file(FILE *fl, account_data *acct) {
 	char temp[MAX_STRING_LENGTH];
 	struct account_player *plr;
+	struct friend_data *friend, *next_friend;
 	struct pk_data *pk;
 	struct unlocked_archetype *unarch, *next_unarch;
 	
@@ -608,6 +623,11 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	// D0: unlocked archetypes
 	HASH_ITER(hh, acct->unlocked_archetypes, unarch, next_unarch) {
 		fprintf(fl, "D0 %d\n", unarch->vnum);
+	}
+	
+	// F: friends
+	HASH_ITER(hh, acct->friends, friend, next_friend) {
+		fprintf(fl, "F%d %d %s %s\n", friend->status, friend->account_id, (friend->original_name ? friend->original_name : "*"), (friend->name ? friend->name : "Unknown"));
 	}
 	
 	// K: player kills
@@ -2501,6 +2521,9 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	
 	index->account_id = GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0;	// may not be set yet
 	index->last_logon = ch->prev_logon;
+	if (GET_ACCOUNT(ch)) {
+		GET_ACCOUNT(ch)->last_logon = MAX(GET_ACCOUNT(ch)->last_logon, ch->prev_logon);
+	}
 	index->birth = ch->player.time.birth;
 	index->played = ch->player.time.played;
 	index->access_level = GET_ACCESS_LEVEL(ch);
@@ -3797,7 +3820,7 @@ void announce_login(char_data *ch) {
 			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
 				continue;
 			}
-			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+			if (GET_ACCESS_LEVEL(desc->character) < get_highest_access_level(GET_ACCOUNT(ch))) {
 				continue;
 			}
 			
@@ -3815,12 +3838,15 @@ void announce_login(char_data *ch) {
 	}
 	
 	// mortlog
-	if (GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins") && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+	if (GET_INVIS_LEV(ch) == 0 && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+		if (config_get_bool("public_logins")) {
 			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
 		}
-		else if (GET_LOYALTY(ch)) {
-			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+		else {
+			mortlog_friends(ch, "%s has entered the game", PERS(ch, ch, TRUE));
+			if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+			}
 		}
 	}
 }
@@ -4443,6 +4469,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_friends(ch);
 	check_languages(ch);
 	check_minipets_and_companions(ch);
 	check_player_events(ch);
@@ -4581,8 +4608,10 @@ int get_highest_access_level(account_data *acct) {
 	struct account_player *plr;
 	int highest = 0;
 	
-	LL_FOREACH(acct->players, plr) {
-		highest = MAX(highest, plr->player->access_level);
+	if (acct) {
+		LL_FOREACH(acct->players, plr) {
+			highest = MAX(highest, plr->player->access_level);
+		}
 	}
 	
 	return highest;

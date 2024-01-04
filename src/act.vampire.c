@@ -32,6 +32,7 @@
 */
 
 // external functions
+ACMD(do_drink);
 ACMD(do_say);
 ACMD(do_stand);
 ACMD(do_wake);
@@ -450,13 +451,43 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 */
 bool starving_vampire_aggro(char_data *ch) {
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
-	int backup_found = 0, vict_found = 0;
+	int backup_found = 0, count, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj, *obj2;
 	struct affected_type *af;
 	
 	if (IS_IMMORTAL(ch) || GET_FEEDING_FROM(ch) || IS_DEAD(ch) || GET_POS(ch) < POS_RESTING || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED) || !IS_VAMPIRE(ch)) {
 		return FALSE;	// conditions which will block bite
 	}
+	
+	// look for blood to drink
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (!IS_DRINK_CONTAINER(obj) || GET_DRINK_CONTAINER_CONTENTS(obj) < 1 || !liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_BLOOD)) {
+			continue;	// not a drink container
+		}
+		
+		// ok estimate what its number will be for targeting
+		count = 0;
+		DL_FOREACH2(ch->carrying, obj2, next_content) {
+			if (isname(fname(GET_OBJ_KEYWORDS(obj)), GET_OBJ_KEYWORDS(obj2))) {
+				++count;
+			}
+			if (obj2 == obj) {
+				break;
+			}
+		}
+		
+		// going to try to drink from it
+		snprintf(arg, sizeof(arg), "%d.%s", count, fname(GET_OBJ_KEYWORDS(obj)));
+		do_drink(ch, arg, 0, 0);
+	}
+	
+	// did we find enough from drinking?
+	if (!IS_BLOOD_STARVED(ch)) {
+		return FALSE;
+	}
+	
+	// otherwise must bite
 	if (get_cooldown_time(ch, COOLDOWN_BITE) > 0) {
 		return FALSE;	// can't bite right now
 	}
@@ -670,7 +701,7 @@ void update_biting_char(char_data *ch) {
 		act("$n shudders with ecstasy as $e feeds from $N!", FALSE, ch, 0, victim, TO_NOTVICT);
 		act("A surge of ecstasy fills your body as $n feeds from your veins!", FALSE, ch, 0, victim, TO_VICT);
 		
-		if ((GET_BLOOD(victim) * 100 / GET_MAX_BLOOD(victim)) < 20) {
+		if (amount >= GET_BLOOD(victim) || (GET_BLOOD(victim) * 100 / GET_MAX_BLOOD(victim)) < 20) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
 		}
 	}

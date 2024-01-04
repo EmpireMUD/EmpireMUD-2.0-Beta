@@ -595,7 +595,7 @@ if !%SelfRoom.in_city%
 end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
-  nop %actor.set_cooldown(16611, 20)%
+  nop %actor.set_cooldown(16611, 5)%
   halt
 end
 if !%MoveDir%
@@ -2161,11 +2161,11 @@ if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 * check witnesses
-if !%ch.aff_flagged(HIDDEN)% && %ch.skill(Stealth)% < 100
+if !%actor.aff_flagged(HIDDEN)% && %actor.skill(Stealth)% < 100
   set witnesses 0
   set ch %actor.room.people%
   while %ch% && %witnesses% < 2
-    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && !%ch.leader% && %ch.mob_flagged(HUMAN)%
+    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && %ch.mob_flagged(HUMAN)% && !%ch.aff_flagged(STUNNED)%
       eval witnesses %witnesses% + 1
     end
     set ch %ch.next_in_room%

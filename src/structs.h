@@ -1503,6 +1503,7 @@ typedef struct vehicle_data vehicle_data;
 #define LIQF_WATER  BIT(0)	// counts as water for certain commands
 #define LIQF_COOLING  BIT(1)	// cools down the player, if warm
 #define LIQF_WARMING  BIT(2)	// warms up the player, if cold
+#define LIQF_BLOOD  BIT(3)	// counts as blood for vampires
 // BIT(31) limit: this is stored as an int (in the generic values)
 
 
@@ -2216,6 +2217,13 @@ typedef enum {
 #define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE | FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK | FM_MY_HEALS | FM_HEALS_ON_ME | FM_HEALS_ON_ALLIES | FM_HEALS_ON_TARGET | FM_HEALS_ON_OTHER)
 
 
+// FRIEND_x: status on the friends list
+#define FRIEND_NONE					0	// not friends
+#define FRIEND_REQUEST_SENT			1	// sent a request to this player
+#define FRIEND_REQUEST_RECEIVED		2	// received a request from that player
+#define FRIEND_FRIENDSHIP			3	// true friendship
+
+
 // GRANT_X: Grant flags allow players to use abilities below the required access level
 #define GRANT_ADVANCE  BIT(0)
 #define GRANT_BAN  BIT(1)
@@ -2395,6 +2403,7 @@ typedef enum {
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 #define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
 #define PRF_SHORT_EXITS  BIT(41)	// shows circlemud-style exits
+#define PRF_NO_FRIENDS  BIT(42)	// this alt will not appear on friends lists
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -4309,6 +4318,7 @@ struct account_data {
 	char *notes;	// account notes
 	
 	// lists/hashes
+	struct friend_data *friends;	// hash table of friends
 	struct pk_data *killed_by;	// LL of players who killed this player recently
 	struct unlocked_archetype *unlocked_archetypes;	// hash (vnum)
 	
@@ -4369,6 +4379,16 @@ struct companion_mod {
 	int num;	// numeric data (used by some types)
 	char *str;	// string data (used by some types)
 	struct companion_mod *next;
+};
+
+
+// account-wide friends list
+struct friend_data {
+	int account_id;			// id of the friend's account
+	int status;				// FRIEND_ status
+	char *name;				// last name seen
+	char *original_name;	// name we added with
+	UT_hash_handle hh;		// hash handle for account->friends
 };
 
 
