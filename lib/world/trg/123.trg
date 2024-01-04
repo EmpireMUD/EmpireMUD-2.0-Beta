@@ -1706,7 +1706,7 @@ if %to_room%
     * tag mob for player
     %mod% %mob% tag %actor%
     * reskin self to change the kill message
-    %mod% %self% shortdesc %actor.name%
+    %mod% %self% shortdesc something it ate
     * and kill the mob
     %slay% %mob%
   end
