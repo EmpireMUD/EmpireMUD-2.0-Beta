@@ -346,19 +346,19 @@ M
 $n shoots a bolt of white mana at $N, cleansing $M.~
 M
 8
-You shine brightly as your mana cleanses you.~
+There was nothing to cleanse.~
 M
 9
-$n shines brightly for a moment as $s mana cleanses $m.~
+*~
 M
 10
-You shoot a bolt of white mana at $N, cleansing $M.~
+There was nothing to cleanse on $N.~
 M
 11
-$n shoots a bolt of white mana at you, cleansing you.~
+*~
 M
 12
-$n shoots a bolt of white mana at $N, cleansing $M.~
+*~
 T s 1
 S
 #117
