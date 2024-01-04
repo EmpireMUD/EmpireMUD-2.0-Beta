@@ -3820,7 +3820,7 @@ void announce_login(char_data *ch) {
 			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
 				continue;
 			}
-			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+			if (GET_ACCESS_LEVEL(desc->character) < get_highest_access_level(GET_ACCOUNT(ch))) {
 				continue;
 			}
 			
