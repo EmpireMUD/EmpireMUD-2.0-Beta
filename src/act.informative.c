@@ -2195,7 +2195,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		}
 		
 		// determine length to show
-		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		if (!screenreader) {
 			num = color_code_length(out);
 			strcpy(buf1, out);
 			size = snprintf(out, sizeof(out), "%-*.*s", 35 + num, 35 + num, buf1);
