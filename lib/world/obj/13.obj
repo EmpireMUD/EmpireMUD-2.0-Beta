@@ -19,7 +19,7 @@ a striped barbfish~
 The remains of a striped barbfish is rotting here.~
 You can eat the fish.
 ~
-6 kl a 0 0 4
+6 kl a 0 0 5
 24 0 0
 7 168
 C
@@ -27,6 +27,8 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5196 0
 S
 #1302
 linefish giant remains fish~
@@ -34,7 +36,7 @@ a giant linefish~
 The remains of a giant linefish is rotting here.~
 You can eat the fish.
 ~
-6 k a 0 0 4
+6 k a 0 0 5
 24 0 0
 7 168
 C
@@ -42,6 +44,8 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5196 0
 S
 #1303
 arrowfish magenta remains fish~
@@ -49,7 +53,7 @@ a magenta arrowfish~
 The remains of a magenta arrowfish is rotting here.~
 You can eat the fish.
 ~
-6 k a 0 0 4
+6 k a 0 0 5
 24 0 0
 7 168
 C
@@ -57,6 +61,8 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5196 0
 S
 #1304
 junk sea pile~
@@ -194,7 +200,7 @@ a spotted eel~
 A spotted eel is dried up and rotting.~
 You can eat the fish.
 ~
-6 k a 0 0 5
+6 k a 0 0 7
 24 0 0
 7 168
 C
@@ -202,26 +208,13 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5207 0
 S
 #1312
 trout speckled fish~
 a speckled trout~
 A speckled trout lies dead on the ground.~
-You can eat the fish.
-~
-6 k a 0 0 6
-24 0 0
-7 168
-C
-1 1
-O+ 1 6203
-R
-4 5119 0
-S
-#1313
-fish leaping red bright~
-a bright red leaping fish~
-A bright red leaping fish is rotting on the ground.~
 You can eat the fish.
 ~
 6 k a 0 0 8
@@ -232,6 +225,27 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5207 0
+R
+4 5208 0
+S
+#1313
+fish leaping red bright~
+a bright red leaping fish~
+A bright red leaping fish is rotting on the ground.~
+You can eat the fish.
+~
+6 k a 0 0 9
+24 0 0
+7 168
+C
+1 1
+O+ 1 6203
+R
+4 5119 0
+R
+4 5207 0
 S
 #1314
 catfish fish fat~
@@ -239,7 +253,7 @@ a fat catfish~
 A fat catfish is lying on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 10
+6 k a 0 0 11
 24 0 0
 7 168
 C
@@ -247,6 +261,8 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5208 0
 S
 #1315
 perch yellow fish~
@@ -254,7 +270,7 @@ a yellow perch~
 A yellow perch lies dead on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 10
+6 k a 0 0 11
 24 0 0
 7 168
 C
@@ -262,6 +278,8 @@ C
 O+ 1 6203
 R
 4 5119 0
+R
+4 5208 0
 S
 #1316
 gator small~

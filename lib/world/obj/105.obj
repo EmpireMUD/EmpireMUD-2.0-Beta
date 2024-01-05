@@ -213,7 +213,7 @@ An ironbread ration has been dropped here.~
 ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
 months and is rich in iron. Actually, it might even be made of iron.
 ~
-6 0 a 0 0 8
+6 0 a 0 0 9
 120 0 0
 2 0
 M
@@ -230,6 +230,8 @@ M
 $n bites into $p with a sound like tearing metal.~
 R
 4 5606 0
+R
+4 5132 0
 S
 #10513
 gemfruit unripe~
@@ -652,7 +654,7 @@ a rhubarb pie~
 All you can smell is that warm rhubarb pie on the ground.~
 The pie looks delicious!
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -663,6 +665,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #10554
 runes strange glacier~

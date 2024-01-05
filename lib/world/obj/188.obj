@@ -1319,7 +1319,7 @@ the garden. At the top, the long vertical ridges on the pumpkin converge at a
 short green stem. You can craft a jack-o-lantern or bake a roast pumpkin from
 this.
 ~
-6 bg a 0 0 12
+6 bg a 0 0 13
 12 18890 0
 7 168
 C
@@ -1330,6 +1330,8 @@ R
 4 5606 0
 R
 4 5610 0
+R
+4 5132 0
 S
 #18891
 seeds pumpkin bunch~
@@ -1367,7 +1369,7 @@ A roast pumpkin is lying here.~
    The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
 but tastes a lot better than it did fresh.
 ~
-6 gm a 0 0 13
+6 gm a 0 0 14
 24 18890 0
 7 1680
 A
@@ -1377,6 +1379,8 @@ C
 O+ 1 6241
 R
 4 5619 0
+R
+4 5132 0
 S
 #18894
 seeds roasted pumpkin~
@@ -1384,13 +1388,15 @@ some roasted pumpkin seeds~
 Some roast pumpkin seeds have been dropped here.~
 These seeds have been roasted and they taste great.
 ~
-6 m a 0 0 13
+6 m a 0 0 14
 6 0 0
 0 1680
 A
 11 1 0
 C
 50 50
+R
+4 5132 0
 S
 #18895
 jack-o-lantern lantern jackolantern~
