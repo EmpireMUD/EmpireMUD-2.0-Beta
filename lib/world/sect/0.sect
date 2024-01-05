@@ -340,7 +340,7 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 The river starts to burble and flow.~
@@ -1795,7 +1795,7 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 22 174 5.00 25  # PAN: small flake of gold
 X
 plains flooding flooded water around river~
    As you stand on the edge of the river, you see vast plains stretching out
@@ -1844,7 +1844,7 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 A tree rises from the water, toward the sky!~
@@ -1892,7 +1892,7 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 A tree rises from the water and unfolds its canopy in the sky!~
@@ -2304,7 +2304,7 @@ I 21 1304 5.00 1 f  # FISH: sea junk
 I 21 1311 25.00 1 f  # FISH: spotted eel
 I 21 1313 25.00 1 f  # FISH: bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 The waters start to flow.~
