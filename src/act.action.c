@@ -262,7 +262,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		}},
 		OBJ_CUSTOM_FISH_TO_CHAR, OBJ_CUSTOM_FISH_TO_ROOM
 	},
-	{ INTERACT_FORAGE, ACT_FORAGING, "forage", "foraging", "forge_base_timer", 4,
+	{ INTERACT_FORAGE, ACT_FORAGING, "forage", "foraging", "forage_base_timer", 4,
 		PTECH_FORAGE_COMMAND, DPLTN_FORAGE, GI_NO_CONFIG,
 		NO_TOOL, GI_NO_SPEC, GI_LOCAL_CROPS,
 		{ /* start msg */ { "You forage around for food...", "$n starts foraging around." },
