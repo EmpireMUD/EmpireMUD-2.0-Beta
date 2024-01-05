@@ -206,6 +206,8 @@
 #define NO_ABIL  NO_SKILL	// things that don't require an ability
 #define NO_FLAGS  0
 #define NO_SKILL  -1	// things that don't require a skill
+#define NO_TECH  NOTHING	// empire or player tech
+#define NO_TOOL  NOBITS		// does not require a tool
 #define NOT_REPEATABLE  -1	// quest's repeatable_after
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
@@ -425,7 +427,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_INTERACTS  37
 
 // for do_gen_interact
-#define GEN_INTERACT_SPECIAL(name)	void (name)(char_data *ch, const struct gen_interact_data_t *data)
+#define GEN_INTERACT_SPECIAL(name)	void (name)(char_data *ch, room_data *room, const struct gen_interact_data_t *data)
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -3243,7 +3245,9 @@ struct gen_interact_data_t {
 	int ptech;	// required ptech (may be NOTHING)
 	int depletion;	// DPLTN_ type (may be NOTHING)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	bitvector_t tool;	// any TOOL_ needed
 	GEN_INTERACT_SPECIAL(*spec_proc);	// optional spec to run during the process such as gen_proc_nature_burn
+	bitvector_t flags;	// GI_ flags
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action
 		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p

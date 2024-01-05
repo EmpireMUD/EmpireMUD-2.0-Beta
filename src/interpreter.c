@@ -265,7 +265,6 @@ ACMD(do_order);
 
 ACMD(do_page);
 ACMD(do_paint);
-ACMD(do_pan);
 ACMD(do_passives);
 ACMD(do_peace);
 ACMD(do_pickpocket);
@@ -804,7 +803,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
 	SIMPLE_CMD( "paint", POS_STANDING, do_paint, NO_MIN, CTYPE_BUILD ),
-	STANDARD_CMD( "pan", POS_STANDING, do_pan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "pan", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_PAN, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "passives", POS_DEAD, do_passives, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "peace", POS_DEAD, do_peace, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PEACE ),
