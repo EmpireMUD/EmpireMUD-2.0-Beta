@@ -5101,7 +5101,7 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// CHIP  -- definitely cannot support this
 	FALSE,	// CHOP
 	FALSE,	// FISH
-	FALSE,	// PAN
+	TRUE,	// PAN
 	TRUE,	// QUARRY
 	FALSE,	// TAME  -- definitely cannot support this
 	FALSE,	// SEED  -- definitely cannot support this
