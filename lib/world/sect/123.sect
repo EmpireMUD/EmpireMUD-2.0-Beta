@@ -242,11 +242,11 @@ E
 E
 14 0 1.00 57
 I 6 12353 100.00 1  # FORAGE: white berries
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 12362 100.00 1 f  # FISH: arctic char
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 12362 100.00 125 f  # FISH: arctic char
 X
 ice hoarfrost frost frozen icebergs sea shallow coast ocean water around~
    The frigid water is full of chunks of ice -- small, large, and every size in

@@ -2344,9 +2344,9 @@ of saltwater and fish is strong in the air.
 ~
 F
 I
-I 21 1302 33.00 1 f  # FISH: giant linefish
-I 21 1303 33.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1302 33.00 250 f  # FISH: giant linefish
+I 21 1303 33.00 250 f  # FISH: magenta arrowfish
+I 21 1301 100.00 250 f  # FISH: striped barbfish
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0

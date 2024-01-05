@@ -332,14 +332,14 @@ D4
 &c~
 E
 7 57 1.00 53
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
 I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
@@ -434,14 +434,14 @@ D0
 &B~
 I 10 9019 5.00 1  # ENCOUNTER: shark
 I 10 9232 0.05 1  # ENCOUNTER: box jellyfish
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1302 25.00 1 f  # FISH: giant linefish
-I 21 1303 25.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1302 25.00 125 f  # FISH: giant linefish
+I 21 1303 25.00 125 f  # FISH: magenta arrowfish
+I 21 1301 100.00 125 f  # FISH: striped barbfish
 X
 ocean water horizon around~
    You are surrounded by a seemingly endless expanse of open ocean, the horizon
@@ -1311,14 +1311,14 @@ E
 15 0 5.00 34
 I 6 3310 50.00 1  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1316 25.00 1 f  # FISH: small gator
-I 21 1314 100.00 1 f  # FISH: fat catfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
 M
 264 10.00 ace
 X
@@ -1372,14 +1372,14 @@ D0
 &c~
 E
 15 0 25.00 33
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1314 25.00 1 f  # FISH: fat catfish
-I 21 1315 25.00 1 f  # FISH: yellow perch
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1314 25.00 125 f  # FISH: fat catfish
+I 21 1315 25.00 125 f  # FISH: yellow perch
+I 21 1312 100.00 125 f  # FISH: speckled trout
 U
 0
 The sparkling waters of the lake start to shimmer.~
@@ -1465,14 +1465,14 @@ E
 10 32 4.00 27
 I 6 3310 50.00 1  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1316 25.00 1 f  # FISH: small gator
-I 21 1314 100.00 1 f  # FISH: fat catfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
 M
 264 10.00 ace
 X
@@ -1787,14 +1787,14 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
 I 22 174 5.00 25  # PAN: small flake of gold
 X
 plains flooding flooded water around river~
@@ -1836,14 +1836,14 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 120 100.00 1  # CHOP: large tree
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
 I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
@@ -1884,14 +1884,14 @@ I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 120 100.00 1  # CHOP: large tree
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
 I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
@@ -2294,16 +2294,16 @@ D0
 &a~
 E
 11 57 5.00 5
-I 21 3052 8.00 1 f  # FISH: clam
-I 21 3051 8.00 1 f  # FISH: sea urchin
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 3052 8.00 125 f  # FISH: clam
+I 21 3051 8.00 125 f  # FISH: sea urchin
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
 I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
@@ -2473,14 +2473,14 @@ The Shallow Sea, Near the Coast~
 D0
 ~~~~~
 &a~
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1302 25.00 1 f  # FISH: giant linefish
-I 21 1303 25.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1302 25.00 125 f  # FISH: giant linefish
+I 21 1303 25.00 125 f  # FISH: magenta arrowfish
+I 21 1301 100.00 125 f  # FISH: striped barbfish
 U
 0
 The water seems to come to life!~

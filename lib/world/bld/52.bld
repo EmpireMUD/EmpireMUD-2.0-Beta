@@ -179,9 +179,9 @@ available.
 ~
 F
 FI
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1311 25.00 250 f  # FISH: spotted eel
+I 21 1313 25.00 250 f  # FISH: bright red leaping fish
+I 21 1312 100.00 250 f  # FISH: speckled trout
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
@@ -210,9 +210,9 @@ peaceful atmosphere.
 ~
 F
 FI
-I 21 1314 25.00 1 f  # FISH: fat catfish
-I 21 1315 25.00 1 f  # FISH: yellow perch
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1314 25.00 250 f  # FISH: fat catfish
+I 21 1315 25.00 250 f  # FISH: yellow perch
+I 21 1312 100.00 250 f  # FISH: speckled trout
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
