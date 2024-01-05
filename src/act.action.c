@@ -162,6 +162,7 @@ const struct action_data_struct action_data[] = {
 #define GI_CONTINUE_WHEN_DEPLETED	BIT(1)	// will not stop for depletion
 #define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
 #define GI_LOCAL_CROPS				BIT(3)	// if the interaction fails, tries a random local crop too
+#define GI_ATTEMPT_WITHOUT_INTERACT	BIT(4)	// can try it even if nothing is here
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -264,7 +265,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	{ INTERACT_FORAGE, ACT_FORAGING, "forage", "foraging", "forage_base_timer", 4,
 		PTECH_FORAGE_COMMAND, DPLTN_FORAGE, GI_NO_CONFIG,
-		NO_TOOL, GI_NO_SPEC, GI_LOCAL_CROPS,
+		NO_TOOL, GI_NO_SPEC, GI_LOCAL_CROPS | GI_ATTEMPT_WITHOUT_INTERACT,
 		{ /* start msg */ { "You forage around for food...", "$n starts foraging around." },
 		/* pre-finish */ NULL,
 		/* finish msg */ { "You find $p!", "$n finds $p!" },
@@ -3372,6 +3373,10 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	else if (can_veh_but_no_permit) {
 		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
+	}
+	else if (IS_SET(data->flags, GI_ATTEMPT_WITHOUT_INTERACT)) {
+		// allow it if we got here and have this flag
+		return TRUE;
 	}
 	else {
 		msg_to_char(ch, "You can't %s %s.\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"));
