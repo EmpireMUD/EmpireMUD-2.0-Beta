@@ -1035,6 +1035,11 @@ int determine_depletion_type(struct interaction_item *interact) {
 	struct interact_restriction *res;
 	int type = DPLTN_PRODUCTION;	// default
 	
+	// override for a fishing interaction
+	if (interact->type == INTERACT_FISH) {
+		type = DPLTN_FISH;
+	}
+	
 	if (interact) {
 		LL_FOREACH(interact->restrictions, res) {
 			if (res->type == INTERACT_RESTRICT_DEPLETION) {
@@ -2538,7 +2543,13 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 INTERACTION_FUNC(one_fishing_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
-	int amt;
+	int amt, depletion_type;
+	
+	// make sure this item isn't depleted
+	depletion_type = determine_depletion_type(interaction);
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+		return FALSE;
+	}
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_FISHING, interaction->vnum)) {
 		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
@@ -2546,7 +2557,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
 		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
-		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_FISH, TRUE);
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, depletion_type, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 			if (amt > 1) {
@@ -2571,7 +2582,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 */
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
-	bool depleted = (GET_CHORE_DEPLETION(room, veh, DPLTN_FISH) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
+	bool depleted = !has_any_undepleted_interaction_for_chore(room, veh, INTERACT_FISH);
 	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_FISHING, VEH_INTERACTIONS(veh), INTERACT_FISH, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FISHING, INTERACT_FISH);
 	bool can_do = !depleted && can_gain;
 	
