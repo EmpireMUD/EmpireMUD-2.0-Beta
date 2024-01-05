@@ -4962,7 +4962,7 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 /**
 * Gets the highest available depletion level amongst matching interactions in
 * the list. This mainly returns the highest 'quantity' from a
-* interact_one_at_a_time[] interaction, or else common_depletion.
+* interact_one_at_a_time[] interaction, or else room depletion/common_depletion.
 *
 * @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
 * @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
@@ -4976,7 +4976,7 @@ int get_interaction_depletion(char_data *ch, empire_data *emp, struct interactio
 	int highest = 0;
 	
 	if (!interact_one_at_a_time[interaction_type]) {
-		return config_get_int("common_depletion");
+		return ch ? DEPLETION_LIMIT(IN_ROOM(ch)) : config_get_int("common_depletion");
 	}
 	
 	// for one-at-a-time chores, look for the highest depletion
@@ -5016,7 +5016,7 @@ int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *r
 	int this, highest = 0;
 	
 	if (!interact_one_at_a_time[interaction_type]) {
-		return config_get_int("common_depletion");	// shortcut
+		return DEPLETION_LIMIT(room);	// shortcut
 	}
 	
 	highest = get_interaction_depletion(ch, emp, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, require_storable);

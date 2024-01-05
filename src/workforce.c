@@ -1263,7 +1263,7 @@ bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh
 	}
 	
 	// prevent more lookups in the loop
-	common_depletion = config_get_int("common_depletion");
+	common_depletion = room ? DEPLETION_LIMIT(room) : config_get_int("common_depletion");
 	
 	// build lists of interactions to check
 	list_size = 0;

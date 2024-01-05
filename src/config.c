@@ -1910,8 +1910,8 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in seconds; planting reduces it by half up to 3 times");
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT, "number of times you can chop a tile that has no chop evolution");
-	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile");
-	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion from forage, etc");
+	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile, normally");
+	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion used by hunt, formerly by others");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
