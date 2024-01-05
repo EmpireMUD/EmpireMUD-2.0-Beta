@@ -14,11 +14,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -56,11 +56,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -99,11 +99,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -144,11 +144,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -190,11 +190,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -232,11 +232,11 @@ I 5 104 3.00 125 X  # DIG: a red bloodstone
 I 5 103 3.00 125 X  # DIG: a yellow lightning stone
 I 5 102 8.00 125 X  # DIG: a flint stone
 I 5 100 100.00 125 X  # DIG: a rock
-I 6 1254 1.00 1 X  # FORAGE: a mana potion
-I 6 3013 25.00 1 X  # FORAGE: a handful of nuts
-I 6 3009 25.00 1 X  # FORAGE: an orange
-I 6 3007 25.00 1 X  # FORAGE: a couple red cherries
-I 6 3001 100.00 1 X  # FORAGE: a green apple
+I 6 1254 1.00 25 X  # FORAGE: a mana potion
+I 6 3013 25.00 25 X  # FORAGE: a handful of nuts
+I 6 3009 25.00 25 X  # FORAGE: an orange
+I 6 3007 25.00 25 X  # FORAGE: a couple red cherries
+I 6 3001 100.00 25 X  # FORAGE: a green apple
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 15.28 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs

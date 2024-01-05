@@ -369,7 +369,7 @@ path winding around~
 cleared trails, and rope bridges. Though it looks treacherous at a distance,
 the path is surprisingly well-planned and easy to follow.
 ~
-I 6 3015 100.00 1  # FORAGE: red berries
+I 6 3015 100.00 25  # FORAGE: red berries
 R
 1001 1 5 0
 R

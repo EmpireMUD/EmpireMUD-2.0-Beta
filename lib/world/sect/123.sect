@@ -31,7 +31,7 @@ E
 13 0 5.00 20
 E
 14 0 1.00 20
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -82,7 +82,7 @@ E
 13 0 5.00 20
 E
 14 0 1.00 20
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -127,7 +127,7 @@ E
 13 0 5.00 21
 E
 14 0 1.00 21
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -178,7 +178,7 @@ E
 13 0 5.00 51
 E
 14 0 1.00 51
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -241,7 +241,7 @@ E
 13 0 5.00 57
 E
 14 0 1.00 57
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 21 1300 20.00 125 f  # FISH: glowing green seashell
 I 21 256 0.25 125 f  # FISH: hestian trinket
 I 21 262 0.25 125 f  # FISH: trinket of conveyance
@@ -288,7 +288,7 @@ E
 13 0 5.00 70
 E
 14 0 1.00 70
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -341,7 +341,7 @@ E
 13 0 5.00 73
 E
 14 0 1.00 73
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -402,7 +402,7 @@ E
 13 0 5.00 75
 E
 14 0 1.00 75
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -447,7 +447,7 @@ E
 13 0 5.00 82
 E
 14 0 1.00 82
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -630,7 +630,7 @@ E
 13 0 5.00 88
 E
 14 0 1.00 88
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -800,7 +800,7 @@ E
 13 0 5.00 36
 E
 14 0 1.00 36
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -845,7 +845,7 @@ E
 13 0 5.00 0
 E
 14 0 1.00 0
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M
@@ -890,7 +890,7 @@ E
 13 0 5.00 58
 E
 14 0 1.00 58
-I 6 12353 100.00 1  # FORAGE: white berries
+I 6 12353 100.00 25  # FORAGE: white berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 12368 100.00 125 p  # PICK: frost flower
 M

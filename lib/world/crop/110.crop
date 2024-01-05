@@ -9,7 +9,7 @@ D0
 D0
 @w&t!&?i@e~
 &g~
-I 6 11010 100.00 1  # FORAGE: handful of purple seeds
+I 6 11010 100.00 25  # FORAGE: handful of purple seeds
 I 8 11009 20.00 2 H  # HARVEST: bundle of zephyr cattails
 I 8 11009 20.00 3 H  # HARVEST: bundle of zephyr cattails
 I 8 11009 20.00 4 H  # HARVEST: bundle of zephyr cattails
@@ -40,7 +40,7 @@ w&vO&?ww~
 D0
 ww&vO&?w~
 &g~
-I 6 11012 100.00 1  # FORAGE: tiny eggplant
+I 6 11012 100.00 25  # FORAGE: tiny eggplant
 I 8 11011 20.00 2 H  # HARVEST: eggplant
 I 8 11011 20.00 3 H  # HARVEST: eggplant
 I 8 11011 20.00 4 H  # HARVEST: eggplant

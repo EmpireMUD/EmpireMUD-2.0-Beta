@@ -26,8 +26,8 @@ frozen river portal around~
 portal. Snow blasts through the portal and, as the snow lands on your skin, you
 feel the electric mana of the Magiterranean -- the realm of nature mages.
 ~
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9172 5.00 g
 M

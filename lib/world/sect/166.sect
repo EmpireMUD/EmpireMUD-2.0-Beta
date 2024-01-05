@@ -38,7 +38,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 X
 stumps nordlys grove trees forest around~
    You find yourself in a field of stumps. The trees look exotic, like nordlys,
@@ -113,7 +113,7 @@ I 5 1300 6.00 125 d  # DIG: glowing green seashell
 I 5 1206 6.00 125 d  # DIG: iridescent blue iris
 I 5 106 18.00 125 d  # DIG: rough piece of obsidian
 I 5 100 58.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M
 615 10.00 c
@@ -246,7 +246,7 @@ I 5 1300 6.00 125 d  # DIG: glowing green seashell
 I 5 1206 6.00 125 d  # DIG: iridescent blue iris
 I 5 106 18.00 125 d  # DIG: rough piece of obsidian
 I 5 100 58.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 16697 100.00 1  # CHOP: glowing nordlys tree
 M
 615 10.00 c

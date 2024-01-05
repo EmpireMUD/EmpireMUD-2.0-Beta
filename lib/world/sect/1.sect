@@ -23,7 +23,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -68,7 +68,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -120,7 +120,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -171,7 +171,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -247,7 +247,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -321,7 +321,7 @@ E
 19 0 100.00 100
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 100 66.67 125 X  # DIG: rock
-I 6 3003 100.00 1  # FORAGE: handful of grain
+I 6 3003 100.00 25  # FORAGE: handful of grain
 X
 field seeded seeds plants crop around~
    You find yourself standing in a vast field of dirt, recently turned over in
@@ -377,7 +377,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 X
 stumps field forest trees around~
    The plain is littered with stumps where the trees have been cut down. The
@@ -419,7 +419,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -466,7 +466,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -513,7 +513,7 @@ E
 I 5 102 33.33 125 X  # DIG: flint stone
 I 5 101 16.67 125 X  # DIG: lump of clay
 I 5 100 50.00 125 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -557,7 +557,7 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -615,7 +615,7 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -679,7 +679,7 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -731,7 +731,7 @@ E
 I 5 102 9.00 125 X  # DIG: flint stone
 I 5 100 9.00 125 X  # DIG: rock
 I 5 101 82.00 125 X  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -790,7 +790,7 @@ E
 I 5 102 9.00 125 X  # DIG: flint stone
 I 5 100 9.00 125 X  # DIG: rock
 I 5 101 82.00 125 X  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -835,8 +835,8 @@ E
 8 0 100.00 113
 I 5 107 75.00 125 x  # DIG: bag of sand
 I 5 101 25.00 125 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -893,8 +893,8 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3051 40.00 1 x  # FORAGE: sea urchin
-I 6 3052 40.00 1 x  # FORAGE: clam
+I 6 3051 40.00 25 x  # FORAGE: sea urchin
+I 6 3052 40.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -941,8 +941,8 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -983,7 +983,7 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1044,8 +1044,8 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -1105,8 +1105,8 @@ E
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
 I 5 101 82.00 125 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs

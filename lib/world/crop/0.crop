@@ -20,7 +20,7 @@ A Field of Wheat~
 D0
 ;;;;~
 &Y~
-I 6 3058 100.00 1  # FORAGE: handful of grain
+I 6 3058 100.00 25  # FORAGE: handful of grain
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 141 20.00 2 H  # HARVEST: bundle of wheat
 I 8 141 20.00 3 H  # HARVEST: bundle of wheat
@@ -45,7 +45,7 @@ A Field of Corn~
 D0
 iiii~
 &g~
-I 6 3059 100.00 1  # FORAGE: handful of kernels
+I 6 3059 100.00 25  # FORAGE: handful of kernels
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 3005 20.00 2 H  # HARVEST: bushel of corn
 I 8 3005 20.00 3 H  # HARVEST: bushel of corn
@@ -73,7 +73,7 @@ A Field of Hops~
 D0
 ::::~
 &G~
-I 6 3060 100.00 1  # FORAGE: handful of seeds
+I 6 3060 100.00 25  # FORAGE: handful of seeds
 I 8 143 20.00 2 H  # HARVEST: bushel of hops
 I 8 143 20.00 3 H  # HARVEST: bushel of hops
 I 8 143 20.00 4 H  # HARVEST: bushel of hops
@@ -104,7 +104,7 @@ A Field of Cotton~
 D0
 ::::~
 &0~
-I 6 3061 100.00 1 f  # FORAGE: handful of seeds
+I 6 3061 100.00 25 f  # FORAGE: handful of seeds
 I 8 144 20.00 2 H  # HARVEST: basket of cotton
 I 8 144 20.00 3 H  # HARVEST: basket of cotton
 I 8 144 20.00 4 H  # HARVEST: basket of cotton
@@ -133,7 +133,7 @@ A Field of Barley~
 D0
 ::::~
 &Y~
-I 6 3062 100.00 1  # FORAGE: handful of seeds
+I 6 3062 100.00 25  # FORAGE: handful of seeds
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 145 20.00 2 H  # HARVEST: sack of barley
 I 8 145 20.00 3 H  # HARVEST: sack of barley
@@ -191,7 +191,7 @@ D0
 D0
 o^^^~
 &Y~
-I 6 3006 100.00 1  # FORAGE: plump peach
+I 6 3006 100.00 25  # FORAGE: plump peach
 I 7 3004 100.00 14  # PICK: basket of peaches
 I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
@@ -246,7 +246,7 @@ D0
 D0
 &Ro&?^^^~
 &Y~
-I 6 3007 100.00 1  # FORAGE: couple red cherries
+I 6 3007 100.00 25  # FORAGE: couple red cherries
 I 7 3008 100.00 14  # PICK: bag of cherries
 I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
@@ -283,7 +283,7 @@ D0
 D0
 .&G^&?o.~
 &y~
-I 6 3009 100.00 1  # FORAGE: orange
+I 6 3009 100.00 25  # FORAGE: orange
 I 7 3010 100.00 14  # PICK: sack of oranges
 I 9 132 100.00 50  # GATHER: thorny branches
 I 20 122 50.00 1 c  # CHOP: rough wood
@@ -312,7 +312,7 @@ A Rice Paddy~
 D0
 ,,,,~
 &g~
-I 6 3063 100.00 1  # FORAGE: handful of rice
+I 6 3063 100.00 25  # FORAGE: handful of rice
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 3011 20.00 2 H  # HARVEST: sack of dried rice
 I 8 3011 20.00 3 H  # HARVEST: sack of dried rice
@@ -354,7 +354,7 @@ D0
 D0
 .&Go^&?.~
 &y~
-I 6 3018 100.00 1  # FORAGE: couple of olives
+I 6 3018 100.00 25  # FORAGE: couple of olives
 I 7 3019 100.00 14  # PICK: basket of olives
 I 9 132 100.00 50  # GATHER: thorny branches
 I 20 122 50.00 1 c  # CHOP: rough wood
@@ -386,7 +386,7 @@ A Field of Peas~
 D0
 &u&G....&0~
 &G~
-I 6 3020 100.00 1  # FORAGE: handful of peas
+I 6 3020 100.00 25  # FORAGE: handful of peas
 I 8 3021 20.00 2 H  # HARVEST: basket of peas
 I 8 3021 20.00 3 H  # HARVEST: basket of peas
 I 8 3021 20.00 4 H  # HARVEST: basket of peas
@@ -418,7 +418,7 @@ A Field of Squash Vines~
 D0
 oooo~
 &y~
-I 6 3022 100.00 1  # FORAGE: yellow squash
+I 6 3022 100.00 25  # FORAGE: yellow squash
 I 8 3023 100.00 2  # HARVEST: basket of squash
 U
 0
@@ -473,7 +473,7 @@ D0
 D0
 &Go&?^^^~
 &Y~
-I 6 3001 100.00 1  # FORAGE: green apple
+I 6 3001 100.00 25  # FORAGE: green apple
 I 7 3002 100.00 14  # PICK: bunch of apples
 I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
@@ -501,7 +501,7 @@ A Group of Plantain Stems~
 D0
 &Gd&?\/&Gb~
 &g~
-I 6 3024 100.00 1  # FORAGE: unripe plantain
+I 6 3024 100.00 25  # FORAGE: unripe plantain
 I 8 3025 20.00 2 H  # HARVEST: basket of plantains
 I 8 3025 20.00 3 H  # HARVEST: basket of plantains
 I 8 3025 20.00 4 H  # HARVEST: basket of plantains

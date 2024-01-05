@@ -15,8 +15,8 @@ D0
 D0
 &a.&?...~
 &g~
-I 6 18322 10.00 1 t  # FORAGE: sack of flaxseed
-I 6 3003 90.00 1 t  # FORAGE: handful of grain
+I 6 18322 10.00 25 t  # FORAGE: sack of flaxseed
+I 6 3003 90.00 25 t  # FORAGE: handful of grain
 I 8 18321 75.00 1 f  # HARVEST: bundle of flax fibers
 I 8 18321 25.00 2 f  # HARVEST: bundle of flax fibers
 I 8 18322 50.00 2 s  # HARVEST: sack of flaxseed

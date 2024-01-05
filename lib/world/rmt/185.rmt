@@ -123,7 +123,7 @@ D14
 D8
 ~
 0 18505
-I 6 18501 100.00 1  # FORAGE: a single papaya
+I 6 18501 100.00 25  # FORAGE: a single papaya
 I 8 18500 100.00 1  # HARVEST: a basket of papayas
 M 0 18502 100.00 1
 S

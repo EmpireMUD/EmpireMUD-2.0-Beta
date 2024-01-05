@@ -238,9 +238,9 @@ adeg 0 0 -1
 D8
 ~
 0 11114
-I 6 11105 33.33 1 X  # FORAGE: few blackberries
-I 6 11103 33.33 1 X  # FORAGE: carrot
-I 6 11107 100.00 1 X  # FORAGE: ripe pear
+I 6 11105 33.33 25 X  # FORAGE: few blackberries
+I 6 11103 33.33 25 X  # FORAGE: carrot
+I 6 11107 100.00 25 X  # FORAGE: ripe pear
 I 8 11102 33.33 1 X  # HARVEST: bunch of carrots
 I 8 11104 33.33 1 X  # HARVEST: bunch of blackberries
 I 8 11106 100.00 1 X  # HARVEST: juicy pears

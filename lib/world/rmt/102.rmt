@@ -59,8 +59,8 @@ acegi 0 0 10226
 D2
 ~
 0 10226
-I 6 10228 50.00 1 X  # FORAGE: stack of cactus pads
-I 6 10229 100.00 1 X  # FORAGE: cactus fruit
+I 6 10228 50.00 25 X  # FORAGE: stack of cactus pads
+I 6 10229 100.00 25 X  # FORAGE: cactus fruit
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -92,8 +92,8 @@ acegi 0 0 10226
 D3
 ~
 0 10226
-I 6 10226 50.00 1 X  # FORAGE: pineapple
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10226 50.00 25 X  # FORAGE: pineapple
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -125,8 +125,8 @@ acegi 0 0 10226
 D0
 ~
 0 10226
-I 6 10227 50.00 1 X  # FORAGE: agave heart
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10227 50.00 25 X  # FORAGE: agave heart
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -158,8 +158,8 @@ acegi 0 0 10226
 D1
 ~
 0 10226
-I 6 10230 50.00 1 X  # FORAGE: thick aloe leaves
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10230 50.00 25 X  # FORAGE: thick aloe leaves
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs

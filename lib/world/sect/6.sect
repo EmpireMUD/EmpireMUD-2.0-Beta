@@ -79,7 +79,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 M
 602 100.00 d
 X
@@ -137,7 +137,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
 9151 3.33 c
@@ -219,7 +219,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
 602 100.00 d
@@ -456,7 +456,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 603 100.00 1  # CHOP: starwood tree
 M
 602 100.00 d
@@ -544,7 +544,7 @@ E
 9 0 50.00 3
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 91.00 125 d  # DIG: rock
-I 6 3015 75.00 1  # FORAGE: red berries
+I 6 3015 75.00 25  # FORAGE: red berries
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
 X
 forest dead trees enchanted woods around~
@@ -618,7 +618,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 9151 3.33 c
@@ -735,7 +735,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 9151 3.33 c
@@ -924,7 +924,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 602 100.00 d
@@ -1032,7 +1032,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 M
 602 100.00 d
 X
@@ -1090,7 +1090,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
@@ -1236,7 +1236,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
@@ -1441,7 +1441,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
@@ -1533,7 +1533,7 @@ E
 9 0 50.00 26
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 91.00 125 d  # DIG: rock
-I 6 3016 75.00 1  # FORAGE: handful of dates
+I 6 3016 75.00 25  # FORAGE: handful of dates
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
 X
 grove dead trees forest weirdwood woods around~
@@ -1574,7 +1574,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 101 9.00 125 d  # DIG: lump of clay
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
@@ -1647,7 +1647,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 101 9.00 125 d  # DIG: lump of clay
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
@@ -1719,7 +1719,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 101 9.00 125 d  # DIG: lump of clay
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 7 103 2.00 125 p  # PICK: yellow lightning stone
 I 7 104 2.00 125 p  # PICK: red bloodstone
 I 7 1206 2.00 125 p  # PICK: iridescent blue iris
@@ -1815,7 +1815,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 602 100.00 d
@@ -1942,7 +1942,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 602 100.00 d
@@ -2088,7 +2088,7 @@ I 5 1300 2.00 125 d  # DIG: glowing green seashell
 I 5 1206 2.00 125 d  # DIG: iridescent blue iris
 I 5 102 9.00 125 d  # DIG: flint stone
 I 5 100 83.00 125 d  # DIG: rock
-I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 6 606 100.00 25  # FORAGE: handful of elderberries
 I 20 605 100.00 1  # CHOP: pile of dead wood
 M
 602 100.00 d
