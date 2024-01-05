@@ -168,7 +168,6 @@ ACMD(do_finish);
 ACMD(do_fire);
 ACMD(do_flee);
 ACMD(do_follow);
-ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_forgive);
 ACMD(do_friend);
@@ -676,7 +675,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "fish", POS_SITTING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FISH, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),
 	SIMPLE_CMD( "follow", POS_RESTING, do_follow, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "forage", POS_STANDING, do_forage, NO_MIN, CTYPE_SKILL ),
+	STANDARD_CMD( "forage", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FORAGE, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	STANDARD_CMD( "forge", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),

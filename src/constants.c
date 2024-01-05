@@ -5085,7 +5085,7 @@ const bool interact_one_at_a_time[NUM_INTERACTS] = {
 	FALSE,	// BARDE  -- definitely cannot support this
 	FALSE,	// LOOT  -- definitely cannot support this
 	TRUE,	// DIG
-	FALSE,	// FORAGE
+	TRUE,	// FORAGE
 	TRUE,	// PICK
 	FALSE,	// HARVEST  -- PROBABLY cannot support this
 	TRUE,	// GATHER

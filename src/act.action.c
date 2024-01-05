@@ -60,7 +60,6 @@ void process_copying_book(char_data *ch);
 void process_dismantle_action(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
-void process_foraging(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_gen_interact_room(char_data *ch);
 void process_harvesting(char_data *ch);
@@ -85,7 +84,6 @@ void process_tanning(char_data *ch);
 
 // other local protos
 GEN_INTERACT_SPECIAL(gen_proc_nature_burn);
-INTERACTION_FUNC(finish_foraging);
 
 // external variables
 extern bool catch_up_actions;
@@ -144,7 +142,7 @@ const struct action_data_struct action_data[] = {
 	{ "repairing", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
-	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
+	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_gen_interact_room, NULL },	// ACT_FORAGING
 	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
 	{ "ability", "is doing something...", ACTF_SITTING | ACTF_RESTING | ACTF_FIGHTING, perform_over_time_ability, cancel_over_time_ability },	// ACT_OVER_TIME_ABILITY
 	
@@ -163,6 +161,7 @@ const struct action_data_struct action_data[] = {
 #define GI_ALLOW_DIRECTION			BIT(0)	// player can do this in a direction from here
 #define GI_CONTINUE_WHEN_DEPLETED	BIT(1)	// will not stop for depletion
 #define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
+#define GI_LOCAL_CROPS				BIT(3)	// if the interaction fails, tries a random local crop too
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -262,6 +261,19 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			END_RANDOM_TICK_MSGS
 		}},
 		OBJ_CUSTOM_FISH_TO_CHAR, OBJ_CUSTOM_FISH_TO_ROOM
+	},
+	{ INTERACT_FORAGE, ACT_FORAGING, "forage", "foraging", "forge_base_timer", 4,
+		PTECH_FORAGE_COMMAND, DPLTN_FORAGE, GI_NO_CONFIG,
+		NO_TOOL, GI_NO_SPEC, GI_LOCAL_CROPS,
+		{ /* start msg */ { "You forage around for food...", "$n starts foraging around." },
+		/* pre-finish */ NULL,
+		/* finish msg */ { "You find $p!", "$n finds $p!" },
+		/* empty msg */ "You can't find anything to eat.",
+		75, { // random tick messages:
+			{ "You forage around for something to eat...", "$n forages for food..." },
+			END_RANDOM_TICK_MSGS
+		}},
+		NOTHING, NOTHING
 	},
 	
 	// this must go last
@@ -561,29 +573,6 @@ bool action_flagged(char_data *ch, bitvector_t actf) {
 
 
 /**
-* When a player forages in the wild and gets nothing, they get a chance at a
-* local crop, too, even if that crop is not on this tile.
-*
-* @param char_data *ch The person trying to forage.
-* @return bool TRUE if any forage interactions ran successfully, FALSE if not.
-*/
-bool do_crop_forage(char_data *ch) {
-	crop_data *crop;
-	
-	if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || IS_MAP_BUILDING(IN_ROOM(ch))) {
-		return FALSE;	// must be outdoor
-	}
-	
-	if ((crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE))) {
-		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, NULL, finish_foraging);
-	}
-	else {
-		return FALSE;	// no crop
-	}
-}
-
-
-/**
 * Finds a tool equipped by the character. Returns the best one.
 *
 * @param char_data *ch The person who might have the tool.
@@ -848,17 +837,6 @@ void start_chopping(char_data *ch) {
 
 
 /**
-* begins the "forage" action
-*
-* @param char_data *ch The future forager.
-*/
-void start_foraging(char_data *ch) {
-	start_action(ch, ACT_FORAGING, config_get_int("forage_base_timer"));
-	send_to_char("You begin foraging around for food...\r\n", ch);
-}
-
-
-/**
 * Starts the mining action where possible.
 *
 * @param char_data *ch The prospective miner.
@@ -924,55 +902,6 @@ INTERACTION_FUNC(finish_chopping) {
 		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
-	}
-	
-	return TRUE;
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(finish_foraging) {
-	obj_data *obj = NULL;
-	obj_vnum vnum = interaction->vnum;
-	int iter, num = interaction->quantity, obj_ok = 0;
-	char *cust;
-
-	// give objs
-	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
-		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), vnum, num);
-	}
-	
-	if (obj_ok && obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (num > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", num);
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		}
-		else {
-			act(cust ? cust : "You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-		}
-		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
-		
-		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
-			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
-		}
-	}
-	else {
-		msg_to_char(ch, "You find nothing.\r\n");
 	}
 	
 	return TRUE;
@@ -1622,71 +1551,6 @@ void process_fillin(char_data *ch) {
 				msg_to_char(ch, "You finish filling in the trench!\r\n");
 				act("$n finishes filling in the trench!", FALSE, ch, 0, 0, TO_ROOM);
 				untrench_room(IN_ROOM(ch));
-			}
-		}
-	}
-}
-
-
-/**
-* Tick updates for foraging.
-*
-* @param char_data *ch The forager.
-*/
-void process_foraging(char_data *ch) {
-	room_data *in_room = IN_ROOM(ch);
-	bool found = FALSE;
-	
-	int forage_depletion = config_get_int("short_depletion");
-	
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't forage anything in an incomplete building.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to forage for anything.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You look around for something to eat...\r\n", ch);
-	}
-	// no room message
-
-	// decrement
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		end_action(ch);
-		
-		// forage triggers
-		if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL)) {
-			return;
-		}
-		
-		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= forage_depletion) {
-			msg_to_char(ch, "You can't find anything left to eat here.\r\n");
-			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {	// success
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, NULL, GUESTS_ALLOWED, finish_foraging)) {
-				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
-				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL, NULL, NULL);
-				found = TRUE;
-			}
-			else if (do_crop_forage(ch)) {
-				gain_player_tech_exp(ch, PTECH_FORAGE_COMMAND, 10);
-				run_ability_hooks_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL, NULL, NULL);
-				found = TRUE;
-			}
-			
-			if (found && IN_ROOM(ch) == in_room) {
-				start_foraging(ch);
-			}
-			else if (!found) {
-				msg_to_char(ch, "You couldn't find anything to eat here.\r\n");
 			}
 		}
 	}
@@ -2821,45 +2685,6 @@ ACMD(do_fillin) {
 }
 
 
-ACMD(do_forage) {
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot forage.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_FORAGING) {
-		send_to_char("You stop searching.\r\n", ch);
-		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_FORAGE_COMMAND)) {
-		msg_to_char(ch, "You don't have the correct ability to forage for anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!IS_OUTDOORS(ch) && !can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
-		send_to_char("You don't see anything to forage for here.\r\n", ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to forage for anything here.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't forage for anything in an incomplete building.\r\n");
-	}
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
-	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE_COMMAND, NULL, NULL)) {
-		// triggered
-	}
-	else {
-		start_foraging(ch);
-	}
-}
-
-
 ACMD(do_harvest) {
 	int harvest_timer = config_get_int("harvest_timer");
 	
@@ -3585,6 +3410,9 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		// checks here, not the target room
 		msg_to_char(ch, "It's too dark to %s anything here.\r\n", data->command);
 	}
+	else if (!IS_COMPLETE(room)) {
+		msg_to_char(ch, "You can't %s anything at an incomplete building.\r\n", data->command);
+	}
 	else if (data->tool && !has_all_tools(ch, data->tool)) {
 		prettier_sprintbit(data->tool, tool_flags, buf);
 		if (count_bits(data->tool) > 1) {
@@ -3734,6 +3562,30 @@ void start_gen_interact_room(char_data *ch, int dir, room_data *room, const stru
 
 
 /**
+* Some interacts can "fail over" to a local crop -- if the interaction failed
+* on the tile itself. It picks a local crop with the interaction, if one
+* exists, and tries it on that instead.
+*
+* @param char_data *ch The person trying to interact.
+* @return bool TRUE if any interactions ran successfully, FALSE if not.
+*/
+bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct gen_interact_data_t *data) {
+	crop_data *crop;
+	
+	if (!IS_OUTDOOR_TILE(room) || IS_MAP_BUILDING(room)) {
+		return FALSE;	// must be outdoor
+	}
+	
+	if ((crop = get_potential_crop_for_location(room, data->interact))) {
+		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), data->interact, room, NULL, NULL, NULL, finish_gen_interact_room);
+	}
+	else {
+		return FALSE;	// no crop
+	}
+}
+
+
+/**
 * Ticker function for do_gen_interact_room.
 *
 * @param char_data *ch The person doing the interaction.
@@ -3776,7 +3628,7 @@ void process_gen_interact_room(char_data *ch) {
 			act(data->msg.pre_finish, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 		}
 		
-		if (run_room_interactions(ch, to_room, data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room)) {
+		if (run_room_interactions(ch, to_room, data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room) || (IS_SET(data->flags, GI_LOCAL_CROPS) && try_gen_interact_local_crops(ch, to_room, data))) {
 			end_action(ch);
 			
 			if (data->ptech != NO_TECH) {

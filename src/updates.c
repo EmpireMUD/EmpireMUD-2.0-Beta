@@ -295,7 +295,7 @@ void b3_2_map_and_gear(void) {
 		// crops
 		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
-			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, FALSE));
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, NOTHING));
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
@@ -432,7 +432,7 @@ void b3_15_crop_update(void) {
 		if (map->crop_type) {
 			// update crop
 			if (room || (room = real_room(map->vnum))) {
-				new_crop = get_potential_crop_for_location(room, FALSE);
+				new_crop = get_potential_crop_for_location(room, NOTHING);
 				set_crop_type(room, new_crop ? new_crop : crop_table);
 			}
 		}

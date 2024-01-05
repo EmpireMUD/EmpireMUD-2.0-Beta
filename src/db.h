@@ -937,7 +937,7 @@ void finish_trench(room_data *room);
 void free_complex_data(struct complex_room_data *data);
 void free_shared_room_data(struct shared_room_data *data);
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
+crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact);
 #define get_world_filename(str, vnum, suffix)  sprintf(str, "%s%02d/%d%s", WLD_PREFIX, ((vnum) % 100), (vnum), NULLSAFE(suffix))
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
