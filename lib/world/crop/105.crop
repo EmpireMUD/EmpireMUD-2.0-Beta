@@ -41,7 +41,7 @@ I 8 10507 20.00 5 H  # HARVEST: bundle of spadebrush
 I 8 10507 20.00 6 H  # HARVEST: bundle of spadebrush
 I 8 10506 75.00 1 S  # HARVEST: handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: handful of spadebrush seeds
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 U
 0
 Spades grow, fully-formed, from the soil!~
@@ -214,7 +214,7 @@ D0
 I 6 10521 1.00 1 a  # FORAGE: fig leaf
 I 6 10518 100.00 1 a  # FORAGE: unripe fig
 I 7 10519 100.00 14  # PICK: basket of pudding figs
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -326,7 +326,7 @@ I 8 10532 20.00 5 H  # HARVEST: pickthorn stalk
 I 8 10532 20.00 6 H  # HARVEST: pickthorn stalk
 I 8 10531 75.00 1 S  # HARVEST: red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: red pickthorn fruit
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
 U
 0
 Crooked, thorny stems spring out of the soil!~

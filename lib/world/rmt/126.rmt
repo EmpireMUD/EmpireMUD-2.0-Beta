@@ -45,7 +45,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12676 100.00 1
 T 12654
 T 12680
@@ -89,7 +89,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 1 12652 100.00 1
 M 0 12675 100.00 1
 T 12654
@@ -136,7 +136,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -181,7 +181,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 1 12679 75.00 2
 T 12654
@@ -221,7 +221,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 100.00 25
 T 12654
 T 12680
@@ -271,7 +271,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 1 12679 75.00 2
 T 12654
@@ -387,7 +387,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12676
@@ -485,7 +485,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -523,7 +523,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -568,7 +568,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 M 0 12650 75.00 1
 T 12654
@@ -609,7 +609,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 S
@@ -642,7 +642,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 100.00 25
 T 12654
 S
@@ -680,7 +680,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12656 100.00 1
 M 0 12660 25.00 25
 T 12654
@@ -721,7 +721,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12660 25.00 25
 T 12654
 T 12680
@@ -765,7 +765,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12655 100.00 1
 M 0 12660 25.00 25
 T 12654
@@ -806,7 +806,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1205 15.27 1 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: small flower
-I 9 121 100.00 1 X  # GATHER: sticks and leaves
+I 9 121 100.00 50 X  # GATHER: sticks and leaves
 M 0 12669 5.00 1
 M 0 12660 50.00 25
 M 0 12660 50.00 25

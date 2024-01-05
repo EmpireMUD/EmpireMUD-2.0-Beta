@@ -17,7 +17,7 @@ I 5 102 15.00 125 X  # DIG: flint stone
 I 5 101 15.00 125 X  # DIG: lump of clay
 I 5 100 100.00 125 X  # DIG: rock
 I 6 3015 75.00 1  # FORAGE: red berries
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 X
 tree withered trees trunk~
@@ -44,7 +44,7 @@ I 5 103 8.00 125 X  # DIG: yellow lightning stone
 I 5 102 15.00 125 X  # DIG: flint stone
 I 5 100 100.00 125 X  # DIG: rock
 I 6 3016 75.00 1  # FORAGE: handful of dates
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
 I 20 122 5.00 4 c  # CHOP: rough wood
 I 20 122 10.00 3 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood

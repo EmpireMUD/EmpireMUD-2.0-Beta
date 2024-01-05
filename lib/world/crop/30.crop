@@ -612,7 +612,7 @@ D0
 &Y~
 I 6 3071 100.00 1  # FORAGE: couple of apricots
 I 7 3070 100.00 14  # PICK: basket of apricots
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -718,7 +718,7 @@ D0
 &G~
 I 6 3077 100.00 1  # FORAGE: single ripe lemon
 I 7 3076 100.00 14  # PICK: basket of lemons
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0

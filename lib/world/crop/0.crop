@@ -193,7 +193,7 @@ o^^^~
 &Y~
 I 6 3006 100.00 1  # FORAGE: plump peach
 I 7 3004 100.00 14  # PICK: basket of peaches
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -248,7 +248,7 @@ D0
 &Y~
 I 6 3007 100.00 1  # FORAGE: couple red cherries
 I 7 3008 100.00 14  # PICK: bag of cherries
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -285,7 +285,7 @@ D0
 &y~
 I 6 3009 100.00 1  # FORAGE: orange
 I 7 3010 100.00 14  # PICK: sack of oranges
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
 I 20 122 50.00 1 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood
 U
@@ -356,7 +356,7 @@ D0
 &y~
 I 6 3018 100.00 1  # FORAGE: couple of olives
 I 7 3019 100.00 14  # PICK: basket of olives
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
 I 20 122 50.00 1 c  # CHOP: rough wood
 I 20 122 50.00 2 c  # CHOP: rough wood
 U
@@ -475,7 +475,7 @@ D0
 &Y~
 I 6 3001 100.00 1  # FORAGE: green apple
 I 7 3002 100.00 14  # PICK: bunch of apples
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0

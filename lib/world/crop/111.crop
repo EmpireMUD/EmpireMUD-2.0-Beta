@@ -97,7 +97,7 @@ D0
 &Y~
 I 6 11107 100.00 1  # FORAGE: ripe pear
 I 7 11106 100.00 14  # PICK: juicy pears
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0

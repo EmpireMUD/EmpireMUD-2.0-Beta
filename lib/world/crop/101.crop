@@ -84,7 +84,7 @@ D4
 &y~
 I 6 3014 100.00 1  # FORAGE: dry beans
 I 7 10152 100.00 28  # PICK: handful of mesquite pods
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
 I 20 10151 50.00 2 c  # CHOP: mesquite tree
 I 20 10151 50.00 1 c  # CHOP: mesquite tree
 M
