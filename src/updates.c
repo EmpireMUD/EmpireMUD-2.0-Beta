@@ -3537,6 +3537,39 @@ void b5_166_barrier_magentafication(void) {
 }
 
 
+// clears removed DIGGING flag
+void b5_168_updates(void) {
+	bld_data *bld, *next_bld;
+	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
+	
+	bitvector_t FNC_DIGGING = BIT(5);
+	
+	// ensure no use of the DIGGING function flag
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		if (IS_SET(GET_BLD_FUNCTIONS(bld), FNC_DIGGING)) {
+			REMOVE_BIT(GET_BLD_FUNCTIONS(bld), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from building %d %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (IS_SET(GET_RMT_FUNCTIONS(rmt), FNC_DIGGING)) {
+			REMOVE_BIT(GET_RMT_FUNCTIONS(rmt), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from room template %d %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_DIGGING)) {
+			REMOVE_BIT(VEH_FUNCTIONS(veh), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from vehicle %d %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3636,6 +3669,7 @@ const struct {
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
 	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
+	{ "b5.168", b5_168_updates, NULL, "Removing old DIGGING function flag" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
