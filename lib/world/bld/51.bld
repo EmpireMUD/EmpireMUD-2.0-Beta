@@ -535,8 +535,6 @@ to the monumental structures that it will one day become a part of. The quarry
 is a place of industry and hard work, a reminder that even the most humble of
 materials can be transformed into something magnificent.
 ~
-F
-f
 I 5 102 15.00 250 X  # DIG: flint stone
 I 5 100 100.00 250 X  # DIG: rock
 I 23 105 100.00 125  # QUARRY: huge stone block
@@ -572,8 +570,6 @@ to create beautiful works of art. The clay pit is a place of raw materials and
 endless possibilities, a reminder that even the simplest of substances can be
 transformed into something beautiful and useful.
 ~
-F
-f
 I 5 101 100.00 250 X  # DIG: lump of clay
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 I 31 101 100.00 250 X  # PRODUCTION: lump of clay

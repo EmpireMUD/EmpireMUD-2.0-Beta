@@ -20,7 +20,7 @@ an apple pie~
 A warm apple pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 2
+6 m a 0 0 3
 24 0 0
 7 336
 A
@@ -29,27 +29,13 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3302
 pie peach glistening~
 a peach pie~
 A glistening peach pie is sitting here.~
-The pie looks delicious!
-~
-6 m a 0 0 2
-24 0 0
-7 336
-A
-4 1 0
-C
-1 1
-R
-4 5606 0
-S
-#3303
-pie cherry rich~
-a cherry pie~
-A rich cherry pie is cooling here.~
 The pie looks delicious!
 ~
 6 m a 0 0 3
@@ -61,6 +47,26 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
+S
+#3303
+pie cherry rich~
+a cherry pie~
+A rich cherry pie is cooling here.~
+The pie looks delicious!
+~
+6 m a 0 0 4
+24 0 0
+7 336
+A
+4 1 0
+C
+1 1
+R
+4 5606 0
+R
+4 5132 0
 S
 #3304
 apple candied~
@@ -80,7 +86,7 @@ a steaming casserole~
 A casserole is steaming on the ground.~
 The casserole looks delicious.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -90,6 +96,8 @@ C
 O+ 1 6242
 R
 4 5619 0
+R
+4 5132 0
 S
 #3306
 jerky pouch~
@@ -205,7 +213,7 @@ a loaf of bread~
 A loaf of bread has been dropped on the ground.~
 Bread is a good portable food.
 ~
-6 lm a 0 0 3
+6 lm a 0 0 4
 24 0 0
 7 336
 A
@@ -216,6 +224,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3314
 rice fried bowl~
@@ -458,7 +468,7 @@ a pumpkin pie~
 A rich pumpkin pie is cooling here.~
 The pie looks delicious!
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 24 0 0
 7 336
 A
@@ -467,6 +477,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3324
 tart blackberry flaky~
@@ -475,7 +487,7 @@ A flaky blackberry tart has been left here.~
    This small tart is stuffed full with blackberries. Flaky, honey baked crust
 surround a thick blackberry filling. It should be quite delicious.
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 24 0 0
 7 336
 M
@@ -486,6 +498,8 @@ M
 $n takes a bite of $p, as you watch a thin stream of blackberry juice runs down $s chin.~
 R
 4 5619 0
+R
+4 5132 0
 S
 #3325
 flatbread nutty squash piece~
@@ -494,7 +508,7 @@ A piece of flatbread has been left here.~
    Threaded through this inocuous piece of flatbread are nuts, squash and a
 distinct glaze from honey.
 ~
-6 m a 0 0 2
+6 m a 0 0 3
 24 0 0
 7 336
 A
@@ -509,6 +523,8 @@ M
 $n rolls up $p and bites off a good sized piece.~
 R
 4 5619 0
+R
+4 5132 0
 S
 #3326
 plate roast delicious hot vegetables~
@@ -517,7 +533,7 @@ A hot plate of roast and vegetables has been left here.~
    A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
 to perfection, the sliced carrots and squash let off a surprising aroma.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -533,6 +549,8 @@ $n scoops up some vegetables with $s roast and eats them.~
 O+ 1 6242
 R
 4 5619 0
+R
+4 5132 0
 S
 #3327
 plate fish poached vegetables~
@@ -590,12 +608,14 @@ A fillet of roast meat is sitting on the ground here.~
    You're not sure what this is from, but it probably tastes fine. Or at least
 better than it would have raw.
 ~
-6 0 a 0 0 4
+6 0 a 0 0 5
 18 0 0
 7 96
 O+ 1 6220
 R
 4 5619 0
+R
+4 5132 0
 S
 #3330
 pie banana~
@@ -603,7 +623,7 @@ a banana pie~
 A warm banana pie is sitting out to cool.~
 It looks delicious!
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 24 0 0
 7 336
 A
@@ -612,6 +632,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3331
 bread banana loaf~
@@ -619,7 +641,7 @@ a loaf of banana bread~
 A loaf of banana bread has been dropped on the ground.~
 Banana bread is a good portable food.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -628,6 +650,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3332
 spray pepper vial glass~
@@ -699,11 +723,13 @@ a plum pie~
 A plum pie has been left here.~
 This plum pie looks delicious.
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 48 0 0
 7 336
 R
 4 5606 0
+R
+4 5132 0
 S
 #3337
 pie strawberry~
@@ -711,7 +737,7 @@ a strawberry pie~
 A warm strawberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 24 0 0
 7 336
 A
@@ -720,6 +746,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3338
 jam strawberry jar~
@@ -759,7 +787,7 @@ a blueberry pie~
 A warm blueberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 24 0 0
 7 336
 A
@@ -768,6 +796,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3341
 jam blueberry jar~
@@ -832,7 +862,7 @@ a flat oat cake~
 A flat oat cake is on the ground.~
 This flat oat cake looks like it would keep you well nourished.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -841,6 +871,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3345
 meatloaf loaf hearty~
@@ -848,7 +880,7 @@ a hearty meatloaf~
 A hearty meatloaf is sitting on the ground.~
 This hearty meatloaf will make you strong.
 ~
-6 mp a 0 0 4
+6 mp a 0 0 5
 48 0 0
 7 336
 A
@@ -859,6 +891,8 @@ M
 4
 You savor the hearty meatloaf.~
 O+ 1 6242
+R
+4 5132 0
 S
 #3346
 pie shepherd's shepherds~
@@ -866,7 +900,7 @@ a shepherd's pie~
 A shepherd's pie is sitting on the ground.~
 This old family recipe will boost your dexterity.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -877,6 +911,8 @@ M
 4
 You eat a big portion of the savory shepherd's pie.~
 O+ 1 6242
+R
+4 5132 0
 S
 #3347
 fish chips plate~
@@ -903,7 +939,7 @@ chicken and dumplings~
 A plate of chicken and dumplings is sitting here.~
 This old cottage recipe will boost your intelligence.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -914,6 +950,8 @@ M
 4
 You enjoy the chicken and dumplings -- just like mother used to make.~
 O+ 1 6242
+R
+4 5132 0
 S
 #3349
 cobbler berry rich~
@@ -921,7 +959,7 @@ a rich berry cobbler~
 A rich berry cobbler is lying on the ground.~
 This old-fashioned dessert is exactly what you need to boost your wits.
 ~
-6 mp a 0 0 4
+6 mp a 0 0 5
 48 0 0
 7 336
 A
@@ -931,6 +969,8 @@ C
 M
 4
 You eat the warm berry cobbler, and think fondly of home.~
+R
+4 5132 0
 S
 #3350
 sausage black~
@@ -1011,7 +1051,7 @@ mom's fruit pie~
 Mom's fruit pie is sitting here.~
 This old-fashioned pie is sure to boost your mana.
 ~
-6 mp a 0 0 3
+6 mp a 0 0 4
 48 0 0
 7 336
 A
@@ -1021,6 +1061,8 @@ C
 M
 4
 Every bite of the fruit pie reminds you of home.~
+R
+4 5132 0
 S
 #3355
 biscuits gravy~
@@ -1028,7 +1070,7 @@ biscuits and gravy~
 Some biscuits and gravy are sitting here.~
 This homestyle favorite will boost your move regeneration.
 ~
-6 mp a 0 0 3
+6 mp a 0 0 4
 48 0 0
 7 336
 A
@@ -1038,6 +1080,8 @@ C
 M
 4
 The biscuits and gravy tastes like a warm fireside meal.~
+R
+4 5132 0
 S
 #3356
 vegetables stewed~
@@ -1272,9 +1316,11 @@ a bowl of baked potatoes~
 A bowl of baked potatoes is lying here.~
 These potatoes look good enough to eat!
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 24 0 0
 0 168
+R
+4 5132 0
 S
 #3369
 potato baked~
@@ -1282,9 +1328,11 @@ a baked potato~
 A baked potato has been left here.~
 It looks good enough to eat!
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 2 0 0
 0 168
+R
+4 5132 0
 S
 #3370
 sugar sack small~
@@ -1309,7 +1357,7 @@ a loaf of garlic bread~
 A loaf of garlic bread has been dropped on the ground.~
 Garlic bread is a good portable food.
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 48 0 0
 7 336
 A
@@ -1318,6 +1366,8 @@ C
 1 1
 R
 4 5606 0
+R
+4 5132 0
 S
 #3372
 lemon candied~

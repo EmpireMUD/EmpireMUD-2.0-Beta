@@ -292,8 +292,6 @@ piles of sand nearby where people have deposited the sand they've dug up. The
 air is dry and the sun beats down on the sandy ground, making it almost too hot
 to touch. Despite the heat, it's a peaceful and quiet place.
 ~
-F
-f
 I 5 100 4.00 250 x  # DIG: rock
 I 5 102 4.00 250 x  # DIG: flint stone
 I 5 107 92.00 250 x  # DIG: bag of sand
