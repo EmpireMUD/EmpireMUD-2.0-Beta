@@ -3242,7 +3242,7 @@ struct gen_interact_data_t {
 	char *verb;	// 'quarrying'
 	char *timer_config;	// optional: config to get the timer (NULL to not use)
 	int timer;	// number of action ticks to use if a config is not set
-	int ptech;	// required ptech (may be NOTHING)
+	int ptech;	// required ptech (may be NO_TECH)
 	int depletion;	// DPLTN_ type (may be NOTHING)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
 	bitvector_t tool;	// any TOOL_ needed
@@ -3250,11 +3250,14 @@ struct gen_interact_data_t {
 	bitvector_t flags;	// GI_ flags
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action
+		char *pre_finish;	// shown before attempting the resource interaction
 		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p
 		char *empty;	// char-only, shown at the end if there's nothing they can get
 		int random_frequency;	// 1-100% chance to see a message per tick
 		char *random_tick[10][2];
 	} msg;
+	int custom_tool_message_to_char;	// optional OBJ_CUSTOM_ type; may be NOTHING
+	int custom_tool_message_to_room;	// optional OBJ_CUSTOM_ type; may be NOTHING
 };
 
 

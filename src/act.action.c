@@ -60,7 +60,6 @@ void process_copying_book(char_data *ch);
 void process_dismantle_action(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
-void process_fishing(char_data *ch);
 void process_foraging(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_gen_interact_room(char_data *ch);
@@ -113,7 +112,7 @@ const struct action_data_struct action_data[] = {
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_ALWAYS_FAST | ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
-	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
+	{ "fishing", "is fishing.", ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIR_VEHICLE
 	{ "chipping", "is chipping flints.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
@@ -163,6 +162,7 @@ const struct action_data_struct action_data[] = {
 // available flags
 #define GI_ALLOW_DIRECTION			BIT(0)	// player can do this in a direction from here
 #define GI_CONTINUE_WHEN_DEPLETED	BIT(1)	// will not stop for depletion
+#define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -170,11 +170,14 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	// { interact, action, command, verb, timer_config, timer
 	//	ptech, depletion, approval_config,
 	//	tool, spec_proc, flags,
-	//	{ { start-to-char, start-to-room }, { finish-to-char, finish-to-room },
+	//	{ { start-to-char, start-to-room },
+	//		pre-finish-to-char
+	//		{ finish-to-char, finish-to-room },
 	//		empty-to-char
 	//		chance-of-random-tick-msg,
 	//		{ { random-to-char, random-to-room }, ..., END_RANDOM_TICK_MSGS
 	//	} }
+	//	custom-tool-message-to-char, custom-tool-message-to-room
 	// }
 	
 	// start of list
@@ -182,17 +185,20 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		PTECH_PICK_COMMAND, DPLTN_PICK, "gather_approval",
 		NO_TOOL, GI_NO_SPEC, NOBITS,
 		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
+		/* pre-finish */ NULL,
 		/* finish msg */ { "You find $p!", "$n finds $p!" },
 		/* empty msg */ "You can't find anything here left to pick.",
-		100, { // random tick messages:
+		75, { // random tick messages:
 			{ "You look around for something nice to pick...", "$n looks around for something to pick." },
 			END_RANDOM_TICK_MSGS
-		}}
+		}},
+		NOTHING, NOTHING
 	},
 	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", GI_NO_CONFIG, 12,
 		PTECH_QUARRY_COMMAND, DPLTN_QUARRY, "gather_approval",
 		NO_TOOL, gen_proc_nature_burn, NOBITS,
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
+		/* pre-finish */ NULL,
 		/* finish msg */ { "You give the plug drill one final swing and pry loose $p!", "$n hits the plug drill hard with a hammer and pries loose $p!" },
 		/* empty msg */ "You don't seem to find anything of use.",
 		30, { // random tick messages:
@@ -200,44 +206,66 @@ const struct gen_interact_data_t gen_interact_data[] = {
 			{ "You brush dust out of the cracks in the stone.", "$n brushes dust out of the cracks in the stone." },
 			{ "You hammer a plug drill into the stone.", "$n hammers a plug drill into the stone." },
 			END_RANDOM_TICK_MSGS
-		}}
+		}},
+		NOTHING, NOTHING
 	},
 	{ INTERACT_DIG, ACT_DIGGING, "dig", "digging", "dig_base_timer", 4,
 		PTECH_DIG_COMMAND, DPLTN_DIG, "gather_approval",
 		NO_TOOL, gen_proc_nature_burn, NOBITS,
 		{ /* start msg */ { "You begin to dig into the ground.", "$n kneels down and begins to dig." },
+		/* pre-finish */ NULL,
 		/* finish msg */ { "You pull $p from the ground!", "$n pulls $p from the ground!" },
 		/* empty msg */ "You don't seem to be able to find anything worth digging for.",
-		100, { // random tick messages:
+		75, { // random tick messages:
 			{ "You dig vigorously at the ground.", "$n digs vigorously at the ground." },
 			END_RANDOM_TICK_MSGS
-		}}
+		}},
+		NOTHING, NOTHING
 	},
 	{ INTERACT_GATHER, ACT_GATHERING, "gather", "gathering", "gather_base_timer", 4,
 		PTECH_GATHER_COMMAND, DPLTN_GATHER, "gather_approval",
 		NO_TOOL, GI_NO_SPEC, NOBITS,
 		{ /* start msg */ { "You begin looking around for material.", "$n starts looking for something to on the ground." },
+		/* pre-finish */ NULL,
 		/* finish msg */ { "You gather $p!", "$n gathers $p!" },
 		/* empty msg */ "There's no good material left for you to gather here.",
-		100, { // random tick messages:
+		75, { // random tick messages:
 			{ "You search the ground for useful material...", "$n searches around on the ground..." },
 			END_RANDOM_TICK_MSGS
-		}}
+		}},
+		NOTHING, NOTHING
 	},
 	{ INTERACT_PAN, ACT_PANNING, "pan", "panning", "panning_timer", 10,
 		NO_TECH, DPLTN_PAN, "gather_approval",
 		TOOL_PAN, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_CONTINUE_WHEN_DEPLETED,
 		{ /* start msg */ { "You kneel down and begin panning.", "$n kneels down and begins panning." },
+		/* pre-finish */ NULL,
 		/* finish msg */ { "You find $p!", "$n finds $p!" },
 		/* empty msg */ "You find nothing of value.",
-		100, { // random tick messages:
+		50, { // random tick messages:
 			{ "You sift through the sand and pebbles, looking for gold...", "$n sifts through the sand, looking for gold..." },
 			END_RANDOM_TICK_MSGS
-		}}
+		}},
+		NOTHING, NOTHING
+	},
+	{ INTERACT_FISH, ACT_FISHING, "fish", "fishing", "fishing_timer", 40,
+		PTECH_FISH_COMMAND, DPLTN_FISH, GI_NO_CONFIG,
+		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_FASTER_WITH_SKILL_CHECK,
+		{ /* start msg */ { "You start watching for fish...", "$n starts looking for fish." },
+		/* pre-finish */ "A fish darts past you...",
+		/* finish msg */ { "You catch $p.", "$n catches $p." },
+		/* empty msg */ "You can't seem to catch anything.",
+		30, { // random tick messages:
+			{ "A fish darts past you, but you narrowly miss it!", "$n lunges for a fish, but misses." },
+			{ "The water waves peacefully, but you don't see any fish...", "$n watches the water intently." },
+			{ "The fish are jumping off in the distance, but you can't seem to catch one!", "$n watches the fish jumping." },
+			END_RANDOM_TICK_MSGS
+		}},
+		OBJ_CUSTOM_FISH_TO_CHAR, OBJ_CUSTOM_FISH_TO_ROOM
 	},
 	
 	// this must go last
-	{ -1, -1, "\n", "\n", GI_NO_CONFIG, 0, NOTHING, NOTHING, GI_NO_APPROVAL, NO_TOOL, GI_NO_SPEC, NOBITS, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
+	{ -1, -1, "\n", "\n", GI_NO_CONFIG, 0, NOTHING, NOTHING, GI_NO_APPROVAL, NO_TOOL, GI_NO_SPEC, NOBITS, { { NULL, NULL }, NULL, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS }, NOTHING, NOTHING }	// last
 };
 
 
@@ -896,60 +924,6 @@ INTERACTION_FUNC(finish_chopping) {
 		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			act("Your inventory was full; $p fell to the ground.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
-	}
-	
-	return TRUE;
-}
-
-
-// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
-INTERACTION_FUNC(finish_fishing) {
-	char buf[MAX_STRING_LENGTH];
-	char *to_char = NULL, *to_room = NULL;
-	obj_data *obj = NULL, *tool;
-	int num, obj_ok = 0;
-	
-	const char *default_to_char = "You catch $p!";
-	const char *default_to_room = "$n catches $p!";
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char(obj, ch);
-		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	// messaging
-	if (obj_ok && obj) {
-		// check for custom messages on their fishing tool
-		if ((tool = has_tool(ch, TOOL_FISHING))) {
-			to_char = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_CHAR);
-			to_room = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_ROOM);
-		}
-		if (!to_char) {
-			to_char = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		}
-		if (!to_room) {
-			to_room = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		}
-		
-		if (interaction->quantity > 1) {
-			sprintf(buf, "%s (x%d)", to_char ? to_char : default_to_char, interaction->quantity);
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		else {
-			act(to_char ? to_char : default_to_char, FALSE, ch, obj, NULL, TO_CHAR);
-		}
-		
-		act(to_room ? to_room : default_to_room, TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1650,87 +1624,6 @@ void process_fillin(char_data *ch) {
 				untrench_room(IN_ROOM(ch));
 			}
 		}
-	}
-}
-
-
-/**
-* Manages a fishing tick and completion.
-*
-* @param char_data *ch The fisher (Bobby?)
-*/
-void process_fishing(char_data *ch) {
-	bool success = FALSE;
-	room_data *room;
-	obj_data *tool;
-	int amt, dir;
-	
-	dir = GET_ACTION_VNUM(ch, 0);
-	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
-	
-	if (!(tool = has_tool(ch, TOOL_FISHING))) {
-		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!room || !can_interact_room(room, INTERACT_FISH) || !can_use_room(ch, room, MEMBERS_ONLY)) {
-		msg_to_char(ch, "You can no longer fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
-		cancel_action(ch);
-		return;
-	}
-	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to fish here.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	amt = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20) + (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_MEDIUM) ? 2 : 0);
-	GET_ACTION_TIMER(ch) -= MAX(1, amt);
-	
-	if (GET_ACTION_TIMER(ch) > 0) {
-		switch (number(0, 10)) {
-			case 0: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "A fish darts past you, but you narrowly miss it!\r\n");
-				}
-				break;
-			}
-			case 1: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "The water waves peacefully, but you don't see any fish...\r\n");
-				}
-				break;
-			}
-			case 2: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "The fish are jumping off in the distance, but you can't seem to catch one!\r\n");
-				}
-				break;
-			}
-		}
-	}
-	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
-		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
-		end_action(ch);
-	}
-	else {
-		// SUCCESS
-		msg_to_char(ch, "A fish darts past you...\r\n");
-		success = run_room_interactions(ch, room, INTERACT_FISH, NULL, GUESTS_ALLOWED, finish_fishing);
-		
-		if (success) {
-			add_depletion(room, DPLTN_FISH, TRUE);
-		}
-		else {
-			msg_to_char(ch, "You can't seem to catch anything.\r\n");
-		}
-		
-		gain_player_tech_exp(ch, PTECH_FISH_COMMAND, 15);
-		run_ability_hooks_by_player_tech(ch, PTECH_FISH_COMMAND, NULL, NULL, NULL, NULL);
-		
-		// restart action
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH_COMMAND, DIFF_EASY) ? 2 : 1));
-		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
 
@@ -3679,11 +3572,14 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		// only possible if they targeted a direction and it was removed mid-action
 		msg_to_char(ch, "You can't do that there.\r\n");
 	}
-	else if (data->ptech != NOTHING && !has_player_tech(ch, data->ptech)) {
+	else if (data->ptech != NO_TECH && !has_player_tech(ch, data->ptech)) {
 		msg_to_char(ch, "You don't have the correct ability to %s.\r\n", data->command);
 	}
 	else if (data->approval_config && *(data->approval_config) && !IS_APPROVED(ch) && config_get_bool(data->approval_config)) {
 		send_config_msg(ch, "need_approval_string");
+	}
+	else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You can't do that now!\r\n");
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		// checks here, not the target room
@@ -3701,7 +3597,7 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 	else if (!can_gen_interact_room(ch, room, data)) {
 		// sends own messages
 	}
-	else if (data->ptech != NOTHING && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL)) {
+	else if (data->ptech != NO_TECH && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3717,8 +3613,8 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 INTERACTION_FUNC(finish_gen_interact_room) {
 	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj = NULL;
-	char *cust;
+	obj_data *obj = NULL, *tool = NULL;
+	char *to_char = NULL, *to_room = NULL;
 	int num, amount, obj_ok = 0;
 	
 	// safety check
@@ -3761,20 +3657,35 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	}
 	
 	if (obj_ok && obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (cust || data->msg.finish[0]) {
-			if (amount > 1) {
-				sprintf(buf, "%s (x%d)", cust ? cust : data->msg.finish[0], amount);
+		// prep messaging
+		if (data->custom_tool_message_to_char != NOTHING || data->custom_tool_message_to_room != NOTHING) {
+			if (data->tool && (tool = has_tool(ch, data->tool))) {
+				to_char = (data->custom_tool_message_to_char != NOTHING) ? obj_get_custom_message(tool, data->custom_tool_message_to_char) : NULL;
+				to_room = (data->custom_tool_message_to_room != NOTHING) ? obj_get_custom_message(tool, data->custom_tool_message_to_room) : NULL;
 			}
-			else {
-				strcpy(buf, cust ? cust : data->msg.finish[0]);
-			}
-			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		if (cust || data->msg.finish[1]) {
-			act(cust ? cust : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
+		// message to char
+		if (!to_char) {
+			to_char = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		}
+		if (to_char || data->msg.finish[0]) {
+			if (amount > 1) {
+				sprintf(buf, "%s (x%d)", to_char ? to_char : data->msg.finish[0], amount);
+				to_char = buf;
+			}
+			else if (!to_char) {
+				to_char = data->msg.finish[0];
+			}
+			act(to_char, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// message to room
+		if (!to_room) {
+			to_room = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		}
+		if (to_room || data->msg.finish[1]) {
+			act(to_room ? to_room : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
 		}
 		
 		if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -3808,8 +3719,13 @@ void start_gen_interact_room(char_data *ch, int dir, room_data *room, const stru
 	start_action(ch, data->action, timer);
 	GET_ACTION_VNUM(ch, 0) = dir;
 	
+	// optional skill check?
+	if (IS_SET(data->flags, GI_FASTER_WITH_SKILL_CHECK) && data->ptech != NO_TECH && player_tech_skill_check_by_ability_difficulty(ch, data->ptech)) {
+		GET_ACTION_TIMER(ch) /= 2;
+	}
+	
 	if (data->msg.start[0]) {
-		msg_to_char(ch, "%s\r\n", data->msg.start[0]);
+		act(data->msg.start[0], FALSE, ch, NULL, NULL, TO_CHAR);
 	}
 	if (data->msg.start[1]) {
 		act(data->msg.start[1], FALSE, ch, NULL, NULL, TO_ROOM);
@@ -3855,10 +3771,15 @@ void process_gen_interact_room(char_data *ch) {
 	else {	// done
 		// do not un-set GET_ACTION before running interactions
 		
+		// check for pre-message?
+		if (data->msg.pre_finish && *data->msg.pre_finish) {
+			act(data->msg.pre_finish, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		
 		if (run_room_interactions(ch, to_room, data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room)) {
 			end_action(ch);
 			
-			if (data->ptech) {
+			if (data->ptech != NO_TECH) {
 				gain_player_tech_exp(ch, data->ptech, 10);
 				run_ability_hooks_by_player_tech(ch, data->ptech, NULL, NULL, NULL, to_room);
 			}
@@ -3906,14 +3827,14 @@ ACMD(do_gen_interact_room) {
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot do this.\r\n");
 	}
-	else if (GET_ACTION(ch) == data->action ) {
+	else if (GET_ACTION(ch) == data->action && (!IS_SET(data->flags, GI_ALLOW_DIRECTION) || !*arg)) {
 		msg_to_char(ch, "You stop %s.\r\n", data->verb);
 		snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
 		act(buf, FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != data->action) {
+		send_to_char("You're really too busy to do that.\r\n", ch);
 	}
 	else if (IS_SET(data->flags, GI_ALLOW_DIRECTION) && *arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "&Z%s in what direction?\r\n", data->command);
