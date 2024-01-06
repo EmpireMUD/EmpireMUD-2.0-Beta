@@ -2680,7 +2680,9 @@ DO_ABIL(abil_action_devastate_area) {
 		}
 		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < get_depletion_max(to_room, DPLTN_CHOP)) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
-			change_chop_territory(to_room);
+			if (get_depletion(to_room, DPLTN_CHOP) >= get_depletion_max(to_room, DPLTN_CHOP)) {
+				change_chop_territory(to_room);
+			}
 			data->success = TRUE;
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
