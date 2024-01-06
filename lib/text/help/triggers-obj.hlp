@@ -208,6 +208,7 @@ When using field  - The variable returns:
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &cid&0 - The unique id of the object.
+&cin_obj&0 - If the object is inside another object, returns that object.
 &cis_component(name/vnum, ...)&0 - Returns whether or not the object matches
    one of the components listed here. Specify as many as you want, separated
    by commas.

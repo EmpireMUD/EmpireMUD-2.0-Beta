@@ -5006,8 +5006,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// obj.i*
-					if (!str_cmp(field, "id"))
+					if (!str_cmp(field, "id")) {
 						snprintf(str, slen, "%d", obj_script_id(o));
+					}
+					else if (!str_cmp(field, "in_obj")) {
+						if (o->in_obj) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(o->in_obj));
+						}
+						else {
+							strcpy(str, "");
+						}
+					}
 
 					else if (!str_cmp(field, "is_flagged")) {
 						if (subfield && *subfield) {
