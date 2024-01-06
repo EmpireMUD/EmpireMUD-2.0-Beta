@@ -4747,7 +4747,7 @@ ACMD(do_whois) {
 	// friend portion
 	if (!PRF_FLAGGED(victim, PRF_NO_FRIENDS) && (friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(victim))) && friend->status == FRIEND_FRIENDSHIP) {
 		if (strcmp(friend->original_name, GET_NAME(victim))) {
-			snprintf(friend_part, sizeof(friend_part), " (friends: %s)", friend->original_name);
+			snprintf(friend_part, sizeof(friend_part), " (friends, alt of %s)", friend->original_name);
 		}
 		else {
 			snprintf(friend_part, sizeof(friend_part), " (friends)");
