@@ -1159,7 +1159,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 132 85.00 50 g  # GATHER: thorny branches
 I 9 134 15.00 50 g  # GATHER: thorny sapling
-I 20 122 100.00 3 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 The scraggly trees unfold leaf after leaf as they grow larger and larger!~
