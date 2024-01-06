@@ -4724,10 +4724,11 @@ ACMD(do_whoami) {
 
 
 ACMD(do_whois) {
-	char part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], friend_part[256];
 	char_data *victim = NULL;
 	bool file = FALSE;
 	int level, diff, math;
+	struct friend_data *friend;
 
 	skip_spaces(&argument);
 
@@ -4743,10 +4744,23 @@ ACMD(do_whois) {
 	// load remaining data
 	check_delayed_load(victim);
 	
+	// friend portion
+	if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(victim))) && friend->status == FRIEND_FRIENDSHIP) {
+		if (strcmp(friend->original_name, GET_NAME(victim))) {
+			snprintf(friend_part, sizeof(friend_part), " (friends: %s)", friend->original_name);
+		}
+		else {
+			snprintf(friend_part, sizeof(friend_part), " (friends)");
+		}
+	}
+	else {
+		*friend_part = '\0';
+	}
+	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
 	sprinttype(GET_REAL_SEX(victim), genders, part, sizeof(part), "UNDEFINED");
-	msg_to_char(ch, "Status: %s %s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
+	msg_to_char(ch, "Status: %s %s%s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1], friend_part);
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {

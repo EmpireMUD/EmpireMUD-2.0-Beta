@@ -28,7 +28,6 @@
 */
 
 // local prototypes
-struct friend_data *find_account_friend(account_data *acct, int acct_id);
 bool remove_account_friend(account_data *acct, int acct_id);
 
 
