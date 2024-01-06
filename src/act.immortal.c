@@ -7568,7 +7568,7 @@ void do_stat_room(char_data *ch) {
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
-	int duration, found, num, zenith;
+	int duration, found, max, num, zenith;
 	bool comma;
 	adv_data *adv;
 	obj_data *j;
@@ -7844,8 +7844,15 @@ void do_stat_room(char_data *ch) {
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
-			if (dep->type < NUM_DEPLETION_TYPES) {
-				msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
+				max = get_depletion_max(IN_ROOM(ch), dep->type);
+				if (max > 0) {
+					msg_to_char(ch, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+				}
+				else {
+					// can't detect max
+					msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				}
 				comma = TRUE;
 			}
 		}

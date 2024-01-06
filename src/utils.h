@@ -2038,6 +2038,7 @@ bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int di
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
 bitvector_t get_climate(room_data *room);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
+int get_depletion_max(room_data *room, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
 char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
