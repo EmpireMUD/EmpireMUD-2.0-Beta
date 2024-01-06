@@ -168,7 +168,7 @@ const struct action_data_struct action_data[] = {
 // INTERACT_x: interactions that are processed by do_gen_interact_room
 const struct gen_interact_data_t gen_interact_data[] = {
 	// { interact, action, command, verb, timer_config, timer
-	//	ptech, depletion, approval_config,
+	//	ptech, approval_config,
 	//	tool, spec_proc, flags,
 	//	{ { start-to-char, start-to-room },
 	//		pre-finish-to-char
@@ -182,7 +182,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	
 	// start of list
 	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", "pick_base_timer", 4,
-		PTECH_PICK_COMMAND, DPLTN_PICK, "gather_approval",
+		PTECH_PICK_COMMAND, "gather_approval",
 		NO_TOOL, GI_NO_SPEC, NOBITS,
 		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
 		/* pre-finish */ NULL,
@@ -195,7 +195,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		NOTHING, NOTHING
 	},
 	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", GI_NO_CONFIG, 12,
-		PTECH_QUARRY_COMMAND, DPLTN_QUARRY, "gather_approval",
+		PTECH_QUARRY_COMMAND, "gather_approval",
 		NO_TOOL, gen_proc_nature_burn, NOBITS,
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
 		/* pre-finish */ NULL,
@@ -210,7 +210,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		NOTHING, NOTHING
 	},
 	{ INTERACT_DIG, ACT_DIGGING, "dig", "digging", "dig_base_timer", 4,
-		PTECH_DIG_COMMAND, DPLTN_DIG, "gather_approval",
+		PTECH_DIG_COMMAND, "gather_approval",
 		NO_TOOL, gen_proc_nature_burn, NOBITS,
 		{ /* start msg */ { "You begin to dig into the ground.", "$n kneels down and begins to dig." },
 		/* pre-finish */ NULL,
@@ -223,7 +223,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		NOTHING, NOTHING
 	},
 	{ INTERACT_GATHER, ACT_GATHERING, "gather", "gathering", "gather_base_timer", 4,
-		PTECH_GATHER_COMMAND, DPLTN_GATHER, "gather_approval",
+		PTECH_GATHER_COMMAND, "gather_approval",
 		NO_TOOL, GI_NO_SPEC, NOBITS,
 		{ /* start msg */ { "You begin looking around for material.", "$n starts looking for something to on the ground." },
 		/* pre-finish */ NULL,
@@ -236,7 +236,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		NOTHING, NOTHING
 	},
 	{ INTERACT_PAN, ACT_PANNING, "pan", "panning", "panning_timer", 10,
-		NO_TECH, DPLTN_PAN, "gather_approval",
+		NO_TECH, "gather_approval",
 		TOOL_PAN, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_CONTINUE_WHEN_DEPLETED,
 		{ /* start msg */ { "You kneel down and begin panning.", "$n kneels down and begins panning." },
 		/* pre-finish */ NULL,
@@ -249,7 +249,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		NOTHING, NOTHING
 	},
 	{ INTERACT_FISH, ACT_FISHING, "fish", "fishing", "fishing_timer", 40,
-		PTECH_FISH_COMMAND, DPLTN_FISH, GI_NO_CONFIG,
+		PTECH_FISH_COMMAND, GI_NO_APPROVAL,
 		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_FASTER_WITH_SKILL_CHECK,
 		{ /* start msg */ { "You start watching for fish...", "$n starts looking for fish." },
 		/* pre-finish */ "A fish darts past you...",
@@ -264,7 +264,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		OBJ_CUSTOM_FISH_TO_CHAR, OBJ_CUSTOM_FISH_TO_ROOM
 	},
 	{ INTERACT_FORAGE, ACT_FORAGING, "forage", "foraging", "forage_base_timer", 4,
-		PTECH_FORAGE_COMMAND, DPLTN_FORAGE, GI_NO_CONFIG,
+		PTECH_FORAGE_COMMAND, GI_NO_APPROVAL,
 		NO_TOOL, GI_NO_SPEC, GI_LOCAL_CROPS | GI_ATTEMPT_WITHOUT_INTERACT,
 		{ /* start msg */ { "You forage around for food...", "$n starts foraging around." },
 		/* pre-finish */ NULL,
@@ -278,7 +278,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	
 	// this must go last
-	{ -1, -1, "\n", "\n", GI_NO_CONFIG, 0, NOTHING, NOTHING, GI_NO_APPROVAL, NO_TOOL, GI_NO_SPEC, NOBITS, { { NULL, NULL }, NULL, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS }, NOTHING, NOTHING }	// last
+	{ -1, -1, "\n", "\n", GI_NO_CONFIG, 0, NOTHING, GI_NO_APPROVAL, NO_TOOL, GI_NO_SPEC, NOBITS, { { NULL, NULL }, NULL, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS }, NOTHING, NOTHING }	// last
 };
 
 
@@ -3329,7 +3329,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		if (!can_use_room(ch, room, MEMBERS_ONLY)) {
 			can_room_but_no_permit = TRUE;	// error later
 		}
-		else if (data->depletion != NOTHING && get_depletion(room, data->depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
+		else if (interact_data[data->interact].depletion != NOTHING && get_depletion(room, interact_data[data->interact].depletion) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
 			can_room_but_depleted = TRUE;	// error later
 		}
 		else {
@@ -3349,7 +3349,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 				can_veh_but_no_permit = veh;
 				continue;
 			}
-			else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
+			else if (interact_data[data->interact].depletion != NOTHING && get_vehicle_depletion(veh, interact_data[data->interact].depletion) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
 				can_veh_but_depleted = veh;
 				continue;
 			}
@@ -3448,20 +3448,21 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL, *tool = NULL;
 	char *to_char = NULL, *to_room = NULL;
-	int num, amount, obj_ok = 0;
+	int depletion, num, amount, obj_ok = 0;
 	
 	// safety check
 	if (!data) {
 		return FALSE;
 	}
-	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	depletion = determine_depletion_type(interaction);
+	if (depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, depletion) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;	// depleted vehicle
 	}
-	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	else if (depletion != NOTHING && !inter_veh && get_depletion(inter_room, depletion) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;	// depleted room
 	}
 	
-	amount = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+	amount = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 	
 	// give items
 	for (num = 0; num < amount; ++num) {
@@ -3480,12 +3481,12 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	}
 	
 	// check depletion
-	if (data->depletion != NOTHING) {
+	if (depletion != NOTHING) {
 		if (inter_veh) {
-			add_vehicle_depletion(inter_veh, data->depletion, TRUE);
+			add_vehicle_depletion(inter_veh, depletion, TRUE);
 		}
 		else {
-			add_depletion(inter_room ? inter_room : IN_ROOM(ch), data->depletion, TRUE);
+			add_depletion(inter_room ? inter_room : IN_ROOM(ch), depletion, TRUE);
 		}
 	}
 	

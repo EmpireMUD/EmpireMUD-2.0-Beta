@@ -904,7 +904,7 @@ ADMIN_UTIL(util_bldconvert) {
 			continue;	// skip self
 		}
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interactions for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
 				break;
 			}
@@ -972,7 +972,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in interior room for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interaction for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 				break;
 			}

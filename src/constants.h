@@ -10,6 +10,28 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+/**
+* Contents:
+*   Structs
+*   Constants
+*/
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// STRUCTS /////////////////////////////////////////////////////////////////
+
+// properties for interactions
+struct interact_data_t {
+	int attach_type;	// TYPE_ it attaches to (TYPE_MOB, etc)
+	int vnum_type;		// TYPE_ of the vnum it produces (TYPE_OBJ, etc)
+	bool one_at_a_time;	// quantity represents the maximum amount, but resource is gained one at a time
+	int depletion;	// DPLTN_ type, if any (NOTHING if not applicable)
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONSTANTS ///////////////////////////////////////////////////////////////
+
 // empiremud constants
 extern const char *level_names[][2];
 extern const int num_of_reboot_strings;
@@ -299,9 +321,7 @@ extern const char *fill_words[];
 extern const char *global_types[];
 extern const char *global_flags[];
 extern const char *interact_types[];
-extern const int interact_attach_types[NUM_INTERACTS];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
+extern const struct interact_data_t interact_data[NUM_INTERACTS];
 extern const char *interact_restriction_types[];
 extern const char *morph_flags[];
 extern const char *requirement_types[];
@@ -342,5 +362,4 @@ extern struct promo_code_list promo_codes[];
 extern const int round_level_scaling_to_nearest;
 extern const double score_levels[];
 extern const int techs_requiring_same_island[];
-extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 extern const int universal_wait;

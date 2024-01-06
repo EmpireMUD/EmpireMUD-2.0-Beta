@@ -937,7 +937,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1051,7 +1051,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			any = TRUE;
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}

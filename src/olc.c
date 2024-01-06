@@ -4796,7 +4796,7 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 */
 const char *get_interaction_target(int type, any_vnum vnum) {
 	// TYPE_x: interaction display
-	switch (interact_vnum_types[type]) {
+	switch (interact_data[type].vnum_type) {
 		case TYPE_MOB: {
 			return skip_filler(get_mob_name_by_proto(vnum, FALSE));
 		}
@@ -4836,7 +4836,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	*save_buffer = '\0';
 	
 	for (interact = list; interact; interact = interact->next) {
-		if (interact_one_at_a_time[interact->type]) {
+		if (interact_data[interact->type].one_at_a_time) {
 			snprintf(quant, sizeof(quant), "%d-max", interact->quantity);
 		}
 		else {
@@ -5073,13 +5073,13 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	struct audint_t *at, *next_at;
 	
 	for (iter = list; iter; iter = iter->next) {
-		if (interact_attach_types[iter->type] != attach_type) {
+		if (interact_data[iter->type].attach_type != attach_type) {
 			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
 			problem = TRUE;
 		}
 		
 		// store quantity for later except chores that are often high
-		if (!interact_one_at_a_time[iter->type] && iter->type != INTERACT_LIQUID_CONJURE) {
+		if (!interact_data[iter->type].one_at_a_time && iter->type != INTERACT_LIQUID_CONJURE) {
 			max_quantity = MAX(max_quantity, iter->quantity);
 		}
 		else if (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) {
@@ -7891,26 +7891,26 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		if (!*arg2 || !*arg3 || !*arg4 || !*arg5 || !isdigit(*arg3) || !isdigit(*arg4) || (!isdigit(*arg5) && *arg5 != '.')) {
 			msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]\r\n");
 		}
-		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
+		else if ((loc = search_block(arg2, interact_types, FALSE)) == NOTHING || interact_data[loc].attach_type != attach_type) {
 			msg_to_char(ch, "Invalid type.\r\n");
 		}
 		// TYPE_x:
-		else if (interact_vnum_types[loc] == TYPE_MOB && !mob_proto(vnum)) {
+		else if (interact_data[loc].vnum_type == TYPE_MOB && !mob_proto(vnum)) {
 			msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
 		}
-		else if (interact_vnum_types[loc] == TYPE_OBJ && !obj_proto(vnum)) {
+		else if (interact_data[loc].vnum_type == TYPE_OBJ && !obj_proto(vnum)) {
 			msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 		}
-		else if (interact_vnum_types[loc] == TYPE_BLD && !building_proto(vnum)) {
+		else if (interact_data[loc].vnum_type == TYPE_BLD && !building_proto(vnum)) {
 			msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
 		}
-		else if (interact_vnum_types[loc] == TYPE_VEH && !vehicle_proto(vnum)) {
+		else if (interact_data[loc].vnum_type == TYPE_VEH && !vehicle_proto(vnum)) {
 			msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
 		}
-		else if (interact_vnum_types[loc] == TYPE_ABIL && !ability_proto(vnum)) {
+		else if (interact_data[loc].vnum_type == TYPE_ABIL && !ability_proto(vnum)) {
 			msg_to_char(ch, "Invalid ability vnum %d.\r\n", vnum);
 		}
-		else if (interact_vnum_types[loc] == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
+		else if (interact_data[loc].vnum_type == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
 			msg_to_char(ch, "Invalid generic liquid vnum %d.\r\n", vnum);
 		}
 		else if (num < 1 || num >= 1000) {
@@ -7969,7 +7969,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		
 		// ok now which field to change:
 		if (is_abbrev(arg3, "type")) {
-			if ((loc = search_block(arg4, interact_types, FALSE)) == NOTHING || interact_attach_types[loc] != attach_type) {
+			if ((loc = search_block(arg4, interact_types, FALSE)) == NOTHING || interact_data[loc].attach_type != attach_type) {
 				msg_to_char(ch, "Invalid type.\r\n");
 			}
 			else {
@@ -7992,22 +7992,22 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "Change it to which vnum?\r\n");
 			}
 			// TYPE_x:
-			else if (interact_vnum_types[change->type] == TYPE_MOB && !mob_proto(vnum)) {
+			else if (interact_data[change->type].vnum_type == TYPE_MOB && !mob_proto(vnum)) {
 				msg_to_char(ch, "Invalid mob vnum %d.\r\n", vnum);
 			}
-			else if (interact_vnum_types[change->type] == TYPE_OBJ && !obj_proto(vnum)) {
+			else if (interact_data[change->type].vnum_type == TYPE_OBJ && !obj_proto(vnum)) {
 				msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 			}
-			else if (interact_vnum_types[change->type] == TYPE_BLD && !building_proto(vnum)) {
+			else if (interact_data[change->type].vnum_type == TYPE_BLD && !building_proto(vnum)) {
 				msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
 			}
-			else if (interact_vnum_types[change->type] == TYPE_VEH && !vehicle_proto(vnum)) {
+			else if (interact_data[change->type].vnum_type == TYPE_VEH && !vehicle_proto(vnum)) {
 				msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
 			}
-			else if (interact_vnum_types[change->type] == TYPE_ABIL && !ability_proto(vnum)) {
+			else if (interact_data[change->type].vnum_type == TYPE_ABIL && !ability_proto(vnum)) {
 				msg_to_char(ch, "Invalid ability vnum %d.\r\n", vnum);
 			}
-			else if (interact_vnum_types[change->type] == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
+			else if (interact_data[change->type].vnum_type == TYPE_LIQUID && !find_generic(vnum, GENERIC_LIQUID)) {
 				msg_to_char(ch, "Invalid generic liquid vnum %d.\r\n", vnum);
 			}
 			else {
@@ -8059,7 +8059,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		msg_to_char(ch, "Available types:\r\n");
 		
 		for (count = 0, iter = 0; *interact_types[iter] != '\n'; ++iter) {
-			if (interact_attach_types[iter] == attach_type) {
+			if (interact_data[iter].attach_type == attach_type) {
 				msg_to_char(ch, " %-24.24s%s", interact_types[iter], ((count++ % 2) ? "\r\n" : ""));
 			}
 		}

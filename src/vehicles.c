@@ -1890,7 +1890,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		any = FALSE;
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_VEH && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1906,7 +1906,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_VEH && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -2025,7 +2025,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh_iter, next_veh_iter) {
 		any = FALSE;
 		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_VEH && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}

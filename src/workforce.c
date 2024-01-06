@@ -516,7 +516,7 @@ static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location,
 	LL_FOREACH(list, interact) {
 		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
-			if (interact_one_at_a_time[interact->type]) {
+			if (interact_data[interact->type].one_at_a_time) {
 				// 1 at a time
 				ewt_mark_resource_worker(emp, location, interact->vnum, 1);
 			}
@@ -1025,34 +1025,6 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 
 
 /**
-* Determines which DPLTN_ depletion type the interaction uses. This defaults
-* to 'production' depletion.
-*
-* @param struct interaction_item *interact The interaction item.
-* @return int The DPLTN_ type for the interaction.
-*/
-int determine_depletion_type(struct interaction_item *interact) {
-	struct interact_restriction *res;
-	int type = DPLTN_PRODUCTION;	// default
-	
-	// override for a fishing interaction
-	if (interact->type == INTERACT_FISH) {
-		type = DPLTN_FISH;
-	}
-	
-	if (interact) {
-		LL_FOREACH(interact->restrictions, res) {
-			if (res->type == INTERACT_RESTRICT_DEPLETION) {
-				type = res->vnum;
-			}
-		}
-	}
-	
-	return type;
-}
-
-
-/**
 * Gets an empire's workforce chore limit:
 * 0: Do not work
 * -1: Use natural limit
@@ -1263,7 +1235,7 @@ int get_workforce_production_limit(empire_data *emp, obj_vnum vnum) {
 */
 bool has_any_undepleted_interaction_for_chore(empire_data *emp, int chore, room_data *room, vehicle_data *veh, int interaction_type, bool *over_limit) {
 	struct interaction_item *interact, *list[4] = { NULL, NULL, NULL, NULL };
-	int iter, list_size, common_depletion;
+	int iter, list_size, common_depletion, depletion_type;
 	crop_data *cp;
 	obj_data *proto;
 	
@@ -1308,7 +1280,8 @@ bool has_any_undepleted_interaction_for_chore(empire_data *emp, int chore, room_
 			if (!meets_interaction_restrictions(interact->restrictions, NULL, emp, NULL, NULL)) {
 				continue;	// restrictions
 			}
-			if (GET_CHORE_DEPLETION(room, veh, determine_depletion_type(interact)) >= (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
+			depletion_type = determine_depletion_type(interact);
+			if (GET_CHORE_DEPLETION(room, veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction_type].one_at_a_time ? interact->quantity : common_depletion)) {
 				continue;	// depleted
 			}
 			
@@ -2106,7 +2079,7 @@ INTERACTION_FUNC(one_chop_chore) {
 	int amt;
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
@@ -2303,7 +2276,7 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 	int amt;
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, einv_interaction_chore_type, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
@@ -2407,7 +2380,7 @@ INTERACTION_FUNC(one_farming_chore) {
 	int amt;
 	
 	if (emp && proto && GET_OBJ_STORAGE(proto) && can_gain_chore_resource(emp, inter_room, CHORE_FARMING, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
@@ -2572,12 +2545,12 @@ INTERACTION_FUNC(one_fishing_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_FISHING, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
@@ -2862,12 +2835,12 @@ INTERACTION_FUNC(one_production_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_PRODUCTION, interaction->vnum)) {
-		amt = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, amt);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);

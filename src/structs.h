@@ -3243,7 +3243,6 @@ struct gen_interact_data_t {
 	char *timer_config;	// optional: config to get the timer (NULL to not use)
 	int timer;	// number of action ticks to use if a config is not set
 	int ptech;	// required ptech (may be NO_TECH)
-	int depletion;	// DPLTN_ type (may be NOTHING)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
 	bitvector_t tool;	// any TOOL_ needed
 	GEN_INTERACT_SPECIAL(*spec_proc);	// optional spec to run during the process such as gen_proc_nature_burn

@@ -204,9 +204,9 @@ comm.o: comm.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
 config.o: config.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
   interpreter.h olc.h
 	$(CC) -c $(CFLAGS) config.c
-constants.o: constants.c conf.h sysdep.h structs.h uthash.h skills.h \
-  utils.h interpreter.h vnums.h olc.h
-	$(CC) -c $(CFLAGS) constants.c
+constants.o: constants.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h skills.h interpreter.h vnums.h olc.h constants.h
+$(CC) -c $(CFLAGS) constants.c
 data.o: data.c conf.h sysdep.h structs.h protocol.h uthash.h utlist.h \
   utils.h comm.h db.h
 	$(CC) -c $(CFLAGS) data.c
