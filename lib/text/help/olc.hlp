@@ -158,6 +158,13 @@ Augments (AUGEDIT):
   choice for a cumulative set, give it 100% non-cumulative and the choose-last
   flag. If no cumulative choice is picked, it will be chosen.
 
+Books (BOOKEDIT):
+- Players can make books, too. Theirs have vnums over 1000000.
+- Books with author 0 or ones in no libraries can appear as lost books in
+  "show lostbooks" and "%load% book lost".
+- To preserve a book from a player, copy it to a permanent vnum and set the
+  author to 0. Leave the player's version on its existing vnum.
+
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
 - If a building has at least 1 Citizen, players can also set it as their home.
