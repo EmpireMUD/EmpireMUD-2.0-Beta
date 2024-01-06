@@ -904,7 +904,7 @@ ADMIN_UTIL(util_bldconvert) {
 			continue;	// skip self
 		}
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interactions for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
 				break;
 			}
@@ -972,7 +972,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in interior room for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interaction for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 				break;
 			}
@@ -2262,25 +2262,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		affect_total(vict);
 	}
 	else if SET_CASE("greatness") {
-		// only update greatness if ch is in a room (playing)
-		emp = GET_LOYALTY(vict);
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) -= vict->real_attributes[GREATNESS];
-		}
-
-		// set the actual greatness
 		vict->real_attributes[GREATNESS] = RANGE(1, att_max(vict));
-		
-		// add greatness back
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) += vict->real_attributes[GREATNESS];
-		}
-		
 		affect_total(vict);
-		if (emp) {
-			update_member_data(vict);
-			update_empire_members_and_greatness(emp);
-		}
 	}
 	else if SET_CASE("intelligence") {
 		vict->real_attributes[INTELLIGENCE] = RANGE(1, att_max(vict));
@@ -7568,7 +7551,7 @@ void do_stat_room(char_data *ch) {
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
-	int duration, found, num, zenith;
+	int duration, found, max, num, zenith;
 	bool comma;
 	adv_data *adv;
 	obj_data *j;
@@ -7844,8 +7827,15 @@ void do_stat_room(char_data *ch) {
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
-			if (dep->type < NUM_DEPLETION_TYPES) {
-				msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
+				max = get_depletion_max(IN_ROOM(ch), dep->type);
+				if (max > 0) {
+					msg_to_char(ch, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+				}
+				else {
+					// can't detect max
+					msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				}
 				comma = TRUE;
 			}
 		}

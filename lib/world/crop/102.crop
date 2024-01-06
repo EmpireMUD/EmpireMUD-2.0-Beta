@@ -6,7 +6,7 @@ A Pineapple Field~
 D0
 wwww~
 &g~
-I 6 3015 100.00 1  # FORAGE: red berries
+I 6 3015 100.00 25  # FORAGE: red berries
 I 8 10226 20.00 2 H  # HARVEST: pineapple
 I 8 10226 20.00 3 H  # HARVEST: pineapple
 I 8 10226 20.00 4 H  # HARVEST: pineapple
@@ -31,7 +31,7 @@ A Field of Agave~
 D0
 vvvv~
 &G~
-I 6 10231 100.00 1  # FORAGE: desert dandelions
+I 6 10231 100.00 25  # FORAGE: desert dandelions
 I 8 10227 20.00 2 H  # HARVEST: agave heart
 I 8 10227 20.00 3 H  # HARVEST: agave heart
 I 8 10227 20.00 4 H  # HARVEST: agave heart
@@ -57,7 +57,7 @@ A Field of Prickly Pears~
 D0
 o88o~
 &G~
-I 6 10229 100.00 1  # FORAGE: cactus fruit
+I 6 10229 100.00 25  # FORAGE: cactus fruit
 I 8 10228 20.00 2 H  # HARVEST: stack of cactus pads
 I 8 10228 20.00 3 H  # HARVEST: stack of cactus pads
 I 8 10228 20.00 4 H  # HARVEST: stack of cactus pads
@@ -86,7 +86,7 @@ A Field of Aloe~
 D0
 xxxx~
 &g~
-I 6 10231 100.00 1  # FORAGE: desert dandelions
+I 6 10231 100.00 25  # FORAGE: desert dandelions
 I 8 10230 20.00 2 H  # HARVEST: thick aloe leaves
 I 8 10230 20.00 3 H  # HARVEST: thick aloe leaves
 I 8 10230 20.00 4 H  # HARVEST: thick aloe leaves

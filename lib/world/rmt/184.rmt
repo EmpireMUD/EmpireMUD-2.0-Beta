@@ -132,7 +132,7 @@ The blue plaque reads:
 "The Wizard of Oz", to the 1939 film by that name, and to the song "Tragic
 Kingdom" by No Doubt.
 ~
-I 6 18484 100.00 1  # FORAGE: handful of popcorn
+I 6 18484 100.00 25  # FORAGE: handful of popcorn
 I 7 18485 100.00 1  # PICK: bag of popcorn
 M 0 18485 100.00 1
 T 18461

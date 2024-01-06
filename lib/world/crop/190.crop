@@ -6,7 +6,7 @@ A Patch of Okra~
 D0
 @@@@~
 &G~
-I 6 19041 100.00 1  # FORAGE: okra seeds
+I 6 19041 100.00 25  # FORAGE: okra seeds
 I 8 19042 20.00 2 H  # HARVEST: bunch of okra pods
 I 8 19042 20.00 3 H  # HARVEST: bunch of okra pods
 I 8 19042 20.00 4 H  # HARVEST: bunch of okra pods

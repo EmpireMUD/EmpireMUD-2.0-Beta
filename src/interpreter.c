@@ -116,7 +116,6 @@ ACMD(do_demote);
 ACMD(do_deposit);
 ACMD(do_designate);
 ACMD(do_diagnose);
-ACMD(do_dig);
 ACMD(do_diplomacy);
 ACMD(do_disembark);
 ACMD(do_disguise);
@@ -167,16 +166,13 @@ ACMD(do_fillin);
 ACMD(do_findmaintenance);
 ACMD(do_finish);
 ACMD(do_fire);
-ACMD(do_fish);
 ACMD(do_flee);
 ACMD(do_follow);
-ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_forgive);
 ACMD(do_friend);
 ACMD(do_fullsave);
 
-ACMD(do_gather);
 ACMD(do_gecho);
 ACMD(do_gen_augment);
 ACMD(do_gen_craft);
@@ -267,7 +263,6 @@ ACMD(do_order);
 
 ACMD(do_page);
 ACMD(do_paint);
-ACMD(do_pan);
 ACMD(do_passives);
 ACMD(do_peace);
 ACMD(do_pickpocket);
@@ -621,7 +616,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "distance", POS_DEAD, do_distance, NO_MIN, CTYPE_IMMORTAL ),
-	STANDARD_CMD( "dig", POS_STANDING, do_dig, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "dig", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_DIG, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "dispatch", POS_RESTING, do_dispatch, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
@@ -677,10 +672,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "finish", POS_DEAD, do_finish, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "fire", POS_SITTING, do_fire, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "fish", POS_SITTING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "fish", POS_SITTING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FISH, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),
 	SIMPLE_CMD( "follow", POS_RESTING, do_follow, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "forage", POS_STANDING, do_forage, NO_MIN, CTYPE_SKILL ),
+	STANDARD_CMD( "forage", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FORAGE, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	STANDARD_CMD( "forge", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),
@@ -690,7 +685,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
 	SIMPLE_CMD( "get", POS_RESTING, do_get, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "gather", POS_STANDING, do_gather, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "gather", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_GATHER, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "gecho", POS_DEAD, do_gecho, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_GECHO ),
 	SIMPLE_CMD( "give", POS_RESTING, do_give, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "goto", POS_SLEEPING, do_goto, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_GOTO ),
@@ -806,7 +801,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
 	SIMPLE_CMD( "paint", POS_STANDING, do_paint, NO_MIN, CTYPE_BUILD ),
-	STANDARD_CMD( "pan", POS_STANDING, do_pan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "pan", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_PAN, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "passives", POS_DEAD, do_passives, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "peace", POS_DEAD, do_peace, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PEACE ),

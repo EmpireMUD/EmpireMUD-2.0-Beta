@@ -65,7 +65,7 @@ a fruitcake~
 A fruitcake is lying on the ground.~
 This fruitcake looks like it might have been re-gifted.
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 72 0 0
 7 336
 A
@@ -77,6 +77,8 @@ M
 As you eat the fruitcake, you feel warm deep down inside.~
 R
 4 5619 0
+R
+4 5132 0
 S
 #10706
 recipe cake fruitcake~
@@ -96,7 +98,7 @@ roast goose~
 A roast goose is lying here.~
 This plump roast goose is perfect for Christmas dinner.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 72 0 0
 7 336
 A
@@ -105,6 +107,8 @@ C
 50 50
 R
 4 5619 0
+R
+4 5132 0
 S
 #10708
 recipe roast goose~
@@ -206,7 +210,7 @@ a plate of christmas cookies~
 A plate of cookies is lying here.~
 A variety of delicious cookies are spread across the plate.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 72 0 0
 7 336
 A
@@ -218,6 +222,8 @@ M
 You're filled with holiday cheer!~
 R
 4 5606 0
+R
+4 5132 0
 S
 #10717
 recipe cookie christmas~
@@ -304,7 +310,7 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 18 0 0
 7 336
 A
@@ -313,6 +319,8 @@ C
 50 50
 R
 4 5606 0
+R
+4 5132 0
 S
 #10723
 whistle Christmas tree minipet~

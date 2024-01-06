@@ -68,7 +68,7 @@ S
 Ready Blood Weapons~
 0 314 1.00 0 bcn 0
 C
-unknown 5 w 3 40 0.00 -1 0 0 2 0
+unknown 5 w 3 15 0.00 -1 0 0 2 0
 D 4 1101 0
 D 4 1102 0
 D 4 1103 0
@@ -780,6 +780,8 @@ S
 #72
 Fish~
 0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 1
 D 1 16 0
 T e 1
 S

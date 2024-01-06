@@ -5786,11 +5786,11 @@ E
 water muddy~
 The water is a muddy brown color. You can't see anything in it.
 ~
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1311 20.00 1 f  # FISH: spotted eel
-I 21 1313 20.00 1 f  # FISH: bright red leaping fish
-I 21 1312 20.00 1 f  # FISH: speckled trout
-I 21 11978 20.00 1 f  # FISH: mussels
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1311 20.00 125 f  # FISH: spotted eel
+I 21 1313 20.00 125 f  # FISH: bright red leaping fish
+I 21 1312 20.00 125 f  # FISH: speckled trout
+I 21 11978 20.00 125 f  # FISH: mussels
 M 1 11979 100.00 1
 T 11945
 T 11946

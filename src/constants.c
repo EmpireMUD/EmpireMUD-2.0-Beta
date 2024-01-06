@@ -17,8 +17,8 @@
 #include "utils.h"
 #include "skills.h"
 #include "interpreter.h"	/* alias_data */
-#include "vnums.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.167";
+const char *version = "EmpireMUD 2.0 beta 5.168";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -3885,19 +3885,47 @@ const char *crop_custom_types[] = {
 };
 
 
-// DPLTN_x
-const char *depletion_type[] = {
-	"dig",
+// DPLTN_x (1/2): basic depletion names
+const char *depletion_types[] = {
+	"dig",		// 0
 	"forage",
 	"gather",
 	"pick",
 	"fish",
-	"quarry",
+	"quarry",	// 5
 	"pan",
 	"trapping",
 	"chop",
 	"hunt",
-	"production",
+	"production",	// 10
+	"\n"
+};
+
+
+// DPLTN_x (2/2): depletion strings for survey; may be empty; use $$ as a placeholder for the depletion_levels[] amount
+const char *depletion_strings[] = {
+	"dug up $$ ground",	// 0
+	"foraged $$ food in the area",
+	"gathered $$ material on the ground",
+	"picked $$ things here",
+	"caught $$ fish",
+	"quarried $$ stone",	// 5
+	"panned $$ gold",
+	"trapped $$ animals",
+	"chopped $$ trees",
+	"hunted $$ animals",	// unlikely to be able to show this one
+	"",	// 10, production
+	"\n"
+};
+
+
+// for depletion displays, take the percent depleted, divide by 25:
+const char *depletion_levels[] = {
+	"some",				// 0-24
+	"a bunch of the",	// 25-49
+	"a lot of",			// 50-74
+	"most of the",		// 75-99
+	"all the",			// 100%
 	"\n"
 };
 
@@ -4033,7 +4061,7 @@ const char *function_flags[] = {
 	"BATHS",
 	"BEDROOM",
 	"CARPENTER",
-	"DIGGING",	// 5
+	"*",	// 5
 	"DOCKS",
 	"FORGE",
 	"GLASSBLOWER",
@@ -4078,7 +4106,7 @@ const char *function_flags_long[] = {
 	"at the baths",
 	"in a bedroom",
 	"at a carpenter",
-	"somewhere that can be dug",	// 5
+	"",	// 5
 	"at the docks",
 	"at a forge",
 	"at a glassblower",
@@ -4948,7 +4976,7 @@ const char *global_flags[] = {
 };
 
 
-// INTERACT_x (1/4): names of interactions
+// INTERACT_x (1/2): names of interactions
 const char *interact_types[] = {
 	"BUTCHER",	// 0
 	"SKIN",
@@ -4991,131 +5019,49 @@ const char *interact_types[] = {
 };
 
 
-// INTERACT_x (2/4): what type of thing has this interaction
-const int interact_attach_types[NUM_INTERACTS] = {
-	TYPE_MOB,
-	TYPE_MOB,
-	TYPE_MOB,
-	TYPE_MOB,
-	TYPE_MOB,
-	TYPE_ROOM,	// dig
-	TYPE_ROOM,
-	TYPE_ROOM,
-	TYPE_ROOM,
-	TYPE_ROOM,
-	TYPE_ROOM,
-	TYPE_OBJ,	// light
-	TYPE_MOB,	// pickpocket
-	TYPE_MINE_DATA,	// mine
-	TYPE_OBJ,	// combine
-	TYPE_OBJ,	// separate
-	TYPE_OBJ,	// scrape
-	TYPE_OBJ,	// saw
-	TYPE_OBJ,	// tan
-	TYPE_OBJ,	// chip
-	TYPE_ROOM,	// chop
-	TYPE_ROOM,	// fish
-	TYPE_ROOM,	// pan
-	TYPE_ROOM,	// quarry
-	TYPE_MOB,	// tame
-	TYPE_OBJ,	// seed
-	TYPE_OBJ,	// decays-to
-	TYPE_OBJ,	// consumes-to
-	TYPE_OBJ,	// IDENTIFIES-TO
-	TYPE_ROOM,	// RUINS-TO-BLD
-	TYPE_ROOM,	// RUINS-TO-VEH
-	TYPE_ROOM,	// PRODUCTION
-	TYPE_ROOM,	// SKILLED-LABOR
-	TYPE_ABIL,	// LIQUID-CONJURE
-	TYPE_ABIL,	// OBJECT-CONJURE
-	TYPE_ABIL,	// VEHICLE-CONJURE
-	TYPE_OBJ,	// DISENCHANT
-};
-
-
-// INTERACT_x (3/4): type of thing represented by interact->vnum
-const byte interact_vnum_types[NUM_INTERACTS] = {
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_MOB,	// barde
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_MOB,	// encounter
-	TYPE_OBJ,
-	TYPE_OBJ,
-	TYPE_OBJ,	// mine
-	TYPE_OBJ,	// combine
-	TYPE_OBJ,	// separate
-	TYPE_OBJ,	// scrape
-	TYPE_OBJ,	// saw
-	TYPE_OBJ,	// tan
-	TYPE_OBJ,	// chip
-	TYPE_OBJ,	// chop
-	TYPE_OBJ,	// fish
-	TYPE_OBJ,	// pan
-	TYPE_OBJ,	// quarry
-	TYPE_MOB,	// tame
-	TYPE_OBJ,	// seed
-	TYPE_OBJ,	// decays-to
-	TYPE_OBJ,	// consumes-to
-	TYPE_OBJ,	// IDENTIFIES-TO
-	TYPE_BLD,	// RUINS-TO-BLD
-	TYPE_VEH,	// RUINS-TO-VEH
-	TYPE_OBJ,	// PRODUCTION
-	TYPE_OBJ,	// SKILLED-LABOR
-	TYPE_LIQUID,	// LIQUID-CONJURE
-	TYPE_OBJ,	// OBJECT-CONJURE
-	TYPE_VEH,	// VEHICLE-CONJURE
-	TYPE_OBJ,	// DISENCHANT
-};
-
-
-// INTERACT_x (4/4): some interactions give you 1 at a time and use 'quantity' as their depletion cap
-// WARNING: Currently, only actions performed through do_gen_interact_room() or workforce support this.
-// Conceptually, this will ONLY work for room/vehicle interactions unless you put depletions/counters on objects and mobs.
-const bool interact_one_at_a_time[NUM_INTERACTS] = {
-	FALSE,	// BUTCHER  -- definitely cannot support this
-	FALSE,	// SKIN  -- definitely cannot support this
-	FALSE,	// SHEAR  -- definitely cannot support this
-	FALSE,	// BARDE  -- definitely cannot support this
-	FALSE,	// LOOT  -- definitely cannot support this
-	FALSE,	// DIG
-	FALSE,	// FORAGE
-	TRUE,	// PICK
-	FALSE,	// HARVEST  -- PROBABLY cannot support this
-	FALSE,	// GATHER
-	FALSE,	// ENCOUNTER  -- definitely cannot support this
-	FALSE,	// LIGHT  -- definitely cannot support this
-	FALSE,	// PICKPOCKET  -- definitely cannot support this
-	FALSE,	// MINE  -- definitely cannot support this
-	FALSE,	// COMBINE  -- definitely cannot support this
-	FALSE,	// SEPARATE  -- definitely cannot support this
-	FALSE,	// SCRAPE  -- definitely cannot support this
-	FALSE,	// SAW  -- definitely cannot support this
-	FALSE,	// TAN  -- definitely cannot support this
-	FALSE,	// CHIP  -- definitely cannot support this
-	FALSE,	// CHOP
-	FALSE,	// FISH
-	FALSE,	// PAN
-	TRUE,	// QUARRY
-	FALSE,	// TAME  -- definitely cannot support this
-	FALSE,	// SEED  -- definitely cannot support this
-	FALSE,	// DECAYS_TO  -- definitely cannot support this
-	FALSE,	// CONSUMES_TO  -- definitely cannot support this
-	FALSE,	// IDENTIFIES_TO  -- definitely cannot support this
-	FALSE,	// RUINS_TO_BLD  -- definitely cannot support this
-	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
-	TRUE,	// PRODUCTION
-	TRUE,	// SKILLED_LABOR
-	FALSE,	// LIQUID_CONJURE
-	FALSE,	// OBJECT_CONJURE
-	FALSE,	// VEHICLE_CONJURE
-	FALSE,	// DISENCHANT
+// INTERACT_x: (2/2): additional data for each interaction
+const struct interact_data_t interact_data[NUM_INTERACTS] = {
+	// attach-to, vnum-type, one-at-a-time, depletion
+	{ TYPE_MOB,	TYPE_OBJ, FALSE, NOTHING }, // INTERACT_BUTCHER
+	{ TYPE_MOB,	TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SKIN
+	{ TYPE_MOB,	TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SHEAR
+	{ TYPE_MOB,	TYPE_MOB, FALSE, NOTHING }, // INTERACT_BARDE
+	{ TYPE_MOB,	TYPE_OBJ, FALSE, NOTHING }, // INTERACT_LOOT
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_DIG }, // INTERACT_DIG
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_FORAGE }, // INTERACT_FORAGE
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_PICK }, // INTERACT_PICK
+	{ TYPE_ROOM, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_HARVEST
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_GATHER }, // INTERACT_GATHER
+	{ TYPE_ROOM, TYPE_MOB, FALSE, NOTHING }, // INTERACT_ENCOUNTER
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_LIGHT
+	{ TYPE_MOB, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_PICKPOCKET
+	{ TYPE_MINE_DATA, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_MINE
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_COMBINE
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SEPARATE
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SCRAPE
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SAW
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_TAN
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_CHIP
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_CHOP }, // INTERACT_CHOP
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_FISH }, // INTERACT_FISH
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_PAN }, // INTERACT_PAN
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_QUARRY }, // INTERACT_QUARRY
+	{ TYPE_MOB, TYPE_MOB, FALSE, NOTHING }, // INTERACT_TAME
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_SEED
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_DECAYS_TO
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_CONSUMES_TO
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_IDENTIFIES_TO
+	{ TYPE_ROOM, TYPE_BLD, FALSE, NOTHING }, // INTERACT_RUINS_TO_BLD
+	{ TYPE_ROOM, TYPE_VEH, FALSE, NOTHING }, // INTERACT_RUINS_TO_VEH
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_PRODUCTION }, // INTERACT_PRODUCTION
+	{ TYPE_ROOM, TYPE_OBJ, TRUE, DPLTN_PRODUCTION }, // INTERACT_SKILLED_LABOR
+	{ TYPE_ABIL, TYPE_LIQUID, FALSE, NOTHING }, // INTERACT_LIQUID_CONJURE
+	{ TYPE_ABIL, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_OBJECT_CONJURE
+	{ TYPE_ABIL, TYPE_VEH, FALSE, NOTHING }, // INTERACT_VEHICLE_CONJURE
+	{ TYPE_OBJ, TYPE_OBJ, FALSE, NOTHING }, // INTERACT_DISENCHANT
+	
+	// WARNING: Currently, only actions performed through do_gen_interact_room() or workforce support one-at-a-time.
+	// Conceptually, this will ONLY work for room/vehicle interactions unless you put depletions/counters on objects and mobs.
 };
 
 

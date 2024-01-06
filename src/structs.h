@@ -206,6 +206,8 @@
 #define NO_ABIL  NO_SKILL	// things that don't require an ability
 #define NO_FLAGS  0
 #define NO_SKILL  -1	// things that don't require a skill
+#define NO_TECH  NOTHING	// empire or player tech
+#define NO_TOOL  NOBITS		// does not require a tool
 #define NOT_REPEATABLE  -1	// quest's repeatable_after
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
@@ -423,6 +425,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_VEHICLE_CONJURE  35
 #define INTERACT_DISENCHANT  36
 #define NUM_INTERACTS  37
+
+// for do_gen_interact
+#define GEN_INTERACT_SPECIAL(name)	void (name)(char_data *ch, room_data *room, const struct gen_interact_data_t *data)
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -787,7 +792,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
-#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+	#define FNC_UNUSED5  BIT(5)	// formerly DIGGING; no longer needed for workforce
 #define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
 #define FNC_FORGE  BIT(7)	// can use the forge command here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
@@ -1081,12 +1086,12 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_CHOPPING  3
 #define CHORE_MAINTENANCE  4
 #define CHORE_MINING  5
-#define CHORE_DIGGING  6
+	#define CHORE_UNUSED6  6	// formerly digging; merged into productions
 #define CHORE_SAWING  7
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_PRODUCTION  11	// formerly quarry, trapping, beekeeping, herb-gardening
+#define CHORE_PRODUCTION  11	// formerly digging, quarry, trapping, beekeeping, herb-gardening
 #define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
 	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
@@ -1959,11 +1964,6 @@ typedef enum {
 #define WEAR_TOOL  22
 #define WEAR_SHARE  23
 #define NUM_WEARS  24	/* This must be the # of eq positions!! */
-
-
-// for item scaling based on wear flags
-#define WEAR_POS_MINOR  0
-#define WEAR_POS_MAJOR  1
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3235,17 +3235,23 @@ struct gen_interact_data_t {
 	int action;	// ACT_ type
 	char *command;	// 'quarry'
 	char *verb;	// 'quarrying'
-	int timer;	// number of action ticks
-	int ptech;	// required ptech (may be NOTHING)
-	int depletion;	// DPLTN_ type (may be NOTHING)
+	char *timer_config;	// optional: config to get the timer (NULL to not use)
+	int timer;	// number of action ticks to use if a config is not set
+	int ptech;	// required ptech (may be NO_TECH)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	bitvector_t tool;	// any TOOL_ needed
+	GEN_INTERACT_SPECIAL(*spec_proc);	// optional spec to run during the process such as gen_proc_nature_burn
+	bitvector_t flags;	// GI_ flags
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action
+		char *pre_finish;	// shown before attempting the resource interaction
 		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p
 		char *empty;	// char-only, shown at the end if there's nothing they can get
 		int random_frequency;	// 1-100% chance to see a message per tick
 		char *random_tick[10][2];
 	} msg;
+	int custom_tool_message_to_char;	// optional OBJ_CUSTOM_ type; may be NOTHING
+	int custom_tool_message_to_room;	// optional OBJ_CUSTOM_ type; may be NOTHING
 };
 
 
@@ -3969,14 +3975,6 @@ struct archetype_gear {
 };
 
 
-// used in character creation
-struct archetype_menu_type {
-	int type;
-	char *name;
-	char *description;
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// ATTACK MESSAGE STRUCTS //////////////////////////////////////////////////
 
@@ -4066,16 +4064,6 @@ struct augment_data {
 	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
-};
-
-
-// used by do_gen_augment
-struct augment_type_data {
-	char *noun;
-	char *verb;
-	int apply_type;	// APPLY_TYPE_x
-	bitvector_t default_flags;	// AUG_x always applied
-	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
 
@@ -4755,6 +4743,7 @@ struct player_special_data {
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
 	byte rank;	// Rank in the empire
+	sh_int highest_known_greatness;	// maximum greatness achieved (prevents empire greatness dropping)
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
@@ -5185,24 +5174,6 @@ struct action_data_struct {
 };
 
 
-// STRENGTH, NUM_ATTRIBUTES, etc
-struct attribute_data_type {
-	char *name;
-	char *creation_description;	// shown if players need help during creation
-	char *low_error;	// You are "too weak" to use that item.
-};
-
-
-// used for city metadata
-struct city_metadata_type {
-	char *name;
-	char *icon;
-	int radius;
-	bool show_to_others;
-	bool is_capital;
-};
-
-
 // chore type data -- CHORE_
 struct empire_chore_type {
 	char *name;
@@ -5212,47 +5183,11 @@ struct empire_chore_type {
 };
 
 
-// MAT_x
-struct material_data {
-	char *name;
-	bool floats;
-	double chance_to_dismantle;	// percent chance of getting it back when dismantling
-	char *decay_on_char;	// message sent if carried/used by a person
-	char *decay_in_room;	// message sent if it decays in the room
-};
-
-
 // for BREW_x
 struct tavern_data_type {
 	char *name;
 	int liquid;
 	int ingredients[3];
-};
-
-
-// for do_toggle
-struct toggle_data_type {
-	char *name;	// toggle display and subcommand
-	int type;	// TOG_ONOFF, TOG_OFFON
-	bitvector_t bit;	// PRF_
-	int level;	// required level to see/use toggle
-	void (*callback_func)(char_data *ch);	// optional function to alert changes
-};
-
-
-// WEAR_ data for each equipment slot
-struct wear_data_type {
-	char *eq_prompt;	// shown on 'eq' list
-	char *name;	// display name
-	bitvector_t item_wear;	// matching ITEM_WEAR_
-	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
-	double gear_level_mod;	// modifier (slot significance) when counting gear level
-	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
-	char *already_wearing;	// error message when slot is full
-	char *wear_msg_to_room;	// msg act()'d to room on wear
-	char *wear_msg_to_char;	// msg act()'d to char on wear
-	bool allow_custom_msgs;	// some slots don't
-	bool save_to_eq_set;	// slots that can be saved with 'eq set'
 };
 
 
@@ -5527,13 +5462,6 @@ struct offense_data {
 	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
 	
 	struct offense_data *prev, *next;	// doubly-linked list
-};
-
-
-// offense configs - constants.c
-struct offense_info_type {
-	char *name;
-	int weight;	// how bad it is
 };
 
 
@@ -5837,16 +5765,6 @@ struct faction_relation {
 	faction_data *ptr;	// quick reference
 	
 	UT_hash_handle hh;	// fct->relations hash handle
-};
-
-
-// used to determine the order and value of reputations
-struct faction_reputation_type {
-	int type;	// REP_ type
-	char *name;
-	char *by_to;	// You are now [Reputation] [by | to] [Faction Name].
-	char *color;	// & or \t color code
-	int value;	// points total a player must be at for this
 };
 
 
@@ -6390,20 +6308,6 @@ struct vehicle_room_list {
  //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON STRUCTS //////////////////////////////////////////////
 
-// for climate-based temperature
-struct climate_temperature_t {
-	int base_add;	// core temperature from this climate
-	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
-	double season_weight;	// how much season affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
-	double cold_modifier;	// multiplies cold temperatures by this
-	double heat_modifier;	// multiplies hot temperatures by this
-};
-
-
-// for climate temperatures
-#define NO_TEMP_MOD  -1.0
-
-
 // TILESET_x, used in sector_data
 struct tileset_data {
 	char *icon;  // ^^^^
@@ -6622,17 +6526,4 @@ struct map_data {
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect
 	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
-};
-
-
-// for character size, search SIZE_x
-struct character_size_data {
-	int max_blood;	// how much blood the mob has
-	bitvector_t corpse_flags;	// large or not
-	bool can_take_corpse;	// corpse is no-take if false
-	bool show_on_map;	// show (oo)/name on map at range
-	char *corpse_keywords;	// additional keywords on the corpse
-	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
-	char *body_long_desc;	// custom long desc with %s for "the body of"
-	char *show_on_look;	// if not null, shows when you look at a person of this size
 };

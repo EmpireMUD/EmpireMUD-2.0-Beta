@@ -9,9 +9,9 @@ D0
 D0
 ^^&o0&?^~
 &G~
-I 6 18501 100.00 1  # FORAGE: single papaya
+I 6 18501 100.00 25  # FORAGE: single papaya
 I 7 18500 100.00 14  # PICK: basket of papayas
-I 9 133 100.00 1  # GATHER: tangle of vines
+I 9 133 100.00 50  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
 U
 0

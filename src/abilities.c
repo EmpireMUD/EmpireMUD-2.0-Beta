@@ -2365,17 +2365,23 @@ INTERACTION_FUNC(devastate_crop) {
 */
 INTERACTION_FUNC(devastate_trees) {
 	char type[256];
-	int num, obj_ok = 0;
+	int amount, num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
 	obj_data *newobj = NULL;
 	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	if (get_depletion(inter_room, DPLTN_CHOP) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : config_get_int("short_depletion"))) {
+		return FALSE;	// depleted room
 	}
 	
-	for (num = 0; num < interaction->quantity; ++num) {
+	amount = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
+	}
+	
+	for (num = 0; num < amount; ++num) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
@@ -2383,11 +2389,13 @@ INTERACTION_FUNC(devastate_trees) {
 		}
 	}
 	
+	add_depletion(inter_room, DPLTN_CHOP, FALSE);
+	
 	if (newobj && obj_ok) {
 		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
 		strtolower(type);
 		
-		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
+		send_ability_per_item_messages(ch, newobj, amount, abil, data, type);
 	}
 	
 	return TRUE;
@@ -2634,7 +2642,7 @@ DO_ABIL(abil_action_devastate_area) {
 	int dist, iter;
 	int x, y, range;
 	
-	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
+	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < get_depletion_max((room), DPLTN_CHOP))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
 	
 	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
 	if (!range) {
@@ -2678,9 +2686,11 @@ DO_ABIL(abil_action_devastate_area) {
 			uncrop_tile(to_room);
 			data->success = TRUE;
 		}
-		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < get_depletion_max(to_room, DPLTN_CHOP)) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
-			change_chop_territory(to_room);
+			if (get_depletion(to_room, DPLTN_CHOP) >= get_depletion_max(to_room, DPLTN_CHOP)) {
+				change_chop_territory(to_room);
+			}
 			data->success = TRUE;
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {

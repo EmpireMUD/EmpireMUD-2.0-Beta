@@ -295,7 +295,7 @@ void b3_2_map_and_gear(void) {
 		// crops
 		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
-			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, FALSE));
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, NOTHING));
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
@@ -432,7 +432,7 @@ void b3_15_crop_update(void) {
 		if (map->crop_type) {
 			// update crop
 			if (room || (room = real_room(map->vnum))) {
-				new_crop = get_potential_crop_for_location(room, FALSE);
+				new_crop = get_potential_crop_for_location(room, NOTHING);
 				set_crop_type(room, new_crop ? new_crop : crop_table);
 			}
 		}
@@ -3537,6 +3537,54 @@ void b5_166_barrier_magentafication(void) {
 }
 
 
+// clears removed DIGGING flag
+void b5_168_updates(void) {
+	bld_data *bld, *next_bld;
+	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
+	
+	bitvector_t FNC_DIGGING = BIT(5);
+	
+	// ensure no use of the DIGGING function flag
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		if (IS_SET(GET_BLD_FUNCTIONS(bld), FNC_DIGGING)) {
+			REMOVE_BIT(GET_BLD_FUNCTIONS(bld), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from building %d %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (IS_SET(GET_RMT_FUNCTIONS(rmt), FNC_DIGGING)) {
+			REMOVE_BIT(GET_RMT_FUNCTIONS(rmt), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from room template %d %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_DIGGING)) {
+			REMOVE_BIT(VEH_FUNCTIONS(veh), FNC_DIGGING);
+			log("Warning: Deprecated function DIGGING removed from vehicle %d %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+}
+
+
+// ensures everyone has a highest greatness shown
+PLAYER_UPDATE_FUNC(b5_188_greatness) {
+	int great;
+	
+	check_delayed_load(ch);
+	
+	great = GET_GREATNESS(ch);
+	great = MIN(great, att_max(ch));
+	
+	if (GET_HIGHEST_KNOWN_GREATNESS(ch) < great) {
+		GET_HIGHEST_KNOWN_GREATNESS(ch) = great;
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3636,6 +3684,7 @@ const struct {
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
 	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
+	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

@@ -6,7 +6,7 @@ A Tomato Patch~
 D0
 &Ro&?88&Ro~
 &g~
-I 6 3027 100.00 1  # FORAGE: ripe tomato
+I 6 3027 100.00 25  # FORAGE: ripe tomato
 I 8 3026 20.00 2 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 3 H  # HARVEST: basket of tomatoes
 I 8 3026 20.00 4 H  # HARVEST: basket of tomatoes
@@ -34,7 +34,7 @@ A Banana Grove~
 D0
 &Yd&?\/&Yb~
 &G~
-I 6 3029 100.00 1  # FORAGE: ripe yellow banana
+I 6 3029 100.00 25  # FORAGE: ripe yellow banana
 I 8 3028 20.00 2 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 3 H  # HARVEST: bunch of bananas
 I 8 3028 20.00 4 H  # HARVEST: bunch of bananas
@@ -89,10 +89,9 @@ D0
 D0
 .&gT&to&?.~
 &y~
-I 6 3031 100.00 1  # FORAGE: split coconut
+I 6 3031 100.00 25  # FORAGE: split coconut
 I 7 3030 100.00 14  # PICK: bunch of coconuts
-I 20 122 50.00 1 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 Palm trees shoot up into the air as large, brown coconuts form in their crowns!~
@@ -122,7 +121,7 @@ xgxx~
 D0
 xxgx~
 &g~
-I 6 3033 100.00 1  # FORAGE: few grapes
+I 6 3033 100.00 25  # FORAGE: few grapes
 I 8 3032 20.00 2 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 3 H  # HARVEST: bunch of grapes
 I 8 3032 20.00 4 H  # HARVEST: bunch of grapes
@@ -162,7 +161,7 @@ n&Ri&?nn~
 D0
 &Ri&?nnn~
 &g~
-I 6 3035 100.00 1  # FORAGE: ripe pepper
+I 6 3035 100.00 25  # FORAGE: ripe pepper
 I 8 3034 20.00 2 H  # HARVEST: basket of peppers
 I 8 3034 20.00 3 H  # HARVEST: basket of peppers
 I 8 3034 20.00 4 H  # HARVEST: basket of peppers
@@ -194,7 +193,7 @@ A Potato Field~
 D0
 nnnn~
 &g~
-I 6 3064 100.00 1  # FORAGE: raw potato
+I 6 3064 100.00 25  # FORAGE: raw potato
 I 8 3036 20.00 2 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 3 H  # HARVEST: sack of potatoes
 I 8 3036 20.00 4 H  # HARVEST: sack of potatoes
@@ -236,7 +235,7 @@ D0
 D0
 &vo&?^^^~
 &g~
-I 6 3038 100.00 1  # FORAGE: ripe plum
+I 6 3038 100.00 25  # FORAGE: ripe plum
 I 7 3037 100.00 14  # PICK: basket of plums
 I 20 120 100.00 1  # CHOP: large tree
 U
@@ -275,7 +274,7 @@ nn&Rv&?n~
 D0
 nnn&Rv~
 &g~
-I 6 3040 100.00 1  # FORAGE: couple of strawberries
+I 6 3040 100.00 25  # FORAGE: couple of strawberries
 I 8 3039 20.00 2 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 3 H  # HARVEST: basket of strawberries
 I 8 3039 20.00 4 H  # HARVEST: basket of strawberries
@@ -321,7 +320,7 @@ D0
 D0
 ^&Oo&?^&Oo~
 &G~
-I 6 3042 100.00 1  # FORAGE: single ripe mango
+I 6 3042 100.00 25  # FORAGE: single ripe mango
 I 7 3041 100.00 14  # PICK: basket of mangoes
 I 20 128 100.00 1  # CHOP: massive jungle tree
 U
@@ -358,7 +357,7 @@ D0
 D0
 %%%&Bo~
 &g~
-I 6 3044 100.00 1  # FORAGE: handful of blueberries
+I 6 3044 100.00 25  # FORAGE: handful of blueberries
 I 8 3043 20.00 2 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 3 H  # HARVEST: basket of blueberries
 I 8 3043 20.00 4 H  # HARVEST: basket of blueberries
@@ -414,7 +413,7 @@ D0
 D0
 &to&?^^^~
 &Y~
-I 6 3065 100.00 1  # FORAGE: red berries
+I 6 3065 100.00 25  # FORAGE: red berries
 I 8 3045 20.00 2 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 3 H  # HARVEST: sack of coffee beans
 I 8 3045 20.00 4 H  # HARVEST: sack of coffee beans
@@ -442,7 +441,7 @@ A Field of Oats~
 D0
 iiii~
 &T~
-I 6 3066 100.00 1  # FORAGE: handful of grain
+I 6 3066 100.00 25  # FORAGE: handful of grain
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 3046 20.00 2 H  # HARVEST: sack of oats
 I 8 3046 20.00 3 H  # HARVEST: sack of oats
@@ -502,7 +501,7 @@ owow~
 D0
 wowo~
 &G~
-I 6 3067 100.00 1  # FORAGE: small watermelon
+I 6 3067 100.00 25  # FORAGE: small watermelon
 I 8 3047 20.00 2 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 3 H  # HARVEST: single ripe watermelon
 I 8 3047 20.00 4 H  # HARVEST: single ripe watermelon
@@ -531,7 +530,7 @@ A Lettuce Patch~
 D0
 @@@@~
 &G~
-I 6 3050 100.00 1  # FORAGE: lettuce seeds
+I 6 3050 100.00 25  # FORAGE: lettuce seeds
 I 8 3049 20.00 2 H  # HARVEST: head of lettuce
 I 8 3049 20.00 3 H  # HARVEST: head of lettuce
 I 8 3049 20.00 4 H  # HARVEST: head of lettuce
@@ -560,7 +559,7 @@ A Field of Calabash Gourds~
 D0
 oooo~
 &g~
-I 6 3053 100.00 1  # FORAGE: green calabash
+I 6 3053 100.00 25  # FORAGE: green calabash
 I 8 3054 100.00 2  # HARVEST: sack of fresh calabash gourds
 U
 0
@@ -610,9 +609,9 @@ D0
 D0
 &oo&?^^^~
 &Y~
-I 6 3071 100.00 1  # FORAGE: couple of apricots
+I 6 3071 100.00 25  # FORAGE: couple of apricots
 I 7 3070 100.00 14  # PICK: basket of apricots
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -649,7 +648,7 @@ D0
 D0
 \\\\~
 &G~
-I 6 3073 100.00 1  # FORAGE: handful of grain
+I 6 3073 100.00 25  # FORAGE: handful of grain
 I 8 3072 20.00 2 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 3 H  # HARVEST: bundle of sugarcane
 I 8 3072 20.00 4 H  # HARVEST: bundle of sugarcane
@@ -678,7 +677,7 @@ A Field of Garlic~
 D0
 ,,,,~
 &T~
-I 6 3075 100.00 1  # FORAGE: clove of garlic
+I 6 3075 100.00 25  # FORAGE: clove of garlic
 I 8 3074 20.00 2 H  # HARVEST: basket of garlic
 I 8 3074 20.00 3 H  # HARVEST: basket of garlic
 I 8 3074 20.00 4 H  # HARVEST: basket of garlic
@@ -716,9 +715,9 @@ D0
 D0
 &Yo&?^&Yo&?^~
 &G~
-I 6 3077 100.00 1  # FORAGE: single ripe lemon
+I 6 3077 100.00 25  # FORAGE: single ripe lemon
 I 7 3076 100.00 14  # PICK: basket of lemons
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -759,7 +758,7 @@ momm~
 D0
 mmom~
 &g~
-I 6 3079 100.00 1  # FORAGE: single ripe cucumber
+I 6 3079 100.00 25  # FORAGE: single ripe cucumber
 I 8 3078 20.00 2 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 3 H  # HARVEST: basket of cucumbers
 I 8 3078 20.00 4 H  # HARVEST: basket of cucumbers

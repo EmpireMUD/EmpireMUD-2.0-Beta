@@ -19,7 +19,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "skills.h"
 #include "constants.h"
 
 /**
@@ -29,7 +28,6 @@
 */
 
 // local prototypes
-struct friend_data *find_account_friend(account_data *acct, int acct_id);
 bool remove_account_friend(account_data *acct, int acct_id);
 
 
@@ -478,7 +476,7 @@ ACMD(do_friends_all) {
 		
 		// otherwise show it...
 		*color = '\0';
-		plr = find_online_friend(ch, friend->account_id);
+		plr = (friend->status == FRIEND_FRIENDSHIP ? find_online_friend(ch, friend->account_id) : NULL);
 		if (plr) {
 			nsize = snprintf(name, sizeof(name), "%s", GET_NAME(plr));
 		}
@@ -845,7 +843,9 @@ ACMD(do_friend_request) {
 // called through do_friend
 ACMD(do_friend_status) {
 	bool file = FALSE;
+	int status;
 	char_data *plr = NULL;
+	struct friend_data *friend;
 	
 	if (!*argument) {
 		// argument is actually guaranteed, but in case
@@ -860,9 +860,25 @@ ACMD(do_friend_status) {
 	}
 	else {
 		// FRIEND_x:
-		switch (account_friend_status(ch, plr)) {
+		status = account_friend_status(ch, plr);
+		friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr));
+		
+		// ensure they're really friends on this alt
+		if (status != FRIEND_FRIENDSHIP && friend) {
+			if (strcmp(friend->original_name, GET_NAME(plr))) {
+				// offered to someone else?
+				status = FRIEND_NONE;
+			}
+		}
+		
+		switch (status) {
 			case FRIEND_FRIENDSHIP: {
-				msg_to_char(ch, "You are friends with %s.\r\n", GET_NAME(plr));
+				if (strcmp(friend->original_name, GET_NAME(plr))) {
+					msg_to_char(ch, "You are friends with %s (%s).\r\n", GET_NAME(plr), friend->original_name);
+				}
+				else {
+					msg_to_char(ch, "You are friends with %s.\r\n", GET_NAME(plr));
+				}
 				break;
 			}
 			case FRIEND_REQUEST_SENT: {

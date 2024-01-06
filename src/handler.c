@@ -610,7 +610,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig, grt;
+	int diff, orig;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -655,14 +655,6 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_GREATNESS: {
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
-			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-				grt = GET_GREATNESS(ch);	// store temporarily
-				GET_GREATNESS(ch) = MIN(grt, att_max(ch));
-				GET_GREATNESS(ch) = MAX(0, GET_GREATNESS(ch));
-				update_member_data(ch);	// update empire
-				GET_GREATNESS(ch) = grt;	// restore to what it just was
-				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
-			}
 			break;
 		}
 		case APPLY_INTELLIGENCE:
@@ -990,7 +982,7 @@ void affect_total(char_data *ch) {
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;
-	int health, move, mana, greatness;
+	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -1004,7 +996,6 @@ void affect_total(char_data *ch) {
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
-	greatness = GET_GREATNESS(ch);
 	
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
@@ -1100,10 +1091,13 @@ void affect_total(char_data *ch) {
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
-	// check greatness thresholds
-	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-		update_member_data(ch);
-		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+	// check new highest greatness
+	if (!IS_NPC(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
+		GET_HIGHEST_KNOWN_GREATNESS(ch) = GET_GREATNESS(ch);
+		if (GET_LOYALTY(ch) && IN_ROOM(ch)) {
+			update_member_data(ch);
+			TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+		}
 	}
 	
 	// look for changed traits if player has trait hooks
@@ -4960,14 +4954,37 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 
 
 /**
+* Determines which DPLTN_ depletion type the interaction uses. This defaults
+* to 'production' depletion.
+*
+* @param struct interaction_item *interact The interaction item.
+* @return int The DPLTN_ type for the interaction.
+*/
+int determine_depletion_type(struct interaction_item *interact) {
+	struct interact_restriction *res;
+	int type = interact_data[interact->type].depletion;	// default
+	
+	if (interact) {
+		LL_FOREACH(interact->restrictions, res) {
+			if (res->type == INTERACT_RESTRICT_DEPLETION) {
+				type = res->vnum;
+			}
+		}
+	}
+	
+	return type;
+}
+
+
+/**
 * Gets the highest available depletion level amongst matching interactions in
 * the list. This mainly returns the highest 'quantity' from a
-* interact_one_at_a_time[] interaction, or else common_depletion.
+* one_at_a_time interaction, or else room depletion/common_depletion.
 *
 * @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
 * @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
 * @param struct interaction_item *list The list of interactions to check.
-* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @param int interaction_type Any type, but one_at_a_time types are the main purpose here.
 * @return int The depletion cap.
 */
 int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable) {
@@ -4975,8 +4992,8 @@ int get_interaction_depletion(char_data *ch, empire_data *emp, struct interactio
 	obj_data *proto;
 	int highest = 0;
 	
-	if (!interact_one_at_a_time[interaction_type]) {
-		return config_get_int("common_depletion");
+	if (!interact_data[interaction_type].one_at_a_time) {
+		return ch ? DEPLETION_LIMIT(IN_ROOM(ch)) : config_get_int("common_depletion");
 	}
 	
 	// for one-at-a-time chores, look for the highest depletion
@@ -5008,15 +5025,15 @@ int get_interaction_depletion(char_data *ch, empire_data *emp, struct interactio
 * @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
 * @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
 * @param room_data *room The room whose sector/crop/building to check for interaction caps.
-* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @param int interaction_type Any type, but one_at_a_time types are the main purpose here.
 * @return int The depletion cap.
 */
 int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable) {
 	crop_data *cp;
 	int this, highest = 0;
 	
-	if (!interact_one_at_a_time[interaction_type]) {
-		return config_get_int("common_depletion");	// shortcut
+	if (!interact_data[interaction_type].one_at_a_time) {
+		return DEPLETION_LIMIT(room);	// shortcut
 	}
 	
 	highest = get_interaction_depletion(ch, emp, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, require_storable);

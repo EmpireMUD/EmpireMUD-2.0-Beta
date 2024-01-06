@@ -198,7 +198,7 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 		next_inter = inter->next;
 		
 		// deleted!
-		if (interact_vnum_types[inter->type] == vnum_type && inter->vnum == vnum) {
+		if (interact_data[inter->type].vnum_type == vnum_type && inter->vnum == vnum) {
 			found = TRUE;
 			LL_DELETE(*list, inter);
 			inter->next = NULL;	// freed as a list
@@ -843,7 +843,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			any = TRUE;
 		}
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -869,7 +869,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		for (inter = GET_BLD_INTERACTIONS(bld); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 			}
@@ -891,7 +891,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		for (inter = GET_CROP_INTERACTIONS(crop); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
@@ -903,7 +903,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		any = FALSE;
 		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -922,7 +922,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
 		for (inter = mob->interactions; inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
@@ -974,7 +974,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
@@ -993,7 +993,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		for (inter = GET_SECT_INTERACTIONS(sect); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
@@ -1033,7 +1033,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		for (inter = VEH_INTERACTIONS(veh); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 			}

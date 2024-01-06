@@ -260,11 +260,6 @@ struct alias_data {
 #define SCMD_EINVENTORY	0
 #define SCMD_EIDENTIFY	1
 
-// do_toggle
-#define TOG_ONOFF  0
-#define TOG_OFFON  1
-#define NUM_TOG_TYPES  2
-
 // do_warehouse
 #define SCMD_WAREHOUSE  0
 #define SCMD_HOME  1

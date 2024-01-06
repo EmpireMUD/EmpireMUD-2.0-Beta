@@ -1359,7 +1359,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			any = TRUE;
 		}
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1415,7 +1415,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
 		for (inter = GET_BLD_INTERACTIONS(bld); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
@@ -1456,7 +1456,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		any = FALSE;
 		for (inter = GET_CROP_INTERACTIONS(crop); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
@@ -1491,7 +1491,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		any = FALSE;
 		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -1510,7 +1510,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
 		for (inter = mob->interactions; inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
@@ -1530,7 +1530,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		any = FALSE;
 		for (inter = GET_OBJ_INTERACTIONS(obj); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
@@ -1590,7 +1590,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
@@ -1602,7 +1602,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		any = FALSE;
 		for (inter = GET_SECT_INTERACTIONS(sect); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
@@ -1652,7 +1652,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));

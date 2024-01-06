@@ -3632,7 +3632,6 @@ Available functions:
  BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
- DIGGING - triggers the workforce digging chore (also need interaction)
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships
  FORGE - can use the forge command here
  GLASSBLOWER - required for some crafts

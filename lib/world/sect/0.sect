@@ -46,15 +46,15 @@ E
 8 0 100.00 13
 E
 9 0 33.33 39
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 U
 0
 The grassy plains seem to come to life!~
@@ -99,16 +99,16 @@ E
 4 0 0.80 2
 E
 9 0 50.00 2
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -156,16 +156,16 @@ E
 4 0 0.80 3
 E
 9 0 50.00 3
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -212,16 +212,16 @@ E
 4 0 0.20 4
 E
 9 0 50.00 4
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -289,16 +289,16 @@ E
 3 29 0.80 29
 E
 20 40320 0.01 90
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -332,15 +332,15 @@ D4
 &c~
 E
 7 57 1.00 53
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 The river starts to burble and flow.~
@@ -434,14 +434,14 @@ D0
 &B~
 I 10 9019 5.00 1  # ENCOUNTER: shark
 I 10 9232 0.05 1  # ENCOUNTER: box jellyfish
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1302 25.00 1 f  # FISH: giant linefish
-I 21 1303 25.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1302 25.00 125 f  # FISH: giant linefish
+I 21 1303 25.00 125 f  # FISH: magenta arrowfish
+I 21 1301 100.00 125 f  # FISH: striped barbfish
 X
 ocean water horizon around~
    You are surrounded by a seemingly endless expanse of open ocean, the horizon
@@ -473,9 +473,9 @@ E
 16 0 100.00 0
 E
 19 0 100.00 0
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
 U
 0
 The crop grows with astounding speed!~
@@ -502,11 +502,11 @@ E
 2 32 10.00 58
 E
 2 57 10.00 52
-I 5 106 4.00 1 X  # DIG: rough piece of obsidian
-I 5 104 8.00 1 X  # DIG: red bloodstone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 100.00 1  # FORAGE: red berries
+I 5 106 4.00 125 X  # DIG: rough piece of obsidian
+I 5 104 8.00 125 X  # DIG: red bloodstone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 100.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1202 100.00 125 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
@@ -606,9 +606,9 @@ E
 16 0 100.00 20
 E
 19 0 100.00 20
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
 U
 0
 The crop grows with astounding speed!~
@@ -630,9 +630,9 @@ E
 16 0 100.00 0
 E
 19 0 100.00 0
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3003 100.00 1  # FORAGE: handful of grain
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3003 100.00 25  # FORAGE: handful of grain
 X
 field seeded seeds plants crop around~
    You find yourself standing in a vast field of dirt, recently turned over in
@@ -661,10 +661,10 @@ E
 16 0 100.00 20
 E
 19 0 100.00 20
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 6 3014 100.00 25  # FORAGE: dry beans
 X
 field seeded seeds plants crop desert around~
    You are standing in a parched desert landscape, but amidst the sandy
@@ -695,8 +695,8 @@ E
 16 0 100.00 0
 E
 19 0 100.00 27
-I 6 3017 100.00 1  # FORAGE: plump fig
-I 9 133 100.00 1  # GATHER: tangle of vines
+I 6 3017 100.00 25  # FORAGE: plump fig
+I 9 133 100.00 50  # GATHER: tangle of vines
 X
 field seeded seeds plants crop jungle around~
    You have come upon a small clearing, where you can see that the verdant
@@ -756,9 +756,9 @@ D4
 &0~
 E
 6 0 100.00 19
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
 X
 trench canal moat ground around~
    You find yourself standing on the edge of a trench that has been
@@ -853,16 +853,16 @@ E
 9 0 50.00 25
 E
 26 268435456 4.00 70
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 50.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 50.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
-I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
 U
 0
 The desert seems to come to life!~
@@ -895,16 +895,16 @@ E
 17 20 2.00 25
 E
 26 268435456 4.00 88
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 25.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 25.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
 U
 0
 Water springs from the ground and bushes begin to grow in an instant!~
@@ -937,9 +937,9 @@ D4
 &y~
 E
 6 0 100.00 85
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 107 100.00 1 X  # DIG: bag of sand
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 107 100.00 125 X  # DIG: bag of sand
 X
 trench sandy down around~
    A trench has been dug into the desert, its edges rough and uneven. It
@@ -992,17 +992,17 @@ E
 23 0 100.00 20
 E
 26 268435456 4.00 73
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 50.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 50.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 46.00 1 g  # GATHER: bundle of long leaves
-I 9 132 46.00 1 g  # GATHER: thorny branches
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 46.00 50 g  # GATHER: bundle of long leaves
+I 9 132 46.00 50 g  # GATHER: thorny branches
 X
 stumps trees grove around~
    The harsh desert terrain is marred by a series of stumps where a small grove
@@ -1048,17 +1048,17 @@ E
 9 0 50.00 26
 E
 26 268435456 4.00 74
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3016 50.00 1  # FORAGE: handful of dates
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3016 50.00 25  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 46.00 1 g  # GATHER: bundle of long leaves
-I 9 132 46.00 1 g  # GATHER: thorny branches
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 46.00 50 g  # GATHER: bundle of long leaves
+I 9 132 46.00 50 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
 U
 0
@@ -1103,17 +1103,17 @@ E
 9 0 50.00 26
 E
 26 268435456 4.00 74
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3016 50.00 1  # FORAGE: handful of dates
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3016 50.00 25  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 46.00 1 g  # GATHER: bundle of long leaves
-I 9 132 46.00 1 g  # GATHER: thorny branches
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 46.00 50 g  # GATHER: bundle of long leaves
+I 9 132 46.00 50 g  # GATHER: thorny branches
 I 20 134 100.00 1  # CHOP: thorny sapling
 U
 0
@@ -1149,20 +1149,17 @@ E
 2 57 10.00 51
 E
 26 268435456 4.00 71
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3016 50.00 1  # FORAGE: handful of dates
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3016 50.00 25  # FORAGE: handful of dates
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 132 85.00 1 g  # GATHER: thorny branches
-I 9 134 15.00 1 g  # GATHER: thorny sapling
-I 20 122 5.00 4 c  # CHOP: rough wood
-I 20 122 10.00 3 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 35.00 1 c  # CHOP: rough wood
+I 9 132 85.00 50 g  # GATHER: thorny branches
+I 9 134 15.00 50 g  # GATHER: thorny sapling
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 The scraggly trees unfold leaf after leaf as they grow larger and larger!~
@@ -1212,8 +1209,8 @@ E
 9 0 50.00 28
 E
 15 0 1.00 34
-I 6 3017 33.00 1  # FORAGE: plump fig
-I 9 133 100.00 1  # GATHER: tangle of vines
+I 6 3017 33.00 25  # FORAGE: plump fig
+I 9 133 100.00 50  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
 U
 0
@@ -1270,8 +1267,8 @@ E
 17 4 0.50 27
 E
 17 90 0.70 27
-I 6 3017 33.00 1  # FORAGE: plump fig
-I 9 133 100.00 1  # GATHER: tangle of vines
+I 6 3017 33.00 25  # FORAGE: plump fig
+I 9 133 100.00 50  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
 U
 0
@@ -1309,16 +1306,16 @@ E
 11 5 4.00 27
 E
 15 0 5.00 34
-I 6 3310 50.00 1  # FORAGE: wood ear mushroom
+I 6 3310 50.00 25  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1316 25.00 1 f  # FISH: small gator
-I 21 1314 100.00 1 f  # FISH: fat catfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
 M
 264 10.00 ace
 X
@@ -1339,7 +1336,7 @@ The Arctic Tundra~
 D0
 ,,,,~
 &W~
-I 6 3000 100.00 1  # FORAGE: handful of lichen
+I 6 3000 100.00 25  # FORAGE: handful of lichen
 M
 9178 0.03 g
 M
@@ -1372,14 +1369,14 @@ D0
 &c~
 E
 15 0 25.00 33
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1314 25.00 1 f  # FISH: fat catfish
-I 21 1315 25.00 1 f  # FISH: yellow perch
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1314 25.00 125 f  # FISH: fat catfish
+I 21 1315 25.00 125 f  # FISH: yellow perch
+I 21 1312 100.00 125 f  # FISH: speckled trout
 U
 0
 The sparkling waters of the lake start to shimmer.~
@@ -1430,7 +1427,7 @@ E
 4 0 1.20 2
 E
 9 0 50.00 27
-I 9 133 100.00 1  # GATHER: tangle of vines
+I 9 133 100.00 50  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
 X
 jungle damaged frost-damaged dead trees forest around~
@@ -1463,16 +1460,16 @@ E
 9 0 25.00 27
 E
 10 32 4.00 27
-I 6 3310 50.00 1  # FORAGE: wood ear mushroom
+I 6 3310 50.00 25  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1316 25.00 1 f  # FISH: small gator
-I 21 1314 100.00 1 f  # FISH: fat catfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1316 25.00 125 f  # FISH: small gator
+I 21 1314 100.00 125 f  # FISH: fat catfish
 M
 264 10.00 ace
 X
@@ -1531,10 +1528,10 @@ E
 16 0 100.00 0
 E
 23 0 100.00 0
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 X
 stumps field forest trees around~
    The plain is littered with stumps where the trees have been cut down. The
@@ -1578,10 +1575,10 @@ E
 4 0 0.80 38
 E
 9 0 50.00 38
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -1630,10 +1627,10 @@ E
 4 0 0.40 2
 E
 9 0 50.00 2
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -1682,10 +1679,10 @@ E
 4 0 0.80 1
 E
 9 0 50.00 1
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
 U
 0
@@ -1745,15 +1742,15 @@ E
 10 5 10.00 0
 E
 12 0 25.00 41
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 X
 plains riverbank bank water around~
    The riverbank is soft and muddy underfoot, with waterlogged earth and thick
@@ -1787,15 +1784,15 @@ I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
+I 22 174 5.00 25  # PAN: small flake of gold
 X
 plains flooding flooded water around river~
    As you stand on the edge of the river, you see vast plains stretching out
@@ -1830,21 +1827,21 @@ E
 14 0 20.00 44
 E
 15 0 20.00 44
-I 6 3015 75.00 1  # FORAGE: red berries
+I 6 3015 75.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 120 100.00 1  # CHOP: large tree
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 A tree rises from the water, toward the sky!~
@@ -1878,21 +1875,21 @@ E
 14 0 20.00 45
 E
 15 0 20.00 45
-I 6 3015 75.00 1  # FORAGE: red berries
+I 6 3015 75.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 120 100.00 1  # CHOP: large tree
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 A tree rises from the water and unfolds its canopy in the sky!~
@@ -1939,7 +1936,7 @@ D4
 E
 0 0 100.00 46
 E
-3 29 0.80 29
+2 29 0.80 29
 E
 4 0 1.00 45
 E
@@ -1948,16 +1945,16 @@ E
 10 5 10.00 1
 E
 12 0 25.00 42
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -2004,21 +2001,21 @@ D4
 E
 0 0 100.00 44
 E
-3 29 0.80 29
+2 29 0.80 29
 E
 10 5 10.00 2
 E
 12 0 25.00 43
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -2062,10 +2059,10 @@ E
 16 0 100.00 40
 E
 23 0 100.00 40
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 100.00 1 X  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 100.00 125 X  # DIG: lump of clay
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -2115,7 +2112,7 @@ E
 E
 0 0 100.00 47
 E
-3 29 0.80 29
+2 29 0.80 29
 E
 4 0 0.40 44
 E
@@ -2124,10 +2121,10 @@ E
 10 5 10.00 37
 E
 12 0 25.00 42
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 100.00 1 X  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 100.00 125 X  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -2181,10 +2178,10 @@ E
 8 0 100.00 13
 E
 10 57 5.00 0
-I 5 107 75.00 1 x  # DIG: bag of sand
-I 5 101 25.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 107 75.00 125 x  # DIG: bag of sand
+I 5 101 25.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2223,11 +2220,11 @@ E
 10 57 5.00 20
 E
 26 268435456 4.00 70
-I 5 103 8.00 1 x  # DIG: yellow lightning stone
-I 5 107 71.00 1 x  # DIG: bag of sand
-I 5 101 21.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 103 8.00 125 x  # DIG: yellow lightning stone
+I 5 107 71.00 125 x  # DIG: bag of sand
+I 5 101 21.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2266,11 +2263,11 @@ D4
 &y~
 E
 10 57 5.00 8
-I 5 106 4.00 1 X  # DIG: rough piece of obsidian
-I 5 104 8.00 1 X  # DIG: red bloodstone
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3015 100.00 1  # FORAGE: red berries
+I 5 106 4.00 125 X  # DIG: rough piece of obsidian
+I 5 104 8.00 125 X  # DIG: red bloodstone
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3015 100.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1202 100.00 125 p  # PICK: twig of redthorn
 I+ 0 70  # Ability: Find Herbs
@@ -2294,17 +2291,17 @@ D0
 &a~
 E
 11 57 5.00 5
-I 21 3052 8.00 1 f  # FISH: clam
-I 21 3051 8.00 1 f  # FISH: sea urchin
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
-I 22 174 5.00 1  # PAN: small flake of gold
+I 21 3052 8.00 125 f  # FISH: clam
+I 21 3051 8.00 125 f  # FISH: sea urchin
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1311 25.00 125 f  # FISH: spotted eel
+I 21 1313 25.00 125 f  # FISH: bright red leaping fish
+I 21 1312 100.00 125 f  # FISH: speckled trout
+I 22 174 5.00 25  # PAN: small flake of gold
 U
 0
 The waters start to flow.~
@@ -2354,17 +2351,17 @@ E
 0 1 100.00 59
 E
 10 57 5.00 1
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3051 40.00 1 x  # FORAGE: sea urchin
-I 6 3052 40.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3051 40.00 25 x  # FORAGE: sea urchin
+I 6 3052 40.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
 U
 0
@@ -2399,14 +2396,14 @@ E
 8 0 100.00 15
 E
 10 57 5.00 27
-I 6 3051 40.00 1 x  # FORAGE: sea urchin
-I 6 3052 40.00 1 x  # FORAGE: clam
+I 6 3051 40.00 25 x  # FORAGE: sea urchin
+I 6 3052 40.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 133 85.00 1 g  # GATHER: tangle of vines
-I 9 135 15.00 1 g  # GATHER: reaching sapling
+I 9 133 85.00 50 g  # GATHER: tangle of vines
+I 9 135 15.00 50 g  # GATHER: reaching sapling
 I 20 128 100.00 1  # CHOP: massive jungle tree
 U
 0
@@ -2447,11 +2444,11 @@ E
 8 0 100.00 13
 E
 10 53 5.00 0
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2473,14 +2470,14 @@ The Shallow Sea, Near the Coast~
 D0
 ~~~~~
 &a~
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1305 0.25 1 f  # FISH: worn old statuette
-I 21 256 0.25 1 f  # FISH: hestian trinket
-I 21 262 0.25 1 f  # FISH: trinket of conveyance
-I 21 1304 5.00 1 f  # FISH: sea junk
-I 21 1302 25.00 1 f  # FISH: giant linefish
-I 21 1303 25.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1305 0.25 125 f  # FISH: worn old statuette
+I 21 256 0.25 125 f  # FISH: hestian trinket
+I 21 262 0.25 125 f  # FISH: trinket of conveyance
+I 21 1304 5.00 125 f  # FISH: sea junk
+I 21 1302 25.00 125 f  # FISH: giant linefish
+I 21 1303 25.00 125 f  # FISH: magenta arrowfish
+I 21 1301 100.00 125 f  # FISH: striped barbfish
 U
 0
 The water seems to come to life!~
@@ -2513,15 +2510,15 @@ D4
 &0~
 E
 8 0 100.00 13
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 U
 0
 The grassy hills seem to come to life!~
@@ -2578,11 +2575,11 @@ E
 16 0 100.00 50
 E
 23 0 100.00 50
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2638,11 +2635,11 @@ E
 9 0 50.00 54
 E
 10 57 5.00 37
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 100.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 101 100.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2709,7 +2706,7 @@ E
 16 0 100.00 0
 E
 23 0 100.00 0
-I 6 3017 33.00 1  # FORAGE: plump fig
+I 6 3017 33.00 25  # FORAGE: plump fig
 X
 vined densely field stumps jungle trees forest around~
    You step into a clearing amidst the dense jungle, only to find it marred by
@@ -2758,7 +2755,7 @@ E
 9 0 50.00 27
 E
 15 0 1.00 34
-I 6 3017 33.00 1  # FORAGE: plump fig
+I 6 3017 33.00 25  # FORAGE: plump fig
 I 20 135 100.00 1  # CHOP: reaching sapling
 U
 0
@@ -2796,8 +2793,8 @@ E
 16 0 100.00 50
 E
 23 0 100.00 50
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2835,8 +2832,8 @@ E
 9 0 50.00 55
 E
 10 57 5.00 62
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -2883,7 +2880,7 @@ E
 9 0 50.00 27
 E
 15 0 1.00 34
-I 6 3017 33.00 1  # FORAGE: plump fig
+I 6 3017 33.00 25  # FORAGE: plump fig
 I 20 135 100.00 1  # CHOP: reaching sapling
 X
 jungle edge trees forest grassland plains around~
@@ -2924,19 +2921,19 @@ E
 9 0 50.00 71
 E
 27 268435456 4.00 20
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
 U
 0
 The irrigated field seems to come to life!~
@@ -2977,19 +2974,19 @@ E
 9 0 50.00 79
 E
 27 268435456 4.00 26
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1 c  # CHOP: large tree
 U
 0
@@ -3035,21 +3032,20 @@ E
 0 0 100.00 72
 E
 27 268435456 4.00 26
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 123 85.00 1 g  # GATHER: small flower
-I 9 135 15.00 1 g  # GATHER: reaching sapling
-I 20 128 50.00 1 c  # CHOP: massive jungle tree
-I 20 128 50.00 2 c  # CHOP: massive jungle tree
+I 9 123 85.00 50 g  # GATHER: small flower
+I 9 135 15.00 50 g  # GATHER: reaching sapling
+I 20 128 100.00 1 c  # CHOP: massive jungle tree
 U
 0
 Whole trees curl up from the soil, fully-grown in seconds!~
@@ -3087,19 +3083,19 @@ E
 23 0 100.00 70
 E
 27 268435456 4.00 23
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
 X
 stumps field trees forest irrigated irrigation canal around~
    You walk through an irrigated field where stumps of trees lie scattered
@@ -3138,11 +3134,11 @@ E
 9 0 50.00 71
 E
 27 268435456 4.00 24
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -3186,11 +3182,11 @@ E
 23 0 100.00 70
 E
 27 268435456 4.00 23
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -3241,11 +3237,11 @@ E
 9 0 50.00 72
 E
 27 268435456 4.00 24
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -3286,9 +3282,9 @@ E
 19 0 100.00 70
 E
 27 268435456 4.00 20
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3003 100.00 1  # FORAGE: handful of grain
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3003 100.00 25  # FORAGE: handful of grain
 X
 field planted plants seeds irrigated irrigation around~
    You stand in a vast field, surrounded by the endless expanse of desert. But
@@ -3313,9 +3309,9 @@ E
 19 0 100.00 70
 E
 27 268435456 4.00 20
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
 U
 0
 The crop grows with astounding speed!~
@@ -3356,19 +3352,19 @@ E
 0 0 100.00 79
 E
 27 268435456 4.00 26
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 45.83 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1 c  # CHOP: large tree
 U
 0
@@ -3406,20 +3402,18 @@ E
 17 20 2.00 25
 E
 26 268435456 4.00 89
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 25.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 25.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 15.00 1 g  # GATHER: thorny sapling
-I 9 139 50.00 1 g  # GATHER: bundle of long leaves
-I 9 132 35.00 1 g  # GATHER: thorny branches
-I 20 122 85.00 2 c  # CHOP: rough wood
-I 20 122 10.00 3 c  # CHOP: rough wood
-I 20 122 5.00 4 c  # CHOP: rough wood
+I 9 134 15.00 50 g  # GATHER: thorny sapling
+I 9 139 50.00 50 g  # GATHER: bundle of long leaves
+I 9 132 35.00 50 g  # GATHER: thorny branches
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 Thirsty trees rise from the rich soil around the oasis!~
@@ -3447,20 +3441,18 @@ E
 17 20 2.00 25
 E
 26 268435456 4.00 89
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 25.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 25.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 132 35.00 1 g  # GATHER: thorny branches
-I 9 134 15.00 1 g  # GATHER: thorny sapling
-I 9 139 50.00 1 g  # GATHER: bundle of long leaves
-I 20 122 25.00 2 c  # CHOP: rough wood
-I 20 122 25.00 3 c  # CHOP: rough wood
-I 20 122 50.00 4 c  # CHOP: rough wood
+I 9 132 35.00 50 g  # GATHER: thorny branches
+I 9 134 15.00 50 g  # GATHER: thorny sapling
+I 9 139 50.00 50 g  # GATHER: bundle of long leaves
+I 20 122 100.00 3 c  # CHOP: rough wood
 U
 0
 Bushy trees grow around the oasis and encircle it!~
@@ -3501,16 +3493,16 @@ E
 22 0 0.50 21
 E
 26 268435456 4.00 88
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 50.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 50.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1204 100.00 125 p  # PICK: daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
-I 9 134 8.00 1 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
 U
 0
 The desert seems to come to life!~
@@ -3544,10 +3536,10 @@ E
 16 0 100.00 21
 E
 19 0 100.00 21
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 6 3014 100.00 25  # FORAGE: dry beans
 X
 oasis planted crops water around~
    You stand on the edge of an oasis in the desert, surrounded by
@@ -3569,9 +3561,9 @@ E
 16 0 100.00 21
 E
 19 0 100.00 21
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 100 100.00 125 X  # DIG: rock
 U
 0
 The crop grows with astounding speed!~
@@ -3616,9 +3608,9 @@ D4
 &y~
 E
 6 0 100.00 87
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 107 100.00 1 X  # DIG: bag of sand
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 107 100.00 125 X  # DIG: bag of sand
 X
 trench damp dirt soil down around desert~
    You find yourself standing next to a damp trench. The trench has been dug in
@@ -3673,16 +3665,16 @@ E
 17 70 2.00 74
 E
 27 268435456 4.00 80
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
 U
 0
 Water springs from the ground and bushes begin to grow in an instant!~
@@ -3705,28 +3697,24 @@ D0
 &g^&C~~&g^~
 &G~
 E
-0 0 50.00 88
-E
-0 0 100.00 89
+0 0 100.00 88
 E
 17 20 2.00 25
 E
 17 70 2.00 74
 E
 27 268435456 4.00 81
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 134 8.00 1 g  # GATHER: thorny sapling
-I 9 139 92.00 1 g  # GATHER: bundle of long leaves
-I 20 122 25.00 2 c  # CHOP: rough wood
-I 20 122 50.00 3 c  # CHOP: rough wood
-I 20 122 25.00 4 c  # CHOP: rough wood
+I 9 134 8.00 50 g  # GATHER: thorny sapling
+I 9 139 92.00 50 g  # GATHER: bundle of long leaves
+I 20 122 100.00 3 c  # CHOP: rough wood
 U
 0
 Whole trees grow around the oasis and begin to cover the sky as their leaves unfurl!~
@@ -3803,13 +3791,13 @@ E
 17 70 0.60 71
 E
 17 0 0.60 39
-I 6 3015 25.00 1  # FORAGE: red berries
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 16.66 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 137 100.00 1  # CHOP: ancient tree
 X
 forest trees old-growth oldgrowth growth plants around up~
@@ -3839,10 +3827,10 @@ E
 16 0 100.00 82
 E
 19 0 100.00 82
-I 5 101 15.00 1 X  # DIG: lump of clay
-I 5 100 100.00 1 X  # DIG: rock
-I 5 103 8.00 1 X  # DIG: yellow lightning stone
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 5 101 15.00 125 X  # DIG: lump of clay
+I 5 100 100.00 125 X  # DIG: rock
+I 5 103 8.00 125 X  # DIG: yellow lightning stone
+I 6 3014 100.00 25  # FORAGE: dry beans
 X
 field seeded seeds plants crop desert around~
    You are standing in a parched desert landscape, but amidst the sandy

@@ -9,8 +9,8 @@ E
 4 0 5.00 5
 E
 9 0 100.00 5
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -42,8 +42,8 @@ E
 4 0 5.00 53
 E
 9 0 100.00 53
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -70,8 +70,8 @@ E
 4 0 5.00 19
 E
 9 0 100.00 19
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -98,8 +98,8 @@ E
 4 0 5.00 32
 E
 9 0 100.00 32
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -127,8 +127,8 @@ E
 4 0 5.00 85
 E
 9 0 100.00 85
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -155,8 +155,8 @@ E
 4 0 5.00 87
 E
 9 0 100.00 87
-I 6 10562 95.00 1 F  # FORAGE: handful of red and green seeds
-I 6 10563 5.00 1 F  # FORAGE: seed of pure ice
+I 6 10562 95.00 25 F  # FORAGE: handful of red and green seeds
+I 6 10563 5.00 25 F  # FORAGE: seed of pure ice
 M
 9178 0.03 g
 M
@@ -196,14 +196,14 @@ E
 4 0 0.80 10563
 E
 9 0 50.00 10563
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 10552 75.00 1  # FORAGE: arctic brambleberries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 10552 75.00 25  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 10558 100.00 1  # CHOP: spruce tree
 M
 10556 5.00 0
@@ -270,14 +270,14 @@ E
 4 0 0.80 10564
 E
 9 0 50.00 10564
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 10552 75.00 1  # FORAGE: arctic brambleberries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 10552 75.00 25  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 10558 100.00 1  # CHOP: spruce tree
 M
 10556 5.00 0
@@ -321,14 +321,14 @@ E
 4 0 0.20 10565
 E
 9 0 50.00 10565
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 10552 75.00 1  # FORAGE: arctic brambleberries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 10552 75.00 25  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 10558 100.00 1  # CHOP: spruce tree
 M
 10556 5.00 0
@@ -372,15 +372,15 @@ E
 17 4 0.01 10565
 E
 17 0 0.10 10562
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
-I 6 10552 75.00 1  # FORAGE: arctic brambleberries
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
+I 6 10552 75.00 25  # FORAGE: arctic brambleberries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 100.00 1  # GATHER: sticks and leaves
-I 20 10558 100.00 1  # CHOP: spruce tree
+I 9 121 100.00 50  # GATHER: sticks and leaves
+I 20 10558 100.00 2  # CHOP: spruce tree
 M
 10556 5.00 0
 M
@@ -437,9 +437,9 @@ E
 16 0 100.00 0
 E
 23 0 100.00 0
-I 5 10552 9.00 1 X  # DIG: arctic brambleberries
-I 5 100 100.00 1 X  # DIG: rock
-I 6 3013 75.00 1  # FORAGE: handful of nuts
+I 5 10552 9.00 125 X  # DIG: arctic brambleberries
+I 5 100 100.00 125 X  # DIG: rock
+I 6 3013 75.00 25  # FORAGE: handful of nuts
 M
 10556 5.00 0
 M

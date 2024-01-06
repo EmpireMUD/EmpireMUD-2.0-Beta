@@ -15,7 +15,7 @@ D3
 D4
 .&j'|&?.~
 &y~
-I 6 10147 100.00 1  # FORAGE: spiny red fruit
+I 6 10147 100.00 25  # FORAGE: spiny red fruit
 I 7 10146 100.00 14  # PICK: basket of saguaro fruit
 I 20 10149 100.00 1  # CHOP: fallen saguaro cactus
 M
@@ -82,11 +82,10 @@ D4
 D4
 .&j^&?..~
 &y~
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 10152 100.00 28  # PICK: handful of mesquite pods
-I 9 132 100.00 1  # GATHER: thorny branches
-I 20 10151 50.00 2 c  # CHOP: mesquite tree
-I 20 10151 50.00 1 c  # CHOP: mesquite tree
+I 9 132 100.00 50  # GATHER: thorny branches
+I 20 10151 100.00 2 c  # CHOP: mesquite tree
 M
 10150 5.00 a
 M
@@ -143,10 +142,9 @@ D0
 D0
 .&G^&bo&?.~
 &y~
-I 6 10154 100.00 1  # FORAGE: ripe alligator pear
+I 6 10154 100.00 25  # FORAGE: ripe alligator pear
 I 7 10153 100.00 14  # PICK: basket of alligator pears
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M
@@ -200,10 +198,9 @@ D0
 D0
 .&l^o&?.~
 &y~
-I 6 10156 100.00 1  # FORAGE: single ripe lime
+I 6 10156 100.00 25  # FORAGE: single ripe lime
 I 7 10155 100.00 14  # PICK: basket of limes
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M
@@ -270,7 +267,7 @@ ww&Ro&?w~
 D0
 www&Ro~
 &G~
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 8 10157 16.67 2 H  # HARVEST: maroon firemelon
 I 8 10157 16.67 3 H  # HARVEST: maroon firemelon
 I 8 10157 16.66 4 H  # HARVEST: maroon firemelon

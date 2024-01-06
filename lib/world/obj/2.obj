@@ -87,7 +87,7 @@ Some bricks are piled on the ground.~
    These bricks have been made from fired clay, with holes in the middle to
 reduce the weight. You can use the bricks for building.
 ~
-3 el a 0 0 6
+3 el a 0 0 7
 0 0 0
 6 0
 C
@@ -101,6 +101,8 @@ $n puts down a layer of bricks.~
 O+ 1 6076
 R
 4 5117 0
+R
+4 5110 0
 S
 #258
 pipe peace~

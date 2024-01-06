@@ -1260,6 +1260,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
 #define GET_GRANT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->grants))
 #define GET_GROUP_INVITE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->group_invite_by))
+#define GET_HIGHEST_KNOWN_GREATNESS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_greatness))
 #define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
 #define GET_HISTORY(ch, type)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->channel_history[(type)]))
 #define GET_HOME_STORAGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_storage))
@@ -2038,6 +2039,7 @@ bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int di
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
 bitvector_t get_climate(room_data *room);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
+int get_depletion_max(room_data *room, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
 char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);

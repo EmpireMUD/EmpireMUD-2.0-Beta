@@ -700,7 +700,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_INT("citizensover", cits_over, 0, INT_MAX)
 		FULLSEARCH_INT("citizensunder", cits_under, 0, INT_MAX)
 		FULLSEARCH_STRING("commands", only_commands)
-		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_types)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
@@ -937,7 +937,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1051,7 +1051,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			any = TRUE;
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}

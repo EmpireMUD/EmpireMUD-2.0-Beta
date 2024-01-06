@@ -6124,6 +6124,49 @@ bitvector_t get_climate(room_data *room) {
 
 
 /**
+* Determines the maximum depletion amount the interactions in a given room
+* allow.
+*
+* @param room_data *room Which room (to find interactions in).
+* @param int depletion_type Which depletion we're looking for.
+* @return int Detected deletion cap if any; -1 if not detected.
+*/
+int get_depletion_max(room_data *room, int depletion_type) {
+	int iter, list_size, max, best = -1;
+	struct interaction_item *interact, *list[4] = { NULL, NULL, NULL, NULL };
+	
+	if (!room) {
+		return best;
+	}
+	
+	// build lists of interactions to check
+	list_size = 0;
+	list[list_size++] = GET_SECT_INTERACTIONS(SECT(room));
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) {
+		list[list_size++] = GET_CROP_INTERACTIONS(ROOM_CROP(room));
+	}
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		list[list_size++] = GET_BLD_INTERACTIONS(GET_BUILDING(room));
+	}
+	if (GET_ROOM_TEMPLATE(room)) {
+		list[list_size++] = GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room));
+	}
+	
+	// check all lists
+	for (iter = 0; iter < list_size; ++iter) {
+		LL_FOREACH(list[iter], interact) {
+			if (determine_depletion_type(interact) == depletion_type) {
+				max = interact_data[interact->type].one_at_a_time ? interact->quantity : DEPLETION_LIMIT(room);
+				best = MAX(best, max);
+			}
+		}
+	}
+	
+	return best;
+}
+
+
+/**
 * This finds the ultimate map point for a given room, resolving any number of
 * layers of boats and home rooms.
 *

@@ -617,7 +617,7 @@ void disassociate_building(room_data *room) {
 		
 	// also check for missing crop data
 	if (SECT_FLAGGED(SECT(room), SECTF_HAS_CROP_DATA | SECTF_CROP) && !ROOM_CROP(room)) {
-		crop_data *new_crop = get_potential_crop_for_location(room, FALSE);
+		crop_data *new_crop = get_potential_crop_for_location(room, NOTHING);
 		set_crop_type(room, new_crop ? new_crop : crop_table);
 	}
 	

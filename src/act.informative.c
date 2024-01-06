@@ -2171,7 +2171,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
 		else {
-			get_player_skill_string(ch, part, TRUE);
+			get_player_skill_string(ch, part, !screenreader);
 			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], part, screenreader ? show_role : "\t0");
 		}
 	}
@@ -4153,12 +4153,14 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char buf[MAX_STRING_LENGTH];
+	char line[1024];
+	char *temp;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
-	int ter_type, base_height, mod_height;
+	int max, prc, ter_type, base_height, mod_height;
 	bool junk, large_radius;
+	struct depletion_data *dep;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
@@ -4213,6 +4215,32 @@ ACMD(do_survey) {
 		}
 		if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "It's on fire!\r\n");
+		}
+	}
+	
+	// depletion
+	*buf = '\0';
+	LL_FOREACH(ROOM_DEPLETION(IN_ROOM(ch)), dep) {
+		if (dep->count > 0 && *depletion_strings[dep->type] && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
+			strcpy(line, depletion_strings[dep->type]);
+			prc = dep->count * 100 / max;
+			prc = MIN(100, MAX(1, prc)) / 25;
+			temp = str_replace("$$", depletion_levels[prc], line);
+			
+			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
+			free(temp);
+		}
+	}
+	if (*buf) {
+		// add an "and"
+		if ((temp = strrchr(buf, ',')) && temp != strchr(buf, ',')) {
+			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp + 1);
+		}
+		else if (temp) {
+			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf), (int)(temp-buf), buf, temp + 1);
+		}
+		else {	// no comma
+			msg_to_char(ch, "It looks like someone has %s.\r\n", buf);
 		}
 	}
 	
@@ -4696,10 +4724,11 @@ ACMD(do_whoami) {
 
 
 ACMD(do_whois) {
-	char part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], friend_part[256];
 	char_data *victim = NULL;
 	bool file = FALSE;
 	int level, diff, math;
+	struct friend_data *friend;
 
 	skip_spaces(&argument);
 
@@ -4715,10 +4744,23 @@ ACMD(do_whois) {
 	// load remaining data
 	check_delayed_load(victim);
 	
+	// friend portion
+	if (!PRF_FLAGGED(victim, PRF_NO_FRIENDS) && (friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(victim))) && friend->status == FRIEND_FRIENDSHIP) {
+		if (strcmp(friend->original_name, GET_NAME(victim))) {
+			snprintf(friend_part, sizeof(friend_part), " (friends, alt of %s)", friend->original_name);
+		}
+		else {
+			snprintf(friend_part, sizeof(friend_part), " (friends)");
+		}
+	}
+	else {
+		*friend_part = '\0';
+	}
+	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
 	sprinttype(GET_REAL_SEX(victim), genders, part, sizeof(part), "UNDEFINED");
-	msg_to_char(ch, "Status: %s %s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
+	msg_to_char(ch, "Status: %s %s%s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1], friend_part);
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {

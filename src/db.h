@@ -293,6 +293,7 @@ void remove_player_from_account(char_data *ch);
 // account friends
 bool add_account_friend_id(account_data *acct, int acct_id, int status, char *name);
 void check_friends(char_data *ch);
+struct friend_data *find_account_friend(account_data *acct, int acct_id);
 void free_account_friends(struct friend_data **hash);
 int has_pending_friend_requests(char_data *ch);
 
@@ -937,7 +938,7 @@ void finish_trench(room_data *room);
 void free_complex_data(struct complex_room_data *data);
 void free_shared_room_data(struct shared_room_data *data);
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
+crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact);
 #define get_world_filename(str, vnum, suffix)  sprintf(str, "%s%02d/%d%s", WLD_PREFIX, ((vnum) % 100), (vnum), NULLSAFE(suffix))
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
@@ -1009,6 +1010,7 @@ extern int max_players_this_uptime;
 
 // text file strings
 extern char *text_file_strings[NUM_TEXT_FILE_STRINGS];
+extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 
 // workforce.c
 extern struct empire_territory_data *global_next_territory_entry;

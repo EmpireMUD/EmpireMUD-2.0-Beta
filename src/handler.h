@@ -236,6 +236,7 @@ struct help_index_element *find_help_entry(int level, const char *word);
 // interaction handlers
 bool can_interact_room(room_data *room, int type);
 bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
+int determine_depletion_type(struct interaction_item *interact);
 struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);
 int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable);

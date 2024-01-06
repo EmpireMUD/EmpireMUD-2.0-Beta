@@ -179,9 +179,9 @@ available.
 ~
 F
 FI
-I 21 1311 25.00 1 f  # FISH: spotted eel
-I 21 1313 25.00 1 f  # FISH: bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1311 25.00 250 f  # FISH: spotted eel
+I 21 1313 25.00 250 f  # FISH: bright red leaping fish
+I 21 1312 100.00 250 f  # FISH: speckled trout
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
@@ -210,9 +210,9 @@ peaceful atmosphere.
 ~
 F
 FI
-I 21 1314 25.00 1 f  # FISH: fat catfish
-I 21 1315 25.00 1 f  # FISH: yellow perch
-I 21 1312 100.00 1 f  # FISH: speckled trout
+I 21 1314 25.00 250 f  # FISH: fat catfish
+I 21 1315 25.00 250 f  # FISH: yellow perch
+I 21 1312 100.00 250 f  # FISH: speckled trout
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
@@ -279,7 +279,7 @@ S
 Sand Pit~
 A Sand Pit~
 &Y|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig~
@@ -292,12 +292,16 @@ piles of sand nearby where people have deposited the sand they've dug up. The
 air is dry and the sun beats down on the sandy ground, making it almost too hot
 to touch. Despite the heat, it's a peaceful and quiet place.
 ~
-F
-f
-I 5 100 4.00 1 x  # DIG: rock
-I 5 102 4.00 1 x  # DIG: flint stone
-I 5 107 92.00 1 x  # DIG: bag of sand
+I 5 100 4.00 250 x  # DIG: rock
+I 5 102 4.00 250 x  # DIG: flint stone
+I 5 107 92.00 250 x  # DIG: bag of sand
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 100 4.00 250 X  # PRODUCTION: rock
+I+ 7 0  # Depletion: dig
+I 31 102 4.00 250 X  # PRODUCTION: flint stone
+I+ 7 0  # Depletion: dig
+I 31 107 92.00 250 X  # PRODUCTION: bag of sand
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S
@@ -365,7 +369,7 @@ path winding around~
 cleared trails, and rope bridges. Though it looks treacherous at a distance,
 the path is surprisingly well-planned and easy to follow.
 ~
-I 6 3015 100.00 1  # FORAGE: red berries
+I 6 3015 100.00 25  # FORAGE: red berries
 R
 1001 1 5 0
 R

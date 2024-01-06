@@ -653,7 +653,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		any |= (ABIL_COOLDOWN(abil) == vnum);
 		
 		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_LIQUID && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_LIQUID && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
