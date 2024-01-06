@@ -57,7 +57,7 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Has both CUMULATIVE-PRC and CHOOSE-LAST");
 		problem = TRUE;
 	}
-	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb)) {
+	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb) && GET_GLOBAL_MAX_LEVEL(glb) > 0) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Min level is greater than max level");
 		problem = TRUE;
 	}
