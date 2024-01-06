@@ -887,6 +887,8 @@ INTERACTION_FUNC(finish_chopping) {
 		}
 	}
 	
+	add_depletion(inter_room, DPLTN_CHOP, FALSE);
+	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
