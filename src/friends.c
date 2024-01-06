@@ -477,7 +477,7 @@ ACMD(do_friends_all) {
 		
 		// otherwise show it...
 		*color = '\0';
-		plr = find_online_friend(ch, friend->account_id);
+		plr = (friend->status == FRIEND_FRIENDSHIP ? find_online_friend(ch, friend->account_id) : NULL);
 		if (plr) {
 			nsize = snprintf(name, sizeof(name), "%s", GET_NAME(plr));
 		}
