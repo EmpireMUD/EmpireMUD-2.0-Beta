@@ -505,6 +505,10 @@ void delete_room(room_data *room, bool check_exits) {
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
 	
+	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+		remove_library_from_books(GET_ROOM_VNUM(room));
+	}
+	
 	// ensure not owned (and update empire stuff if so)
 	if ((emp = ROOM_OWNER(room))) {
 		if ((ter = find_territory_entry(emp, room))) {

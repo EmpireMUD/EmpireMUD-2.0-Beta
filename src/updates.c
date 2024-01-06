@@ -3594,9 +3594,11 @@ void b5_169_book_move(void) {
 	char_data *ch;
 	empire_data *emp, *next_emp;
 	obj_data *obj;
+	room_data *room;
 	player_index_data *index, *next_index;
 	struct author_data *author, *next_author;
 	struct empire_unique_storage *eus;
+	struct library_data *libr, *next_libr;
 	struct trading_post_data *tpd;
 	
 	// list to keep as-is
@@ -3733,6 +3735,17 @@ void b5_169_book_move(void) {
 		}
 		else {
 			queue_delayed_update(ch, CDU_SAVE);
+		}
+	}
+	
+	// and lastly, audit remaining books for invalid library locations
+	HASH_ITER(hh, book_table, book, next_book) {
+		LL_FOREACH_SAFE(book->in_libraries, libr, next_libr) {
+			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
+				// invalid location
+				LL_DELETE(book->in_libraries, libr);
+				free(libr);
+			}
 		}
 	}
 	

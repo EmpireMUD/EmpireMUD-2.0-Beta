@@ -244,6 +244,34 @@ void save_author_books(int idnum) {
 
 
 /**
+* When a library is destroyed, removes it from the library list on all books.
+*
+* @param room_vnum location Where the library was.
+*/
+void remove_library_from_books(room_vnum location) {
+	book_data *book, *next_book;
+	struct library_data *libr, *next_libr;
+	struct vnum_hash *vhash = NULL, *vh, *next_vh;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		LL_FOREACH_SAFE(book->in_libraries, libr, next_libr) {
+			if (libr->location == location) {
+				add_vnum_hash(&vhash, book->author, 1);
+				LL_DELETE(book->in_libraries, libr);
+				free(libr);
+			}
+		}
+	}
+	
+	// and save authors
+	HASH_ITER(hh, vhash, vh, next_vh) {
+		save_author_books(vh->vnum);
+	}
+	free_vnum_hash(&vhash);
+}
+
+
+/**
 * saves the author index file, e.g. when a new author is added
 */
 void save_author_index(void) {

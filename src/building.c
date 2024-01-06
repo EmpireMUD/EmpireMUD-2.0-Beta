@@ -572,6 +572,10 @@ void disassociate_building(room_data *room) {
 		et_lose_building(ROOM_OWNER(room), GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 	
+	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+		remove_library_from_books(GET_ROOM_VNUM(room));
+	}
+	
 	if (ROOM_OWNER(room)) {
 		adjust_building_tech(ROOM_OWNER(room), room, FALSE);
 	}
