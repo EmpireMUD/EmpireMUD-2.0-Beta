@@ -17,7 +17,6 @@
 #include "utils.h"
 #include "skills.h"
 #include "interpreter.h"	/* alias_data */
-#include "vnums.h"
 #include "olc.h"
 #include "constants.h"
 
