@@ -38,6 +38,9 @@ book_data *book_table = NULL;	// hash table
 struct author_data *author_table = NULL;	// hash table of authors
 book_vnum top_book_vnum = 0;	// need a persistent top vnum because re-using a book vnum causes funny issues with obj copies of the book
 
+// from bookedit.c
+extern const char *default_book_title;
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// AUTHOR TRACKING /////////////////////////////////////////////////////////
@@ -282,11 +285,20 @@ book_data *random_lost_book(void) {
 	int count = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author == 0 || !book->in_libraries) {
-			if (!number(0, count++)) {
-				found = book;
-			}
-	    }
+		if (book->author != 0 || book->in_libraries) {
+			continue;	// not lost
+		}
+		if (!book->paragraphs) {
+			continue;	// skip empty book
+		}
+		if (!book->title || !strcmp(book->title, default_book_title)) {
+			continue;	// skip default title
+		}
+		
+		// ok pick at random if we got here
+		if (!number(0, count++)) {
+			found = book;
+		}
 	}
 	
 	return found;	// if any
