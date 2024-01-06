@@ -975,6 +975,11 @@ LIBRARY_SCMD(bookedit_write) {
 	// was a new book?
 	if (!book) {
 		GET_OLC_BOOK(ch->desc)->vnum = ++top_book_vnum;
+		if (top_book_vnum < START_PLAYER_BOOKS) {
+			// if it's the first player book, ensure it's not too low in vnum
+			top_book_vnum = START_PLAYER_BOOKS;
+			GET_OLC_BOOK(ch->desc)->vnum = START_PLAYER_BOOKS;
+		}
 		GET_OLC_BOOK(ch->desc)->byline = str_dup(PERS(ch, ch, TRUE));
 		GET_OLC_BOOK(ch->desc)->author = GET_IDNUM(ch);
 	}

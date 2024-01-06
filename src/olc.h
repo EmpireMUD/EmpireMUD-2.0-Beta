@@ -16,6 +16,7 @@
 
 
 #define MAX_VNUM  999999	// highest allowed vnum for olc
+#define START_PLAYER_BOOKS  (MAX_VNUM+1)	// start of vnums for player-written books
 
 
 // olc controls
