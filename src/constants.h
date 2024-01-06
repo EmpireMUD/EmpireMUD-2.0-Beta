@@ -14,11 +14,74 @@
 * Contents:
 *   Structs
 *   Constants
+*   Externs
 */
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// STRUCTS /////////////////////////////////////////////////////////////////
+
+// used in character creation
+struct archetype_menu_type {
+	int type;
+	char *name;
+	char *description;
+};
+
+// STRENGTH, NUM_ATTRIBUTES, etc
+struct attribute_data_type {
+	char *name;
+	char *creation_description;	// shown if players need help during creation
+	char *low_error;	// You are "too weak" to use that item.
+};
+
+// used by do_gen_augment
+struct augment_type_data {
+	char *noun;
+	char *verb;
+	int apply_type;	// APPLY_TYPE_x
+	bitvector_t default_flags;	// AUG_x always applied
+	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
+};
+
+// for character size, search SIZE_x
+struct character_size_data {
+	int max_blood;	// how much blood the mob has
+	bitvector_t corpse_flags;	// large or not
+	bool can_take_corpse;	// corpse is no-take if false
+	bool show_on_map;	// show (oo)/name on map at range
+	char *corpse_keywords;	// additional keywords on the corpse
+	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
+	char *body_long_desc;	// custom long desc with %s for "the body of"
+	char *show_on_look;	// if not null, shows when you look at a person of this size
+};
+
+// used for city metadata
+struct city_metadata_type {
+	char *name;
+	char *icon;
+	int radius;
+	bool show_to_others;
+	bool is_capital;
+};
+
+// for climate-based temperature
+struct climate_temperature_t {
+	int base_add;	// core temperature from this climate
+	double sun_weight;	// how much time-of-day affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double season_weight;	// how much season affects this (default: 1.0 / 100%, can be NO_TEMP_MOD)
+	double cold_modifier;	// multiplies cold temperatures by this
+	double heat_modifier;	// multiplies hot temperatures by this
+};
+
+// used to determine the order and value of reputations
+struct faction_reputation_type {
+	int type;	// REP_ type
+	char *name;
+	char *by_to;	// You are now [Reputation] [by | to] [Faction Name].
+	char *color;	// & or \t color code
+	int value;	// points total a player must be at for this
+};
 
 // properties for interactions
 struct interact_data_t {
@@ -28,9 +91,64 @@ struct interact_data_t {
 	int depletion;	// DPLTN_ type, if any (NOTHING if not applicable)
 };
 
+// MAT_ material type
+struct material_data {
+	char *name;
+	bool floats;
+	double chance_to_dismantle;	// percent chance of getting it back when dismantling
+	char *decay_on_char;	// message sent if carried/used by a person
+	char *decay_in_room;	// message sent if it decays in the room
+};
+
+// offense configs - constants.c
+struct offense_info_type {
+	char *name;
+	int weight;	// how bad it is
+};
+
+// for do_toggle
+struct toggle_data_type {
+	char *name;	// toggle display and subcommand
+	int type;	// TOG_ONOFF, TOG_OFFON
+	bitvector_t bit;	// PRF_
+	int level;	// required level to see/use toggle
+	void (*callback_func)(char_data *ch);	// optional function to alert changes
+};
+
+// WEAR_ data for each equipment slot
+struct wear_data_type {
+	char *eq_prompt;	// shown on 'eq' list
+	char *name;	// display name
+	bitvector_t item_wear;	// matching ITEM_WEAR_
+	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
+	double gear_level_mod;	// modifier (slot significance) when counting gear level
+	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
+	char *already_wearing;	// error message when slot is full
+	char *wear_msg_to_room;	// msg act()'d to room on wear
+	char *wear_msg_to_char;	// msg act()'d to char on wear
+	bool allow_custom_msgs;	// some slots don't
+	bool save_to_eq_set;	// slots that can be saved with 'eq set'
+};
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CONSTANTS ///////////////////////////////////////////////////////////////
+
+// for climate temperatures
+#define NO_TEMP_MOD  -1.0
+
+// do_toggle
+#define TOG_ONOFF  0
+#define TOG_OFFON  1
+#define NUM_TOG_TYPES  2
+
+// for item scaling based on wear flags
+#define WEAR_POS_MINOR  0
+#define WEAR_POS_MAJOR  1
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EXTERNS /////////////////////////////////////////////////////////////////
 
 // empiremud constants
 extern const char *level_names[][2];
