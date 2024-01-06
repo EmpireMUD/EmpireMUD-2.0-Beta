@@ -9891,7 +9891,7 @@ ACMD(do_load) {
 	two_arguments(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
-		send_to_char("Usage: load { obj | mob | vehicle } <number>\r\n", ch);
+		send_to_char("Usage: load { obj | mob | vehicle | book } <number>\r\n", ch);
 		return;
 	}
 	if ((number = atoi(buf2)) < 0) {
@@ -9960,6 +9960,21 @@ ACMD(do_load) {
 		}
 		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!book_proto(number)) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		
+		obj = create_book_obj(book_proto(number));
+		obj_to_char(obj, ch);
+		act("$n makes a strange magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $p!", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
+		act("You create $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
 		}
 	}
 	else {
