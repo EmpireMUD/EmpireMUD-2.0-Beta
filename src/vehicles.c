@@ -3602,7 +3602,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
 		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
-		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_types)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
@@ -4132,7 +4132,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		comma = FALSE;
 		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				comma = TRUE;
 			}
 		}

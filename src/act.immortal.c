@@ -7845,7 +7845,7 @@ void do_stat_room(char_data *ch) {
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+				msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				comma = TRUE;
 			}
 		}

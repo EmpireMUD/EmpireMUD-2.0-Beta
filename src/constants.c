@@ -3886,7 +3886,7 @@ const char *crop_custom_types[] = {
 
 
 // DPLTN_x
-const char *depletion_type[] = {
+const char *depletion_types[] = {
 	"dig",
 	"forage",
 	"gather",

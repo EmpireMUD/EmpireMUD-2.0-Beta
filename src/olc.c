@@ -4760,7 +4760,7 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				break;
 			}
 			case INTERACT_RESTRICT_DEPLETION: {
-				snprintf(line, sizeof(line), "Depletion: %s", depletion_type[res->vnum]);
+				snprintf(line, sizeof(line), "Depletion: %s", depletion_types[res->vnum]);
 				break;
 			}
 			default: {
@@ -7579,7 +7579,7 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 		}
 		else if (is_abbrev(arg, "-depletion")) {
 			ptr = any_one_word(ptr, arg);
-			if ((num = search_block(arg, depletion_type, FALSE)) != NOTHING) {
+			if ((num = search_block(arg, depletion_types, FALSE)) != NOTHING) {
 				CREATE(res, struct interact_restriction, 1);
 				res->type = INTERACT_RESTRICT_DEPLETION;
 				res->vnum = num;

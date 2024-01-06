@@ -5455,7 +5455,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						int type;
 						comma_args(subfield, arg1, arg2);
 						
-						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+						if (!*arg1 || (type = search_block(arg1, depletion_types, FALSE)) == NOTHING) {
 							// missing type?
 							*str = '\0';
 						}
@@ -6033,7 +6033,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						int type;
 						comma_args(subfield, arg1, arg2);
 						
-						if (!*arg1 || (type = search_block(arg1, depletion_type, FALSE)) == NOTHING) {
+						if (!*arg1 || (type = search_block(arg1, depletion_types, FALSE)) == NOTHING) {
 							// missing type?
 							*str = '\0';
 						}
