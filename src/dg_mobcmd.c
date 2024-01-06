@@ -729,7 +729,7 @@ ACMD(do_mload) {
 	
 	if (is_abbrev(arg1, "book")) {
 		// special checking for books
-		if (!*arg2 || (!is_number(arg2) && !str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
+		if (!*arg2 || (!is_number(arg2) && str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
 			mob_log(ch, "mload: bad syntax (book)");
 			return;
 		}

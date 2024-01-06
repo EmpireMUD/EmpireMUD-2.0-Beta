@@ -1262,7 +1262,7 @@ OCMD(do_oload) {
 
 	if (is_abbrev(arg1, "book")) {
 		// special checking for books
-		if (!*arg2 || (!is_number(arg2) && !str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
+		if (!*arg2 || (!is_number(arg2) && str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
 			obj_log(obj, "oload: bad syntax (book)");
 			return;
 		}
