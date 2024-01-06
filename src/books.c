@@ -164,8 +164,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				if (real_room(room)) {
 					CREATE(libr, struct library_data, 1);
 					libr->location = room;
-
-					LL_APPEND(book->in_libraries, libr);
+					HASH_ADD_INT(book->in_libraries, location, libr);
 				}
 				
 				break;
@@ -191,7 +190,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 void save_author_books(int idnum) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
-	struct library_data *libr;
+	struct library_data *libr, *next_libr;
 	book_data *book, *next_book;
 	FILE *fl;
 	
@@ -229,7 +228,7 @@ void save_author_books(int idnum) {
 			}
 			
 			// 'L': library
-			for (libr = book->in_libraries; libr; libr = libr->next) {
+			HASH_ITER(hh, book->in_libraries, libr, next_libr) {
 				fprintf(fl, "L %d\n", libr->location);
 			}
 			
@@ -254,10 +253,10 @@ void remove_library_from_books(room_vnum location) {
 	struct vnum_hash *vhash = NULL, *vh, *next_vh;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		LL_FOREACH_SAFE(book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
 			if (libr->location == location) {
 				add_vnum_hash(&vhash, book->author, 1);
-				LL_DELETE(book->in_libraries, libr);
+				HASH_DEL(book->in_libraries, libr);
 				free(libr);
 			}
 		}
@@ -309,7 +308,7 @@ void save_author_index(void) {
 */
 book_data *find_book_in_library(char *argument, room_data *room) {
 	book_data *book, *next_book, *by_name = NULL, *found = NULL;
-	struct library_data *libr;
+	struct library_data *libr, *next_libr;
 	int num = NOTHING;
 	
 	if (is_number(argument)) {
@@ -318,11 +317,12 @@ book_data *find_book_in_library(char *argument, room_data *room) {
 	
 	// find by number or name
 	HASH_ITER(hh, book_table, book, next_book) {
-		for (libr = book->in_libraries; libr && !found; libr = libr->next) {
+		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
 			if (libr->location == GET_ROOM_VNUM(room)) {
 				if (num != NOTHING && --num == 0) {
 					// found by number!
 					found = book;
+					break;	// only needed 1
 				}
 				else if (is_abbrev(argument, book->title)) {
 					// title match
@@ -413,15 +413,15 @@ LIBRARY_SCMD(library_browse) {
 	book_data *book, *next_book;
 	struct library_data *libr;
 	int count = 0;
+	room_vnum loc = GET_ROOM_VNUM(IN_ROOM(ch));
 
 	if (ch->desc) {
 		sprintf(buf, "Books shelved here:\r\n");
 	
 		HASH_ITER(hh, book_table, book, next_book) {
-			for (libr = book->in_libraries; libr; libr = libr->next) {
-				if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-					sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, book->title, book->byline);
-				}
+			HASH_FIND_INT(book->in_libraries, &loc, libr);
+			if (libr) {
+				sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, book->title, book->byline);
 			}
 		}
 	
@@ -467,23 +467,23 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 	book_data *book;
 	struct library_data *libr;
 	bool found = FALSE;
+	room_vnum loc = GET_ROOM_VNUM(IN_ROOM(ch));
 	
 	if (!IS_BOOK(obj) || !(book = book_proto(GET_BOOK_ID(obj)))) {
 		act("You can't shelve $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
 	else {
-		for (libr = book->in_libraries; libr && !found; libr = libr->next) {
-			if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-				found = TRUE;
-			}
+		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		if (libr) {
+			found = TRUE;
 		}
 		
 		if (!found) {
 			// not already in the library
 			CREATE(libr, struct library_data, 1);
 			libr->location = GET_ROOM_VNUM(IN_ROOM(ch));
-			LL_APPEND(book->in_libraries, libr);
+			HASH_ADD_INT(book->in_libraries, location, libr);
 			
 			// save new locations
 			save_author_books(book->author);
@@ -584,7 +584,8 @@ LIBRARY_SCMD(library_shelve) {
 
 LIBRARY_SCMD(library_burn) {
 	book_data *book;
-	struct library_data *libr, *next_libr;
+	struct library_data *libr;
+	room_vnum loc;
 	
 	skip_spaces(&argument);
 	
@@ -598,13 +599,11 @@ LIBRARY_SCMD(library_burn) {
 		msg_to_char(ch, "No such book is shelved here.\r\n");
 	}
 	else {
-		for (libr = book->in_libraries; libr; libr = next_libr) {
-			next_libr = libr->next;
-			
-			if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-				LL_DELETE(book->in_libraries, libr);
-				free(libr);
-			}
+		loc = GET_ROOM_VNUM(IN_ROOM(ch));
+		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		if (libr) {
+			HASH_DEL(book->in_libraries, libr);
+			free(libr);
 		}
 
 		save_author_books(book->author);

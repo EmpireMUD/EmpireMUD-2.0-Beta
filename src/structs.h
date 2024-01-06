@@ -4100,7 +4100,7 @@ struct book_data {
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
-	struct library_data *in_libraries;	// places this book is kept
+	struct library_data *in_libraries;	// hash of places this book is kept
 	
 	UT_hash_handle hh;	// book_table
 };
@@ -4109,7 +4109,7 @@ struct book_data {
 // linked list of locations the book occurs
 struct library_data {
 	room_vnum location;
-	struct library_data *next;
+	UT_hash_handle hh;	// in_libraries hash
 };
 
 

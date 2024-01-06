@@ -146,7 +146,7 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 void free_book(book_data *book) {
 	book_data *proto = book_proto(book->vnum);
 	struct paragraph_data *para;
-	struct library_data *libr;
+	struct library_data *libr, *next_libr;
 	
 	if (book->title && (!proto || book->title != proto->title)) {
 		free(book->title);
@@ -162,8 +162,8 @@ void free_book(book_data *book) {
 	}
 	
 	if (book->in_libraries && (!proto || book->in_libraries != proto->in_libraries)) {
-		while ((libr = book->in_libraries)) {
-			book->in_libraries = libr->next;
+		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+			HASH_DEL(book->in_libraries, libr);
 			free(libr);
 		}
 	}

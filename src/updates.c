@@ -3740,10 +3740,10 @@ void b5_169_book_move(void) {
 	
 	// and lastly, audit remaining books for invalid library locations
 	HASH_ITER(hh, book_table, book, next_book) {
-		LL_FOREACH_SAFE(book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
 			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
 				// invalid location
-				LL_DELETE(book->in_libraries, libr);
+				HASH_DEL(book->in_libraries, libr);
 				free(libr);
 			}
 		}
