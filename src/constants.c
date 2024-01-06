@@ -3885,19 +3885,47 @@ const char *crop_custom_types[] = {
 };
 
 
-// DPLTN_x
+// DPLTN_x (1/2): basic depletion names
 const char *depletion_types[] = {
-	"dig",
+	"dig",		// 0
 	"forage",
 	"gather",
 	"pick",
 	"fish",
-	"quarry",
+	"quarry",	// 5
 	"pan",
 	"trapping",
 	"chop",
 	"hunt",
-	"production",
+	"production",	// 10
+	"\n"
+};
+
+
+// DPLTN_x (2/2): depletion strings for survey
+const char *depletion_strings[] = {
+	"dug up $$ ground",	// 0
+	"foraged $$ food in the area",
+	"gathered $$ material on the ground",
+	"picked $$ flowers here",
+	"caught $$ fish here",
+	"quarried $$ stone here",	// 5
+	"panned $$ gold here",
+	"trapped $$ animals here",
+	"chopped $$ trees here",
+	"hunted $$ animals here",
+	"produced $$ things here",	// 10
+	"\n"
+};
+
+
+// for depletion displays, take the percent depleted, divide by 25:
+const char *depletion_levels[] = {
+	"some",				// 0-24
+	"a bunch of the",	// 25-49
+	"a lot of",			// 50-74
+	"most of the",		// 75-99
+	"all the",			// 100%
 	"\n"
 };
 
