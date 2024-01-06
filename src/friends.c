@@ -861,9 +861,10 @@ ACMD(do_friend_status) {
 	else {
 		// FRIEND_x:
 		status = account_friend_status(ch, plr);
+		friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr));
 		
 		// ensure they're really friends on this alt
-		if (status != FRIEND_FRIENDSHIP && (friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr)))) {
+		if (status != FRIEND_FRIENDSHIP && friend) {
 			if (strcmp(friend->original_name, GET_NAME(plr))) {
 				// offered to someone else?
 				status = FRIEND_NONE;
@@ -872,7 +873,12 @@ ACMD(do_friend_status) {
 		
 		switch (status) {
 			case FRIEND_FRIENDSHIP: {
-				msg_to_char(ch, "You are friends with %s.\r\n", GET_NAME(plr));
+				if (strcmp(friend->original_name, GET_NAME(plr))) {
+					msg_to_char(ch, "You are friends with %s (%s).\r\n", GET_NAME(plr), friend->original_name);
+				}
+				else {
+					msg_to_char(ch, "You are friends with %s.\r\n", GET_NAME(plr));
+				}
 				break;
 			}
 			case FRIEND_REQUEST_SENT: {
