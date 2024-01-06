@@ -122,8 +122,8 @@ int einv_interaction_chore_type = 0;
 
 
 #define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)) && (chore_data[(chore)].requires_tech == NOTHING || EMPIRE_HAS_TECH(emp, chore_data[(chore)].requires_tech)))
-#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type)) : get_depletion((room), (type)))
-#define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
+#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), ((type) != NOTHING ? (type) : DPLTN_PRODUCTION)) : get_depletion((room), ((type) != NOTHING ? (type) : DPLTN_PRODUCTION)))
+#define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), ((type) != NOTHING ? (type) : DPLTN_PRODUCTION), (multiple)); } else { add_depletion((room), ((type) != NOTHING ? (type) : DPLTN_PRODUCTION), (multiple)); } }
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -1281,7 +1281,7 @@ bool has_any_undepleted_interaction_for_chore(empire_data *emp, int chore, room_
 				continue;	// restrictions
 			}
 			depletion_type = determine_depletion_type(interact);
-			if (GET_CHORE_DEPLETION(room, veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction_type].one_at_a_time ? interact->quantity : common_depletion)) {
+			if (GET_CHORE_DEPLETION(room, veh, depletion_type) >= (interact_data[interaction_type].one_at_a_time ? interact->quantity : common_depletion)) {
 				continue;	// depleted
 			}
 			
@@ -2076,7 +2076,7 @@ INTERACTION_FUNC(one_chop_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
@@ -2525,7 +2525,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
@@ -2804,7 +2804,7 @@ INTERACTION_FUNC(one_production_chore) {
 	
 	// make sure this item isn't depleted
 	depletion_type = determine_depletion_type(interaction);
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
 		return FALSE;
 	}
 	
