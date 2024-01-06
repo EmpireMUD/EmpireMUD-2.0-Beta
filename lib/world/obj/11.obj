@@ -499,4 +499,15 @@ M
 11
 $n's claws meld back into $s fingers.~
 S
+#1128
+book lost~
+a lost book~
+A lost book is lying here.~
+It looks like someone lost this book.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+T 1128
+S
 $
