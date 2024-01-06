@@ -3907,13 +3907,13 @@ const char *depletion_strings[] = {
 	"dug up $$ ground",	// 0
 	"foraged $$ food in the area",
 	"gathered $$ material on the ground",
-	"picked $$ flowers here",
-	"caught $$ fish here",
-	"quarried $$ stone here",	// 5
-	"panned $$ gold here",
-	"trapped $$ animals here",
-	"chopped $$ trees here",
-	"hunted $$ animals here",	// unlikely to be able to show this one
+	"picked $$ flowers",
+	"caught $$ fish",
+	"quarried $$ stone",	// 5
+	"panned $$ gold",
+	"trapped $$ animals",
+	"chopped $$ trees",
+	"hunted $$ animals",	// unlikely to be able to show this one
 	"",	// 10, production
 	"\n"
 };
