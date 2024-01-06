@@ -1219,7 +1219,7 @@ Usage:  show ammotypes
 Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
 #e
-"SHOW AUTHOR" "SHOW LIBRARIES" "SHOW LOSTBOOKS" "SHOW LOST BOOKS"
+"SHOW AUTHOR" "SHOW LIBRARIES" "SHOW LOSTBOOKS" "SHOW LOST BOOKS" "LOST BOOKS"
 
 Usage:  show author <author idnum>
         show libraries <book vnum>
@@ -1234,10 +1234,10 @@ These three show commands help manage the book system.
    shelved.
 
 &cshow lostbooks&0 - Show all the books that do not appear in any libraries.
-   Immortals can load books directly; this is the only way to get a lost book
-   into the world.
+   Immortals can load books directly, as can the %load% command in scripts.
+   Scripts can load a random lost book with "%load% book lost".
 
-See also: LOAD
+See also: LOAD, %LOAD%
 #e
 "SHOW COMPANIONS"
 

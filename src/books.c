@@ -89,6 +89,34 @@ book_data *book_proto(book_vnum vnum) {
 }
 
 
+/**
+* Dumps all the books stored here into the room as items. (They remain in the
+* library list, too, unless you also call remove_library_from_books() on the
+* room.
+*
+* @param room_data *room The room to dump books in, from its own library list.
+*/
+void dump_library_to_room(room_data *room) {
+	room_vnum loc = GET_ROOM_VNUM(room);
+	book_data *book, *next_book;
+	obj_data *obj;
+	struct library_data *libr;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		if (libr) {
+			// found a book
+			obj = create_book_obj(book);
+			obj_to_room(obj, room);
+			
+			if (load_otrigger(obj) && ROOM_PEOPLE(room)) {
+				act("$p falls to the ground.", FALSE, ROOM_PEOPLE(room), obj, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
+	}
+}
+
+
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
 	book_data *book;
@@ -239,6 +267,29 @@ void save_author_books(int idnum) {
 	fprintf(fl, "$~\n");
 	fclose(fl);
 	rename(tempfile, filename);
+}
+
+
+/**
+* Picks a book at random from the list of books that either:
+* - are by author 0, or
+* - are not in any libraries
+*
+* @return book_data* The book entry, if any, or NULL if not.
+*/
+book_data *random_lost_book(void) {
+	book_data *book, *next_book, *found = NULL;
+	int count = 0;
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (book->author == 0 || !book->in_libraries) {
+			if (!number(0, count++)) {
+				found = book;
+			}
+	    }
+	}
+	
+	return found;	// if any
 }
 
 

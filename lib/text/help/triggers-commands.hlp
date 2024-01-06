@@ -453,11 +453,16 @@ See also: EXPRESSIONS, NESTED-IFS
 %load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
+%load% book <vnum | lost> <room | in-obj | name <position>>
 
 This command loads a mob, object, or vehicle into the game. No-take objects
 loaded to a mob will load to the room. Mobs loading other mobs may specify
 "ally" to set the loaded mob as a follower, which assists combat scripts in
 determining whose side they are on.
+
+It can also load a book either by book vnum (not object vnum) or a lost book,
+if you specify "lost" as the vnum. A lost book is one that is either by author
+id 0, or which is shelved in no libraries.
 
 The %load% command will automatically scale things to the same level as the
 thing that does the loading (when it can). However, you can specify a

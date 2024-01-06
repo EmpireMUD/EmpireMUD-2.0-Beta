@@ -1412,9 +1412,17 @@ void start_dismantle_building(room_data *loc) {
 		adjust_building_tech(ROOM_OWNER(loc), loc, FALSE);
 	}
 	
+	// stored books?
+	if (HAS_FUNCTION(loc, FNC_LIBRARY)) {
+		dump_library_to_room(loc);
+	}
+	
 	// interior only
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
+			if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+				dump_library_to_room(room);
+			}
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
 			
