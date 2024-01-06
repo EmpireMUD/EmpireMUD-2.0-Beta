@@ -285,7 +285,7 @@ book_data *random_lost_book(void) {
 	int count = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author != 0 || book->in_libraries) {
+		if (book->author != 0 && book->in_libraries) {
 			continue;	// not lost
 		}
 		if (!book->paragraphs) {
