@@ -5056,8 +5056,9 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 */
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
 	struct interaction_item *iter;
-	bool problem = FALSE;
-	int code, type, max_quantity = 0, min_q_1_at_a_time = -1;
+	bool variable_1_at_a_time = FALSE, problem = FALSE;
+	int code, pos, type, max_quantity = 0, min_q_1_at_a_time = -1;
+	int found_1_at_a_time[NUM_INTERACTS];
 	
 	struct audint_t {
 		int code;
@@ -5072,6 +5073,11 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	struct audint_s *as, *next_as, *set = NULL;
 	struct audint_t *at, *next_at;
 	
+	// init this
+	for (pos = 0; pos < NUM_INTERACTS; ++pos) {
+		found_1_at_a_time[pos] = 0;
+	}
+	
 	for (iter = list; iter; iter = iter->next) {
 		if (interact_data[iter->type].attach_type != attach_type) {
 			olc_audit_msg(ch, vnum, "Bad interaction: %s", interact_types[iter->type]);
@@ -5082,8 +5088,16 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		if (!interact_data[iter->type].one_at_a_time && iter->type != INTERACT_LIQUID_CONJURE) {
 			max_quantity = MAX(max_quantity, iter->quantity);
 		}
-		else if (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) {
+		else if (interact_data[iter->type].one_at_a_time && (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity)) {
 			min_q_1_at_a_time = iter->quantity;
+		}
+		
+		// check variable quantities
+		if (interact_data[iter->type].one_at_a_time) {
+			if (found_1_at_a_time[iter->type] > 0 && iter->quantity != found_1_at_a_time[iter->type]) {
+				variable_1_at_a_time = TRUE;
+			}
+			found_1_at_a_time[iter->type] = iter->quantity;
 		}
 		
 		// track cumulative percent
@@ -5128,6 +5142,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	}
 	if (min_q_1_at_a_time != -1 && min_q_1_at_a_time < 10) {
 		olc_audit_msg(ch, vnum, "One-at-a-time interaction has unusually low quantity %d", min_q_1_at_a_time);
+		problem = TRUE;
+	}
+	if (variable_1_at_a_time) {
+		olc_audit_msg(ch, vnum, "One-at-a-time interaction has different maximums");
 		problem = TRUE;
 	}
 	
