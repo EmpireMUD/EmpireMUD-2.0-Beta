@@ -5977,7 +5977,7 @@ SHOW(show_libraries) {
 }
 
 
-SHOW(show_lostbooks) {
+SHOW(show_lost_books) {
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	size_t size, count;
 	book_data *book, *next_book;
@@ -11259,6 +11259,8 @@ ACMD(do_show) {
 		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
 		{ "friends", LVL_START_IMM, show_friends },
 		{ "libraries", LVL_START_IMM, show_libraries },
+		{ "author", LVL_START_IMM, show_author },
+		{ "lostbooks", LVL_START_IMM, show_lost_books },
 
 		// last
 		{ "\n", 0, NULL }
