@@ -2072,7 +2072,13 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 INTERACTION_FUNC(one_chop_chore) {
 	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
-	int amt;
+	int amt, depletion_type;
+	
+	// make sure this item isn't depleted
+	depletion_type = determine_depletion_type(interaction);
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, depletion_type != NOTHING ? depletion_type : DPLTN_PRODUCTION) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : DEPLETION_LIMIT(inter_room))) {
+		return FALSE;
+	}
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
 		amt = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
@@ -2080,6 +2086,8 @@ INTERACTION_FUNC(one_chop_chore) {
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
 		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
+		
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, depletion_type, FALSE);
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2117,7 +2125,11 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 				if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) == 0) {
 					// finished!
 					run_room_interactions(worker, room, INTERACT_CHOP, NULL, NOTHING, one_chop_chore);
-					change_chop_territory(room);
+					
+					// evolve?
+					if (get_depletion(room, DPLTN_CHOP) >= get_depletion_max(room, DPLTN_CHOP)) {
+						change_chop_territory(room);
+					}
 				
 					if (CAN_CHOP_ROOM(room)) {
 						set_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, config_get_int("chop_timer"));
