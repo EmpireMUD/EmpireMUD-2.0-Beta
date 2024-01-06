@@ -844,7 +844,9 @@ ACMD(do_friend_request) {
 // called through do_friend
 ACMD(do_friend_status) {
 	bool file = FALSE;
+	int status;
 	char_data *plr = NULL;
+	struct friend_data *friend;
 	
 	if (!*argument) {
 		// argument is actually guaranteed, but in case
@@ -859,7 +861,17 @@ ACMD(do_friend_status) {
 	}
 	else {
 		// FRIEND_x:
-		switch (account_friend_status(ch, plr)) {
+		status = account_friend_status(ch, plr);
+		
+		// ensure they're really friends on this alt
+		if (status != FRIEND_FRIENDSHIP && (friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr)))) {
+			if (strcmp(friend->original_name, GET_NAME(plr))) {
+				// offered to someone else?
+				status = FRIEND_NONE;
+			}
+		}
+		
+		switch (status) {
 			case FRIEND_FRIENDSHIP: {
 				msg_to_char(ch, "You are friends with %s.\r\n", GET_NAME(plr));
 				break;
