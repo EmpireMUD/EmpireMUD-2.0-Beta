@@ -42,10 +42,7 @@ I 5 102 15.00 125 X  # DIG: flint stone
 I 5 101 15.00 125 X  # DIG: lump of clay
 I 5 100 100.00 125 X  # DIG: rock
 I 6 3013 75.00 25  # FORAGE: handful of nuts
-I 20 121 25.00 4 a  # CHOP: sticks and leaves
-I 20 121 25.00 6 a  # CHOP: sticks and leaves
-I 20 121 25.00 10 a  # CHOP: sticks and leaves
-I 20 121 25.00 14 a  # CHOP: sticks and leaves
+I 20 121 100.00 10 a  # CHOP: sticks and leaves
 X
 stumps field around~
 The stumps that dot this field look like they were hacked apart by tiny axes.

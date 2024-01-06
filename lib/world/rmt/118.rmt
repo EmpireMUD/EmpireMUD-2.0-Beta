@@ -1069,7 +1069,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1124,7 +1124,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1393,7 +1393,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1448,7 +1448,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1503,7 +1503,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1558,7 +1558,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1756,7 +1756,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1811,7 +1811,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1866,7 +1866,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 M 1 11887 100.00 1
 T 11929
 T 11943
@@ -1920,7 +1920,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 M 1 11886 100.00 1
 T 11929
 T 11943

@@ -1159,10 +1159,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 132 85.00 50 g  # GATHER: thorny branches
 I 9 134 15.00 50 g  # GATHER: thorny sapling
-I 20 122 5.00 4 c  # CHOP: rough wood
-I 20 122 10.00 3 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 35.00 1 c  # CHOP: rough wood
+I 20 122 100.00 3 c  # CHOP: rough wood
 U
 0
 The scraggly trees unfold leaf after leaf as they grow larger and larger!~
@@ -3048,8 +3045,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 123 85.00 50 g  # GATHER: small flower
 I 9 135 15.00 50 g  # GATHER: reaching sapling
-I 20 128 50.00 1 c  # CHOP: massive jungle tree
-I 20 128 50.00 2 c  # CHOP: massive jungle tree
+I 20 128 100.00 2 c  # CHOP: massive jungle tree
 U
 0
 Whole trees curl up from the soil, fully-grown in seconds!~
@@ -3417,9 +3413,7 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 15.00 50 g  # GATHER: thorny sapling
 I 9 139 50.00 50 g  # GATHER: bundle of long leaves
 I 9 132 35.00 50 g  # GATHER: thorny branches
-I 20 122 85.00 2 c  # CHOP: rough wood
-I 20 122 10.00 3 c  # CHOP: rough wood
-I 20 122 5.00 4 c  # CHOP: rough wood
+I 20 122 100.00 4 c  # CHOP: rough wood
 U
 0
 Thirsty trees rise from the rich soil around the oasis!~
@@ -3458,9 +3452,7 @@ I 7 123 100.00 125 p  # PICK: small flower
 I 9 132 35.00 50 g  # GATHER: thorny branches
 I 9 134 15.00 50 g  # GATHER: thorny sapling
 I 9 139 50.00 50 g  # GATHER: bundle of long leaves
-I 20 122 25.00 2 c  # CHOP: rough wood
-I 20 122 25.00 3 c  # CHOP: rough wood
-I 20 122 50.00 4 c  # CHOP: rough wood
+I 20 122 100.00 3 c  # CHOP: rough wood
 U
 0
 Bushy trees grow around the oasis and encircle it!~
@@ -3724,9 +3716,7 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 134 8.00 50 g  # GATHER: thorny sapling
 I 9 139 92.00 50 g  # GATHER: bundle of long leaves
-I 20 122 25.00 2 c  # CHOP: rough wood
-I 20 122 50.00 3 c  # CHOP: rough wood
-I 20 122 25.00 4 c  # CHOP: rough wood
+I 20 122 100.00 3 c  # CHOP: rough wood
 U
 0
 Whole trees grow around the oasis and begin to cover the sky as their leaves unfurl!~

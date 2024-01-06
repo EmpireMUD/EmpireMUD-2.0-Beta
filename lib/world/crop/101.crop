@@ -85,8 +85,7 @@ D4
 I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 10152 100.00 28  # PICK: handful of mesquite pods
 I 9 132 100.00 50  # GATHER: thorny branches
-I 20 10151 50.00 2 c  # CHOP: mesquite tree
-I 20 10151 50.00 1 c  # CHOP: mesquite tree
+I 20 10151 100.00 2 c  # CHOP: mesquite tree
 M
 10150 5.00 a
 M
@@ -145,8 +144,7 @@ D0
 &y~
 I 6 10154 100.00 25  # FORAGE: ripe alligator pear
 I 7 10153 100.00 14  # PICK: basket of alligator pears
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M
@@ -202,8 +200,7 @@ D0
 &y~
 I 6 10156 100.00 25  # FORAGE: single ripe lime
 I 7 10155 100.00 14  # PICK: basket of limes
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M

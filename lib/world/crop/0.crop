@@ -286,8 +286,7 @@ D0
 I 6 3009 100.00 25  # FORAGE: orange
 I 7 3010 100.00 14  # PICK: sack of oranges
 I 9 132 100.00 50  # GATHER: thorny branches
-I 20 122 50.00 1 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 New trees burst forth across the grove, each dangling succulent orange fruits!~
@@ -357,8 +356,7 @@ D0
 I 6 3018 100.00 25  # FORAGE: couple of olives
 I 7 3019 100.00 14  # PICK: basket of olives
 I 9 132 100.00 50  # GATHER: thorny branches
-I 20 122 50.00 1 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 Fresh trees rise from the ground and sprout hundreds of fresh olives!~

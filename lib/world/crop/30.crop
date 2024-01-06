@@ -91,8 +91,7 @@ D0
 &y~
 I 6 3031 100.00 25  # FORAGE: split coconut
 I 7 3030 100.00 14  # PICK: bunch of coconuts
-I 20 122 50.00 1 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 U
 0
 Palm trees shoot up into the air as large, brown coconuts form in their crowns!~

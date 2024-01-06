@@ -380,7 +380,7 @@ I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 9 121 100.00 50  # GATHER: sticks and leaves
-I 20 10558 100.00 1  # CHOP: spruce tree
+I 20 10558 100.00 2  # CHOP: spruce tree
 M
 10556 5.00 0
 M
