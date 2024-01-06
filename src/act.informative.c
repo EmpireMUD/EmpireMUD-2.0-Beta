@@ -4153,12 +4153,14 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char buf[MAX_STRING_LENGTH];
+	char line[1024];
+	char *temp;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
-	int ter_type, base_height, mod_height;
+	int max, prc, ter_type, base_height, mod_height;
 	bool junk, large_radius;
+	struct depletion_data *dep;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
@@ -4213,6 +4215,29 @@ ACMD(do_survey) {
 		}
 		if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "It's on fire!\r\n");
+		}
+	}
+	
+	// depletion
+	*buf = '\0';
+	LL_FOREACH(ROOM_DEPLETION(IN_ROOM(ch)), dep) {
+		if (dep->count > 0 && *depletion_strings[dep->type] && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
+			strcpy(line, depletion_strings[dep->type]);
+			prc = dep->count * 100 / max;
+			prc = MIN(100, MAX(1, prc)) / 25;
+			temp = str_replace("$$", depletion_levels[prc], line);
+			
+			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
+			free(temp);
+		}
+	}
+	if (*buf) {
+		// add an "and"
+		if ((temp = strrchr(buf, ','))) {
+			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp);
+		}
+		else {	// no comma
+			msg_to_char(ch, "It looks like someone has %s.\r\n", buf);
 		}
 	}
 	

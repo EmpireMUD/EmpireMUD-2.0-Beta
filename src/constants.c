@@ -3902,7 +3902,7 @@ const char *depletion_types[] = {
 };
 
 
-// DPLTN_x (2/2): depletion strings for survey
+// DPLTN_x (2/2): depletion strings for survey; may be empty; use $$ as a placeholder for the depletion_levels[] amount
 const char *depletion_strings[] = {
 	"dug up $$ ground",	// 0
 	"foraged $$ food in the area",
@@ -3913,8 +3913,8 @@ const char *depletion_strings[] = {
 	"panned $$ gold here",
 	"trapped $$ animals here",
 	"chopped $$ trees here",
-	"hunted $$ animals here",
-	"produced $$ things here",	// 10
+	"hunted $$ animals here",	// unlikely to be able to show this one
+	"",	// 10, production
 	"\n"
 };
 
