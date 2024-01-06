@@ -3374,6 +3374,10 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
+	else if ((can_room_but_depleted || can_veh_but_depleted) && IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED)) {
+		// only reason we were stopped is depletion? allow with this flag
+		return TRUE;
+	}
 	else if (IS_SET(data->flags, GI_ATTEMPT_WITHOUT_INTERACT)) {
 		// allow it if we got here and have this flag
 		return TRUE;
