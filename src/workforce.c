@@ -2100,7 +2100,7 @@ INTERACTION_FUNC(one_chop_chore) {
 
 void do_chore_chopping(empire_data *emp, room_data *room) {
 	char_data *worker;
-	bool depleted = (get_depletion(room, DPLTN_CHOP) >= config_get_int("chop_depletion"));
+	bool depleted = (get_depletion(room, DPLTN_CHOP) >= get_depletion_max(room, DPLTN_CHOP));
 	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
 	bool can_do = !depleted && can_gain;
 	

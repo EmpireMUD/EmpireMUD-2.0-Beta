@@ -807,7 +807,7 @@ void start_chopping(char_data *ch) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
@@ -869,9 +869,15 @@ void start_mining(char_data *ch) {
 INTERACTION_FUNC(finish_chopping) {
 	char buf[MAX_STRING_LENGTH], *cust;
 	obj_data *obj = NULL;
-	int num, obj_ok = 0;
+	int amount, num, obj_ok = 0;
 	
-	for (num = 0; num < interaction->quantity; ++num) {
+	if (get_depletion(inter_room, DPLTN_CHOP) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : config_get_int("short_depletion"))) {
+		return FALSE;	// depleted room
+	}
+	
+	amount = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
+	
+	for (num = 0; num < amount; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
@@ -883,14 +889,14 @@ INTERACTION_FUNC(finish_chopping) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
 	}
 	
 	// messaging
 	if (obj_ok && obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (interaction->quantity > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "With a loud crack, $p falls!", interaction->quantity);
+		if (amount > 1) {
+			sprintf(buf, "%s (x%d)", cust ? cust : "With a loud crack, $p falls!", amount);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
@@ -1332,7 +1338,7 @@ void process_chipping(char_data *ch) {
 * @param char_data *ch The chopper.
 */
 void process_chop(char_data *ch) {
-	bool got_any = FALSE;
+	bool got_any;
 	char *cust;
 	char_data *ch_iter;
 	obj_data *axe;
@@ -1375,19 +1381,20 @@ void process_chop(char_data *ch) {
 	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
-		// run interacts for items only if not depleted
-		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, GUESTS_ALLOWED, finish_chopping);
-		}
+		// run interacts -- these will return false if already depleted
+		got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, GUESTS_ALLOWED, finish_chopping);
 		
 		if (!got_any) {
 			// likely didn't get a completion message
 			act("You finish chopping.", FALSE, ch, NULL, NULL, TO_CHAR);
 			act("$n finishes chopping.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
 		}
 		
-		// attempt to change terrain
-		change_chop_territory(IN_ROOM(ch));
+		// attempt to change terrain if depleted
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= get_depletion_max(IN_ROOM(ch), DPLTN_CHOP)) {
+			change_chop_territory(IN_ROOM(ch));
+		}
 		
 		gain_player_tech_exp(ch, PTECH_CHOP_COMMAND, 15);
 		run_ability_hooks_by_player_tech(ch, PTECH_CHOP_COMMAND, NULL, NULL, NULL, NULL);

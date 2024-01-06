@@ -2634,7 +2634,7 @@ DO_ABIL(abil_action_devastate_area) {
 	int dist, iter;
 	int x, y, range;
 	
-	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
+	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < get_depletion_max((room), DPLTN_CHOP))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
 	
 	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
 	if (!range) {
@@ -2678,7 +2678,7 @@ DO_ABIL(abil_action_devastate_area) {
 			uncrop_tile(to_room);
 			data->success = TRUE;
 		}
-		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < get_depletion_max(to_room, DPLTN_CHOP)) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			change_chop_territory(to_room);
 			data->success = TRUE;
