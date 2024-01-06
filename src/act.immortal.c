@@ -5877,6 +5877,56 @@ SHOW(show_learned) {
 }
 
 
+SHOW(show_libraries) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book;
+	room_data *room;
+	struct library_data *libr;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show libraries <book vnum>\r\n");
+	}
+	else if (!(book = book_proto(atoi(arg)))) {
+		msg_to_char(ch, "No such book %d.\r\n", atoi(arg));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", book->vnum, book->title);
+		
+		count = 0;
+		LL_FOREACH(book->in_libraries, libr) {
+			if (!(room = real_room(libr->location))) {
+				continue;
+			}
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_minipets) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct minipet_data *mini, *next_mini;
@@ -11120,6 +11170,7 @@ ACMD(do_show) {
 		{ "smessages", LVL_START_IMM, show_smessages },
 		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
 		{ "friends", LVL_START_IMM, show_friends },
+		{ "libraries", LVL_START_IMM, show_libraries },
 
 		// last
 		{ "\n", 0, NULL }

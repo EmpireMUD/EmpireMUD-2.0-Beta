@@ -1161,6 +1161,7 @@ islands    Immort   Shows you which island ids have empire storage (for MOVEEINV
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
+libraries  Immort   Shows where a book is shelved.
 minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
