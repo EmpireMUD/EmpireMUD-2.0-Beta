@@ -2365,17 +2365,23 @@ INTERACTION_FUNC(devastate_crop) {
 */
 INTERACTION_FUNC(devastate_trees) {
 	char type[256];
-	int num, obj_ok = 0;
+	int amount, num, obj_ok = 0;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
 	obj_data *newobj = NULL;
 	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	if (get_depletion(inter_room, DPLTN_CHOP) >= (interact_data[interaction->type].one_at_a_time ? interaction->quantity : config_get_int("short_depletion"))) {
+		return FALSE;	// depleted room
 	}
 	
-	for (num = 0; num < interaction->quantity; ++num) {
+	amount = interact_data[interaction->type].one_at_a_time ? 1 : interaction->quantity;
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
+	}
+	
+	for (num = 0; num < amount; ++num) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
@@ -2383,11 +2389,13 @@ INTERACTION_FUNC(devastate_trees) {
 		}
 	}
 	
+	add_depletion(inter_room, DPLTN_CHOP, FALSE);
+	
 	if (newobj && obj_ok) {
 		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
 		strtolower(type);
 		
-		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
+		send_ability_per_item_messages(ch, newobj, amount, abil, data, type);
 	}
 	
 	return TRUE;
