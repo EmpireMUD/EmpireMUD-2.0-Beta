@@ -4233,8 +4233,11 @@ ACMD(do_survey) {
 	}
 	if (*buf) {
 		// add an "and"
-		if ((temp = strrchr(buf, ','))) {
-			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp);
+		if ((temp = strrchr(buf, ',')) && temp != strchr(buf, ',')) {
+			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp + 1);
+		}
+		else if (temp) {
+			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf), (int)(temp-buf), buf, temp + 1);
 		}
 		else {	// no comma
 			msg_to_char(ch, "It looks like someone has %s.\r\n", buf);
