@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e5.0.2"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e5.0.3"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
