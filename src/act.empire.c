@@ -5200,6 +5200,9 @@ ACMD(do_enroll) {
 		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
+		// reset max greatness now (max greatness in THIS empire)
+		GET_HIGHEST_KNOWN_GREATNESS(targ) = GET_GREATNESS(targ);
+		
 		SAVE_CHAR(targ);
 		update_member_data(targ);
 		
@@ -5405,7 +5408,7 @@ ACMD(do_enroll) {
 				refresh_all_quests(victim);
 			}
 		}
-			
+		
 		// update goal trackers: AFTER rereading tech
 		update_empire_members_and_greatness(e);
 		refresh_empire_goals(e, NOTHING);

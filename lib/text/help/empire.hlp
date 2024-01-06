@@ -823,6 +823,10 @@ name", then you "enroll player". They don't have to be online at the same time
 as you to do this, so you can add other characters on your account to the
 empire this way.
 
+An empire's Greatness is the sum of the highest Greatness achieved by each of
+its members during their time in the empire. This number does not drop if those
+members lose greatness -- only if you lose members.
+
 When more than one character on an account is in the same empire, they all
 count as just 1 member. Only the highest Greatness among those alts is
 contributed to the empire, but all alts contribute playtime. This prevents

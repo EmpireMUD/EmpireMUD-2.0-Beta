@@ -1757,7 +1757,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'H': {
-				if (!strn_cmp(line, "Highest Known Level: ", 21)) {
+				if (!strn_cmp(line, "Highest Greatness: ", 19)) {
+					GET_HIGHEST_KNOWN_GREATNESS(ch) = atoi(line + 19);
+				}
+				else if (!strn_cmp(line, "Highest Known Level: ", 21)) {
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + 21);
 				}
 				else if (!strn_cmp(line, "History: ", 9)) {
@@ -2805,6 +2808,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'H'
+	fprintf(fl, "Highest Greatness: %d\n", GET_HIGHEST_KNOWN_GREATNESS(ch));
 	fprintf(fl, "Highest Known Level: %d\n", GET_HIGHEST_KNOWN_LEVEL(ch));
 	
 	// 'I'
@@ -5893,7 +5897,7 @@ void update_member_data(char_data *ch) {
 	if ((acct = get_member_account(GET_LOYALTY(ch), GET_ACCOUNT(ch)->id, TRUE))) {
 		if ((data = get_member_account_player(acct, GET_IDNUM(ch), TRUE))) {
 			data->timeout_at = get_member_timeout_ch(ch);
-			data->greatness = GET_GREATNESS(ch);
+			data->greatness = GET_HIGHEST_KNOWN_GREATNESS(ch);
 		}
 	}
 }

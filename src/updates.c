@@ -3570,6 +3570,21 @@ void b5_168_updates(void) {
 }
 
 
+// ensures everyone has a highest greatness shown
+PLAYER_UPDATE_FUNC(b5_188_greatness) {
+	int great;
+	
+	check_delayed_load(ch);
+	
+	great = GET_GREATNESS(ch);
+	great = MIN(great, att_max(ch));
+	
+	if (GET_HIGHEST_KNOWN_GREATNESS(ch) < great) {
+		GET_HIGHEST_KNOWN_GREATNESS(ch) = great;
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3669,7 +3684,7 @@ const struct {
 	{ "b5.162", NULL, b5_162_status_messages, "Applying default status messages to players" },
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
 	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
-	{ "b5.168", b5_168_updates, NULL, "Removing old DIGGING function flag" },
+	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

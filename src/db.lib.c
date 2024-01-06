@@ -1836,6 +1836,9 @@ empire_data *create_empire(char_data *ch) {
 		}
 	}
 	
+	// reset max greatness now (max greatness in THIS empire)
+	GET_HIGHEST_KNOWN_GREATNESS(ch) = GET_GREATNESS(ch);
+	
 	// basic creation
 	CREATE(emp, empire_data, 1);
 	EMPIRE_VNUM(emp) = vnum;
@@ -1853,7 +1856,7 @@ empire_data *create_empire(char_data *ch) {
 	// member data
 	EMPIRE_LEADER(emp) = GET_IDNUM(ch);
 	EMPIRE_MEMBERS(emp) = 1;
-	EMPIRE_GREATNESS(emp) = GET_GREATNESS(ch);
+	EMPIRE_GREATNESS(emp) = GET_HIGHEST_KNOWN_GREATNESS(ch);
 	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
 		EMPIRE_IMM_ONLY(emp) = 1;
 	}

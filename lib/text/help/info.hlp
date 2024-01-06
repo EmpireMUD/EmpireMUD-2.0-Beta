@@ -907,14 +907,15 @@ Type:  passive (you can go as low as 0)
 Greatness is a measure of the majesty your character portrays, as well as how
 others perceive you.
 
+Each character also contributes their Greatness score to their empire. This
+amount never goes down; it's always the highest Greatness the character has had
+since joining the empire. If you have multiple alts (your other characters) in
+the same empire, only the highest Greatness among them is counted.
+
 Greatness is used for:
  - Increasing the amount of territory your empire can control.
  - Increasing your empire's score and ranking.
  - Certain synergy abilities such as Noble Bearing.
-
-Empires also have a Greatness rating, equal to the total Greatness of their
-members. However, if you have multiple alts (your other characters) in the same
-empire, only the highest Greatness is counted.
 
 See also: ALTS, ATTRIBUTES, ESCORE, TERRITORY, NOBLE BEARING
 #

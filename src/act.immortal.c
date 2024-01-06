@@ -2262,25 +2262,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		affect_total(vict);
 	}
 	else if SET_CASE("greatness") {
-		// only update greatness if ch is in a room (playing)
-		emp = GET_LOYALTY(vict);
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) -= vict->real_attributes[GREATNESS];
-		}
-
-		// set the actual greatness
 		vict->real_attributes[GREATNESS] = RANGE(1, att_max(vict));
-		
-		// add greatness back
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) += vict->real_attributes[GREATNESS];
-		}
-		
 		affect_total(vict);
-		if (emp) {
-			update_member_data(vict);
-			update_empire_members_and_greatness(emp);
-		}
 	}
 	else if SET_CASE("intelligence") {
 		vict->real_attributes[INTELLIGENCE] = RANGE(1, att_max(vict));

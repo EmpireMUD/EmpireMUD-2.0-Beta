@@ -4743,6 +4743,7 @@ struct player_special_data {
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
 	byte rank;	// Rank in the empire
+	sh_int highest_known_greatness;	// maximum greatness achieved (prevents empire greatness dropping)
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	

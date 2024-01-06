@@ -610,7 +610,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig, grt;
+	int diff, orig;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -655,14 +655,6 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_GREATNESS: {
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
-			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-				grt = GET_GREATNESS(ch);	// store temporarily
-				GET_GREATNESS(ch) = MIN(grt, att_max(ch));
-				GET_GREATNESS(ch) = MAX(0, GET_GREATNESS(ch));
-				update_member_data(ch);	// update empire
-				GET_GREATNESS(ch) = grt;	// restore to what it just was
-				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
-			}
 			break;
 		}
 		case APPLY_INTELLIGENCE:
@@ -990,7 +982,7 @@ void affect_total(char_data *ch) {
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;
-	int health, move, mana, greatness;
+	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -1004,7 +996,6 @@ void affect_total(char_data *ch) {
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
-	greatness = GET_GREATNESS(ch);
 	
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
@@ -1100,10 +1091,13 @@ void affect_total(char_data *ch) {
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
-	// check greatness thresholds
-	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-		update_member_data(ch);
-		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+	// check new highest greatness
+	if (!IS_NPC(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
+		GET_HIGHEST_KNOWN_GREATNESS(ch) = GET_GREATNESS(ch);
+		if (GET_LOYALTY(ch) && IN_ROOM(ch)) {
+			update_member_data(ch);
+			TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+		}
 	}
 	
 	// look for changed traits if player has trait hooks
