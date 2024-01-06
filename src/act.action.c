@@ -1390,7 +1390,6 @@ void process_chop(char_data *ch) {
 			// likely didn't get a completion message
 			act("You finish chopping.", FALSE, ch, NULL, NULL, TO_CHAR);
 			act("$n finishes chopping.", TRUE, ch, NULL, NULL, TO_ROOM);
-		
 		}
 		
 		// attempt to change terrain if depleted

@@ -6148,6 +6148,9 @@ int get_depletion_max(room_data *room, int depletion_type) {
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		list[list_size++] = GET_BLD_INTERACTIONS(GET_BUILDING(room));
 	}
+	if (GET_ROOM_TEMPLATE(room)) {
+		list[list_size++] = GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room));
+	}
 	
 	// check all lists
 	for (iter = 0; iter < list_size; ++iter) {
