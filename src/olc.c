@@ -1712,7 +1712,7 @@ OLC_MODULE(olc_copy) {
 		msg_to_char(ch, "Usage: olc %s copy <from vnum> <to vnum>\r\n", typename);
 		return;
 	}
-	if (!isdigit(*arg) || (from_vnum = atoi(arg)) < 0 || from_vnum > MAX_VNUM) {
+	if (!isdigit(*arg) || (from_vnum = atoi(arg)) < 0 || from_vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
@@ -2099,7 +2099,7 @@ OLC_MODULE(olc_delete) {
 		msg_to_char(ch, "Delete which %s (vnum)?\r\n", typename);
 		return;
 	}
-	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > MAX_VNUM) {
+	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
@@ -2388,7 +2388,7 @@ OLC_MODULE(olc_edit) {
 		msg_to_char(ch, "Edit which %s (vnum)?\r\n", typename);
 		return;
 	}
-	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > MAX_VNUM) {
+	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
