@@ -1251,17 +1251,25 @@ int get_workforce_production_limit(empire_data *emp, obj_vnum vnum) {
 
 /**
 * Checks the depletion types for all matching interactions to see if there's at
-* least 1 available for a chore.
+* least 1 available for a chore. Also checks if the empire can gain it.
 *
-* @param room_data *room Optional: The room to check for interactions. May be NULL if using a vehicle.
+* @param empire_data *emp The empire for the chore.
+* @param int chore Which CHORE_ is being done.
+* @param room_data *room Optional: The room to check for interactions. May be NULL if using a vehicle; empire must own room if provided.
 * @param vehicle_data *veh Optional: The vehicle to check for interactions. May be NULL if using a room.
 * @param int interaction_type Any INTERACT_ type.
+* @param bool *over_limit Optional: Detects if there was an undepleted item the empire can't gain.
 * @return bool TRUE if at least 1 interaction is available and undepleted.
 */
-bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh, int interaction_type) {
+bool has_any_undepleted_interaction_for_chore(empire_data *emp, int chore, room_data *room, vehicle_data *veh, int interaction_type, bool *over_limit) {
 	struct interaction_item *interact, *list[4] = { NULL, NULL, NULL, NULL };
-	int iter, list_size, common_depletion, depletion_type;
+	int iter, list_size, common_depletion;
 	crop_data *cp;
+	obj_data *proto;
+	
+	if (over_limit) {
+		*over_limit = FALSE;
+	}
 	
 	if (!room && !veh) {
 		return FALSE;	// requires 1 or the other
@@ -1272,7 +1280,7 @@ bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh
 	
 	// build lists of interactions to check
 	list_size = 0;
-	if (room) {
+	if (room && ROOM_OWNER(room) == emp) {
 		list[list_size++] = GET_SECT_INTERACTIONS(SECT(room));
 		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 			list[list_size++] = GET_CROP_INTERACTIONS(cp);
@@ -1288,16 +1296,33 @@ bool has_any_undepleted_interaction_for_chore(room_data *room, vehicle_data *veh
 	// check all lists
 	for (iter = 0; iter < list_size; ++iter) {
 		LL_FOREACH(list[iter], interact) {
-			if (interact->type == interaction_type) {
-				depletion_type = determine_depletion_type(interact);
-				if (GET_CHORE_DEPLETION(room, veh, depletion_type) < (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
-					// only needed 1
-					return TRUE;
-				}
+			if (interact->type != interaction_type) {
+				continue;	// wrong type
+			}
+			if (!(proto = obj_proto(interact->vnum))) {
+				continue;	// no proto
+			}
+			if (!GET_OBJ_STORAGE(proto)) {
+				continue;	// MUST be storable
+			}
+			if (!meets_interaction_restrictions(interact->restrictions, NULL, emp, NULL, NULL)) {
+				continue;	// restrictions
+			}
+			if (GET_CHORE_DEPLETION(room, veh, determine_depletion_type(interact)) >= (interact_one_at_a_time[interaction_type] ? interact->quantity : common_depletion)) {
+				continue;	// depleted
+			}
+			
+			// appears ok
+			if (can_gain_chore_resource(emp, room ? room : IN_ROOM(veh), chore, interact->vnum)) {
+				return TRUE;	// only need 1
+			}
+			else if (over_limit) {
+				*over_limit = TRUE;
 			}
 		}
 	}
 	
+	// did not find one
 	return FALSE;
 }
 
@@ -2581,35 +2606,28 @@ INTERACTION_FUNC(one_fishing_chore) {
 * @param vehicle_data *veh Optional: If the chore is performed by a vehicle, this is set.
 */
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
-	bool depleted = !has_any_undepleted_interaction_for_chore(room, veh, INTERACT_FISH);
-	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_FISHING, VEH_INTERACTIONS(veh), INTERACT_FISH, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FISHING, INTERACT_FISH);
-	bool can_do = !depleted && can_gain;
+	char_data *worker;
+	bool over_limit = FALSE;
 	
-	if (can_do && worker) {
-		// not able to ewt_mark_resource_worker() until we're inside the interact
-		// fishing is free
-		charge_workforce(emp, CHORE_FISHING, room, worker, 0, NOTHING, 0);
-		if (veh) {
-			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_FISH, room, NULL, NULL, veh, one_fishing_chore);
+	if (has_any_undepleted_interaction_for_chore(emp, CHORE_FISHING, room, veh, INTERACT_FISH, &over_limit)) {
+		if ((worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob))) {
+			// fishing is free
+			charge_workforce(emp, CHORE_FISHING, room, worker, 0, NOTHING, 0);
+			if (veh) {
+				run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_FISH, room, NULL, NULL, veh, one_fishing_chore);
+			}
+			else {
+				run_room_interactions(worker, room, INTERACT_FISH, veh, NOTHING, one_fishing_chore);
+			}
 		}
-		else {
-			run_room_interactions(worker, room, INTERACT_FISH, veh, NOTHING, one_fishing_chore);
+		else if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
+			// fresh worker
+			ewt_mark_for_interactions(emp, room, INTERACT_FISH);
+			charge_workforce(emp, CHORE_FISHING, room, worker, 0, NOTHING, 0);
 		}
-	}
-	else if (can_do && (worker = place_chore_worker(emp, CHORE_FISHING, room))) {
-		ewt_mark_for_interactions(emp, room, INTERACT_FISH);
-		charge_workforce(emp, CHORE_FISHING, room, worker, 0, NOTHING, 0);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_FISHING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_FISHING, WF_PROB_DEPLETED, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_FISHING, WF_PROB_OVER_LIMIT, FALSE);
+		log_workforce_problem(emp, room, CHORE_FISHING, over_limit ? WF_PROB_OVER_LIMIT : WF_PROB_DEPLETED, FALSE);
 	}
 }
 
@@ -2890,38 +2908,30 @@ INTERACTION_FUNC(one_production_chore) {
 * @param int interact_type INTERACT_PRODUCTION or INTERACT_SKILLED_LABOR
 */
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type) {
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_PRODUCTION].mob);
-	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_PRODUCTION, VEH_INTERACTIONS(veh), interact_type, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_PRODUCTION, interact_type);
-	bool depleted = !has_any_undepleted_interaction_for_chore(room, veh, interact_type);
-	bool can_do = can_gain && !depleted;
+	bool over_limit = FALSE;
+	char_data *worker;
 	
-	if (worker && can_do) {
-		charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
+	if (has_any_undepleted_interaction_for_chore(emp, CHORE_PRODUCTION, room, veh, interact_type, &over_limit)) {
+		if ((worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_PRODUCTION].mob))) {
+			charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
 		
-		if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
-			// successful vehicle interact
+			if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
+				// successful vehicle interact
+			}
+			else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
+				// successful room interact
+			}
+			// no else: these interactions may fail due to low percentages
 		}
-		else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
-			// successful room interact
-		}
-		// no else: these interactions may fail due to low percentages
-	}
-	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_PRODUCTION, room))) {
+		else if ((worker = place_chore_worker(emp, CHORE_PRODUCTION, room))) {
+			// fresh worker
 			ewt_mark_for_interactions(emp, room, interact_type);
 			charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
 		}
 	}
-	else if (!worker) {
-		// mark_workforce_delay(emp, room, CHORE_PRODUCTION, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_PRODUCTION, WF_PROB_DEPLETED, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_PRODUCTION, WF_PROB_OVER_LIMIT, FALSE);
+	else {
+		// problem
+		log_workforce_problem(emp, room, CHORE_PRODUCTION, over_limit ? WF_PROB_OVER_LIMIT : WF_PROB_DEPLETED, FALSE);
 	}
 }
 
