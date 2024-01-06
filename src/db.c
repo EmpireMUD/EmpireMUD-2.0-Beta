@@ -62,6 +62,7 @@ void check_for_new_map();
 void check_learned_empire_crafts();
 void check_newbie_islands();
 void check_nowhere_einv_all();
+void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
 void check_triggers();
@@ -487,6 +488,8 @@ void boot_db(void) {
 	
 	log("Activating workforce.");
 	chore_update();
+	
+	check_for_player_wipe();
 	
 	log("Final startup...");
 	write_whole_mapout();
