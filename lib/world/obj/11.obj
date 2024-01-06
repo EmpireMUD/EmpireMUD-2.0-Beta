@@ -14,11 +14,19 @@ a crimson bloodsword~
 A bloodsword is puddling on the ground.~
 The sword drips with blood.
 ~
-1 gmp an 0 0 2
+1 gmp an 0 0 4
 0 3 1
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1102
 spear bloodspear vicious~
@@ -26,17 +34,25 @@ a vicious bloodspear~
 A bloodspear is pooling on the ground.~
 The spear drips with blood.
 ~
-1 gmp an b 0 7
+1 gmp an b 0 10
 0 1 3
 10 0
 A
 18 3 0
+A
+26 1 0
 M
 15
 You jab your spear into the water and when you extract it you find $p on the end!~
 M
 16
 $n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1103
 skean bloodskean deep red~
@@ -44,11 +60,19 @@ a deep red bloodskean~
 A bloodskean is dripping on the ground.~
 The skean drips with blood.
 ~
-1 gmp an f 0 4
+1 gmp an f 0 6
 0 3 4
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1104
 mace bloodmace wicked~
@@ -56,11 +80,19 @@ a wicked bloodmace~
 A bloodmace has melted on the ground.~
 The mace drips with blood.
 ~
-1 gmp an 0 0 3
+1 gmp an 0 0 5
 0 3 5
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1105
 fireball~
@@ -68,9 +100,15 @@ a fireball~
 A fireball is rolling around here.~
 You're ready to shoot fireballs.
 ~
-1 gmp ano 0 0 4
+1 gmp ano 0 0 5
 0 1 16
 10 0
+M
+10
+The flame in your hand flickers and goes out.~
+M
+11
+The flame in $n's hand flickers and goes out.~
 S
 #1106
 orb light glowing~
@@ -207,11 +245,19 @@ a veined bloodstaff~
 A bloodstaff is puddling on the ground.~
 The staff drips with blood.
 ~
-1 gmp an p 0 4
+1 gmp an p 0 6
 0 3 19
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1117
 whip bloody bloodwhip dripping~
@@ -221,11 +267,19 @@ A bloody whip is pooling on the ground.~
 a horse, and coiled into a horrific mass. It splashes blood everywhere as you
 whip it around.
 ~
-1 gmp an 0 0 5
+1 gmp an 0 0 7
 0 1 7
 10 0
 A
 18 3 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1118
 axe bloodaxe~
@@ -234,11 +288,19 @@ A bloodaxe is dripping on the ground.~
    The axe is made from blood, handle and all. It drips and splashes as you
 swing it.
 ~
-1 gmp an a 0 8
+1 gmp an a 0 10
 0 1 2
 10 0
 A
 1 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1119
 spike nocturnium~
@@ -261,11 +323,19 @@ A bloodmaul has been hammered into the ground.~
    This great maul is made from blood itself, though it looks like you could
 still use it as a hammer in the forge.
 ~
-1 gmp an c 0 10
+1 gmp an c 0 12
 0 1 6
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1121
 cloth grave~
@@ -288,11 +358,19 @@ A bloodmattock is dripping on the ground.~
    This pick mattock is made from red, dripping blood. It looks like you could
 use it for mining -- or murder.
 ~
-1 gmp an h 0 9
+1 gmp an h 0 11
 0 1 8
 10 0
 A
 1 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1123
 starberry berry twinkling~
