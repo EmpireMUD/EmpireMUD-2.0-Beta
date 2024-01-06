@@ -5491,6 +5491,56 @@ SHOW(show_ammotypes) {
 }
 
 
+SHOW(show_author) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	int idnum;
+	size_t size, count;
+	book_data *book, *next_book;
+	player_index_data *index;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show author <author idnum>\r\n");
+	}
+	else if ((idnum = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid author idnum.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Books authored by [%d] %s:\r\n", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
+		
+		count = 0;
+		HASH_ITER(hh, book_table, book, next_book) {
+			if (book->author != idnum) {
+				continue;
+			}
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", book->vnum, book->title);
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_ignoring) {
 	char arg[MAX_INPUT_LENGTH];
 	player_index_data *index;
@@ -5923,6 +5973,44 @@ SHOW(show_libraries) {
 		if (ch->desc) {
 			page_string(ch->desc, output, TRUE);
 		}
+	}
+}
+
+
+SHOW(show_lostbooks) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book, *next_book;
+	
+	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
+	
+	count = 0;
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (book->in_libraries) {
+			continue;
+		}
+		
+		snprintf(line, sizeof(line), "[%7d] %s\r\n", book->vnum, book->title);
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
+		}
+		else {
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
+		}
+	}
+	
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 }
 
