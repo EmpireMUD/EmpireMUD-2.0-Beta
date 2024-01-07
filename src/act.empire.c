@@ -2271,6 +2271,12 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
+	// customize name
+	snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	set_room_custom_name(city->location, buf);
+	affect_total_room(city->location);
+	
 	// move einv here if any is lost
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
@@ -2551,8 +2557,10 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	write_city_data_file();
 	
 	// and rename the center
-	snprintf(buf, sizeof(buf), "The Center of %s", newname);
+	snprintf(buf, sizeof(buf), "The Center of %s", newname);	
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	set_room_custom_name(city->location, buf);
+	affect_total_room(city->location);
 }
 
 

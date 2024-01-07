@@ -3773,7 +3773,9 @@ void b5_169_city_centers(void) {
 		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
 				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 				set_room_custom_name(city->location, buf);
+				affect_total_room(city->location);
 			}
 		}
 	}
