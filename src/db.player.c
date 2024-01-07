@@ -4456,10 +4456,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// verify abils}
 	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
-
-	// script/trigger stuff
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
-	greet_triggers(ch, NO_DIR, "login", FALSE);
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -4584,6 +4580,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
 	}
+	
+	// script/trigger stuff
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	greet_triggers(ch, NO_DIR, "login", FALSE);
 }
 
 
