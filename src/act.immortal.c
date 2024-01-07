@@ -10091,14 +10091,14 @@ ACMD(do_load) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
 		}
 		
-		load_vtrigger(veh);
-		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
 		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
 		}
+		
+		load_vtrigger(veh);
 	}
 	else if (is_abbrev(buf, "book")) {
 		if (!book_proto(number)) {

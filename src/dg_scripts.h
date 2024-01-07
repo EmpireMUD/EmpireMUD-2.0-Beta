@@ -442,7 +442,7 @@ int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
 int destroy_vtrigger(vehicle_data *veh, char *method);
 int entry_vtrigger(vehicle_data *veh, char *method);
 int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
-void load_vtrigger(vehicle_data *veh);
+int load_vtrigger(vehicle_data *veh);
 void reboot_vtrigger(vehicle_data *veh);
 void speech_vtrigger(char_data *actor, char *str, generic_data *language);
 

@@ -2273,7 +2273,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(conjure_vehicle_interaction) {
-	bool junk;
+	bool junk, veh_ok = TRUE;
 	int level, num;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
@@ -2309,11 +2309,11 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 		}
 		
 		special_vehicle_setup(ch, veh);
-		load_vtrigger(veh);
+		veh_ok = load_vtrigger(veh);
 	}
 	
 	// messaging?
-	if (veh) {
+	if (veh && veh_ok) {
 		send_ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data, NULL);
 	}
 	

@@ -3718,14 +3718,15 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 * Called when a vehicle is first loaded, sometimes before it's been built.
 *
 * @param vehicle_data *veh The vehicle that was just loaded.
+* @return int 0 to indicate the vehicle is gone; 1 if it's ok.
 */
-void load_vtrigger(vehicle_data *veh) {
+int load_vtrigger(vehicle_data *veh) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
 	int val = 1;
 
 	if (!SCRIPT_CHECK(veh, VTRIG_LOAD)) {
-		return;
+		return 1;
 	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
@@ -3736,6 +3737,9 @@ void load_vtrigger(vehicle_data *veh) {
 			union script_driver_data_u sdd;
 			sdd.v = veh;
 			val = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+			if (!sdd.v) {
+				val = 0;
+			}
 			if (!val || !IS_SET(GET_TRIG_TYPE(t), VTRIG_ALLOW_MULTIPLE)) {
 				break;
 			}
@@ -3744,6 +3748,8 @@ void load_vtrigger(vehicle_data *veh) {
 			}
 		}
 	}
+	
+	return val;
 }
 
 
