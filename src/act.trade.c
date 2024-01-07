@@ -2130,7 +2130,7 @@ ACMD(do_gen_craft) {
 	}
 	else if (*arg && !list_only && !type) {
 		// found no match
-		msg_to_char(ch, "Unknown %s. Type '%s' by itself to see a list of what you can %s.\r\n", gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
+		msg_to_char(ch, "Unknown %s '%s'. Type '%s' by itself to see a list of what you can %s.\r\n", arg, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
 	}
 	else if (!*arg && !list_only && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
 		// 'build' no-arg in an incomplete building: resume
