@@ -6635,33 +6635,13 @@ int get_direction_to(room_data *from, room_data *to) {
 * @param bool abbrev If TRUE, gets e.g. "ene". If FALSE, gets e.g. "east-northeast".
 * @return char* The string for the direction. May be an empty string if to == from.
 */
-char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
+const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
 	room_data *origin = HOME_ROOM(from), *dest = HOME_ROOM(to);
 	int from_x = X_COORD(origin), from_y = Y_COORD(origin);
 	int to_x = X_COORD(dest), to_y = Y_COORD(dest);
 	int x_diff = to_x - from_x, y_diff = to_y - from_y;
 	int iter;
 	double radians, slope, degrees;
-	
-	char *partial_dirs[][2] = {
-		// counter-clockwise from ENE, ending with E
-		{ "east-northeast", "ene" },
-		{ "northeast", "ne" },
-		{ "north-northeast", "nne" },
-		{ "north", "n" },
-		{ "north-northwest", "nnw" },
-		{ "northwest", "nw" },
-		{ "west-northwest", "wnw" },
-		{ "west", "w" },
-		{ "west-southwest", "wsw" },
-		{ "southwest", "sw" },
-		{ "south-southwest", "ssw" },
-		{ "south", "s" },
-		{ "south-southeast", "sse" },
-		{ "southeast", "se" },
-		{ "east-southeast", "ese" },
-		{ "east", "e" }		// must be last for the iterator to work
-	};
 	
 	// adjust for edges
 	if (WRAP_X) {
@@ -6722,7 +6702,7 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 	
 	// each dir is 22.5 degrees of the circle (11.25 each way)
 	// so we remove that first 11.25 and do East (0 degrees) at the end...
-	for (iter = 0; strcmp(partial_dirs[iter][1], "e"); ++iter) {
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
 		if ((degrees - 11.25) < ((iter + 1) * 22.5)) {
 			// found!
 			return partial_dirs[iter][(abbrev ? 1 : 0)];

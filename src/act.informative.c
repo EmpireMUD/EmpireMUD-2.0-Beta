@@ -3619,7 +3619,7 @@ ACMD(do_mapsize) {
 
 ACMD(do_mark) {
 	int dist;
-	char *dir_str;
+	const char *dir_str;
 	room_data *mark, *here;
 	
 	skip_spaces(&argument);
@@ -3768,7 +3768,8 @@ ACMD(do_mudstats) {
 
 ACMD(do_nearby) {
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
+	const char *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;

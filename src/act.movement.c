@@ -2464,7 +2464,7 @@ ACMD(do_move) {
 ACMD(do_portal) {
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
-	char *dir_str;
+	const char *dir_str;
 	struct temp_portal_data *port, *next_port, *portal_list = NULL;
 	room_data *near = NULL, *target = NULL;
 	obj_data *portal, *end, *obj;

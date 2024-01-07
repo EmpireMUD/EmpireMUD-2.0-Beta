@@ -2042,7 +2042,7 @@ bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *ne
 int get_depletion_max(room_data *room, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
-char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
+const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
@@ -2095,7 +2095,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void load_empire_chat_history(empire_data *emp);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs, bool organize_general_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
@@ -2392,6 +2392,7 @@ char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 void look_in_direction(char_data *ch, int dir);
+char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))

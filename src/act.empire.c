@@ -72,6 +72,41 @@ struct einv_type {
 };
 
 
+// scan helper
+struct _organize_general_dirs_t {
+	char dir[80];
+	char string[1024];
+	bool full;
+	UT_hash_handle hh;
+} *ogd_hash = NULL, *ogd, *next_ogd;
+
+// simple scan sorter
+int _sort_ogd(struct _organize_general_dirs_t *a, struct _organize_general_dirs_t *b) {
+	int a_pos = -1, b_pos = -1;
+	int iter;
+	
+	// empty string
+	if (!*a->dir) {
+		return -1;
+	}
+	else if (!*b->dir) {
+		return 1;
+	}
+	
+	// detect position
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
+		if (a_pos == -1 && (!strcmp(a->dir, partial_dirs[iter][1]) || !strcmp(a->dir, partial_dirs[iter][0]))) {
+			a_pos = iter;
+		}
+		if (b_pos == -1 && (!strcmp(b->dir, partial_dirs[iter][1]) || !strcmp(b->dir, partial_dirs[iter][0]))) {
+			b_pos = iter;
+		}
+	}
+	
+	return a_pos - b_pos;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
@@ -3310,13 +3345,14 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 * @param int max_dist How far to see (e.g. mapsize radius).
 * @param bitvector_t only_in_dirs Optional: Requires that any tiles be in one of the directions listed here as BIT(NORTH), BIT(EAST), etc. Ignored if empty.
+* @param bool organize_general_dirs If TRUE, sorts results into general directions. Otherwise, shows a full tile list.
 */
-void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs) {
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs, bool organize_general_dirs) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
-	char *dir_str;
+	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room, *block_room;
@@ -3532,7 +3568,8 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		}
 	}
 
-	if (node_list) {
+	if (node_list && !organize_general_dirs) {
+		// default output: full tile list
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
@@ -3605,6 +3642,76 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		if (over_count) {
 			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
 		}
+		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		page_string(ch->desc, output, TRUE);
+	}
+	else if (node_list && organize_general_dirs) {
+		// optionally organize into geneal directions
+		
+		sort_territory_from_loc = IN_ROOM(ch);
+	    DL_SORT(node_list, sort_territory_nodes_by_distance);
+		
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+		}
+		
+		// display and free the nodes
+		total = over_count = 0;
+		DL_FOREACH_SAFE(node_list, node, next_node) {
+			total += node->count;
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			// find ogd entry for this direction (or create one)
+			dir_str = get_partial_direction_to(ch, IN_ROOM(ch), node->loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
+			HASH_FIND_STR(ogd_hash, dir_str, ogd);
+			if (!ogd) {
+				CREATE(ogd, struct _organize_general_dirs_t, 1);
+				strcpy(ogd->dir, dir_str);
+				*ogd->string = '\0';
+				HASH_ADD_STR(ogd_hash, dir, ogd);
+			}
+			
+			// general entry
+			lsize = snprintf(line, sizeof(line), "%s%s", screenread_one_tile(ch, IN_ROOM(ch), node->loc, TRUE), coord_display(ch, check_x, check_y, FALSE));
+			
+			if (lsize + strlen(ogd->string) + 8 < sizeof(ogd->string)) {
+				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
+			}
+			else {
+				ogd->full = TRUE;
+			}
+			
+			// free node
+			DL_DELETE(node_list, node);
+			if (node->details) {
+				free(node->details);
+			}
+			free(node);
+		}
+		
+		// sort directions
+		HASH_SORT(ogd_hash, _sort_ogd);
+		
+		HASH_ITER(hh, ogd_hash, ogd, next_ogd) {
+			lsize = snprintf(line, sizeof(line), "%s: %s%s\r\n", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
+			
+			if (lsize + size + 40 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			
+			// and free
+			HASH_DEL(ogd_hash, ogd);
+			free(ogd);
+		}
+		
+		// space reserved for this
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
 		page_string(ch->desc, output, TRUE);
 	}

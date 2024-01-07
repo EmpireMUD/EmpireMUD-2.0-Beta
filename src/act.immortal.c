@@ -9061,7 +9061,7 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char *dir_str;
+	const char *dir_str;
 	room_data *target;
 	int dist;
 	

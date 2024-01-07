@@ -45,7 +45,6 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 // locals
 ACMD(do_exits);
 char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
-char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs);
 
 
@@ -2566,7 +2565,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
 
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dist, max_distance;
-	char *dir_str;
+	const char *dir_str;
 	char_data *i, *found = NULL;
 	
 	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
@@ -2999,7 +2998,7 @@ ACMD(do_scan) {
 	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR || (dist >= 0 && dash_distance)) {
 		// scanning by tile name
 		clear_recent_moves(ch);
-		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
+		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers, dash_distance);
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {

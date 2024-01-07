@@ -2498,7 +2498,8 @@ DO_ABIL(abil_action_close_to_melee) {
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
-	char *dir_str, *repl_array[2];
+	char *repl_array[2];
+	const char *dir_str;
 	int adv_dist;
 	struct instance_data *inst;
 	struct empire_city_data *match_city;
@@ -2601,7 +2602,7 @@ DO_ABIL(abil_action_detect_hide) {
 DO_ABIL(abil_action_detect_players_around) {
 	bool wait;
 	char where_str[256];
-	char *dir_str;
+	const char *dir_str;
 	int player_dist;
 	char_data *ch_iter;
 	struct empire_city_data *match_city;

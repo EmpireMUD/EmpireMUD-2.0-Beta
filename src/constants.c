@@ -1689,6 +1689,30 @@ const int show_map_y_first[NUM_SIMPLE_DIRS] = {
 };
 
 
+// used for get_partial_direction_to() etc
+const char *partial_dirs[][2] = {
+	// counter-clockwise from ENE, ending with E
+	{ "east-northeast", "ene" },
+	{ "northeast", "ne" },
+	{ "north-northeast", "nne" },
+	{ "north", "n" },
+	{ "north-northwest", "nnw" },
+	{ "northwest", "nw" },
+	{ "west-northwest", "wnw" },
+	{ "west", "w" },
+	{ "west-southwest", "wsw" },
+	{ "southwest", "sw" },
+	{ "south-southwest", "ssw" },
+	{ "south", "s" },
+	{ "south-southeast", "sse" },
+	{ "southeast", "se" },
+	{ "east-southeast", "ese" },
+	{ "east", "e" },
+	
+	{ "\n", "\n" }		// must be last for the iterator to work
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER CONSTANTS /////////////////////////////////////////////////////
 
