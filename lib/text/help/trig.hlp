@@ -69,7 +69,7 @@ The following trigger types are supported:
 Mobs: ability, act, death, entry, leave, load, speech
 Objects: ability, consume, drop, get, give, load, remove, wear
 Rooms: ability, door, drop, enter, leave, load, speech, zone reset
-Vehicles: destroy, entry, leave, load, speech
+Vehicles: ability, destroy, entry, leave, load, speech
 
 Support for this can be added to more trigger types on request.
 
