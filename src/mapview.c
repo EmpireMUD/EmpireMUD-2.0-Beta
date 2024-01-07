@@ -2955,6 +2955,9 @@ ACMD(do_scan) {
 				msg_to_char(ch, "Invalid direction modifier '%s'.\r\n", arg+1);
 				return;
 			}
+			else if (val >= NUM_2D_DIRS) {
+				msg_to_char(ch, "You can't scan that way.\r\n");
+			}
 			else {
 				// accept direction modifier
 				dir_modifiers |= BIT(val);
