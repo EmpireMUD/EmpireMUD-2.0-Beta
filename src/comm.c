@@ -1577,6 +1577,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
 					}
 					CHECK_NULL(obj, (const char *) obj);
+					dg_arg = (char *) obj;
 					break;
 				}
 				case 'F': {

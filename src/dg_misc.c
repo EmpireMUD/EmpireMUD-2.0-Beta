@@ -1051,7 +1051,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_room_vis((char_data*)thing, targ_arg, NULL);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
+			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT_DESC((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
 			break;
 		}
 		case OBJ_TRIGGER: {

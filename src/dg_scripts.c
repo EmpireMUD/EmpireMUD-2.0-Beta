@@ -1408,8 +1408,8 @@ ACMD(do_tattach) {
 		reread_companion_trigs(victim);
 		request_char_save_in_world(victim);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
-		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT_DESC(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
+		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT_DESC(victim), GET_MOB_VNUM(victim));
 	}
 	else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
 		object = (*targ_name == UID_CHAR) ? get_obj(targ_name) : get_obj_vis(ch, targ_name, NULL);
@@ -1793,13 +1793,13 @@ ACMD(do_tdetach) {
 		else if (trigger && !str_cmp(trigger, "all")) {
 			remove_all_triggers(victim, MOB_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT_DESC(victim), GET_NAME(ch));
 			}
-			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT_DESC(victim));
 		}
 		else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT_DESC(victim), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			check_extract_script(victim, MOB_TRIGGER);
@@ -1936,7 +1936,7 @@ void script_log_by_type(int go_type, void *go, const char *format, ...) {
 	switch (go_type) {
 		case MOB_TRIGGER: {
 			strcpy(type, "Mob");
-			strcpy(name, GET_SHORT((char_data*)go));
+			strcpy(name, GET_SHORT_DESC((char_data*)go));
 			vnum = GET_MOB_VNUM((char_data*)go);
 			break;
 		}

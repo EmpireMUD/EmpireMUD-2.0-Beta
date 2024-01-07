@@ -27,20 +27,38 @@
 #include "dg_event.h"
 #include "constants.h"
 
-/*
-*  General functions used by several triggers
+/**
+* Contents:
+*   General Functions
+*   Mob Triggers
+*   Object Triggers
+*   World Triggers
+*   Vehicle Triggers
+*   Combo Triggers
+*   Greet Triggers
+*   Start Quest Triggers
+*   Finish Quest Triggers
+*   Reset Trigger Helper
+*   Kill Triggers
 */
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERAL FUNCTIONS ///////////////////////////////////////////////////////
+
 /*
 * Copy first phrase into first_arg, returns rest of string
+*
+* @param char *arg The incoming phrase.
+* @param char *first_arg A buffer to store the first argument.
+* @return char* The remaining part of arg.
 */
 char *one_phrase(char *arg, char *first_arg) {
 	skip_spaces(&arg);
 
-	if (!*arg)
-	*first_arg = '\0';
-
+	if (!*arg) {
+		*first_arg = '\0';
+	}
 	else if (*arg == '"') {
 		char *p, c;
 
@@ -48,10 +66,12 @@ char *one_phrase(char *arg, char *first_arg) {
 		c = *p;
 		*p = '\0';
 		strcpy(first_arg, arg + 1);
-		if (c == '\0')
+		if (c == '\0') {
 			return p;
-		else
+		}
+		else {
 			return p + 1;
+		}
 	}
 	else {
 		char *s, *p;
@@ -59,8 +79,9 @@ char *one_phrase(char *arg, char *first_arg) {
 		s = first_arg;
 		p = arg;
 
-		while (*p && !isspace(*p) && *p != '"')
+		while (*p && !isspace(*p) && *p != '"') {
 			*s++ = *p++;
+		}
 
 		*s = '\0';
 		return p;
@@ -70,6 +91,13 @@ char *one_phrase(char *arg, char *first_arg) {
 }
 
 
+/**
+* Determines if one string is a substring of the other.
+*
+* @param char *sub The part to try to find in 'string'.
+* @param char *string The full string to search.
+* @return int 1 if it's a substring; 0 if not.
+*/
 int is_substring(char *sub, char *string) {
 	char *s;
 
@@ -86,6 +114,8 @@ int is_substring(char *sub, char *string) {
 
 
 /**
+* Attempts to match a input to a command trigger.
+*
 * @param char *input The player's command input (without args).
 * @param char *match The text to match (one or more words).
 * @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
@@ -129,32 +159,45 @@ bool match_command_trig(char *input, char *match, bool mode) {
 
 
 /*
-* return 1 if str contains a word or phrase from wordlist.
-* phrases are in double quotes (").
-* if wrdlist is NULL, then return 1, if str is NULL, return 0.
+* Checks if a word from wordlist is in a string. If wordlist is NULL, then it
+* returns 1; if str is NULL, returns 0.
+*
+* @param char *str The string to search.
+* @param char *wordlist A list of words to check. Phrases are in "double quotes". An asterisk matches anything.
+* @return bool 1 if a word or phrase from wordlist is in 'str'; 0 if not.
 */
 int word_check(char *str, char *wordlist) {
 	char words[MAX_INPUT_LENGTH], phrase[MAX_INPUT_LENGTH], *s;
 
-	if (*wordlist=='*')
+	if (*wordlist == '*') {
 		return 1;
+	}
 
 	strcpy(words, wordlist);
 
-	for (s = one_phrase(words, phrase); *phrase; s = one_phrase(s, phrase))
-		if (is_substring(phrase, str))
+	for (s = one_phrase(words, phrase); *phrase; s = one_phrase(s, phrase)) {
+		if (is_substring(phrase, str)) {
 			return 1;
+		}
+	}
 
 	return 0;
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// MOB TRIGGERS ////////////////////////////////////////////////////////////
 
-/*
-*  mob triggers
+/**
+* Called before the character actually enters the room, and before they look
+* at it, giving time to hide a mob or reject the entry.
+*
+* @param char_data *actor The person who is going to move.
+* @param room_data *room The room they are trying to enter.
+* @param int dir The direction they are moving.
+* @param char *method How they are moving.
+* @return int 1 to allow; 0 to try to prevent the movement.
 */
-
-
 int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method) {
 	trig_data *t, *next_t;
 	char_data *ch;
@@ -164,8 +207,9 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method)
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
 	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
 		return TRUE;
+	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_PRE_GREET_ALL) || (ch == actor)) {
@@ -398,6 +442,17 @@ void speech_mtrigger(char_data *actor, char *str, generic_data *language, char_d
 }
 
 
+/**
+* Called when an act() action message is sent to a mob.
+*
+* @param const char_data *ch The person receiving the action message.
+* @param char *str The string shown.
+* @param char_data *actor The person who caused the message to be sent.
+* @param char_data *victim The victim/target of the message, if any.
+* @param obj_data *object The first object-target of the message, if any.
+* @param obj_data *target The secodn object-target of the message, if any.
+* @param char *arg The string passed to the target arg, if any. This is NOT USED.
+*/
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -432,14 +487,18 @@ void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *v
 			if (((GET_TRIG_NARG(t) && word_check(str, GET_TRIG_ARG(t))) || (!GET_TRIG_NARG(t) && is_substring(GET_TRIG_ARG(t), str)))) {
 				union script_driver_data_u sdd;
 
-				if (actor)
+				if (actor) {
 					ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				if (victim)
+				}
+				if (victim) {
 					ADD_UID_VAR(buf, t, char_script_id(victim), "victim", 0);
-				if (object)
+				}
+				if (object) {
 					ADD_UID_VAR(buf, t, obj_script_id(object), "object", 0);
-				if (target)
+				}
+				if (target) {
 					ADD_UID_VAR(buf, t, obj_script_id(target), "target", 0);
+				}
 				if (str) {
 					/* we're guaranteed to have a string ending with \r\n\0 */
 					char *nstr = strdup(str), *fstr = nstr, *p = strchr(nstr, '\r');
@@ -509,13 +568,19 @@ int fight_mtrigger(char_data *ch, bool will_hit) {
 }
 
 
+/**
+* Called after a hit against the mob.
+*
+* @param char_data *ch The mob being hit.
+*/
 void hitprcnt_mtrigger(char_data *ch) {
 	char_data *actor;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_HITPRCNT) || !FIGHTING(ch))
+	if (!SCRIPT_CHECK(ch, MTRIG_HITPRCNT) || !FIGHTING(ch)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -534,13 +599,22 @@ void hitprcnt_mtrigger(char_data *ch) {
 }
 
 
+/**
+* Called when someone is giving an object to a mob.
+*
+* @param char_data *ch The mob receiving the item.
+* @param char_data *actor The person giving the mob the object.
+* @param obj_data *obj The item being given.
+* @return int 1 to allow it; 0 to cancel the give.
+*/
 int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_RECEIVE))
+	if (!SCRIPT_CHECK(ch, MTRIG_RECEIVE)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -553,10 +627,12 @@ int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 			ADD_UID_VAR(buf, t, obj_script_id(obj), "object", 0);
 			sdd.c = ch;
 			ret_val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch) || obj->carried_by != actor)
+			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch) || obj->carried_by != actor) {
 				return 0;
-			else
+			}
+			else {
 				return ret_val;
+			}
 		}
 	}
 
@@ -564,14 +640,22 @@ int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 }
 
 
+/**
+* Called as a character dies.
+*
+* @param char_data *ch The mob dying.
+* @param char_data *actor The killer, if applicable.
+* @return 0 to prevent the death cry; 1 to allow it. (The death cannot be prevented.)
+*/
 int death_mtrigger(char_data *ch, char_data *actor) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 	int val = 1;
 	bool multi = FALSE;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_DEATH))
+	if (!SCRIPT_CHECK(ch, MTRIG_DEATH)) {
 		return val;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
@@ -583,8 +667,9 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 		if (TRIGGER_CHECK(t, MTRIG_DEATH) && (number(1, 100) <= GET_TRIG_NARG(t))){
 			union script_driver_data_u sdd;
 
-			if (actor && actor != ch)
+			if (actor && actor != ch) {
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			}
 			sdd.c = ch;
 			val &= script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 			
@@ -602,7 +687,14 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 }
 
 
-// returns 0 to block the bribe, 1 to allow it
+/**
+* Called when someone gives money to a character.
+*
+* @param char_data *ch The mob receiving the money.
+* @param char_data *actor The person giving the money.
+* @param int amount How much is being given.
+* @return int 0 to block the bribe, 1 to allow it.
+*/
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -674,6 +766,11 @@ int can_fight_mtrigger(char_data *ch, char_data *actor) {
 }
 
 
+/**
+* Called when the mob is first loaded.
+*
+* @param char_data *ch The mob.
+*/
 void load_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -702,6 +799,14 @@ void load_mtrigger(char_data *ch) {
 }
 
 
+/**
+* Called when someone tries to target a mob with an ability.
+*
+* @param char_data *actor The person using the ability.
+* @param char_data *ch The mob being targeted.
+* @param any_vnum abil The ability's vnum.
+* @return int 1 to allow the ability; 0 to prevent it.
+*/
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -747,6 +852,8 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 
 
 /**
+* Called as a character tries to leave the room.
+*
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
 * @param char *custom_dir Optional: A different value for %direction% (may be NULL).
@@ -816,6 +923,14 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 }
 
 
+/**
+* Called as a character attempts to use a door.
+*
+* @param char_data *actor The person working a door.
+* @param int subcmd Which door action the player is using.
+* @param int dir Which direction the door is in.
+* @return int 1 to allow the command; 0 to prevent it.
+*/
 int door_mtrigger(char_data *actor, int subcmd, int dir) {
 	trig_data *t, *next_t;
 	char_data *ch;
@@ -837,10 +952,12 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 			if (TRIGGER_CHECK(t, MTRIG_DOOR) && CAN_SEE(ch, actor) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				add_var(&GET_TRIG_VARS(t), "cmd", (char *)cmd_door[subcmd], 0);
-				if (dir>=0 && dir < NUM_OF_DIRS)
+				if (dir>=0 && dir < NUM_OF_DIRS) {
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
-				else
+				}
+				else {
 					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				sdd.c = ch;
 				val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
@@ -858,6 +975,11 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 }
 
 
+/**
+* Called on a mob after the mud starts up.
+*
+* @param char_data *ch The mob.
+*/
 void reboot_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
 	int val;
@@ -879,10 +1001,8 @@ void reboot_mtrigger(char_data *ch) {
 }
 
 
-/*
-*  object triggers
-*/
-
+ //////////////////////////////////////////////////////////////////////////////
+//// OBJECT TRIGGERS /////////////////////////////////////////////////////////
 
 /**
 * Fires when an object's timer expired.
@@ -894,8 +1014,9 @@ int timer_otrigger(obj_data *obj) {
 	trig_data *t, *next_t;
 	int return_val;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_TIMER))
+	if (!SCRIPT_CHECK(obj, OTRIG_TIMER)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
 		if (TRIGGER_CHECK(t, OTRIG_TIMER)) {
@@ -1158,6 +1279,14 @@ int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
+/**
+* Called when a person tries to wear/equip an item.
+*
+* @param obj_data *obj The item they want to equip.
+* @param char_data *actor The person trying to equip it.
+* @param int where Which WEAR_ pos.
+* @return int 1 to allow the item, 0 to prevent it.
+*/
 int wear_otrigger(obj_data *obj, char_data *actor, int where) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -1197,6 +1326,13 @@ int wear_otrigger(obj_data *obj, char_data *actor, int where) {
 }
 
 
+/**
+* Called when a player tries to stop wearing an item.
+*
+* @param obj_data *obj The item the player wants to remove.
+* @param char_data *actor The person trying to do it.
+* @return int 0 to prevent the person from removing the item; 1 to allow it.
+*/
 int remove_otrigger(obj_data *obj, char_data *actor) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -1237,9 +1373,12 @@ int remove_otrigger(obj_data *obj, char_data *actor) {
 
 
 /**
+* Called when the player attempts to drop/put an item somewhere.
+*
 * @param obj_data *obj The object being dropped/put/etc.
 * @param char_data *actor The person doing.
 * @param int mode Any DROP_TRIG_ type.
+* @return int 0 to prevent the item being dropped; 1 to allow it.
 */
 int drop_otrigger(obj_data *obj, char_data *actor, int mode) {
 	trig_data *t, *next_t;
@@ -1304,6 +1443,14 @@ int drop_otrigger(obj_data *obj, char_data *actor, int mode) {
 }
 
 
+/**
+* Called when the actor tries to give away an item.
+*
+* @param obj_data *obj The item being given away.
+* @param char_data *actor The person trying to give it.
+* @param char_data *victim The person to receive the item.
+* @return int 0 to prevent giving the item; 1 to allow it.
+*/
 int give_otrigger(obj_data *obj, char_data *actor, char_data *victim) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -1345,7 +1492,12 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim) {
 }
 
 
-// returns 0 if the obj was purged; 1 otherwise
+/**
+* Called when an item is first loaded.
+*
+* @param obj_data *obj The item.
+* @return int 0 if the obj was purged; 1 otherwise.
+*/
 int load_otrigger(obj_data *obj) {
 	trig_data *trig, *next_trig;
 	bool multi = FALSE;
@@ -1381,6 +1533,15 @@ int load_otrigger(obj_data *obj) {
 	return return_val;
 }
 
+
+/**
+* Called when an ability targets an object.
+*
+* @param char_data *actor The person performing the ability.
+* @param obj_data *obj The object being targeted by the ability.
+* @param any_vnum abil The vnum of the ability.
+* @return int 0 to prevent the ability; 1 to allow it.
+*/
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -1422,6 +1583,8 @@ int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 
 
 /**
+* Called as a person tries to leave the room the object is in.
+*
 * @param room_data *room The room the person is trying to leave.
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
@@ -1617,6 +1780,11 @@ int finish_otrigger(obj_data *obj, char_data *actor) {
 }
 
 
+/**
+* Called on an object after the mud starts up.
+*
+* @param obj_data *obj The item.
+*/
 void reboot_otrigger(obj_data *obj) {
 	trig_data *t, *next_t;
 	int val;
@@ -1639,16 +1807,21 @@ void reboot_otrigger(obj_data *obj) {
 }
 
 
-/*
-*  world triggers
-*/
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD TRIGGERS //////////////////////////////////////////////////////////
 
+/**
+* Called on adventure tile/room as the adventure instance is being removed.
+*
+* @param room_data *room The adventure's location.
+*/
 void adventure_cleanup_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
 
-	if (!SCRIPT_CHECK(room, WTRIG_ADVENTURE_CLEANUP))
+	if (!SCRIPT_CHECK(room, WTRIG_ADVENTURE_CLEANUP)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
 		if (TRIGGER_CHECK(t, WTRIG_ADVENTURE_CLEANUP) && (number(1, 100) <= GET_TRIG_NARG(t))) {
@@ -1666,7 +1839,7 @@ void adventure_cleanup_wtrigger(room_data *room) {
 /**
 * Called when a building is completed.
 *
-* @param room_data *room The room.
+* @param room_data *room The building's location.
 */
 void complete_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
@@ -1708,8 +1881,9 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
 	trig_data *trig;
 	int one, value = 1;
 	
-	if (!SCRIPT_CHECK(room, WTRIG_DISMANTLE))
+	if (!SCRIPT_CHECK(room, WTRIG_DISMANTLE)) {
 		return 1;
+	}
 	
 	LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
 		if (TRIGGER_CHECK(trig, WTRIG_DISMANTLE)) {
@@ -1733,7 +1907,7 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
 
 
 /**
-* Called when a building first loads.
+* Called when a building first loads -- often before it's complete.
 *
 * @param room_data *room The room.
 */
@@ -1743,8 +1917,9 @@ void load_wtrigger(room_data *room) {
 	int val = 0;
 	bool multi = FALSE;
 
-	if (!SCRIPT_CHECK(room, WTRIG_LOAD))
+	if (!SCRIPT_CHECK(room, WTRIG_LOAD)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
@@ -1767,6 +1942,12 @@ void load_wtrigger(room_data *room) {
 }
 
 
+/**
+* Called on rooms in an instance when the room resets. Or, out on the map,
+* reset triggers are called every few minutes.
+*
+* @param room_data *room The room being reset.
+*/
 void reset_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
@@ -1908,6 +2089,14 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 }
 
 
+/**
+* Called when someone utters some words in the room. Does not catch private
+* messages such as whisper, nor out-of-character messages.
+*
+* @param char_data *actor The person speaking.
+* @param char *str What was said.
+* @param generic_data *language The language it was spoken in.
+*/
 void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 	room_data *room;
 	trig_data *t, *next_t;
@@ -1963,9 +2152,12 @@ void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 
 
 /**
+* Called when someone tries to drop an item in the room.
+* 
 * @param obj_data *obj The object being dropped/put/etc.
 * @param char_data *actor The person doing.
 * @param int mode Any DROP_TRIG_ type.
+* @return int 0 to prevent the drop; 1 to allow it.
 */
 int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 	room_data *room;
@@ -1974,8 +2166,9 @@ int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 	int ret_val;
 	bool multi = FALSE;
 
-	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DROP))
+	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DROP)) {
 		return 1;
+	}
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
@@ -2029,6 +2222,18 @@ int drop_wtrigger(obj_data *obj, char_data *actor, int mode) {
 	return 1;
 }
 
+
+/**
+* Called when someone tries to use an ability in the room, no matter what the
+* target.
+*
+* @param char_data *actor The person doing the ability.
+* @param char_data *vict The character target, if any.
+* @param obj_data *obj The object target, if any.
+* @param vehicle_data *veh The vehicle target, if any.
+* @param any_vnum abil The ability being used.
+* @return int 0 to prevent the ability; 1 to allow it.
+*/
 int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_data *veh, any_vnum abil) {
 	room_data *room;
 	trig_data *t, *next_t;
@@ -2078,12 +2283,14 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_d
 
 
 /**
+* Called as a character tries to leave the room.
+*
 * @param room_data *room The room the person is trying to leave.
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
 * @param char *custom_dir Optional: A different value for %direction% (may be NULL).
 * @param char *method Optional: The method by which they moved (may be NULL).
-* @return int 0 = block the leave, 1 = pass
+* @return int 0 = block the leave; 1 = pass and allow.
 */
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method) {
 	trig_data *t, *next_t;
@@ -2091,8 +2298,9 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 	int any_in_room = -1, val;
 	bool multi = FALSE;
 
-	if (!SCRIPT_CHECK(room, WTRIG_LEAVE))
+	if (!SCRIPT_CHECK(room, WTRIG_LEAVE)) {
 		return 1;
+	}
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return 1;
 	}
@@ -2137,6 +2345,15 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 	return 1;
 }
 
+
+/**
+* Called when someone in the room tries to operate a door.
+*
+* @param char_data *actor The person trying to work the door.
+* @param int subcmd Which door command was used.
+* @param int dir Which direction the door is in.
+* @return int 0 to prevent the door action; 1 to allow it.
+*/
 int door_wtrigger(char_data *actor, int subcmd, int dir) {
 	room_data *room;
 	trig_data *t, *next_t;
@@ -2176,6 +2393,11 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 }
 
 
+/**
+* Called on all rooms after the game starts up.
+*
+* @param room_data *room The room.
+*/
 void reboot_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
@@ -2196,71 +2418,6 @@ void reboot_wtrigger(room_data *room) {
 			}
 		}
 	}
-}
-
-
-/**
-* Checks all triggers for something that would prevent a 'buy'.
-*
-* @param char_data *actor The person trying to buy.
-* @param char_data *shopkeeper The mob shopkeeper, if any (many shops have none).
-* @param obj_data *buying The item being bought.
-* @param int cost The amount to be charged.
-* @param any_vnum currency The currency type (NOTHING for coins).
-* @return bool FALSE means hit-trigger/stop; TRUE means continue buying.
-*/
-bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
-	int cont = 1;
-	
-	cont = buy_wtrigger(actor, shopkeeper, buying, cost, currency);	// world trigs
-	if (cont) {
-		cont = buy_mtrigger(actor, shopkeeper, buying, cost, currency);	// mob trigs
-	}
-	if (cont) {
-		cont = buy_otrigger(actor, shopkeeper, buying, cost, currency);	// obj trigs
-	}
-	if (cont) {
-		cont = buy_vtrigger(actor, shopkeeper, buying, cost, currency);	// vehicles
-	}
-	return cont;
-}
-
-
-/**
-* Checks all triggers for a command match.
-*
-* @param char_data *actor The person typing a command.
-* @param char *cmd The command as-typed (first word).
-* @param char *argument Any arguments (remaining text).
-* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
-* @return bool TRUE means hit-trigger/stop; FALSE means continue execution
-*/
-bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
-	int cont = 0;
-	
-	if (!IS_NPC(actor) && ACCOUNT_FLAGGED(actor, ACCT_FROZEN)) {
-		return cont;	// frozen players
-	}
-	if (IS_DEAD(actor)) {
-		return cont;	// dead people
-	}
-	
-	// never override the toggle command for immortals
-	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggles")) {
-		return cont;
-	}
-
-	cont = command_wtrigger(actor, cmd, argument, mode);	// world trigs
-	if (!cont) {
-		cont = command_mtrigger(actor, cmd, argument, mode);	// mob trigs
-	}
-	if (!cont) {
-		cont = command_otrigger(actor, cmd, argument, mode);	// obj trigs
-	}
-	if (!cont) {
-		cont = command_vtrigger(actor, cmd, argument, mode);	// vehicles
-	}
-	return cont;
 }
 
 
@@ -2472,6 +2629,13 @@ int destroy_vtrigger(vehicle_data *veh, char *method) {
 }
 
 
+/**
+* Called when a vehicle enters a new room.
+*
+* @param vehicle_data *veh The vehicle that moved.
+* @param char *method How it moved.
+* @return int 0 to send it back; 1 to let it stay.
+*/
 int entry_vtrigger(vehicle_data *veh, char *method) {
 	union script_driver_data_u sdd;
 	trig_data *t, *next_t;
@@ -2578,6 +2742,11 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method) {
 }
 
 
+/**
+* Called when a vehicle is first loaded, sometimes before it's been built.
+*
+* @param vehicle_data *veh The vehicle that was just loaded.
+*/
 void load_vtrigger(vehicle_data *veh) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
@@ -2607,12 +2776,10 @@ void load_vtrigger(vehicle_data *veh) {
 
 
 /**
-* This trigger is only called if a char is in the area without nohassle.
+* This is called on all vehicles after a reboot.
 *
-* @param vehicle_data *veh The vehicle triggering.
+* @param vehicle_data *veh The vehicle.
 */
-
-
 void reboot_vtrigger(vehicle_data *veh) {
 	trig_data *t, *next_t;
 	int val;
@@ -2634,6 +2801,13 @@ void reboot_vtrigger(vehicle_data *veh) {
 }
 
 
+/**
+* Called when someone speaks in a room with a vehicle in it.
+*
+* @param char_data *actor The person speaking.
+* @param char *str The string being spoken.
+* @param generic_data *language The language being spoken.
+*/
 void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 	vehicle_data *veh, *next_veh;
 	bool multi = FALSE;
@@ -2684,6 +2858,74 @@ void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 			}
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMBO TRIGGERS //////////////////////////////////////////////////////////
+
+/**
+* Checks all triggers for something that would prevent a 'buy'.
+*
+* @param char_data *actor The person trying to buy.
+* @param char_data *shopkeeper The mob shopkeeper, if any (many shops have none).
+* @param obj_data *buying The item being bought.
+* @param int cost The amount to be charged.
+* @param any_vnum currency The currency type (NOTHING for coins).
+* @return bool FALSE means hit-trigger/stop; TRUE means continue buying.
+*/
+bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
+	int cont = 1;
+	
+	cont = buy_wtrigger(actor, shopkeeper, buying, cost, currency);	// world trigs
+	if (cont) {
+		cont = buy_mtrigger(actor, shopkeeper, buying, cost, currency);	// mob trigs
+	}
+	if (cont) {
+		cont = buy_otrigger(actor, shopkeeper, buying, cost, currency);	// obj trigs
+	}
+	if (cont) {
+		cont = buy_vtrigger(actor, shopkeeper, buying, cost, currency);	// vehicles
+	}
+	return cont;
+}
+
+
+/**
+* Checks all triggers for a command match.
+*
+* @param char_data *actor The person typing a command.
+* @param char *cmd The command as-typed (first word).
+* @param char *argument Any arguments (remaining text).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return bool TRUE means hit-trigger/stop; FALSE means continue execution
+*/
+bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
+	int cont = 0;
+	
+	if (!IS_NPC(actor) && ACCOUNT_FLAGGED(actor, ACCT_FROZEN)) {
+		return cont;	// frozen players
+	}
+	if (IS_DEAD(actor)) {
+		return cont;	// dead people
+	}
+	
+	// never override the toggle command for immortals
+	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggles")) {
+		return cont;
+	}
+
+	cont = command_wtrigger(actor, cmd, argument, mode);	// world trigs
+	if (!cont) {
+		cont = command_mtrigger(actor, cmd, argument, mode);	// mob trigs
+	}
+	if (!cont) {
+		cont = command_otrigger(actor, cmd, argument, mode);	// obj trigs
+	}
+	if (!cont) {
+		cont = command_vtrigger(actor, cmd, argument, mode);	// vehicles
+	}
+	return cont;
 }
 
 
@@ -3173,7 +3415,14 @@ int greet_triggers(char_data *ch, int dir, char *method, bool preventable) {
  //////////////////////////////////////////////////////////////////////////////
 //// START QUEST TRIGGERS ////////////////////////////////////////////////////
 
-// 1 = continue; 0 = cancel
+/**
+* Called when an actor tries to start a quest.
+*
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	char_data *ch;
@@ -3220,7 +3469,15 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_da
 }
 
 
-// 1 = continue; 0 = cancel
+/**
+* Called when an actor tries to start a quest.
+*
+* @param obj_data *obj The object to check start-quests on.
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = TRUE;
@@ -3260,7 +3517,14 @@ int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest,
 }
 
 
-// 1 = continue, 0 = stop
+/**
+* Called when an actor tries to start a quest.
+*
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
@@ -3447,7 +3711,14 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
  //////////////////////////////////////////////////////////////////////////////
 //// FINISH QUEST TRIGGERS ///////////////////////////////////////////////////
 
-// 1 = continue; 0 = cancel
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	char_data *ch;
@@ -3495,7 +3766,15 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_d
 }
 
 
-// 1 = continue; 0 = cancel
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param obj_data *obj The object to run triggers on.
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = TRUE;
@@ -3535,7 +3814,14 @@ int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest
 }
 
 
-// 1 = continue, 0 = stop
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
@@ -3580,13 +3866,22 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 }
 
 
-// 0 = stop, 1 = continue
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param room_data *room The room the person is trying top do this in.
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
 
-	if (!SCRIPT_CHECK(room, WTRIG_FINISH_QUEST))
+	if (!SCRIPT_CHECK(room, WTRIG_FINISH_QUEST)) {
 		return 1;
+	}
 	
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;

@@ -156,6 +156,7 @@ extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
 extern const char *reboot_type[];
 extern const char *version;
+extern const char *DG_SCRIPT_VERSION;
 
 // ability constants
 extern const char *ability_actions[];

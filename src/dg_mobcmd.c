@@ -93,7 +93,7 @@ void mob_log(char_data *mob, const char *format, ...) {
 	va_list args;
 	char output[MAX_STRING_LENGTH];
 
-	snprintf(output, sizeof(output), "Mob (%s, VNum %d):: %s", GET_SHORT(mob), GET_MOB_VNUM(mob), format);
+	snprintf(output, sizeof(output), "Mob (%s, VNum %d):: %s", GET_SHORT_DESC(mob), GET_MOB_VNUM(mob), format);
 
 	va_start(args, format);
 	script_vlog(output, args);
