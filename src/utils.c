@@ -790,10 +790,10 @@ bool process_import_one(empire_data *emp) {
 	int limit = config_get_int("imports_per_day");
 	bool any = FALSE;
 	obj_data *orn;
-	double cost;
+	double cost, gain;
 	
-	// round to %.1f
-	#define IMPORT_ROUND(amt)  (((int)((amt) * 10)) / 10.0)
+	// round to %.01f
+	#define IMPORT_ROUND(amt)  (ceil((amt) * 100.0) / 100.0)
 	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
@@ -871,10 +871,13 @@ bool process_import_one(empire_data *emp) {
 			// compute cost for this trade (pair->cost is already rate-exchanged)
 			cost = trade_amt * pair->cost;
 			
+			// round off to 0.1 now (up)
+			cost = ceil(cost * 10.0) / 10.0;
+			
 			// can we afford it?
 			if (EMPIRE_COINS(emp) < cost) {
 				trade_amt = EMPIRE_COINS(emp) / pair->cost;	// reduce to how many we can afford
-				cost = trade_amt * pair->cost;
+				cost = ceil(trade_amt * pair->cost * 10.0) / 10.0;
 				if (trade_amt < 1) {
 					continue;	// can't afford any
 				}
@@ -893,7 +896,8 @@ bool process_import_one(empire_data *emp) {
 				
 				// money
 				decrease_empire_coins(emp, emp, cost);
-				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);
+				gain = cost * pair->rate;
+				increase_empire_coins(pair->emp, pair->emp, gain);
 				
 				// update limit
 				limit -= trade_amt;
@@ -903,7 +907,7 @@ bool process_import_one(empire_data *emp) {
 				// log
 				orn = obj_proto(trade->vnum);
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
-				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost * pair->rate);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), gain);
 			}
 		}
 		
