@@ -547,7 +547,6 @@ union script_driver_data_u {
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);
 
-int trgvar_in_room(room_vnum vnum);
 struct cmdlist_element *find_done(struct cmdlist_element *cl);
 struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 int find_eq_pos_script(char *arg);

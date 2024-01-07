@@ -105,8 +105,9 @@ int is_substring(char *sub, char *string) {
 		int len = strlen(string);
 		int sublen = strlen(sub);
 
-		if ((s == string || isspace(*(s - 1)) || ispunct(*(s - 1))) && ((s + sublen == string + len) || isspace(s[sublen]) || ispunct(s[sublen])))
+		if ((s == string || isspace(*(s - 1)) || ispunct(*(s - 1))) && ((s + sublen == string + len) || isspace(s[sublen]) || ispunct(s[sublen]))) {
 			return 1;
+		}
 	}
 
 	return 0;
@@ -233,16 +234,19 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method)
 			}
 			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
-				if (dir>=0 && dir < NUM_OF_DIRS)
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				else
+				}
+				else {
 					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 				sdd.c = ch;
 				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-				if (!intermediate)
+				if (!intermediate) {
 					final = FALSE;
+				}
 				continue;
 			}
 		}
@@ -336,8 +340,9 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	char buf[MAX_INPUT_LENGTH];
 
 	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, 0))
+	if (!valid_dg_target(actor, 0)) {
 		return 0;
+	}
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (SCRIPT_CHECK(ch, MTRIG_COMMAND) && (actor != ch || !AFF_FLAGGED(ch, AFF_ORDERED))) {
@@ -345,8 +350,9 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					continue;
 				}
-				if (!TRIGGER_CHECK(t, MTRIG_COMMAND))
+				if (!TRIGGER_CHECK(t, MTRIG_COMMAND)) {
 					continue;
+				}
 
 				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
@@ -362,8 +368,9 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 					add_var(&GET_TRIG_VARS(t), "cmd", cmd, 0);
 					sdd.c = ch;
 
-					if (script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW))
+					if (script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
 						return 1;
+					}
 				}
 			}
 		}
@@ -700,8 +707,9 @@ int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_BRIBE))
+	if (!SCRIPT_CHECK(ch, MTRIG_BRIBE)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -775,8 +783,9 @@ void load_mtrigger(char_data *ch) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_LOAD))
+	if (!SCRIPT_CHECK(ch, MTRIG_LOAD)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
@@ -818,8 +827,9 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 		return 1;
 	}
 
-	if (!SCRIPT_CHECK(ch, MTRIG_ABILITY))
+	if (!SCRIPT_CHECK(ch, MTRIG_ABILITY)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
@@ -942,8 +952,9 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
 			continue;	// already did an allow-multi
 		}
-		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor))
+		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
 			continue;
+		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -1210,8 +1221,9 @@ int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int ty
 	if (obj && SCRIPT_CHECK(obj, OTRIG_COMMAND)) {
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
 			// not a command trigger
-			if (!TRIGGER_CHECK(t, OTRIG_COMMAND))
+			if (!TRIGGER_CHECK(t, OTRIG_COMMAND)) {
 				continue;
+			}
 			
 			// bad location
 			if (!IS_SET(GET_TRIG_NARG(t), type)) {
@@ -1232,8 +1244,9 @@ int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int ty
 
 				union script_driver_data_u sdd;
 				sdd.o = obj;
-				if (script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW))
+				if (script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW)) {
 					return 1;
+				}
 			}
 		}
 	}
@@ -1256,12 +1269,15 @@ int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	int i;
 
 	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, 0))
+	if (!valid_dg_target(actor, 0)) {
 		return 0;
+	}
 
-	for (i = 0; i < NUM_WEARS; i++)
-		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP, mode))
+	for (i = 0; i < NUM_WEARS; i++) {
+		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP, mode)) {
 			return 1;
+		}
+	}
 	
 	DL_FOREACH2(actor->carrying, obj, next_content) {
 		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode)) {
@@ -1549,11 +1565,13 @@ int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 	int val = 1;
 	ability_data *ab;
 
-	if (obj == NULL || !(ab = find_ability_by_vnum(abil)))
+	if (obj == NULL || !(ab = find_ability_by_vnum(abil))) {
 		return 1;
+	}
 
-	if (!SCRIPT_CHECK(obj, OTRIG_ABILITY))
+	if (!SCRIPT_CHECK(obj, OTRIG_ABILITY)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), OTRIG_ALLOW_MULTIPLE)) {
@@ -1603,8 +1621,9 @@ int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, obj_next, next_content) {
-		if (!SCRIPT_CHECK(obj, OTRIG_LEAVE))
+		if (!SCRIPT_CHECK(obj, OTRIG_LEAVE)) {
 			continue;
+		}
 
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
 			if (!TRIGGER_CHECK(t, OTRIG_LEAVE)) {
@@ -1660,8 +1679,9 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = 1;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_CONSUME))
+	if (!SCRIPT_CHECK(obj, OTRIG_CONSUME)) {
 		return 1;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), OTRIG_ALLOW_MULTIPLE)) {
@@ -1845,8 +1865,9 @@ void complete_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
 
-	if (!SCRIPT_CHECK(room, WTRIG_COMPLETE))
+	if (!SCRIPT_CHECK(room, WTRIG_COMPLETE)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
 		if (TRIGGER_CHECK(t, WTRIG_COMPLETE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
@@ -1953,8 +1974,9 @@ void reset_wtrigger(room_data *room) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
 
-	if (!SCRIPT_CHECK(room, WTRIG_RESET))
+	if (!SCRIPT_CHECK(room, WTRIG_RESET)) {
 		return;
+	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
 		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
@@ -2052,17 +2074,20 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_COMMAND))
+	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_COMMAND)) {
 		return 0;
+	}
 
 	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, 0))
+	if (!valid_dg_target(actor, 0)) {
 		return 0;
+	}
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (!TRIGGER_CHECK(t, WTRIG_COMMAND))
+		if (!TRIGGER_CHECK(t, WTRIG_COMMAND)) {
 			continue;
+		}
 
 		if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: W-Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
@@ -2104,8 +2129,9 @@ void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 	int any_in_room = -1;
 	bool multi = FALSE;
 
-	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_SPEECH))
+	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_SPEECH)) {
 		return;
+	}
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
@@ -2242,8 +2268,9 @@ int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_d
 	int val;
 	bool multi = FALSE;
 
-	if (!actor || !(ab = find_ability_by_vnum(abil)) || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_ABILITY))
+	if (!actor || !(ab = find_ability_by_vnum(abil)) || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_ABILITY)) {
 		return 1;
+	}
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
@@ -2361,8 +2388,9 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 	int val = 1;
 	bool multi = FALSE;
 
-	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DOOR))
+	if (!actor || !SCRIPT_CHECK(IN_ROOM(actor), WTRIG_DOOR)) {
 		return 1;
+	}
 
 	room = IN_ROOM(actor);
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
@@ -2373,10 +2401,12 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			add_var(&GET_TRIG_VARS(t), "cmd", (char *)cmd_door[subcmd], 0);
-			if (dir>=0 && dir < NUM_OF_DIRS)
+			if (dir >= 0 && dir < NUM_OF_DIRS) {
 				add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[dir], 0);
-			else
+			}
+			else {
 				add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+			}
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			sdd.r = room;
 			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
@@ -3069,8 +3099,9 @@ int greet_mtrigger(char_data *actor, int dir, char *method) {
 	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 		return TRUE;
 	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
 		return TRUE;
+	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
@@ -3097,16 +3128,19 @@ int greet_mtrigger(char_data *actor, int dir, char *method) {
 			}
 			if (number(1, 100) <= GET_TRIG_NARG(t)) {
 				union script_driver_data_u sdd;
-				if (dir>=0 && dir < NUM_OF_DIRS)
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
 					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				else
+				}
+				else {
 					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
 				sdd.c = ch;
 				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-				if (!intermediate)
+				if (!intermediate) {
 					final = FALSE;
+				}
 				continue;
 			}
 		}
@@ -3569,13 +3603,22 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 }
 
 
-// 0 = stop, 1 = continue
+/**
+* Called when an actor tries to start a quest.
+*
+* @param room_data *room The room where the person is trying to start it.
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
 int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t, *next_t;
 
-	if (!SCRIPT_CHECK(room, WTRIG_START_QUEST))
+	if (!SCRIPT_CHECK(room, WTRIG_START_QUEST)) {
 		return 1;
+	}
 	
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;
@@ -3620,12 +3663,15 @@ int start_quest_otrigger(char_data *actor, quest_data *quest, struct instance_da
 	int i;
 
 	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
 		return 1;
+	}
 
-	for (i = 0; i < NUM_WEARS; i++)
-		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
+	for (i = 0; i < NUM_WEARS; i++) {
+		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
 			return 0;
+		}
+	}
 	
 	DL_FOREACH2(actor->carrying, obj, next_content) {
 		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
@@ -3926,12 +3972,15 @@ int finish_quest_otrigger(char_data *actor, quest_data *quest, struct instance_d
 	int i;
 
 	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
 		return 1;
+	}
 
-	for (i = 0; i < NUM_WEARS; i++)
-		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
+	for (i = 0; i < NUM_WEARS; i++) {
+		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
 			return 0;
+		}
+	}
 	
 	DL_FOREACH2(actor->carrying, obj, next_content) {
 		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
