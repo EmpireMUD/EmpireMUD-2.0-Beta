@@ -3536,7 +3536,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Nearby tiles within %d range:\r\n", max_dist);
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
 		}
 		
 		// display and free the nodes
