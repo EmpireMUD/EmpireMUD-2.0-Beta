@@ -75,10 +75,12 @@ struct einv_type {
 // scan helper
 struct _organize_general_dirs_t {
 	char dir[80];
-	char string[1024];
+	char string[2048];
+	int count;
 	bool full;
 	UT_hash_handle hh;
 } *ogd_hash = NULL, *ogd, *next_ogd;
+
 
 // simple scan sorter
 int _sort_ogd(struct _organize_general_dirs_t *a, struct _organize_general_dirs_t *b) {
@@ -3351,14 +3353,14 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	char output[MAX_STRING_LENGTH * 8], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room, *block_room;
 	size_t size, lsize;
 	crop_data *crop;
-	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
+	bool ok, color, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
 	
 	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
@@ -3678,9 +3680,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			}
 			
 			// general entry
-			lsize = snprintf(line, sizeof(line), "%s%s", screenread_one_tile(ch, IN_ROOM(ch), node->loc, TRUE), coord_display(ch, check_x, check_y, FALSE));
+			color = (++(ogd->count) % 2) ? TRUE : FALSE;
+			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), node->loc, TRUE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
 			
-			if (lsize + strlen(ogd->string) + 8 < sizeof(ogd->string)) {
+			if (lsize + strlen(ogd->string) + 3 < sizeof(ogd->string)) {
 				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
 			}
 			else {
