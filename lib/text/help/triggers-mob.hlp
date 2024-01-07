@@ -146,6 +146,9 @@ specified percentage.
 Note: HitPrcnt triggers attached to charmed mobs will not fire unless the
    trigger also has the Charmed type.
 
+Only the FIRST bitprcnt trigger on a mob will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character this mobile is fighting.
 

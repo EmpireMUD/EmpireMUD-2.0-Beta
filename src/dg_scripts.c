@@ -34,10 +34,17 @@ extern unsigned long main_game_pulse;
 // local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
+struct cmdlist_element *find_done(struct cmdlist_element *cl);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf);
 
 
+/**
+* Counts the number of people in a room for %people.vnum%
+*
+* @room_vnum vnum The room to check for people.
+* @return int The number of characters in that room.
+*/
 int trgvar_in_room(room_vnum vnum) {
 	room_data *room = real_room(vnum);
 	int i = 0;
@@ -52,6 +59,14 @@ int trgvar_in_room(room_vnum vnum) {
 	return i;
 }
 
+
+/**
+* Find an object in a list by name without regards to visibility.
+*
+* @param char *name The keyword (singular).
+* @param obj_data *list A list of objects to search.
+* @return obj_data* The matching object in the list, if any, or else NULL.
+*/
 obj_data *get_obj_in_list(char *name, obj_data *list) {
 	obj_data *i;
 	int id;
@@ -78,6 +93,15 @@ obj_data *get_obj_in_list(char *name, obj_data *list) {
 	return NULL;
 }
 
+
+/**
+* Finds an equipped object on a character by name, without regard to
+* visibility.
+*
+* @param char_data *ch The person whose equipment to check.
+* @param char *name The argument to match (singular).
+* @return obj_data* The matching object if found; NULL if not.
+*/
 obj_data *get_object_in_equip(char_data *ch, char *name) {
 	int j, n = 0, number;
 	obj_data *obj;
@@ -120,8 +144,16 @@ obj_data *get_object_in_equip(char_data *ch, char *name) {
 	return NULL;
 }
 
-/* Handles 'held', 'light' and 'wield' positions - Welcor
-After idea from Byron Ellacott - bje@apnic.net */
+
+/**
+* Find a WEAR_ pos by various names.
+*
+* Handles 'held', 'light' and 'wield' positions - Welcor
+* After idea from Byron Ellacott - bje@apnic.net
+*
+* @param char *arg The position as typed in the script.
+* @return int A WEAR_ const to match, or NO_WEAR for no match.
+*/
 int find_eq_pos_script(char *arg) {
 	int i;
 	struct eq_pos_list {
@@ -165,22 +197,6 @@ int find_eq_pos_script(char *arg) {
 			return eq_pos[i].where;
 	}
 	return NO_WEAR;
-}
-
-int can_wear_on_pos(obj_data *obj, int pos) {
-	return CAN_WEAR(obj, wear_data[pos].item_wear);
-}
-
-
-/**
-* Determines if there is a nearby connected player, which is a requirement
-* for some things like random triggers.
-*
-* @param room_data *loc The location to check for nearby players.
-* @return bool TRUE if there are players nearby.
-*/
-static bool players_nearby_script(room_data *loc) {
-	return distance_to_nearest_player(loc) <= PLAYER_SCRIPT_RADIUS;
 }
 
 
@@ -1015,7 +1031,7 @@ void script_trigger_check(void) {
 		if (TRIG_IS_LOCAL(trig) && (!in_room || !any_players_in_room(in_room))) {
 			continue;	// need player present (is local)
 		}
-		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || !players_nearby_script(in_room))) {
+		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || distance_to_nearest_player(in_room) > PLAYER_SCRIPT_RADIUS)) {
 			continue;	// need players nearby (not global)
 		}
 		
@@ -8504,23 +8520,3 @@ struct cmdlist_element *find_done(struct cmdlist_element *cl) {
 
 	return c;
 }
-
-
-/* read a line in from a file, return the number of chars read */
-int fgetline(FILE *file, char *p) {
-	int count = 0;
-
-	do {
-		*p = fgetc(file);
-		if (*p != '\n' && !feof(file)) {
-			p++;
-			count++;
-		}
-	} while (*p != '\n' && !feof(file));
-
-	if (*p == '\n')
-		*p = '\0';
-
-	return count;
-}
-

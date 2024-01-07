@@ -35,11 +35,8 @@
 *   World Triggers
 *   Vehicle Triggers
 *   Combo Triggers
-*   Greet Triggers
-*   Start Quest Triggers
 *   Finish Quest Triggers
 *   Reset Trigger Helper
-*   Kill Triggers
 */
 
 
@@ -381,6 +378,318 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 
 
 /**
+* Called when a character enters a room to see who they remember there.
+*
+* @param char_data *ch The person who moved.
+*/
+void entry_memory_mtrigger(char_data *ch) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	char_data *actor;
+	struct script_memory *mem, *next_mem;
+	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
+
+	if (!SCRIPT_MEM(ch)) {
+		return;
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), actor, next_in_room) {
+		if (!SCRIPT_MEM(ch)) {
+			break;
+		}
+		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+			continue;
+		}
+		if (actor!=ch && SCRIPT_MEM(ch)) {
+			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
+				if (actor->script_id == mem->id) {
+					if (mem->cmd) {
+						command_interpreter(ch, mem->cmd);
+					}
+					else {
+						LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+							if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || number(1, 100) > GET_TRIG_NARG(t)) {
+								continue;	// wrong type or no random roll
+							}
+							if (TRIG_IS_LOCAL(t)) {
+								if (any_in_room == -1) {
+									any_in_room = any_players_in_room(IN_ROOM(ch));
+								}
+								if (!any_in_room) {
+									continue;	// requires a player
+								}
+						    }
+						    
+						    // ok
+							ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+							sdd.c = ch;
+							script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+							break;
+						}
+					}
+					/* delete the memory */
+					LL_DELETE(SCRIPT_MEM(ch), mem);
+					if (mem->cmd) {
+						free(mem->cmd);
+					}
+					free(mem);
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Called when a mob walks into a room.
+*
+* @param char_data *ch The mob who moved.
+* @param char *method The way the mob entered.
+* @return int 1 to allow the entry; 0 to try to send it back.
+*/
+int entry_mtrigger(char_data *ch, char *method) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	int any_in_room = -1, val;
+	bool multi = FALSE;
+
+	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY)) {
+		return 1;
+	}
+	
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
+		if (!TRIGGER_CHECK(t, MTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
+		}
+		
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(IN_ROOM(ch));
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+		sdd.c = ch;
+		val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
+	}
+
+	return 1;
+}
+
+
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	char_data *ch;
+	trig_data *t;
+	
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_FINISH_QUEST) || (ch == actor)) {
+			continue;
+		}
+		
+		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (TRIGGER_CHECK(t, MTRIG_FINISH_QUEST)) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				sdd.c = ch;
+				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
+					quest_instance_global = NULL;	// un-set this
+					return FALSE;
+				}
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
+}
+
+
+/**
+* Called when a person enters a room to see who remembers them.
+*
+* @param char_data *actor The person who moved.
+*/
+void greet_memory_mtrigger(char_data *actor) {
+	trig_data *t, *next_t;
+	char_data *ch;
+	struct script_memory *mem, *next_mem;
+	char buf[MAX_INPUT_LENGTH];
+	int command_performed = 0, any_in_room = -1;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return;
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
+			continue;
+		}
+		/* find memory line with command only */
+		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
+			if (actor->script_id != mem->id) {
+				continue;
+			}
+			if (mem->cmd) {
+				command_interpreter(ch, mem->cmd); /* no script */
+				command_performed = 1;
+				break;
+			}
+			/* if a command was not performed execute the memory script */
+			if (mem && !command_performed) {
+				LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+						continue;
+					}
+					if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || !CAN_SEE(ch, actor)) {
+						continue;
+					}
+					if (TRIG_IS_LOCAL(t)) {
+						if (any_in_room == -1) {
+							any_in_room = any_players_in_room(IN_ROOM(ch));
+						}
+						if (!any_in_room) {
+							continue;	// requires a player
+						}
+					}
+					if (number(1, 100) <= GET_TRIG_NARG(t)) {
+						union script_driver_data_u sdd;
+						ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+						sdd.c = ch;
+						script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+						break;
+					}
+				}
+			}
+			/* delete the memory */
+			if (mem) {
+				LL_DELETE(SCRIPT_MEM(ch), mem);
+				if (mem->cmd) {
+					free(mem->cmd);
+				}
+				free(mem);
+			}
+		}
+	}
+}
+
+
+/**
+* Called when a person walks into a room to run triggers on mobs.
+*
+* @param char_data *ch The person who moved.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int greet_mtrigger(char_data *actor, int dir, char *method) {
+	trig_data *t, *next_t;
+	char_data *ch;
+	char buf[MAX_INPUT_LENGTH];
+	int intermediate, final=TRUE, any_in_room = -1;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
+			continue;
+		}
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (!TRIGGER_CHECK(t, MTRIG_GREET_ALL) && !(TRIGGER_CHECK(t, MTRIG_GREET) && CAN_SEE(ch, actor))) {
+				continue;	// wrong types
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(ch));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.c = ch;
+				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
 * @param char_data *actor Person speaking.
 * @param char *str String spoken.
 * @param generic_data *language Language spoken in.
@@ -446,6 +755,60 @@ void speech_mtrigger(char_data *actor, char *str, generic_data *language, char_d
 			}
 		}
 	}
+}
+
+
+/**
+* Called when an actor tries to start a quest.
+*
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	char_data *ch;
+	trig_data *t;
+	
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_START_QUEST) || (ch == actor)) {
+			continue;
+		}
+		
+		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (TRIGGER_CHECK(t, MTRIG_START_QUEST)) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				sdd.c = ch;
+				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
+					quest_instance_global = NULL;	// un-set this
+					return FALSE;
+				}
+			}
+		}
+	}
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
 }
 
 
@@ -581,6 +944,7 @@ int fight_mtrigger(char_data *ch, bool will_hit) {
 * @param char_data *ch The mob being hit.
 */
 void hitprcnt_mtrigger(char_data *ch) {
+	bool multi = FALSE;
 	char_data *actor;
 	trig_data *t, *next_t;
 	char buf[MAX_INPUT_LENGTH];
@@ -590,6 +954,9 @@ void hitprcnt_mtrigger(char_data *ch) {
 	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
@@ -599,8 +966,10 @@ void hitprcnt_mtrigger(char_data *ch) {
 			actor = FIGHTING(ch);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			sdd.c = ch;
-			script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			break;
+			if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW) || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				break;
+			}
+			multi = TRUE;
 		}
 	}
 }
@@ -1102,6 +1471,153 @@ int get_otrigger(obj_data *obj, char_data *actor, bool preventable) {
 
 
 /**
+* Called when an actor tries to turn in a quest.
+*
+* @param obj_data *obj The object to run triggers on.
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	int ret_val = TRUE;
+	trig_data *t, *next_t;
+	
+	if (!SCRIPT_CHECK(obj, OTRIG_FINISH_QUEST)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
+		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST)) {
+			union script_driver_data_u sdd;
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			sdd.o = obj;
+			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!ret_val) {
+				break;
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return ret_val;
+}
+
+
+/**
+* Finish quest trigger (obj).
+*
+* @param char_data *actor The person trying to get a quest.
+* @param quest_data *quest The quest to try to finish
+* @param struct instance_data *inst The associated instance, if any.
+* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
+*/
+int finish_quest_otrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	obj_data *obj;
+	int i;
+
+	/* prevent people we like from becoming trapped :P */
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return 1;
+	}
+
+	for (i = 0; i < NUM_WEARS; i++) {
+		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
+			return 0;
+		}
+	}
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
+			return 0;
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+
+/**
+* Runs greet triggers on objects in the room.
+*
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character moved.
+* @param char *method Method of movement.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
+*/
+int greet_otrigger(char_data *actor, int dir, char *method) {
+	int intermediate, final = TRUE, any_in_room = -1;
+	obj_data *obj, *next_obj;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_obj, next_content) {
+		if (!SCRIPT_CHECK(obj, OTRIG_GREET)) {
+			continue;
+		}
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
+			if (!TRIGGER_CHECK(t, OTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(actor));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.o = obj;
+				intermediate = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
 * Buy trigger (obj) sub-processor.
 *
 * @param obj_data *obj The item to check.
@@ -1292,6 +1808,159 @@ int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	}
 
 	return 0;
+}
+
+
+/**
+* Runs kill triggers on a single object, then on its next contents
+* (recursively). This function is called by run_kill_triggers, which has
+* already validated that the owner of the object qualifies as either the killer
+* or an ally of the killer.
+*
+* @param obj_data *obj The object possibly running triggers.
+* @param char_data *dying The person who has died.
+* @param char_data *killer Optional: Person who killed them.
+* @return int The return value of a script (1 is normal, 0 suppresses the death cry).
+*/
+int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer) {
+	obj_data *next_contains, *next_inside;
+	union script_driver_data_u sdd;
+	trig_data *trig, *next_trig;
+	int val = 1;	// default value
+	
+	if (!obj) {
+		return val;	// often called with no obj
+	}
+	
+	// save for later
+	next_contains = obj->contains;
+	next_inside = obj->next_content;
+	
+	// run script if possible...
+	if (SCRIPT_CHECK(obj, OTRIG_KILL)) {
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), trig, next_trig) {
+			if (!TRIGGER_CHECK(trig, OTRIG_KILL) || (number(1, 100) > GET_TRIG_NARG(trig))) {
+				continue;	// wrong trig or failed random percent
+			}
+			
+			// ok:
+			memset((char *) &sdd, 0, sizeof(union script_driver_data_u));
+			ADD_UID_VAR(buf, trig, char_script_id(dying), "actor", 0);
+			if (killer) {
+				ADD_UID_VAR(buf, trig, char_script_id(killer), "killer", 0);
+			}
+			else {
+				add_var(&GET_TRIG_VARS(trig), "killer", "", 0);
+			}
+			sdd.o = obj;
+			
+			// run it -- any script returning 0 guarantees we will return 0
+			val &= script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
+			
+			// ensure obj is safe
+			obj = sdd.o;
+			if (!obj) {
+				break;	// cannot run more triggers -- obj is gone
+			}
+		}
+	}
+	
+	// run recursively
+	if (next_contains) {
+		val &= kill_otrigger(next_contains, dying, killer);
+	}
+	if (next_inside) {
+		val &= kill_otrigger(next_inside, dying, killer);
+	}
+	
+	return val;
+}
+
+
+/**
+* Called when an actor tries to start a quest.
+*
+* @param obj_data *obj The object to check start-quests on.
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	int ret_val = TRUE;
+	trig_data *t, *next_t;
+	
+	if (!SCRIPT_CHECK(obj, OTRIG_START_QUEST)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
+		if (TRIGGER_CHECK(t, OTRIG_START_QUEST)) {
+			union script_driver_data_u sdd;
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			sdd.o = obj;
+			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!ret_val) {
+				break;
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return ret_val;
+}
+
+
+/**
+* Start quest trigger (obj).
+*
+* @param char_data *actor The person trying to get a quest.
+* @param quest_data *quest The quest to try to start
+* @param struct instance_data *inst The instance associated with the quest, if any.
+* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
+*/
+int start_quest_otrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	obj_data *obj;
+	int i;
+
+	/* prevent people we like from becoming trapped :P */
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return 1;
+	}
+
+	for (i = 0; i < NUM_WEARS; i++) {
+		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
+			return 0;
+		}
+	}
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
+			return 0;
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
+			return 0;
+		}
+	}
+
+	return 1;
 }
 
 
@@ -1928,6 +2597,119 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
 
 
 /**
+* Called when a person walks into a room.
+*
+* @param room_data *room The room being entered.
+* @param char_data *actor The person who entered.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1, val = 1, this;
+	bool multi = FALSE;
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
+
+	if (!SCRIPT_CHECK(room, WTRIG_ENTER)) {
+		return 1;
+	}
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// alread did an allow-multi
+		}
+		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
+		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(room);
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
+		if (dir>=0 && dir < NUM_OF_DIRS) {
+			add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+		}
+		else {
+			add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+		}
+		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+		sdd.r = room;
+		this = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		val = MIN(val, this);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
+	}
+
+	return val;
+}
+
+
+/**
+* Called when an actor tries to turn in a quest.
+*
+* @param room_data *room The room the person is trying top do this in.
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_FINISH_QUEST)) {
+		return 1;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (TRIGGER_CHECK(t, WTRIG_FINISH_QUEST)) {
+			union script_driver_data_u sdd;
+			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			sdd.r = room;
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				quest_instance_global = NULL;	// un-set this
+				return FALSE;
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
+}
+
+
+/**
 * Called when a building first loads -- often before it's complete.
 *
 * @param room_data *room The room.
@@ -2174,6 +2956,53 @@ void speech_wtrigger(char_data *actor, char *str, generic_data *language) {
 			}
 		}
 	}
+}
+
+
+/**
+* Called when an actor tries to start a quest.
+*
+* @param room_data *room The room where the person is trying to start it.
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_START_QUEST)) {
+		return 1;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+	
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (TRIGGER_CHECK(t, WTRIG_START_QUEST)) {
+			union script_driver_data_u sdd;
+			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			sdd.r = room;
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				quest_instance_global = NULL;	// un-set this
+				return FALSE;
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
 }
 
 
@@ -2709,6 +3538,119 @@ int entry_vtrigger(vehicle_data *veh, char *method) {
 
 
 /**
+* Called when an actor tries to turn in a quest.
+*
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest Which quest they're trying to finish.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
+			if (TRIGGER_CHECK(t, VTRIG_FINISH_QUEST)) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				sdd.v = veh;
+				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+					quest_instance_global = NULL;	// un-set this
+					return FALSE;
+				}
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
+}
+
+
+/**
+* Called when a person walks into a room to run triggers on vehicles.
+*
+* @param char_data *ch The person who moved.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int greet_vtrigger(char_data *actor, int dir, char *method) {
+	int intermediate, final = TRUE, any_in_room = -1;
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_GREET)) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
+			if (!TRIGGER_CHECK(t, VTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(veh));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.v = veh;
+				intermediate = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
 * @param char *custom_dir Optional: A different value for %direction% (may be NULL).
@@ -2891,6 +3833,58 @@ void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 }
 
 
+/**
+* Called when an actor tries to start a quest.
+*
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest Which quest they're trying to start.
+* @param struct instance_data *inst What instance the quest is associated with, if any.
+* @return int 0 to prevent it; 1 to allow it.
+*/
+int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	// store instance globally to allow %instance.xxx% in scripts
+	quest_instance_global = inst;
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
+			if (TRIGGER_CHECK(t, VTRIG_START_QUEST)) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				sdd.v = veh;
+				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+					quest_instance_global = NULL;	// un-set this
+					return FALSE;
+				}
+			}
+		}
+	}
+	
+	quest_instance_global = NULL;	// un-set this
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMBO TRIGGERS //////////////////////////////////////////////////////////
 
@@ -2959,733 +3953,68 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// GREET TRIGGERS //////////////////////////////////////////////////////////
-
 /**
-* Called when a person walks into a room.
+* Checks all quest triggers
 *
-* @param room_data *room The room being entered.
-* @param char_data *actor The person who entered.
-* @param int dir Which direction they moved.
-* @param char *method The way the person entered.
-* @return int 1 to allow the entry; 0 to try to send them back.
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest The quest.
+* @param struct instance_data *inst The associated instance, if any.
+* @return int 0 means stop execution (block quest), 1 means continue
 */
-int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1, val = 1, this;
-	bool multi = FALSE;
-	
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return TRUE;
-	}
+int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
+	room_data *room = IN_ROOM(actor);
+	struct trig_proto_list *tpl;
+	trig_data *proto, *trig;
+	int val = 1;
 
-	if (!SCRIPT_CHECK(room, WTRIG_ENTER)) {
-		return 1;
+	if (val) {
+		val = finish_quest_mtrigger(actor, quest, inst);	// mob trigs
 	}
-
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
-			continue;	// alread did an allow-multi
-		}
-		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
-			continue;
-		}
-		if (TRIG_IS_LOCAL(t)) {
-			if (any_in_room == -1) {
-				any_in_room = any_players_in_room(room);
+	if (val) {
+		val = finish_quest_otrigger(actor, quest, inst);	// obj trigs
+	}
+	if (val) {
+		val = finish_quest_vtrigger(actor, quest, inst);	// vehicles
+	}
+	if (val) {
+		// still here? world triggers require additional work because we add
+		// the trigs from the quest itself
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
 			}
-			if (!any_in_room) {
-				continue;	// requires a player
+			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
+				continue;
 			}
+			
+			// attach this trigger
+			if (!(trig = read_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!SCRIPT(room)) {
+				create_script_data(room, WLD_TRIGGER);
+			}
+			add_trigger(SCRIPT(room), trig, -1);
 		}
 		
-		// ok:
-		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
-		if (dir>=0 && dir < NUM_OF_DIRS) {
-			add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-		}
-		else {
-			add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-		}
-		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-		sdd.r = room;
-		this = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-		val = MIN(val, this);
+		val = finish_quest_wtrigger(room, actor, quest, inst);	// world trigs
 		
-		if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
-			return val;
-		}
-		else {
-			multi = TRUE;
+		// now remove those triggers again
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
+				continue;
+			}
+			
+			// find and remove
+			if (SCRIPT(room)) {
+				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
+			}
 		}
 	}
-
 	return val;
-}
-
-
-/**
-* Called when a mob walks into a room.
-*
-* @param char_data *ch The mob who moved.
-* @param char *method The way the mob entered.
-* @return int 1 to allow the entry; 0 to try to send it back.
-*/
-int entry_mtrigger(char_data *ch, char *method) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	int any_in_room = -1, val;
-	bool multi = FALSE;
-
-	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY)) {
-		return 1;
-	}
-	
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
-			continue;	// already did an allow-multi
-		}
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-			continue;
-		}
-		if (!TRIGGER_CHECK(t, MTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
-			continue;
-		}
-		
-		if (TRIG_IS_LOCAL(t)) {
-			if (any_in_room == -1) {
-				any_in_room = any_players_in_room(IN_ROOM(ch));
-			}
-			if (!any_in_room) {
-				continue;	// requires a player
-			}
-		}
-		
-		// ok:
-		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-		sdd.c = ch;
-		val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-		
-		if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
-			return val;
-		}
-		else {
-			multi = TRUE;
-		}
-	}
-
-	return 1;
-}
-
-
-/**
-* Called when a person walks into a room to run triggers on mobs.
-*
-* @param char_data *ch The person who moved.
-* @param int dir Which direction they moved.
-* @param char *method The way the person entered.
-* @return int 1 to allow the entry; 0 to try to send them back.
-*/
-int greet_mtrigger(char_data *actor, int dir, char *method) {
-	trig_data *t, *next_t;
-	char_data *ch;
-	char buf[MAX_INPUT_LENGTH];
-	int intermediate, final=TRUE, any_in_room = -1;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return TRUE;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
-			continue;
-		}
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-				continue;
-			}
-			if (!TRIGGER_CHECK(t, MTRIG_GREET_ALL) && !(TRIGGER_CHECK(t, MTRIG_GREET) && CAN_SEE(ch, actor))) {
-				continue;	// wrong types
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(ch));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				}
-				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.c = ch;
-				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-				if (!intermediate) {
-					final = FALSE;
-				}
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
-/**
-* Called when a person walks into a room to run triggers on vehicles.
-*
-* @param char_data *ch The person who moved.
-* @param int dir Which direction they moved.
-* @param char *method The way the person entered.
-* @return int 1 to allow the entry; 0 to try to send them back.
-*/
-int greet_vtrigger(char_data *actor, int dir, char *method) {
-	int intermediate, final = TRUE, any_in_room = -1;
-	vehicle_data *veh, *next_veh;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return 1;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_GREET)) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (!TRIGGER_CHECK(t, VTRIG_GREET)) {
-				continue;
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(veh));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				}
-				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.v = veh;
-				intermediate = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
-				if (!intermediate) {
-					final = FALSE;
-				}
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
-/**
-* Runs greet triggers on objects in the room.
-*
-* @param char_data *actor The person who has entered the room.
-* @param int dir Which direction the character moved.
-* @param char *method Method of movement.
-* @return int 1 to allow the character here, 0 to attempt to send them back.
-*/
-int greet_otrigger(char_data *actor, int dir, char *method) {
-	int intermediate, final = TRUE, any_in_room = -1;
-	obj_data *obj, *next_obj;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return 1;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_obj, next_content) {
-		if (!SCRIPT_CHECK(obj, OTRIG_GREET)) {
-			continue;
-		}
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
-			if (!TRIGGER_CHECK(t, OTRIG_GREET)) {
-				continue;
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(actor));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				}
-				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.o = obj;
-				intermediate = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
-				if (!intermediate) {
-					final = FALSE;
-				}
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
-/**
-* Called when a character enters a room to see who they remember there.
-*
-* @param char_data *ch The person who moved.
-*/
-void entry_memory_mtrigger(char_data *ch) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	char_data *actor;
-	struct script_memory *mem, *next_mem;
-	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1;
-
-	if (!SCRIPT_MEM(ch)) {
-		return;
-	}
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), actor, next_in_room) {
-		if (!SCRIPT_MEM(ch)) {
-			break;
-		}
-		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-			continue;
-		}
-		if (actor!=ch && SCRIPT_MEM(ch)) {
-			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
-				if (actor->script_id == mem->id) {
-					if (mem->cmd) {
-						command_interpreter(ch, mem->cmd);
-					}
-					else {
-						LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-							if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || number(1, 100) > GET_TRIG_NARG(t)) {
-								continue;	// wrong type or no random roll
-							}
-							if (TRIG_IS_LOCAL(t)) {
-								if (any_in_room == -1) {
-									any_in_room = any_players_in_room(IN_ROOM(ch));
-								}
-								if (!any_in_room) {
-									continue;	// requires a player
-								}
-						    }
-						    
-						    // ok
-							ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-							sdd.c = ch;
-							script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-							break;
-						}
-					}
-					/* delete the memory */
-					LL_DELETE(SCRIPT_MEM(ch), mem);
-					if (mem->cmd) {
-						free(mem->cmd);
-					}
-					free(mem);
-				}
-			}
-		}
-	}
-}
-
-
-/**
-* Called when a person enters a room to see who remembers them.
-*
-* @param char_data *actor The person who moved.
-*/
-void greet_memory_mtrigger(char_data *actor) {
-	trig_data *t, *next_t;
-	char_data *ch;
-	struct script_memory *mem, *next_mem;
-	char buf[MAX_INPUT_LENGTH];
-	int command_performed = 0, any_in_room = -1;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return;
-	}
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
-			continue;
-		}
-		/* find memory line with command only */
-		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
-			if (actor->script_id != mem->id) {
-				continue;
-			}
-			if (mem->cmd) {
-				command_interpreter(ch, mem->cmd); /* no script */
-				command_performed = 1;
-				break;
-			}
-			/* if a command was not performed execute the memory script */
-			if (mem && !command_performed) {
-				LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-						continue;
-					}
-					if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || !CAN_SEE(ch, actor)) {
-						continue;
-					}
-					if (TRIG_IS_LOCAL(t)) {
-						if (any_in_room == -1) {
-							any_in_room = any_players_in_room(IN_ROOM(ch));
-						}
-						if (!any_in_room) {
-							continue;	// requires a player
-						}
-					}
-					if (number(1, 100) <= GET_TRIG_NARG(t)) {
-						union script_driver_data_u sdd;
-						ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-						sdd.c = ch;
-						script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-						break;
-					}
-				}
-			}
-			/* delete the memory */
-			if (mem) {
-				LL_DELETE(SCRIPT_MEM(ch), mem);
-				if (mem->cmd) {
-					free(mem->cmd);
-				}
-				free(mem);
-			}
-		}
-	}
-}
-
-
-/**
-* Runs greet, entry, and enter triggers on everything in the room. If the
-* movement is preventable, it stops on any trigger that prevents it. If it's
-* not, it runs them all.
-*
-* @param char_data *actor The person who has entered the room.
-* @param int dir Which direction the character came from.
-* @param char *method Method of movement.
-* @param bool preventable TRUE if the character can be sent back; FALSE if not.
-* @return int 1 to allow the character here, 0 to attempt to send them back.
-*/
-int greet_triggers(char_data *ch, int dir, char *method, bool preventable) {
-	if (!entry_mtrigger(ch, method) && preventable) {
-		return 0;
-	}
-	else if (!enter_wtrigger(IN_ROOM(ch), ch, dir, method) && preventable) {
-		return 0;
-	}
-	else if (!greet_mtrigger(ch, dir, method) && preventable) {
-		return 0;
-	}
-	else if (!greet_vtrigger(ch, dir, method) && preventable) {
-		return 0;
-	}
-	else if (!greet_otrigger(ch, dir, method) && preventable) {
-		return 0;
-	}
-	
-	// if we got this far, we're staying
-	
-	// people we remember when we enter
-	entry_memory_mtrigger(ch);
-	
-	// people we remember when they enter
-	greet_memory_mtrigger(ch);
-
-	return 1;
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// START QUEST TRIGGERS ////////////////////////////////////////////////////
-
-/**
-* Called when an actor tries to start a quest.
-*
-* @param char_data *actor The person trying to start a quest.
-* @param quest_data *quest Which quest they're trying to start.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	char_data *ch;
-	trig_data *t;
-	
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_START_QUEST) || (ch == actor)) {
-			continue;
-		}
-		
-		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
-			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-				continue;
-			}
-			if (TRIGGER_CHECK(t, MTRIG_START_QUEST)) {
-				union script_driver_data_u sdd;
-				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-				}
-				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				sdd.c = ch;
-				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
-					quest_instance_global = NULL;	// un-set this
-					return FALSE;
-				}
-			}
-		}
-	}
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Called when an actor tries to start a quest.
-*
-* @param obj_data *obj The object to check start-quests on.
-* @param char_data *actor The person trying to start a quest.
-* @param quest_data *quest Which quest they're trying to start.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	int ret_val = TRUE;
-	trig_data *t, *next_t;
-	
-	if (!SCRIPT_CHECK(obj, OTRIG_START_QUEST)) {
-		return TRUE;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
-		if (TRIGGER_CHECK(t, OTRIG_START_QUEST)) {
-			union script_driver_data_u sdd;
-			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-			}
-			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-			}
-			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			sdd.o = obj;
-			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
-			obj = sdd.o;
-			if (!ret_val) {
-				break;
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return ret_val;
-}
-
-
-/**
-* Called when an actor tries to start a quest.
-*
-* @param char_data *actor The person trying to start a quest.
-* @param quest_data *quest Which quest they're trying to start.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	vehicle_data *veh, *next_veh;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-	
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (TRIGGER_CHECK(t, VTRIG_START_QUEST)) {
-				union script_driver_data_u sdd;
-				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-				}
-				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				sdd.v = veh;
-				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
-					quest_instance_global = NULL;	// un-set this
-					return FALSE;
-				}
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Called when an actor tries to start a quest.
-*
-* @param room_data *room The room where the person is trying to start it.
-* @param char_data *actor The person trying to start a quest.
-* @param quest_data *quest Which quest they're trying to start.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (!SCRIPT_CHECK(room, WTRIG_START_QUEST)) {
-		return 1;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-	
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (TRIGGER_CHECK(t, WTRIG_START_QUEST)) {
-			union script_driver_data_u sdd;
-			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
-			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-			}
-			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-			}
-			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			sdd.r = room;
-			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
-				quest_instance_global = NULL;	// un-set this
-				return FALSE;
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Start quest trigger (obj).
-*
-* @param char_data *actor The person trying to get a quest.
-* @param quest_data *quest The quest to try to start
-* @param struct instance_data *inst The instance associated with the quest, if any.
-* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
-*/
-int start_quest_otrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	obj_data *obj;
-	int i;
-
-	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 1;
-	}
-
-	for (i = 0; i < NUM_WEARS; i++) {
-		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
-			return 0;
-		}
-	}
-	
-	DL_FOREACH2(actor->carrying, obj, next_content) {
-		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
-			return 0;
-		}
-	}
-	
-	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
-		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
-			return 0;
-		}
-	}
-
-	return 1;
 }
 
 
@@ -3754,369 +4083,45 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// FINISH QUEST TRIGGERS ///////////////////////////////////////////////////
-
 /**
-* Called when an actor tries to turn in a quest.
+* Runs greet, entry, and enter triggers on everything in the room. If the
+* movement is preventable, it stops on any trigger that prevents it. If it's
+* not, it runs them all.
 *
-* @param char_data *actor The person trying to finish a quest.
-* @param quest_data *quest Which quest they're trying to finish.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character came from.
+* @param char *method Method of movement.
+* @param bool preventable TRUE if the character can be sent back; FALSE if not.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
 */
-int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	char_data *ch;
-	trig_data *t;
-	
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
+int greet_triggers(char_data *ch, int dir, char *method, bool preventable) {
+	if (!entry_mtrigger(ch, method) && preventable) {
+		return 0;
+	}
+	else if (!enter_wtrigger(IN_ROOM(ch), ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_mtrigger(ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_vtrigger(ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_otrigger(ch, dir, method) && preventable) {
+		return 0;
 	}
 	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
+	// if we got this far, we're staying
 	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_FINISH_QUEST) || (ch == actor)) {
-			continue;
-		}
-		
-		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
-			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-				continue;
-			}
-			if (TRIGGER_CHECK(t, MTRIG_FINISH_QUEST)) {
-				union script_driver_data_u sdd;
-				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-				}
-				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				sdd.c = ch;
-				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
-					quest_instance_global = NULL;	// un-set this
-					return FALSE;
-				}
-			}
-		}
-	}
+	// people we remember when we enter
+	entry_memory_mtrigger(ch);
 	
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Called when an actor tries to turn in a quest.
-*
-* @param obj_data *obj The object to run triggers on.
-* @param char_data *actor The person trying to finish a quest.
-* @param quest_data *quest Which quest they're trying to finish.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	int ret_val = TRUE;
-	trig_data *t, *next_t;
-	
-	if (!SCRIPT_CHECK(obj, OTRIG_FINISH_QUEST)) {
-		return TRUE;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
-		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST)) {
-			union script_driver_data_u sdd;
-			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-			}
-			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-			}
-			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			sdd.o = obj;
-			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
-			obj = sdd.o;
-			if (!ret_val) {
-				break;
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return ret_val;
-}
-
-
-/**
-* Called when an actor tries to turn in a quest.
-*
-* @param char_data *actor The person trying to finish a quest.
-* @param quest_data *quest Which quest they're trying to finish.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	vehicle_data *veh, *next_veh;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-	
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (TRIGGER_CHECK(t, VTRIG_FINISH_QUEST)) {
-				union script_driver_data_u sdd;
-				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-				}
-				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				sdd.v = veh;
-				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
-					quest_instance_global = NULL;	// un-set this
-					return FALSE;
-				}
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Called when an actor tries to turn in a quest.
-*
-* @param room_data *room The room the person is trying top do this in.
-* @param char_data *actor The person trying to finish a quest.
-* @param quest_data *quest Which quest they're trying to finish.
-* @param struct instance_data *inst What instance the quest is associated with, if any.
-* @return int 0 to prevent it; 1 to allow it.
-*/
-int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, struct instance_data *inst) {
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (!SCRIPT_CHECK(room, WTRIG_FINISH_QUEST)) {
-		return 1;
-	}
-	
-	// store instance globally to allow %instance.xxx% in scripts
-	quest_instance_global = inst;
-
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (TRIGGER_CHECK(t, WTRIG_FINISH_QUEST)) {
-			union script_driver_data_u sdd;
-			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
-			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
-				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
-			}
-			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
-				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
-			}
-			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			sdd.r = room;
-			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
-				quest_instance_global = NULL;	// un-set this
-				return FALSE;
-			}
-		}
-	}
-	
-	quest_instance_global = NULL;	// un-set this
-	return TRUE;
-}
-
-
-/**
-* Finish quest trigger (obj).
-*
-* @param char_data *actor The person trying to get a quest.
-* @param quest_data *quest The quest to try to finish
-* @param struct instance_data *inst The associated instance, if any.
-* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
-*/
-int finish_quest_otrigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	obj_data *obj;
-	int i;
-
-	/* prevent people we like from becoming trapped :P */
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 1;
-	}
-
-	for (i = 0; i < NUM_WEARS; i++) {
-		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst)) {
-			return 0;
-		}
-	}
-	
-	DL_FOREACH2(actor->carrying, obj, next_content) {
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
-			return 0;
-		}
-	}
-	
-	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
-			return 0;
-		}
-	}
+	// people we remember when they enter
+	greet_memory_mtrigger(ch);
 
 	return 1;
 }
 
-
-/**
-* Checks all quest triggers
-*
-* @param char_data *actor The person trying to finish a quest.
-* @param quest_data *quest The quest.
-* @param struct instance_data *inst The associated instance, if any.
-* @return int 0 means stop execution (block quest), 1 means continue
-*/
-int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst) {
-	room_data *room = IN_ROOM(actor);
-	struct trig_proto_list *tpl;
-	trig_data *proto, *trig;
-	int val = 1;
-
-	if (val) {
-		val = finish_quest_mtrigger(actor, quest, inst);	// mob trigs
-	}
-	if (val) {
-		val = finish_quest_otrigger(actor, quest, inst);	// obj trigs
-	}
-	if (val) {
-		val = finish_quest_vtrigger(actor, quest, inst);	// vehicles
-	}
-	if (val) {
-		// still here? world triggers require additional work because we add
-		// the trigs from the quest itself
-		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
-			if (!(proto = real_trigger(tpl->vnum))) {
-				continue;
-			}
-			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
-				continue;
-			}
-			
-			// attach this trigger
-			if (!(trig = read_trigger(tpl->vnum))) {
-				continue;
-			}
-			if (!SCRIPT(room)) {
-				create_script_data(room, WLD_TRIGGER);
-			}
-			add_trigger(SCRIPT(room), trig, -1);
-		}
-		
-		val = finish_quest_wtrigger(room, actor, quest, inst);	// world trigs
-		
-		// now remove those triggers again
-		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
-			if (!(proto = real_trigger(tpl->vnum))) {
-				continue;
-			}
-			if (!TRIGGER_CHECK(proto, WTRIG_FINISH_QUEST)) {
-				continue;
-			}
-			
-			// find and remove
-			if (SCRIPT(room)) {
-				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
-			}
-		}
-	}
-	return val;
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// RESET TRIGGER HELPER ////////////////////////////////////////////////////
-
-// runs room reset triggers on a loop
-EVENTFUNC(run_reset_triggers) {
-	struct room_event_data *data = (struct room_event_data *)event_obj;
-	room_data *room;
-	
-	// grab data but don't free (we usually reschedule this)
-	room = data->room;
-	
-	// still have any?
-	if (IS_ADVENTURE_ROOM(room) || !SCRIPT_CHECK(room, WTRIG_RESET)) {
-		delete_stored_event_room(room, SEV_RESET_TRIGGER);
-		free(data);
-		return 0;
-	}
-	
-	reset_wtrigger(room);
-	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
-}
-
-
-/**
-* Checks if a building is a tavern and can run. If so, sets up the data for
-* it and schedules the event. If not, it clears that data.
-*
-* @param room_data *room The room to check for tavernness.
-* @param bool random_offest If TRUE, throws in some random in the 1st timer.
-*/
-void check_reset_trigger_event(room_data *room, bool random_offset) {
-	struct room_event_data *data;
-	struct dg_event *ev;
-	int mins;
-	
-	if (!IS_ADVENTURE_ROOM(room) && SCRIPT_CHECK(room, WTRIG_RESET)) {
-		if (!find_stored_event_room(room, SEV_RESET_TRIGGER)) {
-			CREATE(data, struct room_event_data, 1);
-			data->room = room;
-			
-			// schedule every 7.5 minutes
-			mins = 7.5 - (random_offset ? number(0,6) : 0);
-			ev = dg_event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);
-			add_stored_event_room(room, SEV_RESET_TRIGGER, ev);
-		}
-	}
-	else {
-		cancel_stored_event_room(room, SEV_RESET_TRIGGER);
-	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// KILL TRIGGER FUNCS //////////////////////////////////////////////////////
 
 /**
 * Runs kill triggers for everyone involved in the kill -- the killer, their
@@ -4230,67 +4235,54 @@ int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_kil
 }
 
 
-/**
-* Runs kill triggers on a single object, then on its next contents
-* (recursively). This function is called by run_kill_triggers, which has
-* already validated that the owner of the object qualifies as either the killer
-* or an ally of the killer.
-*
-* @param obj_data *obj The object possibly running triggers.
-* @param char_data *dying The person who has died.
-* @param char_data *killer Optional: Person who killed them.
-* @return int The return value of a script (1 is normal, 0 suppresses the death cry).
-*/
-int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer) {
-	obj_data *next_contains, *next_inside;
-	union script_driver_data_u sdd;
-	trig_data *trig, *next_trig;
-	int val = 1;	// default value
+ //////////////////////////////////////////////////////////////////////////////
+//// RESET TRIGGER HELPER ////////////////////////////////////////////////////
+
+// runs room reset triggers on a loop
+EVENTFUNC(run_reset_triggers) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	room_data *room;
 	
-	if (!obj) {
-		return val;	// often called with no obj
+	// grab data but don't free (we usually reschedule this)
+	room = data->room;
+	
+	// still have any?
+	if (IS_ADVENTURE_ROOM(room) || !SCRIPT_CHECK(room, WTRIG_RESET)) {
+		delete_stored_event_room(room, SEV_RESET_TRIGGER);
+		free(data);
+		return 0;
 	}
 	
-	// save for later
-	next_contains = obj->contains;
-	next_inside = obj->next_content;
+	reset_wtrigger(room);
+	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
+}
+
+
+/**
+* Checks if a building is a tavern and can run. If so, sets up the data for
+* it and schedules the event. If not, it clears that data.
+*
+* @param room_data *room The room to check for tavernness.
+* @param bool random_offest If TRUE, throws in some random in the 1st timer.
+*/
+void check_reset_trigger_event(room_data *room, bool random_offset) {
+	struct room_event_data *data;
+	struct dg_event *ev;
+	int mins;
 	
-	// run script if possible...
-	if (SCRIPT_CHECK(obj, OTRIG_KILL)) {
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), trig, next_trig) {
-			if (!TRIGGER_CHECK(trig, OTRIG_KILL) || (number(1, 100) > GET_TRIG_NARG(trig))) {
-				continue;	// wrong trig or failed random percent
-			}
+	if (!IS_ADVENTURE_ROOM(room) && SCRIPT_CHECK(room, WTRIG_RESET)) {
+		if (!find_stored_event_room(room, SEV_RESET_TRIGGER)) {
+			CREATE(data, struct room_event_data, 1);
+			data->room = room;
 			
-			// ok:
-			memset((char *) &sdd, 0, sizeof(union script_driver_data_u));
-			ADD_UID_VAR(buf, trig, char_script_id(dying), "actor", 0);
-			if (killer) {
-				ADD_UID_VAR(buf, trig, char_script_id(killer), "killer", 0);
-			}
-			else {
-				add_var(&GET_TRIG_VARS(trig), "killer", "", 0);
-			}
-			sdd.o = obj;
-			
-			// run it -- any script returning 0 guarantees we will return 0
-			val &= script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
-			
-			// ensure obj is safe
-			obj = sdd.o;
-			if (!obj) {
-				break;	// cannot run more triggers -- obj is gone
-			}
+			// schedule every 7.5 minutes
+			mins = 7.5 - (random_offset ? number(0,6) : 0);
+			ev = dg_event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);
+			add_stored_event_room(room, SEV_RESET_TRIGGER, ev);
 		}
 	}
-	
-	// run recursively
-	if (next_contains) {
-		val &= kill_otrigger(next_contains, dying, killer);
+	else {
+		cancel_stored_event_room(room, SEV_RESET_TRIGGER);
 	}
-	if (next_inside) {
-		val &= kill_otrigger(next_inside, dying, killer);
-	}
-	
-	return val;
 }
+

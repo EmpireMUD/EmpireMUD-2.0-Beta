@@ -846,7 +846,7 @@ ACMD(do_mload) {
 				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
 			}
 			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
 				return;
@@ -949,7 +949,7 @@ ACMD(do_mload) {
 				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
 			}
 			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
 				return;

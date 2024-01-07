@@ -446,19 +446,16 @@ void load_vtrigger(vehicle_data *veh);
 void reboot_vtrigger(vehicle_data *veh);
 void speech_vtrigger(char_data *actor, char *str, generic_data *language);
 
-// combo triggers, greet triggers, start quest triggers, finish quest triggers
+// combo triggers, start quest triggers, finish quest triggers
 bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
-int greet_triggers(char_data *ch, int dir, char *method, bool preventable);
-int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int greet_triggers(char_data *ch, int dir, char *method, bool preventable);
+int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 // reset trigger helper
 void check_reset_trigger_event(room_data *room, bool random_offset);
-
-// kill triggers
-int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
-int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -530,8 +527,6 @@ void script_modify(char *argument);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 
-void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
-
 void obj_command_interpreter(obj_data *obj, char *argument);
 void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 void wld_command_interpreter(room_data *room, char *argument);
@@ -547,8 +542,6 @@ union script_driver_data_u {
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);
 
-struct cmdlist_element *find_done(struct cmdlist_element *cl);
-struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 int find_eq_pos_script(char *arg);
 char_data *get_char_near_obj(obj_data *obj, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
@@ -564,9 +557,6 @@ int valid_dg_target(char_data *ch, int bitvector);
 
 // handlers
 void update_script_types(struct script_data *sc);
-
-/* needed for new %load% handling */
-int can_wear_on_pos(obj_data *obj, int pos);
 
 // script uid lookup table functions
 void add_to_lookup_table(int uid, void *ptr, int type);
