@@ -3331,10 +3331,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	if (!ch->desc) {
 		return;	// don't bother
 	}
+	/* now allowing this with no-arg
 	if (!*argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
+	*/
 	if (!(map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
@@ -3438,7 +3440,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			else if (adventures && find_instance_by_room(room, FALSE, TRUE)) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+			else if (!*argument || multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
@@ -3467,7 +3469,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
 							continue;	// can't see from here
 						}
-						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
+						if (!*argument || !multi_isname(argument, VEH_KEYWORDS(veh))) {
 							continue;
 						}
 					
@@ -3530,7 +3532,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
-		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within %d range:\r\n", max_dist);
+		}
 		
 		// display and free the nodes
 		total = over_count = 0;

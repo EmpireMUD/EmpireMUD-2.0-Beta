@@ -2933,6 +2933,7 @@ ACMD(do_mapscan) {
 
 
 ACMD(do_scan) {
+	bool dash_distance = FALSE;
 	char arg[MAX_INPUT_LENGTH], new_arg[MAX_INPUT_LENGTH];
 	bitvector_t dir_modifiers = NOBITS;
 	int dir, dist = -1, val;
@@ -2950,6 +2951,7 @@ ACMD(do_scan) {
 			// -dir modifier (or maybe -dist)
 			if (isdigit(*(arg+1))) {
 				dist = atoi(arg+1);
+				dash_distance = TRUE;	// distance with a dash
 			}
 			else if ((val = parse_direction(ch, arg+1)) == NO_DIR) {
 				msg_to_char(ch, "Invalid direction modifier '%s'.\r\n", arg+1);
@@ -2957,6 +2959,7 @@ ACMD(do_scan) {
 			}
 			else if (val >= NUM_2D_DIRS) {
 				msg_to_char(ch, "You can't scan that way.\r\n");
+				return;
 			}
 			else {
 				// accept direction modifier
@@ -2989,11 +2992,11 @@ ACMD(do_scan) {
 	else if (!*new_arg && dist == -1 && dir_modifiers == NOBITS) {
 		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
-	else if (!*new_arg && (dist >= 0 || dir_modifiers)) {
+	else if (!*new_arg && (dist >= 0 || dir_modifiers) && !dash_distance) {
 		// normal 'screenreader look' scan with a custom distance
 		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 	}
-	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR) {
+	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR || (dist >= 0 && dash_distance)) {
 		// scanning by tile name
 		clear_recent_moves(ch);
 		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
