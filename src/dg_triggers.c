@@ -1647,6 +1647,66 @@ int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 
 
 /**
+* Runs greet triggers on objects in the room.
+*
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character came from.
+* @param char *method Method of movement.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
+*/
+int greet_otrigger(char_data *actor, int dir, char *method) {
+	int intermediate, final = TRUE, any_in_room = -1;
+	obj_data *obj, *next_obj;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_obj, next_content) {
+		if (!SCRIPT_CHECK(obj, OTRIG_GREET)) {
+			continue;
+		}
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
+			if (!TRIGGER_CHECK(t, OTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(actor));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.o = obj;
+				intermediate = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
 * @param room_data *room The room the person is trying to leave.
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).

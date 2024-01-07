@@ -492,6 +492,7 @@ ACMD(do_respawn) {
 		greet_mtrigger(ch, NO_DIR, "respawn");
 		greet_memory_mtrigger(ch);
 		greet_vtrigger(ch, NO_DIR, "respawn");
+		greet_otrigger(ch, NO_DIR, "respawn");
 		
 		// temporary safety effect after a respawn
 		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);

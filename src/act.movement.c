@@ -883,6 +883,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	greet_mtrigger(ch, NO_DIR, "transport");
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR, "transport");
+	greet_otrigger(ch, NO_DIR, "transport");
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 
@@ -1486,7 +1487,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
-	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "portal") || !greet_mtrigger(ch, NO_DIR, "portal") || !greet_vtrigger(ch, NO_DIR, "portal")) {
+	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "portal") || !greet_mtrigger(ch, NO_DIR, "portal") || !greet_vtrigger(ch, NO_DIR, "portal") || !greet_otrigger(ch, NO_DIR, "portal")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -1579,7 +1580,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// greet trigger section: this can send the player back
-	if (!greet_mtrigger(ch, dir, move_flags_to_method(flags)) || !greet_vtrigger(ch, dir, move_flags_to_method(flags))) {
+	if (!greet_mtrigger(ch, dir, move_flags_to_method(flags)) || !greet_vtrigger(ch, dir, move_flags_to_method(flags)) || !greet_otrigger(ch, dir, move_flags_to_method(flags))) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
@@ -2191,7 +2192,7 @@ ACMD(do_circle) {
 	command_lag(ch, WAIT_MOVEMENT);
 	
 	// triggers?
-	if (!entry_mtrigger(ch, "move") || !enter_wtrigger(IN_ROOM(ch), ch, dir, "move") || !greet_mtrigger(ch, dir, "move") || !greet_vtrigger(ch, dir, "move")) {
+	if (!entry_mtrigger(ch, "move") || !enter_wtrigger(IN_ROOM(ch), ch, dir, "move") || !greet_mtrigger(ch, dir, "move") || !greet_vtrigger(ch, dir, "move") || !greet_otrigger(ch, dir, "move")) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		if (ch->desc) {

@@ -1209,6 +1209,7 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
 				greet_mtrigger(ch, NO_DIR, "system");
 				greet_vtrigger(ch, NO_DIR, "system");
+				greet_otrigger(ch, NO_DIR, "system");
 				entry_memory_mtrigger(ch);
 				greet_memory_mtrigger(ch);
 			}

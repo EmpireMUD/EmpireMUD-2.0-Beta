@@ -5552,6 +5552,7 @@ DO_ABIL(do_teleport_ability) {
 			greet_mtrigger(ch, NO_DIR, "ability");
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "ability");
+			greet_otrigger(ch, NO_DIR, "ability");
 			
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
@@ -5566,6 +5567,7 @@ DO_ABIL(do_teleport_ability) {
 				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
 				greet_memory_mtrigger(GET_COMPANION(ch));
 				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+				greet_otrigger(GET_COMPANION(ch), NO_DIR, "ability");
 			}
 		}
 		

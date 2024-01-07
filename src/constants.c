@@ -4703,7 +4703,7 @@ const char *otrig_types[] = {
 	"Global",	// 0
 	"Random",
 	"Command",
-	"*",
+	"Greet",
 	"*",
 	"Timer",	// 5
 	"Get",
@@ -4735,7 +4735,7 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// global
 	TRIG_ARG_PERCENT,	// random
 	TRIG_ARG_COMMAND | TRIG_ARG_OBJ_WHERE,	// command
-	NOBITS,	//
+	TRIG_ARG_PERCENT,	// greet
 	NOBITS,	//
 	NOBITS,	// timer
 	TRIG_ARG_PERCENT,	// get

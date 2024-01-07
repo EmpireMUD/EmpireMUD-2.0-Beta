@@ -72,6 +72,7 @@
 #define OTRIG_GLOBAL           BIT(0)	// NOT actually used, currently
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define OTRIG_COMMAND          BIT(2)      /* character types a command  */
+#define OTRIG_GREET            BIT(3)	// person enters the room with an object
 
 #define OTRIG_TIMER            BIT(5)     /* item's timer expires       */
 #define OTRIG_GET              BIT(6)     /* item is picked up          */
@@ -362,6 +363,8 @@ int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
 int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_data *veh, any_vnum abil);
 
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
+
+int greet_otrigger(char_data *actor, int dir, char *method);
 
 int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);

@@ -166,6 +166,7 @@ Objects can trigger on the following events:
 &cGlobal&0 - Can happen even without players present (combine with Random).
 &cRandom&0 - Triggers randomly when players are around.
 &cCommand&0 - Responds to a player command.
+&cGreet&0 - Triggers when someone enters the room the object is in.
 &cTimer&0 - Triggers when the object's timer expires.
 &cGet&0 - Triggers when picked up.
 &cDrop&0 - Triggers when dropped/put.

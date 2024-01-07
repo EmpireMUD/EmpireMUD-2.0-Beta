@@ -649,6 +649,7 @@ ACMD(do_infiltrate) {
 			greet_mtrigger(ch, NO_DIR, "move");
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR, "move");
+			greet_otrigger(ch, NO_DIR, "move");
 	
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying

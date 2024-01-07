@@ -90,6 +90,7 @@ void adventure_unsummon(char_data *ch) {
 	greet_mtrigger(ch, NO_DIR, "summon");
 	greet_memory_mtrigger(ch);
 	greet_vtrigger(ch, NO_DIR, "summon");
+	greet_otrigger(ch, NO_DIR, "summon");
 	
 	msdp_update_room(ch);
 	
@@ -108,6 +109,7 @@ void adventure_unsummon(char_data *ch) {
 			greet_mtrigger(fol->follower, NO_DIR, "summon");
 			greet_memory_mtrigger(fol->follower);
 			greet_vtrigger(fol->follower, NO_DIR, "summon");
+			greet_otrigger(fol->follower, NO_DIR, "summon");
 		}
 	}
 }

@@ -363,6 +363,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		greet_mtrigger(VEH_SITTING_ON(veh), dir, "move");
 		greet_memory_mtrigger(VEH_SITTING_ON(veh));
 		greet_vtrigger(VEH_SITTING_ON(veh), dir, "move");
+		greet_otrigger(VEH_SITTING_ON(veh), dir, "move");
 		msdp_update_room(VEH_SITTING_ON(veh));
 		
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
@@ -560,6 +561,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	greet_mtrigger(mob, NO_DIR, "enter");
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR, "enter");
+	greet_otrigger(mob, NO_DIR, "enter");
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
@@ -620,6 +622,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	greet_mtrigger(mob, NO_DIR, "exit");
 	greet_memory_mtrigger(mob);
 	greet_vtrigger(mob, NO_DIR, "exit");
+	greet_otrigger(mob, NO_DIR, "exit");
 	msdp_update_room(mob);	// is this possibly a person?
 }
 
