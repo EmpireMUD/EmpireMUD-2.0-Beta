@@ -5710,11 +5710,11 @@ ACMD(do_findmaintenance) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
-		else if (find_room && ROOM_OWNER(find_room) != emp) {
+		else if (find_room && ROOM_OWNER(find_room) != emp && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "The empire does not own that location.\r\n");
 			return;
 		}
-		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room))) {
+		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room)) && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "That location needs no maintenance.\r\n");
 			return;
 		}
@@ -5722,9 +5722,24 @@ ACMD(do_findmaintenance) {
 	
 	// player is only checking one room (pre-validated)
 	if (find_room) {
-		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		if (ROOM_OWNER(find_room) == emp && (IS_COMPLETE(find_room) && BUILDING_RESOURCES(find_room))) {
+			old_res = total_list;
+			total_list = combine_resources(total_list, BUILDING_RESOURCES(find_room));
+			free_resource_list(old_res);
+		}
+		DL_FOREACH2(ROOM_VEHICLES(find_room), veh, next_in_room) {
+			if (VEH_OWNER(veh) == emp || (!VEH_OWNER(veh) && ROOM_OWNER(find_room) == emp)) {
+				if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh)) {
+					old_res = total_list;
+					total_list = combine_resources(total_list, VEH_NEEDS_RESOURCES(veh));
+					free_resource_list(old_res);
+				}
+			}
+		}
+		show_resource_list(total_list, partial);
 		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s%s: %s\r\n", get_room_name(find_room, FALSE), coord_display_room(ch, find_room, FALSE), partial);
+		free_resource_list(total_list);
 		return;
 	}
 	

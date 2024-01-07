@@ -1307,6 +1307,28 @@ int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_
 
 
 /**
+* Counts vehicles that are owned by the empire in a room. If the room itself
+* is owned, also counts unowned vehicles there.
+*
+* @param room_data *room The room to check.
+* @param empire_data *emp The empire to look for.
+* @return int The number of vehicles there.
+*/
+int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_OWNER(veh) == emp || (!VEH_OWNER(veh) && ROOM_OWNER(room) == emp)) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Unharnesses a mob and loads it back into the game. If it fails to load the
 * mob, it will still remove 'vam' from the animals list.
 *

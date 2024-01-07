@@ -2636,6 +2636,7 @@ void start_dismantle_vehicle(vehicle_data *veh);
 void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room, empire_data *for_empire);
 int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire);
+int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
