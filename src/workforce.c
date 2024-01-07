@@ -147,7 +147,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	// THING 1: burning
 	if (IS_BURNING(room)) {
-		if (!starving && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
+		if (!starving && CHORE_ACTIVE(CHORE_FIRE_BRIGADE) && HOME_ROOM(room) == room) {
 			do_chore_fire_brigade(emp, room);
 		}
 		return;	// blocks all other chores
