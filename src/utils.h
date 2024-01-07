@@ -2331,6 +2331,7 @@ void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
 
 // friends.c
+int account_friend_status(char_data *ch, char_data *vict);
 void mortlog_friends(char_data *ch, const char *str, ...) __attribute__((format(printf, 2, 3)));
 
 // generic.c
