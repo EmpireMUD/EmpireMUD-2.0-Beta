@@ -2036,7 +2036,7 @@ void show_bonus_trait_menu(char_data *ch) {
 	reset = config_get_int("hours_to_bonus_trait_reset");
 	advanced = config_get_int("hours_to_advanced_bonus_traits");
 	
-	msg_to_char(ch, "\r\nBonus Traits:\r\n");
+	msg_to_char(ch, "\r\nBonus Traits (with %d hour%s of play):\r\n", hours, PLURAL(hours));
 	
 	// info section
 	if (first > 0) {
@@ -2052,7 +2052,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, " and another after %d hour%s%s", second, PLURAL(second), (first == 0) ? " of play" : "");
 	}
 	if (reset > 0) {
-		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
+		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after your first %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
 	}
 	else {
 		msg_to_char(ch, ".\r\n");
