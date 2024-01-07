@@ -3048,7 +3048,6 @@ typedef enum {
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
-#define MAX_OBJ_AFFECT  6
 #define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
 #define MAX_POOF_LENGTH  80
