@@ -6910,6 +6910,9 @@ Message types:
  &cmine-to-room&0 - Shown to the room when mining.
  &cchop-to-char&0 - Shown to the character when chopping.
  &cchop-to-room&0 - Shown to the room when chopping.
+ &center-portal-to-char&0 - Shown to the character when entering a portal ($p).
+ &center-portal-to-room&0 - Shown to the room when char enters a portal ($p).
+ &cexit-portal-to-room&0 - Shown to the room when char exits a portal ($p).
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d

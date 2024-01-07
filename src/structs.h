@@ -1900,6 +1900,9 @@ typedef enum {
 #define OBJ_CUSTOM_MINE_TO_ROOM  27
 #define OBJ_CUSTOM_CHOP_TO_CHAR  28
 #define OBJ_CUSTOM_CHOP_TO_ROOM  29
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR  30
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM  31
+#define OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM  32
 
 
 // RES_x: resource requirement types

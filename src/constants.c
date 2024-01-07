@@ -3387,6 +3387,9 @@ const char *obj_custom_types[] = {
 	"mine-to-room",
 	"chop-to-char",
 	"chop-to-room",
+	"enter-portal-to-char",	// 30
+	"enter-portal-to-room",
+	"exit-portal-to-room",
 	"\n"
 };
 
@@ -3407,7 +3410,9 @@ const char *obj_custom_type_help =
 "&w Shown when you use it to mine ore: mine-to-char mine-to-room&0\r\n"
 " Shown when you use it to chop trees: chop-to-char chop-to-room\r\n"
 "&w Shown in order when playing it: instrument-to-char instrument-to-room&0\r\n"
-" Available for scripts: script1 script2 script3 script4 script5\r\n";
+" Shown when using portals: enter-portal-to-char, enter-portal-to-room,\r\n"
+"   exit-portal-to-room\r\n"
+"&w Available for scripts: script1 script2 script3 script4 script5&0\r\n";
 
 
 // basic speed is the theoretical average weapon speed without wits/haste,

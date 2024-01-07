@@ -1402,6 +1402,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 * @param bool following TRUE only if this person followed someone else through.
 */
 void char_through_portal(char_data *ch, obj_data *portal, bool following) {
+	char *msg;
 	obj_data *use_portal;
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
@@ -1417,8 +1418,17 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		cancel_action(ch);
 	}
 	
-	act("You enter $p...", FALSE, ch, portal, 0, TO_CHAR);
-	act("$n steps into $p!", TRUE, ch, portal, 0, TO_ROOM);
+	// to-char entry message
+	if (!(msg = obj_get_custom_message(portal, OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR))) {
+		msg = "You enter $p...";
+	}
+	act(msg, FALSE, ch, portal, NULL, TO_CHAR);
+	
+	// to-room entry message
+	if (!(msg = obj_get_custom_message(portal, OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM))) {
+		msg = "$n steps into $p!";
+	}
+	act(msg, TRUE, ch, portal, NULL, TO_ROOM);
 	
 	// ch first
 	char_from_room(ch);
@@ -1440,7 +1450,12 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
 	
-	act("$n appears from $p!", TRUE, ch, use_portal, 0, TO_ROOM);
+	// to-room exit message
+	if (!(msg = obj_get_custom_message(portal, OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM))) {
+		msg = "$n appears from $p!";
+	}
+	act(msg, TRUE, ch, use_portal, NULL, TO_ROOM);
+	
 	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	give_portal_sickness(ch, portal, was_in, to_room);
