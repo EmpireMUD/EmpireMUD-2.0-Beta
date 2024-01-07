@@ -827,12 +827,7 @@ OFFER_FINISH(ofin_summon) {
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
-	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR, "summon");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "summon");
-	greet_otrigger(ch, NO_DIR, "summon");
+	greet_triggers(ch, NO_DIR, "summon", FALSE);
 	msdp_update_room(ch);	// once we're sure we're staying
 	
 	// followers?
@@ -845,12 +840,7 @@ OFFER_FINISH(ofin_summon) {
 			look_at_room(fol->follower);
 			act("$n appears in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 			
-			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
-			entry_memory_mtrigger(fol->follower);
-			greet_mtrigger(fol->follower, NO_DIR, "summon");
-			greet_memory_mtrigger(fol->follower);
-			greet_vtrigger(fol->follower, NO_DIR, "summon");
-			greet_otrigger(fol->follower, NO_DIR, "summon");
+			greet_triggers(fol->follower, NO_DIR, "summon", FALSE);
 		}
 	}
 	

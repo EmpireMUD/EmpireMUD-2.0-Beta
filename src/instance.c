@@ -1205,13 +1205,7 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				// and announce
 				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
 				
-				entry_mtrigger(ch, "system");
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
-				greet_mtrigger(ch, NO_DIR, "system");
-				greet_vtrigger(ch, NO_DIR, "system");
-				greet_otrigger(ch, NO_DIR, "system");
-				entry_memory_mtrigger(ch);
-				greet_memory_mtrigger(ch);
+				greet_triggers(ch, NO_DIR, "system", FALSE);
 			}
 		}
 	}

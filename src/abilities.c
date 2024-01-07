@@ -5539,21 +5539,19 @@ DO_ABIL(do_teleport_ability) {
 			
 			char_from_room(ch);
 			char_to_room(ch, to_room);
-			qt_visit_room(ch, to_room);
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
 			
+			if (!greet_triggers(ch, NO_DIR, "ability", TRUE)) {
+				char_from_room(ch);
+				char_to_room(ch, was_in);
+				return;
+			}
+			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-		
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
-			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR, "ability");
-			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR, "ability");
-			greet_otrigger(ch, NO_DIR, "ability");
-			
+			qt_visit_room(ch, to_room);
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			
@@ -5562,12 +5560,11 @@ DO_ABIL(do_teleport_ability) {
 				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
 				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
 				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
-				enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
-				entry_memory_mtrigger(GET_COMPANION(ch));
-				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
-				greet_memory_mtrigger(GET_COMPANION(ch));
-				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
-				greet_otrigger(GET_COMPANION(ch), NO_DIR, "ability");
+				
+				if (!greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE)) {
+					char_from_room(GET_COMPANION(ch));
+					char_to_room(GET_COMPANION(ch), was_in);
+				}
 			}
 		}
 		

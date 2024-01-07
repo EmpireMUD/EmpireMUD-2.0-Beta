@@ -638,19 +638,17 @@ ACMD(do_infiltrate) {
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
-			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
+			
+			if (!greet_triggers(ch, dir, "move", TRUE)) {
+				char_to_room(ch, was_in);
+				look_at_room(ch);
+				return;
+			}
+			
 			msg_to_char(ch, "\r\nInfiltration successful.\r\n");
-			
 			GET_LAST_DIR(ch) = dir;
-			
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "move");
-			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR, "move");
-			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR, "move");
-			greet_otrigger(ch, NO_DIR, "move");
-	
+			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}

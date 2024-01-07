@@ -201,7 +201,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	
 	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "goto");
+	greet_triggers(ch, NO_DIR, "goto", FALSE);
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -11720,7 +11720,7 @@ ACMD(do_trans) {
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
-				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+				greet_triggers(victim, NO_DIR, "transfer", FALSE);
 				RESET_LAST_MESSAGED_TEMPERATURE(victim);
 				msdp_update_room(victim);	// once we're sure we're staying
 			}
@@ -11749,7 +11749,7 @@ ACMD(do_trans) {
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
-			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+			greet_triggers(victim, NO_DIR, "transfer", FALSE);
 			RESET_LAST_MESSAGED_TEMPERATURE(victim);
 			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");

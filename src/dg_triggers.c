@@ -155,127 +155,6 @@ int word_check(char *str, char *wordlist) {
 */
 
 
-void greet_memory_mtrigger(char_data *actor) {
-	trig_data *t, *next_t;
-	char_data *ch;
-	struct script_memory *mem, *next_mem;
-	char buf[MAX_INPUT_LENGTH];
-	int command_performed = 0, any_in_room = -1;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
-		return;
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
-			continue;
-		}
-		/* find memory line with command only */
-		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
-			if (actor->script_id != mem->id) {
-				continue;
-			}
-			if (mem->cmd) {
-				command_interpreter(ch, mem->cmd); /* no script */
-				command_performed = 1;
-				break;
-			}
-			/* if a command was not performed execute the memory script */
-			if (mem && !command_performed) {
-				LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-						continue;
-					}
-					if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || !CAN_SEE(ch, actor)) {
-						continue;
-					}
-					if (TRIG_IS_LOCAL(t)) {
-						if (any_in_room == -1) {
-							any_in_room = any_players_in_room(IN_ROOM(ch));
-						}
-						if (!any_in_room) {
-							continue;	// requires a player
-						}
-					}
-					if (number(1, 100) <= GET_TRIG_NARG(t)) {
-						union script_driver_data_u sdd;
-						ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-						sdd.c = ch;
-						script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-						break;
-					}
-				}
-			}
-			/* delete the memory */
-			if (mem) {
-				LL_DELETE(SCRIPT_MEM(ch), mem);
-				if (mem->cmd) {
-					free(mem->cmd);
-				}
-				free(mem);
-			}
-		}
-	}
-}
-
-
-int greet_mtrigger(char_data *actor, int dir, char *method) {
-	trig_data *t, *next_t;
-	char_data *ch;
-	char buf[MAX_INPUT_LENGTH];
-	int intermediate, final=TRUE, any_in_room = -1;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return TRUE;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS))
-		return TRUE;
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
-			continue;
-		}
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-				continue;
-			}
-			if (!TRIGGER_CHECK(t, MTRIG_GREET_ALL) && !(TRIGGER_CHECK(t, MTRIG_GREET) && CAN_SEE(ch, actor))) {
-				continue;	// wrong types
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(ch));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir>=0 && dir < NUM_OF_DIRS)
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				else
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.c = ch;
-				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-				if (!intermediate)
-					final = FALSE;
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
 int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method) {
 	trig_data *t, *next_t;
 	char_data *ch;
@@ -325,110 +204,6 @@ int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method)
 		}
 	}
 	return final;
-}
-
-
-void entry_memory_mtrigger(char_data *ch) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	char_data *actor;
-	struct script_memory *mem, *next_mem;
-	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1;
-
-	if (!SCRIPT_MEM(ch))
-		return;
-	
-	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), actor, next_in_room) {
-		if (!SCRIPT_MEM(ch)) {
-			break;
-		}
-		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-			continue;
-		}
-		if (actor!=ch && SCRIPT_MEM(ch)) {
-			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
-				if (actor->script_id == mem->id) {
-					if (mem->cmd) {
-						command_interpreter(ch, mem->cmd);
-					}
-					else {
-						LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-							if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || number(1, 100) > GET_TRIG_NARG(t)) {
-								continue;	// wrong type or no random roll
-							}
-							if (TRIG_IS_LOCAL(t)) {
-								if (any_in_room == -1) {
-									any_in_room = any_players_in_room(IN_ROOM(ch));
-								}
-								if (!any_in_room) {
-									continue;	// requires a player
-								}
-						    }
-						    
-						    // ok
-							ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-							sdd.c = ch;
-							script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-							break;
-						}
-					}
-					/* delete the memory */
-					LL_DELETE(SCRIPT_MEM(ch), mem);
-					if (mem->cmd) {
-						free(mem->cmd);
-					}
-					free(mem);
-				}
-			}
-		}
-	}
-}
-
-
-int entry_mtrigger(char_data *ch, char *method) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	int any_in_room = -1, val;
-	bool multi = FALSE;
-
-	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY))
-		return 1;
-	
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
-		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
-			continue;	// already did an allow-multi
-		}
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-			continue;
-		}
-		if (!TRIGGER_CHECK(t, MTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
-			continue;
-		}
-		
-		if (TRIG_IS_LOCAL(t)) {
-			if (any_in_room == -1) {
-				any_in_room = any_players_in_room(IN_ROOM(ch));
-			}
-			if (!any_in_room) {
-				continue;	// requires a player
-			}
-		}
-		
-		// ok:
-		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-		sdd.c = ch;
-		val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-		
-		if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
-			return val;
-		}
-		else {
-			multi = TRUE;
-		}
-	}
-
-	return 1;
 }
 
 
@@ -1647,66 +1422,6 @@ int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil) {
 
 
 /**
-* Runs greet triggers on objects in the room.
-*
-* @param char_data *actor The person who has entered the room.
-* @param int dir Which direction the character came from.
-* @param char *method Method of movement.
-* @return int 1 to allow the character here, 0 to attempt to send them back.
-*/
-int greet_otrigger(char_data *actor, int dir, char *method) {
-	int intermediate, final = TRUE, any_in_room = -1;
-	obj_data *obj, *next_obj;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return 1;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_obj, next_content) {
-		if (!SCRIPT_CHECK(obj, OTRIG_GREET)) {
-			continue;
-		}
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
-			if (!TRIGGER_CHECK(t, OTRIG_GREET)) {
-				continue;
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(actor));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				}
-				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.o = obj;
-				intermediate = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
-				if (!intermediate) {
-					final = FALSE;
-				}
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
-/**
 * @param room_data *room The room the person is trying to leave.
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
@@ -2078,60 +1793,6 @@ void reset_wtrigger(room_data *room) {
 			}
 		}
 	}
-}
-
-
-int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
-	union script_driver_data_u sdd;
-	trig_data *t, *next_t;
-	char buf[MAX_INPUT_LENGTH];
-	int any_in_room = -1, val = 1, this;
-	bool multi = FALSE;
-	
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return TRUE;
-	}
-
-	if (!SCRIPT_CHECK(room, WTRIG_ENTER))
-		return 1;
-
-	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
-		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
-			continue;	// alread did an allow-multi
-		}
-		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
-			continue;
-		}
-		if (TRIG_IS_LOCAL(t)) {
-			if (any_in_room == -1) {
-				any_in_room = any_players_in_room(room);
-			}
-			if (!any_in_room) {
-				continue;	// requires a player
-			}
-		}
-		
-		// ok:
-		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
-		if (dir>=0 && dir < NUM_OF_DIRS)
-			add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-		else
-			add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-		sdd.r = room;
-		this = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-		val = MIN(val, this);
-		
-		if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
-			return val;
-		}
-		else {
-			multi = TRUE;
-		}
-	}
-
-	return val;
 }
 
 
@@ -2853,59 +2514,6 @@ int entry_vtrigger(vehicle_data *veh, char *method) {
 }
 
 
-int greet_vtrigger(char_data *actor, int dir, char *method) {
-	int intermediate, final = TRUE, any_in_room = -1;
-	vehicle_data *veh, *next_veh;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t, *next_t;
-
-	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
-		return 1;
-	}
-	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return TRUE;
-	}
-	
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_GREET)) {
-			continue;
-		}
-
-		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
-			if (!TRIGGER_CHECK(t, VTRIG_GREET)) {
-				continue;
-			}
-			if (TRIG_IS_LOCAL(t)) {
-				if (any_in_room == -1) {
-					any_in_room = any_players_in_room(IN_ROOM(veh));
-				}
-				if (!any_in_room) {
-					continue;	// requires a player
-				}
-			}
-			if (number(1, 100) <= GET_TRIG_NARG(t)) {
-				union script_driver_data_u sdd;
-				if (dir >= 0 && dir < NUM_OF_DIRS) {
-					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
-				}
-				else {
-					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
-				}
-				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
-				sdd.v = veh;
-				intermediate = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
-				if (!intermediate) {
-					final = FALSE;
-				}
-				continue;
-			}
-		}
-	}
-	return final;
-}
-
-
 /**
 * @param char_data *actor The person trying to leave.
 * @param int dir The direction they are trying to go (passed through to %direction%).
@@ -3076,6 +2684,489 @@ void speech_vtrigger(char_data *actor, char *str, generic_data *language) {
 			}
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GREET TRIGGERS //////////////////////////////////////////////////////////
+
+/**
+* Called when a person walks into a room.
+*
+* @param room_data *room The room being entered.
+* @param char_data *actor The person who entered.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1, val = 1, this;
+	bool multi = FALSE;
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
+
+	if (!SCRIPT_CHECK(room, WTRIG_ENTER)) {
+		return 1;
+	}
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			continue;	// alread did an allow-multi
+		}
+		if (!TRIGGER_CHECK(t, WTRIG_ENTER) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
+		}
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(room);
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
+		if (dir>=0 && dir < NUM_OF_DIRS) {
+			add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+		}
+		else {
+			add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+		}
+		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+		sdd.r = room;
+		this = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		val = MIN(val, this);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), WTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
+	}
+
+	return val;
+}
+
+
+/**
+* Called when a mob walks into a room.
+*
+* @param char_data *ch The mob who moved.
+* @param char *method The way the mob entered.
+* @return int 1 to allow the entry; 0 to try to send it back.
+*/
+int entry_mtrigger(char_data *ch, char *method) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	int any_in_room = -1, val;
+	bool multi = FALSE;
+
+	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY)) {
+		return 1;
+	}
+	
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+		if (multi && !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			continue;	// already did an allow-multi
+		}
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
+		if (!TRIGGER_CHECK(t, MTRIG_ENTRY) || (number(1, 100) > GET_TRIG_NARG(t))) {
+			continue;
+		}
+		
+		if (TRIG_IS_LOCAL(t)) {
+			if (any_in_room == -1) {
+				any_in_room = any_players_in_room(IN_ROOM(ch));
+			}
+			if (!any_in_room) {
+				continue;	// requires a player
+			}
+		}
+		
+		// ok:
+		add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+		sdd.c = ch;
+		val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+		
+		if (!val || !IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+			return val;
+		}
+		else {
+			multi = TRUE;
+		}
+	}
+
+	return 1;
+}
+
+
+/**
+* Called when a person walks into a room to run triggers on mobs.
+*
+* @param char_data *ch The person who moved.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int greet_mtrigger(char_data *actor, int dir, char *method) {
+	trig_data *t, *next_t;
+	char_data *ch;
+	char buf[MAX_INPUT_LENGTH];
+	int intermediate, final=TRUE, any_in_room = -1;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+		return TRUE;
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
+			continue;
+		}
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (!TRIGGER_CHECK(t, MTRIG_GREET_ALL) && !(TRIGGER_CHECK(t, MTRIG_GREET) && CAN_SEE(ch, actor))) {
+				continue;	// wrong types
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(ch));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir>=0 && dir < NUM_OF_DIRS)
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				else
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.c = ch;
+				intermediate = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+				if (!intermediate)
+					final = FALSE;
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
+* Called when a person walks into a room to run triggers on vehicles.
+*
+* @param char_data *ch The person who moved.
+* @param int dir Which direction they moved.
+* @param char *method The way the person entered.
+* @return int 1 to allow the entry; 0 to try to send them back.
+*/
+int greet_vtrigger(char_data *actor, int dir, char *method) {
+	int intermediate, final = TRUE, any_in_room = -1;
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_GREET)) {
+			continue;
+		}
+
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
+			if (!TRIGGER_CHECK(t, VTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(veh));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.v = veh;
+				intermediate = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
+* Runs greet triggers on objects in the room.
+*
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character moved.
+* @param char *method Method of movement.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
+*/
+int greet_otrigger(char_data *actor, int dir, char *method) {
+	int intermediate, final = TRUE, any_in_room = -1;
+	obj_data *obj, *next_obj;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t, *next_t;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_obj, next_content) {
+		if (!SCRIPT_CHECK(obj, OTRIG_GREET)) {
+			continue;
+		}
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(obj)), t, next_t) {
+			if (!TRIGGER_CHECK(t, OTRIG_GREET)) {
+				continue;
+			}
+			if (TRIG_IS_LOCAL(t)) {
+				if (any_in_room == -1) {
+					any_in_room = any_players_in_room(IN_ROOM(actor));
+				}
+				if (!any_in_room) {
+					continue;	// requires a player
+				}
+			}
+			if (number(1, 100) <= GET_TRIG_NARG(t)) {
+				union script_driver_data_u sdd;
+				if (dir >= 0 && dir < NUM_OF_DIRS) {
+					add_var(&GET_TRIG_VARS(t), "direction", (char *)dirs[rev_dir[dir]], 0);
+				}
+				else {
+					add_var(&GET_TRIG_VARS(t), "direction", "none", 0);
+				}
+				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+				add_var(&GET_TRIG_VARS(t), "method", method ? method : "none", 0);
+				sdd.o = obj;
+				intermediate = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+				if (!intermediate) {
+					final = FALSE;
+				}
+				continue;
+			}
+		}
+	}
+	return final;
+}
+
+
+/**
+* Called when a character enters a room to see who they remember there.
+*
+* @param char_data *ch The person who moved.
+*/
+void entry_memory_mtrigger(char_data *ch) {
+	union script_driver_data_u sdd;
+	trig_data *t, *next_t;
+	char_data *actor;
+	struct script_memory *mem, *next_mem;
+	char buf[MAX_INPUT_LENGTH];
+	int any_in_room = -1;
+
+	if (!SCRIPT_MEM(ch)) {
+		return;
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), actor, next_in_room) {
+		if (!SCRIPT_MEM(ch)) {
+			break;
+		}
+		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+			continue;
+		}
+		if (actor!=ch && SCRIPT_MEM(ch)) {
+			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
+				if (actor->script_id == mem->id) {
+					if (mem->cmd) {
+						command_interpreter(ch, mem->cmd);
+					}
+					else {
+						LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+							if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || number(1, 100) > GET_TRIG_NARG(t)) {
+								continue;	// wrong type or no random roll
+							}
+							if (TRIG_IS_LOCAL(t)) {
+								if (any_in_room == -1) {
+									any_in_room = any_players_in_room(IN_ROOM(ch));
+								}
+								if (!any_in_room) {
+									continue;	// requires a player
+								}
+						    }
+						    
+						    // ok
+							ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+							sdd.c = ch;
+							script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+							break;
+						}
+					}
+					/* delete the memory */
+					LL_DELETE(SCRIPT_MEM(ch), mem);
+					if (mem->cmd) {
+						free(mem->cmd);
+					}
+					free(mem);
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Called when a person enters a room to see who remembers them.
+*
+* @param char_data *actor The person who moved.
+*/
+void greet_memory_mtrigger(char_data *actor) {
+	trig_data *t, *next_t;
+	char_data *ch;
+	struct script_memory *mem, *next_mem;
+	char buf[MAX_INPUT_LENGTH];
+	int command_performed = 0, any_in_room = -1;
+
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return;
+	}
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return;
+	}
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
+			continue;
+		}
+		/* find memory line with command only */
+		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
+			if (actor->script_id != mem->id) {
+				continue;
+			}
+			if (mem->cmd) {
+				command_interpreter(ch, mem->cmd); /* no script */
+				command_performed = 1;
+				break;
+			}
+			/* if a command was not performed execute the memory script */
+			if (mem && !command_performed) {
+				LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+						continue;
+					}
+					if (!TRIGGER_CHECK(t, MTRIG_MEMORY) || !CAN_SEE(ch, actor)) {
+						continue;
+					}
+					if (TRIG_IS_LOCAL(t)) {
+						if (any_in_room == -1) {
+							any_in_room = any_players_in_room(IN_ROOM(ch));
+						}
+						if (!any_in_room) {
+							continue;	// requires a player
+						}
+					}
+					if (number(1, 100) <= GET_TRIG_NARG(t)) {
+						union script_driver_data_u sdd;
+						ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+						sdd.c = ch;
+						script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+						break;
+					}
+				}
+			}
+			/* delete the memory */
+			if (mem) {
+				LL_DELETE(SCRIPT_MEM(ch), mem);
+				if (mem->cmd) {
+					free(mem->cmd);
+				}
+				free(mem);
+			}
+		}
+	}
+}
+
+
+/**
+* Runs greet, entry, and enter triggers on everything in the room. If the
+* movement is preventable, it stops on any trigger that prevents it. If it's
+* not, it runs them all.
+*
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character came from.
+* @param char *method Method of movement.
+* @param bool preventable TRUE if the character can be sent back; FALSE if not.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
+*/
+int greet_triggers(char_data *ch, int dir, char *method, bool preventable) {
+	if (!entry_mtrigger(ch, method) && preventable) {
+		return 0;
+	}
+	else if (!enter_wtrigger(IN_ROOM(ch), ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_mtrigger(ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_vtrigger(ch, dir, method) && preventable) {
+		return 0;
+	}
+	else if (!greet_otrigger(ch, dir, method) && preventable) {
+		return 0;
+	}
+	
+	// if we got this far, we're staying
+	
+	// people we remember when we enter
+	entry_memory_mtrigger(ch);
+	
+	// people we remember when they enter
+	greet_memory_mtrigger(ch);
+
+	return 1;
 }
 
 

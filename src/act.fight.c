@@ -488,11 +488,7 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "respawn");
-		greet_mtrigger(ch, NO_DIR, "respawn");
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR, "respawn");
-		greet_otrigger(ch, NO_DIR, "respawn");
+		greet_triggers(ch, NO_DIR, "respawn", FALSE);
 		
 		// temporary safety effect after a respawn
 		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);
