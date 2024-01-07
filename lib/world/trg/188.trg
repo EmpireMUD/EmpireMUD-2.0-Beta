@@ -2677,8 +2677,8 @@ else
   done
   %mod% %self% shortdesc a ghostly %target.pc_name%
   %mod% %self% longdesc A ghostly %target.pc_name% floats above the ground.
-  %mod% %self% keywords ghostly %actor.name%
-  %mod% %self% lookdesc this ghostly version of %target.pc_name% is a citizen of %self.room.empire_name% the same as the living one.
+  %mod% %self% keywords ghostly %target.pc_name%
+  %mod% %self% lookdesc This ghostly version of %target.pc_name% is a citizen of %self.room.empire_name% the same as the living one.
 end
 %echo% A chill comes over you as ~%self% fades into view.
 set day_count %dailycycle%
