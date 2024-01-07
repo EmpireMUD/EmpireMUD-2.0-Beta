@@ -1757,7 +1757,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
 		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
 		obj_data *use_portal = find_back_portal(to_room, from_room, portal);
-		if (use_portal) {
+		if (use_portal && obj_has_custom_message(use_portal, OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM)) {
+			act(obj_get_custom_message(use_portal, OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM), TRUE, ch, use_portal, NULL, TO_ROOM);
+		}
+		else if (use_portal) {
 			act("$n appears from $p!", TRUE, ch, use_portal, NULL, TO_ROOM);
 		}
 		else {
@@ -1767,7 +1770,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
-		if (veh && is_bld) {
+		if (veh && veh_has_custom_message(veh, VEH_CUSTOM_ENTER_TO_INSIDE)) {
+			act(veh_get_custom_message(veh, VEH_CUSTOM_ENTER_TO_INSIDE), TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+		}
+		else if (veh && is_bld) {
 			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
@@ -1784,7 +1790,10 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
-		if (veh && is_bld) {
+		if (veh && veh_has_custom_message(veh, VEH_CUSTOM_EXIT_TO_OUTSIDE)) {
+			act(veh_get_custom_message(veh, VEH_CUSTOM_EXIT_TO_OUTSIDE), TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+		}
+		else if (veh && is_bld) {
 			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
@@ -1889,7 +1898,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
 		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
-		if (portal) {
+		if (portal && obj_has_custom_message(portal, OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM)) {
+			act(obj_get_custom_message(portal, OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM), TRUE, ch, portal, NULL, TO_ROOM);
+		}
+		else if (portal) {
 			act("$n steps into $p.", TRUE, ch, portal, NULL, TO_ROOM);
 		}
 		else {
@@ -1899,7 +1911,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
-		if (veh && is_bld) {
+		if (veh && veh_has_custom_message(veh, VEH_CUSTOM_ENTER_TO_OUTSIDE)) {
+			act(veh_get_custom_message(veh, VEH_CUSTOM_ENTER_TO_OUTSIDE), TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+		}
+		else if (veh && is_bld) {
 			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {
@@ -1916,7 +1931,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
-		if (veh && is_bld) {
+		if (veh && veh_has_custom_message(veh, VEH_CUSTOM_EXIT_TO_INSIDE)) {
+			act(veh_get_custom_message(veh, VEH_CUSTOM_EXIT_TO_INSIDE), TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+		}
+		else if (veh && is_bld) {
 			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (veh && !is_bld) {

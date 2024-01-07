@@ -10343,11 +10343,16 @@ Usage:  .custom add <type> <message>
 You can set custom messages on vehicles.
 
 If you set more than one message of the same type, one will be chosen at
-random each time.
+random each time. These generally use $V for the vehicle. Messages that involve
+a person also use $n, $e, $m, and $s.
 
 Message types:
  &cruins-to-room&0 - Shown when it falls into ruins (from decay).
  &cclimate-change-to-room&0 - Shown when ruined due to climate flag change.
+ &center-to-inside&0 - Shown to people in a vehicle when a player enters.
+ &center-to-outside&0 - Shown to people outside a vehicle when a player goes in.
+ &cexit-to-inside&0 - Shown to people inside a vehicle as a player exits.
+ &cexit-to-outside&0 - Shown to people outside a vehicle as a player exits.
 
 See also: OLC VEHICLES, DOLLAR SIGN CODES
 #d

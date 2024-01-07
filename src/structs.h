@@ -2770,6 +2770,10 @@ typedef enum {
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
 #define VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM 1	// sent when the vehicle is destroyed by climate flags
+#define VEH_CUSTOM_ENTER_TO_INSIDE  2	// sent inside a vehicle when a player enters
+#define VEH_CUSTOM_ENTER_TO_OUTSIDE  3	// sent outside a vehicle when a player enters
+#define VEH_CUSTOM_EXIT_TO_INSIDE  4	// sent inside a vehicle when a player exits
+#define VEH_CUSTOM_EXIT_TO_OUTSIDE  5	// sent outside a vehicle when a player exits
 
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
