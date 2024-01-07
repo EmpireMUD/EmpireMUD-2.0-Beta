@@ -1367,7 +1367,7 @@ See also: OLC ABILITIES, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
-Usage:  .masterability <ability>
+Usage:  .masteryability <ability>
 
 The mastery ability is a separate ability which boosts the performance of this
 ability if a player has both. For example, many crafting abilities have linked
