@@ -1374,7 +1374,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
-	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !WATER_SECT(IN_ROOM(veh)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
+	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && (!WATER_SECT(IN_ROOM(veh)) || !VEH_FLAGGED(veh, VEH_DRAGGABLE)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
 		if (ch) {
 			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
