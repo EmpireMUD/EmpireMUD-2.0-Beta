@@ -2108,6 +2108,10 @@ ACMD(do_gen_craft) {
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
 	}
+	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE) > 0 && (find_type = craft_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE))) && subcmd == GET_CRAFT_TYPE(find_type) && multi_isname(arg, GET_CRAFT_NAME(find_type))) {
+		// attempting to resume the current building by something that's not exactly the name
+		resume_craft_building(ch, find_type);
+	}
 	else if (*arg && !list_only && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
 		// attempting to resume a vehicle by name
 		resume_craft_vehicle(ch, veh, find_type);
@@ -2115,10 +2119,6 @@ ACMD(do_gen_craft) {
 	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && type && CRAFT_IS_BUILDING(type) && GET_BUILDING(IN_ROOM(ch)) && GET_CRAFT_BUILD_TYPE(type) == GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch)))) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
-	}
-	else if (*arg && !list_only && !type && IS_INCOMPLETE(IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE) > 0 && (find_type = craft_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE))) && multi_isname(arg, GET_CRAFT_NAME(find_type))) {
-		// attempting to resume the current building by something that's not exactly the name
-		resume_craft_building(ch, find_type);
 	}
 	else if (*arg && !list_only && !type && wrong_cmd != NOTHING) {
 		// found no match but there was an almost-match with a different command (forge, sew, etc)
