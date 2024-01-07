@@ -3353,7 +3353,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
-	char output[MAX_STRING_LENGTH * 8], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	char output[MAX_STRING_LENGTH * 8], line[MAX_STRING_LENGTH], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
@@ -3715,7 +3715,9 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		}
 		
 		// space reserved for this
-		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		if (size < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		}
 		page_string(ch->desc, output, TRUE);
 	}
 	else {
