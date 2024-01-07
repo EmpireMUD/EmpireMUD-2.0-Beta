@@ -1831,7 +1831,7 @@ ACMD(do_companions) {
 	if (abil && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
 		return;
 	}
-	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
+	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, NULL, ABIL_VNUM(abil))) {
 		return;
 	}
 	
@@ -2463,7 +2463,7 @@ ACMD(do_herd) {
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL, NULL)) {
 		// triggered
 	}
 	
@@ -2722,7 +2722,7 @@ ACMD(do_milk) {
 		msg_to_char(ch, "It's already full of something else.\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) >= GET_DRINK_CONTAINER_CAPACITY(cont))
 		msg_to_char(ch, "It's already full.\r\n");
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont, NULL)) {
 		// triggered
 	}
 	else {
@@ -2976,7 +2976,7 @@ ACMD(do_morph) {
 	else if (morph && MORPH_COST_TYPE(morph) == BLOOD && MORPH_COST(morph) > 0 && !CAN_SPEND_BLOOD(ch)) {
 		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
 	}
-	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
+	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, NULL, MORPH_ABILITY(morph))) {
 		return;
 	}
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
@@ -3383,7 +3383,7 @@ ACMD(do_shear) {
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL, NULL)) {
 		// triggered
 	}
 	else {

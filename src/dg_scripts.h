@@ -93,6 +93,7 @@
 #define OTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define OTRIG_BUY              BIT(24)	// attempting a purchase
 #define OTRIG_KILL             BIT(25)	// obj's owner has killed something
+#define OTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // VTRIG_x: vehicle trigger types
@@ -107,7 +108,8 @@
 #define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
 // unused BIT(9), BIT(10), BIT(11), BIT(12)
 #define VTRIG_LOAD  BIT(13)	// vehicle is loaded
-// unused BIT(14), BIT(15)
+// unused BIT(14)
+#define VTRIG_ABILITY          BIT(15)	// ability targeting the vehicle
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
 // unuused: 17-19
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
@@ -116,6 +118,7 @@
 #define VTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define VTRIG_BUY              BIT(24)	// attempting a purchase in the room
 #define VTRIG_KILL             BIT(25)	// vehicle killed someone
+#define VTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // WTRIG_x: wld trigger types
@@ -355,7 +358,8 @@ void load_wtrigger(room_data *room);
 
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
+int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_data *veh, any_vnum abil);
 
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 
@@ -532,7 +536,7 @@ int valid_dg_target(char_data *ch, int bitvector);
 			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
 
 
-#define ABILITY_TRIGGERS(actor, vict, obj, abil)  (!ability_wtrigger((actor), (vict), (obj), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)))
+#define ABILITY_TRIGGERS(actor, vict, obj, veh, abil)  (!ability_wtrigger((actor), (vict), (obj), (veh), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)) || !ability_vtrigger((actor), (veh), (abil)))
 
 #define SCRIPT_SHOULD_SKIP_CHAR(ch)  (EXTRACTED(ch) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO) || GET_INVIS_LEV(ch) >= LVL_START_IMM)) || AFF_FLAGGED(ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))
 

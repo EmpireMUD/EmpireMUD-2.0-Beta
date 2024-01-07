@@ -4726,6 +4726,7 @@ const char *otrig_types[] = {
 	"Reboot",
 	"Buy",
 	"Kill",	// 25
+	"Allow-Multiple",
 	"\n"
 };
 
@@ -4757,6 +4758,7 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// reboot
 	TRIG_ARG_OBJ_WHERE,	// buy
 	TRIG_ARG_PERCENT,	// kill
+	NOBITS,	// allow-multiple
 };
 
 
@@ -4777,7 +4779,7 @@ const char *vtrig_types[] = {
 	"*",	// 12
 	"Load",
 	"*",	// 14
-	"*",	// 15
+	"Ability",	// 15
 	"Leave",
 	"*",	// 17
 	"*",	// 18
@@ -4788,6 +4790,7 @@ const char *vtrig_types[] = {
 	"Reboot",
 	"Buy",
 	"Kill",	// 25
+	"Allow-Multiple",
 	"\n"
 };
 
@@ -4809,7 +4812,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 12
 	TRIG_ARG_PERCENT,	// load
 	NOBITS,	// 14
-	NOBITS,	// 15
+	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	NOBITS,	// 17
 	NOBITS,	// 18
@@ -4820,6 +4823,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// reboot
 	NOBITS,	// buy
 	TRIG_ARG_PERCENT,	// kill
+	NOBITS,	// allow-multiple
 };
 
 

@@ -21,6 +21,9 @@ fire).
 Use the "return 0" option cautiously, as this may make the vehicle
 indestructible.
 
+Only the FIRST destroy trigger on a vehicle will run unless it also has the
+Allow-Multiple type.
+
 Variables: 
   &c%method%&0 - How it was destroyed (siege, burning, ruins, despawn*).
 
@@ -76,6 +79,7 @@ Vehicles can trigger on the following events:
 &cGreet&0 - Triggers when a person enters the room.
 &cEntry&0 - Triggers when the vehicle moves into a new room.
 &cLoad&0 - Triggers when the vehicle loads (or is finished being crafted).
+&cAbility&0 - Triggers when the vehicle is the target of an ability.
 &cLeave&0 - Triggers when a person tries to leave.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
@@ -83,6 +87,8 @@ Vehicles can trigger on the following events:
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cKill&0 - Triggers when the vehicle kills someone.
+&cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
+  triggers with this flag first; any trigger without it will end the list.
 
 For each type, there is a help file named &yVTRIG <type>&0.
 #d

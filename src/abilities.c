@@ -7672,7 +7672,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	}
 	
 	// these happen immediately before the first message
-	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
+	if (ABILITY_TRIGGERS(ch, vict, ovict, vvict, ABIL_VNUM(abil))) {
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;
 		return;

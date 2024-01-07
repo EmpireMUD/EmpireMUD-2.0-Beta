@@ -364,7 +364,7 @@ void remove_minipet(char_data *ch, any_vnum vnum);
 void add_player_tech(char_data *ch, ability_data *abil, int tech);
 bool has_player_tech(char_data *ch, int tech);
 void remove_player_tech(char_data *ch, any_vnum abil);
-bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
+bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict, vehicle_data *vvict);
 
 // requirement handlers
 struct req_data *copy_requirements(struct req_data *from);

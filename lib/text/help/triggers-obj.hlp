@@ -32,6 +32,9 @@ lighter, but you MUST return 0 if you purge the lighter itself.
 Note: If you purge a poison or arrow object in its consume trigger, you must
 return 0 to prevent trying to extract the item afterwards.
 
+Only the FIRST consume trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character attempting to consume the object.
   &c%target%&0 - The target of the consumption (poison/shoot only; the target
@@ -72,6 +75,9 @@ these cases, returning 0 does NOT prevent the character from having the item.
 If this trigger would purge the object, consider using "wait 1" before the
 purge to avoid conflicts.
 
+Only the FIRST get trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character trying to get the object.
   &c%preventable%&0 - 1 means the "get" can be blocked, 0 means it cannot. If
@@ -86,6 +92,9 @@ Argument type:  percent chance to execute
 Return value:  return 0 to prevent giving the item
 
 Activated when a player attempts to give this object to another character.
+
+Only the FIRST give trigger on an object will run unless it also has the
+Allow-Multiple type.
 
 Variables:
   &c%actor%&0 - The character giving away the object.
@@ -174,6 +183,8 @@ Objects can trigger on the following events:
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cKill&0 - Triggers when the object's owner, or their ally, kills someone here.
+&cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
+  triggers with this flag first; any trigger without it will end the list.
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d
@@ -259,6 +270,9 @@ Return value:  return 0 to prevent removing the item
 
 Activated each time a character is wearing this object and tries to remove it.
 
+Only the FIRST remove trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character attempting to remove the object.
 #d
@@ -282,6 +296,9 @@ Wear (object trigger)
 Return value:  return 0 to prevent wearing the item
 
 Activated each time a character attempts to wear the object.
+
+Only the FIRST wear trigger on an object will run unless it also has the
+Allow-Multiple type.
 
 Variables:
   &c%actor%&0 - The character attempting to wear the object.

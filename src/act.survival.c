@@ -216,7 +216,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -369,7 +369,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -575,7 +575,7 @@ ACMD(do_butcher) {
 	else if (!has_tool(ch, TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to equip a good knife to butcher with.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse, NULL)) {
 		return;
 	}
 	else {
@@ -689,7 +689,7 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
 		return;
 	}
-	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL)) {
 		return;
 	}
 	
@@ -849,7 +849,7 @@ ACMD(do_track) {
 		msg_to_char(ch, "Track whom? Or what?\r\n");
 		return;
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL, NULL)) {
 		return;
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {

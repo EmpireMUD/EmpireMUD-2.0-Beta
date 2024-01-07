@@ -1634,7 +1634,7 @@ ACMD(do_gen_augment) {
 	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE, GET_AUG_NAME(aug))) {
 		// sends its own messages
 	}
-	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
+	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, NULL, GET_AUG_ABILITY(aug))) {
 		return;
 	}
 	else {
@@ -2827,7 +2827,7 @@ ACMD(do_tame) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL, NULL)) {
 		// triggered
 	}
 	else {

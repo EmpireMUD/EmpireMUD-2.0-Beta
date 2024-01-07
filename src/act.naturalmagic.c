@@ -223,7 +223,7 @@ ACMD(do_confer) {
 	else if (type == NOTHING || confer_list[type].apply == APPLY_NONE) {
 		msg_to_char(ch, "You don't know how to confer '%s'.\r\n", arg1);
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_CONFER)) {
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, NULL, ABIL_CONFER)) {
 		return;
 	}
 	else {
@@ -314,7 +314,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_EARTHMELD)) {
+	if (ABILITY_TRIGGERS(ch, NULL, NULL, NULL, ABIL_EARTHMELD)) {
 		return;
 	}
 

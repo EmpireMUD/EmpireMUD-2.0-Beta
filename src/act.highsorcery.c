@@ -71,7 +71,7 @@ ACMD(do_mirrorimage) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_MIRRORIMAGE)) {
+	if (ABILITY_TRIGGERS(ch, NULL, NULL, NULL, ABIL_MIRRORIMAGE)) {
 		return;
 	}
 	

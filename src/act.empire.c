@@ -3792,7 +3792,7 @@ ACMD(do_barde) {
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -6376,7 +6376,7 @@ ACMD(do_inspire) {
 	else if (vict && IS_NPC(vict)) {
 		msg_to_char(ch, "You can only inspire other players.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_INSPIRE)) {
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, NULL, ABIL_INSPIRE)) {
 		return;
 	}
 	else {

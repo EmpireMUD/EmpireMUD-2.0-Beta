@@ -292,7 +292,7 @@ void do_summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (run_ability_triggers_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL, NULL)) {
 		return;
 	}
 	

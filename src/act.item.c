@@ -7624,7 +7624,7 @@ ACMD(do_roadsign) {
 	else if (color_strlen(argument) > max_length) {
 		msg_to_char(ch, "Road signs can't be more than %d characters long.\r\n", max_length);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
