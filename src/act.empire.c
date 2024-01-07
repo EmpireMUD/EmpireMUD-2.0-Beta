@@ -2474,7 +2474,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 
 
 void rename_city(char_data *ch, empire_data *emp, char *argument) {
-	char newname[MAX_INPUT_LENGTH];
+	char newname[MAX_INPUT_LENGTH], buf[256];
 	struct empire_city_data *city;
 
 	half_chop(argument, arg, newname);
@@ -2512,6 +2512,10 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	city->name = str_dup(newname);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	write_city_data_file();
+	
+	// and rename the center
+	snprintf(buf, sizeof(buf), "The Center of %s", newname);
+	set_room_custom_name(city->location, buf);
 }
 
 

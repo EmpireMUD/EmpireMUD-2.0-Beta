@@ -3763,6 +3763,23 @@ void b5_169_book_move(void) {
 }
 
 
+// b5.169 part 2: rename city centers
+void b5_169_city_centers(void) {
+	char buf[256];
+	empire_data *emp, *next_emp;
+	struct empire_city_data *city;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
+				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+				set_room_custom_name(city->location, buf);
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3864,6 +3881,7 @@ const struct {
 	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
 	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
 	{ "b5.169", b5_169_book_move, NULL, "Renumbering books written by players to resolve vnum conflicts" },
+	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

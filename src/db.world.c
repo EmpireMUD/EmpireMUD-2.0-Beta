@@ -1811,6 +1811,7 @@ int count_city_points_used(empire_data *emp) {
 * @return struct empire_city_data* the city object
 */
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type) {
+	char buf[256];
 	struct empire_city_data *city;
 	
 	// sanity first
@@ -1841,6 +1842,10 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 		complete_building(location);
 	}
+	
+	// rename
+	snprintf(buf, sizeof(buf), "The Center of %s", name);
+	set_room_custom_name(location, buf);
 	
 	// verify ownership
 	claim_room(location, emp);
