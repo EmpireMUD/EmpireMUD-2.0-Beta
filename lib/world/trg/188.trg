@@ -2146,6 +2146,7 @@ if %cmd% == stand
   rdelete timer_running %self.id%
   eval time %timestamp% - %self.start_bob%
   if %time% == 0
+    %send% %actor% You stand back up immediately, with no apple.
     %echoaround% %actor% ~%actor% stands back up immediately with no apple in ^%actor% mouth.
     return 1
     halt
