@@ -2116,6 +2116,10 @@ ACMD(do_gen_craft) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
 	}
+	else if (*arg && !list_only && !type && IS_INCOMPLETE(IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE) > 0 && (find_type = craft_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE))) && multi_isname(arg, GET_CRAFT_NAME(find_type))) {
+		// attempting to resume the current building by something that's not exactly the name
+		resume_craft_building(ch, find_type);
+	}
 	else if (*arg && !list_only && !type && wrong_cmd != NOTHING) {
 		// found no match but there was an almost-match with a different command (forge, sew, etc)
 		msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[subcmd].command, gen_craft_data[wrong_cmd].command);
