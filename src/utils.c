@@ -792,8 +792,8 @@ bool process_import_one(empire_data *emp) {
 	obj_data *orn;
 	double cost, gain;
 	
-	// round to %.01f
-	#define IMPORT_ROUND(amt)  (ceil((amt) * 100.0) / 100.0)
+	// round to %.001f
+	#define IMPORT_ROUND(amt)  (round((amt) * 1000.0) / 1000.0)
 	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
