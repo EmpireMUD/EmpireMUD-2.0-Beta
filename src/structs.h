@@ -3043,7 +3043,7 @@ typedef enum {
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
-#define MAX_ITEM_DESCRIPTION  4000
+#define MAX_ITEM_DESCRIPTION  8000
 #define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
@@ -3060,7 +3060,6 @@ typedef enum {
 #define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
 #define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
 #define MAX_REFERRED_BY_LENGTH  160
-#define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
