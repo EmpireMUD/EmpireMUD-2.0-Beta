@@ -1346,7 +1346,7 @@ if !(%actor.obj_target(%arg.car%)% == %self%)
   return 0
   halt
 end
-if %arg.cdr% != freezing
+if !(freezing /= %arg.cdr%)
   %send% %actor% You must enchant @%self% with freezing to subdue the abominable snowman.
   halt
 end
