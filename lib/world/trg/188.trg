@@ -664,6 +664,7 @@ corpse wagon is destroyed~
 %load% veh 18859 %self.level%
 if %self.empire%
   set burnt %self.room.vehicles%
+  nop %burnt.unlink_instance%
   %own% %burnt% %self.empire%
 end
 return 0
@@ -2345,6 +2346,7 @@ done
 nop %actor.set_cooldown(18862, 30)%
 %load% veh 18861
 set veh %self.room.vehicles%
+nop %veh.unlink_instance%
 set spawn_time %timestamp%
 remote spawn_time %veh.id%
 if !%actor.has_component(6200, 1)%
@@ -3154,6 +3156,7 @@ nop %coach.dump%
 %load% veh 18898
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 18898
+  nop %upgr.unlink_instance%
   %own% %upgr% %coach.empire%
   %send% %actor% You say, 'Salagadoola... mechicka... boola!'
   %echoaround% %actor% ~%actor% says, 'Salagadoola... mechicka... boola!'

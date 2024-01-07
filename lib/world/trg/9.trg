@@ -3,6 +3,10 @@ Shoddy Raft Drop~
 1 n 100
 ~
 %load% veh 923
+set raft %self.room.vehicles%
+if %raft% && %raft.vnum% == 923
+  nop %raft.unlink_instance%
+end
 %purge% %self%
 ~
 #916
@@ -73,6 +77,10 @@ if %command% && %command% == junk
   halt
 end
 %load% veh 916
+set hive %self.room.vehicles%
+if %hive% && %hive.vnum% == 916
+  nop %hive.unlink_instance%
+end
 wait 1
 %purge% %self%
 ~

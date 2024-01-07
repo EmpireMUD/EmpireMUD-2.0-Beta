@@ -415,12 +415,13 @@ if (%actor.position% != Standing)
   halt
 end
 set target %self.val0%
-%load% v %target%
-* Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
-* and use %vehicle.name% instead of "a rib-bone boat"
-* (see minipet use for an example)
-%send% %actor% You use @%self% and a rib-bone boat appears!
-%echoaround% %actor% ~%actor% uses @%self% and a rib-bone boat appears!
+%load% veh %target%
+set boat %self.room.vehicles%
+if %boat% && %boat.vnum% == %target%
+  nop %boat.unlink_instance%
+  %send% %actor% You use @%self% and @%boat% appears!
+  %echoaround% %actor% ~%actor% uses @%self% and @%boat% appears!
+end
 %purge% %self%
 ~
 #11116

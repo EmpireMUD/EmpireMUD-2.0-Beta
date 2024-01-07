@@ -2351,6 +2351,7 @@ end
 %load% veh 16650
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
+  nop %upgr.unlink_instance%
   %own% %upgr% %sleigh.empire%
   %send% %actor% You polish %sleigh.shortdesc% with @%self%...
   %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with @%self%...
