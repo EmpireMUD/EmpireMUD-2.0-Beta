@@ -1460,6 +1460,8 @@ E
 9 0 25.00 27
 E
 10 32 4.00 27
+E
+17 0 0.60 65
 I 6 3310 50.00 25  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
 I 21 1300 20.00 125 f  # FISH: glowing green seashell

@@ -348,7 +348,7 @@ S
 Foundry~
 A Foundry~
 &0{FF}~
-8 0 bR 0
+8 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, smelt, store~
@@ -450,7 +450,7 @@ S
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-8 0 bR 0
+8 0 bpR 0
 0 0 0 -1
 C
 retrieve, store~
@@ -772,7 +772,7 @@ S
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-16 0 dmosD 0
+16 0 dmopsD 0
 0 0 0 -1
 E
 bridge building~
@@ -1834,7 +1834,7 @@ S
 Terraced Garden~
 A Terraced Garden~
 /&r##&?\~
-32 0 dn 0
+32 0 dnp 0
 0 0 0 -1
 C
 pick~
@@ -1860,7 +1860,7 @@ S
 Raft Garden~
 A Garden Made of Rafts~
 ~&b##&?~~
-10 0 dnD 0
+10 0 dnpD 0
 0 0 0 -1
 C
 pick~
@@ -1886,7 +1886,7 @@ S
 Oasis Garden~
 An Oasis Garden~
 &g^&C##&g^~
-10 0 dn 0
+10 0 dnp 0
 0 0 0 -1
 C
 pick~
@@ -1918,7 +1918,7 @@ S
 Estuary Garden~
 An Estuary Garden~
 ~&0##&?~~
-10 0 dnD 0
+10 0 dnpD 0
 0 0 0 -1
 C
 pick~
@@ -1943,7 +1943,7 @@ S
 Shady Garden~
 A Shady Garden~
 &g|&y##&g|~
-10 0 dn 0
+10 0 dnp 0
 0 0 0 -1
 C
 pick~

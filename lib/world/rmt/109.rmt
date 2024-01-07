@@ -6,7 +6,7 @@ to pursue its prey into the side passages. There are also clear signs that
 adventurers have come this way before, but most tracks lead into the cave
 rather than out of it.
 ~
-b 0 0
+b 0 0 -1
 D14
 ~
 0 10901
@@ -24,7 +24,7 @@ of the cave is dominated by a huge nest, apparently made from whole trees. No
 creature but a red dragon builds a nest so large. To the side, you can see
 charred bits of armor, perhaps returned from the dragon's sensitive stomach.
 ~
-b 0 0
+c 0 0 -1
 D14
 ~
 0 10900
@@ -37,7 +37,7 @@ small for the dragon to enter. It looks as if a knight has set up camp in here,
 perhaps to prepare to fight the dragon. Claw marks at the entrance show that
 the dragon has tried to thwart the knight more than once.
 ~
-b 0 0
+c 0 0 -1
 D14
 ~
 0 10900
@@ -49,21 +49,21 @@ A Hole in the Muck~
 swamp for several days. This hole is rather large, indicating that it wasn't a
 small dragon resting here. This one has already emerged. Perhaps it is nearby?
 ~
-g 0 0
+g 0 0 -1
 M 0 10950 100.00 1
 S
 #10965
 Inside the Hovel~
 This is a holding room not seen by players.
 ~
-g 0 0
+g 0 0 -1
 M 0 10968 100.00 1
 S
 #10980
 Renegade Spellcaster Spawn Room~
 This room is not accessible by players.
 ~
-g 0 0
+g 0 0 -1
 M 0 10980 100.00 1
 S
 $
