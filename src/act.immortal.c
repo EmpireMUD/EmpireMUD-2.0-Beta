@@ -8731,6 +8731,11 @@ ACMD(do_automessage) {
 			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
 			return;
 		}
+		else if (strlen(argument) >= 255) {
+			// fread_string won't be able to read it beyond this.
+			msg_to_char(ch, "Message too long.\r\n");
+			return;
+		}
 		
 		// ready!
 		CREATE(msg, struct automessage, 1);
@@ -8803,6 +8808,11 @@ ACMD(do_automessage) {
 		else if (is_abbrev(type_arg, "message")) {
 			if (!*argument) {
 				msg_to_char(ch, "Change the message to what?\r\n");
+				return;
+			}
+			else if (strlen(argument) >= 255) {
+				// fread_string won't be able to read it beyond this.
+				msg_to_char(ch, "Message too long.\r\n");
 				return;
 			}
 			
