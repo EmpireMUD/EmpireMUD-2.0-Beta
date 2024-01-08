@@ -2419,7 +2419,7 @@ ACMD(do_unharness) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (*arg1 && !(animal = find_harnessed_mob_by_name(veh, arg1))) {
-		msg_to_char(ch, "There isn't %s %s harnessed to it.", AN(arg1), arg1);
+		msg_to_char(ch, "There isn't %s %s harnessed to it.\r\n", AN(arg1), arg1);
 	}
 	else if (count_harnessed_animals(veh) == 0 && !animal) {
 		act("There isn't anything harnessed to $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
