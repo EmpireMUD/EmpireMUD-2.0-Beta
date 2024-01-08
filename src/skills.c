@@ -1820,7 +1820,7 @@ ACMD(do_skills) {
 	ability_data *abil;
 	int points, level, iter;
 	bool found, any, line;
-	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE, want_all = FALSE;
+	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE, want_all = FALSE, show_all_info = FALSE;
 	int min_level = -1, max_level = -1;
 	size_t size;
 	
@@ -2325,6 +2325,7 @@ ACMD(do_skills) {
 		// if no levels were requested, default to only showing up to the next cap
 		if (min_level == -1 && max_level == -1 && !want_all) {
 			max_level = NEXT_CAP_LEVEL(ch, SKILL_VNUM(skill));
+			show_all_info = TRUE;
 		}
 		
 		// header
@@ -2368,6 +2369,10 @@ ACMD(do_skills) {
 		
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
+		
+		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < MAX_SKILL_CAP && size < sizeof(outbuf)) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "(For higher level abilities, use 'skill %s -all'.)\r\n", SKILL_NAME(skill));
+		}
 		
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);
