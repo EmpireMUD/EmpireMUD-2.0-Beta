@@ -6903,7 +6903,7 @@ Message types:
  &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
- &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
+ &cresource-to-room&0 - Shown to room when gained as a resource (see below).
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
  &cmine-to-char&0 - Shown to the character when mining.
@@ -6913,6 +6913,11 @@ Message types:
  &center-portal-to-char&0 - Shown to the character when entering a portal ($p).
  &center-portal-to-room&0 - Shown to the room when char enters a portal ($p).
  &cexit-portal-to-room&0 - Shown to the room when char exits a portal ($p).
+
+Resource messages are shown when received from: butcher, chop, dig, fish,
+forage, harvest, mine, pick, quarry, scrape, shear, or skin. These use $p for
+the item and $n for the person gathering them. Skin and butcher also provide
+$P for the corpse being used. Shear provides $N for the mob being sheared.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
