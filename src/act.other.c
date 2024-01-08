@@ -586,6 +586,7 @@ static void print_group(char_data *ch) {
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
+	char *cust;
 	int iter, amt, obj_ok = 0;
 	obj_data *obj = NULL;
 	
@@ -618,16 +619,24 @@ INTERACTION_FUNC(shear_interact) {
 		act("$n skillfully shears $N.", FALSE, ch, NULL, inter_mob, TO_NOTVICT);
 	}
 	else if (amt == 1) {
-		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		act(cust ? cust : "You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		
 		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
-		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
 	}
 	else {
-		sprintf(buf, "You skillfully shear $N and get $p (x%d).", amt);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		sprintf(buf, "%s (x%d)", cust ? cust : "You skillfully shear $N and get $p.", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_CHAR);
+		
 		sprintf(buf, "$n skillfully shears you and gets $p (x%d).", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_VICT);
-		sprintf(buf, "$n skillfully shears $N and gets $p (x%d).", amt);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		sprintf(buf, "%s (x%d)", cust ? cust : "$n skillfully shears $N and gets $p.", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_NOTVICT);
 	}
 	
@@ -638,6 +647,7 @@ INTERACTION_FUNC(shear_interact) {
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
+	char *cust;
 	obj_data *obj = NULL;
 	int num, obj_ok = 0;
 	
@@ -666,14 +676,20 @@ INTERACTION_FUNC(skin_interact) {
 		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else if (interaction->quantity > 1) {
-		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		sprintf(buf, "%s (x%d)", cust ? cust : "You carefully skin $P and get $p.", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
-		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		sprintf(buf, "%s (x%d)", cust ? cust : "$n carefully skins $P and gets $p.", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else {
-		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
-		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		act(cust ? cust : "You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	
 	return TRUE;

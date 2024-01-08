@@ -42,6 +42,7 @@ ACMD(do_dismount);
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
+	char *cust;
 	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
@@ -66,19 +67,24 @@ INTERACTION_FUNC(butcher_interact) {
 	if (fillet) {
 		if (!obj_ok) {
 			// obj likely self-purged
-			act("You skillfully butcher the corpse!", FALSE, ch, NULL, NULL, TO_CHAR);
-			act("$n butchers a corpse.", FALSE, ch, NULL, NULL, TO_ROOM);
+			act("You skillfully butcher $P!", FALSE, ch, NULL, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			act("$n butchers $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		else if (interaction->quantity != 1) {
-			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You skillfully butcher $p from $P!", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
 			
-			sprintf(buf, "$n butchers a corpse and gets $p (x%d).", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			sprintf(buf, "%s (x%d)", cust ? cust : "$n butchers $P and gets $p.", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		else {
-			act("You skillfully butcher $p from the corpse!", FALSE, ch, fillet, NULL, TO_CHAR);
-			act("$n butchers a corpse and gets $p.", FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			act(cust ? cust : "You skillfully butcher $p from $P!", FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			act(cust ? cust : "$n butchers $P and gets $p.", FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		return TRUE;
 	}
