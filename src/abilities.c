@@ -5374,27 +5374,11 @@ DO_ABIL(do_resurrect_ability) {
 DO_ABIL(do_room_affect_ability) {
 	struct affected_type *af;
 	any_vnum affect_vnum;
-	double total_points = 1, remaining_points = 1;
-	int dur;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	total_points = get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points;
-	remaining_points = total_points;
-	
-	if (total_points <= 0) {
-		return;
-	}
-	
-	// determine duration (in seconds)
-	dur = get_ability_duration(ch, abil);
 	
 	// affect flags? cost == level 100 ability
 	if (room_targ && ABIL_AFFECTS(abil)) {
-		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-		remaining_points = MAX(0, remaining_points);
-		
-		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+		af = create_flag_aff(affect_vnum, get_ability_duration(ch, abil), ABIL_AFFECTS(abil), ch);
 		affect_to_room(room_targ, af);
 		free(af);	// affect_to_room duplicates affects
 	}
