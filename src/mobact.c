@@ -39,8 +39,6 @@
 */
 
 // external vars
-extern bool catch_up_mobs;
-extern bool caught_up_mobs;
 
 // external funcs
 ACMD(do_exit);
