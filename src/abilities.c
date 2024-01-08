@@ -3619,7 +3619,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 							msg_to_char(ch, "You can't do that when you don't have any mana.\r\n");
 						}
 						else {
-							msg_to_char(ch, "You can't use that one someone without any mana.\r\n");
+							msg_to_char(ch, "You can't use that on someone without any mana.\r\n");
 						}
 					}
 					return FALSE;
