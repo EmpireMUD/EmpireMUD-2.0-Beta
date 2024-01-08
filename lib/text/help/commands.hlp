@@ -1135,6 +1135,8 @@ account-wide and helps you and your friends keep track of each other when you
 have a lot of characters.
 
 Friends will see when you log in or out, and can see when you were last online.
+When a friend was sending you tells then switches characters with alternate,
+your reply command will still go to the correct alt.
 
 If you have some characters who you keep secret for any reason, use 'toggle
 no-friends' to keep those particular characters hidden from friends lists. To
@@ -1144,7 +1146,7 @@ setting.
 
 If a player is bothering you with friend requests, 'ignore' will silence them.
 
-See also: IGNORE
+See also: ALTERNATE, IGNORE, REPLY
 #
 GET TAKE
 
@@ -2145,6 +2147,9 @@ TELL. It works just as if you had typed 'tell <player> <message>' but makes
 it a bit easier. It can also be very useful in case someone invisible sends
 you a message.
 
+If someone is on your friends list, you will even be able to reply after they
+switch characters using alternate.
+
 Example:
 
 Ras tells you, 'Hi!'
@@ -2155,7 +2160,7 @@ Someone tells you, 'I am your secret admirer.'
 > reply Who are you?
 You tell someone, 'Who are you?'
 
-See also: IGNORE, TELL, NOTELL
+See also: IGNORE, TELL, NOTELL, ALTERNATE, FRIENDS
 Immortals see also: BREAKREPLY
 #
 REPORT
