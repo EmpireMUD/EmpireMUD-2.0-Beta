@@ -2752,14 +2752,12 @@ void perform_immort_where(char_data *ch, char *arg) {
 				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
-		num = 0;
 		DL_FOREACH(vehicle_list, veh) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
 				msg_to_char(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
-		num = 0;
 		DL_FOREACH(object_list, k) {
 			if (CAN_SEE_OBJ(ch, k) && multi_isname(arg, GET_OBJ_KEYWORDS(k))) {
 				found = 1;
