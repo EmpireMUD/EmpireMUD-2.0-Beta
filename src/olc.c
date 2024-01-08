@@ -6769,6 +6769,10 @@ void olc_process_string(char_data *ch, char *argument, const char *name, char **
 	if (!*argument) {
 		msg_to_char(ch, "Set its %s to what?\r\n", name);
 	}
+	else if (strlen(argument) >= 255) {
+		// fread_string won't be able to read it beyond this.
+		msg_to_char(ch, "String too long.\r\n");
+	}
 	else {
 		delete_doubledollar(argument);
 		
