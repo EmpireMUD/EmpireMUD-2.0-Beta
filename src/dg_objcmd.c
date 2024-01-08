@@ -1286,7 +1286,7 @@ OCMD(do_oload) {
 			return;
 		}
 		mob = read_mobile(number, TRUE);
-		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+		if (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) == get_adventure_for_vnum(number) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			MOB_INSTANCE_ID(mob) = INST_ID(inst);
 			if (MOB_INSTANCE_ID(mob) != NOTHING) {
 				add_instance_mob(inst, GET_MOB_VNUM(mob));
@@ -1508,7 +1508,7 @@ OCMD(do_oload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
-		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+		if (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) == get_adventure_for_vnum(number) && (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			VEH_INSTANCE_ID(veh) = INST_ID(inst);
 		}
 		vehicle_to_room(veh, room);

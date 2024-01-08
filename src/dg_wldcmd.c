@@ -1117,7 +1117,7 @@ WCMD(do_wquest) {
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	struct instance_data *inst = find_instance_by_room(room, FALSE, TRUE);
+	struct instance_data *inst = find_instance_by_room(room, FALSE, FALSE);
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
@@ -1149,7 +1149,7 @@ WCMD(do_wload) {
 		mob = read_mobile(number, TRUE);
 		
 		// store instance id
-		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+		if (inst) {
 			MOB_INSTANCE_ID(mob) = INST_ID(inst);
 			if (MOB_INSTANCE_ID(mob) != NOTHING) {
 				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
@@ -1215,7 +1215,7 @@ WCMD(do_wload) {
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
-		else if ((inst = find_instance_by_room(room, FALSE, TRUE)) && INST_LEVEL(inst) > 0) {
+		else if (inst && INST_LEVEL(inst) > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, INST_LEVEL(inst));
 		}
@@ -1313,7 +1313,7 @@ WCMD(do_wload) {
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
-		else if ((inst = find_instance_by_room(room, FALSE, TRUE)) && INST_LEVEL(inst) > 0) {
+		else if (inst && INST_LEVEL(inst) > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, INST_LEVEL(inst));
 		}
@@ -1361,7 +1361,7 @@ WCMD(do_wload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
-		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+		if (inst) {
 			VEH_INSTANCE_ID(veh) = INST_ID(inst);
 		}
 		

@@ -469,6 +469,13 @@ thing that does the loading (when it can). However, you can specify a
 different scale level if you like. For object loading, you MUST also include
 the target to load to AND the load position before the scale level.
 
+Adventure instance note: mobs and vehicles will be attached to the same
+instance as the mob, vehicle, or room which loaded them. If they were loaded
+by an object, they will be linked to the instance if loaded in/at an instance
+and if the object loading them is from the same adventure as the instance. You
+can use "nop %mob.link_instance%" and "nop %mob.unlink_instance%" to get finer
+control over this. A linked mob or vehicle vanishes when its instance despawns.
+
 Load an object to the room:  %load% obj 1300 room
 Load a scaled mob to room:  %load% mob 1300 %actor.level%
 Load obj to player inv:  %load% obj 1300 %actor% inv
