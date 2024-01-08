@@ -1312,7 +1312,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && IAF(ACT_HEAL)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
