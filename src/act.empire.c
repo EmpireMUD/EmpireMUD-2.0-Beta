@@ -3656,7 +3656,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		page_string(ch->desc, output, TRUE);
 	}
 	else if (node_list && organize_general_dirs) {
-		// optionally organize into geneal directions
+		// optionally organize into general directions
 		
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
@@ -3689,7 +3689,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			
 			// general entry
 			color = (++(ogd->count) % 2) ? TRUE : FALSE;
-			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), node->loc, TRUE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
+			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
 			
 			if (lsize + strlen(ogd->string) + 3 < sizeof(ogd->string)) {
 				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
