@@ -2370,8 +2370,8 @@ ACMD(do_skills) {
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
 		
-		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < MAX_SKILL_CAP && size < sizeof(outbuf)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "(For higher level abilities, use 'skill %s -all'.)\r\n", SKILL_NAME(skill));
+		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < SKILL_MAX_LEVEL(skill) && size < sizeof(outbuf)) {
+			size += snprintf(outbuf + size, sizeof(outbuf) - size, "(For higher level abilities, use 'skill %s -all')\r\n", SKILL_NAME(skill));
 		}
 		
 		if (ch->desc) {
