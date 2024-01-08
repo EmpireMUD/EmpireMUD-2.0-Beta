@@ -2348,7 +2348,7 @@ elseif %sleigh.animals_harnessed% > 0
   %echoaround% %actor% ~%actor% unharnesses the animal from %sleigh.shortdesc%...
   nop %sleigh.unharness%
 end
-%load% veh 16650
+%load% veh 16650 %sleigh.level%
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
   nop %upgr.unlink_instance%

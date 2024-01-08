@@ -3153,7 +3153,7 @@ if %coach.contents%
   %echoaround% %actor% ~%actor% empties out %coach.shortdesc%...
 end
 nop %coach.dump%
-%load% veh 18898
+%load% veh 18898 %coach.level%
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 18898
   nop %upgr.unlink_instance%
