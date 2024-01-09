@@ -52,6 +52,7 @@ void use_ammo(char_data *ch, obj_data *obj);
 void use_poison(char_data *ch, obj_data *obj);
 
 // local protos
+ACMD(do_pour);
 ACMD(do_unshare);
 ACMD(do_warehouse);
 int get_wear_by_item_wear(bitvector_t item_wear);
@@ -5997,6 +5998,134 @@ ACMD(do_eat) {
 			reduce_obj_binding(food, ch);
 		}
 		request_obj_save_in_world(food);
+	}
+}
+
+
+ACMD(do_empty) {
+	bool messaged;
+	obj_data *found_obj, *obj, *next_obj;
+	vehicle_data *found_veh;
+	
+	// may need these
+	int size = count_objs_in_room(IN_ROOM(ch));
+	int item_limit = config_get_int("room_item_limit");
+	
+	one_argument(argument, arg);
+	if (!*arg) {
+		msg_to_char(ch, "Empty what?\r\n");
+		return;
+	}
+	
+	generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, NULL, &found_obj, &found_veh);
+	
+	if (found_veh) {
+		if (VEH_CAPACITY(found_veh) <= 0) {
+			msg_to_char(ch, "You can't empty that.\r\n");
+		}
+		else if (WATER_SECT(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't empty it in the water.\r\n");
+		}
+		else if (!can_use_vehicle(ch, found_veh, MEMBERS_ONLY)) {
+			act("You don't own $V.", FALSE, ch, NULL, found_veh, TO_CHAR | ACT_VEH_VICT);
+		}
+		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You don't have permission to empty it here.\r\n");
+		}
+		else if (!VEH_CONTAINS(found_veh)) {
+			msg_to_char(ch, "There's nothing in it.\r\n");
+		}
+		else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size >= item_limit) {
+			msg_to_char(ch, "The room is already full.\r\n");
+		}
+		else {
+			// ok: empty vehicle
+			messaged = FALSE;
+			DL_FOREACH_SAFE2(VEH_CONTAINS(found_veh), obj, next_obj, next_content) {
+				if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size + obj_carry_size(obj) > item_limit) {
+					continue;	// would be over the limit
+				}
+				
+				// prelim messaging on the first item
+				if (!messaged) {
+					act("You empty $V...", FALSE, ch, NULL, found_veh, TO_CHAR | TO_QUEUE | ACT_VEH_VICT);
+					act("$n empties $V...", FALSE, ch, NULL, found_veh, TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
+					messaged = TRUE;
+				}
+				
+				obj_to_room(obj, IN_ROOM(ch));
+				size += obj_carry_size(obj);
+				
+				act("You unload $p onto the ground.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+				act("$n unloads $p onto the ground.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
+			}
+			
+			if (!messaged) {
+				act("There was nothing you could empty from $V.", FALSE, ch, NULL, found_veh, TO_CHAR | ACT_VEH_VICT);
+			}
+		}
+	}
+	else if (found_obj) {
+		if (IS_DRINK_CONTAINER(found_obj)) {
+			// pass through to "pour <item> out"
+			snprintf(buf, sizeof(buf), " %s out", arg);
+			do_pour(ch, buf, 0, 0);
+		}
+		else if (IS_CONTAINER(found_obj)) {
+			if (IS_SET(GET_CONTAINER_FLAGS(found_obj), CONT_CLOSED)) {
+				msg_to_char(ch, "It's closed.\r\n");
+			}
+			else if (!found_obj->contains) {
+				msg_to_char(ch, "There's nothing inside it.\r\n");
+			}
+			else if (IN_ROOM(found_obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+				msg_to_char(ch, "You don't have permission to empty it here.\r\n");
+			}
+			else if (IN_ROOM(found_obj) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size >= item_limit) {
+				msg_to_char(ch, "The room is already full.\r\n");
+			}
+			else {
+				// ok: empty container
+				messaged = FALSE;
+				DL_FOREACH_SAFE2(found_obj->contains, obj, next_obj, next_content) {
+					if (IN_ROOM(found_obj) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size + obj_carry_size(obj) > item_limit) {
+						continue;	// would be over the limit
+					}
+					
+					// prelim messaging on the first item
+					if (!messaged) {
+						act("You empty $p...", FALSE, ch, found_obj, NULL, TO_CHAR | TO_QUEUE);
+						act("$n empties $p...", FALSE, ch, found_obj, NULL, TO_ROOM | TO_QUEUE);
+						messaged = TRUE;
+					}
+					
+					if (IN_ROOM(found_obj)) {
+						obj_to_room(obj, IN_ROOM(ch));
+						size += obj_carry_size(obj);
+						
+						act("You dump $p onto the ground.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+						act("$n dumps $p onto the ground.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
+					}
+					else {
+						// no need to check inventory size if it's going inventory-to-inventory
+						obj_to_char(obj, ch);
+						
+						act("You dump $p out into your inventory.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+						act("$n dumps $p out into $s inventory.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
+					}
+				}
+				
+				if (!messaged) {
+					act("There was nothing you could empty from $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+				}
+			}
+		}
+		else {
+			act("You can't empty $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+		}
+	}
+	else {
+		msg_to_char(ch, "You don't see %s %s here.", AN(arg), arg);
 	}
 }
 

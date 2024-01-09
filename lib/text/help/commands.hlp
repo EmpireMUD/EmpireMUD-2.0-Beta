@@ -881,6 +881,15 @@ You can also do the following complex emotes:
 
 See also: SOCIALS
 #
+EMPTY
+
+Usage:  empty <thing>
+
+This command can be used to dump out a vehicle or container. It will even work
+on bound items in the vehicle.
+
+See also: GET
+#
 EQUIPMENT
 
 Usage:  equipment [-all]  -- see your current gear
