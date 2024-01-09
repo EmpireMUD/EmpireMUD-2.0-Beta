@@ -12287,7 +12287,7 @@ ACMD(do_vstat) {
 		do_stat_crop(ch, crop);
 	}
 	else if (!strn_cmp(buf, "emp", 3) && is_abbrev(buf, "empire")) {
-		if ((emp = get_empire_by_name(buf2))) {
+		if ((emp = real_empire(number))) {
 			do_stat_empire(ch, emp);
 		}
 		else if (!*buf2) {
