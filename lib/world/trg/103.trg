@@ -173,6 +173,7 @@ done
 Dragon Whistle use~
 1 c 2
 use~
+* Deprecated: the whistle now uses trig 9910 instead
 if !%self.is_name(%arg%)%
   return 0
   halt
