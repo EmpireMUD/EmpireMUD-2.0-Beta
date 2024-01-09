@@ -152,7 +152,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	
 	timediff = (death_penalty_time * SECS_PER_REAL_MIN) - (time(0) - get_last_killed_by_empire(ch, emp));
 	if (death_penalty_time && get_last_killed_by_empire(ch, emp) && timediff > 0) {
-		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%d:%02d remain).\r\n", EMPIRE_NAME(emp), (int)(timediff / 60), (int)(timediff % 60));
+		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%s remain).\r\n", EMPIRE_NAME(emp), colon_time(timediff, FALSE, NULL));
 		return FALSE;
 	}
 	
@@ -553,7 +553,7 @@ ACMD(do_disguise) {
 	else if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, NULL, ABIL_DISGUISE)) {
 		return;
 	}
 	else if (!skill_check(ch, ABIL_DISGUISE, DIFF_MEDIUM)) {
@@ -593,7 +593,7 @@ ACMD(do_infiltrate) {
 	else if (!can_use_ability(ch, NO_ABIL, MOVE, cost, NOTHING)) {
 		// sends own message
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_INFILTRATE, NULL, NULL, NULL)) {
 		return;
 	}
 	else if (!*argument)
@@ -638,18 +638,17 @@ ACMD(do_infiltrate) {
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
-			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
+			
+			if (!greet_triggers(ch, dir, "move", TRUE)) {
+				char_to_room(ch, was_in);
+				look_at_room(ch);
+				return;
+			}
+			
 			msg_to_char(ch, "\r\nInfiltration successful.\r\n");
-			
 			GET_LAST_DIR(ch) = dir;
-			
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "move");
-			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR, "move");
-			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR, "move");
-	
+			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
@@ -711,7 +710,7 @@ ACMD(do_pickpocket) {
 	else if (FIGHTING(vict)) {
 		msg_to_char(ch, "You can't steal from someone who's fighting.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL, NULL)) {
 		return;
 	}
 	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
@@ -807,7 +806,7 @@ ACMD(do_search) {
 		act("$n begins searching around!", TRUE, ch, NULL, NULL, TO_ROOM);
 		msg_to_char(ch, "You search, but find nobody.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SEARCH_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SEARCH_COMMAND, NULL, NULL, NULL)) {
 		// failed trigger
 	}
 	else {
@@ -872,7 +871,7 @@ ACMD(do_steal) {
 	else if (!has_player_tech(ch, PTECH_STEAL_COMMAND)) {
 		msg_to_char(ch, "You can't steal anything.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else if (!IS_IMMORTAL(ch) && !can_steal(ch, emp)) {

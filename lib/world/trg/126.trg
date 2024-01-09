@@ -395,7 +395,11 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
+if %instance.players_present% > %self.room.players_present%
+  %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
+  return 1
+  halt
+end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
   set difficulty 1

@@ -429,7 +429,7 @@ ACMD(do_meters) {
 	
 	// raw length
 	length = (mtr->over ? mtr->end : time(0)) - mtr->start;
-	msg_to_char(ch, "Fight length: %d:%02d (%d second%s)\r\n", (length/60), (length%60), length, PLURAL(length));
+	msg_to_char(ch, "Fight length: %s (%d second%s)\r\n", colon_time(length, FALSE, NULL), length, PLURAL(length));
 	
 	// prevent divide-by-zero
 	length = MAX(1, length);
@@ -488,10 +488,7 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "respawn");
-		greet_mtrigger(ch, NO_DIR, "respawn");
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR, "respawn");
+		greet_triggers(ch, NO_DIR, "respawn", FALSE);
 		
 		// temporary safety effect after a respawn
 		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);

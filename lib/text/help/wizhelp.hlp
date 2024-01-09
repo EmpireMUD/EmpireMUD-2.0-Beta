@@ -598,7 +598,7 @@ number. This command is grantable.
 
 (For the mortal command, try LOAD VEHICLE.)
 
-You can load: mob, obj, vehicle
+You can load: mob, obj, vehicle, book
 
 Example:
 
@@ -1143,6 +1143,7 @@ Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
+author     Immort   Shows all books from a given author idnum.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
 companions Immort   Shows a player's available companions.
 components Immort   Shows all items matching a generic component vnum.
@@ -1161,6 +1162,8 @@ islands    Immort   Shows you which island ids have empire storage (for MOVEEINV
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
+libraries  Immort   Shows where a book is shelved.
+lostbooks  Immort   Shows books that are not shelved in any libraries.
 minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
@@ -1215,6 +1218,26 @@ Usage:  show ammotypes
 
 Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
+#e
+"SHOW AUTHOR" "SHOW LIBRARIES" "SHOW LOSTBOOKS" "SHOW LOST BOOKS" "LOST BOOKS"
+
+Usage:  show author <author idnum>
+        show libraries <book vnum>
+        show lostbooks
+
+These three show commands help manage the book system.
+
+&cshow author <author idnum>&0 - Look up all books by a given author, by idnum.
+   This also works on idnum 0, which are authorless books.
+
+&cshow libraries <book vnum>&0 - Show all the locations where a given book is
+   shelved.
+
+&cshow lostbooks&0 - Show all the books that do not appear in any libraries.
+   Immortals can load books directly, as can the %load% command in scripts.
+   Scripts can load a random lost book with "%load% book lost".
+
+See also: LOAD, %LOAD%
 #e
 "SHOW COMPANIONS"
 
@@ -1934,9 +1957,9 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object (or thing) by virtual number (vnum).
 
 Valid types are: adventure, ability, archetype, attack, augment, book,
-                 building, craft, class, crop, event, faction, global, generic,
-                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
-                 skill, social, trigger, vehicle
+                 building, craft, class, crop, empire, event, faction, global,
+                 generic, mob, morph, obj,  progress, quest, roomtemplate,
+                 sector, shop, skill, social, trigger, vehicle
 
 For attack messages, this supports the -d option to see the full messages.
 

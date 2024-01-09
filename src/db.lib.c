@@ -1565,6 +1565,8 @@ void remove_empire_from_table(empire_data *emp) {
 * icon-locking is done.
 */
 void check_for_new_map(void) {
+	book_data *book, *next_book;
+	struct author_data *author, *next_author;
 	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade, *next_trade;
@@ -1573,6 +1575,7 @@ void check_for_new_map(void) {
 	struct empire_island *isle, *next_isle;
 	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
+	struct library_data *libr, *next_libr;
 	empire_data *emp, *next_emp;
 	struct map_data *map;
 	room_data *room;
@@ -1714,6 +1717,17 @@ void check_for_new_map(void) {
 		if (SECT_FLAGGED(map->sector_type, TILE_KEEP_FLAGS)) {
 			real_room(map->vnum);
 		}
+	}
+	
+	// clear libraries (they were lost in the map wipe)
+	HASH_ITER(hh, book_table, book, next_book) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
+			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
+			free(libr);
+		}
+	}
+	HASH_ITER(hh, author_table, author, next_author) {
+		save_author_books(author->idnum);
 	}
 	
 	setup_start_locations();

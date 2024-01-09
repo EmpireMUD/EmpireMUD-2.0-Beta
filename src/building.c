@@ -572,6 +572,10 @@ void disassociate_building(room_data *room) {
 		et_lose_building(ROOM_OWNER(room), GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 	
+	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+		remove_library_from_books(GET_ROOM_VNUM(room));
+	}
+	
 	if (ROOM_OWNER(room)) {
 		adjust_building_tech(ROOM_OWNER(room), room, FALSE);
 	}
@@ -1408,9 +1412,17 @@ void start_dismantle_building(room_data *loc) {
 		adjust_building_tech(ROOM_OWNER(loc), loc, FALSE);
 	}
 	
+	// stored books?
+	if (HAS_FUNCTION(loc, FNC_LIBRARY)) {
+		dump_library_to_room(loc);
+	}
+	
 	// interior only
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
+			if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+				dump_library_to_room(room);
+			}
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
 			
@@ -2115,6 +2127,9 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (count_players_in_vehicle(veh, TRUE)) {
 		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
 	}
+	else if (!dismantle_vtrigger(ch, veh, TRUE)) {
+		// prevented by trigger
+	}
 	else {
 		// ensure nobody is building it
 		if (!VEH_IS_DISMANTLING(veh)) {
@@ -2130,7 +2145,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		
-		start_dismantle_vehicle(veh);
+		start_dismantle_vehicle(veh, ch);
 		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
 		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 		process_dismantle_vehicle(ch);
@@ -2330,7 +2345,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You are not allowed to customize.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CUSTOMIZE_BUILDING, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else if (is_abbrev(arg, "name")) {

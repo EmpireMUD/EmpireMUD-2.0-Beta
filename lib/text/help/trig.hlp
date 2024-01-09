@@ -16,20 +16,20 @@ Type 'version' to see the current version of the scripting system.
 
 See: TRIGEDIT
 #d
-"ABILITY TRIGGER" "MTRIG ABILITY" "OTRIG ABILITY" "RTRIG ABILITY" TRIGEDIT-MOB-ABILITY TRIGEDIT-OBJ-ABILITY TRIGEDIT-ROOM-ABILITY
+"ABILITY TRIGGER" "MTRIG ABILITY" "OTRIG ABILITY" "RTRIG ABILITY" "VTRIG ABILITY" TRIGEDIT-MOB-ABILITY TRIGEDIT-OBJ-ABILITY TRIGEDIT-ROOM-ABILITY TRIGEDIT-VEH-ABILITY
 
 Ability (trigger type)
 
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the ability
 
-Ability triggers are used by mobs, objects, and rooms to detect, alter,
-replace, or prevent player abilities. Rooms will trigger on any ability
-performed in them, but mobs and objects only execute Ability triggers if they
-are the target of the ability.
+Ability triggers are used by mobs, objects, vehicles, and rooms to detect,
+alter, replace, or prevent player abilities. Rooms will trigger on any ability
+performed in them, but mobs, objects, and vehicles only execute ability
+triggers if they are the target of the ability.
 
 Only the FIRST ability trigger will run on a given mob (or room, etc) unless it
-also has the Allow-Multiple type. This is only supported for mobs and rooms.
+also has the Allow-Multiple type.
 
 Note: Ability triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -42,15 +42,16 @@ Variables:
   &c%abilityname%&0 - The name of the ability.
 
 Room triggers also provide:
-  &c%vict%&0 - The target (mob/player) of the ability, if any.
-  &c%obj%&0 - The target (object) of the ability, if any.
+  &c%victim%&0 - The target (mob/player) of the ability, if any.
+  &c%object%&0 - The target (object) of the ability, if any.
+  &c%vehicle&0 - The target (vehicle) of the ability, if any.
 
-Mob and object triggers also provide:
-  &c%self%&0 - Ability triggers only execute when the target is self.
+Mob, object, and vehicle triggers also provide:
+  &c%self%&0 - The mob, object, or vehicle being targeted.
 
 See also: MTRIG CHARMED, ALLOW-MULTIPLE
 #d
-ALLOW-MULTIPLE "ALLOW-MULTIPLE TRIGGER" "ALLOW MULTIPLE TRIGGER" "MTRIG ALLOW-MULTIPLE" TRIGEDIT-MOB-ALLOW-MULTIPLE
+ALLOW-MULTIPLE "ALLOW-MULTIPLE TRIGGER" "ALLOW MULTIPLE TRIGGER" "MTRIG ALLOW-MULTIPLE" TRIGEDIT-MOB-ALLOW-MULTIPLE "OTRIG ALLOW-MULTIPLE" "RTRIG ALLOW-MULTIPLE" "VTRIG ALLOW-MULTIPLE"
 
 Allow-Multiple (trigger type)
 
@@ -58,15 +59,17 @@ This type of trigger is set in conjunction with some other triggers to allow
 multiple scripts of the same type to run. Some types of triggers normally only
 allow 1 script to run, even if it returns 0.
 
-For two triggers to both run, BOTH must have Allow-Multiple set.
+For two such triggers to both run, BOTH must have Allow-Multiple set.
 
 Be sure not to set Allow-Multiple if the trigger will kill or purge a mob
 running it.
 
 The following trigger types are supported:
 
-Mobs: ability, act, death, entry, leave, load, speech
+Mobs: ability, act, death, entry, hitprc, leave, load, speech
+Objects: ability, consume, drop, get, give, load, remove, wear
 Rooms: ability, door, drop, enter, leave, load, speech, zone reset
+Vehicles: ability, destroy, entry, leave, load, speech
 
 Support for this can be added to more trigger types on request.
 
@@ -130,6 +133,23 @@ Variables:
 
 See also: TOGGLE, MTRIG CHARMED
 #d
+"DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE "VTRIG DISMANTLE" TRIGEDIT-VEH-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
+
+Dismantle (trigger type)
+
+Return value:  return 0 to prevent the dismantle/redesignate
+
+Rooms: This trigger is called when someone tries to dismantle or redesignate a
+room, or when the room is destroyed for any reason.
+
+Vehicles: Called when someone tries to dismantle the vehicle, or when it falls
+into ruins or is destroyed.
+
+Variables:
+  &c%actor%&0 - The person attempting to dismantle (there may be no actor if
+    the dismantle is caused by siege damage or decay).
+  &c%preventable%&0 - Whether or not you can attempt to prevent this action.
+#d
 "DOOR TRIGGER" "MTRIG DOOR" "RTRIG DOOR" TRIGEDIT-MOB-DOOR TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
 
 Door (trigger type)
@@ -166,8 +186,8 @@ room. This trigger also fires on put, junk, and sacrifice.
 
 The object trigger includes putting the object into a container or vehicle.
 
-Only the FIRST drop trigger on a room will run unless it also has the
-Allow-Multiple type. This is not supported for object triggers yet.
+Only the FIRST drop trigger will run unless it also has the Allow-Multiple
+type.
 
 Variables:
   &c%actor%&0 - The character attempting to drop the object.
@@ -306,7 +326,7 @@ detach any random trigger that's no longer needed.
 
 See also: DETACH, RANDOM TRIGGER
 #d
-"GREET TRIGGER" "MTRIG GREET" "VTRIG GREET" TRIGEDIT-MOB-GREET TRIGEDIT-VEH-GREET GREET "GREET ALL TRIGGER" "MTRIG GREET ALL" TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL
+"GREET TRIGGER" "MTRIG GREET" "OTRIG GREET" "VTRIG GREET" TRIGEDIT-MOB-GREET TRIGEDIT-VEH-GREET GREET "GREET ALL TRIGGER" "MTRIG GREET ALL" TRIGEDIT-MOB-GREET-ALL GREET-ALL TRIGEDIT-MOB-GREETALL TRIGEDIT-OBJ-GREET
 
 Greet (trigger)
 
@@ -375,7 +395,7 @@ Mobs can only execute Leave triggers on people they can see. You can use the
 Leave-All version to also stop sneaky or invisible people.
 
 Only the FIRST leave trigger on a mob (or room, etc) will run unless it also
-has the Allow-Multiple type. This is only supported for mobs and rooms so far.
+has the Allow-Multiple type, except for objects, which run all leave triggers.
 
 Note: Leave triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -395,6 +415,7 @@ See also: PLAYER-IN-ROOM TRIGGER, ALLOW-MULTIPLE
 Load (trigger type)
 
 Argument type:  percent chance to execute
+Return value:  return 0 if purging the thing itself
 
 The Load trigger happens when something is first loaded into the game (but not
 on reboot or re-login). For crafted vehicles, the Load trigger doesn't happen
@@ -409,11 +430,10 @@ are complete.
 If an object, mob, or vehicle will purge itself in its own load trigger, you
 should consider doing a "wait 1" (or longer) before purging it.
 
-Only the FIRST load trigger on a mob or room will run unless it also has the
-Allow-Multiple type. On objects or vehicles, only the first trigger will run
-and there is currently no way to override this.
+Only the FIRST load trigger will run unless it also has the Allow-Multiple
+type.
 
-See also: RTRIG COMPLETE, ALLOW-MULTIPLE
+See also: RTRIG COMPLETE
 #d
 "METHOD LIST" "METHODS LIST"
 
@@ -458,8 +478,8 @@ if it returns 0, that message is not sent. Consider using a # on any echoes or
 sends that should appear after the person enters and auto-looks. For other
 things that should happen after someone enters, consider adding a 'wait 1'.
 
-Only the FIRST entry trigger on a mob will run unless it also has the
-Allow-Multiple type. This is not supported for vehicles yet.
+Only the FIRST entry trigger on a mob (or vehicle, etc) will run unless it also
+has the Allow-Multiple type.
 
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
@@ -643,6 +663,7 @@ Special Variables When using field - The variable returns:
    instance of a given adventure (only works if not in a !LOCATION spot).
 &cinstance.nearest_rmt(vnum)&0 - Finds a given room in the nearest instance
    that has one (only works if you aren't in a !LOCATION spot).
+&cinstance.players_present&0 - Count of all players inside the instance.
 &cinstance.real_location&0 - The instance's original location (if any).
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
@@ -693,9 +714,9 @@ words in a word list) using the normal "say" command. This is can be used to
 add riddle quests, to make doors activate on command ("open sesame"), or to
 add other types of interactions to the game.
 
-Only the FIRST matching speech trigger on each mob will run unless it also has
-the Allow-Multiple type. Additonal mobs can each run 1 speech trigger without
-Allow-Multiple; this trigger is per-mob. Vehicles do not support this flag yet.
+Only the FIRST matching speech trigger on each mob (room, etc) will run unless
+it also has the Allow-Multiple type. Additonal mobs/vehicles can each run 1
+speech trigger without Allow-Multiple; this trigger is per-mob/vehicle.
 
 The language used for this speech is provided as the %lang% and %lang_vnum%
 variables. This may be different from %actor.speaking% if the actor specified a

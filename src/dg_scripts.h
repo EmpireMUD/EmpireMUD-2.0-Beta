@@ -13,9 +13,20 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e5.0.2"
+/**
+* Contents:
+*   Consts
+*   Macros
+*   Structures
+*   dg_triggers.c Prototypes
+*   dg_scripts.c Prototypes
+*/
 
-// look for 'x_TRIGGER' for things related to this (I know that's backwards)
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONSTS //////////////////////////////////////////////////////////////////
+
+// x_TRIGGER: things related to trigger attachment (I know that's backwards)
 #define MOB_TRIGGER  0
 #define OBJ_TRIGGER  1
 #define WLD_TRIGGER  2
@@ -72,19 +83,20 @@
 #define OTRIG_GLOBAL           BIT(0)	// NOT actually used, currently
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define OTRIG_COMMAND          BIT(2)      /* character types a command  */
-
+#define OTRIG_GREET            BIT(3)	// person enters the room with an object
+// BIT(4)
 #define OTRIG_TIMER            BIT(5)     /* item's timer expires       */
 #define OTRIG_GET              BIT(6)     /* item is picked up          */
 #define OTRIG_DROP             BIT(7)     /* character trys to drop obj */
 #define OTRIG_GIVE             BIT(8)     /* character trys to give obj */
 #define OTRIG_WEAR             BIT(9)     /* character trys to wear obj */
 #define OTRIG_REMOVE           BIT(11)    /* character trys to remove obj */
-
+// BIT(12)
 #define OTRIG_LOAD             BIT(13)    /* the object is loaded       */
-
+// BIT(14)
 #define OTRIG_ABILITY          BIT(15)    /* object targetted by ability */
 #define OTRIG_LEAVE            BIT(16)    /* someone leaves room seen    */
-
+// BIT(17)
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
 #define OTRIG_FINISH           BIT(19)	// char finishes reading a book
 #define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
@@ -93,6 +105,7 @@
 #define OTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define OTRIG_BUY              BIT(24)	// attempting a purchase
 #define OTRIG_KILL             BIT(25)	// obj's owner has killed something
+#define OTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // VTRIG_x: vehicle trigger types
@@ -100,22 +113,29 @@
 #define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
 #define VTRIG_COMMAND  BIT(2)	// character types a command
 #define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
-// unused BIT(4)
+// BIT(4)
 #define VTRIG_DESTROY  BIT(5)	// called before destruction
 #define VTRIG_GREET  BIT(6)	// character enters the room
-// unused BIT(7)
+// BIT(7)
 #define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
-// unused BIT(9), BIT(10), BIT(11), BIT(12)
+// BIT(9)
+// BIT(10)
+// BIT(11)
+// BIT(12)
 #define VTRIG_LOAD  BIT(13)	// vehicle is loaded
-// unused BIT(14), BIT(15)
+// BIT(14)
+#define VTRIG_ABILITY          BIT(15)	// ability targeting the vehicle
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
-// unuused: 17-19
+// BIT(17)
+#define VTRIG_DISMANTLE        BIT(18)	// starts dismantling
+// BIT(19)
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define VTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define VTRIG_BUY              BIT(24)	// attempting a purchase in the room
 #define VTRIG_KILL             BIT(25)	// vehicle killed someone
+#define VTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // WTRIG_x: wld trigger types
@@ -127,33 +147,32 @@
 #define WTRIG_RESET            BIT(5)      /* zone has been reset        */
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
-
+// BIT(8)
+// BIT(9)
+// BIT(10)
+// BIT(11)
+// BIT(12)
 #define WTRIG_LOAD  BIT(13)	// called when the room/building loads
 #define WTRIG_COMPLETE  BIT(14)	// called when the building is complete
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
 #define WTRIG_DISMANTLE        BIT(18)	// starts dismantling or redesignates
-// unused: 19
+// BIT(19)
 #define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define WTRIG_BUY              BIT(24)	// attempting a purchase
-// unused 25: rooms cannot kill
+// BIT(25)
 #define WTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
-
-
-// list of global trigger types (for random_triggers linked list)
-#define TRIG_IS_GLOBAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_GLOBAL)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_GLOBAL)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_GLOBAL)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_GLOBAL)))
-#define TRIG_IS_LOCAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_PLAYER_IN_ROOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_PLAYER_IN_ROOM)))
-#define TRIG_IS_RANDOM(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_RANDOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_RANDOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_RANDOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)))
 
 
 /* obj command trigger types */
 #define OCMD_EQUIP             BIT(0)	     /* obj must be in char's equip */
 #define OCMD_INVEN             BIT(1)	     /* obj must be in char's inven */
 #define OCMD_ROOM              BIT(2)	     /* obj must be in char's room  */
+
 
 /* obj consume trigger commands */
 #define OCMD_EAT  1
@@ -169,6 +188,8 @@
 #define OCMD_TASTE  11
 #define OCMD_SIP  12
 
+
+// running modes for triggers
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
 
@@ -188,11 +209,63 @@
 #define DROP_TRIG_PUT  3
 
 
+// starts all ids
+#define UID_CHAR	'}'
+
+
+// SCRIPT IDS:
+// player idnums are used as script ids up to EMPIRE_ID_BASE-1
+#define EMPIRE_ID_BASE	20000000	// reserve this many ids for players; empires use base+vnum
+#define ROOM_ID_BASE	(10000000 + EMPIRE_ID_BASE)	// reserve 10000000 ids for empires
+#define OTHER_ID_BASE	((MAP_SIZE * 5) + ROOM_ID_BASE)	// reserve 5x mapsize for room ids
+// removed MOB_ID_BASE, OBJ_ID_BASE, VEHICLE_ID_BASE: these ids now share the OTHER_ID_BASE-space
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MACROS //////////////////////////////////////////////////////////////////
+
+#define GET_TRIG_NAME(t)		((t)->name)
+#define GET_TRIG_VNUM(t)		((t)->vnum)
+#define GET_TRIG_TYPE(t)		((t)->trigger_type)
+#define GET_TRIG_DATA_TYPE(t)	((t)->data_type)
+#define GET_TRIG_NARG(t)		((t)->narg)
+#define GET_TRIG_ARG(t)			((t)->arglist)
+#define GET_TRIG_VARS(t)		((t)->var_list)
+#define GET_TRIG_WAIT(t)		((t)->wait_event)
+#define GET_TRIG_DEPTH(t)		((t)->depth)
+#define GET_TRIG_LOOPS(t)		((t)->loops)
+
+#define SCRIPT(o)				((o)->script)
+#define SCRIPT_MEM(c)			((c)->memory)
+#define SCRIPT_TYPES(s)			((s)->types)
+#define TRIGGERS(s)				((s)->trig_list)
+
+#define HAS_TRIGGERS(o)			(SCRIPT(o) && TRIGGERS(SCRIPT(o)))
+#define SCRIPT_CHECK(go, type)	(SCRIPT(go) && IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
+#define SCRIPT_SHOULD_SKIP_CHAR(ch)	(EXTRACTED(ch) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO) || GET_INVIS_LEV(ch) >= LVL_START_IMM)) || AFF_FLAGGED(ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))
+#define TRIGGER_CHECK(t, type)	(IS_SET(GET_TRIG_TYPE(t), type) && !GET_TRIG_DEPTH(t))
+
+#define ADD_UID_VAR(buf, trig, id, name, context)	do { \
+			sprintf(buf, "%c%d", UID_CHAR, id); \
+			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
+
+#define ABILITY_TRIGGERS(actor, vict, obj, veh, abil)  (!ability_wtrigger((actor), (vict), (obj), (veh), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)) || !ability_vtrigger((actor), (veh), (abil)))
+
+
 // commmand functions
 #define OCMD(name)  void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
 #define VCMD(name)  void (name)(vehicle_data *veh, char *argument, int cmd, int subcmd)
 #define WCMD(name)  void (name)(room_data *room, char *argument, int cmd, int subcmd)
 
+
+// list of global trigger types (for random_triggers linked list)
+#define TRIG_IS_GLOBAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_GLOBAL)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_GLOBAL)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_GLOBAL)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_GLOBAL)))
+#define TRIG_IS_LOCAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_PLAYER_IN_ROOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_PLAYER_IN_ROOM)))
+#define TRIG_IS_RANDOM(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_RANDOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_RANDOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_RANDOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// STRUCTURES //////////////////////////////////////////////////////////////
 
 /* one line of the trigger */
 struct cmdlist_element {
@@ -314,84 +387,81 @@ struct wld_command_info {
 };
 
 
-/* function prototypes from dg_triggers.c (and others) */
-void adventure_cleanup_wtrigger(room_data *room);
-void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
-void speech_mtrigger(char_data *actor, char *str, generic_data *language, char_data *only_mob);
-void speech_wtrigger(char_data *actor, char *str, generic_data *language);
-void greet_memory_mtrigger(char_data *ch);
-int greet_mtrigger(char_data *actor, int dir, char *method);
+
+ //////////////////////////////////////////////////////////////////////////////
+//// dg_triggers.c PROTOTYPES ////////////////////////////////////////////////
+
+// general functions
+int is_substring(char *sub, char *string);
+
+// mob triggers
 int pre_greet_mtrigger(char_data *actor, room_data *room, int dir, char *method);
-int entry_mtrigger(char_data *ch, char *method);
-void entry_memory_mtrigger(char_data *ch);
-int enter_wtrigger(room_data *room, char_data *actor, int dir, char *method);
-int drop_otrigger(obj_data *obj, char_data *actor, int mode);
-int timer_otrigger(obj_data *obj);
-int get_otrigger(obj_data *obj, char_data *actor, bool preventable);
-int drop_wtrigger(obj_data *obj, char_data *actor, int mode);
-int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
-int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
-int wear_otrigger(obj_data *obj, char_data *actor, int where);
-int remove_otrigger(obj_data *obj, char_data *actor);
-int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode);
-int command_otrigger(char_data *actor, char *cmd, char *argument, int mode);
-int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
-bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
-bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
-int death_mtrigger(char_data *ch, char_data *actor);
+void speech_mtrigger(char_data *actor, char *str, generic_data *language, char_data *only_mob);
+void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);
 int fight_mtrigger(char_data *ch, bool will_hit);
 void hitprcnt_mtrigger(char_data *ch);
+int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj);
+int death_mtrigger(char_data *ch, char_data *actor);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 int can_fight_mtrigger(char_data *ch, char_data *actor);
+void load_mtrigger(char_data *ch);
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
+int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method);
+int door_mtrigger(char_data *actor, int subcmd, int dir);
+void reboot_mtrigger(char_data *ch);
 
+// object triggers
+int timer_otrigger(obj_data *obj);
+int get_otrigger(obj_data *obj, char_data *actor, bool preventable);
+int wear_otrigger(obj_data *obj, char_data *actor, int where);
+int remove_otrigger(obj_data *obj, char_data *actor);
+int drop_otrigger(obj_data *obj, char_data *actor, int mode);
+int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
+int load_otrigger(obj_data *obj);
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
+int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
+int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target);
+int finish_otrigger(obj_data *obj, char_data *actor);
+void reboot_otrigger(obj_data *obj);
+
+// world triggers
+void adventure_cleanup_wtrigger(room_data *room);
 void complete_wtrigger(room_data *room);
 int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
-
-void reset_wtrigger(room_data *ch);
-
-void load_mtrigger(char_data *ch);
-int load_otrigger(obj_data *obj);
 void load_wtrigger(room_data *room);
-
-int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
-int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
-
-int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
-
-int leave_mtrigger(char_data *actor, int dir, char *custom_dir, char *method);
+void reset_wtrigger(room_data *ch);
+void speech_wtrigger(char_data *actor, char *str, generic_data *language);
+int drop_wtrigger(obj_data *obj, char_data *actor, int mode);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, vehicle_data *veh, any_vnum abil);
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
-int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
-
-int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
-
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target);
-
-int finish_otrigger(obj_data *obj, char_data *actor);
-
-int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
-int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
-
-int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
-int destroy_vtrigger(vehicle_data *veh, char *method);
-int entry_vtrigger(vehicle_data *veh, char *method);
-int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
-void load_vtrigger(vehicle_data *veh);
-int greet_vtrigger(char_data *actor, int dir, char *method);
-void speech_vtrigger(char_data *actor, char *str, generic_data *language);
-
-void reboot_mtrigger(char_data *ch);
-void reboot_otrigger(obj_data *obj);
-void reboot_vtrigger(vehicle_data *veh);
 void reboot_wtrigger(room_data *room);
 
+// vehicle triggers
+int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
+int destroy_vtrigger(vehicle_data *veh, char *method);
+int dismantle_vtrigger(char_data *actor, vehicle_data *veh, bool preventable);
+int entry_vtrigger(vehicle_data *veh, char *method);
+int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
+int load_vtrigger(vehicle_data *veh);
+void reboot_vtrigger(vehicle_data *veh);
+void speech_vtrigger(char_data *actor, char *str, generic_data *language);
+
+// combo triggers, start quest triggers, finish quest triggers
+bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
+bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int greet_triggers(char_data *ch, int dir, char *method, bool preventable);
+int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
+// reset trigger helper
 void check_reset_trigger_event(room_data *room, bool random_offset);
 
-/* function prototypes from dg_scripts.c */
+
+ //////////////////////////////////////////////////////////////////////////////
+//// dg_scripts.c PROTOTYPES /////////////////////////////////////////////////
+
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 char_data *get_char(char *name);
@@ -416,7 +486,6 @@ void assign_triggers(void *i, int type);
 void extract_trigger(trig_data *trig);
 void free_freeable_triggers();
 void free_varlist(struct trig_var_data *vd);
-int is_substring(char *sub, char *string);
 char *matching_quote(char *p);
 void parse_trigger(FILE *trig_f, int nr);
 void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
@@ -459,8 +528,6 @@ void script_modify(char *argument);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 
-void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
-
 void obj_command_interpreter(obj_data *obj, char *argument);
 void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 void wld_command_interpreter(room_data *room, char *argument);
@@ -476,9 +543,6 @@ union script_driver_data_u {
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);
 
-int trgvar_in_room(room_vnum vnum);
-struct cmdlist_element *find_done(struct cmdlist_element *cl);
-struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 int find_eq_pos_script(char *arg);
 char_data *get_char_near_obj(obj_data *obj, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
@@ -490,58 +554,10 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name);
 int valid_dg_target(char_data *ch, int bitvector);
 #define DG_ALLOW_GODS BIT(0)
 
-/* Macros for scripts */
-
-// #define UID_CHAR   '\x1b'
-#define UID_CHAR   '}'
-#define GET_TRIG_NAME(t)          ((t)->name)
-#define GET_TRIG_VNUM(t)	  ((t)->vnum)
-#define GET_TRIG_TYPE(t)          ((t)->trigger_type)
-#define GET_TRIG_DATA_TYPE(t)	  ((t)->data_type)
-#define GET_TRIG_NARG(t)          ((t)->narg)
-#define GET_TRIG_ARG(t)           ((t)->arglist)
-#define GET_TRIG_VARS(t)	  ((t)->var_list)
-#define GET_TRIG_WAIT(t)	  ((t)->wait_event)
-#define GET_TRIG_DEPTH(t)         ((t)->depth)
-#define GET_TRIG_LOOPS(t)         ((t)->loops)
-
-// SCRIPT IDS:
-// player idnums are used as script ids up to EMPIRE_ID_BASE-1
-#define EMPIRE_ID_BASE  20000000	// reserve this many ids for players; empires use base+vnum
-#define ROOM_ID_BASE  (10000000 + EMPIRE_ID_BASE)	// reserve 10000000 ids for empires
-#define OTHER_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// reserve 5x mapsize for room ids
-// removed MOB_ID_BASE, OBJ_ID_BASE, VEHICLE_ID_BASE: these ids now share the OTHER_ID_BASE-space
-
-
-#define SCRIPT(o)		  ((o)->script)
-#define SCRIPT_MEM(c)             ((c)->memory)
-
-#define SCRIPT_TYPES(s)		  ((s)->types)				  
-#define TRIGGERS(s)		  ((s)->trig_list)
-
-#define HAS_TRIGGERS(o)  (SCRIPT(o) && TRIGGERS(SCRIPT(o)))
-
-#define GET_SHORT(ch)    ((ch)->player.short_descr)
-
-
-#define SCRIPT_CHECK(go, type)   (SCRIPT(go) && IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
-#define TRIGGER_CHECK(t, type)   (IS_SET(GET_TRIG_TYPE(t), type) && !GET_TRIG_DEPTH(t))
-
-#define ADD_UID_VAR(buf, trig, id, name, context) do { \
-			sprintf(buf, "%c%d", UID_CHAR, id); \
-			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
-
-
-#define ABILITY_TRIGGERS(actor, vict, obj, abil)  (!ability_wtrigger((actor), (vict), (obj), (abil)) || !ability_mtrigger((actor), (vict), (abil)) || !ability_otrigger((actor), (obj), (abil)))
-
-#define SCRIPT_SHOULD_SKIP_CHAR(ch)  (EXTRACTED(ch) || (!IS_NPC(ch) && (PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO) || GET_INVIS_LEV(ch) >= LVL_START_IMM)) || AFF_FLAGGED(ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))
 
 
 // handlers
 void update_script_types(struct script_data *sc);
-
-/* needed for new %load% handling */
-int can_wear_on_pos(obj_data *obj, int pos);
 
 // script uid lookup table functions
 void add_to_lookup_table(int uid, void *ptr, int type);
@@ -571,3 +587,6 @@ int veh_script_id(vehicle_data *veh);
 
 // wait helpers
 EVENT_CANCEL_FUNC(cancel_wait_event);
+
+// from vehicles.c
+void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch);

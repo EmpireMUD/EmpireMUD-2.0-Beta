@@ -371,18 +371,8 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	// Cooldown?
 	if (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent)) {
-		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
-		}
-		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
-		}
-		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		}
+		has_param_details = TRUE;
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %s%s\r\n", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
 	}
 	
 	// data, if parameterized
@@ -425,30 +415,15 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	
 	// build duration
-	if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-		strcpy(lbuf, "unlimited");
-	}
-	else if (ABIL_SHORT_DURATION(abil) >= 60) {
-		sprintf(lbuf, "%d minute%s", (ABIL_SHORT_DURATION(abil) / 60), PLURAL(ABIL_SHORT_DURATION(abil) / 60));
-	}
-	else if (ABIL_SHORT_DURATION(abil) > 0) {
-		sprintf(lbuf, "%d second%s", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+	if (ABIL_SHORT_DURATION(abil) == UNLIMITED || ABIL_SHORT_DURATION(abil) > 0) {
+		sprintf(lbuf, "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	else {
 		*lbuf = '\0';
 	}
 	
-	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil)) {
-		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
-		}
-		else if (ABIL_LONG_DURATION(abil) >= 60) {
-			sprintf(lbuf + strlen(lbuf), "%s %d minute%s", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60), PLURAL(ABIL_LONG_DURATION(abil) / 60));
-		}
-		else if (ABIL_LONG_DURATION(abil) > 0) {
-			sprintf(lbuf + strlen(lbuf), "%s%d second%s", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
-		}
-		// no else for long duration
+	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil) && ABIL_LONG_DURATION(abil) > 0) {
+		sprintf(lbuf + strlen(lbuf), "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	
 	// show duration?
@@ -2273,7 +2248,7 @@ INTERACTION_FUNC(conjure_object_interaction) {
 
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(conjure_vehicle_interaction) {
-	bool junk;
+	bool junk, veh_ok = TRUE;
 	int level, num;
 	struct ability_exec *data = GET_RUNNING_ABILITY_DATA(ch);
 	ability_data *abil = data->abil;
@@ -2309,11 +2284,11 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 		}
 		
 		special_vehicle_setup(ch, veh);
-		load_vtrigger(veh);
+		veh_ok = load_vtrigger(veh);
 	}
 	
 	// messaging?
-	if (veh) {
+	if (veh && veh_ok) {
 		send_ability_per_vehicle_message(ch, veh, interaction->quantity, abil, data, NULL);
 	}
 	
@@ -2498,7 +2473,8 @@ DO_ABIL(abil_action_close_to_melee) {
 DO_ABIL(abil_action_detect_adventures_around) {
 	bool wait;
 	char where_str[256];
-	char *dir_str, *repl_array[2];
+	char *repl_array[2];
+	const char *dir_str;
 	int adv_dist;
 	struct instance_data *inst;
 	struct empire_city_data *match_city;
@@ -2601,7 +2577,7 @@ DO_ABIL(abil_action_detect_hide) {
 DO_ABIL(abil_action_detect_players_around) {
 	bool wait;
 	char where_str[256];
-	char *dir_str;
+	const char *dir_str;
 	int player_dist;
 	char_data *ch_iter;
 	struct empire_city_data *match_city;
@@ -3618,7 +3594,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 							msg_to_char(ch, "You can't do that when you don't have any mana.\r\n");
 						}
 						else {
-							msg_to_char(ch, "You can't use that one someone without any mana.\r\n");
+							msg_to_char(ch, "You can't use that on someone without any mana.\r\n");
 						}
 					}
 					return FALSE;
@@ -5373,27 +5349,11 @@ DO_ABIL(do_resurrect_ability) {
 DO_ABIL(do_room_affect_ability) {
 	struct affected_type *af;
 	any_vnum affect_vnum;
-	double total_points = 1, remaining_points = 1;
-	int dur;
-	
-	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
-	
-	total_points = get_ability_type_data(data, ABILT_ROOM_AFFECT)->scale_points;
-	remaining_points = total_points;
-	
-	if (total_points <= 0) {
-		return;
-	}
-	
-	// determine duration (in seconds)
-	dur = get_ability_duration(ch, abil);
 	
 	// affect flags? cost == level 100 ability
 	if (room_targ && ABIL_AFFECTS(abil)) {
-		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-		remaining_points = MAX(0, remaining_points);
-		
-		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
+		affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
+		af = create_flag_aff(affect_vnum, get_ability_duration(ch, abil), ABIL_AFFECTS(abil), ch);
 		affect_to_room(room_targ, af);
 		free(af);	// affect_to_room duplicates affects
 	}
@@ -5539,20 +5499,19 @@ DO_ABIL(do_teleport_ability) {
 			
 			char_from_room(ch);
 			char_to_room(ch, to_room);
-			qt_visit_room(ch, to_room);
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
 			
+			if (!greet_triggers(ch, NO_DIR, "ability", TRUE)) {
+				char_from_room(ch);
+				char_to_room(ch, was_in);
+				return;
+			}
+			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-		
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "ability");
-			entry_memory_mtrigger(ch);
-			greet_mtrigger(ch, NO_DIR, "ability");
-			greet_memory_mtrigger(ch);
-			greet_vtrigger(ch, NO_DIR, "ability");
-			
+			qt_visit_room(ch, to_room);
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			
@@ -5561,11 +5520,11 @@ DO_ABIL(do_teleport_ability) {
 				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
 				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
 				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
-				enter_wtrigger(IN_ROOM(ch), GET_COMPANION(ch), NO_DIR, "ability");
-				entry_memory_mtrigger(GET_COMPANION(ch));
-				greet_mtrigger(GET_COMPANION(ch), NO_DIR, "ability");
-				greet_memory_mtrigger(GET_COMPANION(ch));
-				greet_vtrigger(GET_COMPANION(ch), NO_DIR, "ability");
+				
+				if (!greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE)) {
+					char_from_room(GET_COMPANION(ch));
+					char_to_room(GET_COMPANION(ch), was_in);
+				}
 			}
 		}
 		
@@ -7672,7 +7631,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	}
 	
 	// these happen immediately before the first message
-	if (ABILITY_TRIGGERS(ch, vict, ovict, ABIL_VNUM(abil))) {
+	if (ABILITY_TRIGGERS(ch, vict, ovict, vvict, ABIL_VNUM(abil))) {
 		data->stop = TRUE;
 		data->should_charge_cost = FALSE;
 		return;
@@ -11041,7 +11000,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
@@ -11061,19 +11020,9 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
-		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			strcpy(part, "unlimited");
-		}
-		else {
-			snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
-		}
-		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			strcpy(part2, "unlimited");
-		}
-		else {
-			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
-		}
-		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s seconds\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
+		strcpy(part, colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"));
+		strcpy(part2, colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"));
+		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");

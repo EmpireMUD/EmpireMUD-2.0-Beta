@@ -1431,7 +1431,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	if (show_inv && !disguise) {
 		// show inventory
-		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying && !run_ability_triggers_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL)) {
+		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying && !run_ability_triggers_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL, NULL)) {
 			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
@@ -1482,12 +1482,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		else {
 			duration = aff->expire_time - time(0);
 			duration = MAX(duration, 0);
-			if (duration >= 60 * 60) {
-				sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-			}
-			else {
-				sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-			}
+			strcpy(lbuf, colon_time(duration, FALSE, NULL));
 		}
 		
 		// main entry
@@ -1510,7 +1505,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 	
 	// show DoT affects too
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
+		strcpy(lbuf, colon_time(dot->time_remaining, FALSE, NULL));
 		
 		// main body
 		msg_to_char(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
@@ -1554,12 +1549,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(lbuf, colon_time(duration, FALSE, "infinite"));
 			}
 			
 			// main entry
@@ -1598,7 +1588,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		if (details) {
-			snprintf(line, sizeof(line), "&r%s&0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+			snprintf(line, sizeof(line), "&r%s&0%s (%s)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), colon_time(dot->time_remaining, FALSE, "infinite"), lbuf);
 		}
 		else {	// simple version
 			snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
@@ -2923,7 +2913,6 @@ ACMD(do_contents) {
 
 ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
-	char when[256];
 	int diff;
 	bool found = FALSE;
 	
@@ -2933,14 +2922,7 @@ ACMD(do_cooldowns) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
 		if (diff >= 0) {
-			if (diff >= SECS_PER_REAL_HOUR) {
-				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
-			}
-			else {
-				snprintf(when, sizeof(when), "%d:%02d", (diff / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
-			}
-			msg_to_char(ch, " &c%s&0 %s\r\n", get_generic_name_by_vnum(cool->type), when);
-
+			msg_to_char(ch, " &c%s&0 %s\r\n", get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 			found = TRUE;
 		}
 	}
@@ -3619,7 +3601,7 @@ ACMD(do_mapsize) {
 
 ACMD(do_mark) {
 	int dist;
-	char *dir_str;
+	const char *dir_str;
 	room_data *mark, *here;
 	
 	skip_spaces(&argument);
@@ -3768,12 +3750,13 @@ ACMD(do_mudstats) {
 
 ACMD(do_nearby) {
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256], *dir_str;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
+	const char *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;
 	int iter, dist, size, max_dist;
-	bool found = FALSE;
+	bool found = FALSE, newbie_only;
 	room_data *loc;
 	any_vnum vnum;
 	struct nearby_item_t *nrb_list = NULL, *nrb_item, *next_item;
@@ -3802,6 +3785,9 @@ ACMD(do_nearby) {
 	max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	max_dist += GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
 	max_dist = MAX(0, max_dist);
+	
+	// newbie islands only show newbie island things
+	newbie_only = (GET_ISLAND(IN_ROOM(ch)) && IS_SET(GET_ISLAND(IN_ROOM(ch))->flags, ISLE_NEWBIE)) ? TRUE : FALSE;
 	
 	// argument-parsing
 	skip_spaces(&argument);
@@ -3864,6 +3850,10 @@ ACMD(do_nearby) {
 		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+				if (newbie_only && GET_ISLAND(city->location) && !IS_SET(GET_ISLAND(city->location)->flags, ISLE_NEWBIE)) {
+					continue;	// skip non-newbie
+				}
+				
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
@@ -3899,11 +3889,14 @@ ACMD(do_nearby) {
 			glb = NULL;	// init this now -- used later
 			
 			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-				continue;
+				continue;	// not a valid location or was completed
 			}
 		
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_NEARBY)) {
-				continue;
+				continue;	// does not show on nearby
+			}
+			if (newbie_only && GET_ISLAND(INST_FAKE_LOC(inst)) && !IS_SET(GET_ISLAND(INST_FAKE_LOC(inst))->flags, ISLE_NEWBIE)) {
+				continue;	// only showing newbie now
 			}
 		
 			loc = INST_FAKE_LOC(inst);

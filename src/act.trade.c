@@ -1634,7 +1634,7 @@ ACMD(do_gen_augment) {
 	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE, GET_AUG_NAME(aug))) {
 		// sends its own messages
 	}
-	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
+	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, NULL, GET_AUG_ABILITY(aug))) {
 		return;
 	}
 	else {
@@ -2039,7 +2039,7 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2054,7 +2054,7 @@ ACMD(do_gen_craft) {
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2073,7 +2073,7 @@ ACMD(do_gen_craft) {
 					abbrev_no_res = craft;
 				}
 			}
-			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2108,6 +2108,10 @@ ACMD(do_gen_craft) {
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
 	}
+	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE) > 0 && (find_type = craft_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE))) && subcmd == GET_CRAFT_TYPE(find_type) && multi_isname(arg, GET_CRAFT_NAME(find_type))) {
+		// attempting to resume the current building by something that's not exactly the name
+		resume_craft_building(ch, find_type);
+	}
 	else if (*arg && !list_only && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
 		// attempting to resume a vehicle by name
 		resume_craft_vehicle(ch, veh, find_type);
@@ -2126,7 +2130,7 @@ ACMD(do_gen_craft) {
 	}
 	else if (*arg && !list_only && !type) {
 		// found no match
-		msg_to_char(ch, "Unknown %s. Type '%s' by itself to see a list of what you can %s.\r\n", gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
+		msg_to_char(ch, "Unknown %s '%s'. Type '%s' by itself to see a list of what you can %s.\r\n", arg, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
 	}
 	else if (!*arg && !list_only && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
 		// 'build' no-arg in an incomplete building: resume
@@ -2167,7 +2171,7 @@ ACMD(do_gen_craft) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
 			}
-			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_BUILD_FACING(craft) || !*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
 				continue;	// search exclusion
 			}
 			
@@ -2827,7 +2831,7 @@ ACMD(do_tame) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL, NULL)) {
 		// triggered
 	}
 	else {

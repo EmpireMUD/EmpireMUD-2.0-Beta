@@ -147,7 +147,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	// THING 1: burning
 	if (IS_BURNING(room)) {
-		if (!starving && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
+		if (!starving && CHORE_ACTIVE(CHORE_FIRE_BRIGADE) && HOME_ROOM(room) == room) {
 			do_chore_fire_brigade(emp, room);
 		}
 		return;	// blocks all other chores
@@ -1799,6 +1799,9 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		if (CRAFT_FLAGGED(craft, CRAFT_SKILLED_LABOR) && !EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
 			continue;	// need skillz
 		}
+		if (CRAFT_FLAGGED(craft, CRAFT_LEARNED) && !empire_has_learned_craft(emp, GET_CRAFT_VNUM(craft))) {
+			continue;	// not learned
+		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {
 			continue;	// don't allow crafts with TAKE-REQUIRED-OBJ
 		}
@@ -1919,6 +1922,9 @@ void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *
 		}
 		if (CRAFT_FLAGGED(craft, CRAFT_SKILLED_LABOR) && !EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
 			continue;	// need skillz
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_LEARNED) && !empire_has_learned_craft(emp, GET_CRAFT_VNUM(craft))) {
+			continue;	// not learned
 		}
 		if (!veh && !room_has_function_and_city_ok(emp, room, GET_CRAFT_REQUIRES_FUNCTION(craft))) {
 			continue;	// room-based chore missing function
@@ -2251,7 +2257,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 			charge_workforce(emp, CHORE_DISMANTLE_MINES, room, worker, 1, NOTHING, 0);
 			if (veh) {
 				act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
-				start_dismantle_vehicle(veh);
+				start_dismantle_vehicle(veh, NULL);
 			}
 			else {
 				act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);

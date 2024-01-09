@@ -1460,6 +1460,8 @@ E
 9 0 25.00 27
 E
 10 32 4.00 27
+E
+17 0 0.60 65
 I 6 3310 50.00 25  # FORAGE: wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: massive crocodile
 I 21 1300 20.00 125 f  # FISH: glowing green seashell
@@ -2973,6 +2975,10 @@ E
 E
 9 0 50.00 79
 E
+17 0 0.60 39
+E
+17 70 1.00 71
+E
 27 268435456 4.00 26
 I 5 102 15.00 125 X  # DIG: flint stone
 I 5 101 15.00 125 X  # DIG: lump of clay
@@ -3030,6 +3036,10 @@ E
 0 1 50.00 75
 E
 0 0 100.00 72
+E
+17 70 1.00 72
+E
+17 0 0.60 65
 E
 27 268435456 4.00 26
 I 5 102 15.00 125 X  # DIG: flint stone

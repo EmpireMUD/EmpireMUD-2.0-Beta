@@ -8,4 +8,18 @@ if %timestamp% - %self.var(load_time)% >= 3600
   %purge% %self%
 end
 ~
+#1128
+Lost Book: Replace on load~
+1 n 100
+~
+wait 1
+if %self.carried_by%
+  %load% book lost %self.carried_by%
+elseif %self.in_obj%
+  %load% book lost %self.in_obj%
+else
+  %load% book lost
+end
+%purge% %self%
+~
 $

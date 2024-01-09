@@ -22,6 +22,18 @@ legs~
 are only four of them, they give the impression of a giant spider as they move.
 ~
 I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+K
+3
+$n climbs up the legs of $V and goes inside.~
+K
+2
+$n enters through the doorway.~
+K
+4
+$n walks out the doorway and jumps down outside.~
+K
+5
+$n jumps down off of $V.~
 M
 11944 45.00 e
 P
@@ -55,6 +67,18 @@ windows~
 The windows of the tower are too high to see.
 ~
 I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+K
+3
+$n climbs an invisible staircase up to $V.~
+K
+5
+$n climbs down an invisible staircase from $V.~
+K
+2
+$n enters through the door.~
+K
+4
+$n leaves out the door.~
 P
 0
 R
@@ -99,7 +123,31 @@ pools water~
    Below the gardens, along the walkway, a small pond provides crystal clear
 water and reflects the trees above.
 ~
+I 7 1200 16.67 5 x  # PICK: handful of whitegrass
+I+ 0 70  # Ability: Find Herbs
+I 7 1201 16.66 5 x  # PICK: sack of fiveleaf
+I+ 0 70  # Ability: Find Herbs
+I 7 1202 16.67 5 x  # PICK: twig of redthorn
+I+ 0 70  # Ability: Find Herbs
+I 7 1203 16.66 5 x  # PICK: magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 1204 16.67 5 x  # PICK: daggerbite frond
+I+ 0 70  # Ability: Find Herbs
+I 7 1205 16.67 5 x  # PICK: bileberries
+I+ 0 70  # Ability: Find Herbs
 I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 32 1200 3.00 5 x  # SKILLED-LABOR: handful of whitegrass
+I+ 7 3  # Depletion: pick
+I 32 1201 3.00 5 x  # SKILLED-LABOR: sack of fiveleaf
+I+ 7 3  # Depletion: pick
+I 32 1202 3.00 5 x  # SKILLED-LABOR: twig of redthorn
+I+ 7 3  # Depletion: pick
+I 32 1203 3.00 5 x  # SKILLED-LABOR: magewhisper sepals
+I+ 7 3  # Depletion: pick
+I 32 1204 3.00 5 x  # SKILLED-LABOR: daggerbite frond
+I+ 7 3  # Depletion: pick
+I 32 1205 3.00 5 x  # SKILLED-LABOR: bileberries
+I+ 7 3  # Depletion: pick
 H 0 1
 M
 11943 75.00 ce

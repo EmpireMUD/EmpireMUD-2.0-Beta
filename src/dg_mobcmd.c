@@ -93,7 +93,7 @@ void mob_log(char_data *mob, const char *format, ...) {
 	va_list args;
 	char output[MAX_STRING_LENGTH];
 
-	snprintf(output, sizeof(output), "Mob (%s, VNum %d):: %s", GET_SHORT(mob), GET_MOB_VNUM(mob), format);
+	snprintf(output, sizeof(output), "Mob (%s, VNum %d):: %s", GET_SHORT_DESC(mob), GET_MOB_VNUM(mob), format);
 
 	va_start(args, format);
 	script_vlog(output, args);
@@ -726,8 +726,15 @@ ACMD(do_mload) {
 
 	target = two_arguments(argument, arg1, arg2);
 	skip_spaces(&target);
-
-	if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
+	
+	if (is_abbrev(arg1, "book")) {
+		// special checking for books
+		if (!*arg2 || (!is_number(arg2) && str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
+			mob_log(ch, "mload: bad syntax (book)");
+			return;
+		}
+	}
+	else if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
 		mob_log(ch, "mload: bad syntax");
 		return;
 	}
@@ -839,7 +846,110 @@ ACMD(do_mload) {
 				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
 			}
 			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
+				equip_char(tch, object, pos);
+				load_otrigger(object);
+				return;
+			}
+			obj_to_char(object, tch);
+			if (load_otrigger(object)) {
+				get_otrigger(object, tch, FALSE);
+			}
+			return;
+		}
+		
+		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
+			// load in container
+			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+
+		/* neither char nor container found - just dump it in room */
+		obj_to_room(object, IN_ROOM(ch)); 
+		load_otrigger(object);
+		return;
+	}
+	else if (is_abbrev(arg1, "book")) {
+		book_data *book;
+		
+		if (!str_cmp(arg2, "lost")) {
+			book = random_lost_book();
+		}
+		else {
+			book = book_proto(number);
+		}
+		
+		if (!book) {
+			mob_log(ch, "mload: bad book vnum%s", !str_cmp(arg2, "lost") ? " - no lost books" : "");
+			return;
+		}
+		
+		object = create_book_obj(book);
+		
+		if (inst) {
+			instance_obj_setup(inst, object);
+		}
+		
+		/* special handling to make objects able to load on a person/in a container/worn etc. */
+		if (!target || !*target) {
+			if (CAN_WEAR(object, ITEM_WEAR_TAKE)) {
+				obj_to_char(object, ch);
+			}
+			else {
+				obj_to_room(object, IN_ROOM(ch));
+			}
+			
+			// must scale now
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
+			
+			if (load_otrigger(object) && object->carried_by) {
+				get_otrigger(object, object->carried_by, FALSE);
+			}
+			return;
+		}
+		
+		target = two_arguments(target, arg1, arg2); /* recycling ... */
+		skip_spaces(&target);
+		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = IN_ROOM(ch);
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(IN_ROOM(ch), arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
+		// scale based on remaining "target" arg
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
+		}
+		
+		if (in_room) {	// load in the room
+			obj_to_room(object, in_room);
+			load_otrigger(object);
+			return;
+		}
+		
+		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
+		if (tch) {	// load on char
+			// mark as "gathered" like a resource
+			if (!IS_NPC(tch) && GET_LOYALTY(tch)) {
+				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
+			}
+			
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
 				return;
@@ -1078,7 +1188,7 @@ ACMD(do_mgoto) {
 
 	char_from_room(ch);
 	char_to_room(ch, location);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+	greet_triggers(ch, NO_DIR, "script", FALSE);
 	msdp_update_room(ch);
 }
 
@@ -1344,7 +1454,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
+				greet_triggers(vict, NO_DIR, "script", FALSE);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);
@@ -1375,7 +1485,7 @@ ACMD(do_mteleport) {
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
-						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR, "script");
+						greet_triggers(vict, NO_DIR, "script", FALSE);
 						qt_visit_room(vict, IN_ROOM(vict));
 						RESET_LAST_MESSAGED_TEMPERATURE(vict);
 						msdp_update_room(vict);
@@ -1395,7 +1505,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
-				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR, "script");
+				greet_triggers(vict, NO_DIR, "script", FALSE);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);
 				msdp_update_room(vict);

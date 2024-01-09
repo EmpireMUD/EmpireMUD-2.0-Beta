@@ -711,7 +711,7 @@ bool validate_burn_area(char_data *ch) {
 	else if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(IN_ROOM(ch)), DIPL_WAR)) {
 		msg_to_char(ch, "You must be at war to burn someone else's territory!\r\n");
 	}
-	else if (objless && run_ability_triggers_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL)) {
+	else if (objless && run_ability_triggers_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else { // safe!
@@ -1683,7 +1683,7 @@ void process_hunting(char_data *ch) {
 		load_mtrigger(mob);
 		
 		// stun it if triggers allow
-		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL)) {
+		if (!run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, mob, NULL, NULL)) {
 			af = create_flag_aff(ATYPE_HUNTED, 5, AFF_IMMOBILIZED, ch);
 			affect_join(mob, af, 0);
 		}
@@ -2449,7 +2449,7 @@ ACMD(do_chip) {
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHIP_COMMAND, NULL, target)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHIP_COMMAND, NULL, target, NULL)) {
 		// triggered
 	}
 	else {
@@ -2507,7 +2507,7 @@ ACMD(do_chop) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHOP_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_CHOP_COMMAND, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -2737,7 +2737,7 @@ ACMD(do_harvest) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_HARVEST_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HARVEST_COMMAND, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -2846,7 +2846,7 @@ ACMD(do_mint) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_MINT_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MINT_COMMAND, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -2964,7 +2964,7 @@ ACMD(do_plant) {
 			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
 		}
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -3097,7 +3097,7 @@ ACMD(do_saw) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SAW_COMMAND, NULL, obj)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SAW_COMMAND, NULL, obj, NULL)) {
 		// triggered
 	}
 	else {
@@ -3156,7 +3156,7 @@ ACMD(do_scrape) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to scrape anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SCRAPE_COMMAND, NULL, obj)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SCRAPE_COMMAND, NULL, obj, NULL)) {
 		// triggered
 	}
 	else {
@@ -3229,7 +3229,7 @@ ACMD(do_tan) {
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to tan anything here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAN_COMMAND, NULL, obj)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAN_COMMAND, NULL, obj, NULL)) {
 		// triggered
 	}
 	else {
@@ -3442,7 +3442,7 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 	else if (!can_gen_interact_room(ch, room, data)) {
 		// sends own messages
 	}
-	else if (data->ptech != NO_TECH && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL)) {
+	else if (data->ptech != NO_TECH && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {

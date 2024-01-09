@@ -201,7 +201,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	
 	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "goto");
+	greet_triggers(ch, NO_DIR, "goto", FALSE);
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -5491,6 +5491,56 @@ SHOW(show_ammotypes) {
 }
 
 
+SHOW(show_author) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	int idnum;
+	size_t size, count;
+	book_data *book, *next_book;
+	player_index_data *index;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show author <author idnum>\r\n");
+	}
+	else if ((idnum = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid author idnum.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Books authored by [%d] %s:\r\n", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
+		
+		count = 0;
+		HASH_ITER(hh, book_table, book, next_book) {
+			if (BOOK_AUTHOR(book) != idnum) {
+				continue;
+			}
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_ignoring) {
 	char arg[MAX_INPUT_LENGTH];
 	player_index_data *index;
@@ -5873,6 +5923,94 @@ SHOW(show_learned) {
 	
 	if (plr && file) {
 		free_char(plr);
+	}
+}
+
+
+SHOW(show_libraries) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book;
+	room_data *room;
+	struct library_data *libr, *next_libr;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show libraries <book vnum>\r\n");
+	}
+	else if (!(book = book_proto(atoi(arg)))) {
+		msg_to_char(ch, "No such book %d.\r\n", atoi(arg));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+		
+		count = 0;
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
+			if (!(room = real_room(libr->location))) {
+				continue;
+			}
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
+SHOW(show_lost_books) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book, *next_book;
+	
+	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
+	
+	count = 0;
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (BOOK_IN_LIBRARIES(book)) {
+			continue;
+		}
+		
+		snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
+		}
+		else {
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
+		}
+	}
+	
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 }
 
@@ -6438,7 +6576,6 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 */
 void do_stat_adventure(char_data *ch, adv_data *adv) {
 	char lbuf[MAX_STRING_LENGTH];
-	int time;
 	
 	if (!adv) {
 		return;
@@ -6453,12 +6590,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	if (GET_ADV_RESET_TIME(adv) == 0) {
 		strcpy(lbuf, "never");
 	}
-	else if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
-		time = GET_ADV_RESET_TIME(adv) - (GET_ADV_RESET_TIME(adv) / (60 * 24));
-		sprintf(lbuf, "%d:%02d:%02d", (GET_ADV_RESET_TIME(adv) / (60 * 24)), (time / 60), (time % 60));
-	}
 	else if (GET_ADV_RESET_TIME(adv) > 60) {
-		sprintf(lbuf, "%2d:%02d", (GET_ADV_RESET_TIME(adv) / 60), (GET_ADV_RESET_TIME(adv) % 60));
+		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
 	else {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
@@ -6495,19 +6628,21 @@ void do_stat_book(char_data *ch, book_data *book) {
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", book->title);
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", book->byline);
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", BOOK_TITLE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", BOOK_BYLINE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", BOOK_ITEM_NAME(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", BOOK_ITEM_DESC(book));	// desc has its own crlf
 	
 	// precompute number of paragraphs
 	num = 0;
-	for (para = book->paragraphs; para; para = para->next) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++num;
 	}
 	
-	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+	count = 0;
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
+		++count;
 		txt = para->text;
 		skip_spaces(&txt);
 		len = strlen(txt);
@@ -6831,7 +6966,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
@@ -6856,12 +6991,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(lbuf, colon_time(duration, FALSE, NULL));
 			}
 
 			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
@@ -6884,8 +7014,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		sprintf(lbuf, "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -6944,7 +7073,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%s&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 	else {
 		msg_to_char(ch, "\r\n");
@@ -7262,7 +7391,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);
+		snprintf(part, sizeof(part), "%d tick%s (%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL));
 	}
 	else {
 		strcpy(part, "none");
@@ -7314,7 +7443,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
@@ -7854,12 +7983,7 @@ void do_stat_room(char_data *ch) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(buf3, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(buf3, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(buf3, colon_time(duration, FALSE, NULL));
 			}
 
 			sprintf(buf, "Affect: (%s) &c%s&0", buf3, get_generic_name_by_vnum(aff->type));
@@ -8066,8 +8190,8 @@ int vnum_book(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
-			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
+		if (multi_isname(searchname, BOOK_TITLE(book)) || multi_isname(searchname, BOOK_BYLINE(book))) {
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 		}
 	}
 
@@ -8593,6 +8717,11 @@ ACMD(do_automessage) {
 			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
 			return;
 		}
+		else if (strlen(argument) >= 255) {
+			// fread_string won't be able to read it beyond this.
+			msg_to_char(ch, "Message too long.\r\n");
+			return;
+		}
 		
 		// ready!
 		CREATE(msg, struct automessage, 1);
@@ -8665,6 +8794,11 @@ ACMD(do_automessage) {
 		else if (is_abbrev(type_arg, "message")) {
 			if (!*argument) {
 				msg_to_char(ch, "Change the message to what?\r\n");
+				return;
+			}
+			else if (strlen(argument) >= 255) {
+				// fread_string won't be able to read it beyond this.
+				msg_to_char(ch, "Message too long.\r\n");
 				return;
 			}
 			
@@ -8923,7 +9057,7 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char *dir_str;
+	const char *dir_str;
 	room_data *target;
 	int dist;
 	
@@ -9891,7 +10025,7 @@ ACMD(do_load) {
 	two_arguments(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
-		send_to_char("Usage: load { obj | mob | vehicle } <number>\r\n", ch);
+		send_to_char("Usage: load { obj | mob | vehicle | book } <number>\r\n", ch);
 		return;
 	}
 	if ((number = atoi(buf2)) < 0) {
@@ -9953,13 +10087,28 @@ ACMD(do_load) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
 		}
 		
-		load_vtrigger(veh);
-		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
 		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+		
+		load_vtrigger(veh);
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!book_proto(number)) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		
+		obj = create_book_obj(book_proto(number));
+		obj_to_char(obj, ch);
+		act("$n makes a strange magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $p!", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
+		act("You create $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
 		}
 	}
 	else {
@@ -11105,6 +11254,9 @@ ACMD(do_show) {
 		{ "smessages", LVL_START_IMM, show_smessages },
 		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
 		{ "friends", LVL_START_IMM, show_friends },
+		{ "libraries", LVL_START_IMM, show_libraries },
+		{ "author", LVL_START_IMM, show_author },
+		{ "lostbooks", LVL_START_IMM, show_lost_books },
 
 		// last
 		{ "\n", 0, NULL }
@@ -11564,7 +11716,7 @@ ACMD(do_trans) {
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
-				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+				greet_triggers(victim, NO_DIR, "transfer", FALSE);
 				RESET_LAST_MESSAGED_TEMPERATURE(victim);
 				msdp_update_room(victim);	// once we're sure we're staying
 			}
@@ -11593,7 +11745,7 @@ ACMD(do_trans) {
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
-			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+			greet_triggers(victim, NO_DIR, "transfer", FALSE);
 			RESET_LAST_MESSAGED_TEMPERATURE(victim);
 			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
@@ -12137,7 +12289,7 @@ ACMD(do_vstat) {
 		do_stat_crop(ch, crop);
 	}
 	else if (!strn_cmp(buf, "emp", 3) && is_abbrev(buf, "empire")) {
-		if ((emp = get_empire_by_name(buf2))) {
+		if ((emp = real_empire(number))) {
 			do_stat_empire(ch, emp);
 		}
 		else if (!*buf2) {

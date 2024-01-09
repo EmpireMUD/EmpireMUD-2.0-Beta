@@ -319,11 +319,20 @@ void perform_alternate(char_data *old, char_data *new) {
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
 	
-	// switch over replies for immortals, too
+	// switch over replies for immortals and friends, too
 	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) == CON_PLAYING && desc->character && IS_IMMORTAL(desc->character) && GET_LAST_TELL(desc->character) == GET_IDNUM(old)) {
-			GET_LAST_TELL(desc->character) = GET_IDNUM(new);
+		if (STATE(desc) != CON_PLAYING || !desc->character) {
+			continue;	// not playing
 		}
+		if (GET_LAST_TELL(desc->character) != GET_IDNUM(old)) {
+			continue;	// last tell wasn't old char
+		}
+		if (!IS_IMMORTAL(desc->character) && (PRF_FLAGGED(old, PRF_NO_FRIENDS) || PRF_FLAGGED(new, PRF_NO_FRIENDS) || account_friend_status(old, desc->character) != FRIEND_FRIENDSHIP)) {
+			continue;	// not immortal or friends
+		}
+		
+		// ok: update last tell
+		GET_LAST_TELL(desc->character) = GET_IDNUM(new);
 	}
 	
 	// move desc (do this AFTER saving)
@@ -577,6 +586,7 @@ static void print_group(char_data *ch) {
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(shear_interact) {
 	char buf[MAX_STRING_LENGTH];
+	char *cust;
 	int iter, amt, obj_ok = 0;
 	obj_data *obj = NULL;
 	
@@ -609,16 +619,24 @@ INTERACTION_FUNC(shear_interact) {
 		act("$n skillfully shears $N.", FALSE, ch, NULL, inter_mob, TO_NOTVICT);
 	}
 	else if (amt == 1) {
-		act("You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		act(cust ? cust : "You skillfully shear $N and get $p.", FALSE, ch, obj, inter_mob, TO_CHAR);
+		
 		act("$n skillfully shears you and gets $p.", FALSE, ch, obj, inter_mob, TO_VICT);
-		act("$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n skillfully shears $N and gets $p.", FALSE, ch, obj, inter_mob, TO_NOTVICT);
 	}
 	else {
-		sprintf(buf, "You skillfully shear $N and get $p (x%d).", amt);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		sprintf(buf, "%s (x%d)", cust ? cust : "You skillfully shear $N and get $p.", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_CHAR);
+		
 		sprintf(buf, "$n skillfully shears you and gets $p (x%d).", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_VICT);
-		sprintf(buf, "$n skillfully shears $N and gets $p (x%d).", amt);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		sprintf(buf, "%s (x%d)", cust ? cust : "$n skillfully shears $N and gets $p.", amt);
 		act(buf, FALSE, ch, obj, inter_mob, TO_NOTVICT);
 	}
 	
@@ -629,6 +647,7 @@ INTERACTION_FUNC(shear_interact) {
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(skin_interact) {
 	char buf[MAX_STRING_LENGTH];
+	char *cust;
 	obj_data *obj = NULL;
 	int num, obj_ok = 0;
 	
@@ -657,14 +676,20 @@ INTERACTION_FUNC(skin_interact) {
 		act("$n carefully skins $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else if (interaction->quantity > 1) {
-		sprintf(buf, "You carefully skin $P and get $p (x%d).", interaction->quantity);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		sprintf(buf, "%s (x%d)", cust ? cust : "You carefully skin $P and get $p.", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
-		sprintf(buf, "$n carefully skins $P and gets $p (x%d).", interaction->quantity);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		sprintf(buf, "%s (x%d)", cust ? cust : "$n carefully skins $P and gets $p.", interaction->quantity);
 		act(buf, FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	else {
-		act("You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
-		act("$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		act(cust ? cust : "You carefully skin $P and get $p.", FALSE, ch, obj, inter_item, TO_CHAR | ACT_OBJ_VICT);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n carefully skins $P and gets $p.", FALSE, ch, obj, inter_item, TO_ROOM | ACT_OBJ_VICT);
 	}
 	
 	return TRUE;
@@ -827,11 +852,7 @@ OFFER_FINISH(ofin_summon) {
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "summon");
-	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR, "summon");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "summon");
+	greet_triggers(ch, NO_DIR, "summon", FALSE);
 	msdp_update_room(ch);	// once we're sure we're staying
 	
 	// followers?
@@ -844,11 +865,7 @@ OFFER_FINISH(ofin_summon) {
 			look_at_room(fol->follower);
 			act("$n appears in a swirl of light!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 			
-			enter_wtrigger(IN_ROOM(fol->follower), fol->follower, NO_DIR, "summon");
-			entry_memory_mtrigger(fol->follower);
-			greet_mtrigger(fol->follower, NO_DIR, "summon");
-			greet_memory_mtrigger(fol->follower);
-			greet_vtrigger(fol->follower, NO_DIR, "summon");
+			greet_triggers(fol->follower, NO_DIR, "summon", FALSE);
 		}
 	}
 	
@@ -1831,7 +1848,7 @@ ACMD(do_companions) {
 	if (abil && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
 		return;
 	}
-	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
+	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, NULL, ABIL_VNUM(abil))) {
 		return;
 	}
 	
@@ -2463,7 +2480,7 @@ ACMD(do_herd) {
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_HERD_COMMAND, victim, NULL, NULL)) {
 		// triggered
 	}
 	
@@ -2722,7 +2739,7 @@ ACMD(do_milk) {
 		msg_to_char(ch, "It's already full of something else.\r\n");
 	else if (GET_DRINK_CONTAINER_CONTENTS(cont) >= GET_DRINK_CONTAINER_CAPACITY(cont))
 		msg_to_char(ch, "It's already full.\r\n");
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_MILK_COMMAND, mob, cont, NULL)) {
 		// triggered
 	}
 	else {
@@ -2976,7 +2993,7 @@ ACMD(do_morph) {
 	else if (morph && MORPH_COST_TYPE(morph) == BLOOD && MORPH_COST(morph) > 0 && !CAN_SPEND_BLOOD(ch)) {
 		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
 	}
-	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
+	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, NULL, MORPH_ABILITY(morph))) {
 		return;
 	}
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
@@ -3383,7 +3400,7 @@ ACMD(do_shear) {
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
 		act("$E is already shorn.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_SHEAR_COMMAND, mob, NULL, NULL)) {
 		// triggered
 	}
 	else {

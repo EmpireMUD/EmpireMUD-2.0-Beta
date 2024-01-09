@@ -4,7 +4,7 @@ a bolt of cloth~
 A bolt of cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 0 a 0 9
+3 0 a 0 0 9
 0 0 0
 11 0
 C
@@ -25,7 +25,7 @@ a bolt of basic cloth~
 A bolt of basic cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 0 a 0 11
+3 0 a 0 0 11
 0 0 0
 11 0
 C
@@ -46,7 +46,7 @@ a bolt of magic cloth~
 A bolt of magic cloth is glowing on the ground.~
 This glowing cloth is used to sew magical garments.
 ~
-3 0 a 0 10
+3 0 a 0 0 10
 0 0 0
 11 0
 C
@@ -68,7 +68,7 @@ Some glass is scattered here.~
    This glass is broken and probably can't be used for much in its current
 state, but you may be able to craft with it.
 ~
-3 0 a 0 10
+3 0 a 0 0 10
 0 0 0
 8 0
 C
@@ -84,7 +84,7 @@ A magic handle is hovering here.~
    This strange handle has a faint glow and seems to float. It looks like it
 could be attached to many different items to craft a useful tool.
 ~
-1 0 ano 0 5
+1 0 ano 0 0 6
 0 3 5
 0 0
 C
@@ -92,6 +92,10 @@ C
 O+ 1 6851
 R
 4 5121 0
+R
+4 5610 0
+R
+4 5108 0
 S
 #6870
 cord length~
@@ -100,7 +104,7 @@ A length of cord is looped on the ground.~
    This small cord could be used to bind things, though it isn't large enough
 or sturdy enough for heavy use.
 ~
-3 0 a 0 10
+3 0 a 0 0 10
 0 0 0
 0 0
 C
@@ -129,7 +133,7 @@ some paint~
 Some paint has been spilled here.~
 This item can be used to paint a building with the 'paint' command.
 ~
-13 e a 0 19
+13 e a 0 0 19
 14 0 0
 6 0
 C
@@ -144,7 +148,7 @@ some wax~
 Some wax is piled here.~
 Wax can be crafted into a candle or other small things.
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 9 100
 C

@@ -505,6 +505,10 @@ void delete_room(room_data *room, bool check_exits) {
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
 	
+	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+		remove_library_from_books(GET_ROOM_VNUM(room));
+	}
+	
 	// ensure not owned (and update empire stuff if so)
 	if ((emp = ROOM_OWNER(room))) {
 		if ((ter = find_territory_entry(emp, room))) {
@@ -1807,6 +1811,7 @@ int count_city_points_used(empire_data *emp) {
 * @return struct empire_city_data* the city object
 */
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type) {
+	char buf[256];
 	struct empire_city_data *city;
 	
 	// sanity first
@@ -1837,6 +1842,10 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 		complete_building(location);
 	}
+	
+	// rename
+	snprintf(buf, sizeof(buf), "The Center of %s", name);
+	set_room_custom_name(location, buf);
 	
 	// verify ownership
 	claim_room(location, emp);

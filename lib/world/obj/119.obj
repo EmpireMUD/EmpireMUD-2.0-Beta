@@ -1289,11 +1289,20 @@ you can see the goblin cages. The next, it's Scaldorran's lab. There's no time
 to look at details before the next image appears, so you're not sure how useful
 a mirror like this would be.
 ~
-8 jB 0 0 0 4
+8 jB 0 0 0 5
 11800 0 0
 3 0
 C
 100 100
+M
+30
+You press your hand against the mirror... and fall through!~
+M
+31
+$n presses $s hand against the mirror... and falls through!~
+M
+32
+You suddenly notice $n standing there.~
 T 11962
 S
 #11963
@@ -1304,11 +1313,20 @@ A strange mirror occupies much of the wall.~
 mirror doesn't show you standing here in the Grand High Sorcerer's quarters,
 but instead reflects you standing in the great hall on the first floor!
 ~
-8 jB 0 0 0 3
+8 jB 0 0 0 5
 11800 0 0
 3 0
 C
 100 100
+M
+30
+You press your hand against the mirror... and fall through!~
+M
+31
+$n presses $s hand against the mirror... and falls through!~
+M
+32
+You suddenly notice $n standing by the buffet.~
 S
 #11964
 stone brilliant eternal sunshine~

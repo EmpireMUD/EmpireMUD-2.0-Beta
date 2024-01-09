@@ -1040,8 +1040,11 @@ else
   %load% veh %vnum% 25
   set emp %actor.empire%
   set veh %self.room.vehicles%
-  if %emp%
-    %own% %veh% %emp%
+  if %veh% && %veh.vnum% == %vnum%
+    nop %veh.unlink_instance%
+    if %emp%
+      %own% %veh% %emp%
+    end
   end
 end
 %send% %actor% You buy %named% for %coinstr%.
@@ -1196,9 +1199,11 @@ end
 set coinstr %actor.charge_coins(50)%
 %load% veh %vnum% 25
 set emp %actor.empire%
-set veh %self.room.vehicles%
-if %emp%
-  %own% %veh% %emp%
+if %veh% && %veh.vnum% == %vnum%
+  nop %veh.unlink_instance%
+  if %emp%
+    %own% %veh% %emp%
+  end
 end
 %send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
@@ -1322,6 +1327,10 @@ Goblin raft replacer~
 1 n 100
 ~
 %load% veh 10771
+set raft %self.room.vehicles%
+if %raft% && %raft.vnum% == 10771
+  nop %raft.unlink_instance%
+end
 %purge% %self%
 ~
 #10775

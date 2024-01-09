@@ -1346,7 +1346,7 @@ if !(%actor.obj_target(%arg.car%)% == %self%)
   return 0
   halt
 end
-if %arg.cdr% != freezing
+if !(freezing /= %arg.cdr%)
   %send% %actor% You must enchant @%self% with freezing to subdue the abominable snowman.
   halt
 end
@@ -2348,9 +2348,10 @@ elseif %sleigh.animals_harnessed% > 0
   %echoaround% %actor% ~%actor% unharnesses the animal from %sleigh.shortdesc%...
   nop %sleigh.unharness%
 end
-%load% veh 16650
+%load% veh 16650 %sleigh.level%
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
+  nop %upgr.unlink_instance%
   %own% %upgr% %sleigh.empire%
   %send% %actor% You polish %sleigh.shortdesc% with @%self%...
   %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with @%self%...

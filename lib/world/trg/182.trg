@@ -567,8 +567,11 @@ Atlasian Turtle Egg: Hatch~
 set room %self.room%
 %load% veh 18224
 set tortoise %room.vehicles%
-%echo% The huge egg cracks open, and %tortoise.shortdesc% pokes its head out!
-%own% %tortoise% %room.empire%
+if %tortoise% && %tortoise.vnum% == 18224
+  nop %tortoise.unlink_instance%
+  %echo% The huge egg cracks open, and %tortoise.shortdesc% pokes its head out!
+  %own% %tortoise% %room.empire%
+end
 %build% %room% demolish
 return 0
 %purge% %self%

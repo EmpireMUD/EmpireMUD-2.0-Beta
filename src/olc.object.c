@@ -2234,7 +2234,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? BOOK_TITLE(book) : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {
@@ -2312,7 +2312,7 @@ void olc_show_object(char_data *ch) {
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
 	struct obj_apply *apply;
-	int count, minutes;
+	int count, seconds;
 	
 	if (!obj) {
 		return;
@@ -2326,8 +2326,8 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
-		minutes = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		sprintf(buf1, "%d tick%s (%d:%02d)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), minutes / 60, minutes % 60);
+		seconds = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR;
+		sprintf(buf1, "%d tick%s (%s)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), colon_time(seconds, FALSE, NULL));
 	}
 	else {
 		strcpy(buf1, "none");

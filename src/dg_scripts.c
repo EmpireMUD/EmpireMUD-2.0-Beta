@@ -34,10 +34,17 @@ extern unsigned long main_game_pulse;
 // local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
+struct cmdlist_element *find_done(struct cmdlist_element *cl);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf);
 
 
+/**
+* Counts the number of people in a room for %people.vnum%
+*
+* @room_vnum vnum The room to check for people.
+* @return int The number of characters in that room.
+*/
 int trgvar_in_room(room_vnum vnum) {
 	room_data *room = real_room(vnum);
 	int i = 0;
@@ -52,6 +59,14 @@ int trgvar_in_room(room_vnum vnum) {
 	return i;
 }
 
+
+/**
+* Find an object in a list by name without regards to visibility.
+*
+* @param char *name The keyword (singular).
+* @param obj_data *list A list of objects to search.
+* @return obj_data* The matching object in the list, if any, or else NULL.
+*/
 obj_data *get_obj_in_list(char *name, obj_data *list) {
 	obj_data *i;
 	int id;
@@ -78,6 +93,15 @@ obj_data *get_obj_in_list(char *name, obj_data *list) {
 	return NULL;
 }
 
+
+/**
+* Finds an equipped object on a character by name, without regard to
+* visibility.
+*
+* @param char_data *ch The person whose equipment to check.
+* @param char *name The argument to match (singular).
+* @return obj_data* The matching object if found; NULL if not.
+*/
 obj_data *get_object_in_equip(char_data *ch, char *name) {
 	int j, n = 0, number;
 	obj_data *obj;
@@ -120,8 +144,16 @@ obj_data *get_object_in_equip(char_data *ch, char *name) {
 	return NULL;
 }
 
-/* Handles 'held', 'light' and 'wield' positions - Welcor
-After idea from Byron Ellacott - bje@apnic.net */
+
+/**
+* Find a WEAR_ pos by various names.
+*
+* Handles 'held', 'light' and 'wield' positions - Welcor
+* After idea from Byron Ellacott - bje@apnic.net
+*
+* @param char *arg The position as typed in the script.
+* @return int A WEAR_ const to match, or NO_WEAR for no match.
+*/
 int find_eq_pos_script(char *arg) {
 	int i;
 	struct eq_pos_list {
@@ -165,22 +197,6 @@ int find_eq_pos_script(char *arg) {
 			return eq_pos[i].where;
 	}
 	return NO_WEAR;
-}
-
-int can_wear_on_pos(obj_data *obj, int pos) {
-	return CAN_WEAR(obj, wear_data[pos].item_wear);
-}
-
-
-/**
-* Determines if there is a nearby connected player, which is a requirement
-* for some things like random triggers.
-*
-* @param room_data *loc The location to check for nearby players.
-* @return bool TRUE if there are players nearby.
-*/
-static bool players_nearby_script(room_data *loc) {
-	return distance_to_nearest_player(loc) <= PLAYER_SCRIPT_RADIUS;
 }
 
 
@@ -1015,7 +1031,7 @@ void script_trigger_check(void) {
 		if (TRIG_IS_LOCAL(trig) && (!in_room || !any_players_in_room(in_room))) {
 			continue;	// need player present (is local)
 		}
-		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || !players_nearby_script(in_room))) {
+		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || distance_to_nearest_player(in_room) > PLAYER_SCRIPT_RADIUS)) {
 			continue;	// need players nearby (not global)
 		}
 		
@@ -1299,7 +1315,16 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(j) ? obj_script_id(j) : j->script_id);
+	int id;
+	
+	if (IN_ROOM(j) || j->in_obj || j->in_vehicle || j->carried_by || j->worn_by) {
+		id = SCRIPT(j) ? obj_script_id(j) : j->script_id;
+	}
+	else {
+		id = j->script_id;
+	}
+	
+	msg_to_char(ch, "Script information (id %d):\r\n", id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1310,7 +1335,7 @@ void do_sstat_object(char_data *ch, obj_data *j) {
 
 
 void do_sstat_character(char_data *ch, char_data *k) {
-	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(k) ? char_script_id(k) : k->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", (SCRIPT(k) && IN_ROOM(k)) ? char_script_id(k) : k->script_id);
 	if (!SCRIPT(k)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1408,8 +1433,8 @@ ACMD(do_tattach) {
 		reread_companion_trigs(victim);
 		request_char_save_in_world(victim);
 
-		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
-		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT_DESC(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
+		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT_DESC(victim), GET_MOB_VNUM(victim));
 	}
 	else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
 		object = (*targ_name == UID_CHAR) ? get_obj(targ_name) : get_obj_vis(ch, targ_name, NULL);
@@ -1793,13 +1818,13 @@ ACMD(do_tdetach) {
 		else if (trigger && !str_cmp(trigger, "all")) {
 			remove_all_triggers(victim, MOB_TRIGGER);
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "All triggers removed from mob %s by %s", GET_SHORT_DESC(victim), GET_NAME(ch));
 			}
-			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT(victim));
+			msg_to_char(ch, "All triggers removed from %s.\r\n", GET_SHORT_DESC(victim));
 		}
 		else if (trigger && remove_trigger(SCRIPT(victim), trigger)) {
 			if (!IS_NPC(ch)) {
-				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT(victim), GET_NAME(ch));
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "Trigger %s removed from mob %s by %s", trigger, GET_SHORT_DESC(victim), GET_NAME(ch));
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			check_extract_script(victim, MOB_TRIGGER);
@@ -1936,7 +1961,7 @@ void script_log_by_type(int go_type, void *go, const char *format, ...) {
 	switch (go_type) {
 		case MOB_TRIGGER: {
 			strcpy(type, "Mob");
-			strcpy(name, GET_SHORT((char_data*)go));
+			strcpy(name, GET_SHORT_DESC((char_data*)go));
 			vnum = GET_MOB_VNUM((char_data*)go);
 			break;
 		}
@@ -2608,6 +2633,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
+				}
+				else if (!str_cmp(field, "players_present")) {
+					int count = 0;
+					char_data *ch_iter;
+					DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+						if (ROOM_INSTANCE(IN_ROOM(ch_iter)) == inst) {
+							++count;
+						}
+					}
+					snprintf(str, slen, "%d", count);
 				}
 				else if (!str_cmp(field, "real_location")) {
 					if (INST_LOCATION(inst)) {
@@ -5006,8 +5041,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'i': {	// obj.i*
-					if (!str_cmp(field, "id"))
+					if (!str_cmp(field, "id")) {
 						snprintf(str, slen, "%d", obj_script_id(o));
+					}
+					else if (!str_cmp(field, "in_obj")) {
+						if (o->in_obj) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(o->in_obj));
+						}
+						else {
+							strcpy(str, "");
+						}
+					}
 
 					else if (!str_cmp(field, "is_flagged")) {
 						if (subfield && *subfield) {
@@ -8495,23 +8539,3 @@ struct cmdlist_element *find_done(struct cmdlist_element *cl) {
 
 	return c;
 }
-
-
-/* read a line in from a file, return the number of chars read */
-int fgetline(FILE *file, char *p) {
-	int count = 0;
-
-	do {
-		*p = fgetc(file);
-		if (*p != '\n' && !feof(file)) {
-			p++;
-			count++;
-		}
-	} while (*p != '\n' && !feof(file));
-
-	if (*p == '\n')
-		*p = '\0';
-
-	return count;
-}
-

@@ -749,8 +749,9 @@ Cost:  (based on amount healed)
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
-seconds until it expires. The amount rejuvenated depends on your your Natural
-Magic level and your Intelligence. The cost depends upon the amount healed.
+seconds until it expires. The amount rejuvenated depends on your Natural Magic
+level and your Intelligence. The cost depends upon the amount healed.
+
 The Bonus-Healing attribute will also add to the amount healed, but won't
 raise the cost.
 

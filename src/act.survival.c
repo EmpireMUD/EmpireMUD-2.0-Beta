@@ -42,6 +42,7 @@ ACMD(do_dismount);
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
+	char *cust;
 	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
@@ -66,19 +67,24 @@ INTERACTION_FUNC(butcher_interact) {
 	if (fillet) {
 		if (!obj_ok) {
 			// obj likely self-purged
-			act("You skillfully butcher the corpse!", FALSE, ch, NULL, NULL, TO_CHAR);
-			act("$n butchers a corpse.", FALSE, ch, NULL, NULL, TO_ROOM);
+			act("You skillfully butcher $P!", FALSE, ch, NULL, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			act("$n butchers $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		else if (interaction->quantity != 1) {
-			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You skillfully butcher $p from $P!", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
 			
-			sprintf(buf, "$n butchers a corpse and gets $p (x%d).", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			sprintf(buf, "%s (x%d)", cust ? cust : "$n butchers $P and gets $p.", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		else {
-			act("You skillfully butcher $p from the corpse!", FALSE, ch, fillet, NULL, TO_CHAR);
-			act("$n butchers a corpse and gets $p.", FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			act(cust ? cust : "You skillfully butcher $p from $P!", FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			act(cust ? cust : "$n butchers $P and gets $p.", FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		return TRUE;
 	}
@@ -216,7 +222,7 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -369,7 +375,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -575,7 +581,7 @@ ACMD(do_butcher) {
 	else if (!has_tool(ch, TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to equip a good knife to butcher with.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse, NULL)) {
 		return;
 	}
 	else {
@@ -689,7 +695,7 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
 		return;
 	}
-	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL)) {
 		return;
 	}
 	
@@ -849,7 +855,7 @@ ACMD(do_track) {
 		msg_to_char(ch, "Track whom? Or what?\r\n");
 		return;
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL, NULL)) {
 		return;
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {

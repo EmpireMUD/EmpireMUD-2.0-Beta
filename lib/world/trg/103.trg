@@ -64,6 +64,7 @@ Flame Dragon delay-completer~
 if %instance.start%
   * Attempt delayed despawn
   %at% %instance.start% %load% o 10316
+  nop %instance.set_location(%instance.start%)%
 else
   %adventurecomplete%
 end
@@ -172,6 +173,7 @@ done
 Dragon Whistle use~
 1 c 2
 use~
+* Deprecated: the whistle now uses trig 9910 instead
 if !%self.is_name(%arg%)%
   return 0
   halt

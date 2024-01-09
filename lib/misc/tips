@@ -156,4 +156,5 @@ Bound items can be stored in your home. See 'help home' for more info.
 You can see more information about an ability by typing 'ability info <name>'.
 You can see buffs and debuffs on other characters by using 'affects' on them.
 You can add other players as friends and see when they're online.
+Dump out a cart quickly with the empty command.
 $~

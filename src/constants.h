@@ -156,6 +156,7 @@ extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
 extern const char *reboot_type[];
 extern const char *version;
+extern const char *DG_SCRIPT_VERSION;
 
 // ability constants
 extern const char *ability_actions[];
@@ -238,6 +239,7 @@ extern const int rev_dir[NUM_OF_DIRS];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const int how_to_show_map[NUM_SIMPLE_DIRS][2];
 extern const int show_map_y_first[NUM_SIMPLE_DIRS];
+extern const char *partial_dirs[][2];
 
 // character constants
 extern const char *affected_bits[];

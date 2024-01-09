@@ -67,7 +67,7 @@ void add_book_to_table(book_data *book) {
 	book_vnum vnum;
 	
 	if (book) {
-		vnum = book->vnum;
+		vnum = BOOK_VNUM(book);
 		HASH_FIND_INT(book_table, &vnum, find);
 		if (!find) {
 			HASH_ADD_INT(book_table, vnum, book);
@@ -89,17 +89,17 @@ obj_data *create_book_obj(book_data *book) {
 	
 	obj = create_obj();
 	
-	set_obj_short_desc(obj, NULLSAFE(book->item_name));
-	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(book->item_name)));
+	set_obj_short_desc(obj, NULLSAFE(BOOK_ITEM_NAME(book)));
+	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(BOOK_ITEM_NAME(book))));
 	set_obj_keywords(obj, buf);
-	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(book->item_name));
+	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(BOOK_ITEM_NAME(book)));
 	set_obj_long_desc(obj, buf);
-	set_obj_look_desc(obj, NULLSAFE(book->item_description), FALSE);
+	set_obj_look_desc(obj, NULLSAFE(BOOK_ITEM_DESC(book)), FALSE);
 	
 	obj->proto_data->type_flag = ITEM_BOOK;
 	GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
 	GET_OBJ_TIMER(obj) = UNLIMITED;
-	set_obj_val(obj, VAL_BOOK_ID, book->vnum);
+	set_obj_val(obj, VAL_BOOK_ID, BOOK_VNUM(book));
 	
 	return obj;
 }
@@ -121,11 +121,11 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 	}
 	
 	CREATE(book, book_data, 1);
-	book->vnum = vnum;
+	BOOK_VNUM(book) = vnum;
 	add_book_to_table(book);
 	
 	// update authors
-	book->author = author;
+	BOOK_AUTHOR(book) = author;
 	add_book_author(author);
 	
 	// save now
@@ -144,33 +144,33 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 * @param book_data *book The book to free.
 */
 void free_book(book_data *book) {
-	book_data *proto = book_proto(book->vnum);
+	book_data *proto = book_proto(BOOK_VNUM(book));
 	struct paragraph_data *para;
-	struct library_data *libr;
+	struct library_data *libr, *next_libr;
 	
-	if (book->title && (!proto || book->title != proto->title)) {
-		free(book->title);
+	if (BOOK_TITLE(book) && (!proto || BOOK_TITLE(book) != BOOK_TITLE(proto))) {
+		free(BOOK_TITLE(book));
 	}
-	if (book->byline && (!proto || book->byline != proto->byline)) {
-		free(book->byline);
+	if (BOOK_BYLINE(book) && (!proto || BOOK_BYLINE(book) != BOOK_BYLINE(proto))) {
+		free(BOOK_BYLINE(book));
 	}
-	if (book->item_name && (!proto || book->item_name != proto->item_name)) {
-		free(book->item_name);
+	if (BOOK_ITEM_NAME(book) && (!proto || BOOK_ITEM_NAME(book) != BOOK_ITEM_NAME(proto))) {
+		free(BOOK_ITEM_NAME(book));
 	}
-	if (book->item_description && (!proto || book->item_description != proto->item_description)) {
-		free(book->item_description);
+	if (BOOK_ITEM_DESC(book) && (!proto || BOOK_ITEM_DESC(book) != BOOK_ITEM_DESC(proto))) {
+		free(BOOK_ITEM_DESC(book));
 	}
 	
-	if (book->in_libraries && (!proto || book->in_libraries != proto->in_libraries)) {
-		while ((libr = book->in_libraries)) {
-			book->in_libraries = libr->next;
+	if (BOOK_IN_LIBRARIES(book) && (!proto || BOOK_IN_LIBRARIES(book) != BOOK_IN_LIBRARIES(proto))) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
+			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
 			free(libr);
 		}
 	}
 	
-	if (book->paragraphs && (!proto || book->paragraphs != proto->paragraphs)) {
-		while ((para = book->paragraphs)) {
-			book->paragraphs = para->next;
+	if (BOOK_PARAGRAPHS(book) && (!proto || BOOK_PARAGRAPHS(book) != BOOK_PARAGRAPHS(proto))) {
+		while ((para = BOOK_PARAGRAPHS(book))) {
+			BOOK_PARAGRAPHS(book) = para->next;
 			if (para->text) {
 				free(para->text);
 			}
@@ -193,10 +193,10 @@ char *list_one_book(book_data *book, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", book->vnum, book->title, book->byline);
+		snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s\t0", book->vnum, book->title);
+		snprintf(output, sizeof(output), "[%5d] %s\t0", BOOK_VNUM(book), BOOK_TITLE(book));
 	}
 	
 	return output;
@@ -221,13 +221,13 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(book->title));
+	snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
 		
 	// pull it from the hash FIRST
 	remove_book_from_table(book);
 	
 	// save without it
-	author = book->author;
+	author = BOOK_AUTHOR(book);
 	save_author_books(author);
 
 	if (ch) {	
@@ -254,7 +254,7 @@ void process_copying_book(char_data *ch) {
 			obj = create_book_obj(book);
 			obj_to_char(obj, ch);
 			
-			msg_to_char(ch, "You finish a fresh copy of %s!\r\n", book->title);
+			msg_to_char(ch, "You finish a fresh copy of %s!\r\n", BOOK_TITLE(book));
 			act("$n finishes copying out $p.", TRUE, ch, obj, NULL, TO_ROOM);
 			if (load_otrigger(obj)) {
 				get_otrigger(obj, ch, FALSE);
@@ -293,70 +293,70 @@ void save_olc_book(descriptor_data *desc) {
 	
 	// have a place to save it?
 	if (!(proto = book_proto(vnum))) {
-		proto = create_book_table_entry(vnum, book->author);
+		proto = create_book_table_entry(vnum, BOOK_AUTHOR(book));
 	}
 	
 	// free prototype strings and pointers
-	if (proto->title) {
-		free(proto->title);
+	if (BOOK_TITLE(proto)) {
+		free(BOOK_TITLE(proto));
 	}
-	if (proto->byline) {
-		free(proto->byline);
+	if (BOOK_BYLINE(proto)) {
+		free(BOOK_BYLINE(proto));
 	}
-	if (proto->item_name) {
-		free(proto->item_name);
+	if (BOOK_ITEM_NAME(proto)) {
+		free(BOOK_ITEM_NAME(proto));
 	}
-	if (proto->item_description) {
-		free(proto->item_description);
+	if (BOOK_ITEM_DESC(proto)) {
+		free(BOOK_ITEM_DESC(proto));
 	}
-	while ((para = proto->paragraphs)) {
+	while ((para = BOOK_PARAGRAPHS(proto))) {
 		if (para->text) {
 			free(para->text);
 		}
-		proto->paragraphs = para->next;
+		BOOK_PARAGRAPHS(proto) = para->next;
 		free(para);
 	}
 	
 	// basic sanitation:
-	if (!book->title) {
-		book->title = str_dup(default_book_title);
+	if (!BOOK_TITLE(book)) {
+		BOOK_TITLE(book) = str_dup(default_book_title);
 	}
-	if (!book->byline) {
-		book->byline = str_dup("Unknown");
+	if (!BOOK_BYLINE(book)) {
+		BOOK_BYLINE(book) = str_dup("Unknown");
 	}
-	if (!book->item_name) {
-		book->item_name = str_dup(default_book_item);
+	if (!BOOK_ITEM_NAME(book)) {
+		BOOK_ITEM_NAME(book) = str_dup(default_book_item);
 	}
-	if (!book->item_description) {
-		book->item_description = str_dup(default_book_desc);
+	if (!BOOK_ITEM_DESC(book)) {
+		BOOK_ITEM_DESC(book) = str_dup(default_book_desc);
 	}
-	for (para = book->paragraphs; para; para = para->next) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		if (!para->text) {
 			para->text = str_dup("Empty paragraph.\r\n");
 		}
 	}
 	
 	// may need to save multiple authors
-	if (book->author != proto->author) {
-		author_change = proto->author;
-		add_book_author(book->author);
+	if (BOOK_AUTHOR(book) != BOOK_AUTHOR(proto)) {
+		author_change = BOOK_AUTHOR(proto);
+		add_book_author(BOOK_AUTHOR(book));
 	}
 	
 	// save library data and move over
-	libr = proto->in_libraries;
-	proto->in_libraries = NULL;
+	libr = BOOK_IN_LIBRARIES(proto);
+	BOOK_IN_LIBRARIES(proto) = NULL;
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	*proto = *book;	// copy data
-	proto->vnum = vnum;	// ensure correct vnum
+	BOOK_VNUM(proto) = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore hash handle
 	
 	// restore libraries
-	proto->in_libraries = libr;
+	BOOK_IN_LIBRARIES(proto) = libr;
 	
 	// and save to file
-	save_author_books(book->author);
+	save_author_books(BOOK_AUTHOR(book));
 	
 	// did we change author ids?
 	if (author_change != -1) {
@@ -382,28 +382,28 @@ book_data *setup_olc_book(book_data *input) {
 		// copy normal data
 		*new = *input;
 		
-		new->title = input->title ? str_dup(input->title) : NULL;
-		new->byline = input->byline ? str_dup(input->byline) : NULL;
-		new->item_name = input->item_name ? str_dup(input->item_name) : NULL;
-		new->item_description = input->item_description ? str_dup(input->item_description) : NULL;
+		BOOK_TITLE(new) = BOOK_TITLE(input) ? str_dup(BOOK_TITLE(input)) : NULL;
+		BOOK_BYLINE(new) = BOOK_BYLINE(input) ? str_dup(BOOK_BYLINE(input)) : NULL;
+		BOOK_ITEM_NAME(new) = BOOK_ITEM_NAME(input) ? str_dup(BOOK_ITEM_NAME(input)) : NULL;
+		BOOK_ITEM_DESC(new) = BOOK_ITEM_DESC(input) ? str_dup(BOOK_ITEM_DESC(input)) : NULL;
 		
 		// don't need this
-		new->in_libraries = NULL;
+		BOOK_IN_LIBRARIES(new) = NULL;
 		
-		new->paragraphs = NULL;
-		for (para = input->paragraphs; para; para = para->next) {
+		BOOK_PARAGRAPHS(new) = NULL;
+		LL_FOREACH(BOOK_PARAGRAPHS(input), para) {
 			CREATE(copy, struct paragraph_data, 1);
 			copy->text = str_dup(para->text);
-			LL_APPEND(new->paragraphs, copy);
+			LL_APPEND(BOOK_PARAGRAPHS(new), copy);
 		}
 	}
 	else {
 		// new!
-		new->vnum = NOTHING;
-		new->title = str_dup(default_book_title);
-		new->byline = NULL;	// will set this soon
-		new->item_name = str_dup(default_book_item);
-		new->item_description = str_dup(default_book_desc);
+		BOOK_VNUM(new) = NOTHING;
+		BOOK_TITLE(new) = str_dup(default_book_title);
+		BOOK_BYLINE(new) = NULL;	// will set this soon
+		BOOK_ITEM_NAME(new) = str_dup(default_book_item);
+		BOOK_ITEM_DESC(new) = str_dup(default_book_desc);
 	}
 		
 	// done
@@ -419,7 +419,7 @@ book_data *setup_olc_book(book_data *input) {
 * @return int Sort instruction of -1, 0, or 1
 */
 int sort_book_table(book_data *a, book_data *b) {
-	return a->vnum - b->vnum;
+	return BOOK_VNUM(a) - BOOK_VNUM(b);
 }
 
 
@@ -433,12 +433,12 @@ int wordcount_book(book_data *book) {
 	int count = 0;
 	struct paragraph_data *para;
 	
-	count += wordcount_string(book->title);
-	count += wordcount_string(book->byline);
-	count += wordcount_string(book->item_name);
-	count += wordcount_string(book->item_description);
+	count += wordcount_string(BOOK_TITLE(book));
+	count += wordcount_string(BOOK_BYLINE(book));
+	count += wordcount_string(BOOK_ITEM_NAME(book));
+	count += wordcount_string(BOOK_ITEM_DESC(book));
 	
-	LL_FOREACH(book->paragraphs, para) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		count += wordcount_string(para->text);
 	}
 	
@@ -470,25 +470,25 @@ void olc_show_book(char_data *ch) {
 	*buf = '\0';
 
 	if (imm) {
-		sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
+		sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	else {
-		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !book_proto(book->vnum) ? "new book" : book_proto(book->vnum)->title);
+		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(book->title, default_book_title), NULLSAFE(book->title));
-	sprintf(buf + strlen(buf), "<%sbyline\t0> %s\r\n", OLC_LABEL_STR(book->byline, ""), NULLSAFE(book->byline));
-	sprintf(buf + strlen(buf), "<%sitem\t0> %s\r\n", OLC_LABEL_STR(book->item_name, default_book_item), NULLSAFE(book->item_name));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(book->item_description, default_book_desc), NULLSAFE(book->item_description));
+	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
+	sprintf(buf + strlen(buf), "<%sbyline\t0> %s\r\n", OLC_LABEL_STR(BOOK_BYLINE(book), ""), NULLSAFE(BOOK_BYLINE(book)));
+	sprintf(buf + strlen(buf), "<%sitem\t0> %s\r\n", OLC_LABEL_STR(BOOK_ITEM_NAME(book), default_book_item), NULLSAFE(BOOK_ITEM_NAME(book)));
+	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(BOOK_ITEM_DESC(book), default_book_desc), NULLSAFE(BOOK_ITEM_DESC(book)));
 	
 	count = 0;
-	for (para = book->paragraphs; para; para = para->next) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++count;
 	}
-	sprintf(buf + strlen(buf), "<%sparagraphs\t0> %d (list, edit, new, delete)\r\n", OLC_LABEL_PTR(book->paragraphs), count);
+	sprintf(buf + strlen(buf), "<%sparagraphs\t0> %d (list, edit, new, delete)\r\n", OLC_LABEL_PTR(BOOK_PARAGRAPHS(book)), count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_VAL(book->author, 0), (book->author != 0 && (index = find_player_index_by_idnum(book->author))) ? index->fullname : "nobody");
+		sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_VAL(BOOK_AUTHOR(book), 0), (BOOK_AUTHOR(book) != 0 && (index = find_player_index_by_idnum(BOOK_AUTHOR(book)))) ? index->fullname : "nobody");
 	}
 	else {
 		sprintf(buf + strlen(buf), "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>\r\n", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
@@ -513,7 +513,7 @@ OLC_MODULE(booked_author) {
 		msg_to_char(ch, "Set the author to who (idnum, name, or nobody)?\r\n");
 	}
 	else if (!str_cmp(argument, "nobody") || !str_cmp(argument, "none")) {
-		book->author = 0;
+		BOOK_AUTHOR(book) = 0;
 		msg_to_char(ch, "You set the book's author to nobody.\r\n");
 	}
 	else if (is_number(argument) && (id = atoi(argument)) >= 0) {
@@ -521,7 +521,7 @@ OLC_MODULE(booked_author) {
 			msg_to_char(ch, "No such player id.\r\n");
 		}
 		else {
-			book->author = id;
+			BOOK_AUTHOR(book) = id;
 			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !index) ? "nobody" : index->fullname);
 		}
 	}
@@ -529,7 +529,7 @@ OLC_MODULE(booked_author) {
 		msg_to_char(ch, "Unable to find character '%s'.\r\n", argument);
 	}
 	else {
-		book->author = index->idnum;
+		BOOK_AUTHOR(book) = index->idnum;
 		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (index->idnum <= 0 || !index->fullname) ? "nobody" : index->fullname, index->idnum);
 	}
 }
@@ -542,7 +542,7 @@ OLC_MODULE(booked_byline) {
 		msg_to_char(ch, "Book bylines may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {
-		olc_process_string(ch, argument, "byline", &(book->byline));
+		olc_process_string(ch, argument, "byline", &BOOK_BYLINE(book));
 	}
 }
 
@@ -554,7 +554,7 @@ OLC_MODULE(booked_item_description) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		start_string_editor(ch->desc, "book item description", &(book->item_description), MAX_ITEM_DESCRIPTION, TRUE);
+		start_string_editor(ch->desc, "book item description", &BOOK_ITEM_DESC(book), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 
@@ -575,7 +575,7 @@ OLC_MODULE(booked_item_name) {
 		msg_to_char(ch, "Book item names must contain a word like 'book' or 'tome'. See HELP BOOKEDIT ITEM.\r\n");
 	}
 	else {
-		olc_process_string(ch, argument, "item name", &(book->item_name));
+		olc_process_string(ch, argument, "item name", &BOOK_ITEM_NAME(book));
 	}
 }
 
@@ -598,7 +598,7 @@ OLC_MODULE(booked_paragraphs) {
 		char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 		int count, from = -1, to = -1;
 		
-		if (!book->paragraphs) {
+		if (!BOOK_PARAGRAPHS(book)) {
 			msg_to_char(ch, "You have not added any paragraphs.\r\n");
 			return;
 		}
@@ -614,7 +614,9 @@ OLC_MODULE(booked_paragraphs) {
 		*buf = '\0';
 		size = 0;
 		
-		for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+		count = 0;
+		LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
+			++count;
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
 				snprintf(line, sizeof(line), "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
 				
@@ -645,11 +647,11 @@ OLC_MODULE(booked_paragraphs) {
 			msg_to_char(ch, "Invalid paragraph number.\r\n");
 		}
 		else {
-			for (para = book->paragraphs; !found && para; para = para->next) {
+		    LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 				if (--num == 0) {
-					found = TRUE;
 					msg_to_char(ch, "NOTE: Each paragraph should be no more than 4 or 5 lines, formatted with /fi\r\n");
 					start_string_editor(ch->desc, "paragraph", &(para->text), MAX_BOOK_PARAGRAPH, FALSE);
+					found = TRUE;
 					break;
 				}
 			}
@@ -679,21 +681,21 @@ OLC_MODULE(booked_paragraphs) {
 		CREATE(new, struct paragraph_data, 1);
 		
 		if (pos == 1) {
-			LL_PREPEND(book->paragraphs, new);
+			LL_PREPEND(BOOK_PARAGRAPHS(book), new);
 			found = TRUE;
 		}
 		else {
 			// find the correct insert position or possibly the end of the list
-			for (para = book->paragraphs; !found && para; para = para->next) {
+			LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 				if (pos != -1 && --pos == 1) {
-					LL_APPEND_ELEM(book->paragraphs, para, new);
+					LL_APPEND_ELEM(BOOK_PARAGRAPHS(book), para, new);
 					found = TRUE;
 					break;
 				}
 			}
 		
 			if (!found) {
-				LL_APPEND(book->paragraphs, new);
+				LL_APPEND(BOOK_PARAGRAPHS(book), new);
 				found = TRUE;
 			}
 		}
@@ -717,15 +719,16 @@ OLC_MODULE(booked_paragraphs) {
 			msg_to_char(ch, "Invalid paragraph position.\r\n");
 		}
 		else {
-			for (para = book->paragraphs; !found && para; para = para->next) {
+			LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 				if (--pos == 0) {
-					LL_DELETE(book->paragraphs, para);
+					LL_DELETE(BOOK_PARAGRAPHS(book), para);
 					if (para->text) {
 						free(para->text);
 					}
 					free(para);
 				
 					found = TRUE;
+					break;
 				}
 			}
 
@@ -750,7 +753,7 @@ OLC_MODULE(booked_title) {
 		msg_to_char(ch, "Book titles may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {
-		olc_process_string(ch, argument, "title", &(book->title));
+		olc_process_string(ch, argument, "title", &BOOK_TITLE(book));
 	}
 }
 
@@ -802,9 +805,9 @@ LIBRARY_SCMD(bookedit_copy) {
 	}
 	else {
 		start_action(ch, ACT_COPYING_BOOK, 12);
-		GET_ACTION_VNUM(ch, 0) = book->vnum;
+		GET_ACTION_VNUM(ch, 0) = BOOK_VNUM(book);
 		
-		msg_to_char(ch, "You pick up a blank book and begin to copy out '%s'.\r\n", book->title);
+		msg_to_char(ch, "You pick up a blank book and begin to copy out '%s'.\r\n", BOOK_TITLE(book));
 		act("$n begins to write out a copy of a book.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
 		// rapido!
@@ -831,7 +834,7 @@ LIBRARY_SCMD(bookedit_delete) {
 		msg_to_char(ch, "No such book.\r\n");
 		return;
 	}
-	if (GET_OLC_BOOK(ch->desc) && GET_OLC_VNUM(ch->desc) == book->vnum) {
+	if (GET_OLC_BOOK(ch->desc) && GET_OLC_VNUM(ch->desc) == BOOK_VNUM(book)) {
 		msg_to_char(ch, "You can't delete that book while you're editing it.\r\n");
 		return;
 	}
@@ -839,7 +842,7 @@ LIBRARY_SCMD(bookedit_delete) {
 	// make sure nobody else is editing it
 	found = FALSE;
 	for (desc = descriptor_list; desc && !found; desc = desc->next) {
-		if (GET_OLC_TYPE(desc) == OLC_BOOK && GET_OLC_VNUM(desc) == book->vnum) {
+		if (GET_OLC_TYPE(desc) == OLC_BOOK && GET_OLC_VNUM(desc) == BOOK_VNUM(book)) {
 			found = TRUE;
 		}
 	}
@@ -851,8 +854,8 @@ LIBRARY_SCMD(bookedit_delete) {
 	}
 	
 	// success!
-	msg_to_char(ch, "You delete the book %s.\r\n", book->title);
-	olc_delete_book(NULL, book->vnum);	// don't pass ch -- prevents OLC messages
+	msg_to_char(ch, "You delete the book %s.\r\n", BOOK_TITLE(book));
+	olc_delete_book(NULL, BOOK_VNUM(book));	// don't pass ch -- prevents OLC messages
 }
 
 
@@ -880,17 +883,17 @@ LIBRARY_SCMD(bookedit_list) {
 	size = snprintf(buf, sizeof(buf), "Books you have written:\r\n");
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author != GET_IDNUM(ch)) {
+		if (BOOK_AUTHOR(book) != GET_IDNUM(ch)) {
 			continue;
 		}
 		
 		if (IS_IMMORTAL(ch)) {
-			sprintf(buf1, "[%5d] ", book->vnum);
+			sprintf(buf1, "[%5d] ", BOOK_VNUM(book));
 		}
 		else {
 			*buf1 = '\0';
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s\t0 (%s\t0)\r\n", buf1, ++count, book->title, book->byline);
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s\t0 (%s\t0)\r\n", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 
 	if (count == 0) {
@@ -956,7 +959,7 @@ LIBRARY_SCMD(bookedit_write) {
 	if (book) {
 		found = FALSE;
 		for (desc = descriptor_list; desc && !found; desc = desc->next) {
-			if (GET_OLC_TYPE(desc) == OLC_BOOK && GET_OLC_VNUM(desc) == book->vnum) {
+			if (GET_OLC_TYPE(desc) == OLC_BOOK && GET_OLC_VNUM(desc) == BOOK_VNUM(book)) {
 				found = TRUE;
 			}
 		}
@@ -974,13 +977,21 @@ LIBRARY_SCMD(bookedit_write) {
 	
 	// was a new book?
 	if (!book) {
-		GET_OLC_BOOK(ch->desc)->vnum = ++top_book_vnum;
-		GET_OLC_BOOK(ch->desc)->byline = str_dup(PERS(ch, ch, TRUE));
-		GET_OLC_BOOK(ch->desc)->author = GET_IDNUM(ch);
+		BOOK_VNUM(GET_OLC_BOOK(ch->desc)) = ++top_book_vnum;
+		if (top_book_vnum < START_PLAYER_BOOKS) {
+			// if it's the first player book, ensure it's not too low in vnum
+			top_book_vnum = START_PLAYER_BOOKS;
+			BOOK_VNUM(GET_OLC_BOOK(ch->desc)) = START_PLAYER_BOOKS;
+		}
+		if (BOOK_BYLINE(GET_OLC_BOOK(ch->desc))) {
+			free(BOOK_BYLINE(GET_OLC_BOOK(ch->desc)));
+		}
+		BOOK_BYLINE(GET_OLC_BOOK(ch->desc)) = str_dup(PERS(ch, ch, TRUE));
+		BOOK_AUTHOR(GET_OLC_BOOK(ch->desc)) = GET_IDNUM(ch);
 	}
 	
 	// ready!
-	GET_OLC_VNUM(ch->desc) = GET_OLC_BOOK(ch->desc)->vnum;
+	GET_OLC_VNUM(ch->desc) = BOOK_VNUM(GET_OLC_BOOK(ch->desc));
 	GET_OLC_TYPE(ch->desc) = OLC_BOOK;
 
 	msg_to_char(ch, "You begin writing a book:\r\n");

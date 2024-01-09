@@ -3585,6 +3585,203 @@ PLAYER_UPDATE_FUNC(b5_188_greatness) {
 }
 
 
+// moves player books to a new vnum range to fix an old problem
+void b5_169_book_move(void) {
+	any_vnum new_vnum, old_vnum;
+	bool found, is_file;
+	int iter;
+	book_data *book, *next_book, *copied;
+	char_data *ch;
+	empire_data *emp, *next_emp;
+	obj_data *obj;
+	room_data *room;
+	player_index_data *index, *next_index;
+	struct author_data *author, *next_author;
+	struct empire_unique_storage *eus;
+	struct library_data *libr, *next_libr;
+	struct trading_post_data *tpd;
+	
+	// list to keep as-is
+	int core_book_list[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 24, 5511, 11862, -1 };	// terminated by -1
+	
+	// helpers for updating existing books
+	struct book_repair_t {
+		any_vnum old;
+		any_vnum new;
+		UT_hash_handle hh;
+	} *book_hash = NULL, *bh, *next_bh;
+	
+	// update all books
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (BOOK_VNUM(book) >= START_PLAYER_BOOKS) {
+			continue;	// skip any already moved/legal
+		}
+		
+		// is it a core book?
+		for (iter = 0, found = FALSE; core_book_list[iter] != -1 && !found; ++iter) {
+			if (BOOK_VNUM(book) == core_book_list[iter]) {
+				found = TRUE;
+			}
+		}
+		if (found) {
+			// skip books on the core list
+			continue;
+		}
+		
+		// ok, going to move the book: determine new vnum
+		old_vnum = BOOK_VNUM(book);
+		new_vnum = ++top_book_vnum;
+		if (top_book_vnum < START_PLAYER_BOOKS) {
+			// if it's the first player book, ensure it's not too low in vnum
+			top_book_vnum = START_PLAYER_BOOKS;
+			new_vnum = START_PLAYER_BOOKS;
+		}
+		
+		// create hash entry (or find?)
+		HASH_FIND_INT(book_hash, &old_vnum, bh);
+		if (!bh) {
+			CREATE(bh, struct book_repair_t, 1);
+			bh->old = old_vnum;
+			HASH_ADD_INT(book_hash, old, bh);
+		}
+		bh->new = new_vnum;
+		
+		// copy book to that location
+		copied = setup_olc_book(book);
+		BOOK_VNUM(copied) = new_vnum;
+		add_book_to_table(copied);
+		
+		// swap in-library data; this will be correct soon
+		BOOK_IN_LIBRARIES(copied) = BOOK_IN_LIBRARIES(book);
+		BOOK_IN_LIBRARIES(book) = NULL;
+		
+		// delete old book
+		remove_book_from_table(book);
+		free_book(book);
+	}
+	
+	// update existing books: world
+	DL_FOREACH(object_list, obj) {
+		if (IS_BOOK(obj)) {
+			old_vnum = GET_BOOK_ID(obj);
+			HASH_FIND_INT(book_hash, &old_vnum, bh);
+			if (bh) {
+				set_obj_val(obj, VAL_BOOK_ID, bh->new);
+			}
+		}
+	}
+	
+	// update existing books: warehouse
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if ((obj = eus->obj) && IS_BOOK(obj)) {
+				old_vnum = GET_BOOK_ID(obj);
+				HASH_FIND_INT(book_hash, &old_vnum, bh);
+				if (bh) {
+					set_obj_val(obj, VAL_BOOK_ID, bh->new);
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				}
+			}
+		}
+	}
+	
+	// update existing books: trading post
+	DL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj) && IS_BOOK(obj)) {
+			old_vnum = GET_BOOK_ID(obj);
+			HASH_FIND_INT(book_hash, &old_vnum, bh);
+			if (bh) {
+				set_obj_val(obj, VAL_BOOK_ID, bh->new);
+			}
+		}
+	}
+	save_trading_post();
+	
+	// update existing books: players
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (!(ch = find_or_load_player(index->name, &is_file))) {
+			continue;
+		}
+		
+		// skip eq: books are not equippable
+		
+		// inventory
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (IS_BOOK(obj)) {
+				old_vnum = GET_BOOK_ID(obj);
+				HASH_FIND_INT(book_hash, &old_vnum, bh);
+				if (bh) {
+					set_obj_val(obj, VAL_BOOK_ID, bh->new);
+				}
+			}
+		}
+		
+		// home storage
+		DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+			if ((obj = eus->obj) && IS_BOOK(obj)) {
+				old_vnum = GET_BOOK_ID(obj);
+				HASH_FIND_INT(book_hash, &old_vnum, bh);
+				if (bh) {
+					set_obj_val(obj, VAL_BOOK_ID, bh->new);
+				}
+			}
+		}
+		
+		// save
+		if (is_file) {
+			store_loaded_char(ch);
+			is_file = FALSE;
+			ch = NULL;
+		}
+		else {
+			queue_delayed_update(ch, CDU_SAVE);
+		}
+	}
+	
+	// and lastly, audit remaining books for invalid library locations
+	HASH_ITER(hh, book_table, book, next_book) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
+			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
+				// invalid location
+				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
+				free(libr);
+			}
+		}
+	}
+	
+	// save all books:
+	save_author_index();
+	HASH_ITER(hh, author_table, author, next_author) {
+		save_author_books(author->idnum);
+	}
+	
+	// free data
+	HASH_ITER(hh, book_hash, bh, next_bh) {
+		HASH_DEL(book_hash, bh);
+		free(bh);
+	}
+}
+
+
+// b5.169 part 2: rename city centers
+void b5_169_city_centers(void) {
+	char buf[256];
+	empire_data *emp, *next_emp;
+	struct empire_city_data *city;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
+				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+				set_room_custom_name(city->location, buf);
+				affect_total_room(city->location);
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3685,6 +3882,8 @@ const struct {
 	{ "b5.165", NULL, b5_165_fight_messages, "Adding new fight messages to players" },
 	{ "b5.166", b5_166_barrier_magentafication, b5_166_player_update, "Updating enchanted walls, abilities, and affects" },
 	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
+	{ "b5.169", b5_169_book_move, NULL, "Renumbering books written by players to resolve vnum conflicts" },
+	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

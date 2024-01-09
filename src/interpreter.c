@@ -143,6 +143,7 @@ ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
+ACMD(do_empty);
 ACMD(do_endwar);
 ACMD(do_enroll);
 ACMD(do_enter);
@@ -635,6 +636,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "empireidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SCMD_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
+	SIMPLE_CMD( "empty", POS_STANDING, do_empty, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
@@ -2036,7 +2038,7 @@ void show_bonus_trait_menu(char_data *ch) {
 	reset = config_get_int("hours_to_bonus_trait_reset");
 	advanced = config_get_int("hours_to_advanced_bonus_traits");
 	
-	msg_to_char(ch, "\r\nBonus Traits:\r\n");
+	msg_to_char(ch, "\r\nBonus Traits (with %d hour%s of play):\r\n", hours, PLURAL(hours));
 	
 	// info section
 	if (first > 0) {
@@ -2052,7 +2054,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, " and another after %d hour%s%s", second, PLURAL(second), (first == 0) ? " of play" : "");
 	}
 	if (reset > 0) {
-		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
+		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after your first %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
 	}
 	else {
 		msg_to_char(ch, ".\r\n");

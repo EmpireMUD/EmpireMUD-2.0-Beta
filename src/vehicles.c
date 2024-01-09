@@ -955,6 +955,10 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 		delete_room_npcs(vrl->room, NULL, TRUE);
 	}
 	
+	// dismantle triggers first -- despawns boards in studies, etc
+	dismantle_vtrigger(NULL, veh, FALSE);
+	vehicle_interior_dismantle_triggers(veh, NULL);
+	
 	// ruins
 	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_to_vehicle_interaction);
 	
@@ -1157,9 +1161,10 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 * Begins the dismantle process on a vehicle including setting its
 * VEH_DISMANTLING flag and its VEH_CONSTRUCTION_ID().
 *
-* @param bool vehicle_data *veh The vehicle to dismantle.
+* @param vehicle_data *veh The vehicle to dismantle.
+* @param char_data *ch Optional: Player who started the dismantle (may be NULL).
 */
-void start_dismantle_vehicle(vehicle_data *veh) {
+void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	struct resource_data *res, *next_res;
 	obj_data *proto;
 	
@@ -1171,6 +1176,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	// clear it out
+	vehicle_interior_dismantle_triggers(veh, ch);
 	fully_empty_vehicle(veh, IN_ROOM(veh));
 	delete_vehicle_interior(veh);
 	
@@ -1307,6 +1313,28 @@ int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_
 
 
 /**
+* Counts vehicles that are owned by the empire in a room. If the room itself
+* is owned, also counts unowned vehicles there.
+*
+* @param room_data *room The room to check.
+* @param empire_data *emp The empire to look for.
+* @return int The number of vehicles there.
+*/
+int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_OWNER(veh) == emp || (!VEH_OWNER(veh) && ROOM_OWNER(room) == emp)) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Unharnesses a mob and loads it back into the game. If it fails to load the
 * mob, it will still remove 'vam' from the animals list.
 *
@@ -1419,6 +1447,23 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow
 	}
 	
 	return ok;
+}
+
+
+/**
+* Runs the dismantle trigger on all interior rooms of a vehicle. This dismantle
+* is not preventable, but is necessary for some rooms, like the Study, which
+* remove unique items during dismantle.
+*
+* @param vehicle_data *veh The vehicle being dismantled.
+* @param char_data *ch Optional: Who started dismantling it (may be NULL).
+*/
+void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch) {
+	struct vehicle_room_list *vrl;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		dismantle_wtrigger(vrl->room, ch, FALSE);
+	}
 }
 
 
@@ -4121,7 +4166,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (IN_ROOM(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "In room: %s, Led by: %s, ", get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
+		size += snprintf(buf + size, sizeof(buf) - size, "In room: [%d] %s, Led by: %s, ", GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Driven by: %s\r\n", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
 	}
@@ -4198,7 +4243,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// script info
-	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(veh) ? veh_script_id(veh) : veh->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", (SCRIPT(veh) && IN_ROOM(veh)) ? veh_script_id(veh) : veh->script_id);
 	if (SCRIPT(veh)) {
 		script_stat(ch, SCRIPT(veh));
 	}

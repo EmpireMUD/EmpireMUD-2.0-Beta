@@ -1712,7 +1712,7 @@ OLC_MODULE(olc_copy) {
 		msg_to_char(ch, "Usage: olc %s copy <from vnum> <to vnum>\r\n", typename);
 		return;
 	}
-	if (!isdigit(*arg) || (from_vnum = atoi(arg)) < 0 || from_vnum > MAX_VNUM) {
+	if (!isdigit(*arg) || (from_vnum = atoi(arg)) < 0 || from_vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
@@ -1935,7 +1935,7 @@ OLC_MODULE(olc_copy) {
 		}
 		case OLC_BOOK: {
 			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(from_vnum));
-			GET_OLC_BOOK(ch->desc)->vnum = vnum;
+			BOOK_VNUM(GET_OLC_BOOK(ch->desc)) = vnum;
 			olc_show_book(ch);
 			break;
 		}
@@ -2099,7 +2099,7 @@ OLC_MODULE(olc_delete) {
 		msg_to_char(ch, "Delete which %s (vnum)?\r\n", typename);
 		return;
 	}
-	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > MAX_VNUM) {
+	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
@@ -2388,7 +2388,7 @@ OLC_MODULE(olc_edit) {
 		msg_to_char(ch, "Edit which %s (vnum)?\r\n", typename);
 		return;
 	}
-	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > MAX_VNUM) {
+	if (!isdigit(*argument) || (vnum = atoi(argument)) < 0 || vnum > (type == OLC_BOOK ? INT_MAX : MAX_VNUM)) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
@@ -2442,7 +2442,7 @@ OLC_MODULE(olc_edit) {
 		case OLC_BOOK: {
 			// this sets up either new or existing automatically
 			GET_OLC_BOOK(ch->desc) = setup_olc_book(book_proto(vnum));
-			GET_OLC_BOOK(ch->desc)->vnum = vnum;
+			BOOK_VNUM(GET_OLC_BOOK(ch->desc)) = vnum;
 			olc_show_book(ch);
 			break;
 		}
@@ -2989,7 +2989,7 @@ OLC_MODULE(olc_list) {
 					if (len >= sizeof(buf)) {
 						break;
 					}
-					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+					if (BOOK_VNUM(book) >= from_vnum && BOOK_VNUM(book) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_book(book, show_details));
 					}
@@ -3730,7 +3730,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_BOOK: {
 				void save_olc_book(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OLC_BOOK(ch->desc)->title));
+				snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(GET_OLC_BOOK(ch->desc))));
 				save_olc_book(ch->desc);
 				// audit_book(GET_OLC_BOOK(ch->desc), ch);
 				free_book(GET_OLC_BOOK(ch->desc));
@@ -4343,7 +4343,7 @@ OLC_MODULE(olc_wordcount) {
 			case OLC_BOOK: {
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
-					if (book->vnum >= from_vnum && book->vnum <= to_vnum) {
+					if (BOOK_VNUM(book) >= from_vnum && BOOK_VNUM(book) <= to_vnum) {
 						++count;
 						wordcount += wordcount_book(book);
 					}
@@ -5524,7 +5524,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 	else if (IS_SET(type, OLC_MAP) && !OLC_FLAGGED(ch, OLC_FLAG_MAP_EDIT)) {
 		return FALSE;
 	}
-	else if (IS_SET(type, OLC_BOOK) && book_proto(vnum) && book_proto(vnum)->author == GET_IDNUM(ch)) {
+	else if (IS_SET(type, OLC_BOOK) && book_proto(vnum) && BOOK_AUTHOR(book_proto(vnum)) == GET_IDNUM(ch)) {
 		// own book
 		return TRUE;
 	}
@@ -6768,6 +6768,10 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 void olc_process_string(char_data *ch, char *argument, const char *name, char **save_point) {
 	if (!*argument) {
 		msg_to_char(ch, "Set its %s to what?\r\n", name);
+	}
+	else if (strlen(argument) >= 255) {
+		// fread_string won't be able to read it beyond this.
+		msg_to_char(ch, "String too long.\r\n");
 	}
 	else {
 		delete_doubledollar(argument);

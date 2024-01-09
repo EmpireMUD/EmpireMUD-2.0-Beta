@@ -37,6 +37,7 @@
 *   Helpers
 *   Languages
 *   Map Memory
+*   Player Wipe
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
 *   Empire Player Management
@@ -4455,13 +4456,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// verify abils}
 	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
-
-	// script/trigger stuff
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "login");
-	greet_mtrigger(ch, NO_DIR, "login");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "login");
 	
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
@@ -4586,6 +4580,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
 	}
+	
+	// script/trigger stuff
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	greet_triggers(ch, NO_DIR, "login", FALSE);
 }
 
 
@@ -5636,6 +5634,59 @@ void write_map_memory(char_data *ch) {
 	
 	fclose(fl);
 	rename(tempname, filename);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER WIPE /////////////////////////////////////////////////////////////
+
+/**
+* Checks for a player wipe (no players exist at startup) and initializes some
+* data.
+*/
+void check_for_player_wipe(void) {
+	account_data *acct, *next_acct;
+	book_data *book, *next_book;
+	struct author_data *author, *next_author;
+	
+	if (player_table_by_idnum) {
+		// players exist -- nothing to do
+		return;
+	}
+	if (data_get_int(DATA_TOP_IDNUM) < 1) {
+		// probably first startup, not a player wipe
+		return;
+	}
+	
+	log("Detected player wipe...");
+	
+	log("  Resetting top idnum");
+	data_set_int(DATA_TOP_IDNUM, 0);
+	
+	log("  Clearing accounts");
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		HASH_DEL(account_table, acct);
+		free_account(acct);
+	}
+	save_index(DB_BOOT_ACCT);
+	
+	log("  Clearing book authors");
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (BOOK_AUTHOR(book) > 1) {
+			BOOK_AUTHOR(book) = 0;
+		}
+	}
+	HASH_ITER(hh, author_table, author, next_author) {
+		if (author->idnum > 1) {
+			HASH_DEL(author_table, author);
+			free(author);
+		}
+	}
+	add_book_author(0);
+	save_author_books(0);
+	save_author_index();
+	
+	log("  Done");
 }
 
 

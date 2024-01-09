@@ -143,8 +143,6 @@ bool block_all_saves_due_to_shutdown = FALSE;	// if TRUE, nothing can be saved t
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
 bool catch_up_actions = FALSE;	// update_actions()
-bool catch_up_mobs = FALSE;		// prevents mobile activity from running repeatedly
-bool caught_up_mobs = FALSE;	// used to ensure mobile activity ran
 
 // vars for detecting slow IPs and preventing repeat-lag
 char **detected_slow_ips = NULL;
@@ -829,7 +827,7 @@ void heartbeat(unsigned long heart_pulse) {
 	free_freeable_dots();
 	HEARTBEAT_LOG("0.5")
 
-	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
+	// this is meant to be slightly longer than the (now-gone) mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
 		script_trigger_check();
 		HEARTBEAT_LOG("1")
@@ -1314,7 +1312,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && IAF(ACT_HEAL)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1577,6 +1575,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
 					}
 					CHECK_NULL(obj, (const char *) obj);
+					dg_arg = (char *) obj;
 					break;
 				}
 				case 'F': {
@@ -4075,16 +4074,9 @@ void game_loop(socket_t mother_desc) {
 		/* Now execute the heartbeat functions */
 		catch_up_combat = TRUE;
 		catch_up_actions = TRUE;
-		catch_up_mobs = TRUE;
-		caught_up_mobs = FALSE;
 		
 		while (missed_pulses--) {
 			heartbeat(++main_game_pulse);
-			
-			// check this and mark mobs as caught up now: this prevents too much mobile_activity when the mud is stalled
-			if (caught_up_mobs) {
-				catch_up_mobs = FALSE;
-			}
 		}
 
 		/* Update tics_passed for deadlock protection */

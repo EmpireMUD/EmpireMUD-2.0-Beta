@@ -963,7 +963,7 @@ ACMD(do_bite) {
 	else if (NOT_MELEE_RANGE(ch, victim)) {
 		msg_to_char(ch, "You need to be at melee range to do this.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_VAMPIRE_BITE, victim, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -1157,7 +1157,7 @@ ACMD(do_boost) {
 	}
 	
 	// check trigs
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BOOST)) {
+	if (ABILITY_TRIGGERS(ch, NULL, NULL, NULL, ABIL_BOOST)) {
 		return;
 	}
 	
@@ -1223,7 +1223,7 @@ ACMD(do_command) {
 		msg_to_char(ch, "If you wish to include your orders in a sentence, you must include the word in that sentence.\r\nFormat: command <target> <command> [sentence including command]\r\n");
 	else if (!CAN_SEE(victim, ch))
 		act("How do you intend to command $M if $E can't even see you?", FALSE, ch, 0, victim, TO_CHAR);
-	else if (ABILITY_TRIGGERS(ch, victim, NULL, ABIL_VAMP_COMMAND)) {
+	else if (ABILITY_TRIGGERS(ch, victim, NULL, NULL, ABIL_VAMP_COMMAND)) {
 		return;
 	}
 	else {

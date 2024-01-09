@@ -72,6 +72,43 @@ struct einv_type {
 };
 
 
+// scan helper
+struct _organize_general_dirs_t {
+	char dir[80];
+	char string[2048];
+	int count;
+	bool full;
+	UT_hash_handle hh;
+} *ogd_hash = NULL, *ogd, *next_ogd;
+
+
+// simple scan sorter
+int _sort_ogd(struct _organize_general_dirs_t *a, struct _organize_general_dirs_t *b) {
+	int a_pos = -1, b_pos = -1;
+	int iter;
+	
+	// empty string
+	if (!*a->dir) {
+		return -1;
+	}
+	else if (!*b->dir) {
+		return 1;
+	}
+	
+	// detect position
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
+		if (a_pos == -1 && (!strcmp(a->dir, partial_dirs[iter][1]) || !strcmp(a->dir, partial_dirs[iter][0]))) {
+			a_pos = iter;
+		}
+		if (b_pos == -1 && (!strcmp(b->dir, partial_dirs[iter][1]) || !strcmp(b->dir, partial_dirs[iter][0]))) {
+			b_pos = iter;
+		}
+	}
+	
+	return a_pos - b_pos;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
@@ -2234,6 +2271,12 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
+	// customize name
+	snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	set_room_custom_name(city->location, buf);
+	affect_total_room(city->location);
+	
 	// move einv here if any is lost
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
@@ -2474,7 +2517,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 
 
 void rename_city(char_data *ch, empire_data *emp, char *argument) {
-	char newname[MAX_INPUT_LENGTH];
+	char newname[MAX_INPUT_LENGTH], buf[256];
 	struct empire_city_data *city;
 
 	half_chop(argument, arg, newname);
@@ -2512,6 +2555,12 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	city->name = str_dup(newname);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	write_city_data_file();
+	
+	// and rename the center
+	snprintf(buf, sizeof(buf), "The Center of %s", newname);	
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	set_room_custom_name(city->location, buf);
+	affect_total_room(city->location);
 }
 
 
@@ -3306,19 +3355,20 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 * @param int max_dist How far to see (e.g. mapsize radius).
 * @param bitvector_t only_in_dirs Optional: Requires that any tiles be in one of the directions listed here as BIT(NORTH), BIT(EAST), etc. Ignored if empty.
+* @param bool organize_general_dirs If TRUE, sorts results into general directions. Otherwise, shows a full tile list.
 */
-void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs) {
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs, bool organize_general_dirs) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
-	char *dir_str;
+	char output[MAX_STRING_LENGTH * 8], line[MAX_STRING_LENGTH], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room, *block_room;
 	size_t size, lsize;
 	crop_data *crop;
-	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
+	bool ok, color, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
 	
 	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
@@ -3331,10 +3381,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	if (!ch->desc) {
 		return;	// don't bother
 	}
+	/* now allowing this with no-arg
 	if (!*argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
+	*/
 	if (!(map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
@@ -3438,7 +3490,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			else if (adventures && find_instance_by_room(room, FALSE, TRUE)) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+			else if (!*argument || multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
@@ -3467,7 +3519,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
 							continue;	// can't see from here
 						}
-						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
+						if (!*argument || !multi_isname(argument, VEH_KEYWORDS(veh))) {
 							continue;
 						}
 					
@@ -3526,11 +3578,17 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		}
 	}
 
-	if (node_list) {
+	if (node_list && !organize_general_dirs) {
+		// default output: full tile list
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
-		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+		}
 		
 		// display and free the nodes
 		total = over_count = 0;
@@ -3595,6 +3653,79 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
 		}
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		page_string(ch->desc, output, TRUE);
+	}
+	else if (node_list && organize_general_dirs) {
+		// optionally organize into general directions
+		
+		sort_territory_from_loc = IN_ROOM(ch);
+	    DL_SORT(node_list, sort_territory_nodes_by_distance);
+		
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+		}
+		
+		// display and free the nodes
+		total = over_count = 0;
+		DL_FOREACH_SAFE(node_list, node, next_node) {
+			total += node->count;
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			// find ogd entry for this direction (or create one)
+			dir_str = get_partial_direction_to(ch, IN_ROOM(ch), node->loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
+			HASH_FIND_STR(ogd_hash, dir_str, ogd);
+			if (!ogd) {
+				CREATE(ogd, struct _organize_general_dirs_t, 1);
+				strcpy(ogd->dir, dir_str);
+				*ogd->string = '\0';
+				HASH_ADD_STR(ogd_hash, dir, ogd);
+			}
+			
+			// general entry
+			color = (++(ogd->count) % 2) ? TRUE : FALSE;
+			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
+			
+			if (lsize + strlen(ogd->string) + 3 < sizeof(ogd->string)) {
+				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
+			}
+			else {
+				ogd->full = TRUE;
+			}
+			
+			// free node
+			DL_DELETE(node_list, node);
+			if (node->details) {
+				free(node->details);
+			}
+			free(node);
+		}
+		
+		// sort directions
+		HASH_SORT(ogd_hash, _sort_ogd);
+		
+		HASH_ITER(hh, ogd_hash, ogd, next_ogd) {
+			lsize = snprintf(line, sizeof(line), "%s: %s%s\r\n", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
+			
+			if (lsize + size + 40 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			
+			// and free
+			HASH_DEL(ogd_hash, ogd);
+			free(ogd);
+		}
+		
+		// space reserved for this
+		if (size < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		}
 		page_string(ch->desc, output, TRUE);
 	}
 	else {
@@ -3792,7 +3923,7 @@ ACMD(do_barde) {
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL, NULL)) {
 		// triggered
 	}
 	else {
@@ -5699,11 +5830,11 @@ ACMD(do_findmaintenance) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
-		else if (find_room && ROOM_OWNER(find_room) != emp) {
+		else if (find_room && ROOM_OWNER(find_room) != emp && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "The empire does not own that location.\r\n");
 			return;
 		}
-		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room))) {
+		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room)) && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "That location needs no maintenance.\r\n");
 			return;
 		}
@@ -5711,9 +5842,24 @@ ACMD(do_findmaintenance) {
 	
 	// player is only checking one room (pre-validated)
 	if (find_room) {
-		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		if (ROOM_OWNER(find_room) == emp && (IS_COMPLETE(find_room) && BUILDING_RESOURCES(find_room))) {
+			old_res = total_list;
+			total_list = combine_resources(total_list, BUILDING_RESOURCES(find_room));
+			free_resource_list(old_res);
+		}
+		DL_FOREACH2(ROOM_VEHICLES(find_room), veh, next_in_room) {
+			if (VEH_OWNER(veh) == emp || (!VEH_OWNER(veh) && ROOM_OWNER(find_room) == emp)) {
+				if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh)) {
+					old_res = total_list;
+					total_list = combine_resources(total_list, VEH_NEEDS_RESOURCES(veh));
+					free_resource_list(old_res);
+				}
+			}
+		}
+		show_resource_list(total_list, partial);
 		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s%s: %s\r\n", get_room_name(find_room, FALSE), coord_display_room(ch, find_room, FALSE), partial);
+		free_resource_list(total_list);
 		return;
 	}
 	
@@ -6376,7 +6522,7 @@ ACMD(do_inspire) {
 	else if (vict && IS_NPC(vict)) {
 		msg_to_char(ch, "You can only inspire other players.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_INSPIRE)) {
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, NULL, ABIL_INSPIRE)) {
 		return;
 	}
 	else {

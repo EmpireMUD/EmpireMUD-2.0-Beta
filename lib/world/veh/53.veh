@@ -3,13 +3,13 @@ post trapper's trappers~
 the trapper's post~
 There is a trapper's post here.~
    The trapper's post is little more than a cabin and some tents surrounded by
-trees. Racks of meat hang in the smoke near the billowing fire and along every
-wall are fresh skins hanging to dry. The pungent smell of the smoking meat and
-drying leather leaves a hollow feeling in your stomach, and your mouth begins
-to water.
+trees. Racks of meat hang in the smoke near the smouldering fire and along
+every wall are fresh skins hanging to dry. The pungent smell of the smoking
+meat and drying leather leaves a hollow feeling in your stomach, and your mouth
+begins to water.
 ~
 @.&g/\@.~
-hmuwF 19 10 0 0 G 0 0 4 w
+hmuwF 19 10 0 0 0 0 0 4 w
 I 30 5006 100.00 1 r  # RUINS-TO-VEH: ruins of #n
 I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I+ 7 7  # Depletion: trapping
@@ -32,11 +32,11 @@ post trapper's trappers collection tents sand-colored colored~
 the trapper's post~
 A collection of sand-colored trapper's tents are set up here.~
    Various snake skins, spotted furs, and other assorted hides hang from hooks
-on the sides of a collection of sandy tents. A smoky fire burns in a pit
+on the sides of a collection of sandy tents. A smoky fire smoulders in a pit
 between the tents. Jerky is slowly drying on racks near the fire.
 ~
 @.&T/\@.~
-hmuwF 19 10 0 0 G 0 0 4 0
+hmuwF 19 10 0 0 0 0 0 4 0
 I 30 5006 100.00 1 r  # RUINS-TO-VEH: ruins of #n
 I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I+ 7 7  # Depletion: trapping
@@ -64,10 +64,10 @@ the trapper's post~
 There is a trapper's post hanging among the vines.~
    The trapper's post is made from a collection of small shacks hanging on the
 sides of the trees, up off of the overgrown jungle floor. The only part of the
-post at ground level is the fire pit.
+post at ground level is the smouldering fire pit pit.
 ~
 @.&G/\@.~
-hmuwFK 19 10 0 0 G 0 0 4 w
+hmuwFK 19 10 0 0 0 0 0 4 w
 I 30 5006 100.00 1 r  # RUINS-TO-VEH: ruins of #n
 I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I+ 7 7  # Depletion: trapping

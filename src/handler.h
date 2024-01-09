@@ -176,6 +176,7 @@ void abandon_room(room_data *room);
 void claim_room(room_data *room, empire_data *emp);
 int count_dropped_items(empire_data *emp, obj_vnum vnum);
 struct empire_political_data *create_relation(empire_data *a, empire_data *b);
+bool empire_has_learned_craft(empire_data *emp, any_vnum vnum);
 int find_rank_by_name(empire_data *emp, char *name);
 struct empire_political_data *find_relation(empire_data *from, empire_data *to);
 struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);
@@ -364,7 +365,7 @@ void remove_minipet(char_data *ch, any_vnum vnum);
 void add_player_tech(char_data *ch, ability_data *abil, int tech);
 bool has_player_tech(char_data *ch, int tech);
 void remove_player_tech(char_data *ch, any_vnum abil);
-bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
+bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict, vehicle_data *vvict);
 
 // requirement handlers
 struct req_data *copy_requirements(struct req_data *from);
@@ -514,8 +515,11 @@ obj_data *perform_remove(char_data *ch, int pos);
 
 // books.c
 book_data *book_proto(book_vnum vnum);
+void dump_library_to_room(room_data *room);
 book_data *find_book_by_author(char *argument, int idnum);
 book_data *find_book_in_library(char *argument, room_data *room);
+book_data *random_lost_book(void);
+void remove_library_from_books(room_vnum location);
 
 // config.c
 bitvector_t config_get_bitvector(char *key);

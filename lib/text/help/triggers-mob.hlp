@@ -146,6 +146,9 @@ specified percentage.
 Note: HitPrcnt triggers attached to charmed mobs will not fire unless the
    trigger also has the Charmed type.
 
+Only the FIRST bitprcnt trigger on a mob will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character this mobile is fighting.
 
@@ -369,8 +372,8 @@ Mobs can trigger on the following events:
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cKill&0 - Triggers when this mob or its ally kills someone here.
-&cAllow-Multiple&0 - For load/death triggers, multiple triggers can run. Put
-  the triggers with this flag first; any trigger without it will end the list.
+&cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
+  triggers with this flag first; any trigger without it will end the list.
 &cCan-Fight&0 - Triggers when someone tries to attack.
 
 For each type, there is a help file named &yMTRIG <type>&0.

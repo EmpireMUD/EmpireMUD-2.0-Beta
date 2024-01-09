@@ -45,7 +45,6 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 // locals
 ACMD(do_exits);
 char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
-char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs);
 
 
@@ -2566,7 +2565,7 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
 
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dist, max_distance;
-	char *dir_str;
+	const char *dir_str;
 	char_data *i, *found = NULL;
 	
 	if (has_player_tech(ch, PTECH_WHERE_UPGRADE)) {
@@ -2753,14 +2752,12 @@ void perform_immort_where(char_data *ch, char *arg) {
 				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
-		num = 0;
 		DL_FOREACH(vehicle_list, veh) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
 				msg_to_char(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
-		num = 0;
 		DL_FOREACH(object_list, k) {
 			if (CAN_SEE_OBJ(ch, k) && multi_isname(arg, GET_OBJ_KEYWORDS(k))) {
 				found = 1;
@@ -2933,6 +2930,7 @@ ACMD(do_mapscan) {
 
 
 ACMD(do_scan) {
+	bool dash_distance = FALSE, plus_distance = FALSE;
 	char arg[MAX_INPUT_LENGTH], new_arg[MAX_INPUT_LENGTH];
 	bitvector_t dir_modifiers = NOBITS;
 	int dir, dist = -1, val;
@@ -2950,14 +2948,26 @@ ACMD(do_scan) {
 			// -dir modifier (or maybe -dist)
 			if (isdigit(*(arg+1))) {
 				dist = atoi(arg+1);
+				dash_distance = TRUE;	// distance with a dash
 			}
 			else if ((val = parse_direction(ch, arg+1)) == NO_DIR) {
 				msg_to_char(ch, "Invalid direction modifier '%s'.\r\n", arg+1);
 				return;
 			}
+			else if (val >= NUM_2D_DIRS) {
+				msg_to_char(ch, "You can't scan that way.\r\n");
+				return;
+			}
 			else {
 				// accept direction modifier
 				dir_modifiers |= BIT(val);
+			}
+		}
+		else if (*arg == '+' && *(arg+1)) {
+			// +dist
+			if (isdigit(*(arg+1))) {
+				dist = atoi(arg+1);
+				plus_distance = TRUE;	// distance with a plus
 			}
 		}
 		else if (isdigit(*arg)) {
@@ -2986,14 +2996,14 @@ ACMD(do_scan) {
 	else if (!*new_arg && dist == -1 && dir_modifiers == NOBITS) {
 		msg_to_char(ch, "Scan which direction or for what type of tile?\r\n");
 	}
-	else if (!*new_arg && (dist >= 0 || dir_modifiers)) {
+	else if (!*new_arg && (dist >= 0 || dir_modifiers) && !dash_distance && !plus_distance) {
 		// normal 'screenreader look' scan with a custom distance
 		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
 	}
-	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR) {
+	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR || (dist >= 0 && (dash_distance || plus_distance))) {
 		// scanning by tile name
 		clear_recent_moves(ch);
-		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
+		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers, dash_distance);
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {

@@ -790,10 +790,10 @@ bool process_import_one(empire_data *emp) {
 	int limit = config_get_int("imports_per_day");
 	bool any = FALSE;
 	obj_data *orn;
-	double cost;
+	double cost, gain;
 	
-	// round to %.1f
-	#define IMPORT_ROUND(amt)  (((int)((amt) * 10)) / 10.0)
+	// round to %.001f
+	#define IMPORT_ROUND(amt)  (round((amt) * 1000.0) / 1000.0)
 	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
@@ -871,10 +871,13 @@ bool process_import_one(empire_data *emp) {
 			// compute cost for this trade (pair->cost is already rate-exchanged)
 			cost = trade_amt * pair->cost;
 			
+			// round off to 0.1 now (up)
+			cost = ceil(cost * 10.0) / 10.0;
+			
 			// can we afford it?
 			if (EMPIRE_COINS(emp) < cost) {
 				trade_amt = EMPIRE_COINS(emp) / pair->cost;	// reduce to how many we can afford
-				cost = trade_amt * pair->cost;
+				cost = ceil(trade_amt * pair->cost * 10.0) / 10.0;
 				if (trade_amt < 1) {
 					continue;	// can't afford any
 				}
@@ -893,7 +896,8 @@ bool process_import_one(empire_data *emp) {
 				
 				// money
 				decrease_empire_coins(emp, emp, cost);
-				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);
+				gain = cost * pair->rate;
+				increase_empire_coins(pair->emp, pair->emp, gain);
 				
 				// update limit
 				limit -= trade_amt;
@@ -903,7 +907,7 @@ bool process_import_one(empire_data *emp) {
 				// log
 				orn = obj_proto(trade->vnum);
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
-				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost * pair->rate);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), gain);
 			}
 		}
 		
@@ -4742,6 +4746,61 @@ char *CAP(char *txt) {
 
 
 /**
+* Converts a number of seconds (or minutes) from a large number to a 0:00
+* format (or 0:00:00 or even 0:00:00:00).
+*
+* @param int seconds How long the time is.
+* @param bool minutes_instead if TRUE, the 'seconds' field is actually minutes and the time returned will be minutes as well.
+* @param char *unlimited_str If the time can be -1/UNLIMITED, returns this string instead (may be NULL).
+* @return char* The time string formatted with colons, or the "unlimited_str" if seconds was -1/UNLIMITED
+*/
+char *colon_time(int seconds, bool minutes_instead, char *unlimited_str) {
+	static char output[256];
+	int minutes, hours, days;
+	
+	// some things using this function allow UNLIMITED as a value
+	if (seconds == UNLIMITED) {
+		return unlimited_str ? unlimited_str : "unlimited";
+	}
+	
+	// multiplier if the unit is minutes
+	if (minutes_instead) {
+		seconds *= SECS_PER_REAL_MIN;
+	}
+	
+	// a negative here would be meaningless
+	seconds = ABSOLUTE(seconds);
+	
+	// compute
+	days = seconds / SECS_PER_REAL_DAY;
+	seconds %= SECS_PER_REAL_DAY;
+	
+	hours = seconds / SECS_PER_REAL_HOUR;
+	seconds %= SECS_PER_REAL_HOUR;
+	
+	minutes = seconds / SECS_PER_REAL_MIN;
+	seconds %= SECS_PER_REAL_MIN;
+	
+	if (days > 0) {
+		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, seconds);
+	}
+	else if (hours > 0) {
+		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, seconds);
+	}
+	else {
+		snprintf(output, sizeof(output), "%d:%02d", minutes, seconds);
+	}
+	
+	// if we started with minutes, shave the seconds off
+	if (minutes_instead && strlen(output) >= 3) {
+		output[strlen(output) - 3] = '\0';
+	}
+	
+	return output;
+}
+
+
+/**
 * Counts the number of chars in a string that are color codes and will be
 * invisible to the player.
 *
@@ -6635,33 +6694,13 @@ int get_direction_to(room_data *from, room_data *to) {
 * @param bool abbrev If TRUE, gets e.g. "ene". If FALSE, gets e.g. "east-northeast".
 * @return char* The string for the direction. May be an empty string if to == from.
 */
-char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
+const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
 	room_data *origin = HOME_ROOM(from), *dest = HOME_ROOM(to);
 	int from_x = X_COORD(origin), from_y = Y_COORD(origin);
 	int to_x = X_COORD(dest), to_y = Y_COORD(dest);
 	int x_diff = to_x - from_x, y_diff = to_y - from_y;
 	int iter;
 	double radians, slope, degrees;
-	
-	char *partial_dirs[][2] = {
-		// counter-clockwise from ENE, ending with E
-		{ "east-northeast", "ene" },
-		{ "northeast", "ne" },
-		{ "north-northeast", "nne" },
-		{ "north", "n" },
-		{ "north-northwest", "nnw" },
-		{ "northwest", "nw" },
-		{ "west-northwest", "wnw" },
-		{ "west", "w" },
-		{ "west-southwest", "wsw" },
-		{ "southwest", "sw" },
-		{ "south-southwest", "ssw" },
-		{ "south", "s" },
-		{ "south-southeast", "sse" },
-		{ "southeast", "se" },
-		{ "east-southeast", "ese" },
-		{ "east", "e" }		// must be last for the iterator to work
-	};
 	
 	// adjust for edges
 	if (WRAP_X) {
@@ -6722,7 +6761,7 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 	
 	// each dir is 22.5 degrees of the circle (11.25 each way)
 	// so we remove that first 11.25 and do East (0 degrees) at the end...
-	for (iter = 0; strcmp(partial_dirs[iter][1], "e"); ++iter) {
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
 		if ((degrees - 11.25) < ((iter + 1) * 22.5)) {
 			// found!
 			return partial_dirs[iter][(abbrev ? 1 : 0)];
@@ -6898,7 +6937,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
+			greet_triggers(ch, NO_DIR, "system", FALSE);
 			msdp_update_room(ch);
 		}
 	}

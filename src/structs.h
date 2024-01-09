@@ -1900,6 +1900,9 @@ typedef enum {
 #define OBJ_CUSTOM_MINE_TO_ROOM  27
 #define OBJ_CUSTOM_CHOP_TO_CHAR  28
 #define OBJ_CUSTOM_CHOP_TO_ROOM  29
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR  30
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM  31
+#define OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM  32
 
 
 // RES_x: resource requirement types
@@ -2767,6 +2770,10 @@ typedef enum {
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
 #define VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM 1	// sent when the vehicle is destroyed by climate flags
+#define VEH_CUSTOM_ENTER_TO_INSIDE  2	// sent inside a vehicle when a player enters
+#define VEH_CUSTOM_ENTER_TO_OUTSIDE  3	// sent outside a vehicle when a player enters
+#define VEH_CUSTOM_EXIT_TO_INSIDE  4	// sent inside a vehicle when a player exits
+#define VEH_CUSTOM_EXIT_TO_OUTSIDE  5	// sent outside a vehicle when a player exits
 
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
@@ -3043,12 +3050,11 @@ typedef enum {
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
-#define MAX_ITEM_DESCRIPTION  4000
+#define MAX_ITEM_DESCRIPTION  8000
 #define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
-#define MAX_OBJ_AFFECT  6
 #define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
 #define MAX_POOF_LENGTH  80
@@ -3060,7 +3066,6 @@ typedef enum {
 #define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
 #define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
 #define MAX_REFERRED_BY_LENGTH  160
-#define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
@@ -4093,14 +4098,14 @@ struct book_data {
 	book_vnum vnum;
 	
 	int author;
-	unsigned int bits;
+	bitvector_t flags;
 	char *title;
 	char *byline;
 	char *item_name;
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
-	struct library_data *in_libraries;	// places this book is kept
+	struct library_data *in_libraries;	// hash of places this book is kept
 	
 	UT_hash_handle hh;	// book_table
 };
@@ -4109,7 +4114,7 @@ struct book_data {
 // linked list of locations the book occurs
 struct library_data {
 	room_vnum location;
-	struct library_data *next;
+	UT_hash_handle hh;	// in_libraries hash
 };
 
 

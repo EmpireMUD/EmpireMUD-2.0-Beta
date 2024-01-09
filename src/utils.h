@@ -18,6 +18,7 @@
 *   Archetype Utils
 *   Augment Utils
 *   Bitvector Utils
+*   Book Utils
 *   Building Utils
 *   Can See Utils
 *   Can See Obj Utils
@@ -244,6 +245,22 @@
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// BOOK UTILS //////////////////////////////////////////////////////////////
+
+#define BOOK_VNUM(book)			((book)->vnum)
+#define BOOK_AUTHOR(book)		((book)->author)
+#define BOOK_BYLINE(book)		((book)->byline)
+#define BOOK_FLAGS(book)		((book)->flags)
+#define BOOK_IN_LIBRARIES(book)	((book)->in_libraries)
+#define BOOK_ITEM_DESC(book)	((book)->item_description)
+#define BOOK_ITEM_NAME(book)	((book)->item_name)
+#define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
+#define BOOK_TITLE(book)		((book)->title)
+
+#define BOOK_FLAGGED(book, flag)	IS_SET(BOOK_FLAGS(book), (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// BUILDING UTILS //////////////////////////////////////////////////////////
 
 #define GET_BLD_VNUM(bld)  ((bld)->vnum)
@@ -438,7 +455,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_SLOWED(ch)  (AFF_FLAGGED((ch), AFF_SLOW) && !AFF_FLAGGED((ch), AFF_HASTE))
-#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && (!GET_BUILDING(IN_ROOM(ch)) || !GET_BUILT_WITH(IN_ROOM(ch))) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? ((GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? PRF_FLAGGED(GET_LEADER(ch), PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -1982,6 +1999,7 @@ sector_data *get_sect_by_name(char *name);
 bool any_isname(const char *str, const char *namelist);
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
+char *colon_time(int seconds, bool minutes_instead, char *unlimited_str);
 char *delete_doubledollar(char *string);
 char *double_map_ampersands(char *icon);;
 const char *double_percents(const char *string);
@@ -2042,7 +2060,7 @@ bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *ne
 int get_depletion_max(room_data *room, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
-char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
+const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
@@ -2095,7 +2113,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon), NULL) == TER_CITY)	// backwards-compatibility
 void load_empire_chat_history(empire_data *emp);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs);
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs, bool organize_general_dirs);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
@@ -2331,6 +2349,7 @@ void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
 
 // friends.c
+int account_friend_status(char_data *ch, char_data *vict);
 void mortlog_friends(char_data *ch, const char *str, ...) __attribute__((format(printf, 2, 3)));
 
 // generic.c
@@ -2391,6 +2410,7 @@ char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 void look_in_direction(char_data *ch, int dir);
+char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))
@@ -2631,10 +2651,11 @@ void process_dismantle_vehicle(char_data *ch);
 void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
-void start_dismantle_vehicle(vehicle_data *veh);
+void start_dismantle_vehicle(vehicle_data *veh, char_data *ch);
 void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room, empire_data *for_empire);
 int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire);
+int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);

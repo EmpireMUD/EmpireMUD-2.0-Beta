@@ -21,6 +21,8 @@ R
 1009 1 5 0
 R
 6000 1 1 0
+U
+1 5108
 Z1 13
 S
 #5201
@@ -139,7 +141,7 @@ S
 Boardwalk~
 A Boardwalk Over the Shallows~
 &a~&0--&a~~
-16 0 dmnos 0
+16 0 dmnops 0
 0 0 0 -1
 E
 boardwalk boards walk shallows sea building around down~
@@ -163,7 +165,7 @@ S
 River Fishery~
 A Fishery on the River~
 &0(&c~~&0)~
-8 0 dnpDL 0
+8 0 dnpD 0
 0 0 0 -1
 C
 fish~
@@ -192,7 +194,7 @@ S
 Lake Fishery~
 A Fishery on the Lake~
 &0(&c~~&0)~
-8 0 dnpDL 0
+8 0 dnpD 0
 0 0 0 -1
 C
 fish~

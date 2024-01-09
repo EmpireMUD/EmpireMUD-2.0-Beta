@@ -837,7 +837,7 @@ VCMD(do_vteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+			greet_triggers(ch, NO_DIR, "script", FALSE);
 			qt_visit_room(ch, IN_ROOM(ch));
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
@@ -867,7 +867,7 @@ VCMD(do_vteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+						greet_triggers(ch, NO_DIR, "script", FALSE);
 						qt_visit_room(ch, IN_ROOM(ch));
 						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
@@ -886,7 +886,7 @@ VCMD(do_vteleport) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+				greet_triggers(ch, NO_DIR, "script", FALSE);
 				qt_visit_room(ch, IN_ROOM(ch));
 				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
@@ -1059,7 +1059,14 @@ VCMD(do_vload) {
 	target = two_arguments(argument, arg1, arg2);
 	skip_spaces(&target);
 
-	if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
+	if (is_abbrev(arg1, "book")) {
+		// special checking for books
+		if (!*arg2 || (!is_number(arg2) && str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
+			veh_log(veh, "vload: bad syntax (book)");
+			return;
+		}
+	}
+	else if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
 		veh_log(veh, "vload: bad syntax");
 		return;
 	}
@@ -1152,7 +1159,101 @@ VCMD(do_vload) {
 				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
 			}
 			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
+				equip_char(tch, object, pos);
+				load_otrigger(object);
+				// get_otrigger(object, tch, FALSE);
+				determine_gear_level(tch);
+				return;
+			}
+			obj_to_char(object, tch);
+			if (load_otrigger(object)) {
+				get_otrigger(object, tch, FALSE);
+			}
+			return;
+		}
+		cnt = get_obj_near_vehicle(veh, arg1);
+		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
+			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+		/* neither char nor container found - just dump it in room */
+		obj_to_room(object, room); 
+		load_otrigger(object);
+		return;
+	}
+	else if (is_abbrev(arg1, "book")) {
+		book_data *book;
+		
+		if (!str_cmp(arg2, "lost")) {
+			book = random_lost_book();
+		}
+		else {
+			book = book_proto(number);
+		}
+		
+		if (!book) {
+			veh_log(veh, "vload: bad book vnum%s", !str_cmp(arg2, "lost") ? " - no lost books" : "");
+			return;
+		}
+		
+		object = create_book_obj(book);
+		
+		if (inst) {
+			instance_obj_setup(inst, object);
+		}
+
+		/* special handling to make objects able to load on a person/in a container/worn etc. */
+		if (!target || !*target) {
+			obj_to_room(object, room);
+		
+			// must scale now if possible
+			scale_item_to_level(object, VEH_SCALE_LEVEL(veh));
+
+			load_otrigger(object);
+			return;
+		}
+		target = two_arguments(target, arg1, arg2); /* recycling ... */
+		skip_spaces(&target);
+		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = room;
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(room, arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
+		// if there is still a target, we scale on that number, otherwise default scale
+		if (*target && isdigit(*target)) {
+			scale_item_to_level(object, atoi(target));
+		}
+		else {
+			// default
+			scale_item_to_level(object, VEH_SCALE_LEVEL(veh));
+		}
+		
+		if (in_room) {	// targeting room
+			obj_to_room(object, in_room); 
+			load_otrigger(object);
+		}
+		
+		tch = get_char_near_vehicle(veh, arg1);
+		if (tch) {
+			// mark as "gathered" like a resource
+			if (!IS_NPC(tch) && GET_LOYALTY(tch)) {
+				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
+			}
+			
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
 				// get_otrigger(object, tch, FALSE);

@@ -538,9 +538,11 @@ liquifies like metal and then can be forged into powerful weapons and armor.
 You can light the unforged dragonsteel ingot on fire to return it to its
 original dragon bone state.
 ~
-3 e a 0 0 8
+3 e a 0 0 9
 0 0 0
 14 0
+C
+100 100
 I 11 10903 100.00 1 x  # LIGHT: colossal dragon bone
 O+ 1 6760
 R

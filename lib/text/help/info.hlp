@@ -1318,7 +1318,8 @@ You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list, or you can specify search terms.
 
 Nearby has a default range of 50 tiles. Some buildings, items, and effects can
-increase this.
+increase this. When used on a newbie island, it only shows locations on the
+island.
 
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
@@ -1547,6 +1548,7 @@ Usage:  scan <direction>
         scan <tile/vehicle name>
         scan <claimed/unclaimed/foreign/adventures>
         scan [max-distance] [-direction]
+        scan <-distance | +distance>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
@@ -1566,6 +1568,12 @@ All scans may include the max-distance and -direction modifiers. This lets you
 specify a shorter distance, such as "scan 1" or "scan forest 3", or filter a
 specific direction from a larger scan, such as "scan forest -east". This is
 different from scanning in a direction with "scan east".
+
+When scanning just by max-distance, a plus in front of the distance ("scan +2")
+will show all tiles within that distance individually; distance with a dash
+("scan -2") will show all tiles organized into approxiate directions. A
+distance without the dash or plus ("scan 2") will do a normal 8-direction scan
+showing each direction up to that distance.
 
 Example:
  > scan southwest
