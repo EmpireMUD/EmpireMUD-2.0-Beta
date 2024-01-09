@@ -4098,7 +4098,7 @@ struct book_data {
 	book_vnum vnum;
 	
 	int author;
-	unsigned int bits;
+	bitvector_t flags;
 	char *title;
 	char *byline;
 	char *item_name;

@@ -5511,11 +5511,11 @@ SHOW(show_author) {
 		
 		count = 0;
 		HASH_ITER(hh, book_table, book, next_book) {
-			if (book->author != idnum) {
+			if (BOOK_AUTHOR(book) != idnum) {
 				continue;
 			}
 			
-			snprintf(line, sizeof(line), "[%7d] %s\r\n", book->vnum, book->title);
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 			
 			if (size + strlen(line) < sizeof(output)) {
 				strcat(output, line);
@@ -5943,10 +5943,10 @@ SHOW(show_libraries) {
 		msg_to_char(ch, "No such book %d.\r\n", atoi(arg));
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", book->vnum, book->title);
+		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
-		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
 			if (!(room = real_room(libr->location))) {
 				continue;
 			}
@@ -5986,11 +5986,11 @@ SHOW(show_lost_books) {
 	
 	count = 0;
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->in_libraries) {
+		if (BOOK_IN_LIBRARIES(book)) {
 			continue;
 		}
 		
-		snprintf(line, sizeof(line), "[%7d] %s\r\n", book->vnum, book->title);
+		snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
@@ -6628,19 +6628,21 @@ void do_stat_book(char_data *ch, book_data *book) {
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", book->title);
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", book->byline);
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", BOOK_TITLE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", BOOK_BYLINE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", BOOK_ITEM_NAME(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", BOOK_ITEM_DESC(book));	// desc has its own crlf
 	
 	// precompute number of paragraphs
 	num = 0;
-	for (para = book->paragraphs; para; para = para->next) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++num;
 	}
 	
-	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+	count = 0;
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
+		++count;
 		txt = para->text;
 		skip_spaces(&txt);
 		len = strlen(txt);
@@ -7441,7 +7443,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
@@ -8188,8 +8190,8 @@ int vnum_book(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
-			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
+		if (multi_isname(searchname, BOOK_TITLE(book)) || multi_isname(searchname, BOOK_BYLINE(book))) {
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 		}
 	}
 

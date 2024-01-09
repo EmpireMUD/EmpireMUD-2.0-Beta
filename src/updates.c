@@ -3613,13 +3613,13 @@ void b5_169_book_move(void) {
 	
 	// update all books
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->vnum >= START_PLAYER_BOOKS) {
+		if (BOOK_VNUM(book) >= START_PLAYER_BOOKS) {
 			continue;	// skip any already moved/legal
 		}
 		
 		// is it a core book?
 		for (iter = 0, found = FALSE; core_book_list[iter] != -1 && !found; ++iter) {
-			if (book->vnum == core_book_list[iter]) {
+			if (BOOK_VNUM(book) == core_book_list[iter]) {
 				found = TRUE;
 			}
 		}
@@ -3629,7 +3629,7 @@ void b5_169_book_move(void) {
 		}
 		
 		// ok, going to move the book: determine new vnum
-		old_vnum = book->vnum;
+		old_vnum = BOOK_VNUM(book);
 		new_vnum = ++top_book_vnum;
 		if (top_book_vnum < START_PLAYER_BOOKS) {
 			// if it's the first player book, ensure it's not too low in vnum
@@ -3648,12 +3648,12 @@ void b5_169_book_move(void) {
 		
 		// copy book to that location
 		copied = setup_olc_book(book);
-		copied->vnum = new_vnum;
+		BOOK_VNUM(copied) = new_vnum;
 		add_book_to_table(copied);
 		
 		// swap in-library data; this will be correct soon
-		copied->in_libraries = book->in_libraries;
-		book->in_libraries = NULL;
+		BOOK_IN_LIBRARIES(copied) = BOOK_IN_LIBRARIES(book);
+		BOOK_IN_LIBRARIES(book) = NULL;
 		
 		// delete old book
 		remove_book_from_table(book);
@@ -3740,10 +3740,10 @@ void b5_169_book_move(void) {
 	
 	// and lastly, audit remaining books for invalid library locations
 	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
 			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
 				// invalid location
-				HASH_DEL(book->in_libraries, libr);
+				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
 				free(libr);
 			}
 		}

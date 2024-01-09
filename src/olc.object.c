@@ -2234,7 +2234,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? BOOK_TITLE(book) : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {

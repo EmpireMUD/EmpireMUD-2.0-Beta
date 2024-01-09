@@ -1721,8 +1721,8 @@ void check_for_new_map(void) {
 	
 	// clear libraries (they were lost in the map wipe)
 	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
-			HASH_DEL(book->in_libraries, libr);
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
+			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
 			free(libr);
 		}
 	}

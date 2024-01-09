@@ -18,6 +18,7 @@
 *   Archetype Utils
 *   Augment Utils
 *   Bitvector Utils
+*   Book Utils
 *   Building Utils
 *   Can See Utils
 *   Can See Obj Utils
@@ -241,6 +242,22 @@
 
 #define PLR_TOG_CHK(ch,flag)  ((TOGGLE_BIT(PLR_FLAGS(ch), (flag))) & (flag))
 #define PRF_TOG_CHK(ch,flag)  ((TOGGLE_BIT(PRF_FLAGS(ch), (flag))) & (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BOOK UTILS //////////////////////////////////////////////////////////////
+
+#define BOOK_VNUM(book)			((book)->vnum)
+#define BOOK_AUTHOR(book)		((book)->author)
+#define BOOK_BYLINE(book)		((book)->byline)
+#define BOOK_FLAGS(book)		((book)->flags)
+#define BOOK_IN_LIBRARIES(book)	((book)->in_libraries)
+#define BOOK_ITEM_DESC(book)	((book)->item_description)
+#define BOOK_ITEM_NAME(book)	((book)->item_name)
+#define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
+#define BOOK_TITLE(book)		((book)->title)
+
+#define BOOK_FLAGGED(book, flag)	IS_SET(BOOK_FLAGS(book), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////

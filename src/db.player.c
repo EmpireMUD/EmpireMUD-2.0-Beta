@@ -5672,8 +5672,8 @@ void check_for_player_wipe(void) {
 	
 	log("  Clearing book authors");
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author > 1) {
-			book->author = 0;
+		if (BOOK_AUTHOR(book) > 1) {
+			BOOK_AUTHOR(book) = 0;
 		}
 	}
 	HASH_ITER(hh, author_table, author, next_author) {

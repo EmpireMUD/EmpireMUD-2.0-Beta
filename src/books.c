@@ -106,7 +106,7 @@ void dump_library_to_room(room_data *room) {
 	struct library_data *libr;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
 		if (libr) {
 			// found a book
 			obj = create_book_obj(book);
@@ -133,7 +133,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 	sprintf(buf2, "book #%d", vnum);
 	
 	CREATE(book, book_data, 1);
-	book->vnum = vnum;
+	BOOK_VNUM(book) = vnum;
 	add_book_to_table(book);
 	
 	top_book_vnum = MAX(top_book_vnum, vnum);
@@ -148,27 +148,27 @@ void parse_book(FILE *fl, book_vnum vnum) {
 		exit(1);
 	}
 	else {
-		book->author = lvar[0];
+		BOOK_AUTHOR(book) = lvar[0];
 		add_book_author(lvar[0]);
 		
-		book->bits |= asciiflag_conv(astr);
+		BOOK_FLAGS(book) |= asciiflag_conv(astr);
 	}
 
 	// several strings in a row
-	if ((book->title = fread_string(fl, buf2)) == NULL) {
-		book->title = str_dup("Untitled");
+	if ((BOOK_TITLE(book) = fread_string(fl, buf2)) == NULL) {
+		BOOK_TITLE(book) = str_dup("Untitled");
 	}
 	
-	if ((book->byline = fread_string(fl, buf2)) == NULL) {
-		book->byline = str_dup("Anonymous");
+	if ((BOOK_BYLINE(book) = fread_string(fl, buf2)) == NULL) {
+		BOOK_BYLINE(book) = str_dup("Anonymous");
 	}
 	
-	if ((book->item_name = fread_string(fl, buf2)) == NULL ) {
-		book->item_name = str_dup("a book");
+	if ((BOOK_ITEM_NAME(book) = fread_string(fl, buf2)) == NULL ) {
+		BOOK_ITEM_NAME(book) = str_dup("a book");
 	}
 	
-	if ((book->item_description = fread_string(fl, buf2)) == NULL) {
-		book->item_description = str_dup("It appears to be a book.\r\n");
+	if ((BOOK_ITEM_DESC(book) = fread_string(fl, buf2)) == NULL) {
+		BOOK_ITEM_DESC(book) = str_dup("It appears to be a book.\r\n");
 	}
 			
 	// extra data
@@ -182,7 +182,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				CREATE(para, struct paragraph_data, 1);
 				
 				if ((para->text = fread_string(fl, buf2)) != NULL) {
-				    LL_APPEND(book->paragraphs, para);
+				    LL_APPEND(BOOK_PARAGRAPHS(book), para);
 				}
 				else {
 					// oops
@@ -195,7 +195,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				if (real_room(room)) {
 					CREATE(libr, struct library_data, 1);
 					libr->location = room;
-					HASH_ADD_INT(book->in_libraries, location, libr);
+					HASH_ADD_INT(BOOK_IN_LIBRARIES(book), location, libr);
 				}
 				
 				break;
@@ -239,27 +239,27 @@ void save_author_books(int idnum) {
 	}
 
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author == idnum) {
-			strcpy(temp, NULLSAFE(book->item_description));
+		if (BOOK_AUTHOR(book) == idnum) {
+			strcpy(temp, NULLSAFE(BOOK_ITEM_DESC(book)));
 			strip_crlf(temp);
 		
 			fprintf(fl, "#%d\n"
-						"%d %u\n"
+						"%d %s\n"
 						"%s~\n"
 						"%s~\n"
 						"%s~\n"
 						"%s~\n",
-						book->vnum, book->author, book->bits, book->title, book->byline, book->item_name, temp);
+						BOOK_VNUM(book), BOOK_AUTHOR(book), bitv_to_alpha(BOOK_FLAGS(book)), BOOK_TITLE(book), BOOK_BYLINE(book), BOOK_ITEM_NAME(book), temp);
 			
 			// 'P': paragraph
-			for (para = book->paragraphs; para; para = para->next) {
+			LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 				strcpy(temp, NULLSAFE(para->text));
 				strip_crlf(temp);
 				fprintf(fl, "P\n%s~\n", temp);
 			}
 			
 			// 'L': library
-			HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+			HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
 				fprintf(fl, "L %d\n", libr->location);
 			}
 			
@@ -285,13 +285,13 @@ book_data *random_lost_book(void) {
 	int count = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author != 0 && book->in_libraries) {
+		if (BOOK_AUTHOR(book) != 0 && BOOK_IN_LIBRARIES(book)) {
 			continue;	// not lost
 		}
-		if (!book->paragraphs) {
+		if (!BOOK_PARAGRAPHS(book)) {
 			continue;	// skip empty book
 		}
-		if (!book->title || !strcmp(book->title, default_book_title)) {
+		if (!BOOK_TITLE(book) || !strcmp(BOOK_TITLE(book), default_book_title)) {
 			continue;	// skip default title
 		}
 		
@@ -316,10 +316,10 @@ void remove_library_from_books(room_vnum location) {
 	struct vnum_hash *vhash = NULL, *vh, *next_vh;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
 			if (libr->location == location) {
-				add_vnum_hash(&vhash, book->author, 1);
-				HASH_DEL(book->in_libraries, libr);
+				add_vnum_hash(&vhash, BOOK_AUTHOR(book), 1);
+				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
 				free(libr);
 			}
 		}
@@ -380,14 +380,14 @@ book_data *find_book_in_library(char *argument, room_data *room) {
 	
 	// find by number or name
 	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, book->in_libraries, libr, next_libr) {
+		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
 			if (libr->location == GET_ROOM_VNUM(room)) {
 				if (num != NOTHING && --num == 0) {
 					// found by number!
 					found = book;
 					break;	// only needed 1
 				}
-				else if (is_abbrev(argument, book->title)) {
+				else if (is_abbrev(argument, BOOK_TITLE(book))) {
 					// title match
 					if (num == NOTHING) {
 						found = book;
@@ -425,13 +425,13 @@ book_data *find_book_by_author(char *argument, int idnum) {
 	
 	// find by number or name
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (book->author == idnum) {
+		if (BOOK_AUTHOR(book) == idnum) {
 			if (num != NOTHING && --num == 0) {
 				// found by number!
 				found = book;
 				break;
 			}
-			else if (is_abbrev(argument, book->title)) {
+			else if (is_abbrev(argument, BOOK_TITLE(book))) {
 				// title match
 				if (num == NOTHING) {
 					found = book;
@@ -482,9 +482,9 @@ LIBRARY_SCMD(library_browse) {
 		sprintf(buf, "Books shelved here:\r\n");
 	
 		HASH_ITER(hh, book_table, book, next_book) {
-			HASH_FIND_INT(book->in_libraries, &loc, libr);
+			HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
 			if (libr) {
-				sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, book->title, book->byline);
+				sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 			}
 		}
 	
@@ -516,7 +516,7 @@ LIBRARY_SCMD(library_checkout) {
 		obj = create_book_obj(book);
 		obj_to_char(obj, ch);
 		
-		msg_to_char(ch, "You find a copy of %s on the shelf and take it.\r\n", book->title);
+		msg_to_char(ch, "You find a copy of %s on the shelf and take it.\r\n", BOOK_TITLE(book));
 		act("$n picks up $p off a shelf.", TRUE, ch, obj, NULL, TO_ROOM);
 		if (load_otrigger(obj)) {
 			get_otrigger(obj, ch, FALSE);
@@ -537,7 +537,7 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 		return 0;
 	}
 	else {
-		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
 		if (libr) {
 			found = TRUE;
 		}
@@ -546,10 +546,10 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 			// not already in the library
 			CREATE(libr, struct library_data, 1);
 			libr->location = GET_ROOM_VNUM(IN_ROOM(ch));
-			HASH_ADD_INT(book->in_libraries, location, libr);
+			HASH_ADD_INT(BOOK_IN_LIBRARIES(book), location, libr);
 			
 			// save new locations
-			save_author_books(book->author);
+			save_author_books(BOOK_AUTHOR(book));
 		}
 	
 		act("You shelve $p.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -663,16 +663,16 @@ LIBRARY_SCMD(library_burn) {
 	}
 	else {
 		loc = GET_ROOM_VNUM(IN_ROOM(ch));
-		HASH_FIND_INT(book->in_libraries, &loc, libr);
+		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
 		if (libr) {
-			HASH_DEL(book->in_libraries, libr);
+			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
 			free(libr);
 		}
 
-		save_author_books(book->author);
+		save_author_books(BOOK_AUTHOR(book));
 		
-		msg_to_char(ch, "You take all the copies of %s from the shelves and burn them behind the library!\r\n", book->title);
-		sprintf(buf, "$n takes all the copies of %s from the shelves and burn them behind the library!", book->title);
+		msg_to_char(ch, "You take all the copies of %s from the shelves and burn them behind the library!\r\n", BOOK_TITLE(book));
+		sprintf(buf, "$n takes all the copies of %s from the shelves and burn them behind the library!", BOOK_TITLE(book));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
@@ -822,7 +822,7 @@ void read_book(char_data *ch, obj_data *obj) {
 		start_action(ch, ACT_READING, 0);
 		GET_ACTION_VNUM(ch, 0) = GET_BOOK_ID(obj);
 		
-		msg_to_char(ch, "You start to read '%s', by %s.\r\n", book->title, book->byline);
+		msg_to_char(ch, "You start to read '%s', by %s.\r\n", BOOK_TITLE(book), BOOK_BYLINE(book));
 		act("$n begins to read $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		
 		// ensure binding
@@ -869,10 +869,11 @@ void process_reading(char_data *ch) {
 		pos = (GET_ACTION_TIMER(ch) / 4);
 
 		found = FALSE;
-		for (para = book->paragraphs; para && !found; para = para->next) {
+		LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 			if (--pos == 0) {
-				found = TRUE;
 				msg_to_char(ch, "You read:\r\n%s", para->text);
+				found = TRUE;
+				break;
 			}
 		}
 		
