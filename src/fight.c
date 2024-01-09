@@ -2970,6 +2970,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			die(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh));
 		}
 		
+		vehicle_interior_dismantle_triggers(veh, NULL);
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh, NULL);
 		vehicle_to_room(veh, get_extraction_room());	// put it here temporarily

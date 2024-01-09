@@ -49,7 +49,6 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void clear_vehicle(vehicle_data *veh);
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
-void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -955,6 +954,9 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 		delete_room_npcs(vrl->room, NULL, TRUE);
 	}
+	
+	// dismantle triggers first -- despawns boards in studies, etc
+	vehicle_interior_dismantle_triggers(veh, NULL);
 	
 	// ruins
 	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_to_vehicle_interaction);
