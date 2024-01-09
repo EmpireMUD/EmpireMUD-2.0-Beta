@@ -1158,6 +1158,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Speed: %s\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	}
 	
+	if (VEH_CAPACITY(veh) > 0) {
+		msg_to_char(ch, "Capacity: %d/%d\r\n", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
+	}
+	
 	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
 		msg_to_char(ch, "Dedicated to: %s\r\n", index->fullname);
 	}
