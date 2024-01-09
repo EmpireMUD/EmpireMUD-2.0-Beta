@@ -5672,7 +5672,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 		strcpy(part, "immediate");
 	}
 	else {
-		sprintf(part, "%d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(part, "%d minutes (%s)", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
@@ -5743,7 +5743,7 @@ void olc_show_quest(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> immediately\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
@@ -5912,7 +5912,7 @@ OLC_MODULE(qedit_repeat) {
 	}
 	else if (isdigit(*argument)) {
 		QUEST_REPEATABLE_AFTER(quest) = olc_process_number(ch, argument, "repeatable after", "repeat", 0, MAX_INT, QUEST_REPEATABLE_AFTER(quest));
-		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now repeats after %d minutes (%s).\r\n", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid repeat interval.\r\n");

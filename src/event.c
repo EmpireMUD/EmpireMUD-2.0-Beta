@@ -2458,9 +2458,9 @@ void do_stat_event(char_data *ch, event_data *event) {
 		strcpy(part, "never");	// 0 is not a valid repeat time, unlike quests
 	}
 	else {
-		sprintf(part, "%d minutes (%d:%02d:%02d)", EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		sprintf(part, "%d minutes (%s)", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%d:%02d:%02d)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
 	
 	if (EVT_MAX_POINTS(event) > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tc%d\t0]\r\n", EVT_MAX_POINTS(event));
@@ -2516,13 +2516,13 @@ void olc_show_event(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60));
+	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE || EVT_REPEATS_AFTER(event) == 0) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
 	}
 	else if (EVT_REPEATS_AFTER(event) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	
 	if (EVT_MAX_POINTS(event) > 0) {
@@ -2907,7 +2907,7 @@ OLC_MODULE(evedit_duration) {
 	}
 	else if (isdigit(*argument)) {
 		EVT_DURATION(event) = olc_process_number(ch, argument, "duration", "duration", 1, MAX_INT, EVT_DURATION(event));
-		msg_to_char(ch, "It now runs for %d minutes (%d:%02d:%02d).\r\n", EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now runs for %d minutes (%s).\r\n", EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid duration.\r\n");
@@ -3001,7 +3001,7 @@ OLC_MODULE(evedit_repeat) {
 	}
 	else if (isdigit(*argument)) {
 		EVT_REPEATS_AFTER(event) = olc_process_number(ch, argument, "repeats after", "repeat", 0, MAX_INT, EVT_REPEATS_AFTER(event));
-		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now repeats after %d minutes (%s).\r\n", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid repeat interval.\r\n");

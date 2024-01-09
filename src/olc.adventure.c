@@ -751,7 +751,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 				break;
 			}
 			case ADV_LINK_TIME_LIMIT: {
-				sprintf(lbuf, "expires after %d minutes (%d:%02d:%02d)", rule->value, (rule->value / (60 * 24)), ((rule->value % (60 * 24)) / 60), ((rule->value % (60 * 24)) % 60));
+				sprintf(lbuf, "expires after %d minutes (%s)", rule->value, colon_time(rule->value, TRUE, NULL));
 				break;
 			}
 			case ADV_LINK_NOT_NEAR_SELF: {
@@ -835,7 +835,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 void olc_show_adventure(char_data *ch) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
-	int time;
 	
 	if (!adv) {
 		return;
@@ -862,20 +861,13 @@ void olc_show_adventure(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%splayerlimit\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper
-	if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
-		time = GET_ADV_RESET_TIME(adv) - (GET_ADV_RESET_TIME(adv) / (60 * 24));
-		sprintf(lbuf, " (%2d:%02d:%02d)", (GET_ADV_RESET_TIME(adv) / (60 * 24)), (time / 60), (time % 60));
-	}
-	else if (GET_ADV_RESET_TIME(adv) > 60) {
-		sprintf(lbuf, " (%2d:%02d)", (GET_ADV_RESET_TIME(adv) / 60), (GET_ADV_RESET_TIME(adv) % 60));
-	}
-	else if (GET_ADV_RESET_TIME(adv) <= 0) {
+	if (GET_ADV_RESET_TIME(adv) <= 0) {
 		strcpy(lbuf, " (never)");
 	}
 	else {
-		*lbuf = '\0';
+		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
-	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes%s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
+	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes %s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
 
 	sprintf(buf + strlen(buf), "Linking rules: <%slinking\t0>\r\n", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {

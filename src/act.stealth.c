@@ -152,7 +152,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	
 	timediff = (death_penalty_time * SECS_PER_REAL_MIN) - (time(0) - get_last_killed_by_empire(ch, emp));
 	if (death_penalty_time && get_last_killed_by_empire(ch, emp) && timediff > 0) {
-		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%d:%02d remain).\r\n", EMPIRE_NAME(emp), (int)(timediff / 60), (int)(timediff % 60));
+		msg_to_char(ch, "You cannot steal from %s because they have killed you too recently (%s remain).\r\n", EMPIRE_NAME(emp), colon_time(timediff, FALSE, NULL));
 		return FALSE;
 	}
 	

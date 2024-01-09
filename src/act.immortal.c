@@ -6576,7 +6576,6 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 */
 void do_stat_adventure(char_data *ch, adv_data *adv) {
 	char lbuf[MAX_STRING_LENGTH];
-	int time;
 	
 	if (!adv) {
 		return;
@@ -6591,12 +6590,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	if (GET_ADV_RESET_TIME(adv) == 0) {
 		strcpy(lbuf, "never");
 	}
-	else if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
-		time = GET_ADV_RESET_TIME(adv) - (GET_ADV_RESET_TIME(adv) / (60 * 24));
-		sprintf(lbuf, "%d:%02d:%02d", (GET_ADV_RESET_TIME(adv) / (60 * 24)), (time / 60), (time % 60));
-	}
 	else if (GET_ADV_RESET_TIME(adv) > 60) {
-		sprintf(lbuf, "%2d:%02d", (GET_ADV_RESET_TIME(adv) / 60), (GET_ADV_RESET_TIME(adv) % 60));
+		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
 	else {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
@@ -6969,7 +6964,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
@@ -6994,12 +6989,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(lbuf, colon_time(duration, FALSE, NULL));
 			}
 
 			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
@@ -7022,8 +7012,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		sprintf(lbuf, "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -7082,7 +7071,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%s&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 	else {
 		msg_to_char(ch, "\r\n");
@@ -7400,7 +7389,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);
+		snprintf(part, sizeof(part), "%d tick%s (%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL));
 	}
 	else {
 		strcpy(part, "none");
@@ -7992,12 +7981,7 @@ void do_stat_room(char_data *ch) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(buf3, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(buf3, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(buf3, colon_time(duration, FALSE, NULL));
 			}
 
 			sprintf(buf, "Affect: (%s) &c%s&0", buf3, get_generic_name_by_vnum(aff->type));
