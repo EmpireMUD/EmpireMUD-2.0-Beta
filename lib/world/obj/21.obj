@@ -582,7 +582,7 @@ A bone handle is lying here.~
    The handle is carved from bone, or perhaps horn. It can be attached to many
 things to build tools and weapons.
 ~
-1 0 ano 0 0 5
+1 0 ano 0 0 6
 0 3 5
 14 0
 C
@@ -590,6 +590,10 @@ C
 O+ 1 6850
 R
 4 5121 0
+R
+4 5610 0
+R
+4 5108 0
 S
 #2141
 sickle flint~
