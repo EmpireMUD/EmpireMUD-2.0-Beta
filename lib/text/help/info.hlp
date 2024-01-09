@@ -1318,7 +1318,8 @@ You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list, or you can specify search terms.
 
 Nearby has a default range of 50 tiles. Some buildings, items, and effects can
-increase this.
+increase this. When used on a newbie island, it only shows locations on the
+island.
 
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.

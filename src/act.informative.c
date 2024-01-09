@@ -3756,7 +3756,7 @@ ACMD(do_nearby) {
 	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;
 	int iter, dist, size, max_dist;
-	bool found = FALSE;
+	bool found = FALSE, newbie_only;
 	room_data *loc;
 	any_vnum vnum;
 	struct nearby_item_t *nrb_list = NULL, *nrb_item, *next_item;
@@ -3785,6 +3785,9 @@ ACMD(do_nearby) {
 	max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	max_dist += GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
 	max_dist = MAX(0, max_dist);
+	
+	// newbie islands only show newbie island things
+	newbie_only = (GET_ISLAND(IN_ROOM(ch)) && IS_SET(GET_ISLAND(IN_ROOM(ch))->flags, ISLE_NEWBIE)) ? TRUE : FALSE;
 	
 	// argument-parsing
 	skip_spaces(&argument);
@@ -3847,6 +3850,10 @@ ACMD(do_nearby) {
 		
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+				if (newbie_only && GET_ISLAND(city->location) && !IS_SET(GET_ISLAND(city->location)->flags, ISLE_NEWBIE)) {
+					continue;	// skip non-newbie
+				}
+				
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
@@ -3882,11 +3889,14 @@ ACMD(do_nearby) {
 			glb = NULL;	// init this now -- used later
 			
 			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-				continue;
+				continue;	// not a valid location or was completed
 			}
 		
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_NEARBY)) {
-				continue;
+				continue;	// does not show on nearby
+			}
+			if (newbie_only && GET_ISLAND(INST_FAKE_LOC(inst)) && !IS_SET(GET_ISLAND(INST_FAKE_LOC(inst))->flags, ISLE_NEWBIE)) {
+				continue;	// only showing newbie now
 			}
 		
 			loc = INST_FAKE_LOC(inst);
