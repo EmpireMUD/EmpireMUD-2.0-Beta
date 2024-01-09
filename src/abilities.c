@@ -11045,18 +11045,8 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
-		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			strcpy(part, "unlimited");
-		}
-		else {
-			snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
-		}
-		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			strcpy(part2, "unlimited");
-		}
-		else {
-			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
-		}
+		strcpy(part, colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"));
+		strcpy(part2, colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"));
 		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s seconds\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
