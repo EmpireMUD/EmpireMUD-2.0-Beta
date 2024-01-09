@@ -6045,6 +6045,9 @@ ACMD(do_empty) {
 				if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size + obj_carry_size(obj) > item_limit) {
 					continue;	// would be over the limit
 				}
+				if (!get_otrigger(obj, ch, TRUE)) {
+					continue;
+				}
 				
 				// prelim messaging on the first item
 				if (!messaged) {
@@ -6090,6 +6093,9 @@ ACMD(do_empty) {
 				DL_FOREACH_SAFE2(found_obj->contains, obj, next_obj, next_content) {
 					if (IN_ROOM(found_obj) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) && size + obj_carry_size(obj) > item_limit) {
 						continue;	// would be over the limit
+					}
+					if (!get_otrigger(obj, ch, TRUE)) {
+						continue;
 					}
 					
 					// prelim messaging on the first item
