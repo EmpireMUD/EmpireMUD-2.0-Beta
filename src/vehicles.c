@@ -4220,7 +4220,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// script info
-	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(veh) ? veh_script_id(veh) : veh->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", (SCRIPT(veh) && IN_ROOM(veh)) ? veh_script_id(veh) : veh->script_id);
 	if (SCRIPT(veh)) {
 		script_stat(ch, SCRIPT(veh));
 	}
