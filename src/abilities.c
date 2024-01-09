@@ -371,18 +371,8 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	// Cooldown?
 	if (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent)) {
-		if (ABIL_COOLDOWN_SECS(abil) >= 60 * 60) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d:%02d (hours)\r\n", (ABIL_COOLDOWN_SECS(abil) / 3600), ((ABIL_COOLDOWN_SECS(abil) % 3600) / 60), ((ABIL_COOLDOWN_SECS(abil) % 3600) % 60));
-		}
-		else if (ABIL_COOLDOWN_SECS(abil) >= 60) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d:%02d (minutes)\r\n", (ABIL_COOLDOWN_SECS(abil) / 60), (ABIL_COOLDOWN_SECS(abil) % 60));
-		}
-		else if (ABIL_COOLDOWN_SECS(abil) > 0) {
-			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %d second%s\r\n", ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		}
+		has_param_details = TRUE;
+		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %s%s\r\n", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
 	}
 	
 	// data, if parameterized
@@ -425,30 +415,15 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	
 	// build duration
-	if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-		strcpy(lbuf, "unlimited");
-	}
-	else if (ABIL_SHORT_DURATION(abil) >= 60) {
-		sprintf(lbuf, "%d minute%s", (ABIL_SHORT_DURATION(abil) / 60), PLURAL(ABIL_SHORT_DURATION(abil) / 60));
-	}
-	else if (ABIL_SHORT_DURATION(abil) > 0) {
-		sprintf(lbuf, "%d second%s", ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+	if (ABIL_SHORT_DURATION(abil) == UNLIMITED || ABIL_SHORT_DURATION(abil) > 0) {
+		sprintf(lbuf, "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	else {
 		*lbuf = '\0';
 	}
 	
-	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil)) {
-		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			sprintf(lbuf + strlen(lbuf), "%sunlimited", *lbuf ? "/" : "");
-		}
-		else if (ABIL_LONG_DURATION(abil) >= 60) {
-			sprintf(lbuf + strlen(lbuf), "%s %d minute%s", *lbuf ? "/" : "", (ABIL_LONG_DURATION(abil) / 60), PLURAL(ABIL_LONG_DURATION(abil) / 60));
-		}
-		else if (ABIL_LONG_DURATION(abil) > 0) {
-			sprintf(lbuf + strlen(lbuf), "%s%d second%s", *lbuf ? "/" : "", ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
-		}
-		// no else for long duration
+	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil) && ABIL_LONG_DURATION(abil) > 0) {
+		sprintf(lbuf + strlen(lbuf), "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	
 	// show duration?
@@ -11025,7 +11000,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ABIL_RESOURCE_COST(abil), part);
