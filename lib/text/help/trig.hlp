@@ -133,6 +133,23 @@ Variables:
 
 See also: TOGGLE, MTRIG CHARMED
 #d
+"DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE "VTRIG DISMANTLE" TRIGEDIT-VEH-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
+
+Dismantle (trigger type)
+
+Return value:  return 0 to prevent the dismantle/redesignate
+
+Rooms: This trigger is called when someone tries to dismantle or redesignate a
+room, or when the room is destroyed for any reason.
+
+Vehicles: Called when someone tries to dismantle the vehicle, or when it falls
+into ruins or is destroyed.
+
+Variables:
+  &c%actor%&0 - The person attempting to dismantle (there may be no actor if
+    the dismantle is caused by siege damage or decay).
+  &c%preventable%&0 - Whether or not you can attempt to prevent this action.
+#d
 "DOOR TRIGGER" "MTRIG DOOR" "RTRIG DOOR" TRIGEDIT-MOB-DOOR TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
 
 Door (trigger type)

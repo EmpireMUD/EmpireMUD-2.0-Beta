@@ -4812,7 +4812,7 @@ const char *vtrig_types[] = {
 	"Ability",	// 15
 	"Leave",
 	"*",	// 17
-	"*",	// 18
+	"Dismantle",
 	"*",	// 19
 	"Start-Quest",	// 20
 	"Finish-Quest",
@@ -4845,7 +4845,7 @@ const bitvector_t vtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	NOBITS,	// 17
-	NOBITS,	// 18
+	NOBITS,	// dismantle
 	NOBITS,	// 19
 	NOBITS,	// start-quest
 	NOBITS,	// finish-quest

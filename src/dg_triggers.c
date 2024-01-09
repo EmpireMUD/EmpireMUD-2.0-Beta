@@ -2589,6 +2589,9 @@ int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
 			sdd.r = room;
 			one = script_driver(&sdd, trig, WLD_TRIGGER, TRIG_NEW);
 			value = MIN(value, one);	// can be set to 0
+			if (!one) {
+				break;	// stop on first zero
+			}
 		}
 	}
 
@@ -3485,6 +3488,55 @@ int destroy_vtrigger(vehicle_data *veh, char *method) {
 	}
 
 	return val;
+}
+
+
+/**
+* Called when a player attempts to dismantle a vehicle. Returning a 0 from the
+* script will prevent the dismantle if possible.
+*
+* It's also possible for there to be NO actor if a vehicle is being destroyed
+* by something other than a player.
+*
+* @param char_data *actor Optional: The player attempting the dismantle (may be NULL).
+* @param vehicle_data *veh The vehicle attemping to be dismantled.
+* @param bool preventable If TRUE, returning 0 will prevent the dismantle.
+* @return int The exit code from the script: 1 to continue, 0 to prevent if possible.
+*/
+int dismantle_vtrigger(char_data *actor, vehicle_data *veh, bool preventable) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *trig, *next_trig;
+	int one, value = 1;
+	
+	if (veh == NULL || VEH_IS_EXTRACTED(veh)) {
+		return 1;
+	}
+
+	if (!SCRIPT_CHECK(veh, VTRIG_DISMANTLE)) {
+		return 1;
+	}
+	
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), trig, next_trig) {
+		if (TRIGGER_CHECK(trig, VTRIG_DISMANTLE)) {
+			union script_driver_data_u sdd;
+			
+			add_var(&GET_TRIG_VARS(trig), "preventable", preventable ? "1" : "0", 0);
+			if (actor) {
+				ADD_UID_VAR(buf, trig, char_script_id(actor), "actor", 0);
+			}
+			else {
+				add_var(&GET_TRIG_VARS(trig), "actor", "", 0);
+			}
+			sdd.v = veh;
+			one = script_driver(&sdd, trig, VEH_TRIGGER, TRIG_NEW);
+			value = MIN(value, one);	// can be set to 0
+			if (!one) {
+				break;	// stop on first zero
+			}
+		}
+	}
+
+	return value;
 }
 
 

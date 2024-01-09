@@ -81,6 +81,7 @@ Vehicles can trigger on the following events:
 &cLoad&0 - Triggers when the vehicle loads (or is finished being crafted).
 &cAbility&0 - Triggers when the vehicle is the target of an ability.
 &cLeave&0 - Triggers when a person tries to leave.
+&cDismantle&0 - Triggers when someone tries to dismantle the vehicle.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.

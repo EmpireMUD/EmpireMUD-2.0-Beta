@@ -127,7 +127,7 @@
 #define VTRIG_ABILITY          BIT(15)	// ability targeting the vehicle
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
 // BIT(17)
-// BIT(18)
+#define VTRIG_DISMANTLE        BIT(18)	// starts dismantling
 // BIT(19)
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
@@ -440,6 +440,7 @@ void reboot_wtrigger(room_data *room);
 // vehicle triggers
 int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
 int destroy_vtrigger(vehicle_data *veh, char *method);
+int dismantle_vtrigger(char_data *actor, vehicle_data *veh, bool preventable);
 int entry_vtrigger(vehicle_data *veh, char *method);
 int leave_vtrigger(char_data *actor, int dir, char *custom_dir, char *method);
 int load_vtrigger(vehicle_data *veh);

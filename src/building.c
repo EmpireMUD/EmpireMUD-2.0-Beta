@@ -2127,6 +2127,9 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (count_players_in_vehicle(veh, TRUE)) {
 		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
 	}
+	else if (!dismantle_vtrigger(ch, veh, TRUE)) {
+		// prevented by trigger
+	}
 	else {
 		// ensure nobody is building it
 		if (!VEH_IS_DISMANTLING(veh)) {

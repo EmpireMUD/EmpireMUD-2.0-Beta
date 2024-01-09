@@ -956,6 +956,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	}
 	
 	// dismantle triggers first -- despawns boards in studies, etc
+	dismantle_vtrigger(NULL, veh, FALSE);
 	vehicle_interior_dismantle_triggers(veh, NULL);
 	
 	// ruins
