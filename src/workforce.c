@@ -2257,7 +2257,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 			charge_workforce(emp, CHORE_DISMANTLE_MINES, room, worker, 1, NOTHING, 0);
 			if (veh) {
 				act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
-				start_dismantle_vehicle(veh);
+				start_dismantle_vehicle(veh, NULL);
 			}
 			else {
 				act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);

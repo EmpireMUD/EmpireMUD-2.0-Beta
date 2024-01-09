@@ -438,7 +438,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_SLOWED(ch)  (AFF_FLAGGED((ch), AFF_SLOW) && !AFF_FLAGGED((ch), AFF_HASTE))
-#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && (!GET_BUILDING(IN_ROOM(ch)) || !GET_BUILT_WITH(IN_ROOM(ch))) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? ((GET_LEADER(ch) && !IS_NPC(GET_LEADER(ch))) ? PRF_FLAGGED(GET_LEADER(ch), PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -2634,7 +2634,7 @@ void process_dismantle_vehicle(char_data *ch);
 void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
-void start_dismantle_vehicle(vehicle_data *veh);
+void start_dismantle_vehicle(vehicle_data *veh, char_data *ch);
 void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room, empire_data *for_empire);
 int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire);

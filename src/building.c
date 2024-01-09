@@ -2142,7 +2142,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		
-		start_dismantle_vehicle(veh);
+		start_dismantle_vehicle(veh, ch);
 		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
 		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 		process_dismantle_vehicle(ch);

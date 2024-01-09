@@ -49,6 +49,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void clear_vehicle(vehicle_data *veh);
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
+void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1157,9 +1158,10 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 * Begins the dismantle process on a vehicle including setting its
 * VEH_DISMANTLING flag and its VEH_CONSTRUCTION_ID().
 *
-* @param bool vehicle_data *veh The vehicle to dismantle.
+* @param vehicle_data *veh The vehicle to dismantle.
+* @param char_data *ch Optional: Player who started the dismantle (may be NULL).
 */
-void start_dismantle_vehicle(vehicle_data *veh) {
+void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	struct resource_data *res, *next_res;
 	obj_data *proto;
 	
@@ -1171,6 +1173,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	// clear it out
+	vehicle_interior_dismantle_triggers(veh, ch);
 	fully_empty_vehicle(veh, IN_ROOM(veh));
 	delete_vehicle_interior(veh);
 	
@@ -1441,6 +1444,23 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow
 	}
 	
 	return ok;
+}
+
+
+/**
+* Runs the dismantle trigger on all interior rooms of a vehicle. This dismantle
+* is not preventable, but is necessary for some rooms, like the Study, which
+* remove unique items during dismantle.
+*
+* @param vehicle_data *veh The vehicle being dismantled.
+* @param char_data *ch Optional: Who started dismantling it (may be NULL).
+*/
+void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch) {
+	struct vehicle_room_list *vrl;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		dismantle_wtrigger(vrl->room, ch, FALSE);
+	}
 }
 
 
