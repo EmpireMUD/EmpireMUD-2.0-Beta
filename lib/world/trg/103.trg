@@ -64,6 +64,7 @@ Flame Dragon delay-completer~
 if %instance.start%
   * Attempt delayed despawn
   %at% %instance.start% %load% o 10316
+  nop %instance.set_location(%instance.start%)%
 else
   %adventurecomplete%
 end
