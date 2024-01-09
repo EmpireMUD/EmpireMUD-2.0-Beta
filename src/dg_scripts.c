@@ -2634,6 +2634,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 				}
+				else if (!str_cmp(field, "players")) {
+					int count = 0;
+					char_data *ch_iter;
+					DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+						if (ROOM_INSTANCE(IN_ROOM(ch_iter)) == inst) {
+							++count;
+						}
+					}
+					snprintf(str, slen, "%d", count);
+				}
 				else if (!str_cmp(field, "real_location")) {
 					if (INST_LOCATION(inst)) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(INST_LOCATION(inst)) + ROOM_ID_BASE);

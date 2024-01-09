@@ -663,6 +663,7 @@ Special Variables When using field - The variable returns:
    instance of a given adventure (only works if not in a !LOCATION spot).
 &cinstance.nearest_rmt(vnum)&0 - Finds a given room in the nearest instance
    that has one (only works if you aren't in a !LOCATION spot).
+&cinstance.players&0 - Count of all players inside the instance.
 &cinstance.real_location&0 - The instance's original location (if any).
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
