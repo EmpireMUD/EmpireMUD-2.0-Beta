@@ -429,7 +429,7 @@ ACMD(do_meters) {
 	
 	// raw length
 	length = (mtr->over ? mtr->end : time(0)) - mtr->start;
-	msg_to_char(ch, "Fight length: %d:%02d (%d second%s)\r\n", (length/60), (length%60), length, PLURAL(length));
+	msg_to_char(ch, "Fight length: %s (%d second%s)\r\n", colon_time(length, FALSE, NULL), length, PLURAL(length));
 	
 	// prevent divide-by-zero
 	length = MAX(1, length);

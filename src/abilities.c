@@ -11022,7 +11022,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		strcpy(part, colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"));
 		strcpy(part2, colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"));
-		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s seconds\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");

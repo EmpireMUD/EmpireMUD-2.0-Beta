@@ -1482,12 +1482,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		else {
 			duration = aff->expire_time - time(0);
 			duration = MAX(duration, 0);
-			if (duration >= 60 * 60) {
-				sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-			}
-			else {
-				sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-			}
+			strcpy(lbuf, colon_time(duration, FALSE, NULL));
 		}
 		
 		// main entry
@@ -1510,7 +1505,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 	
 	// show DoT affects too
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		snprintf(lbuf, sizeof(lbuf), "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
+		strcpy(lbuf, colon_time(dot->time_remaining, FALSE, NULL));
 		
 		// main body
 		msg_to_char(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
@@ -1554,12 +1549,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(lbuf, colon_time(duration, FALSE, "infinite"));
 			}
 			
 			// main entry
@@ -1598,7 +1588,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		if (details) {
-			snprintf(line, sizeof(line), "&r%s&0%s (%d:%02d)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), (dot->time_remaining / 60), (dot->time_remaining % 60), lbuf);
+			snprintf(line, sizeof(line), "&r%s&0%s (%s)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), colon_time(dot->time_remaining, FALSE, "infinite"), lbuf);
 		}
 		else {	// simple version
 			snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
@@ -2923,7 +2913,6 @@ ACMD(do_contents) {
 
 ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
-	char when[256];
 	int diff;
 	bool found = FALSE;
 	
@@ -2933,14 +2922,7 @@ ACMD(do_cooldowns) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
 		if (diff >= 0) {
-			if (diff >= SECS_PER_REAL_HOUR) {
-				snprintf(when, sizeof(when), "%d:%02d:%02d", (diff / SECS_PER_REAL_HOUR), ((diff % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
-			}
-			else {
-				snprintf(when, sizeof(when), "%d:%02d", (diff / SECS_PER_REAL_MIN), (diff % SECS_PER_REAL_MIN));
-			}
-			msg_to_char(ch, " &c%s&0 %s\r\n", get_generic_name_by_vnum(cool->type), when);
-
+			msg_to_char(ch, " &c%s&0 %s\r\n", get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 			found = TRUE;
 		}
 	}
