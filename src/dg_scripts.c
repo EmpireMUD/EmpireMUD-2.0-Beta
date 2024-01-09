@@ -2634,7 +2634,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "name")) {
 					snprintf(str, slen, "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 				}
-				else if (!str_cmp(field, "players")) {
+				else if (!str_cmp(field, "players_present")) {
 					int count = 0;
 					char_data *ch_iter;
 					DL_FOREACH2(player_character_list, ch_iter, next_plr) {
