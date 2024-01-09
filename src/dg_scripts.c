@@ -1315,7 +1315,16 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information (id %d):\r\n", SCRIPT(j) ? obj_script_id(j) : j->script_id);
+	int id;
+	
+	if (IN_ROOM(j) || j->in_obj || j->in_vehicle || j->carried_by || j->worn_by) {
+		id = SCRIPT(j) ? obj_script_id(j) : j->script_id;
+	}
+	else {
+		id = j->script_id;
+	}
+	
+	msg_to_char(ch, "Script information (id %d):\r\n", id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
