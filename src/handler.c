@@ -674,7 +674,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			set_move(ch, GET_MOVE(ch) + mod);
 			
 			if (GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
-				GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - mod);
+				diff = MIN(GET_MOVE_DEFICIT(ch), mod);
+				GET_MOVE_DEFICIT(ch) -= diff;
+				set_move(ch, GET_MOVE(ch) - diff);
 			}
 			/*
 			if (!IS_NPC(ch)) {
@@ -701,7 +703,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			set_health(ch, GET_HEALTH(ch) + mod);
 			
 			if (GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
-				GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - mod);
+				diff = MIN(GET_HEALTH_DEFICIT(ch)-1, mod);
+				GET_HEALTH_DEFICIT(ch) -= diff;
+				set_health(ch, GET_HEALTH(ch) - diff);
 			}
 			
 			/*
@@ -738,7 +742,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			set_mana(ch, GET_MANA(ch) + mod);
 			
 			if (GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
-				GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - mod);
+				diff = MIN(GET_MANA_DEFICIT(ch), mod);
+				GET_MANA_DEFICIT(ch) -= diff;
+				set_mana(ch, GET_MANA(ch) - diff);
 			}
 			/*
 			if (!IS_NPC(ch)) {
