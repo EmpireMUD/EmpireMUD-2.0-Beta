@@ -666,19 +666,23 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
-			set_move(ch, GET_MOVE(ch) + mod);
+			
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_MOVE(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
 			if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
 				GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-				set_move(ch, 0);
+				GET_MOVE(ch) = 0;
 			}
 			break;
 		}
 		case APPLY_HEALTH: {
 			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
-			set_health(ch, GET_HEALTH(ch) + mod);
+			
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_HEALTH(ch) += mod;
 			
 			// prevent going below 1
 			if (GET_HEALTH(ch) < 1 && (GET_HEALTH(ch) - mod) >= 1) {
@@ -689,19 +693,21 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				else {
 					// deficit (players only)
 					GET_HEALTH_DEFICIT(ch) -= GET_HEALTH(ch) - 1;
-					set_health(ch, 1);
+					GET_HEALTH(ch) = 1;
 				}
 			}
 			break;
 		}
 		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
-			set_mana(ch, GET_MANA(ch) + mod);
+			
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_MANA(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
 			if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
 				GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-				set_mana(ch, 0);
+				GET_MANA(ch) = 0;
 			}
 			break;
 		}
@@ -1051,20 +1057,32 @@ void affect_total(char_data *ch) {
 	*/
 	
 	// attempt to repay deficits
-	if (GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+	if (!IS_NPC(ch) && GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
 		amount = MIN(GET_MOVE(ch), GET_MOVE_DEFICIT(ch));
 		set_move(ch, GET_MOVE(ch) - amount);
 		GET_MOVE_DEFICIT(ch) -= amount;
 	}
-	if (GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
+	else if (GET_MOVE(ch) > GET_MAX_MOVE(ch)) {
+		// we had to let it go over temporarily; cap it now through set_move
+		set_move(ch, GET_MAX_MOVE(ch));
+	}
+	if (!IS_NPC(ch) && GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
 		amount = MIN(GET_HEALTH(ch) - 1, GET_HEALTH_DEFICIT(ch));
 		set_health(ch, GET_HEALTH(ch) - amount);
 		GET_HEALTH_DEFICIT(ch) -= amount;
 	}
-	if (GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+	else if (GET_HEALTH(ch) > GET_MAX_HEALTH(ch)) {
+		// we had to let it go over temporarily; cap it now through set_health
+		set_health(ch, GET_MAX_HEALTH(ch));
+	}
+	if (!IS_NPC(ch) && GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
 		amount = MIN(GET_MANA(ch), GET_MANA_DEFICIT(ch));
 		set_mana(ch, GET_MANA(ch) - amount);
 		GET_MANA_DEFICIT(ch) -= amount;
+	}
+	else if (GET_MANA(ch) > GET_MAX_MANA(ch)) {
+		// we had to let it go over temporarily; cap it now through set_mana
+		set_mana(ch, GET_MAX_MANA(ch));
 	}
 	
 	// check for inventory size
