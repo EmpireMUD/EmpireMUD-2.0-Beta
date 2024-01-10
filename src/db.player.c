@@ -3089,7 +3089,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// resume affect totals and run it
 	pause_affect_total = FALSE;
-	// affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
+	affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
 }
 
 
