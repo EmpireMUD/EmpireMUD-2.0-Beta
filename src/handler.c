@@ -11348,7 +11348,7 @@ void free_storage_timers(struct storage_timer **list) {
 */
 void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer *merge_from, int total_things) {
 	struct storage_timer *st;
-	int count;
+	int count = 0;
 	
 	if (merge_to) {
 		// the merge
