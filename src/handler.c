@@ -963,12 +963,13 @@ void affect_total(char_data *ch) {
 	}
 	
 	// save these for later -- they shouldn't change during an affect_total
+	// TODO can these be removed now
 	// health = GET_HEALTH(ch);
 	// move = GET_MOVE(ch);
 	// mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
 	
-	for (i = 0; i < NUM_WEARS; i++) {
+	for (i = 0; i < NUM_WEARS; ++i) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
 				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
@@ -1009,7 +1010,7 @@ void affect_total(char_data *ch) {
 		}
 	}
 
-	for (i = 0; i < NUM_WEARS; i++) {
+	for (i = 0; i < NUM_WEARS; ++i) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
 				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
@@ -1056,34 +1057,8 @@ void affect_total(char_data *ch) {
 	set_mana(ch, mana);
 	*/
 	
-	// attempt to repay deficits
-	if (!IS_NPC(ch) && GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
-		amount = MIN(GET_MOVE(ch), GET_MOVE_DEFICIT(ch));
-		set_move(ch, GET_MOVE(ch) - amount);
-		GET_MOVE_DEFICIT(ch) -= amount;
-	}
-	else if (GET_MOVE(ch) > GET_MAX_MOVE(ch)) {
-		// we had to let it go over temporarily; cap it now through set_move
-		set_move(ch, GET_MAX_MOVE(ch));
-	}
-	if (!IS_NPC(ch) && GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
-		amount = MIN(GET_HEALTH(ch) - 1, GET_HEALTH_DEFICIT(ch));
-		set_health(ch, GET_HEALTH(ch) - amount);
-		GET_HEALTH_DEFICIT(ch) -= amount;
-	}
-	else if (GET_HEALTH(ch) > GET_MAX_HEALTH(ch)) {
-		// we had to let it go over temporarily; cap it now through set_health
-		set_health(ch, GET_MAX_HEALTH(ch));
-	}
-	if (!IS_NPC(ch) && GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
-		amount = MIN(GET_MANA(ch), GET_MANA_DEFICIT(ch));
-		set_mana(ch, GET_MANA(ch) - amount);
-		GET_MANA_DEFICIT(ch) -= amount;
-	}
-	else if (GET_MANA(ch) > GET_MAX_MANA(ch)) {
-		// we had to let it go over temporarily; cap it now through set_mana
-		set_mana(ch, GET_MAX_MANA(ch));
-	}
+	// pay off deficits now and check pool caps (for NPCs, this will also check caps)
+	check_deficits(ch);
 	
 	// check for inventory size
 	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {

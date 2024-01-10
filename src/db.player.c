@@ -2558,7 +2558,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
-	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct affected_type *af;//, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
@@ -2574,6 +2574,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
+	struct obj_apply *apply;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	long timer;
 	
@@ -2594,16 +2595,39 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		deficit[iter] = GET_DEFICIT(ch, iter);
 		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
+
+	// unaffect: gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), FALSE);
+			}
+		}
+	}
 	
+	// unaffect: passive buffs
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
+	
+	// unaffect: affects
+	LL_FOREACH(ch->affected, af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
+
+	/* TODO old version of this -- can go
 	// unaffect the character to store raw numbers: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
 			char_eq[iter] = unequip_char(ch, iter);
-			/* this is almopst certainly an error here as this is called on every save:
+			/ * this is almopst certainly an error here as this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				remove_otrigger(char_eq[iter], ch);
 			#endif
-			*/
+			* /
 		}
 		else {
 			char_eq[iter] = NULL;
@@ -2627,6 +2651,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// this is almost certainly ignored due to pause_affect_total
 	affect_total(ch);
+	*/
 	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -2708,7 +2733,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Loc: %d\n", GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
-	for (af = af_list; af; af = af->next) {	// stored earlier
+	LL_FOREACH(ch->affected, af) {
+	// for (af = af_list; af; af = af->next) {	// stored earlier TODO remove this line
 		if (af->expire_time == UNLIMITED) {
 			timer = UNLIMITED;
 		}
@@ -2984,6 +3010,32 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
+	// re-affect: gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), TRUE);
+			}
+		}
+	}
+	
+	// re-affect: passive buffs
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
+	
+	// re-affect: affects
+	for (af = ch->affected; af; af = af->next) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
+	
+	// this will ensure caps and pay off any deficits
+	check_deficits(ch);
+	
+	/* TODO remove old version
 	// re-affect: passives
 	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -2999,33 +3051,40 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// re-apply: equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (char_eq[iter]) {
-			/* this is almost certainly an error since this is called on every save:
+			/ * this is almost certainly an error since this is called on every save:
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				if (wear_otrigger(char_eq[iter], ch, iter)) {
 			#endif
-			*/
+			* /
 					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
 					equip_char(ch, char_eq[iter], iter);
-			/* probably an error here (see above):
+			/ * probably an error here (see above):
 			#ifndef NO_EXTRANEOUS_TRIGGERS
 				}
 				else {
 					obj_to_char(char_eq[iter], ch);
 				}
 			#endif
-			*/
+			* /
 		}
 	}
+	*/
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		if (GET_CURRENT_POOL(ch, iter) != pool[iter]) {
+			log("Debug: Current pool changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), pool[iter], GET_CURRENT_POOL(ch, iter));
+		}
+		if (GET_DEFICIT(ch, iter) != deficit[iter]) {
+			log("Debug: Deficit changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), deficit[iter], GET_DEFICIT(ch, iter));
+		}
 		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
 	// resume affect totals and run it
 	pause_affect_total = FALSE;
-	affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
+	// affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
 }
 
 
