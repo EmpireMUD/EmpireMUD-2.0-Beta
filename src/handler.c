@@ -610,8 +610,6 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff;
-	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
 		
@@ -668,99 +666,43 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_move(ch, GET_MOVE(ch) + mod);
 			
-			// reduce deficit?
-			if (mod > 0 && GET_MOVE_DEFICIT(ch) > 0) {
-				diff = MIN(GET_MOVE_DEFICIT(ch), mod);
-				GET_MOVE_DEFICIT(ch) -= diff;
-				set_move(ch, GET_MOVE(ch) + mod - diff);
+			// deficits: prevent going negative (players only)
+			if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
+				GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
+				set_move(ch, 0);
 			}
-			else {
-				set_move(ch, GET_MOVE(ch) + mod);
-			}
-			
-			/*
-			if (!IS_NPC(ch)) {
-				if (GET_MOVE(ch) < 0) {
-					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-					set_move(ch, 0);
-				}
-				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					diff = MAX(0, GET_MOVE(ch) - orig);
-					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
-					GET_MOVE_DEFICIT(ch) -= diff;
-					set_move(ch, GET_MOVE(ch) - diff);
-				}
-			}
-			*/
 			break;
 		}
 		case APPLY_HEALTH: {
 			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_health(ch, GET_HEALTH(ch) + mod);
 			
-			// reduce deficit
-			if (mod > 0 && GET_HEALTH_DEFICIT(ch) > 0) {
-				diff = MIN(GET_HEALTH_DEFICIT(ch), mod);
-				GET_HEALTH_DEFICIT(ch) -= diff;
-				set_health(ch, GET_HEALTH(ch) + mod - diff);
-			}
-			else {
-				set_health(ch, GET_HEALTH(ch) + mod);
-			}
-			
-			/*
-			if (!IS_NPC(ch)) {
-				if (GET_HEALTH(ch) < 1) {
-					if (GET_POS(ch) >= POS_SLEEPING) {
-						// min 1 on health unless unconscious
-						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-						set_health(ch, 1);
-					}
-					// otherwise leave them dead/negative
+			// prevent going below 1
+			if (GET_HEALTH(ch) < 1 && (GET_HEALTH(ch) - mod) >= 1) {
+				if (IS_NPC(ch)) {
+					// npcs cannot die this way
+					set_health(ch, 1);
 				}
-				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					// positive health plus a health deficit
-					diff = MAX(0, GET_HEALTH(ch) - orig);
-					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
-					diff = MIN(diff, GET_HEALTH(ch)-1);
-					GET_HEALTH_DEFICIT(ch) -= diff;
-					set_health(ch, GET_HEALTH(ch) - diff);
+				else {
+					// deficit (players only)
+					GET_HEALTH_DEFICIT(ch) -= GET_HEALTH(ch) - 1;
+					set_health(ch, 1);
 				}
 			}
-			else {
-				// npcs cannot die this way
-				set_health(ch, MAX(1, GET_HEALTH(ch)));
-			}
-			*/
 			break;
 		}
 		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
+			set_mana(ch, GET_MANA(ch) + mod);
 			
-			// reduce the deficit?
-			if (mod > 0 && GET_MANA_DEFICIT(ch) > 0) {
-				diff = MIN(GET_MANA_DEFICIT(ch), mod);
-				GET_MANA_DEFICIT(ch) -= diff;
-				set_mana(ch, GET_MANA(ch) + mod - diff);
+			// deficits: prevent going negative (players only)
+			if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
+				GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
+				set_mana(ch, 0);
 			}
-			else {
-				set_mana(ch, GET_MANA(ch) + mod);
-			}
-			/*
-			if (!IS_NPC(ch)) {
-				if (GET_MANA(ch) < 0) {
-					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-					set_mana(ch, 0);
-				}
-				else if (GET_MANA_DEFICIT(ch) > 0) {
-					diff = MAX(0, GET_MANA(ch) - orig);
-					diff = MIN(GET_MANA_DEFICIT(ch), diff);
-					GET_MANA_DEFICIT(ch) -= diff;
-					set_mana(ch, GET_MANA(ch) - diff);
-				}
-			}
-			*/
 			break;
 		}
 		case APPLY_BLOOD: {
@@ -1003,7 +945,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	struct affected_type *af;
-	int i, iter, level;
+	int amount, i, iter, level;
 	struct obj_apply *apply;
 	// int health, move, mana;
 	
@@ -1107,26 +1049,22 @@ void affect_total(char_data *ch) {
 	set_move(ch, move);
 	set_mana(ch, mana);
 	*/
-	// check deficits
-	if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
-		GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-		set_move(ch, 0);
+	
+	// attempt to repay deficits
+	if (GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MOVE(ch), GET_MOVE_DEFICIT(ch));
+		set_move(ch, GET_MOVE(ch) - amount);
+		GET_MOVE_DEFICIT(ch) -= amount;
 	}
-	if (!IS_NPC(ch)) {
-		if (GET_HEALTH(ch) < 1 && GET_POS(ch) >= POS_SLEEPING) {
-			// min 1 on health unless unconscious
-			GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-			set_health(ch, 1);
-		}
-		// otherwise leave them dead/negative
+	if (GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
+		amount = MIN(GET_HEALTH(ch) - 1, GET_HEALTH_DEFICIT(ch));
+		set_health(ch, GET_HEALTH(ch) - amount);
+		GET_HEALTH_DEFICIT(ch) -= amount;
 	}
-	else if (GET_POS(ch) >= POS_SLEEPING) {
-		// npcs cannot die this way
-		set_health(ch, MAX(1, GET_HEALTH(ch)));
-	}
-	if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
-		GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-		set_mana(ch, 0);
+	if (GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MANA(ch), GET_MANA_DEFICIT(ch));
+		set_mana(ch, GET_MANA(ch) - amount);
+		GET_MANA_DEFICIT(ch) -= amount;
 	}
 	
 	// check for inventory size
