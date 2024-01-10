@@ -4583,6 +4583,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// script/trigger stuff
 	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	enter_triggers(ch, NO_DIR, "login", FALSE);
 	greet_triggers(ch, NO_DIR, "login", FALSE);
 }
 

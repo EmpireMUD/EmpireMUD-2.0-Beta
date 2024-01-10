@@ -6933,6 +6933,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
+			enter_triggers(ch, NO_DIR, "system", FALSE);
 			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);

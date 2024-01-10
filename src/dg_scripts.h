@@ -452,6 +452,7 @@ bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int enter_triggers(char_data *ch, int dir, char *method, bool preventable);
 int greet_triggers(char_data *ch, int dir, char *method, bool preventable);
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
