@@ -1219,16 +1219,9 @@ char *fread_string(FILE * fl, char *error) {
 		point = strchr(tmp, '\0');
 		templength = point - tmp;
 		
-		if (point > tmp) {
-			for (point-- ; point > tmp && (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
-		}
+		for (point-- ; point > tmp && (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
 		
-		if (!*point) {
-			// string was empty
-			strcpy(point, "\r\n");
-			point += 2;
-		}
-		else if (*point == '~') {
+		if (point >= tmp && *point == '~') {
 			*point = '\0';
 			done = 1;
 		}
