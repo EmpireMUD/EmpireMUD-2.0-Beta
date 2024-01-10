@@ -50,7 +50,6 @@ ACMD(do_respawn);
 int point_update_cycle = 0;	// helps spread out point updates
 
 // local funcs
-bool tick_obj_timer(obj_data *obj);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1253,7 +1252,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// amount we could take
 			if (amount > 0) {
 				any = TRUE;
-				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
+				add_to_empire_storage(emp, eisle->island, store->vnum, -amount, 0);
 				log_to_empire(emp, ELOG_WORKFORCE, "Consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
 			}
 		}
@@ -1453,7 +1452,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			
 			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
-				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
 			}
 		}
 	}

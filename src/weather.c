@@ -438,6 +438,9 @@ void another_hour(void) {
 		}
 	}
 	
+	// all hours
+	check_empire_storage_timers();
+	
 	// and announce it to the players
 	send_hourly_sun_messages();
 }

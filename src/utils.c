@@ -886,8 +886,9 @@ bool process_import_one(empire_data *emp) {
 			// only store it if we did find an island to store to
 			if (found_island != NO_ISLAND || (found_island = get_main_island(emp)) != NO_ISLAND) {
 				// items
-				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt);
-				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt);
+				orn = obj_proto(trade->vnum);
+				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt, orn ? GET_OBJ_TIMER(orn) : 0);
+				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, TRUE);
 				
 				// mark gather trackers
 				add_production_total(emp, trade->vnum, trade_amt);
@@ -905,9 +906,8 @@ bool process_import_one(empire_data *emp) {
 				any = TRUE;
 				
 				// log
-				orn = obj_proto(trade->vnum);
-				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
-				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), gain);
+				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(pair->emp), cost);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(emp), gain);
 			}
 		}
 		

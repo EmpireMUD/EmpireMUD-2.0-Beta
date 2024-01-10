@@ -3245,7 +3245,7 @@ bool extract_tavern_resources(room_data *room) {
 	// extract resources
 	if (ok) {
 		for (iter = 0; tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost);
+			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost, TRUE);
 		}
 	}
 	
@@ -5269,7 +5269,7 @@ ACMD(do_enroll) {
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *merged;
 	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
@@ -5419,8 +5419,11 @@ ACMD(do_enroll) {
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
 					if (store->amount > 0) {
-						add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
-					
+						merged = add_to_empire_storage(e, from_isle->island, store->vnum, store->amount, 0);
+						if (merged) {
+							merge_storage_timers(&merged->timers, store->timers, merged->amount);
+						}
+						
 						// counts as imported items
 						add_production_total(e, store->vnum, store->amount);
 						mark_production_trade(e, store->vnum, store->amount, 0);

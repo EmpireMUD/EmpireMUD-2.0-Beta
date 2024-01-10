@@ -659,7 +659,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	int found;
 	double rating;
 	bool any, library, showed_level = FALSE;
-		
+	
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
 		return;
@@ -1109,6 +1109,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 	}
 	
+	// expiry?
+	if (GET_OBJ_TIMER(obj) > 0) {
+		if (GET_OBJ_TIMER(obj) <= 6) {
+			msg_to_char(ch, "Expires in %d hour%s.\r\n", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)));
+		}
+		if (GET_OBJ_TIMER(obj) <= 24) {
+			msg_to_char(ch, "Expires within a day.\r\n");
+		}
+		else {
+			// longer than 24 hours
+			msg_to_char(ch, "This item will expire.\r\n");
+		}
+	}
+	
 	// equipment sets?
 	if (!simple && GET_OBJ_EQ_SETS(obj)) {
 		any = FALSE;
@@ -1298,7 +1312,7 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 		
 		increase_coins(ch, emp, amt);
 		decrease_empire_coins(emp, emp, amt);
-		add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1);
+		add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
 		extract_obj(obj);
 		return TRUE;
 	}
@@ -3317,15 +3331,15 @@ void scale_item_to_level(obj_data *obj, int level) {
 * @param int from_island The origin island id.
 * @param int to_island The destination island id.
 * @param int number The quantity to ship.
-* @param obj_vnum vnum What item to ship.
+* @param struct empire_storage_data *store Storage info for the item to ship.
 * @param room_data *to_room Optional: Exact destination room (not just island). May be NULL.
 */
-void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum, room_data *to_room) {
+void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, struct empire_storage_data *store, room_data *to_room) {
 	struct shipping_data *sd;
 	struct island_info *isle;
 	bool done;
 	
-	if (!emp || from_island == NO_ISLAND || to_island == NO_ISLAND || number < 0 || vnum == NOTHING) {
+	if (!emp || from_island == NO_ISLAND || to_island == NO_ISLAND || number < 0 || !store) {
 		msg_to_char(ch, "Unable to set up shipping: invalid input.\r\n");
 		return;
 	}
@@ -3333,7 +3347,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	// try to add to existing order
 	done = FALSE;
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
-		if (sd->vnum != vnum) {
+		if (sd->vnum != store->vnum) {
 			continue;
 		}
 		if (sd->from_island != from_island || sd->to_island != to_island) {
@@ -3355,7 +3369,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	if (!done) {
 		// add shipping order
 		CREATE(sd, struct shipping_data, 1);
-		sd->vnum = vnum;
+		sd->vnum = store->vnum;
 		sd->amount = number;
 		sd->from_island = from_island;
 		sd->to_island = to_island;
@@ -3365,21 +3379,24 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		sd->ship_origin = NOWHERE;
 		sd->shipping_id = -1;
 		
+		// borrow the LATEST timers from storage
+		sd->timers = split_storage_timers(&store->timers, number);
+		
 		// add to end
 		DL_APPEND(EMPIRE_SHIPPING_LIST(emp), sd);
 	}
 	
-	// charge resources
-	charge_stored_resource(emp, from_island, vnum, number);
+	// charge resources -- we pass FALSE at the end because we already split out the timers
+	charge_stored_resource(emp, from_island, store->vnum, number, FALSE);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
 	if (to_room) {
-		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
+		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(get_obj_name_by_proto(store->vnum)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
 	}
 	else {
-		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(store->vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 	}
 }
 
@@ -3437,6 +3454,7 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	bool have_ship = (shipd->shipping_id != -1);
 	struct shipping_data *iter;
+	struct empire_storage_data *new_store;
 	room_data *dock = NULL;
 	
 	// mark all shipments on this ship "delivered" (if we still have a ship)
@@ -3468,7 +3486,10 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		// unload the shipment at the destination
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island_name_for_empire(shipd->to_island, emp), coord_display(NULL, X_COORD(dock), Y_COORD(dock), FALSE));
-			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
+			new_store = add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount, 0);
+			if (new_store) {
+				merge_storage_timers(&new_store->timers, shipd->timers, shipd->amount);
+			}
 		}
 		if (have_ship) {
 			move_ship_to_destination(emp, shipd, dock);
@@ -3481,7 +3502,10 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		// no docks -- unload the shipment at home
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
 			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island_name_for_empire(shipd->from_island, emp), coord_display(NULL, dock ? X_COORD(dock) : -1, dock ? Y_COORD(dock) : -1, FALSE));
-			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
+			new_store = add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount, 0);
+			if (new_store) {
+				merge_storage_timers(&new_store->timers, shipd->timers, shipd->amount);
+			}
 		}
 		if (have_ship) {
 			move_ship_to_destination(emp, shipd, dock);
@@ -3490,7 +3514,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	
 	// and delete this entry from the list
 	DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
-	free(shipd);
+	free_shipping_data(shipd);
 }
 
 
@@ -3668,6 +3692,19 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 
 
 /**
+* Frees one shipping_data.
+*
+* @param struct shipping_data *shipd The thing to free.
+*/
+void free_shipping_data(struct shipping_data *shipd) {
+	if (shipd) {
+		free_storage_timers(&shipd->timers);
+		free(shipd);
+	}
+}
+
+
+/**
 * Finds/creates a holding pen for ships during the shipping system.
 *
 * @return room_data* The ship holding pen.
@@ -3742,6 +3779,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->status_time = shipd->status_time;
 		newd->ship_origin = NOWHERE;
 		newd->shipping_id = -1;
+		newd->timers = split_storage_timers(&shipd->timers, newd->amount);
 		
 		// put right after shipd in the list
 		DL_APPEND_ELEM(EMPIRE_SHIPPING_LIST(emp), shipd, newd);
@@ -3832,8 +3870,15 @@ void process_shipping_one(empire_data *emp) {
 		switch (shipd->status) {
 			case SHIPPING_QUEUED:	// both these are 'waiting' states
 			case SHIPPING_WAITING_FOR_SHIP: {
+				// was this lost to decay before shipping?
+				if (shipd->vnum != NOTHING && shipd->amount <= 0) {
+					DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
+					free_shipping_data(shipd);
+					break;
+				}
+				
+				// attempt to find a(nother) ship
 				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island || last_to_vnum != shipd->to_room) {
-					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
 					last_from = shipd->from_island;
 					last_to = shipd->to_island;
@@ -4886,6 +4931,13 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 			if (obj) {
 				iter->amount -= 1;
 				any = TRUE;
+				
+				// grab the timer from storage?
+				if (iter->timers) {
+					GET_OBJ_TIMER(obj) = iter->timers->timer;
+				}
+				remove_storage_timer_items(&iter->timers, 1, TRUE);
+				
 				obj_to_char(obj, ch);	// inventory size pre-checked
 				act("You retrieve $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 				act("$n retrieves $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
@@ -4906,7 +4958,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				DL_DELETE(EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)), iter);
 				EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			}
-		    free(iter);
+		    free_empire_unique_storage(iter);
 		}
 	}
 	
@@ -7943,7 +7995,7 @@ ACMD(do_ship) {
 	char *strptr;
 	struct island_info *from_isle, *to_isle;
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *new_store;
 	struct shipping_data *sd;
 	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
@@ -8090,10 +8142,16 @@ ACMD(do_ship) {
 			
 			// found!
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			add_to_empire_storage(emp, sd->from_island, sd->vnum, sd->amount);
+			if (sd->amount > 0) {
+				// amount can drop to 0 if they all decayed
+				new_store = add_to_empire_storage(emp, sd->from_island, sd->vnum, sd->amount, 0);
+				if (new_store) {
+					merge_storage_timers(&new_store->timers, sd->timers, sd->amount);
+				}
+			}
 			
 			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), sd);
-			free(sd);
+			free_shipping_data(sd);
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			done = TRUE;
@@ -8127,7 +8185,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
 		else {
-			add_shipping_queue(ch, emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
+			add_shipping_queue(ch, emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store, to_room);
 		}
 	}
 }

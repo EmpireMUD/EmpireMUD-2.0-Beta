@@ -1098,7 +1098,7 @@ void free_char(char_data *ch) {
 				add_to_object_list(eus->obj);
 				extract_obj(eus->obj);
 			}
-			free(eus);
+			free_empire_unique_storage(eus);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -1233,7 +1233,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
-	struct empire_unique_storage *eus;
+	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1809,6 +1809,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						eus->obj = obj;
 						
 						DL_APPEND(GET_HOME_STORAGE(ch), eus);
+						
+						last_eus = eus;
+					}
+				}
+				else if (!strn_cmp(line, "Home Store Timer: ", 18)) {
+					if (sscanf(line + 18, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						if (last_eus) {
+							add_storage_timer(&last_eus->timers, i_in[0], i_in[1]);
+						}
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -3043,6 +3052,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_lastname *lastn;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
+	struct storage_timer *stimer;
 	struct companion_mod *cmod;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
@@ -3127,6 +3137,10 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		}
 		fprintf(fl, "Home Storage: %d %d %d\n", eus->island, eus->amount, eus->flags);
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+		
+		DL_FOREACH(eus->timers, stimer) {
+			fprintf(fl, "Home Store Timer: %d %d\n", stimer->timer, stimer->amount);
+		}
 	}
 	
 	// 'I'

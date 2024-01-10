@@ -3521,6 +3521,7 @@ struct shipping_data {
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship
+	struct storage_timer *timers;	// for items that decay
 	
 	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
 };
@@ -5363,6 +5364,7 @@ struct empire_storage_data {
 	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
 	int keep;	// how much workforce should ignore/keep (UNLIMITED/-1 or >0)
+	struct storage_timer *timers;	// doubly-linked list for expiration
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
@@ -5396,7 +5398,8 @@ struct empire_trade_data {
 struct empire_unique_storage {
 	obj_data *obj;	// actual live object
 	int amount;	// stacking
-	sh_int flags;	// up to 15 flags, EUS_x
+	struct storage_timer *timers;	// for expiring items
+	sh_int flags;	// up to 15 flags, EUS_
 	int island;	// split by islands
 	
 	struct empire_unique_storage *prev, *next;
@@ -5467,6 +5470,14 @@ struct offense_data {
 	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
 	
 	struct offense_data *prev, *next;	// doubly-linked list
+};
+
+
+// for item decay timers in storage
+struct storage_timer {
+	int timer;
+	int amount;
+	struct storage_timer *next, *prev;	// stored as a doubly linked list in ascending order by timer
 };
 
 

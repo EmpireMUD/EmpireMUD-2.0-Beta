@@ -366,10 +366,10 @@ void b3_6_einv_fix(void) {
 				if (store->amount > 0 && store->vnum == vnum) {
 					amt = store->amount;
 					total += amt;
-					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
-					add_to_empire_storage(emp, isle->island, silver, 2 * amt);
+					add_to_empire_storage(emp, isle->island, cloth, 4 * amt, 0);
+					add_to_empire_storage(emp, isle->island, silver, 2 * amt, 0);
 					HASH_DEL(isle->store, store);
-					free(store);
+					free_empire_storage_data(store);
 				}
 			}
 		}
@@ -1061,7 +1061,7 @@ void b5_23_potion_update(void) {
 			if ((obj = eus->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
-					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
+					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount, GET_OBJ_TIMER(proto));
 					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}
@@ -1133,7 +1133,7 @@ void b5_24_poison_update(void) {
 			if ((obj = eus->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
-					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
+					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount, GET_OBJ_TIMER(proto));
 					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}

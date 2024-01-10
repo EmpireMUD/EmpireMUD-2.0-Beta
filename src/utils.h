@@ -2397,6 +2397,7 @@ void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
 void schedule_obj_timer_update(obj_data *obj, bool override);
+bool tick_obj_timer(obj_data *obj);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c

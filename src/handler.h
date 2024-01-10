@@ -448,20 +448,34 @@ bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
-struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
+struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, bool storage_timers);
+#define add_to_empire_storage(emp, island, vnum, amount, timer)  add_to_empire_storage_with_timer((emp), (island), (vnum), (amount), (timer), TRUE);
 bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
-bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, bool storage_timers);
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
 bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
 struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
+room_data *find_storage_location_for(empire_data *emp, int island, obj_data *proto);
+room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault);
 struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
+void free_empire_storage_data(struct empire_storage_data *store);
 int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
 bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
 #define obj_can_be_retrieved(obj, loc, by_emp)  obj_can_be_stored((obj), (loc), (by_emp), TRUE)
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
 int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
 bool stored_item_requires_withdraw(obj_data *obj);
+
+// storage timers
+void add_storage_timer(struct storage_timer **list, int timer, int amount);
+void check_empire_storage_timers();
+void free_storage_timers(struct storage_timer **list);
+void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer *merge_from, int total_things);
+void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first);
+void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_island *isle, obj_data *proto, int amount);
+bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_unique_storage *eus, int amount);
+struct storage_timer *split_storage_timers(struct storage_timer **list, int amount);
 
 // targeting handlers
 int find_all_dots(char *arg);
@@ -474,6 +488,7 @@ void expire_trading_post_item(struct trading_post_data *tpd);
 // unique storage handlers
 bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum);
 struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location);
+void free_empire_unique_storage(struct empire_unique_storage *eus);
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full);
 
 // vehicle handlers
@@ -510,6 +525,7 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
+void free_shipping_data(struct shipping_data *shipd);
 int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);
 obj_data *perform_remove(char_data *ch, int pos);
 

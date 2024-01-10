@@ -1610,9 +1610,12 @@ void check_for_new_map(void) {
 		
 		// free shipping (and put the items back)
 		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
-			add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount);
+			new_store = add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount, 0);
+			if (new_store) {
+				merge_storage_timers(&new_store->timers, shipd->timers, shipd->amount);
+			}
 			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
-			free(shipd);	// no need to remove from list
+			free_shipping_data(shipd);
 		}
 		
 		// free trade (no longer relevant)
@@ -1664,7 +1667,10 @@ void check_for_new_map(void) {
 			// move all inventories to nowhere
 			HASH_ITER(hh, isle->store, store, next_store) {
 				if (store->amount > 0) {
-					new_store = add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount);
+					new_store = add_to_empire_storage(emp, NO_ISLAND, store->vnum, store->amount, 0);
+					if (new_store) {
+						merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
+					}
 				}
 				else {
 					new_store = find_stored_resource(emp, NO_ISLAND, store->vnum);
@@ -1681,7 +1687,7 @@ void check_for_new_map(void) {
 				}
 				
 				HASH_DEL(isle->store, store);
-				free(store);
+				free_empire_storage_data(store);
 			}
 			
 			// remove island data
@@ -1755,7 +1761,10 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
 		HASH_ITER(hh, no_isle->store, store, next_store) {
 			if (store->amount > 0) {
-				new_store = add_to_empire_storage(emp, new_island, store->vnum, store->amount);
+				new_store = add_to_empire_storage(emp, new_island, store->vnum, store->amount, 0);
+				if (new_store) {
+					merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
+				}
 			}
 			else {
 				new_store = find_stored_resource(emp, new_island, store->vnum);
@@ -1772,7 +1781,7 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 			}
 			
 			HASH_DEL(no_isle->store, store);
-			free(store);
+			free_empire_storage_data(store);
 			any = TRUE;
 		}
 		no_isle->store = NULL;
@@ -2146,7 +2155,7 @@ void free_empire(empire_data *emp) {
 			add_to_object_list(eus->obj);
 			extract_obj(eus->obj);
 		}
-		free(eus);
+		free_empire_unique_storage(eus);
 	}
 	
 	// free history
@@ -2161,7 +2170,7 @@ void free_empire(empire_data *emp) {
 	// free shipping data
 	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 		DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
-		free(shipd);
+		free_shipping_data(shipd);
 	}
 	
 	// free cities (while they last)
@@ -2293,7 +2302,7 @@ void free_empire(empire_data *emp) {
 		}
 		HASH_ITER(hh, isle->store, store, next_store) {
 			HASH_DEL(isle->store, store);
-			free(store);
+			free_empire_storage_data(store);
 		}
 		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
 		free(isle);
@@ -2410,10 +2419,10 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH], err_str[256];
-	struct empire_unique_storage *eus;
-	struct shipping_data *shipd;
+	struct empire_unique_storage *eus, *last_eus = NULL;
+	struct shipping_data *shipd, *last_ship = NULL;
 	struct empire_production_total *egt;
-	struct empire_storage_data *store;
+	struct empire_storage_data *store, *last_store = NULL;
 	struct theft_log *tft;
 	obj_data *obj, *proto;
 	bool done = FALSE;
@@ -2458,17 +2467,49 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				break;
 			}
 			case 'O': {	// storage
-				if (!get_line(fl, line)) {
-					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
-					exit(1);
-				}
-				if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
-					t[3] = 0;	// !keep
-					if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
-						log("SYSERR: Bad storage data for empire %d", EMPIRE_VNUM(emp));
-						exit(1);
+				if (*(line+1) == '+') {
+					// new format: check data type
+					if (!strncmp(line, "O+T ", 4)) {
+						// timer entry instead
+						if (sscanf(line, "O+T %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Bad storage timer for empire %d: %s", EMPIRE_VNUM(emp), line);
+							exit(1);
+						}
+						
+						// apply timer
+						if (last_store) {
+							add_storage_timer(&last_store->timers, t[0], t[1]);
+						}
+						break;
+					}
+					else {
+						// new storage entry
+						if (sscanf(line, "O+ %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+							log("SYSERR: Bad storage data for empire %d: %s", EMPIRE_VNUM(emp), line);
+							exit(1);
+						}
+						
+						// pass this data down to the next section for validation
 					}
 				}
+				else {
+					// old format: read data
+					if (!get_line(fl, line)) {
+						log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
+						exit(1);
+					}
+					if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+						t[3] = 0;	// !keep
+						if (sscanf(line, "%d %d %d", &t[0], &t[1], &t[2]) != 3) {
+							log("SYSERR: Bad storage data for empire %d", EMPIRE_VNUM(emp));
+							exit(1);
+						}
+					}
+					
+					// pass this data down to the next section:
+				}
+				
+				// adding storage:
 				
 				// validate vnum
 				proto = obj_proto(t[0]);
@@ -2492,12 +2533,16 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 							SAFE_ADD(store->keep, t[3], 0, INT_MAX, FALSE);
 						}
 					}
+					
+					last_store = store;
 				}
 				else if (proto && !GET_OBJ_STORAGE(proto)) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
+					last_store = NULL;
 				}
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));
+					last_store = NULL;
 				}
 				break;
 			}
@@ -2528,6 +2573,23 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				break;
 			}
 			case 'U': {	// unique storage
+				if (*(line+1) == '+') {
+					// look for U+T
+					if (!strncmp(line, "U+T ", 4)) {
+						// timer entry instead
+						if (sscanf(line, "U+T %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Bad unique storage timer for empire %d: %s", EMPIRE_VNUM(emp), line);
+							exit(1);
+						}
+						
+						// apply timer
+						if (last_eus) {
+							add_storage_timer(&last_eus->timers, t[0], t[1]);
+						}
+						break;
+					}
+				}
+				
 				if (sscanf(line, "U %d %d %s", &t[0], &t[1], str_in) != 3) {
 					log("SYSERR: Invalid U line of empire %d: %s", EMPIRE_VNUM(emp), line);
 					exit(0);
@@ -2549,11 +2611,31 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					eus->flags = asciiflag_conv(str_in);
 					eus->obj = obj;
 					DL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					
+					last_eus = eus;
 				}
 				
 				break;
 			}
 			case 'V': {	// shipments
+				if (*(line+1) == '+') {
+					// look for V+T
+					if (!strncmp(line, "V+T ", 4)) {
+						// timer entry instead
+						if (sscanf(line, "V+T %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Bad shipping timer for empire %d: %s", EMPIRE_VNUM(emp), line);
+							exit(1);
+						}
+						
+						// apply timer
+						if (last_ship) {
+							add_storage_timer(&last_ship->timers, t[0], t[1]);
+						}
+						break;
+					}
+				}
+				
+				// otherwise normal shipping line
 				if (sscanf(line, "V %d %d %d %d %d %ld %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6], &t[7]) != 9) {
 					t[7] = NOWHERE;	// backwards-compatible: to_room
 					
@@ -2578,6 +2660,8 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				
 					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
 					DL_APPEND(EMPIRE_SHIPPING_LIST(emp), shipd);
+					
+					last_ship = shipd;
 				}
 				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
@@ -3401,6 +3485,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
+	struct storage_timer *stimer;
 	struct theft_log *tft;
 
 	if (!emp) {
@@ -3421,7 +3506,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// O: storage
 		HASH_ITER(hh, isle->store, store, next_store) {
-			fprintf(fl, "O\n%d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep);
+			fprintf(fl, "O+ %d %d %d %d\n", store->vnum, store->amount, isle->island, store->keep);
+			
+			DL_FOREACH(store->timers, stimer) {
+				fprintf(fl, "O+T %d %d\n", stimer->timer, stimer->amount);
+			}
 		}
 	}
 	
@@ -3443,11 +3532,19 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 		}
 		fprintf(fl, "U %d %d %s\n", eus->island, eus->amount, bitv_to_alpha(eus->flags));
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+		
+		DL_FOREACH(eus->timers, stimer) {
+			fprintf(fl, "U+T %d %d\n", stimer->timer, stimer->amount);
+		}
 	}
 	
 	// V: shipments
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 		fprintf(fl, "V %d %d %d %d %d %ld %d %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin, shipd->to_room);
+		
+		DL_FOREACH(shipd->timers, stimer) {
+			fprintf(fl, "V+T %d %d\n", stimer->timer, stimer->amount);
+		}
 	}
 
 	fprintf(fl, "S\n");

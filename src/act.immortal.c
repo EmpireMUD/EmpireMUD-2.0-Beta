@@ -10149,7 +10149,10 @@ ACMD(do_moveeinv) {
 		HASH_ITER(hh, eisle->store, store, next_store) {
 			if (store->amount > 0) {
 				count += store->amount;
-				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount, 0);
+				if (new_store) {
+					merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
+				}
 			}
 			else {
 				new_store = find_stored_resource(emp, island_to, store->vnum);
@@ -10166,7 +10169,7 @@ ACMD(do_moveeinv) {
 			}
 			
 			HASH_DEL(eisle->store, store);
-			free(store);
+			free_empire_storage_data(store);
 		}
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {

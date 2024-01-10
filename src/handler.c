@@ -66,6 +66,7 @@
 *   Room Targeting Handlers
 *   Sector Handlers
 *   Storage Handlers
+*   Storage Timers
 *   Targeting Handlers
 *   Unique Storage Handlers
 *   Vehicle Handlers
@@ -90,6 +91,7 @@ void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 EVENT_CANCEL_FUNC(cancel_cooldown_event);
 EVENTFUNC(cooldown_expire_event);
+INTERACTION_FUNC(decay_in_storage_interact);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
@@ -98,6 +100,8 @@ void remove_lore_record(char_data *ch, struct lore_data *lore);
 // local file scope variables
 int char_extractions_pending = 0;
 static int veh_extractions_pending = 0;
+empire_data *decay_in_storage_empire = NULL;	// helps decay items in storage
+int decay_in_storage_isle = NO_ISLAND;	// helps decay items in storage
 
 
 // for run_global_mob_interactions_func
@@ -10269,9 +10273,11 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 * @param int island Which island to store it on
 * @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
+* @param int timer For items with timers, how much is left on those timers. Ignored if <= 0.
+* @param bool storage_timers If TRUE, adds/subtracts storage timers. If FALSE, you have handled this yourself.
 * @return struct empire_storage_data* Returns a pointer to the storage entry.
 */
-struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
+struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, bool storage_timers) {
 	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
 	struct empire_island *isle = get_empire_island(emp, island);
 	
@@ -10293,9 +10299,18 @@ struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, 
 	SAFE_ADD(store->amount, amount, 0, MAX_STORAGE, FALSE);
 	store->amount = MAX(store->amount, 0);
 	
+	if (storage_timers) {
+		if (amount > 0) {
+			add_storage_timer(&store->timers, timer, amount);
+		}
+		else {
+			remove_storage_timer_items(&store->timers, -amount, TRUE);
+		}
+	}
+	
 	if (store->amount == 0 && !store->keep) {
 		HASH_DEL(isle->store, store);
-		free(store);
+		free_empire_storage_data(store);
 		store = NULL;
 	}
 	
@@ -10373,7 +10388,7 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 			}
 			
 			// remove it from the island AFTER being done with store->vnum
-			add_to_empire_storage(emp, isle->island, store->vnum, -this);
+			add_to_empire_storage(emp, isle->island, store->vnum, -this, 0);
 		
 			// done?
 			if (found >= amount) {
@@ -10394,9 +10409,10 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 * @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
 * @param obj_vnum vnum type to charge
 * @param int amount How much to charge
+* @param bool storage_timers If TRUE, adds/subtracts storage timers. If FALSE, you have handled this yourself.
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount) {
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, bool storage_timers) {
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	int this;
@@ -10421,7 +10437,7 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 		this = MIN(amount, store->amount);
 		amount -= this;
 		
-		add_to_empire_storage(emp, isle->island, vnum, -this);
+		add_to_empire_storage_with_timer(emp, isle->island, vnum, -this, 0, storage_timers);
 	}
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -10447,7 +10463,7 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 		if (sto) {
 			SAFE_ADD(deleted, sto->amount, 0, MAX_INT, FALSE);
 			HASH_DEL(isle->store, sto);
-			free(sto);
+			free_empire_storage_data(sto);
 		}
 	}
 	
@@ -10538,6 +10554,72 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 
 
 /**
+* Determines if the empire has a valid storage location on the given island.
+*
+* @param empire_data *emp Which empire.
+* @param int *island Which island.
+* @param obj_data *proto A pointer to the prototype of the object.
+* @return room_data* If a valid storage location exists, returns it; if not, returns NULL.
+*/
+room_data *find_storage_location_for(empire_data *emp, int island, obj_data *proto) {
+	struct empire_territory_data *ter, *next_ter;
+	
+	if (!emp || island == NO_ISLAND || !proto || !GET_OBJ_STORAGE(proto)) {
+		return NULL;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
+			continue;	// wrong island
+		}
+		if (!obj_can_be_stored(proto, ter->room, emp, TRUE)) {
+			continue;	// cannot store here
+		}
+		
+		// seems ok
+		return ter->room;
+	}
+	
+	// we do not check vehicles separately: if they were on a claimed tile, this would already have found them
+	
+	return NULL;
+}
+
+
+/**
+* Determines if the empire has a valid warehouse or vault on the given island.
+*
+* @param empire_data *emp Which empire.
+* @param int *island Which island.
+* @return room_data* If a valid warehouse/vault location exists, returns it; if not, returns NULL.
+*/
+room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault) {
+	struct empire_territory_data *ter, *next_ter;
+	
+	if (!emp || island == NO_ISLAND) {
+		return NULL;	// no work
+	}
+	
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
+			continue;	// wrong island
+		}
+		if (vault && !HAS_FUNCTION(ter->room, FNC_VAULT)) {
+			continue;	// not a vault
+		}
+		if (!vault && !HAS_FUNCTION(ter->room, FNC_WAREHOUSE)) {
+			continue;	// not a warehouse
+		}
+		
+		// seems ok
+		return ter->room;
+	}
+	
+	return NULL;
+}
+
+
+/**
 * This finds the empire_storage_data object for a given vnum in an empire,
 * IF there is any of that vnum stored to the empire. Note that the resource
 * MAY have an amount of 0 (empty entries are retained for 'keep' info).
@@ -10556,6 +10638,19 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 	}
 	
 	return store;
+}
+
+
+/**
+* Frees one empire_storage_data.
+*
+* @param struct empire_storage_data *store The thing to free.
+*/
+void free_empire_storage_data(struct empire_storage_data *store) {
+	if (store) {
+		free_storage_timers(&store->timers);
+		free(store);
+	}
 }
 
 
@@ -10724,9 +10819,16 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	}
 
 	obj = read_object(store->vnum, TRUE);
-	available = store->amount - 1;	// for later
-	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
 	scale_item_to_level(obj, 1);	// scale to its minimum
+	
+	// grab the timer from storage?
+	if (store->timers) {
+		GET_OBJ_TIMER(obj) = store->timers->timer;
+	}
+	
+	// charge resource after borrowing the timer -- as it likely removes the first timer
+	available = store->amount - 1;	// for later
+	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1, TRUE);
 	
 	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		obj_to_char(obj, ch);
@@ -10770,7 +10872,7 @@ int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
 	act("You store $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n stores $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 
-	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1);
+	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
 	extract_obj(obj);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
@@ -10863,7 +10965,7 @@ bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum
 			extract_obj(iter->obj);
 			iter->obj = NULL;
 			DL_DELETE(*list, iter);
-			free(iter);
+			free_empire_unique_storage(iter);
 			any = TRUE;
 		}
 	}
@@ -10908,6 +11010,19 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 
 
 /**
+* Frees empire unique storage and the data inside.
+*
+* @param struct empire_unique_storage *eus The storage item to free.
+*/
+void free_empire_unique_storage(struct empire_unique_storage *eus) {
+	if (eus) {
+		free_storage_timers(&eus->timers);
+		free(eus);
+	}
+}
+
+
+/**
 * Store a unique item to an empire. The object MAY be extracted. If save_emp
 * is NULL, it assumes you're saving character home storage instead of empire
 * warehouse storage.
@@ -10941,10 +11056,9 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
 	}
 	
-	// SEV_x: events that must be canceled or changed when an item is stored
+	// SEV_x: events that must be canceled when an item is stored
 	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
 	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
-	// TODO: convert to a timer that can tick while stored
 	
 	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
 	if ((eus = find_eus_entry(obj, *to_list, save_emp ? room : NULL))) {
@@ -10993,6 +11107,9 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		}
 	}
 	
+	// mark storage timer
+	add_storage_timer(&eus->timers, GET_OBJ_TIMER(obj), 1);
+	
 	if (ch) {
 		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		act("$n stores $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
@@ -11006,6 +11123,448 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	if (save_emp) {
 		EMPIRE_NEEDS_STORAGE_SAVE(save_emp) = TRUE;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// STORAGE TIMERS //////////////////////////////////////////////////////////
+
+/**
+* Adds object timer notes to stored items, in order.
+*
+* @param struct storage_timer **list A pointer to the list of storage timers.
+* @param int timer How many ticks (game hours) are left on the timer.
+* @param int amount How many items share this timer.
+*/
+void add_storage_timer(struct storage_timer **list, int timer, int amount) {
+	struct storage_timer *iter, *st;
+	bool done = FALSE;
+	
+	if (amount < 1 || timer < 1) {
+		return;	// no work
+	}
+	
+	if (list) {
+		// find existing entry or insert point
+		DL_FOREACH(*list, iter) {
+			if (iter->timer == timer) {
+				// found
+				SAFE_ADD(iter->amount, amount, 0, INT_MAX, FALSE);
+				done = TRUE;
+				break;
+			}
+			else if (iter->timer > timer) {
+				// need to add an entry before this one
+				CREATE(st, struct storage_timer, 1);
+				st->timer = timer;
+				st->amount = amount;
+				DL_PREPEND_ELEM(*list, iter, st);
+				done = TRUE;
+				break;
+			}
+		}
+		
+		// did not find an insert point: put it at the end
+		if (!done) {
+			CREATE(st, struct storage_timer, 1);
+			st->timer = timer;
+			st->amount = amount;
+			DL_APPEND(*list, st);
+		}
+	}
+}
+
+
+/**
+* To be called every game hour in order to check stored items for expiration
+* timers.
+*/
+void check_empire_storage_timers(void) {
+	bool counted;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	struct empire_unique_storage *eus, *next_eus;
+	struct shipping_data *shipd, *next_shipd;
+	struct storage_timer *st, *next_st;
+	
+	// all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// store this in case decay_in_storage_interact is called
+		decay_in_storage_empire = emp;
+		
+		// each island
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// store this in case decay_in_storage_interact is called
+			decay_in_storage_isle = isle->island;
+			
+			// each storage on the island
+			HASH_ITER(hh, isle->store, store, next_store) {
+				DL_FOREACH_SAFE(store->timers, st, next_st) {
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+					--st->timer;
+					
+					if (st->timer <= 0) {
+						// time to go
+						if ((proto = obj_proto(store->vnum))) {
+							if (SCRIPT_CHECK(proto, OTRIG_TIMER)) {
+								// has a timer trigger
+								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
+							}
+							else if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
+								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							}
+						}
+						log("debug: %dx %d %s decaying from %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
+						
+						// remove
+						store->amount = MAX(0, store->amount - st->amount);
+						DL_DELETE(store->timers, st);
+						free(st);
+						
+						// delete storage if needed
+						if (store->amount == 0 && !store->keep) {
+							HASH_DEL(isle->store, store);
+							free_empire_storage_data(store);
+							store = NULL;
+							break;	// must break out of store->timers as store is gone
+						}
+					}
+				}
+				// do no work here: store may have been deleted; let it loop instead
+			}
+		}
+		
+		// unique storage
+		DL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
+			DL_FOREACH_SAFE(eus->timers, st, next_st) {
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				--st->timer;
+				
+				if (st->timer <= 0) {
+					counted = FALSE;
+					
+					// time to go
+					if (eus->obj) {
+						log("debug: %dx %d %s decaying in EUS from %s", st->amount, GET_OBJ_VNUM(eus->obj), GET_OBJ_SHORT_DESC(eus->obj), EMPIRE_NAME(emp));
+						decay_in_storage_isle = eus->island;
+						if (SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
+							// has a timer trigger
+							counted = run_timer_triggers_on_decaying_warehouse(emp, eus, st->amount);
+						}
+						else if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+							run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+						}
+					}
+					
+					// remove amount if triggers didn't
+					if (!counted) {
+						eus->amount = MAX(0, eus->amount - st->amount);
+					}
+					
+					// remove this set of timers
+					DL_DELETE(eus->timers, st);
+					free(st);
+					
+					// delete storage if needed
+					if (eus->amount <= 0 || !eus->obj) {
+						DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+						free_empire_unique_storage(eus);
+						break;	// must break out as eus is gone
+					}
+				}
+			}
+			// do no work here: eus may have been deleted; let it loop instead
+		}
+		
+		// shipping
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			DL_FOREACH_SAFE(shipd->timers, st, next_st) {
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				--st->timer;
+				
+				// items that decay in shipping are just list
+				if (st->timer <= 0) {
+					log("debug: %dx %d %s decaying from shipping from %s", st->amount, shipd->vnum, get_obj_name_by_proto(shipd->vnum), EMPIRE_NAME(emp));
+					shipd->amount = MAX(0, shipd->amount - st->amount);
+					DL_DELETE(shipd->timers, st);
+					free(st);
+				}
+				
+				// do not remove shipping entry: it will remove itself when done with the ship
+			}
+		}
+	}
+	
+	// clear this data now
+	decay_in_storage_empire = NULL;
+	decay_in_storage_isle = NO_ISLAND;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(decay_in_storage_interact) {
+	obj_data *proto;
+	
+	// this data must be present
+	if (!decay_in_storage_empire || decay_in_storage_isle == NO_ISLAND) {
+		return FALSE;
+	}
+	
+	// ensure object exists and is storable
+	if (!(proto = obj_proto(interaction->vnum)) || !GET_OBJ_STORAGE(proto)) {
+		return FALSE;
+	}
+	
+	add_to_empire_storage(decay_in_storage_empire, decay_in_storage_isle, interaction->vnum, interaction->quantity, GET_OBJ_TIMER(proto));
+	return TRUE;
+}
+
+
+/**
+* Frees a list of storage timers.
+*
+* @param struct storage_timer **list A pointer to the list to free.
+*/
+void free_storage_timers(struct storage_timer **list) {
+	struct storage_timer *st;
+	if (list) {
+		while ((st = *list)) {
+			DL_DELETE(*list, st);
+			free(st);
+		}
+	}
+}
+
+
+/**
+* Copies storage timers from one set to another. This is used when merging two
+* sets of stored items, for example when one empire merges with another.
+*
+* @param struct storage_timer **merge_to List to merge into.
+* @param struct storage_timer *merge_from List to merge items from (will not be modified).
+* @param int total_things For safety, the total number of items after the merge, to avoid having more storage timers than items.
+*/
+void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer *merge_from, int total_things) {
+	struct storage_timer *st;
+	int count;
+	
+	if (merge_to) {
+		// the merge
+		DL_FOREACH(merge_from, st) {
+			add_storage_timer(merge_to, st->timer, st->amount);
+		}
+		
+		// safety check of totals
+		DL_FOREACH(*merge_to, st) {
+			SAFE_ADD(count, st->amount, 0, INT_MAX, FALSE);
+		}
+		if (count > total_things) {
+			remove_storage_timer_items(merge_to, count - total_things, TRUE);
+		}
+	}
+}
+
+
+/**
+* Removes item counts from a set of storage timers.
+*
+* @param struct storage_timer **list A pointer to the list of storage timers.
+* @param int amount How many to remove.
+* @param bool expiring_first If TRUE, removes ones that will expire soonest first. If FALSE, removes the ones with the longest remaining timers instead.
+*/
+void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first) {
+	struct storage_timer *st, *next;
+	int this;
+	
+	if (*list) {
+		if (expiring_first) {
+			// iterate foreward
+			DL_FOREACH_SAFE(*list, st, next) {
+				this = MIN(st->amount, amount);
+				amount -= this;
+				st->amount -= this;
+				
+				// any left?
+				if (st->amount <= 0) {
+					DL_DELETE(*list, st);
+					free(st);
+				}
+				if (amount <= 0) {
+					// done
+					break;
+				}
+			}
+		}
+		else {
+			// iterate backward
+			for (st = *list ? (*list)->prev : NULL; st; st = (st == *list ? NULL : st->prev)) {
+				this = MIN(st->amount, amount);
+				amount -= this;
+				st->amount -= this;
+				
+				// any left?
+				if (st->amount <= 0) {
+					DL_DELETE(*list, st);
+					free(st);
+				}
+				if (amount <= 0) {
+					// done
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* This is called when items decay in empire storage while they have a timer
+* trigger on them. It will attempt to place them into the world to decay and
+* then possibly autostore again later.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_island *isle Which island they're stored on.
+* @param obj_data *proto A pointer to the prototype.
+* @param int amount How many of that object are decaying.
+*/
+void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_island *isle, obj_data *proto, int amount) {
+	int iter;
+	obj_data *obj;
+	room_data *room;
+	
+	if (!emp || !isle || !proto) {
+		return;	// no work
+	}
+	
+	// determine room
+	if (!(room = find_storage_location_for(emp, isle->island, proto))) {
+		// try interactions instead
+		if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+		}
+		
+		// no room = done
+		return;
+	}
+	
+	// place items in room and decay them
+	for (iter = 0; iter < amount; ++iter) {
+		obj = read_object(GET_OBJ_VNUM(proto), TRUE);
+		GET_OBJ_TIMER(obj) = 1;
+		obj_to_room(obj, room);
+		
+		// this may destroy it
+		tick_obj_timer(obj);
+	}
+}
+
+
+/**
+* This is called when items decay in empire unique storage (warehouse) while
+* they have a timer trigger on them. It will attempt to place them into the
+* world to decay and then possibly autostore again later.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_unique_storage *eus The unique storage item.
+* @param int amount How many of them are expiring.
+* @return bool TRUE if it removed the items already; FALSE if not.
+*/
+bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_unique_storage *eus, int amount) {
+	int iter;
+	obj_data *obj;
+	room_data *room;
+	trig_data *trig;
+	
+	if (!emp || !eus || !eus->obj || amount <= 0) {
+		return FALSE;	// no work
+	}
+	
+	// determine room
+	if (!(room = find_warehouse_location_for(emp, eus->island, IS_SET(eus->flags, EUS_VAULT) ? TRUE : FALSE))) {
+		// try interactions instead
+		if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+		}
+		
+		// no room = done
+		return FALSE;
+	}
+	
+	
+	for (iter = 0; iter < MIN(amount, eus->amount); ++iter) {
+		if (eus->amount > 1) {
+			obj = copy_warehouse_obj(eus->obj);
+		}
+		else {
+			// last one
+			obj = eus->obj;
+			eus->obj = NULL;
+			add_to_object_list(obj);	// put back in object list
+			obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
+			
+			// re-add trigs to the random list
+			if (SCRIPT(obj)) {
+				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+					add_trigger_to_global_lists(trig);
+				}
+			}
+		}
+		
+		if (obj) {
+			--eus->amount;
+			GET_OBJ_TIMER(obj) = 1;
+			obj_to_room(obj, room);
+			
+			// this may destroy it
+			tick_obj_timer(obj);
+		}
+	}
+	return TRUE;
+}
+
+
+/**
+* Splits the last N elements out of a set of storage timers into its own new
+* list of timers. This always splits out the LATEST tiemrs because that is the
+* only use-case for this.
+*
+* @param struct storage_timer **list The list to remove from.
+* @param int amount The number to remove.
+* @return struct storage_timer* A new list with the removed quantity and their original timers.
+*/
+struct storage_timer *split_storage_timers(struct storage_timer **list, int amount) {
+	struct storage_timer *iter, *prev, *st, *new_list = NULL;
+	
+	if (list) {
+		// remove in reverse
+		for (iter = *list ? (*list)->prev : NULL; iter; iter = prev) {
+			// safely iterate backwards
+			prev = (iter == *list ? NULL : iter->prev);
+			
+			if (amount >= iter->amount) {
+				// have enough: just move it over
+				DL_DELETE(*list, iter);
+				DL_PREPEND(new_list, iter);
+				amount -= iter->amount;
+			}
+			else if (amount > 0) {
+				CREATE(st, struct storage_timer, 1);
+				st->timer = iter->timer;
+				st->amount = amount;
+				iter->amount -= amount;
+				DL_PREPEND(new_list, iter);
+				amount = 0;
+			}
+			else {
+				// done
+				break;
+			}
+		}
+	}
+	
+	return new_list;
 }
 
 
