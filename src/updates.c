@@ -3782,6 +3782,53 @@ void b5_169_city_centers(void) {
 }
 
 
+// b5.170 applies timers to items in storage
+void b5_170_timer_updates(void) {
+	int amount;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	struct shipping_data *shipd, *next_shipd;
+	
+	// all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// each island
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// each storage on the island
+			HASH_ITER(hh, isle->store, store, next_store) {
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+				if ((proto = obj_proto(store->vnum)) && GET_OBJ_TIMER(proto)) {
+					// initialize to several different times
+					amount = store->amount;
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto), amount/2);
+						amount -= (amount / 2);
+					}
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) / 2, amount/2);
+						amount -= (amount / 2);
+					}
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) * 2/3, amount);
+					}
+				}
+			}
+		}
+		
+		// shipping
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			if ((proto = obj_proto(shipd->vnum)) && GET_OBJ_TIMER(proto)) {
+				add_storage_timer(&shipd->timers, GET_OBJ_TIMER(proto), shipd->amount);
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3884,6 +3931,7 @@ const struct {
 	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
 	{ "b5.169", b5_169_book_move, NULL, "Renumbering books written by players to resolve vnum conflicts" },
 	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
+	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
