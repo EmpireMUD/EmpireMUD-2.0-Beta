@@ -610,7 +610,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig;
+	int diff;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -669,15 +669,16 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
-			orig = GET_MOVE(ch);
-			set_move(ch, GET_MOVE(ch) + mod);
-			
-			if (GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+			// reduce deficit?
+			if (mod > 0 && GET_MOVE_DEFICIT(ch) > 0) {
 				diff = MIN(GET_MOVE_DEFICIT(ch), mod);
 				GET_MOVE_DEFICIT(ch) -= diff;
-				set_move(ch, GET_MOVE(ch) - diff);
+				set_move(ch, GET_MOVE(ch) + mod - diff);
 			}
+			else {
+				set_move(ch, GET_MOVE(ch) + mod);
+			}
+			
 			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
@@ -698,14 +699,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// apply to current
-			orig = GET_HEALTH(ch);
-			set_health(ch, GET_HEALTH(ch) + mod);
-			
-			if (GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
-				diff = MIN(GET_HEALTH_DEFICIT(ch)-1, mod);
+			// reduce deficit
+			if (mod > 0 && GET_HEALTH_DEFICIT(ch) > 0) {
+				diff = MIN(GET_HEALTH_DEFICIT(ch), mod);
 				GET_HEALTH_DEFICIT(ch) -= diff;
-				set_health(ch, GET_HEALTH(ch) - diff);
+				set_health(ch, GET_HEALTH(ch) + mod - diff);
+			}
+			else {
+				set_health(ch, GET_HEALTH(ch) + mod);
 			}
 			
 			/*
@@ -737,14 +738,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
-			orig = GET_MANA(ch);
-			set_mana(ch, GET_MANA(ch) + mod);
-			
-			if (GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+			// reduce the deficit?
+			if (mod > 0 && GET_MANA_DEFICIT(ch) > 0) {
 				diff = MIN(GET_MANA_DEFICIT(ch), mod);
 				GET_MANA_DEFICIT(ch) -= diff;
-				set_mana(ch, GET_MANA(ch) - diff);
+				set_mana(ch, GET_MANA(ch) + mod - diff);
+			}
+			else {
+				set_mana(ch, GET_MANA(ch) + mod);
 			}
 			/*
 			if (!IS_NPC(ch)) {
@@ -1004,7 +1005,7 @@ void affect_total(char_data *ch) {
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;
-	int health, move, mana;
+	// int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -1014,9 +1015,9 @@ void affect_total(char_data *ch) {
 	}
 	
 	// save these for later -- they shouldn't change during an affect_total
-	health = GET_HEALTH(ch);
-	move = GET_MOVE(ch);
-	mana = GET_MANA(ch);
+	// health = GET_HEALTH(ch);
+	// move = GET_MOVE(ch);
+	// mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
 	
 	for (i = 0; i < NUM_WEARS; i++) {
@@ -1112,17 +1113,14 @@ void affect_total(char_data *ch) {
 		set_move(ch, 0);
 	}
 	if (!IS_NPC(ch)) {
-		if (GET_HEALTH(ch) < 1) {
-			if (GET_POS(ch) >= POS_SLEEPING) {
-				// min 1 on health unless unconscious
-				GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-				set_health(ch, 1);
-			}
-			// otherwise leave them dead/negative
+		if (GET_HEALTH(ch) < 1 && GET_POS(ch) >= POS_SLEEPING) {
+			// min 1 on health unless unconscious
+			GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+			set_health(ch, 1);
 		}
-	
+		// otherwise leave them dead/negative
 	}
-	else {
+	else if (GET_POS(ch) >= POS_SLEEPING) {
 		// npcs cannot die this way
 		set_health(ch, MAX(1, GET_HEALTH(ch)));
 	}
