@@ -672,7 +672,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// prevent from going negative
 			orig = GET_MOVE(ch);
 			set_move(ch, GET_MOVE(ch) + mod);
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
 					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
@@ -685,6 +685,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					set_move(ch, GET_MOVE(ch) - diff);
 				}
 			}
+			*/
 			break;
 		}
 		case APPLY_HEALTH: {
@@ -694,7 +695,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// apply to current
 			orig = GET_HEALTH(ch);
 			set_health(ch, GET_HEALTH(ch) + mod);
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {
 					if (GET_POS(ch) >= POS_SLEEPING) {
@@ -717,6 +718,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				// npcs cannot die this way
 				set_health(ch, MAX(1, GET_HEALTH(ch)));
 			}
+			*/
 			break;
 		}
 		case APPLY_MANA: {
@@ -725,7 +727,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// prevent from going negative
 			orig = GET_MANA(ch);
 			set_mana(ch, GET_MANA(ch) + mod);
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
 					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
@@ -738,6 +740,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					set_mana(ch, GET_MANA(ch) - diff);
 				}
 			}
+			*/
 			break;
 		}
 		case APPLY_BLOOD: {
