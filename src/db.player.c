@@ -2570,7 +2570,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
 	struct slash_channel *channel;
-	obj_data *char_eq[NUM_WEARS];
+	//obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
@@ -3002,8 +3002,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// # save equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		if (GET_EQ(ch, iter)) {
+		//	if (char_eq[iter]) {	// TODO remove line
+		//	Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
 		}
 	}
 	

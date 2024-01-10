@@ -951,7 +951,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	struct affected_type *af;
-	int amount, i, iter, level;
+	int i, iter, level;
 	struct obj_apply *apply;
 	// int health, move, mana;
 	
