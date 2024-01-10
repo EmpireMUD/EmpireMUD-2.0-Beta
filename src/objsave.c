@@ -117,7 +117,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	}
 	
 	// for fread_string
-	sprintf(error, "Obj_load_from_file %d", vnum);
+	sprintf(error, "Obj_load_from_file #%d %s", vnum, NULLSAFE(error_str));
 
 	while (!end) {
 		if (!get_line(fl, line)) {
