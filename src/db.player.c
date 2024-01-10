@@ -2617,6 +2617,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	LL_FOREACH(ch->affected, af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
+	
+	// balance out any deficits before saving
+	check_deficits(ch);
 
 	/* TODO old version of this -- can go
 	// unaffect the character to store raw numbers: equipment
