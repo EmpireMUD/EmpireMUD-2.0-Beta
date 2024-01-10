@@ -672,6 +672,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// prevent from going negative
 			orig = GET_MOVE(ch);
 			set_move(ch, GET_MOVE(ch) + mod);
+			
+			if (GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+				GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - mod);
+			}
 			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
@@ -695,6 +699,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// apply to current
 			orig = GET_HEALTH(ch);
 			set_health(ch, GET_HEALTH(ch) + mod);
+			
+			if (GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
+				GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - mod);
+			}
+			
 			/*
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {
@@ -727,6 +736,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// prevent from going negative
 			orig = GET_MANA(ch);
 			set_mana(ch, GET_MANA(ch) + mod);
+			
+			if (GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+				GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - mod);
+			}
 			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
@@ -1082,9 +1095,35 @@ void affect_total(char_data *ch) {
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
 	// restore these because in some cases, they mess up during an affect_total
+	/*
 	set_health(ch, health);
 	set_move(ch, move);
 	set_mana(ch, mana);
+	*/
+	// check deficits
+	if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
+		GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
+		set_move(ch, 0);
+	}
+	if (!IS_NPC(ch)) {
+		if (GET_HEALTH(ch) < 1) {
+			if (GET_POS(ch) >= POS_SLEEPING) {
+				// min 1 on health unless unconscious
+				GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
+				set_health(ch, 1);
+			}
+			// otherwise leave them dead/negative
+		}
+	
+	}
+	else {
+		// npcs cannot die this way
+		set_health(ch, MAX(1, GET_HEALTH(ch)));
+	}
+	if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
+		GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
+		set_mana(ch, 0);
+	}
 	
 	// check for inventory size
 	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
