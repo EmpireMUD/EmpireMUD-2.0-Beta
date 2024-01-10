@@ -2558,7 +2558,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
-	struct affected_type *af;//, *new_af, *next_af, *af_list;
+	struct affected_type *af;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
@@ -2570,7 +2570,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
 	struct slash_channel *channel;
-	//obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
@@ -2620,41 +2619,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// balance out any deficits before saving
 	check_deficits(ch);
-
-	/* TODO old version of this -- can go
-	// unaffect the character to store raw numbers: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			char_eq[iter] = unequip_char(ch, iter);
-			/ * this is almopst certainly an error here as this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				remove_otrigger(char_eq[iter], ch);
-			#endif
-			* /
-		}
-		else {
-			char_eq[iter] = NULL;
-		}
-	}
-	
-	// unaffect: passives
-	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
-		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
-	}
-	
-	// unaffect: affects
-	af_list = NULL;
-	while ((af = ch->affected)) {
-		CREATE(new_af, struct affected_type, 1);
-		*new_af = *af;
-		new_af->expire_event = NULL;
-		LL_PREPEND(af_list, new_af);
-		affect_remove(ch, af);
-	}
-	
-	// this is almost certainly ignored due to pause_affect_total
-	affect_total(ch);
-	*/
 	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -2737,7 +2701,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	LL_FOREACH(ch->affected, af) {
-	// for (af = af_list; af; af = af->next) {	// stored earlier TODO remove this line
 		if (af->expire_time == UNLIMITED) {
 			timer = UNLIMITED;
 		}
@@ -3006,8 +2969,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// # save equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter)) {
-		//	if (char_eq[iter]) {	// TODO remove line
-		//	Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
 			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
 		}
 	}
@@ -3040,43 +3001,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// this will ensure caps and pay off any deficits
 	check_deficits(ch);
 	
-	/* TODO remove old version
-	// re-affect: passives
-	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
-		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-	}
-	
-	// re-apply: affects
-	for (af = af_list; af; af = next_af) {
-		next_af = af->next;
-		affect_to_char_silent(ch, af);
-		free(af);
-	}
-	
-	// re-apply: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			/ * this is almost certainly an error since this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				if (wear_otrigger(char_eq[iter], ch, iter)) {
-			#endif
-			* /
-					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
-					equip_char(ch, char_eq[iter], iter);
-			/ * probably an error here (see above):
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				}
-				else {
-					obj_to_char(char_eq[iter], ch);
-				}
-			#endif
-			* /
-		}
-	}
-	*/
-	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		// TODO remove this if these never log
 		if (GET_CURRENT_POOL(ch, iter) != pool[iter]) {
 			log("Debug: Current pool changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), pool[iter], GET_CURRENT_POOL(ch, iter));
 		}
@@ -4563,7 +4490,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
-	// affect_total(ch);	// just doing this at the end now TODO remove this line?
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {

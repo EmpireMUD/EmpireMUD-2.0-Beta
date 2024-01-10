@@ -953,7 +953,6 @@ void affect_total(char_data *ch) {
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;
-	// int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -961,13 +960,6 @@ void affect_total(char_data *ch) {
 	if (pause_affect_total) {
 		return;
 	}
-	
-	// save these for later -- they shouldn't change during an affect_total
-	// TODO can these be removed now
-	// health = GET_HEALTH(ch);
-	// move = GET_MOVE(ch);
-	// mana = GET_MANA(ch);
-	level = get_approximate_level(ch);
 	
 	for (i = 0; i < NUM_WEARS; ++i) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
@@ -1032,14 +1024,17 @@ void affect_total(char_data *ch) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
 	
-	if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
-		GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
-	}
-	if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
-		GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
-	}
-	if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
-		GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
+	if (!IS_NPC(ch)) {
+		level = get_approximate_level(ch);
+		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
+			GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
+			GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
+			GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
+		}
 	}
 	
 	/* Make sure maximums are considered */
@@ -1049,13 +1044,6 @@ void affect_total(char_data *ch) {
 	
 	// limit this
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
-	
-	// restore these because in some cases, they mess up during an affect_total
-	/*
-	set_health(ch, health);
-	set_move(ch, move);
-	set_mana(ch, mana);
-	*/
 	
 	// pay off deficits now and check pool caps (for NPCs, this will also check caps)
 	check_deficits(ch);
