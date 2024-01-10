@@ -1260,6 +1260,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	long l_in[3], stored;
 	char c_in[2];
 	
+	pause_affect_total = TRUE;
+	
 	// allocate player if we didn't receive one
 	if (!ch) {
 		CREATE(ch, char_data, 1);
@@ -2359,6 +2361,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	free(cont_row);
+
+	pause_affect_total = FALSE;	
+	affect_total(ch);
 	
 	return ch;
 }
