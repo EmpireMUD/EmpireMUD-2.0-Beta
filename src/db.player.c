@@ -743,6 +743,7 @@ void build_player_index(void) {
 				
 				GET_ACCOUNT(ch) = acct;	// not set by load_player
 
+				affect_total(ch);
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
 				
@@ -2363,7 +2364,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	free(cont_row);
 
 	pause_affect_total = FALSE;	
-	affect_total(ch);
 	
 	return ch;
 }
@@ -3508,6 +3508,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 			}
 			else if ((ch = load_player(index->name, TRUE))) {
 				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+				affect_total(ch);
 				*is_file = TRUE;
 				add_loaded_player(ch);
 			}
@@ -4472,8 +4473,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		announce_login(ch);
 	}
 	
-	affect_total(ch);
-	
 	if (stop_action) {
 		cancel_action(ch);
 	}
@@ -4564,7 +4563,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
-	affect_total(ch);
+	// affect_total(ch);	// just doing this at the end now TODO remove this line?
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
@@ -4592,7 +4591,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		clean_lore(ch);
 		clean_player_kills(ch);
 		reset_player_temperature(ch);
-		affect_total(ch);	// again, in case things changed
 	}
 	else {
 		// ensure not dead
@@ -4649,6 +4647,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
 	}
+	
+	affect_total(ch);	// final affect total
 	
 	// script/trigger stuff
 	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this

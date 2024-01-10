@@ -1068,8 +1068,8 @@ void affect_total(char_data *ch) {
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
-	// check new highest greatness
-	if (!IS_NPC(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
+	// check new highest greatness (in-game only)
+	if (!IS_NPC(ch) && IN_ROOM(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
 		GET_HIGHEST_KNOWN_GREATNESS(ch) = GET_GREATNESS(ch);
 		if (GET_LOYALTY(ch) && IN_ROOM(ch)) {
 			update_member_data(ch);
