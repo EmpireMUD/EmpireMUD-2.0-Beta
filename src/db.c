@@ -1223,7 +1223,12 @@ char *fread_string(FILE * fl, char *error) {
 			for (point-- ; point > tmp && (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
 		}
 		
-		if (*point == '~') {
+		if (!*point) {
+			// string was empty
+			strcpy(point, "\r\n");
+			point += 2;
+		}
+		else if (*point == '~') {
 			*point = '\0';
 			done = 1;
 		}
