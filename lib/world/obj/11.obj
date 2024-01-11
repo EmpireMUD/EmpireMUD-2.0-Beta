@@ -380,7 +380,7 @@ A starberry twinkles on the ground.~
 Beneath its deep, celestial blue skin, the fruit's sweet flavor is as
 enchanting as a cloudless night.
 ~
-6 g a 0 0 7
+6 g a 0 0 8
 6 0 0
 7 5
 C
@@ -398,6 +398,8 @@ M
 18
 $p turns to glowing goo and evaporates.~
 O+ 1 6121
+R
+4 5619 0
 S
 #1124
 sunapple apple orange~
@@ -406,7 +408,7 @@ An orange sunapple glows softly on the ground.~
    The juicy sunapple has a golden-orange hue and a soft, comforting glow. Its
 skin is smooth and slightly mottled, like a fresh apple.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 6 0 0
 7 5
 C
@@ -424,6 +426,8 @@ M
 18
 $p turns to glowing goo and evaporates.~
 O+ 1 6121
+R
+4 5619 0
 S
 #1125
 rainbotan rainbow dewy~
@@ -433,7 +437,7 @@ A rainbotan sits on the ground, covered in dew.~
 colors; but when you open the skin, the inside is a delicate fruit that
 glistens as it shifts from hue to hue.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 6 0 0
 7 5
 C
@@ -451,6 +455,8 @@ M
 18
 $p turns to glowing goo and evaporates.~
 O+ 1 6121
+R
+4 5619 0
 S
 #1126
 mysticurrant currant gleaming~
@@ -459,7 +465,7 @@ A mysticurrant gleams on the ground.~
    It's a small, odd fruit with an otherworldly aura. Its skin is iridescent,
 shifting from color to color as it catches the light.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 6 0 0
 7 5
 C
@@ -477,6 +483,8 @@ M
 18
 $p turns to glowing goo and evaporates.~
 O+ 1 6121
+R
+4 5619 0
 S
 #1127
 claws~

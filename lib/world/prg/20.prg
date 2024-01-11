@@ -29,9 +29,9 @@ Storage~
 build that surplus, you must first build storage buildings. Build one of each
 of the basic storage buildings, and be sure to claim them all to complete this
 goal. The basic storage buildings are: cannery, foundry, granary, gravel pit,
-lumber yard, smokehouse, tannery, seed silo, and utility shed.
+lumber yard, smokehouse, tannery, seed silo, utility shed, and root cellar.
 ~
-4 2 0 5 0
+6 2 0 5 0
 K 7 5
 W
 7 5114 0 1 a
@@ -51,6 +51,8 @@ W
 7 5210 0 1 a
 W
 7 5121 0 1 a
+W
+7 5215 0 1 a
 S
 #2011
 Foundations~

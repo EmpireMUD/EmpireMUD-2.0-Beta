@@ -222,7 +222,7 @@ a handful of popcorn~
 A handful of fluffy popcorn is scattered on the ground here.~
 If you add salt and butter to it, it tastes like salty butter.
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 1 0 0
 7 336
 I 14 18485 100.00 4  # COMBINE: bag of popcorn
@@ -232,6 +232,8 @@ You munch on the popcorn.~
 M
 5
 $n munches on some popcorn.~
+R
+4 5619 0
 S
 #18485
 popcorn bag~

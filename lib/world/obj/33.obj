@@ -20,7 +20,7 @@ an apple pie~
 A warm apple pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 24 0 0
 7 336
 A
@@ -28,32 +28,14 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3302
 pie peach glistening~
 a peach pie~
 A glistening peach pie is sitting here.~
-The pie looks delicious!
-~
-6 m a 0 0 3
-24 0 0
-7 336
-A
-4 1 0
-C
-1 1
-R
-4 5606 0
-R
-4 5132 0
-S
-#3303
-pie cherry rich~
-a cherry pie~
-A rich cherry pie is cooling here.~
 The pie looks delicious!
 ~
 6 m a 0 0 4
@@ -64,9 +46,27 @@ A
 C
 1 1
 R
-4 5606 0
+4 5132 0
+R
+4 5619 0
+S
+#3303
+pie cherry rich~
+a cherry pie~
+A rich cherry pie is cooling here.~
+The pie looks delicious!
+~
+6 m a 0 0 5
+24 0 0
+7 336
+A
+4 1 0
+C
+1 1
 R
 4 5132 0
+R
+4 5619 0
 S
 #3304
 apple candied~
@@ -74,11 +74,11 @@ a candied apple~
 A candied apple is stuck on the ground.~
 The candied apple looks delicious!
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 24 0 0
 7 336
 R
-4 5606 0
+4 5619 0
 S
 #3305
 casserole steaming~
@@ -121,7 +121,7 @@ a sack of cornmeal~
 A sack of cornmeal is sitting here.~
 The cornmeal can be cooked into various foods.
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 7 168
 C
@@ -130,7 +130,7 @@ O+ 1 6300
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #3308
 tortilla~
@@ -167,11 +167,11 @@ a wood ear mushroom~
 A wood ear mushroom is growing here.~
 The mushroom looks good enough to eat, somehow.
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 6 0 0
 7 48
 R
-4 5606 0
+4 5619 0
 S
 #3311
 oil oils olive jar~
@@ -179,16 +179,16 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 l a 0 0 5
+3 l a 0 0 6
 0 0 0
 6 168
 O+ 1 6322
 R
 4 5134 0
 R
-4 5606 0
-R
 4 5192 0
+R
+4 5619 0
 S
 #3312
 flour sack~
@@ -196,7 +196,7 @@ a sack of flour~
 A sack of flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 l a 0 0 3
+3 l a 0 0 4
 0 0 0
 7 168
 C
@@ -205,7 +205,7 @@ O+ 1 6300
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #3313
 bread loaf~
@@ -213,7 +213,7 @@ a loaf of bread~
 A loaf of bread has been dropped on the ground.~
 Bread is a good portable food.
 ~
-6 lm a 0 0 4
+6 lm a 0 0 5
 24 0 0
 7 336
 A
@@ -223,9 +223,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3314
 rice fried bowl~
@@ -468,7 +468,7 @@ a pumpkin pie~
 A rich pumpkin pie is cooling here.~
 The pie looks delicious!
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -476,9 +476,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3324
 tart blackberry flaky~
@@ -623,7 +623,7 @@ a banana pie~
 A warm banana pie is sitting out to cool.~
 It looks delicious!
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -631,9 +631,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3331
 bread banana loaf~
@@ -641,7 +641,7 @@ a loaf of banana bread~
 A loaf of banana bread has been dropped on the ground.~
 Banana bread is a good portable food.
 ~
-6 m a 0 0 7
+6 m a 0 0 8
 24 0 0
 7 336
 A
@@ -649,9 +649,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3332
 spray pepper vial glass~
@@ -688,14 +688,12 @@ S
 pouch dried potato slices~
 a pouch of dried potato slices~
 A pouch of dried potato slices is on the ground.~
-This bag of potato slices looks like it would keep you full for much of a long
-adventure.
+   This bag of potato slices looks like it would keep you full for much of a
+long adventure.
 ~
-6 0 a 0 0 5
+6 0 a 0 0 8
 48 0 0
 7 336
-R
-4 5606 0
 R
 4 5619 0
 S
@@ -705,7 +703,7 @@ a pouch of prunes~
 A pouch of prunes has been left here.~
 This pouch of dried prunes is a must-have for the avid traveler.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -714,8 +712,6 @@ C
 1 1
 R
 4 5619 0
-R
-4 5606 0
 S
 #3336
 pie plum~
@@ -723,13 +719,13 @@ a plum pie~
 A plum pie has been left here.~
 This plum pie looks delicious.
 ~
-6 0 a 0 0 3
+6 0 a 0 0 4
 48 0 0
 7 336
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3337
 pie strawberry~
@@ -737,7 +733,7 @@ a strawberry pie~
 A warm strawberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -745,9 +741,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3338
 jam strawberry jar~
@@ -755,7 +751,7 @@ a jar of strawberry jam~
 A jar of strawberry jam has been dropped here.~
 This glass jar has been filled with delicious strawberry jam.
 ~
-6 m a 0 0 8
+6 m a 0 0 9
 24 0 0
 7 336
 A
@@ -765,9 +761,9 @@ C
 I 26 801 100.00 1  # DECAYS-TO: glass jar
 I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-4 5606 0
-R
 4 5619 0
+R
+4 5114 0
 S
 #3339
 mango candied~
@@ -775,11 +771,11 @@ a candied mango~
 A candied mango is stuck on the ground.~
 The candied mango looks delicious!
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 24 0 0
 7 336
 R
-4 5606 0
+4 5619 0
 S
 #3340
 pie blueberry~
@@ -787,7 +783,7 @@ a blueberry pie~
 A warm blueberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -795,9 +791,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3341
 jam blueberry jar~
@@ -805,7 +801,7 @@ a jar of blueberry jam~
 A jar of blueberry jam has been dropped on the ground.~
 A glass jar filled with delicious blueberry jam.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -817,7 +813,7 @@ I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
 4 5619 0
 R
-4 5606 0
+4 5114 0
 S
 #3342
 straw bale~
@@ -844,7 +840,7 @@ a sack of oatmeal~
 A sack of oatmeal has been left on the ground.~
 Oatmeal can be baked into nourishing cakes.
 ~
-3 0 a 0 0 7
+3 0 a 0 0 8
 0 0 0
 7 0
 C
@@ -854,7 +850,7 @@ R
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #3344
 cake oat flat~
@@ -862,7 +858,7 @@ a flat oat cake~
 A flat oat cake is on the ground.~
 This flat oat cake looks like it would keep you well nourished.
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 24 0 0
 7 336
 A
@@ -870,9 +866,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3345
 meatloaf loaf hearty~
@@ -880,7 +876,7 @@ a hearty meatloaf~
 A hearty meatloaf is sitting on the ground.~
 This hearty meatloaf will make you strong.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -891,8 +887,6 @@ M
 4
 You savor the hearty meatloaf.~
 O+ 1 6242
-R
-4 5132 0
 S
 #3346
 pie shepherd's shepherds~
@@ -900,7 +894,7 @@ a shepherd's pie~
 A shepherd's pie is sitting on the ground.~
 This old family recipe will boost your dexterity.
 ~
-6 mp a 0 0 6
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -911,8 +905,6 @@ M
 4
 You eat a big portion of the savory shepherd's pie.~
 O+ 1 6242
-R
-4 5132 0
 S
 #3347
 fish chips plate~
@@ -921,7 +913,7 @@ A plate of fish and chips is sitting here.~
    These fish and chips remind you of your time at the seaside, and those salty
 memories will boost your charisma.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -939,7 +931,7 @@ chicken and dumplings~
 A plate of chicken and dumplings is sitting here.~
 This old cottage recipe will boost your intelligence.
 ~
-6 mp a 0 0 6
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -950,8 +942,6 @@ M
 4
 You enjoy the chicken and dumplings -- just like mother used to make.~
 O+ 1 6242
-R
-4 5132 0
 S
 #3349
 cobbler berry rich~
@@ -959,7 +949,7 @@ a rich berry cobbler~
 A rich berry cobbler is lying on the ground.~
 This old-fashioned dessert is exactly what you need to boost your wits.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -969,8 +959,6 @@ C
 M
 4
 You eat the warm berry cobbler, and think fondly of home.~
-R
-4 5132 0
 S
 #3350
 sausage black~
@@ -979,7 +967,7 @@ A black sausage is sitting here on the ground.~
    This sausage isn't made from the best parts of the animal, but it will boost
 your ability to hit things.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -997,7 +985,7 @@ jellied eels~
 A plate of jellied eels is sitting here.~
 This old-fashioned dish will make you slippery and boost your dodge.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -1015,7 +1003,7 @@ a pot roast~
 A pot roast is sitting here.~
 The savory pot roast will boost your health.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -1033,7 +1021,7 @@ a bowl of chili~
 A bowl of chili is sitting here.~
 This spicy chili will warm your bones and boost your stamina.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 7
 48 0 0
 7 336
 A
@@ -1051,7 +1039,7 @@ mom's fruit pie~
 Mom's fruit pie is sitting here.~
 This old-fashioned pie is sure to boost your mana.
 ~
-6 mp a 0 0 4
+6 mp a 0 0 5
 48 0 0
 7 336
 A
@@ -1061,8 +1049,6 @@ C
 M
 4
 Every bite of the fruit pie reminds you of home.~
-R
-4 5132 0
 S
 #3355
 biscuits gravy~
@@ -1070,7 +1056,7 @@ biscuits and gravy~
 Some biscuits and gravy are sitting here.~
 This homestyle favorite will boost your move regeneration.
 ~
-6 mp a 0 0 4
+6 mp a 0 0 5
 48 0 0
 7 336
 A
@@ -1080,8 +1066,6 @@ C
 M
 4
 The biscuits and gravy tastes like a warm fireside meal.~
-R
-4 5132 0
 S
 #3356
 vegetables stewed~
@@ -1089,7 +1073,7 @@ stewed vegetables~
 Some stewed vegetables are sitting here.~
 These stewed vegetables will fill you up and boost your mana regeneration.
 ~
-6 mp a 0 0 4
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -1239,7 +1223,7 @@ Someone has left a fresh salad on the ground.~
    The salad is made from fresh, crisp lettuce and chopped vegetables. It has
 been dressed with oil and lightly seasoned.
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 24 0 0
 7 336
 A
@@ -1253,7 +1237,7 @@ M
 5
 $n crunches on a fresh salad.~
 R
-4 5606 0
+4 5619 0
 S
 #3364
 oil oils coconut jar~
@@ -1261,16 +1245,18 @@ a jar of coconut oil~
 A jar of coconut oil is sitting on the ground.~
 The coconut oil inside the jar is a rich yellow-orange color.
 ~
-3 0 a 0 0 9
+3 0 a 0 0 10
 0 0 0
 6 168
 C
 1 1
 O+ 1 6320
 R
-4 5606 0
-R
 4 5192 0
+R
+4 5619 0
+R
+4 5134 0
 S
 #3365
 meat shark dried~
@@ -1296,9 +1282,11 @@ some toasted kernels~
 Some toasted kernels are scattered here.~
 The kernels have been toasted and are now slightly edible.
 ~
-6 0 a 0 0 7
+6 0 a 0 0 8
 2 0 0
 0 1152
+R
+4 5619 0
 S
 #3367
 rice toasted~
@@ -1306,9 +1294,11 @@ some toasted rice~
 Some toasted rice is scattered here.~
 Now that the rice is toasted and puffed, you can eat it.
 ~
-6 0 a 0 0 8
+6 0 a 0 0 9
 2 0 0
 0 1152
+R
+4 5619 0
 S
 #3368
 potatoes baked bowl~
@@ -1340,7 +1330,7 @@ a small sack of sugar~
 A small sack of sugar has been left here.~
 You can use sugar for cooking.
 ~
-6 0 a 0 0 4
+6 0 a 0 0 5
 1 0 0
 0 168
 C
@@ -1349,7 +1339,7 @@ O+ 1 6340
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #3371
 bread garlic loaf~
@@ -1357,7 +1347,7 @@ a loaf of garlic bread~
 A loaf of garlic bread has been dropped on the ground.~
 Garlic bread is a good portable food.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 48 0 0
 7 336
 A
@@ -1365,9 +1355,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #3372
 lemon candied~
@@ -1375,7 +1365,7 @@ a candied lemon~
 A candied lemon is on the ground.~
 The candied lemon looks delicious!
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 6 0 0
 7 336
 A
@@ -1383,7 +1373,7 @@ A
 C
 1 1
 R
-4 5606 0
+4 5619 0
 S
 #3373
 jar pickles~
@@ -1392,7 +1382,7 @@ A glass jar full of pickles is here.~
 This jar has been filled with cucumbers that float in a salty pickling
 solution.
 ~
-6 0 a 0 0 5
+6 0 a 0 0 6
 24 0 0
 7 336
 A
@@ -1400,7 +1390,9 @@ A
 I 26 801 100.00 1  # DECAYS-TO: glass jar
 I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-4 5606 0
+4 5619 0
+R
+4 5114 0
 S
 #3374
 stick fruit roast~
@@ -1408,7 +1400,7 @@ roast fruit on a stick~
 Some roast fruit on a stick is lying here.~
 It's a little bit stick, a little bit sweet, and a whole lot of delicious.
 ~
-6 0 a 0 0 4
+6 0 a 0 0 5
 8 0 0
 7 336
 C
@@ -1417,6 +1409,6 @@ M
 4
 You eat the roast fruit off the stick.~
 R
-4 5606 0
+4 5619 0
 S
 $

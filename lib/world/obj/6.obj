@@ -116,7 +116,7 @@ Some elderberries are scattered on the ground.~
    These elderberries look fresh. They also have a faint pink glow, perhaps
 because of the forest they grew in.
 ~
-6 g a 0 0 6
+6 g a 0 0 7
 6 0 0
 7 48
 A
@@ -125,6 +125,8 @@ M
 4
 You eat $p and feel... elder.~
 O+ 1 6121
+R
+4 5619 0
 S
 #607
 hide skins shimmering~

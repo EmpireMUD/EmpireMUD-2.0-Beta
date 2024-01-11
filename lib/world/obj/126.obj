@@ -58,13 +58,15 @@ A sorcerous biscuit is lying here.~
    This flaky, crumbly biscuit is bright pink in color, a sure sign it was made
 by sorcerers.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
 15 1 0
 C
 1 25
+R
+4 5619 0
 S
 #12606
 necklace fire opal~
@@ -661,10 +663,12 @@ Some sugar cubes are scattered on the ground.~
    These strange sugar cubes are glimmering with sparks of Magiterranean magic.
 Perhaps you could plant them...
 ~
-6 b a 0 0 12
+6 b a 0 0 13
 1 12687 0
 10 168
 O+ 1 6340
+R
+4 5619 0
 S
 #12687
 candy cotton bunch~

@@ -681,10 +681,12 @@ A piece of caramel is stuck to the ground.~
    This little piece of fresh caramel has a stem stuck in it. Perhaps it grew
 on a tree.
 ~
-6 0 a 0 0 6
+6 0 a 0 0 7
 2 0 0
 7 48
 O+ 1 6340
+R
+4 5619 0
 S
 #18844
 cornerstone stone mausoleum~
@@ -1319,7 +1321,7 @@ the garden. At the top, the long vertical ridges on the pumpkin converge at a
 short green stem. You can craft a jack-o-lantern or bake a roast pumpkin from
 this.
 ~
-6 bg a 0 0 13
+6 bg a 0 0 15
 12 18890 0
 7 168
 C
@@ -1327,11 +1329,7 @@ C
 I 25 18891 100.00 2  # SEED: bunch of pumpkin seeds
 O+ 1 6152
 R
-4 5606 0
-R
-4 5610 0
-R
-4 5132 0
+4 5215 0
 S
 #18891
 seeds pumpkin bunch~
@@ -1355,12 +1353,14 @@ A pumpkin blossom has fallen here.~
 achieve, like a little blossom wearing a flowing dress. You've heard that some
 people eat these flowers.
 ~
-6 g a 0 0 1
+6 g a 0 0 2
 1 0 0
 0 48
 C
 1 1
 O+ 1 6142
+R
+4 5619 0
 S
 #18893
 pumpkin roast~
@@ -1405,7 +1405,7 @@ A jack-o-lantern is sitting here.~
    This big orange pumpkin has been cut to look like a face. Use 'light
 jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-29 0 ao 0 0 7
+29 0 ao 0 0 8
 36 0 6
 7 168
 C
@@ -1415,7 +1415,7 @@ R
 R
 4 5610 0
 R
-4 5606 0
+4 5619 0
 S
 #18896
 jack-o-lantern lantern jackolantern~

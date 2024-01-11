@@ -91,7 +91,7 @@ wrapped in a pastry shell and baked until golden. Once the traditional meal of
 miners across the land, it's now enjoyed mainly in bourgeois cafes and
 gentrified food carts.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -110,6 +110,8 @@ $p has gone bad and you throw it out.~
 M
 18
 $p rots away to nothing.~
+R
+4 5619 0
 S
 #11905
 cheese turquoise exotic~
@@ -124,7 +126,7 @@ animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
 for traditional ethics. And none of them are afraid to mislabel a product.
 ~
-6 m a 0 0 8
+6 m a 0 0 9
 24 0 0
 7 336
 A
@@ -143,6 +145,8 @@ There's nothing left of $p but mold, and you throw it out.~
 M
 18
 $p molds until there's nothing left.~
+R
+4 5619 0
 S
 #11906
 fountain stone babbling~
@@ -730,7 +734,7 @@ trail of crumbs behind you.
 two children are abandoned by their parents and leave a trail of breadcrumbs to
 find their way through the forest.
 ~
-6 p a 0 0 6
+6 p a 0 0 8
 12 0 0
 7 48
 C
@@ -1574,7 +1578,7 @@ making it easier to pry them apart.
    Since time immemorial, people have gathered and cooked shellfish as a simple
 and bountiful food source.
 ~
-6 m a 0 0 7
+6 m a 0 0 8
 24 0 0
 7 48
 A
@@ -1596,6 +1600,8 @@ M
 18
 $p go bad and rot.~
 O+ 1 6220
+R
+4 5619 0
 S
 #11978
 mussels~
@@ -1606,7 +1612,7 @@ river but you could certainly cook them up.
    Rivers provide a plentiful and sustainable food source as much for the
 shellfish as for the fisherman.
 ~
-6 0 a 0 0 7
+6 0 a 0 0 8
 6 0 0
 7 48
 C
@@ -1621,6 +1627,8 @@ M
 18
 $p rot.~
 O+ 1 6200
+R
+4 5619 0
 S
 #11979
 net fishing~
@@ -2189,7 +2197,7 @@ a distinctly marbled jade color, but it tastes like a slightly funky cheese.
 Skycleave have been extraordinarily successful at grafting unusual foods in
 magical arbors.
 ~
-6 g a 0 0 9
+6 g a 0 0 10
 6 0 0
 7 12
 B
@@ -2208,5 +2216,7 @@ $p sprouts little legs, hops down to the ground, and runs away!~
 M
 18
 $p sprouts little legs and runs away!~
+R
+4 5619 0
 S
 $

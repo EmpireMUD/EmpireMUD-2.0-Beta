@@ -97,9 +97,11 @@ a pack of dry rations~
 A pack of dry rations is sitting open.~
 This food looks like it could last a while.
 ~
-6 eo a 0 0 1
+6 eo a 0 0 2
 500 0 0
 0 700
+R
+4 5619 0
 S
 #10108
 guard neck armored~
@@ -453,10 +455,12 @@ a spiny red fruit~
 A spiny red fruit is lying on the ground.~
 This strange, spiny fruit has a sweet, earthy flavor.
 ~
-6 g a 0 0 7
+6 g a 0 0 8
 1 0 0
 7 48
 O+ 1 6124
+R
+4 5619 0
 S
 #10148
 ribs pile saguaro~
@@ -584,11 +588,13 @@ An alligator pear is lying on the ground.~
    The alligator pear has a bumpy, black skin. But the inside is bright green
 and creamy.
 ~
-6 g a 0 0 7
+6 g a 0 0 8
 2 0 0
 7 48
 I 14 10153 100.00 4 x  # COMBINE: basket of alligator pears
 O+ 1 6144
+R
+4 5619 0
 S
 #10155
 limes basket~
@@ -616,7 +622,7 @@ a single ripe lime~
 A single ripe lime has been forgotten.~
 This is just a single ripe lime that might provide a little substance.
 ~
-6 g a 0 0 7
+6 g a 0 0 8
 1 0 0
 7 48
 I 14 10155 100.00 4 e  # COMBINE: basket of limes
@@ -627,6 +633,8 @@ M
 5
 $n winces as $e eats $p.~
 O+ 1 6120
+R
+4 5619 0
 S
 #10157
 melon firemelon maroon~
@@ -743,14 +751,14 @@ A sack of mesquite flour is sitting here.~
    Mesquite flour is slightly sweet. It is made from the ground up bean pods of
 the mesquite tree, which grows in the driest deserts.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 7 168
 O+ 1 6300
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #10165
 totem mule~

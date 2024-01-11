@@ -6,7 +6,7 @@ Someone has dropped a glowing vegetable.~
 appears to be a magi-netically modified crop from the deranged druids of the
 Magiterranean.
 ~
-6 0 a 0 0 7
+6 0 a 0 0 8
 1 0 0
 7 48
 I 14 10501 100.00 4 x  # COMBINE: handful of glowkra pods
@@ -16,6 +16,8 @@ $n pops a glowing seedpod into $s mouth.~
 M
 4
 You pop a glowing seedpod into your mouth.~
+R
+4 5619 0
 S
 #10501
 pods handful glowkra~
@@ -65,7 +67,7 @@ A plate of seafood glowkra gumbo is resting here.~
    This dish has the rich smell of garlic, pepper, fish, and okra. The okra
 seem to be glowing.
 ~
-6 0 a 0 0 4
+6 0 a 0 0 5
 48 0 0
 0 336
 M
@@ -74,6 +76,8 @@ You can taste the fresh fish as you eat $p.~
 M
 4
 You can taste the fresh glowkra as you eat $p.~
+R
+4 5619 0
 S
 #10504
 tooth dragon's dragons~
@@ -197,13 +201,13 @@ iron rations.
 Bake (no skill required): ironbread
   2x sack of ironflour
 ~
-3 0 a 0 0 7
+3 0 a 0 0 8
 0 0 0
 2 0
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #10512
 ration ironbread~
@@ -213,7 +217,7 @@ An ironbread ration has been dropped here.~
 ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
 months and is rich in iron. Actually, it might even be made of iron.
 ~
-6 0 a 0 0 9
+6 0 a 0 0 10
 120 0 0
 2 0
 M
@@ -229,9 +233,9 @@ M
 5
 $n bites into $p with a sound like tearing metal.~
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #10513
 gemfruit unripe~
@@ -240,11 +244,11 @@ An unripe gemfruit is lying here.~
    This magi-netically engineered crystalline apple-like fruit looks rather
 soft and underripe, but possibly edible.
 ~
-6 0 a 0 0 6
+6 0 a 0 0 7
 6 0 0
 7 48
 R
-4 5114 0
+4 5619 0
 S
 #10514
 gemfruits sparkling basket~
@@ -266,7 +270,7 @@ a magic mushroom~
 A magic mushroom is lying here.~
 You trip while looking at the mushroom.
 ~
-6 0 a 0 0 6
+6 0 a 0 0 7
 1 0 0
 7 48
 B
@@ -275,6 +279,8 @@ I 14 10516 100.00 4 x  # COMBINE: basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
+R
+4 5619 0
 S
 #10516
 basket mushrooms magic~
@@ -285,7 +291,7 @@ growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 b a 0 0 10
+6 b a 0 0 12
 12 10505 0
 7 168
 B
@@ -295,7 +301,7 @@ M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
 R
-4 5606 0
+4 5215 0
 S
 #10517
 potion magic mushroom~
@@ -320,9 +326,11 @@ an unripe fig~
 An unripe fig is lying here.~
 This fig looks a little under-ripe, but it's strangely mushy.
 ~
-6 0 a 0 0 3
+6 0 a 0 0 4
 1 0 0
 7 48
+R
+4 5619 0
 S
 #10519
 basket pudding figs~
@@ -347,9 +355,11 @@ A figgy pudding has been left on the ground.~
    This figgy pudding has the mystical smell of druidic herbs. Somehow, it's
 still warm and each bite reminds you of home.
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 48 0 0
 7 336
+R
+4 5619 0
 S
 #10521
 leaf fig~
@@ -369,14 +379,14 @@ a pouch of dried figs~
 A pouch of dried figs is lying here.~
 These figs are dried, but still have the moist taste of pudding.
 ~
-6 0 a 0 0 4
+6 0 a 0 0 5
 48 0 0
 7 672
 M
 4
 You eat $p. The figs are surprisingly moist.~
 R
-4 5606 0
+4 5619 0
 S
 #10523
 beans magic handful~
@@ -385,7 +395,7 @@ A handful of magic beans is scattered here.~
    These beans look strangely ordinary... You can't believe anyone would sell a
 whole cow just for these.
 ~
-6 b a 0 0 5
+6 b a 0 0 7
 6 10507 0
 10 48
 O+ 1 6141
@@ -399,9 +409,11 @@ Some dark gray leaves are lying here.~
    These dark gray leaves come from the axeroot plant, one of the many strange
 magi-netically modified plants collected by druids.
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 6 0 0
 2 48
+R
+4 5619 0
 S
 #10525
 axeroot root~
@@ -414,11 +426,11 @@ start a new crop.
 Craft (Basic Crafts): axeroot chopper
 Craft (Master Craftsman, level 150): spade-axe
 ~
-3 be a 0 0 7
+3 be a 0 0 8
 0 10508 0
 2 168
 R
-4 5116 0
+4 5215 0
 S
 #10526
 chopper axeroot~
@@ -460,7 +472,7 @@ Some chowberries are scattered on the ground.~
 by some half-fiveleafed Magiterranean druid working late in the magi-netic
 engineering lab.
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 6 0 0
 7 48
 M
@@ -469,6 +481,8 @@ You crunch away on $p.~
 M
 5
 $n crunches away on $p.~
+R
+4 5619 0
 S
 #10529
 pod puppy~
@@ -507,11 +521,11 @@ A pickthorn fruit is lying here.~
    This strange red fruit comes from the pickthorn plant, which was
 magi-netically engineered by a group of druids to grow natural tools.
 ~
-6 b a 0 0 2
+6 b a 0 0 3
 6 10510 0
 0 48
 R
-4 5114 0
+4 5619 0
 S
 #10532
 stalk pickthorn~
@@ -630,12 +644,12 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 bg a 0 0 7
+6 bg a 0 0 8
 12 10551 0
 7 168
 O+ 1 6132
 R
-4 5114 0
+4 5215 0
 S
 #10552
 berries brambleberries arctic~
@@ -643,10 +657,12 @@ some arctic brambleberries~
 Some arctic brambleberries are scattered on the ground.~
 You can eat the berries.
 ~
-6 g a 0 0 6
+6 g a 0 0 7
 2 0 0
 7 48
 O+ 1 6122
+R
+4 5619 0
 S
 #10553
 pie rhubarb~
@@ -654,7 +670,7 @@ a rhubarb pie~
 All you can smell is that warm rhubarb pie on the ground.~
 The pie looks delicious!
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 24 0 0
 7 336
 A
@@ -664,9 +680,9 @@ A
 C
 1 1
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #10554
 runes strange glacier~
@@ -1376,13 +1392,15 @@ A plate of cold cuts is lying on the ground.~
    These cold cuts are, indeed, very cold. It's as if they were made from
 frozen meat.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 18 0 0
 7 96
 A
 24 1 0
 C
 1 1
+R
+4 5619 0
 S
 #10598
 gemstone stone frozen~

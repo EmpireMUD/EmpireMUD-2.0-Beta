@@ -18,11 +18,13 @@ a single papaya~
 Someone has dropped a single papaya here.~
 This is just one papaya, not enough to plant but enough to eat.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 2 0 0
 7 48
 I 14 18500 100.00 4 x  # COMBINE: basket of papayas
 O+ 1 6123
+R
+4 5619 0
 S
 #18502
 sign~

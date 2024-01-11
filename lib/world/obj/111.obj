@@ -32,7 +32,7 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bgl a 0 0 7
+6 bgl a 0 0 9
 12 11100 0
 7 168
 C
@@ -40,7 +40,7 @@ C
 I 15 11103 100.00 4 x  # SEPARATE: carrot
 O+ 1 6152
 R
-4 5606 0
+4 5215 0
 S
 #11103
 carrot~
@@ -48,13 +48,15 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 1 0 0
 7 48
 C
 1 1
 I 14 11102 100.00 4 x  # COMBINE: bunch of carrots
 O+ 1 6142
+R
+4 5619 0
 S
 #11104
 blackberries bunch berries~
@@ -78,13 +80,15 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 g a 0 0 7
+6 g a 0 0 8
 1 0 0
 7 48
 C
 1 1
 I 14 11104 100.00 4 x  # COMBINE: bunch of blackberries
 O+ 1 6122
+R
+4 5619 0
 S
 #11106
 pears juicy~
@@ -108,13 +112,15 @@ a ripe pear~
 Someone has dropped a ripe pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 0 8
+6 g a 0 0 9
 2 0 0
 7 48
 C
 1 1
 I 14 11106 100.00 4 x  # COMBINE: juicy pears
 O+ 1 6122
+R
+4 5619 0
 S
 #11108
 hood scarlet-feathered feathered scarlet~

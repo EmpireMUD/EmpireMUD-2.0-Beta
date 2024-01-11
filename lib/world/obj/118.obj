@@ -2136,7 +2136,7 @@ melts away into cloying sweetness.
 the earth and releasing it into the world, a task it performed ceaselessly
 beneath both sun and stars for 8200 years, but not a day longer.
 ~
-6 m a 0 0 9
+6 m a 0 0 10
 24 0 0
 12 168
 A
@@ -2158,6 +2158,8 @@ M
 18
 $p breaks into little pieces and blows away.~
 O+ 1 11880
+R
+4 5619 0
 S
 #11881
 flask lightning~
@@ -2244,9 +2246,9 @@ Mushrooms like this grow all over.
 important to correctly identify them first. Many mushrooms are difficult to
 distinguish when they're small.
 ~
-6 km a 0 0 1
+6 km a 0 0 3
 6 0 0
-0 0
+0 8064
 C
 150 150
 M
@@ -2255,6 +2257,8 @@ $p rots and you throw it out.~
 M
 18
 $p rots on the ground.~
+R
+4 5619 0
 T 11950
 S
 #11885

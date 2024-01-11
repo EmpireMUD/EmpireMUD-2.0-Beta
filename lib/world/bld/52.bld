@@ -377,4 +377,32 @@ R
 R
 1011 1 5 0
 S
+#5215
+Root Cellar~
+The Community Root Cellar~
+&0{RR}~
+16 0 bp 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   There's an earthy smell as you walk down the dirt ramp into the root cellar.
+It's cool down here, insulated from the world outside world, perfect for
+storing vegetables on the shelves and in the bins all year long.
+~
+E
+shelf shelves~
+Shelves line the earthen walls with room for plenty of vegetables.
+~
+E
+bins~
+Bins fill the center of the room to help sort and store vegetables.
+~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+1002 1 5 0
+R
+1010 1 5 0
+Z1 2
+S
 $

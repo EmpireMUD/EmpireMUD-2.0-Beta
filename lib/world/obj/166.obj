@@ -776,7 +776,7 @@ a gingerbread man~
 A gingerbread man lies dead on the ground.~
 It appears to be a dead gingerbread man.
 ~
-6 0 a 0 0 1
+6 0 a 0 0 2
 24 0 0
 0 24
 C
@@ -790,6 +790,8 @@ $n grabs the gingerbread man and takes a huge bite out of him!~
 M
 17
 The gingerbread man has gone bad and you discard it.~
+R
+4 5619 0
 S
 #16669
 snowman snow-man man little~

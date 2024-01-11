@@ -84,10 +84,12 @@ some seaweed~
 Some seaweed is piled here.~
 The seaweed is a bit slimy, but edible.
 ~
-6 g a 0 0 4
+6 g a 0 0 5
 4 0 0
 0 72
 O+ 1 6150
+R
+4 5619 0
 S
 #12408
 creature sea spawner~
@@ -624,7 +626,7 @@ a seaweed salad~
 A seaweed salad is drying out on the ground.~
 This lightly-dressed salad smells of the ocean.
 ~
-6 m a 0 0 7
+6 m a 0 0 8
 24 0 0
 7 336
 A
@@ -638,7 +640,7 @@ M
 5
 $n grimmaces as $e crunches on a seaweed salad.~
 R
-4 5606 0
+4 5619 0
 S
 #12443
 monster sea spawner~
