@@ -3791,6 +3791,9 @@ void b5_170_timer_updates(void) {
 	struct empire_storage_data *store, *next_store;
 	struct shipping_data *shipd, *next_shipd;
 	
+	// Note: there is no need to update warehouse or home storage: these did
+	// not allow items with timers prior to this patch.
+	
 	// all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		// each island
@@ -3798,7 +3801,12 @@ void b5_170_timer_updates(void) {
 			// each storage on the island
 			HASH_ITER(hh, isle->store, store, next_store) {
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-			
+				
+				if (store->timers) {
+					// remove and replace existing timers
+					free_storage_timers(&store->timers);
+				}
+				
 				if ((proto = store->proto) && GET_OBJ_TIMER(proto)) {
 					// initialize to several different times
 					amount = store->amount;
@@ -3807,7 +3815,7 @@ void b5_170_timer_updates(void) {
 						amount -= (amount / 2);
 					}
 					if (amount > 0) {
-						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) / 2, amount/2);
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) * 3/4, amount/2);
 						amount -= (amount / 2);
 					}
 					if (amount > 0) {
@@ -3820,6 +3828,11 @@ void b5_170_timer_updates(void) {
 		// shipping
 		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			if (shipd->timers) {
+				// remove and replace existing timers
+				free_storage_timers(&shipd->timers);
+			}
 			
 			if ((proto = obj_proto(shipd->vnum)) && GET_OBJ_TIMER(proto)) {
 				add_storage_timer(&shipd->timers, GET_OBJ_TIMER(proto), shipd->amount);
