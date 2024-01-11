@@ -1120,6 +1120,8 @@ For example, if an item costs you 4 coins to post and you sell it for 10 coins,
 You'll receive 9 coins (95% of the sale price) plus your original 4 back, for
 a total of 13 coins.
 
+You cannot post perishable items on the trading post.
+
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 #
 UNIQUE "UNIQUE ITEM" "UNIQUE OBJECT" (UNIQUE)
