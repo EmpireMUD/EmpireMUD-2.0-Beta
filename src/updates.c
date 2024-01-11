@@ -3799,7 +3799,7 @@ void b5_170_timer_updates(void) {
 			HASH_ITER(hh, isle->store, store, next_store) {
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
-				if ((proto = obj_proto(store->vnum)) && GET_OBJ_TIMER(proto)) {
+				if ((proto = store->proto) && GET_OBJ_TIMER(proto)) {
 					// initialize to several different times
 					amount = store->amount;
 					if (amount > 0) {

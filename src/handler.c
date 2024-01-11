@@ -11159,7 +11159,7 @@ void check_empire_storage_timers(void) {
 					
 					if (st->timer <= 0) {
 						// time to go
-						if ((proto = obj_proto(store->vnum))) {
+						if ((proto = store->proto)) {
 							if (prototype_has_timer_trigger(proto)) {
 								// has a timer trigger
 								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
@@ -11198,7 +11198,6 @@ void check_empire_storage_timers(void) {
 					
 					// time to go
 					if (eus->obj) {
-						log("debug: %dx %d %s decaying in EUS from %s", st->amount, GET_OBJ_VNUM(eus->obj), GET_OBJ_SHORT_DESC(eus->obj), EMPIRE_NAME(emp));
 						decay_in_storage_isle = eus->island;
 						if (SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
 							// has a timer trigger
@@ -11389,11 +11388,6 @@ void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_isla
 		return;	// no work
 	}
 	
-	if (GET_OBJ_VNUM(proto) == 3054) {
-		// TODO remove debug log
-		log("debug: %dx calabash starting run_timer_triggers_on_decaying_storage in %s", amount, EMPIRE_NAME(emp));
-	}
-	
 	// determine room
 	if (!(room = find_storage_location_for(emp, isle->island, proto))) {
 		// try interactions instead
@@ -11403,11 +11397,6 @@ void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_isla
 		
 		// no room = done
 		return;
-	}
-	
-	if (GET_OBJ_VNUM(proto) == 3054) {
-		// TODO remove debug log
-		log("debug: %dx calabash loading for trigger in %s at %s", amount, EMPIRE_NAME(emp), room_log_identifier(room));
 	}
 	
 	// place items in room and decay them
