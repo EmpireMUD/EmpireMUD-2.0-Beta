@@ -5993,31 +5993,33 @@ ACMD(do_findmaintenance) {
 
 
 /**
-* Searches the world for the player's private home.
+* Gets the player's private home, if it's still valid.
+*
+* This function formerly searched the world for the player's private home; this
+* data is on the player as of b5.170.
 *
 * @param char_data *ch The player.
 * @return room_data* The home location, or NULL if none found.
 */
 room_data *find_home(char_data *ch) {
-	room_data *iter, *next_iter;
+	room_data *home;
 	
-	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
-		return NULL;
+	home = (!IS_NPC(ch) && GET_HOME_LOCATION(ch) != NOWHERE) ? real_room(GET_HOME_LOCATION(ch)) : NULL;
+	
+	// audit now for lost home:
+	if (home && ROOM_PRIVATE_OWNER(home) != GET_IDNUM(ch)) {
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		home = NULL;
 	}
 	
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
-			return iter;
-		}
-	}
-	
-	return NULL;
+	return home;
 }
 
 
 ACMD(do_home) {
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
+	char_data *targ;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	
@@ -6091,6 +6093,7 @@ ACMD(do_home) {
 			}
 			
 			set_private_owner(real, GET_IDNUM(ch));
+			GET_HOME_LOCATION(ch) = GET_ROOM_VNUM(real);
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
@@ -6127,12 +6130,18 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
 		}
 		else {
+			if ((targ = is_playing(ROOM_PRIVATE_OWNER(real)))) {
+				GET_HOME_LOCATION(targ) = NOWHERE;
+				queue_delayed_update(targ, CDU_SAVE);
+			}
 			clear_private_owner(ROOM_PRIVATE_OWNER(real));
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
 	else if (!str_cmp(command, "unset")) {
 		clear_private_owner(GET_IDNUM(ch));
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		queue_delayed_update(ch, CDU_SAVE);
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
 	else if (is_abbrev(command, "inventory")) {

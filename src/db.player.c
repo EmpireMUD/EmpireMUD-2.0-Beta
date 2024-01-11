@@ -1256,6 +1256,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
+	room_data *room;
 	trig_data *trig;
 	double dbl_in;
 	long l_in[3], stored;
@@ -1791,6 +1792,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						hist->is_disguised = i_in[5] ? TRUE : FALSE;
 						hist->message = fread_string(fl, error);
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+					}
+				}
+				else if (!strn_cmp(line, "Home Room: ", 11)) {
+					GET_HOME_LOCATION(ch) = atoi(line + 11);
+					if (GET_HOME_LOCATION(ch) != NOWHERE && (!(room = real_room(GET_HOME_LOCATION(ch))) || ROOM_PRIVATE_OWNER(room) != GET_IDNUM(ch))) {
+						GET_HOME_LOCATION(ch) = NOWHERE;
 					}
 				}
 				else if (!strn_cmp(line, "Home Storage: ", 14)) {
@@ -2820,6 +2827,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'H'
 	fprintf(fl, "Highest Greatness: %d\n", GET_HIGHEST_KNOWN_GREATNESS(ch));
 	fprintf(fl, "Highest Known Level: %d\n", GET_HIGHEST_KNOWN_LEVEL(ch));
+	if (GET_HOME_LOCATION(ch) != NOWHERE) {
+		fprintf(fl, "Home Room: %d\n", GET_HOME_LOCATION(ch));
+	}
 	
 	// 'I'
 	for (iter = 0; iter < MAX_IGNORES; ++iter) {
@@ -3422,11 +3432,10 @@ void add_loaded_player(char_data *ch) {
 
 
 /**
-* This has the same purpose as get_player_vis_or_file, but won't screw anything
-* up if the target is online but invisible. You can call SAVE_CHAR(ch) like
-* normal. You should call store_loaded_char() if is_file == TRUE, or the player
-* won't be stored. If you do NOT wish to save the character, you can use
-* free_char() instead.
+* This function finds a character in-game or loads them from file. You can call
+* SAVE_CHAR(ch) like normal. You should call store_loaded_char() if is_file ==
+* TRUE, or changes to the player won't be stored. If you do NOT wish to save
+* the character, you can use free_char() instead.
 *
 * If you do not free the character yourself, it will automatically be freed
 * within 1 second. Leaving characters in this state can be advantageous if you
@@ -3473,6 +3482,45 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	}
 	
 	return ch;
+}
+
+
+/**
+* This function finds a character in-game or loads them from file. You can call
+* SAVE_CHAR(ch) like normal. You should call store_loaded_char() if is_file ==
+* TRUE, or changes to the player won't be stored. If you do NOT wish to save
+* the character, you can use free_char() instead.
+*
+* If you do not free the character yourself, it will automatically be freed
+* within 1 second. Leaving characters in this state can be advantageous if you
+* expect several functions to load them in sequence.
+*
+* @param int idnum The player id.
+* @param bool *is_file A place to store whether or not we loaded from file
+* @return char_data *ch or NULL
+*/
+char_data *find_or_load_player_by_idnum(int idnum, bool *is_file) {
+	struct loaded_player_data *lpd;
+	player_index_data *index;
+	char_data *ch = NULL;
+	
+	*is_file = FALSE;
+	
+	if (!(ch = is_playing(idnum))) {
+		HASH_FIND_INT(loaded_player_hash, &idnum, lpd);
+		if (lpd) {	// look in the loaded player hash first
+			*is_file = TRUE;
+			ch = lpd->ch;
+		}
+		else if ((index = find_player_index_by_idnum(idnum)) && (ch = load_player(index->name, TRUE))) {
+			SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+			affect_total(ch);
+			*is_file = TRUE;
+			add_loaded_player(ch);
+		}
+	}
+	
+	return ch;	// if any
 }
 
 
@@ -4068,6 +4116,7 @@ void clear_player(char_data *ch) {
 	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
+	GET_HOME_LOCATION(ch) = NOWHERE;
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;

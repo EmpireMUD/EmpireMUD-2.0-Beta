@@ -1282,6 +1282,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_HIGHEST_KNOWN_GREATNESS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_greatness))
 #define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
 #define GET_HISTORY(ch, type)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->channel_history[(type)]))
+#define GET_HOME_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_location))
 #define GET_HOME_STORAGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_storage))
 #define GET_IDLE_SECONDS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->idle_seconds))
 #define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))

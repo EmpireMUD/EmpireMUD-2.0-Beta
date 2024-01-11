@@ -4800,6 +4800,7 @@ struct player_special_data {
 	room_vnum load_room;	// Which room to place char in
 	room_vnum load_room_check;	// this is the home room of the player's loadroom, used to check that they're still in the right place
 	room_vnum last_room;	// useful when dead
+	room_vnum home_location;	// player's private home, if any -- not called "home_room" to avoid confusion with the room_data version of a "home room"
 	room_vnum tomb_room;	// location of player's chosen tomb
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts

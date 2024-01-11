@@ -3829,6 +3829,36 @@ void b5_170_timer_updates(void) {
 }
 
 
+// b5.170 adds data on the character for their home location; need to update it now
+void b5_170_home_assignments(void) {
+	bool is_file;
+	char_data *ch;
+	room_data *iter, *next_iter;
+	
+	HASH_ITER(hh, world_table, iter, next_iter) {
+		if (ROOM_PRIVATE_OWNER(iter) != NOBODY) {
+			// found private owner
+			if ((ch = find_or_load_player_by_idnum(ROOM_PRIVATE_OWNER(iter), &is_file))) {
+				// save new data
+				GET_HOME_LOCATION(ch) = GET_ROOM_VNUM(iter);
+				
+				if (is_file) {
+					store_loaded_char(ch);
+					is_file = FALSE;
+				}
+				else {
+					queue_delayed_update(ch, CDU_SAVE);
+				}
+			}
+			else {
+				// bad data: no player
+				set_private_owner(iter, NOBODY);
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3932,6 +3962,7 @@ const struct {
 	{ "b5.169", b5_169_book_move, NULL, "Renumbering books written by players to resolve vnum conflicts" },
 	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
 	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
+	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
