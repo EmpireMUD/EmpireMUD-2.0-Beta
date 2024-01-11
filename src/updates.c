@@ -3261,7 +3261,7 @@ void b5_152_light_update(obj_data *obj) {
 		}
 		
 		// and is it really in the world? (not on a loaded character)
-		if (IN_ROOM(obj) || obj->in_vehicle || obj->in_obj || (obj->carried_by && IN_ROOM(obj->carried_by)) || (obj->worn_by && IN_ROOM(obj->worn_by))) {
+		if (OBJ_IS_IN_WORLD(obj)) {
 			request_obj_save_in_world(obj);
 			schedule_obj_timer_update(obj, FALSE);
 			
