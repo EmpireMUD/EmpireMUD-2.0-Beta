@@ -11285,8 +11285,6 @@ void check_home_storage_timers(char_data *ch) {
 				
 				// time to go
 				if (eus->obj) {
-					log("debug: %dx %d %s decaying in home storage for %s", st->amount, GET_OBJ_VNUM(eus->obj), GET_OBJ_SHORT_DESC(eus->obj), GET_NAME(ch));
-					
 					decay_in_storage_isle = eus->island;
 					if (home && SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
 						// has a timer trigger
