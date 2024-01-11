@@ -76,7 +76,8 @@ void adventure_unsummon(char_data *ch) {
 	GET_LAST_DIR(ch) = NO_DIR;
 	qt_visit_room(ch, IN_ROOM(ch));
 	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "summon");	// cannot pre-greet for summon
-
+	enter_triggers(ch, NO_DIR, "summon", FALSE);
+	
 	look_at_room(ch);
 	if (reloc) {
 		msg_to_char(ch, "\r\nYour original location could not be located. You have been returned to a safe location after leaving the adventure.\r\n");
@@ -95,6 +96,7 @@ void adventure_unsummon(char_data *ch) {
 			char_to_room(fol->follower, IN_ROOM(ch));
 			GET_LAST_DIR(fol->follower) = NO_DIR;
 			pre_greet_mtrigger(fol->follower, IN_ROOM(fol->follower), NO_DIR, "summon");	// cannot pre-greet for summon
+			enter_triggers(fol->follower, NO_DIR, "summon", FALSE);
 			look_at_room(fol->follower);
 			act("$n appears in a burst of smoke!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 			

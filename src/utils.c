@@ -3071,6 +3071,31 @@ bool affect_is_beneficial(struct affected_type *aff) {
 
 
 /**
+* If the character chose bonus health, moves, or mana during creation, adds or
+* removes those now.
+*
+* TODO would like to replace this with special abilities, through the passive
+* buff ability engine.
+*
+* @param char_data *ch The player.
+* @param bool add If TRUE, adds the bonus. If FALSE, removes it.
+*/
+void apply_bonus_pools(char_data *ch, bool add) {
+	if (!IS_NPC(ch)) {
+		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
+			affect_modify(ch, APPLY_HEALTH, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
+			affect_modify(ch, APPLY_MOVE, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
+			affect_modify(ch, APPLY_MANA, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+	}
+}
+
+
+/**
 * Player's carry limit. This was formerly a macro.
 *
 * @param char_data *ch The player/character.
@@ -6933,6 +6958,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
+			enter_triggers(ch, NO_DIR, "system", FALSE);
 			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);

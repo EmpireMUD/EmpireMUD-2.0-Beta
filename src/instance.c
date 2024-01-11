@@ -1200,6 +1200,7 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				char_to_room(ch, to_room);
 				GET_LAST_DIR(ch) = NO_DIR;
 				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "system");	// cannot pre-greet for this
+				enter_triggers(ch, NO_DIR, "system", FALSE);
 				look_at_room(ch);
 				
 				// and announce

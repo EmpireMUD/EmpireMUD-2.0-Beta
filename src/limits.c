@@ -160,6 +160,53 @@ void check_daily_cycle_reset(char_data *ch) {
 
 
 /**
+* This is called after removing and re-applying affects/gear.
+* Players: Pays off any deficits they can afford, and checks maximums.
+* NPCS: Just checks maximums.
+*
+* @param char_data *ch The characters.
+*/
+void check_deficits(char_data *ch) {
+	int amount;
+	
+	// move
+	if (!IS_NPC(ch) && GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MOVE(ch), GET_MOVE_DEFICIT(ch));
+		set_move(ch, GET_MOVE(ch) - amount);
+		GET_MOVE_DEFICIT(ch) -= amount;
+	}
+	if (GET_MOVE(ch) > GET_MAX_MOVE(ch)) {
+		// we had to let it go over temporarily; cap it now through set_move
+		set_move(ch, GET_MAX_MOVE(ch));
+	}
+	
+	// health
+	if (!IS_NPC(ch) && GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
+		amount = MIN(GET_HEALTH(ch) - 1, GET_HEALTH_DEFICIT(ch));
+		set_health(ch, GET_HEALTH(ch) - amount);
+		GET_HEALTH_DEFICIT(ch) -= amount;
+	}
+	if (GET_HEALTH(ch) > GET_MAX_HEALTH(ch)) {
+		// we had to let it go over temporarily; cap it now through set_health
+		set_health(ch, GET_MAX_HEALTH(ch));
+	}
+	
+	// mana
+	if (!IS_NPC(ch) && GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MANA(ch), GET_MANA_DEFICIT(ch));
+		set_mana(ch, GET_MANA(ch) - amount);
+		GET_MANA_DEFICIT(ch) -= amount;
+	}
+	if (GET_MANA(ch) > GET_MAX_MANA(ch)) {
+		// we had to let it go over temporarily; cap it now through set_mana
+		set_mana(ch, GET_MAX_MANA(ch));
+	}
+	
+	// do not call affect_total() in here: we are called from there
+}
+
+
+/**
 * Times out players who are sitting at various menus. This is  called every 15
 * seconds, so each of d->idle_tics are 15 seconds.
 *

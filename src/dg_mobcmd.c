@@ -1188,6 +1188,7 @@ ACMD(do_mgoto) {
 
 	char_from_room(ch);
 	char_to_room(ch, location);
+	enter_triggers(ch, NO_DIR, "script", FALSE);
 	greet_triggers(ch, NO_DIR, "script", FALSE);
 	msdp_update_room(ch);
 }
@@ -1454,6 +1455,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
+				enter_triggers(vict, NO_DIR, "script", FALSE);
 				greet_triggers(vict, NO_DIR, "script", FALSE);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);
@@ -1485,6 +1487,7 @@ ACMD(do_mteleport) {
 						char_from_room(vict);
 						char_to_room(vict, target);
 						GET_LAST_DIR(vict) = NO_DIR;
+						enter_triggers(vict, NO_DIR, "script", FALSE);
 						greet_triggers(vict, NO_DIR, "script", FALSE);
 						qt_visit_room(vict, IN_ROOM(vict));
 						RESET_LAST_MESSAGED_TEMPERATURE(vict);
@@ -1505,6 +1508,7 @@ ACMD(do_mteleport) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
+				enter_triggers(vict, NO_DIR, "script", FALSE);
 				greet_triggers(vict, NO_DIR, "script", FALSE);
 				qt_visit_room(vict, IN_ROOM(vict));
 				RESET_LAST_MESSAGED_TEMPERATURE(vict);

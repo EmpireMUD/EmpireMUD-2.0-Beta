@@ -358,6 +358,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		
 		pre_greet_mtrigger(VEH_SITTING_ON(veh), to_room, dir, "move");	// cannot pre-greet for this
+		enter_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE);
 		greet_triggers(VEH_SITTING_ON(veh), dir, "move", FALSE);
 		msdp_update_room(VEH_SITTING_ON(veh));
 		
@@ -551,6 +552,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
 	act(buf, FALSE, mob, NULL, cont, TO_ROOM | ACT_VEH_VICT);
 	
+	enter_triggers(mob, NO_DIR, "enter", FALSE);
 	greet_triggers(mob, NO_DIR, "enter", FALSE);
 	msdp_update_room(mob);	// is this possibly a person?
 }
@@ -607,6 +609,7 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	
 	act("$n is unloaded from $V.", FALSE, mob, NULL, cont, TO_ROOM | ACT_VEH_VICT);
 	
+	enter_triggers(mob, NO_DIR, "exit", FALSE);
 	greet_triggers(mob, NO_DIR, "exit", FALSE);
 	msdp_update_room(mob);	// is this possibly a person?
 }

@@ -488,6 +488,7 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
+		enter_triggers(ch, NO_DIR, "respawn", FALSE);
 		greet_triggers(ch, NO_DIR, "respawn", FALSE);
 		
 		// temporary safety effect after a respawn

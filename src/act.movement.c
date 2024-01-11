@@ -878,6 +878,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
+	enter_triggers(ch, NO_DIR, "transport", FALSE);
 	greet_triggers(ch, NO_DIR, "transport", FALSE);
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
@@ -1418,6 +1419,11 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		cancel_action(ch);
 	}
 	
+	// pre-greet can cancel the whole thing
+	if (!pre_greet_mtrigger(ch, to_room, NO_DIR, "portal")) {
+		return;
+	}
+	
 	// to-char entry message
 	if (!(msg = obj_get_custom_message(portal, OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR))) {
 		msg = "You enter $p...";
@@ -1436,15 +1442,25 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// move them first, then move them back if they aren't allowed to go.
 	// see if an entry trigger disallows the move
+	if (!enter_triggers(ch, NO_DIR, "portal", TRUE)) {
+		char_from_room(ch);
+		char_to_room(ch, was_in);
+		return;
+	}
+	
+	look_at_room(ch);
+	
 	if (!greet_triggers(ch, NO_DIR, "portal", TRUE)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
+		look_at_room(ch);
 		return;
 	}
 	
 	// update visit and last-dir
 	qt_visit_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	add_tracks(ch, was_in, NO_DIR, IN_ROOM(ch));
 	
 	// see if there's a different portal on the other end
@@ -1456,7 +1472,6 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	}
 	act(msg, TRUE, ch, use_portal, NULL, TO_ROOM);
 	
-	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	give_portal_sickness(ch, portal, was_in, to_room);
 	
@@ -1495,14 +1510,6 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		add_offense(ROOM_OWNER(was_in), OFFENSE_INFILTRATED, ch, was_in, offense_was_seen(ch, ROOM_OWNER(was_in), was_in) ? OFF_SEEN : NOBITS);
 	}
 	
-	// trigger section
-	if (!pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "portal") || !greet_triggers(ch, NO_DIR, "portal", TRUE)) {
-		char_from_room(ch);
-		char_to_room(ch, was_in);
-		look_at_room(ch);
-	}
-	
-	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -1565,7 +1572,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
-	if (!greet_triggers(ch, dir, move_flags_to_method(flags), TRUE)) {
+	if (!enter_triggers(ch, dir, move_flags_to_method(flags), TRUE)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		return FALSE;
@@ -2199,13 +2206,17 @@ ACMD(do_circle) {
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		set_move(ch, GET_MOVE(ch) - need_movement);
 	}
-	mark_move_time(ch);
+	
 	char_from_room(ch);
 	char_to_room(ch, found_room);
-	qt_visit_room(ch, IN_ROOM(ch));
 	
-	GET_LAST_DIR(ch) = dir;
+	if (!enter_triggers(ch, dir, "move", TRUE)) {
+		char_from_room(ch);
+		char_to_room(ch, was_in);
+		return;
+	}
 	
+	mark_move_time(ch);
 	if (ch->desc) {
 		look_at_room(ch);
 	}
@@ -2222,6 +2233,8 @@ ACMD(do_circle) {
 		return;
 	}
 	
+	GET_LAST_DIR(ch) = dir;
+	qt_visit_room(ch, IN_ROOM(ch));
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 	

@@ -5499,6 +5499,13 @@ DO_ABIL(do_teleport_ability) {
 			
 			char_from_room(ch);
 			char_to_room(ch, to_room);
+			
+			if (!enter_triggers(ch, NO_DIR, "ability", TRUE)) {
+				char_from_room(ch);
+				char_to_room(ch, was_in);
+				return;
+			}
+			
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
@@ -5506,6 +5513,7 @@ DO_ABIL(do_teleport_ability) {
 			if (!greet_triggers(ch, NO_DIR, "ability", TRUE)) {
 				char_from_room(ch);
 				char_to_room(ch, was_in);
+				look_at_room(ch);
 				return;
 			}
 			
@@ -5521,7 +5529,7 @@ DO_ABIL(do_teleport_ability) {
 				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
 				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
 				
-				if (!greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE)) {
+				if (!enter_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE) || !greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE)) {
 					char_from_room(GET_COMPANION(ch));
 					char_to_room(GET_COMPANION(ch), was_in);
 				}
