@@ -954,8 +954,6 @@ void affect_total(char_data *ch) {
 	int i, iter;
 	struct obj_apply *apply;
 	
-	int pool_bonus_amount = config_get_int("pool_bonus_amount");
-	
 	// this prevents over-totaling
 	if (pause_affect_total) {
 		return;
