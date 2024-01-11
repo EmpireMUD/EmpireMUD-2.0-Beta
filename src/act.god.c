@@ -84,7 +84,7 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	if (OBJ_FLAGGED(obj, OBJ_CREATED))
 		bonus = 1;
 
-	GET_RESOURCE(god, GET_OBJ_MATERIAL(obj)) += (int)((1 + rate_item(obj)) * bonus);
+	SAFE_ADD(GET_RESOURCE(god, GET_OBJ_MATERIAL(obj)), (int)((1 + rate_item(obj)) * bonus), 0, INT_MAX, FALSE);
 
 	if (message) {
 		*buf2 = '\0';
