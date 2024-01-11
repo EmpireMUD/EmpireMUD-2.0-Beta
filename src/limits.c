@@ -1580,7 +1580,7 @@ EVENTFUNC(obj_hour_event) {
 	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
 	
 	// ensure the object is in-game SOMEWHERE
-	if (!obj_room(obj)) {
+	if (!OBJ_IS_IN_WORLD(obj)) {
 		free(data);
 		return 0;	// do not re-enqueue
 	}
