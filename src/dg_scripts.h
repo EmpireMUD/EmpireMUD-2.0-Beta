@@ -591,3 +591,6 @@ EVENT_CANCEL_FUNC(cancel_wait_event);
 
 // from vehicles.c
 void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch);
+
+// from dg_misc.c
+bool prototype_has_timer_trigger(obj_data *proto);

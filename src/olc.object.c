@@ -1707,12 +1707,12 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (SCRIPT(to_update)) {
 		remove_all_triggers(to_update, OBJ_TRIGGER);
 	}
-	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
-		free_proto_scripts(&to_update->proto_script);
+	if (GET_OBJ_SCRIPTS(to_update) && GET_OBJ_SCRIPTS(to_update) != GET_OBJ_SCRIPTS(old_proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(to_update));
 	}
 	
 	// re-attach scripts
-	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
+	GET_OBJ_SCRIPTS(to_update) = copy_trig_protos(GET_OBJ_SCRIPTS(new_proto));
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -1797,8 +1797,8 @@ void save_olc_object(descriptor_data *desc) {
 	GET_OBJ_APPLIES(proto) = NULL;
 	
 	// free old script?
-	if (proto->proto_script) {
-		free_proto_scripts(&proto->proto_script);
+	if (GET_OBJ_SCRIPTS(proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(proto));
 	}
 	
 	// timer must be converted
@@ -1920,7 +1920,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = copy_trig_protos(input->proto_script);
+		GET_OBJ_SCRIPTS(new) = copy_trig_protos(GET_OBJ_SCRIPTS(input));
 		
 		// update version number
 		OBJ_VERSION(new) += 1;
@@ -1936,7 +1936,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		OBJ_VERSION(new) = 1;
 
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
+		GET_OBJ_SCRIPTS(new) = NULL;
 	}
 	
 	// done
@@ -2417,9 +2417,9 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(obj->proto_script));
-	if (obj->proto_script) {
-		get_script_display(obj->proto_script, buf1);
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
+	if (GET_OBJ_SCRIPTS(obj)) {
+		get_script_display(GET_OBJ_SCRIPTS(obj), buf1);
 		strcat(buf, buf1);
 	}
 	
@@ -3308,7 +3308,7 @@ OLC_MODULE(oedit_roomvnum) {
 
 OLC_MODULE(oedit_script) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_script(ch, argument, &(obj->proto_script), OBJ_TRIGGER);
+	olc_process_script(ch, argument, &GET_OBJ_SCRIPTS(obj), OBJ_TRIGGER);
 }
 
 

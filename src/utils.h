@@ -980,6 +980,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_EXTRA(obj)  ((obj)->obj_flags.extra_flags)
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
 #define GET_OBJ_LONG_DESC(obj)  ((obj)->description)
+#define GET_OBJ_SCRIPTS(obj)  ((obj)->proto_script)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_STORED_EVENTS(obj)  ((obj)->stored_events)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)

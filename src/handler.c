@@ -11180,7 +11180,7 @@ void check_empire_storage_timers(void) {
 								// TODO remove debug log
 								log("debug: - has proto");
 							}
-							if (SCRIPT_CHECK(proto, OTRIG_TIMER)) {
+							if (prototype_has_timer_trigger(proto)) {
 								if (store->vnum == 3054) {
 									// TODO remove debug log
 									log("debug: - has trigger");

@@ -856,6 +856,28 @@ int valid_dg_target(char_data *ch, int bitvector) {
 
 
 /**
+* Determine if an objectd has a timer trigger, by prototype.
+*
+* @param obj_data *proto The object prototype to test.
+* @return bool TRUE if any timer trigger is attached; FALSE if not.
+*/
+bool prototype_has_timer_trigger(obj_data *proto) {
+	trig_data *trig;
+	struct trig_proto_list *iter;
+	
+	if (proto) {
+		LL_FOREACH(GET_OBJ_SCRIPTS(proto), iter) {
+			if ((trig = real_trigger(iter->vnum)) && IS_SET(GET_TRIG_TYPE(trig), OTRIG_TIMER)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Runs triggers to update and prepare the mud at startup.
 */
 void run_reboot_triggers(void) {
