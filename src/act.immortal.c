@@ -7392,7 +7392,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL));
+		snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
 	}
 	else {
 		strcpy(part, "none");
