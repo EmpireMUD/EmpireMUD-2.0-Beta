@@ -454,6 +454,9 @@ bool point_update_player(char_data *ch) {
 		return FALSE;
 	}
 	
+	// home item decay
+	check_home_storage_timers(ch);
+	
 	// remove stale offers -- this needs to happen even if dead (resurrect)
 	clean_offers(ch);
 	

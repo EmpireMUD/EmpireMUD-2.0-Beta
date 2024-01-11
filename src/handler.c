@@ -91,6 +91,7 @@ void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 EVENT_CANCEL_FUNC(cancel_cooldown_event);
 EVENTFUNC(cooldown_expire_event);
+INTERACTION_FUNC(decay_in_home_storage_interact);
 INTERACTION_FUNC(decay_in_storage_interact);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
@@ -11253,6 +11254,105 @@ void check_empire_storage_timers(void) {
 }
 
 
+/**
+* Checks items in a player's home storage for ones that have decay times. This
+* only operates on in-game characters: just like inventory, home items do not
+* tick down while offline.
+*
+* @param char_data *ch The player.
+*/
+void check_home_storage_timers(char_data *ch) {
+	bool any, counted;
+	room_data *home;
+	struct empire_unique_storage *eus, *next_eus;
+	struct storage_timer *st, *next_st;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	// home may be NULL -- items will still decay though
+	home = find_home(ch);
+	
+	any = FALSE;
+	DL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+		DL_FOREACH_SAFE(eus->timers, st, next_st) {
+			--st->timer;
+			
+			if (st->timer <= 0) {
+				any = TRUE;
+				counted = FALSE;
+				
+				// time to go
+				if (eus->obj) {
+					log("debug: %dx %d %s decaying in home storage for %s", st->amount, GET_OBJ_VNUM(eus->obj), GET_OBJ_SHORT_DESC(eus->obj), GET_NAME(ch));
+					
+					decay_in_storage_isle = eus->island;
+					if (home && SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
+						// has a timer trigger
+						counted = run_timer_triggers_on_decaying_home_storage(ch, home, eus, st->amount);
+					}
+					else if (home && has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+						run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+					}
+				}
+				
+				// remove amount if triggers didn't
+				if (!counted) {
+					eus->amount = MAX(0, eus->amount - st->amount);
+				}
+				
+				// remove this set of timers
+				DL_DELETE(eus->timers, st);
+				free(st);
+				
+				// delete storage if needed
+				if (eus->amount <= 0 || !eus->obj) {
+					DL_DELETE(GET_HOME_STORAGE(ch), eus);
+					free_empire_unique_storage(eus);
+					break;	// must break out as eus is gone
+				}
+			}
+		}
+		// do no work here: eus may have been deleted; let it loop instead
+	}
+	
+	// clear this data now
+	decay_in_storage_isle = NO_ISLAND;
+	
+	// and save
+	if (any) {
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(decay_in_home_storage_interact) {
+	obj_data *obj, *proto;
+	int num;
+	
+	// basics
+	if (!ch || !inter_room || !(proto = obj_proto(interaction->vnum))) {
+		return FALSE;
+	}
+	
+	if (GET_OBJ_STORAGE(proto) && GET_LOYALTY(ch) && GET_ISLAND_ID(inter_room) != NO_ISLAND) {
+		add_to_empire_storage(GET_LOYALTY(ch), GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity, GET_OBJ_TIMER(proto));
+	}
+	else {
+		// just place in room?
+		for (num = 0; num < interaction->quantity; ++num) {
+			obj = read_object(interaction->vnum, TRUE);
+			scale_item_to_level(obj, 1);	// minimum level
+			obj_to_room(obj, inter_room);
+			load_otrigger(obj);
+		}
+	}
+	return TRUE;
+}
+
+
 // INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(decay_in_storage_interact) {
 	obj_data *proto;
@@ -11366,6 +11466,59 @@ void remove_storage_timer_items(struct storage_timer **list, int amount, bool ex
 			}
 		}
 	}
+}
+
+
+/**
+* This is called when items decay in home unique storage while they have a
+* timer trigger on them. It will attempt to place them into the world to decay
+* and then possibly autostore again later.
+*
+* @param char_data *ch The player.
+* @param room_data *home The pre-validated home location.
+* @param struct empire_unique_storage *eus The unique storage item.
+* @param int amount How many of them are expiring.
+* @return bool TRUE if it removed the items already; FALSE if not.
+*/
+bool run_timer_triggers_on_decaying_home_storage(char_data *ch, room_data *home, struct empire_unique_storage *eus, int amount) {
+	int iter;
+	obj_data *obj;
+	trig_data *trig;
+	
+	if (!ch || IS_NPC(ch) || !home || !eus || !eus->obj || amount <= 0) {
+		return FALSE;	// no work
+	}
+	
+	// place in world
+	for (iter = 0; iter < MIN(amount, eus->amount); ++iter) {
+		if (eus->amount > 1) {
+			obj = copy_warehouse_obj(eus->obj);
+		}
+		else {
+			// last one
+			obj = eus->obj;
+			eus->obj = NULL;
+			add_to_object_list(obj);	// put back in object list
+			obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
+			
+			// re-add trigs to the random list
+			if (SCRIPT(obj)) {
+				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+					add_trigger_to_global_lists(trig);
+				}
+			}
+		}
+		
+		if (obj) {
+			--eus->amount;
+			GET_OBJ_TIMER(obj) = 1;
+			obj_to_room(obj, home);
+			
+			// this may destroy it
+			tick_obj_timer(obj);
+		}
+	}
+	return TRUE;
 }
 
 

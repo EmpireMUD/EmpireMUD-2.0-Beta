@@ -470,9 +470,11 @@ bool stored_item_requires_withdraw(obj_data *obj);
 // storage timers
 void add_storage_timer(struct storage_timer **list, int timer, int amount);
 void check_empire_storage_timers();
+void check_home_storage_timers(char_data *ch);
 void free_storage_timers(struct storage_timer **list);
 void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer *merge_from, int total_things);
 void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first);
+bool run_timer_triggers_on_decaying_home_storage(char_data *ch, room_data *home, struct empire_unique_storage *eus, int amount);
 void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_island *isle, obj_data *proto, int amount);
 bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_unique_storage *eus, int amount);
 struct storage_timer *split_storage_timers(struct storage_timer **list, int amount);
