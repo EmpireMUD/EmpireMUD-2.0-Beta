@@ -3393,10 +3393,10 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	// messaging
 	isle = get_island(to_island, TRUE);
 	if (to_room) {
-		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(get_obj_name_by_proto(store->vnum)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
+		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(GET_OBJ_SHORT_DESC(store->proto)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
 	}
 	else {
-		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(store->vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(GET_OBJ_SHORT_DESC(store->proto)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 	}
 }
 
@@ -8182,7 +8182,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
 		else if (!all && store->amount < number) {
-			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
+			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(GET_OBJ_SHORT_DESC(store->proto)));
 		}
 		else {
 			add_shipping_queue(ch, emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store, to_room);
