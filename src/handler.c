@@ -11169,9 +11169,22 @@ void check_empire_storage_timers(void) {
 					--st->timer;
 					
 					if (st->timer <= 0) {
+						if (store->vnum == 3054) {
+							// TODO remove debug log
+							log("debug: %dx %d %s start decay %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
+						}
+						
 						// time to go
 						if ((proto = obj_proto(store->vnum))) {
+							if (store->vnum == 3054) {
+								// TODO remove debug log
+								log("debug: - has proto");
+							}
 							if (SCRIPT_CHECK(proto, OTRIG_TIMER)) {
+								if (store->vnum == 3054) {
+									// TODO remove debug log
+									log("debug: - has trigger");
+								}
 								// has a timer trigger
 								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
 							}
