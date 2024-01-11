@@ -10520,6 +10520,12 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 		return NULL;	// no work
 	}
 	
+	
+	if (EMPIRE_VNUM(emp) == 1783) {
+		// TODO remove debug log
+		log("debug: searching for storage for %d %s in %s on island %d", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), EMPIRE_NAME(emp), island);
+	}
+	
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10533,6 +10539,11 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 	}
 	
 	// we do not check vehicles separately: if they were on a claimed tile, this would already have found them
+	
+	if (EMPIRE_VNUM(emp) == 1783) {
+		// TODO remove debug log
+		log("debug: failed");
+	}
 	
 	return NULL;
 }
@@ -11168,7 +11179,11 @@ void check_empire_storage_timers(void) {
 								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
 							}
 						}
-						log("debug: %dx %d %s decaying from %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
+						
+						if (store->vnum == 3054) {
+							// TODO remove debug log
+							log("debug: %dx %d %s decaying from %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
+						}
 						
 						// remove
 						store->amount = MAX(0, store->amount - st->amount);
@@ -11390,6 +11405,11 @@ void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_isla
 		return;	// no work
 	}
 	
+	if (GET_OBJ_VNUM(proto) == 3054) {
+		// TODO remove debug log
+		log("debug: %dx calabash starting run_timer_triggers_on_decaying_storage in %s", amount, EMPIRE_NAME(emp));
+	}
+	
 	// determine room
 	if (!(room = find_storage_location_for(emp, isle->island, proto))) {
 		// try interactions instead
@@ -11399,6 +11419,11 @@ void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_isla
 		
 		// no room = done
 		return;
+	}
+	
+	if (GET_OBJ_VNUM(proto) == 3054) {
+		// TODO remove debug log
+		log("debug: %dx calabash loading for trigger in %s at %s", amount, EMPIRE_NAME(emp), room_log_identifier(room));
 	}
 	
 	// place items in room and decay them
