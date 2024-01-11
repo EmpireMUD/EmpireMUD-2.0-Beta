@@ -4142,9 +4142,37 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 
 
 /**
-* Runs greet, entry, and enter triggers on everything in the room. If the
-* movement is preventable, it stops on any trigger that prevents it. If it's
-* not, it runs them all.
+* Runs entry and enter triggers on everything in the room. If the movement is
+* preventable, it stops on any trigger that prevents it. If it's not, it runs
+* them all.
+*
+* Enter triggers run after moving, before looking, and before greet triggers.
+*
+* @param char_data *actor The person who has entered the room.
+* @param int dir Which direction the character came from.
+* @param char *method Method of movement.
+* @param bool preventable TRUE if the character can be sent back; FALSE if not.
+* @return int 1 to allow the character here, 0 to attempt to send them back.
+*/
+int enter_triggers(char_data *ch, int dir, char *method, bool preventable) {
+	if (!entry_mtrigger(ch, method) && preventable) {
+		return 0;
+	}
+	else if (!enter_wtrigger(IN_ROOM(ch), ch, dir, method) && preventable) {
+		return 0;
+	}
+
+	return 1;
+}
+
+
+/**
+* Runs greet and memory triggers on everything in the room. If the movement is
+* preventable, it stops on any trigger that prevents it. If it's not, it runs
+* them all.
+*
+* Greet triggers run after moving and looking, and are the last movement trigs
+* to run.
 *
 * @param char_data *actor The person who has entered the room.
 * @param int dir Which direction the character came from.
@@ -4153,13 +4181,7 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 * @return int 1 to allow the character here, 0 to attempt to send them back.
 */
 int greet_triggers(char_data *ch, int dir, char *method, bool preventable) {
-	if (!entry_mtrigger(ch, method) && preventable) {
-		return 0;
-	}
-	else if (!enter_wtrigger(IN_ROOM(ch), ch, dir, method) && preventable) {
-		return 0;
-	}
-	else if (!greet_mtrigger(ch, dir, method) && preventable) {
+	if (!greet_mtrigger(ch, dir, method) && preventable) {
 		return 0;
 	}
 	else if (!greet_vtrigger(ch, dir, method) && preventable) {

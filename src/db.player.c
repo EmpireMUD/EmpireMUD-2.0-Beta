@@ -743,6 +743,7 @@ void build_player_index(void) {
 				
 				GET_ACCOUNT(ch) = acct;	// not set by load_player
 
+				affect_total(ch);
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
 				
@@ -1259,6 +1260,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	double dbl_in;
 	long l_in[3], stored;
 	char c_in[2];
+	
+	pause_affect_total = TRUE;
 	
 	// allocate player if we didn't receive one
 	if (!ch) {
@@ -2368,6 +2371,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	free(cont_row);
+
+	pause_affect_total = FALSE;	
 	
 	return ch;
 }
@@ -2562,7 +2567,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
-	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct affected_type *af;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
@@ -2574,10 +2579,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
 	struct slash_channel *channel;
-	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
+	struct obj_apply *apply;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	long timer;
 	
@@ -2598,39 +2603,34 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		deficit[iter] = GET_DEFICIT(ch, iter);
 		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
-	
-	// unaffect the character to store raw numbers: equipment
+
+	// unaffect: gear
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			char_eq[iter] = unequip_char(ch, iter);
-			/* this is almopst certainly an error here as this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				remove_otrigger(char_eq[iter], ch);
-			#endif
-			*/
-		}
-		else {
-			char_eq[iter] = NULL;
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), FALSE);
+			}
 		}
 	}
 	
-	// unaffect: passives
+	// unaffect: passive buffs
 	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
 	
 	// unaffect: affects
-	af_list = NULL;
-	while ((af = ch->affected)) {
-		CREATE(new_af, struct affected_type, 1);
-		*new_af = *af;
-		new_af->expire_event = NULL;
-		LL_PREPEND(af_list, new_af);
-		affect_remove(ch, af);
+	LL_FOREACH(ch->affected, af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
 	
-	// this is almost certainly ignored due to pause_affect_total
-	affect_total(ch);
+	// unaffect: bonus pools
+	apply_bonus_pools(ch, FALSE);
+	
+	// balance out any deficits before saving
+	check_deficits(ch);
 	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -2712,7 +2712,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Loc: %d\n", GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
-	for (af = af_list; af; af = af->next) {	// stored earlier
+	LL_FOREACH(ch->affected, af) {
 		if (af->expire_time == UNLIMITED) {
 			timer = UNLIMITED;
 		}
@@ -2980,49 +2980,51 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// # save equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		if (GET_EQ(ch, iter)) {
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
 		}
 	}
 	
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
-	// re-affect: passives
+	// re-affect: bonus pools
+	apply_bonus_pools(ch, TRUE);
+	
+	// re-affect: gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), TRUE);
+			}
+		}
+	}
+	
+	// re-affect: passive buffs
 	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
 	
-	// re-apply: affects
-	for (af = af_list; af; af = next_af) {
-		next_af = af->next;
-		affect_to_char_silent(ch, af);
-		free(af);
+	// re-affect: affects
+	for (af = ch->affected; af; af = af->next) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
 	
-	// re-apply: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			/* this is almost certainly an error since this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				if (wear_otrigger(char_eq[iter], ch, iter)) {
-			#endif
-			*/
-					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
-					equip_char(ch, char_eq[iter], iter);
-			/* probably an error here (see above):
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				}
-				else {
-					obj_to_char(char_eq[iter], ch);
-				}
-			#endif
-			*/
-		}
-	}
+	// this will ensure caps and pay off any deficits
+	check_deficits(ch);
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		// TODO remove this if these never log
+		if (GET_CURRENT_POOL(ch, iter) != pool[iter]) {
+			log("Debug: Current pool changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), pool[iter], GET_CURRENT_POOL(ch, iter));
+		}
+		if (GET_DEFICIT(ch, iter) != deficit[iter]) {
+			log("Debug: Deficit changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), deficit[iter], GET_DEFICIT(ch, iter));
+		}
 		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
@@ -3453,6 +3455,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 			}
 			else if ((ch = load_player(index->name, TRUE))) {
 				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+				affect_total(ch);
 				*is_file = TRUE;
 				add_loaded_player(ch);
 			}
@@ -4417,8 +4420,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		announce_login(ch);
 	}
 	
-	affect_total(ch);
-	
 	if (stop_action) {
 		cancel_action(ch);
 	}
@@ -4477,6 +4478,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure data is up-to-date
 	apply_all_ability_techs(ch);
+	apply_bonus_pools(ch, TRUE);
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
@@ -4509,7 +4511,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
-	affect_total(ch);
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
@@ -4537,7 +4538,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		clean_lore(ch);
 		clean_player_kills(ch);
 		reset_player_temperature(ch);
-		affect_total(ch);	// again, in case things changed
 	}
 	else {
 		// ensure not dead
@@ -4595,8 +4595,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		send_initial_MSDP(ch->desc);
 	}
 	
+	affect_total(ch);	// final affect total
+	
 	// script/trigger stuff
 	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	enter_triggers(ch, NO_DIR, "login", FALSE);
 	greet_triggers(ch, NO_DIR, "login", FALSE);
 }
 
@@ -6087,7 +6090,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		// load the player unless they're in-game
 		if ((ch = find_or_load_player(index->name, &is_file))) {
 			// check_delayed_load(ch);	// no longer need this as equipment is in the main file
-			affect_total(ch);
+			// affect_total(ch);	// no longer need this -- they are already totaled
 		}
 		
 		// check ch for empire traits

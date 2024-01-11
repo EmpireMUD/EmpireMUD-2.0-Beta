@@ -614,8 +614,6 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig;
-	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
 		
@@ -673,21 +671,13 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_MOVE: {
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
-			orig = GET_MOVE(ch);
-			set_move(ch, GET_MOVE(ch) + mod);
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_MOVE(ch) += mod;
 			
-			if (!IS_NPC(ch)) {
-				if (GET_MOVE(ch) < 0) {
-					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
-					set_move(ch, 0);
-				}
-				else if (GET_MOVE_DEFICIT(ch) > 0) {
-					diff = MAX(0, GET_MOVE(ch) - orig);
-					diff = MIN(GET_MOVE_DEFICIT(ch), diff);
-					GET_MOVE_DEFICIT(ch) -= diff;
-					set_move(ch, GET_MOVE(ch) - diff);
-				}
+			// deficits: prevent going negative (players only)
+			if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
+				GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
+				GET_MOVE(ch) = 0;
 			}
 			break;
 		}
@@ -695,52 +685,33 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			// apply to max
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// apply to current
-			orig = GET_HEALTH(ch);
-			set_health(ch, GET_HEALTH(ch) + mod);
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_HEALTH(ch) += mod;
 			
-			if (!IS_NPC(ch)) {
-				if (GET_HEALTH(ch) < 1) {
-					if (GET_POS(ch) >= POS_SLEEPING) {
-						// min 1 on health unless unconscious
-						GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
-						set_health(ch, 1);
-					}
-					// otherwise leave them dead/negative
+			// prevent going below 1
+			if (GET_HEALTH(ch) < 1 && (GET_HEALTH(ch) - mod) >= 1) {
+				if (IS_NPC(ch)) {
+					// npcs cannot die this way
+					set_health(ch, 1);
 				}
-				else if (GET_HEALTH_DEFICIT(ch) > 0) {
-					// positive health plus a health deficit
-					diff = MAX(0, GET_HEALTH(ch) - orig);
-					diff = MIN(diff, GET_HEALTH_DEFICIT(ch));
-					diff = MIN(diff, GET_HEALTH(ch)-1);
-					GET_HEALTH_DEFICIT(ch) -= diff;
-					set_health(ch, GET_HEALTH(ch) - diff);
+				else {
+					// deficit (players only)
+					GET_HEALTH_DEFICIT(ch) -= GET_HEALTH(ch) - 1;
+					GET_HEALTH(ch) = 1;
 				}
-			}
-			else {
-				// npcs cannot die this way
-				set_health(ch, MAX(1, GET_HEALTH(ch)));
 			}
 			break;
 		}
 		case APPLY_MANA: {
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
-			// prevent from going negative
-			orig = GET_MANA(ch);
-			set_mana(ch, GET_MANA(ch) + mod);
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_MANA(ch) += mod;
 			
-			if (!IS_NPC(ch)) {
-				if (GET_MANA(ch) < 0) {
-					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
-					set_mana(ch, 0);
-				}
-				else if (GET_MANA_DEFICIT(ch) > 0) {
-					diff = MAX(0, GET_MANA(ch) - orig);
-					diff = MIN(GET_MANA_DEFICIT(ch), diff);
-					GET_MANA_DEFICIT(ch) -= diff;
-					set_mana(ch, GET_MANA(ch) - diff);
-				}
+			// deficits: prevent going negative (players only)
+			if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
+				GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
+				GET_MANA(ch) = 0;
 			}
 			break;
 		}
@@ -984,24 +955,15 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	struct affected_type *af;
-	int i, iter, level;
+	int i, iter;
 	struct obj_apply *apply;
-	int health, move, mana;
-	
-	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
 	// this prevents over-totaling
 	if (pause_affect_total) {
 		return;
 	}
 	
-	// save these for later -- they shouldn't change during an affect_total
-	health = GET_HEALTH(ch);
-	move = GET_MOVE(ch);
-	mana = GET_MANA(ch);
-	level = get_approximate_level(ch);
-	
-	for (i = 0; i < NUM_WEARS; i++) {
+	for (i = 0; i < NUM_WEARS; ++i) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
 				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
@@ -1017,6 +979,7 @@ void affect_total(char_data *ch) {
 		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 			affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 		}
+		apply_bonus_pools(ch, FALSE);
 	}
 
 	// remove affects
@@ -1042,7 +1005,7 @@ void affect_total(char_data *ch) {
 		}
 	}
 
-	for (i = 0; i < NUM_WEARS; i++) {
+	for (i = 0; i < NUM_WEARS; ++i) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
 				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
@@ -1058,20 +1021,11 @@ void affect_total(char_data *ch) {
 		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
+		apply_bonus_pools(ch, TRUE);
 	}
 
 	for (af = ch->affected; af; af = af->next) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-	}
-	
-	if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
-		GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
-	}
-	if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
-		GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
-	}
-	if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
-		GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 	
 	/* Make sure maximums are considered */
@@ -1082,10 +1036,8 @@ void affect_total(char_data *ch) {
 	// limit this
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
 	
-	// restore these because in some cases, they mess up during an affect_total
-	set_health(ch, health);
-	set_move(ch, move);
-	set_mana(ch, mana);
+	// pay off deficits now and check pool caps (for NPCs, this will also check caps)
+	check_deficits(ch);
 	
 	// check for inventory size
 	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
@@ -1095,8 +1047,8 @@ void affect_total(char_data *ch) {
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
-	// check new highest greatness
-	if (!IS_NPC(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
+	// check new highest greatness (in-game only)
+	if (!IS_NPC(ch) && IN_ROOM(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
 		GET_HIGHEST_KNOWN_GREATNESS(ch) = GET_GREATNESS(ch);
 		if (GET_LOYALTY(ch) && IN_ROOM(ch)) {
 			update_member_data(ch);

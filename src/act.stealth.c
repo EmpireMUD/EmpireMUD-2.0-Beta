@@ -638,6 +638,12 @@ ACMD(do_infiltrate) {
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
+			
+			if (!enter_triggers(ch, dir, "move", TRUE)) {
+				char_to_room(ch, was_in);
+				return;
+			}
+			
 			look_at_room(ch);
 			
 			if (!greet_triggers(ch, dir, "move", TRUE)) {
