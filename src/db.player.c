@@ -4464,6 +4464,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure data is up-to-date
 	apply_all_ability_techs(ch);
+	apply_bonus_pools(ch, TRUE);
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
