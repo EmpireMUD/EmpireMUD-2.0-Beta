@@ -2549,7 +2549,9 @@ will load up empty ships and move them to the target island (you can also
 specify docks on that island by coordinates). You must have docks at both ends.
 
 Shipments happen 4 times per day and take up to 4 days of game time to arrive
-(2 hours real time), depending on distance.
+(2 hours real time), depending on distance. Be careful shipping perishable
+items as they will be dumped overboard if they expire before the shipment is
+delivered.
 
 Items will automatically transfer from the empire inventory on the origin
 island to the empire inventory on the destination island, and the ship will

@@ -731,7 +731,8 @@ You can store up to 300 unique items -- items that can't be stored in other
 buildings -- in your home. Identical items stack with each other and don't
 count toward that 300. When you move to a new home, you can access your stored
 items from your new home after 1 hour. You can check your home inventory and
-identify its items from anywhere.
+identify its items from anywhere. Perishable items will continue to decay in
+home storage, but only while you're in the game (just like your inventory).
 
 Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building

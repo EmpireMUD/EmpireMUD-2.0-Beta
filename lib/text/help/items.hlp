@@ -940,6 +940,8 @@ can be stored from your inventory or from the ground.
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them. This does not apply to home storage.
 
+Perishable items such as food will continue to decay while in storage.
+
 Unique, enchanted, superior, leveled, or otherwise-modified items can't be
 stored in regular storage buildings, but you can store them with the
 "warehouse" command in a warehouse or vault.  Bound items can be stored in your
@@ -1173,7 +1175,8 @@ Command:  warehouse inventory [item keywords]
 
 While normal resource storage (e.g. the lumber yard) can store many simple
 items, you must use a warehouse (or vault) to store items which are unique,
-scaled, enchanted, superior, or otherwise modified.
+scaled, enchanted, superior, or otherwise modified. Perishable items will
+continue to decay while in storage.
 
 You must have the "warehouse" empire privilege to withdraw items from warehouse
 storage. Items which can be stored in normal resource storage may not be stored
