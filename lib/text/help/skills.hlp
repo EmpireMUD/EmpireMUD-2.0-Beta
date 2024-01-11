@@ -156,7 +156,8 @@ Room types:
  hall - A connecting room
  kitchen - Allows cooking, baking, and other fire-dependent tasks
  laboratory - Identical to the free-standing Alchemist
- larder - A place to store food
+ larder - A place to store many foods
+ root cellar - A place to store vegetables
  sitting room - No special features
  skybridge - Above-ground hallways used in some tree buildings
  store room - Holds certain items

@@ -124,6 +124,7 @@ Basic buildings granted by the Build ability:
   {GG} granary -- store grains
   {PP} gravelpit -- store rocks
   {LL} lumberyard -- store lumber
+  {RR} rootcellar -- store vegetables
   |SS| seedsilo -- store seeds
   {SS} smokehouse -- store meats
   {TT} tannery -- store skins
@@ -898,6 +899,21 @@ You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
 When you're done with the shelter, be sure to abandon it.
+#
+"ROOT CELLAR" "COMMUNITY ROOT CELLAR" ROOTCELLAR CELLAR
+
+{RR}  Root Cellar  (Build ability)
+
+Stored here:  vegetables
+
+The community root cellar is a building for storing vegetables that aren't
+intended for canning, especially root vegetables such as potatoes. Like all
+storage facilities, your NPCs move vegetables between root cellars so that you
+can retrieve them from any such location on the same island.
+
+There is also a designated room by the same name: a root cellar for homes.
+
+See also: DESIGNATE, STORAGE
 #
 SANDPIT "SAND PIT"
 
