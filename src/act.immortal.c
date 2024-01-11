@@ -3470,16 +3470,16 @@ SHOW(show_inventory) {
 			count = 0;
 			for (pos = 0; pos < NUM_WEARS; ++pos) {
 				if (GET_EQ(load, pos)) {
-					count += count_objs_by_vnum(vnum, GET_EQ(load, pos));
+					SAFE_ADD(count, count_objs_by_vnum(vnum, GET_EQ(load, pos)), 0, INT_MAX, FALSE);
 				}
 			}
 			if (load->carrying) {
-				count += count_objs_by_vnum(vnum, load->carrying);
+				SAFE_ADD(count, count_objs_by_vnum(vnum, load->carrying), 0, INT_MAX, FALSE);
 			}
 			
 			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
 				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
-					count += eus->amount;
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
 					// does not have contents in home storage
 				}
 			}
@@ -10149,7 +10149,7 @@ ACMD(do_moveeinv) {
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
 			if (store->amount > 0) {
-				count += store->amount;
+				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
 				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount, 0);
 				if (new_store) {
 					merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
@@ -10175,7 +10175,7 @@ ACMD(do_moveeinv) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {
 				unique->island = island_to;
-				count += unique->amount;
+				SAFE_ADD(count, unique->amount, 0, INT_MAX, FALSE);
 				
 				// does not consolidate
 			}
