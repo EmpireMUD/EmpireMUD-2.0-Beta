@@ -10519,13 +10519,7 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 	if (!emp || island == NO_ISLAND || !proto || !GET_OBJ_STORAGE(proto)) {
 		return NULL;	// no work
 	}
-	
-	
-	if (EMPIRE_VNUM(emp) == 1783) {
-		// TODO remove debug log
-		log("debug: searching for storage for %d %s in %s on island %d", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), EMPIRE_NAME(emp), island);
-	}
-	
+		
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10539,11 +10533,6 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 	}
 	
 	// we do not check vehicles separately: if they were on a claimed tile, this would already have found them
-	
-	if (EMPIRE_VNUM(emp) == 1783) {
-		// TODO remove debug log
-		log("debug: failed");
-	}
 	
 	return NULL;
 }
@@ -11169,33 +11158,15 @@ void check_empire_storage_timers(void) {
 					--st->timer;
 					
 					if (st->timer <= 0) {
-						if (store->vnum == 3054) {
-							// TODO remove debug log
-							log("debug: %dx start calabash decay %s", st->amount, EMPIRE_NAME(emp));
-						}
-						
 						// time to go
 						if ((proto = obj_proto(store->vnum))) {
-							if (store->vnum == 3054) {
-								// TODO remove debug log
-								log("debug: - has proto");
-							}
 							if (prototype_has_timer_trigger(proto)) {
-								if (store->vnum == 3054) {
-									// TODO remove debug log
-									log("debug: - has trigger");
-								}
 								// has a timer trigger
 								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
 							}
 							else if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
 								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
 							}
-						}
-						
-						if (store->vnum == 3054) {
-							// TODO remove debug log
-							log("debug: %dx %d %s decaying from %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
 						}
 						
 						// remove
