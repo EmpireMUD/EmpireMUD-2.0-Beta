@@ -11171,7 +11171,7 @@ void check_empire_storage_timers(void) {
 					if (st->timer <= 0) {
 						if (store->vnum == 3054) {
 							// TODO remove debug log
-							log("debug: %dx %d %s start decay %s", st->amount, store->vnum, proto ? GET_OBJ_SHORT_DESC(proto) : "???", EMPIRE_NAME(emp));
+							log("debug: %dx start calabash decay %s", st->amount, EMPIRE_NAME(emp));
 						}
 						
 						// time to go
