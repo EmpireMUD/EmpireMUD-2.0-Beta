@@ -2617,6 +2617,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
 	
+	// unaffect: bonus pools
+	apply_bonus_pools(ch, FALSE);
+	
 	// balance out any deficits before saving
 	check_deficits(ch);
 	
@@ -2975,6 +2978,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
+	
+	// re-affect: bonus pools
+	apply_bonus_pools(ch, TRUE);
 	
 	// re-affect: gear
 	for (iter = 0; iter < NUM_WEARS; ++iter) {

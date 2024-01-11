@@ -951,7 +951,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	struct affected_type *af;
-	int i, iter, level;
+	int i, iter;
 	struct obj_apply *apply;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
@@ -977,6 +977,7 @@ void affect_total(char_data *ch) {
 		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 			affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 		}
+		apply_bonus_pools(ch, FALSE);
 	}
 
 	// remove affects
@@ -1018,23 +1019,11 @@ void affect_total(char_data *ch) {
 		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
+		apply_bonus_pools(ch, TRUE);
 	}
 
 	for (af = ch->affected; af; af = af->next) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
-	}
-	
-	if (!IS_NPC(ch)) {
-		level = get_approximate_level(ch);
-		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
-			GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
-		}
-		if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
-			GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
-		}
-		if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
-			GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
-		}
 	}
 	
 	/* Make sure maximums are considered */
