@@ -1117,6 +1117,7 @@ switch %random.4%
   break
   default
     * failure - do nothing
+    halt
   break
 done
 if %actor%
