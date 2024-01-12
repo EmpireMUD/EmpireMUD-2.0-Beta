@@ -5251,7 +5251,7 @@ ACMD(do_empire_inventory) {
 	}
 	if (emp) {
 		// sort to get predictable order
-		sort_einv_for_empire(emp);
+		sort_einv_for_empire(emp, sort_einv_by_amount);
 		
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
@@ -8488,7 +8488,7 @@ ACMD(do_workforce) {
 		}
 		
 		// sort to ensure predictable order
-		sort_einv_for_empire(emp);
+		sort_einv_for_empire(emp, sort_einv_by_amount);
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {

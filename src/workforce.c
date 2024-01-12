@@ -860,7 +860,7 @@ void chore_update(void) {
 			continue;
 		}
 		
-		sort_einv_for_empire(emp);
+		sort_einv_for_empire(emp, sort_einv_by_perishable);
 		
 		// update islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
@@ -1535,13 +1535,41 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 
 
 /**
-* Simple sorter puts higher quantities at the top (helps workforce optimize)
+* Simple sorter puts higher quantities at the top (helps workforce optimize).
+* This is no longer used as of b5.170; see next function.
 *
 * @param struct empire_storage_data *a One element
 * @param struct empire_storage_data *b Another element
 * @return int Sort instruction of <0, 0, or >0
 */
-int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
+int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b) {
+	return b->amount - a->amount;
+}
+
+
+/**
+* Simple sorter puts sooner-expiring and then higher-quantity items at the top
+* of the list for workforce.
+*
+* @param struct empire_storage_data *a One element
+* @param struct empire_storage_data *b Another element
+* @return int Sort instruction of <0, 0, or >0
+*/
+int sort_einv_by_perishable(struct empire_storage_data *a, struct empire_storage_data *b) {
+	if (a->timers && !b->timers) {
+		return -1;
+	}
+	else if (b->timers) {
+		if (!a->timers) {
+			return 1;
+		}
+		else if (a->timers->timer != b->timers->timer) {
+			return a->timers->timer - b->timers->timer;
+		}
+		// else fall through
+	}
+
+	// ascending by amount
 	return b->amount - a->amount;
 }
 
@@ -1550,15 +1578,16 @@ int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
 * Ensures einv is sorted. Call before einv-related tasks.
 *
 * @param empire_data *emp The empire to sort.
+* @param int *sort_func A sort function for how exactly to sort it (e.g. sort_einv_by_amount).
 */
-void sort_einv_for_empire(empire_data *emp) {
+void sort_einv_for_empire(empire_data *emp, int (*sort_func)(struct empire_storage_data *a, struct empire_storage_data *b)) {
 	struct empire_island *eisle, *next_eisle;
 	
 	if (emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 			// sort einv now to ensure it's in a useful order (most quantity first)
 			if (!eisle->store_is_sorted) {
-				HASH_SORT(eisle->store, sort_einv);
+				HASH_SORT(eisle->store, sort_func);
 				eisle->store_is_sorted = TRUE;
 			}
 		}
