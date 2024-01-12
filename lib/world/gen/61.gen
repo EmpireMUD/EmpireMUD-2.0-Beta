@@ -181,7 +181,7 @@ handfuls of grain~
 S
 #6170
 bunch of grain~
-6 0
+6 a
 0 6170 0 0
 T0
 bunches of grain~
@@ -200,5 +200,19 @@ edible seeds~
 R 6180
 T0
 edible seeds~
+S
+#6182
+handful of nuts~
+6 a
+0 6182 0 0
+T0
+handfuls of nuts~
+S
+#6192
+bunch of nuts~
+6 a
+0 6192 0 0
+T0
+bunches of nuts~
 S
 $

@@ -315,10 +315,12 @@ a handful of grain~
 A handful of grain is scattered here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 0 1152
 O+ 1 6160
+R
+4 5116 0
 S
 #6170
 grain bunch~
@@ -341,10 +343,12 @@ some seeds~
 Some seeds are scattered here.~
 You can't tell where these seeds came from, but they probably aren't edible.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 0 0
 O+ 1 6180
+R
+4 5210 0
 S
 #6181
 seeds~
@@ -356,6 +360,34 @@ These seeds seem okay to eat.
 1 0 0
 0 8064
 O+ 1 6181
+R
+4 5210 0
+S
+#6182
+nuts handful~
+a handful of nuts~
+A handful of nuts is scattered here.~
+It's hard to identify the nuts, but they look edible.
+~
+6 0 a 0 0 5
+4 0 0
+0 1152
+O+ 1 6182
+R
+4 5619 0
+S
+#6192
+nuts bunch~
+a bunch of nuts~
+A bunch of nuts are lying on the ground.~
+These mixed nuts are hard to identify, but easy to eat.
+~
+6 g a 0 0 8
+10 0 0
+0 1152
+C
+1 1
+O+ 1 6192
 R
 4 5210 0
 S

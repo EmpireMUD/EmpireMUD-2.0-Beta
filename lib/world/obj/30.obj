@@ -205,9 +205,10 @@ a handful of nuts~
 There are some nuts scattered on the ground.~
 You can eat the nuts.
 ~
-6 0 a 0 0 2
+6 0 a 0 0 3
 6 0 0
 7 48
+O+ 1 6182
 R
 4 5619 0
 S
@@ -815,13 +816,19 @@ A green calabash is lying here.~
    The calabash, also called a bottle gourd, has a mild flavor. This one isn't
 ripe enough to dry into a bottle, but it might satisfy your hunger.
 ~
-6 g a 0 0 9
+6 g a 0 0 10
 2 0 0
 7 12
+I 26 3056 100.00 1  # DECAYS-TO: calabash seeds
+M
+17
+$p dries out. You throw it away, but the seeds are still good.~
+M
+18
+$p dries out, leaving behind only some seeds.~
 O+ 1 6142
 R
 4 5619 0
-T 3053
 S
 #3054
 sack calabash fresh gourds~
@@ -831,15 +838,22 @@ A sack of fresh calabash gourds is hanging here.~
 calabash is cultivated worldwide for its use as a bottle gourd. If you leave
 this sack out to dry, you could craft it into a bottle.
 ~
-6 egl a 0 0 11
+6 egl a 0 0 12
 12 0 0
 7 132
 C
 1 1
+I 26 3055 100.00 1  # DECAYS-TO: sack of dried calabash gourds
+I 26 3056 33.34 1  # DECAYS-TO: calabash seeds
+M
+17
+$p dries out.~
+M
+18
+$p dries out.~
 O+ 1 6152
 R
 4 5215 0
-T 3054
 S
 #3055
 sack calabash dried gourds~
