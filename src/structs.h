@@ -5294,7 +5294,7 @@ struct empire_island {
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
 	struct empire_storage_data *store;	// hash table of storage here
-	bool store_is_sorted;	// TRUE if the storage hasn't changed order
+	bool store_is_sorted;	// EINV_SORT_ id of how it's currently sorted, or EINV_UNSORTED if not
 	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
