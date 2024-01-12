@@ -264,13 +264,13 @@ you minor shapeshifting abilities!
 1 0
 S
 #10720
-basket chestnuts sweet~
+basket chestnuts nuts sweet~
 a basket of chestnuts~
 A basket of sweet chestnuts is lying here.~
    The pale yellow insides of these smooth, brown nuts can be roasted and
 eaten, if you can remove them from their prickly green cases.
 ~
-6 b a 0 0 7
+6 b a 0 0 9
 12 10700 0
 7 336
 I 15 10721 100.00 4  # SEPARATE: handful of chestnuts
@@ -280,17 +280,18 @@ You peel open $p and eat them.~
 M
 5
 $n peels open $p and eats them.~
+O+ 1 6192
 R
 4 5215 0
 S
 #10721
-chestnuts handful~
+chestnuts nuts handful~
 a handful of chestnuts~
 A handful of chestnuts are lying here.~
    The insides of these smooth brown nuts can be eaten. Or you could roast
 them, if you can find some more.
 ~
-6 0 a 0 0 5
+6 0 a 0 0 7
 1 0 0
 7 48
 I 14 10720 100.00 4  # COMBINE: basket of chestnuts
@@ -300,6 +301,7 @@ You peel open $p and eat them.~
 M
 5
 $n peels open $p and eats them.~
+O+ 1 6182
 R
 4 5619 0
 S
@@ -310,13 +312,14 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 m a 0 0 5
+6 m a 0 0 6
 18 0 0
 7 336
 A
 9 1 0
 C
 50 50
+O+ 1 6192
 R
 4 5132 0
 R
