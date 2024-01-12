@@ -5251,7 +5251,7 @@ ACMD(do_empire_inventory) {
 	}
 	if (emp) {
 		// sort to get predictable order
-		sort_einv_for_empire(emp, sort_einv_by_amount);
+		sort_einv_for_empire(emp, sort_einv_by_perishable);
 		
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
