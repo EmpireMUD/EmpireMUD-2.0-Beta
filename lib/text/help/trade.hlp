@@ -407,14 +407,20 @@ effect for a while after you eat them. These foods are bind-on-pickup, so only
 the person who makes them can eat them.
 
 You can cook the following family recipes:
-  black sausage (to-hit)                   jellied eels (dodge)
-  pot roast (max-health)                   chili (max-moves)
-  fish and chips (charisma)                stewed vegetables (mana-regen)
+  traditional black sausage (to-hit)
+  grandma's jellied eels (dodge)
+  mom's pot roast (max-health)
+  dad's chili (max-moves)
+  dad's fish and chips (charisma)
+  grandpa's stewed vegetables (mana-regen)
   
 You can bake the following family recipes:
-  berry cobbler (wits)                     hearty meatloaf (strength)
-  biscuits and gravy (move-regen)          mom's pie (max-mana)
-  chicken and dumplings (intelligence)     shepherd's pie (dexterity)
+  grandma's berry cobbler (wits)
+  grandma's hearty meatloaf (strength)
+  grandma's biscuits and gravy (move-regen)
+  mom's pie (max-mana)
+  mom's chicken and dumplings (intelligence)
+  grandpa's shepherd's pie (dexterity)
 
 See also: BUFF FOOD, BOP, COOKING FIRE
 #
