@@ -1132,6 +1132,12 @@ typedef struct vehicle_data vehicle_data;
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
 
+// EINV_SORT_x: how sort empire inventory, or how it is currently sorted
+#define EINV_UNSORTED			0	// something has unsorted it (must be 0)
+#define EINV_SORT_AMOUNT		1	// sort by amount
+#define EINV_SORT_PERISHABLE	2	// sort by decay timer
+
+
 // ELOG_x: empire_log_data types
 #define ELOG_NONE  0	// does not log to file
 #define ELOG_ADMIN  1	// administrative changes

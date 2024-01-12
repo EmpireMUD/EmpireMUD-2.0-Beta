@@ -10263,7 +10263,7 @@ struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, i
 		store = NULL;
 	}
 	
-	isle->store_is_sorted = FALSE;
+	isle->store_is_sorted = EINV_UNSORTED;
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	et_get_obj(emp, obj_proto(vnum), amount, store ? store->amount : 0);

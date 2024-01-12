@@ -860,7 +860,7 @@ void chore_update(void) {
 			continue;
 		}
 		
-		sort_einv_for_empire(emp, sort_einv_by_perishable);
+		sort_einv_for_empire(emp, EINV_SORT_PERISHABLE);
 		
 		// update islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
@@ -1578,17 +1578,28 @@ int sort_einv_by_perishable(struct empire_storage_data *a, struct empire_storage
 * Ensures einv is sorted. Call before einv-related tasks.
 *
 * @param empire_data *emp The empire to sort.
-* @param int *sort_func A sort function for how exactly to sort it (e.g. sort_einv_by_amount).
+* @param int einv_sort_type EINV_SORT_AMOUNT or EINV_SORT_PERISHABLE
 */
-void sort_einv_for_empire(empire_data *emp, int (*sort_func)(struct empire_storage_data *a, struct empire_storage_data *b)) {
+void sort_einv_for_empire(empire_data *emp, int einv_sort_type) {
 	struct empire_island *eisle, *next_eisle;
 	
 	if (emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
-			// sort einv now to ensure it's in a useful order (most quantity first)
-			if (!eisle->store_is_sorted) {
-				HASH_SORT(eisle->store, sort_func);
-				eisle->store_is_sorted = TRUE;
+			if (eisle->store_is_sorted != einv_sort_type) {
+				// EINV_SORT_x: implementation
+				switch (einv_sort_type) {
+					case EINV_SORT_AMOUNT: {
+						HASH_SORT(eisle->store, sort_einv_by_amount);
+						break;
+					}
+					case EINV_SORT_PERISHABLE: {
+						HASH_SORT(eisle->store, sort_einv_by_perishable);
+						break;
+					}
+					// no default
+				}
+				
+				eisle->store_is_sorted = einv_sort_type;
 			}
 		}
 	}

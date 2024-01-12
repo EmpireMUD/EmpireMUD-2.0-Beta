@@ -2713,7 +2713,7 @@ void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b);
 int sort_einv_by_perishable(struct empire_storage_data *a, struct empire_storage_data *b);
-void sort_einv_for_empire(empire_data *emp, int (*sort_func)(struct empire_storage_data *a, struct empire_storage_data *b));
+void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 
 
  //////////////////////////////////////////////////////////////////////////////
