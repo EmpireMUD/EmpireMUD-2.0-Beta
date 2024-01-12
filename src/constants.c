@@ -3093,7 +3093,7 @@ const char *extra_bits[] = {
 	"!STORE",	// 25
 	"SEEDED",
 	"IMPORTANT",
-	"LONG-TIMER-IN-STORAGE"
+	"LONG-TIMER-IN-STORAGE",
 	"\n"
 };
 
