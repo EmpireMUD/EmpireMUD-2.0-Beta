@@ -3093,6 +3093,7 @@ const char *extra_bits[] = {
 	"!STORE",	// 25
 	"SEEDED",
 	"IMPORTANT",
+	"LONG-TIMER-IN-STORAGE"
 	"\n"
 };
 
@@ -3127,6 +3128,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// 25, no-store
 	"",	// seeded
 	"",	// important
+	"lasts longer when stored",
 	"\n"
 };
 
@@ -3161,6 +3163,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// 25, OBJ_NO_STORE
 	1.0,	// OBJ_SEEDED
 	1.0,	// OBJ_IMPORTANT
+	1.0,	// OBJ_LONG_TIMER_IN_STORAGE
 };
 
 

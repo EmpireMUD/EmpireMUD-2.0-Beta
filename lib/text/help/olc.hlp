@@ -7002,6 +7002,7 @@ Available flags:
  &c!STORE&0 - can't be stored (or home/warehouse stored), can be toggled by scripts
  &cSEEDED&0 - has already been seeded with the 'seed' command
  &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
+ &cLONG-TIMER-IN-STORAGE&0 - Decays slower while stored.
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d

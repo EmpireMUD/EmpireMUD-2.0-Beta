@@ -2392,6 +2392,8 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void check_daily_cycle_reset(char_data *ch);
 void check_deficits(char_data *ch);
+void check_empire_storage_timers();
+void check_home_storage_timers(char_data *ch);
 void check_pointless_fight(char_data *mob);
 void check_ruined_cities();
 void gain_condition(char_data *ch, int condition, int value);
