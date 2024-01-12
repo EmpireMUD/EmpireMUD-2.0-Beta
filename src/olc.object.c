@@ -109,7 +109,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		while (*temp && ispunct(temp[strlen(temp)-1])) {
 			temp[strlen(temp)-1] = '\0';
 		}
-		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj)) && search_block(temp, ignore_missing_keywords, TRUE) == NOTHING) {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}

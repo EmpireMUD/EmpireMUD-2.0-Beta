@@ -1607,7 +1607,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		while (*temp && ispunct(temp[strlen(temp)-1])) {
 			temp[strlen(temp)-1] = '\0';
 		}
-		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, VEH_KEYWORDS(veh))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, VEH_KEYWORDS(veh)) && search_block(temp, ignore_missing_keywords, TRUE) == NOTHING) {
 			olc_audit_msg(ch, VEH_VNUM(veh), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}

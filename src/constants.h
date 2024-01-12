@@ -356,6 +356,7 @@ extern const double basic_speed;
 // olc constants
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[];
+extern const char *ignore_missing_keywords[];
 
 // progress constants
 extern const char *progress_types[];
