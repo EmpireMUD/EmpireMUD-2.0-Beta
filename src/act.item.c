@@ -24,7 +24,6 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
-#include "dg_event.h"
 #include "constants.h"
 #include "boards.h"
 #include "olc.h"

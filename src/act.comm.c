@@ -19,7 +19,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "skills.h"
 #include "dg_scripts.h"
 #include "constants.h"
 
