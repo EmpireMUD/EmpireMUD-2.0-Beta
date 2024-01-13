@@ -65,6 +65,7 @@ void check_nowhere_einv_all();
 void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
+void check_storage_timers_at_startup();
 void check_triggers();
 void check_version();
 void chore_update();
@@ -635,6 +636,7 @@ void boot_world(void) {
 	
 	log("Loading empire storage and logs.");
 	load_empire_storage();
+	check_storage_timers_at_startup();
 	clean_empire_logs();
 	
 	log("Loading daily quest cycles.");

@@ -11125,6 +11125,56 @@ void add_storage_timer(struct storage_timer **list, int timer, int amount) {
 
 
 /**
+* Ensures all empires have the correct storage timers for their storage.
+*/
+void check_storage_timers_at_startup(void) {
+	int timed;
+	empire_data *emp, *next_emp;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				timed = count_storage_timers(store->timers);
+			
+				// check too many/too few timers
+				if (GET_OBJ_TIMER(store->proto) > 0 && timed < store->amount) {
+					// timers missing?
+					add_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto), store->amount - timed);
+				}
+				else if (GET_OBJ_TIMER(store->proto) -= 0 && timed > 0) {
+					// has timers but shouldn't ???
+					free_storage_timers(&store->timers);
+				}
+			
+				// and sort
+				DL_SORT(store->timers, sort_storage_timers);
+			}
+		}
+	}
+}
+
+
+/**
+* Adds up the items in all the timers.
+*
+* @param struct storage_timer *list List of storage timers.
+* @return int Total number of items controlled by these timers.
+*/
+int count_storage_timers(struct storage_timer *list) {
+	struct storage_timer *st;
+	int total = 0;
+	
+	DL_FOREACH(list, st) {
+		SAFE_ADD(total, st->amount, 0, INT_MAX, FALSE);
+	}
+	
+	return total;
+}
+
+
+/**
 * Frees a list of storage timers.
 *
 * @param struct storage_timer **list A pointer to the list to free.
@@ -11218,6 +11268,12 @@ void remove_storage_timer_items(struct storage_timer **list, int amount, bool ex
 			}
 		}
 	}
+}
+
+
+// simple sorter to put storage timers in ascending order
+int sort_storage_timers(struct storage_timer *a, struct storage_timer *b) {
+	return a->timer - b->timer;
 }
 
 

@@ -469,9 +469,11 @@ bool stored_item_requires_withdraw(obj_data *obj);
 
 // storage timers
 void add_storage_timer(struct storage_timer **list, int timer, int amount);
+int count_storage_timers(struct storage_timer *list);
 void free_storage_timers(struct storage_timer **list);
 void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer *merge_from, int total_things);
 void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first);
+int sort_storage_timers(struct storage_timer *a, struct storage_timer *b);
 struct storage_timer *split_storage_timers(struct storage_timer **list, int amount);
 
 // targeting handlers
