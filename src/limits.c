@@ -2184,6 +2184,9 @@ void check_empire_storage_timers(void) {
 						DL_DELETE(store->timers, st);
 						free(st);
 						
+						// progress loss
+						et_get_obj(emp, store->proto, -st->amount, store->amount);
+						
 						// delete storage if needed
 						if (store->amount == 0 && !store->keep) {
 							HASH_DEL(isle->store, store);
