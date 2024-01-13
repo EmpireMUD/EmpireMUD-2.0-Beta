@@ -3504,7 +3504,14 @@ OLC_MODULE(oedit_storage) {
 
 OLC_MODULE(oedit_timer) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	
+	if (!str_cmp(argument, "none") || !str_cmp(argument, "unlimited") || !str_cmp(argument, "infinite")) {
+		GET_OBJ_TIMER(obj) = UNLIMITED;
+		msg_to_char(ch, "It now has no decay timer.\r\n");
+	}
+	else {
+		GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	}
 }
 
 

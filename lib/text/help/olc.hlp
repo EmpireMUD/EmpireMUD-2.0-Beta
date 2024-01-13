@@ -7459,7 +7459,7 @@ See also: OEDIT KEYWORDS, OLC OBJECTS
 #d
 "OEDIT TIMER" "DECAY TIMER" TIMER
 
-Usage:  .timer <hours>
+Usage:  .timer <hours | none>
 
 This determines how long an item lasts before it decays and is lost. This can
 be used to make any item temporary, but it is used especially on food, drink
