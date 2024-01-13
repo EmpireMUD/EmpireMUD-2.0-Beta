@@ -10606,6 +10606,9 @@ void free_empire_storage_data(struct empire_storage_data *store) {
 /**
 * Counts the total number of something an empire has in all storage.
 *
+* Note: Very similar work is done in ewt_find_tracker(), which tracks more
+* detailed information on items for the workforce system.
+*
 * @param empire_data *emp The empire to check.
 * @param obj_vnum vnum The item to look for.
 * @param bool count_secondary If TRUE, also count items in the shipping system and items on the ground.
@@ -11126,8 +11129,10 @@ void add_storage_timer(struct storage_timer **list, int timer, int amount) {
 
 /**
 * Ensures all empires have the correct storage timers for their storage.
+*
+* @param obj_vnum only_vnum Optional: Only audit one type of thing (may be NOTHING to do all objects).
 */
-void check_storage_timers_at_startup(void) {
+void check_storage_timers(any_vnum only_vnum) {
 	int timed;
 	empire_data *emp, *next_emp;
 	struct empire_island *isle, *next_isle;
@@ -11136,20 +11141,31 @@ void check_storage_timers_at_startup(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			HASH_ITER(hh, isle->store, store, next_store) {
+				if (only_vnum != NOTHING && store->vnum != only_vnum) {
+					continue;
+				}
+				
 				timed = count_storage_timers(store->timers);
 			
 				// check too many/too few timers
 				if (GET_OBJ_TIMER(store->proto) > 0 && timed < store->amount) {
 					// timers missing?
 					add_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto), store->amount - timed);
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 				}
 				else if (GET_OBJ_TIMER(store->proto) -= 0 && timed > 0) {
 					// has timers but shouldn't ???
 					free_storage_timers(&store->timers);
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 				}
 			
-				// and sort
+				// ensure sort
 				DL_SORT(store->timers, sort_storage_timers);
+				
+				// and check caps (after sorting)
+				if (GET_OBJ_TIMER(store->proto) > 0) {
+					ensure_max_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto));
+				}
 			}
 		}
 	}
@@ -11171,6 +11187,37 @@ int count_storage_timers(struct storage_timer *list) {
 	}
 	
 	return total;
+}
+
+
+/**
+* In case the object's timer has changed, guarantees no timer in the list is
+* longer than the current maximum.
+*
+* @param struct storage_timer **list A pointer to the list.
+* @param int max_timer The maximum allowed timer.
+* @return bool TRUE if any changed; FALSE if not.
+*/
+bool ensure_max_storage_timer(struct storage_timer **list, int max_timer) {
+	int total_over = 0;
+	struct storage_timer *iter, *next;
+	
+	if (list) {
+		DL_FOREACH_SAFE(*list, iter, next) {
+			if (iter->timer > max_timer) {
+				SAFE_ADD(total_over, iter->amount, 0, INT_MAX, FALSE);
+				DL_DELETE(*list, iter);
+				free(iter);
+			}
+		}
+		
+		if (total_over > 0) {
+			add_storage_timer(list, max_timer, total_over);
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// found no overages
 }
 
 

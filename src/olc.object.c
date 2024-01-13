@@ -1729,12 +1729,16 @@ void save_olc_object(descriptor_data *desc) {
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	char_data *chiter;
+	int old_timer;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
 	if (!(proto = obj_proto(vnum))) {
 		proto = create_obj_table_entry(vnum);
 	}
+	
+	// for updating storage timers later
+	old_timer = GET_OBJ_TIMER(proto);
 	
 	// update the strings, pointers, and stats on live items
 	DL_FOREACH(object_list, obj_iter) {
@@ -1820,6 +1824,11 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_OBJ, vnum);
+	
+	// lastly, if timers changed:
+	if (GET_OBJ_TIMER(proto) != old_timer) {
+		check_storage_timers(vnum);
+	}
 }
 
 
