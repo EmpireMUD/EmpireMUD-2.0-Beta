@@ -2254,7 +2254,6 @@ void check_empire_storage_timers(void) {
 				
 				// items that decay in shipping are just list
 				if (st->timer <= 0) {
-					log("debug: %dx %d %s decaying from shipping from %s", st->amount, shipd->vnum, get_obj_name_by_proto(shipd->vnum), EMPIRE_NAME(emp));
 					shipd->amount = MAX(0, shipd->amount - st->amount);
 					DL_DELETE(shipd->timers, st);
 					free(st);
