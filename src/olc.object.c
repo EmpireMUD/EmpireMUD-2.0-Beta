@@ -147,6 +147,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && GET_OBJ_STORAGE(obj)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "BoP item has storage locations");
+		problem = TRUE;
+	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;
@@ -3418,6 +3422,15 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
 		}
 		else {
+			// ensure we don't already have it?
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (store->type == mode && store->vnum == num) {
+					msg_to_char(ch, "It already stores there.\r\n");
+					return;
+				}
+			}
+			
+			// ok:
 			CREATE(store, struct obj_storage_type, 1);
 			store->type = mode;
 			store->vnum = num;
