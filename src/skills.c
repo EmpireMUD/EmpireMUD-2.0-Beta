@@ -2559,7 +2559,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	}
 	if (honed && !has_player_tech(ch, PTECH_USE_HONED_GEAR)) {
 		if (send_messages) {
-			act("You don't have the abiltiy to use honed gear like $p.", FALSE, ch, item, NULL, TO_CHAR);
+			act("You don't have the ability to use honed gear like $p.", FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
 	}
