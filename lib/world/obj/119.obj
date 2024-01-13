@@ -91,7 +91,7 @@ wrapped in a pastry shell and baked until golden. Once the traditional meal of
 miners across the land, it's now enjoyed mainly in bourgeois cafes and
 gentrified food carts.
 ~
-6 m a 0 0 7
+6 m a 0 0 8
 24 0 0
 7 336
 A
@@ -126,9 +126,9 @@ animals, something usually seen as the vulgar purview of nature magic. Some
 sorcerers are eager to create new products or conveniences, with little regard
 for traditional ethics. And none of them are afraid to mislabel a product.
 ~
-6 m a 0 0 9
+6 mC a 0 0 10
 24 0 0
-7 336
+7 8760
 A
 16 1 0
 C
@@ -1578,9 +1578,9 @@ making it easier to pry them apart.
    Since time immemorial, people have gathered and cooked shellfish as a simple
 and bountiful food source.
 ~
-6 m a 0 0 8
+6 m a 0 0 9
 24 0 0
-7 48
+7 336
 A
 4 1 0
 A
@@ -1612,7 +1612,7 @@ river but you could certainly cook them up.
    Rivers provide a plentiful and sustainable food source as much for the
 shellfish as for the fisherman.
 ~
-6 0 a 0 0 8
+6 C a 0 0 9
 6 0 0
 7 48
 C
@@ -2197,9 +2197,9 @@ a distinctly marbled jade color, but it tastes like a slightly funky cheese.
 Skycleave have been extraordinarily successful at grafting unusual foods in
 magical arbors.
 ~
-6 g a 0 0 10
+6 gC a 0 0 11
 6 0 0
-7 12
+7 8760
 B
 L
 C

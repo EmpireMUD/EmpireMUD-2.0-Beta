@@ -4,9 +4,9 @@ a little edible plant~
 A little edible plant is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 0 5
+6 gC a 0 0 6
 1 0 0
-7 48
+7 72
 O+ 1 6100
 R
 4 5619 0
@@ -18,9 +18,9 @@ Some edible plants have been left here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 g a 0 0 5
+6 gC a 0 0 6
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6110
@@ -33,9 +33,9 @@ a little fruit~
 A little fruit is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 0 4
+6 gC a 0 0 5
 1 0 0
-7 48
+7 120
 O+ 1 6120
 R
 4 5619 0
@@ -46,9 +46,9 @@ a small magic fruit~
 A small magic fruit is lying here.~
 This little fruit glows with magical power.
 ~
-6 g a 0 0 6
+6 gC a 0 0 7
 1 0 0
-7 48
+7 120
 O+ 1 6121
 R
 4 5619 0
@@ -59,9 +59,9 @@ a small temperate fruit~
 A small temperate fruit is lying on the ground.~
 This fruit looks like it was grown in a temperate region.
 ~
-6 g a 0 0 5
+6 gC a 0 0 6
 1 0 0
-7 48
+7 120
 O+ 1 6122
 R
 4 5619 0
@@ -72,9 +72,9 @@ a small tropical fruit~
 A small tropical fruit is lying on the ground.~
 This fruit looks like it was grown in a tropical region.
 ~
-6 g a 0 0 6
+6 gC a 0 0 7
 1 0 0
-7 48
+7 120
 O+ 1 6123
 R
 4 5619 0
@@ -85,9 +85,9 @@ a small desert fruit~
 A small desert fruit is lying on the ground.~
 This fruit looks like it was grown in a desert region.
 ~
-6 g a 0 0 7
+6 gC a 0 0 8
 1 0 0
-7 48
+7 120
 O+ 1 6124
 R
 4 5619 0
@@ -99,9 +99,9 @@ Some fresh fruit is scattered on the ground.~
    There's a fair amount of fruit here, although you're not exactly sure what
 any of it is.
 ~
-6 g a 0 0 5
+6 gC a 0 0 7
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6130
@@ -114,9 +114,9 @@ some magic fruit~
 Some magic fruit is floating near the ground.~
 This fruit hovers near the ground, glowing. You're not really sure what it is.
 ~
-6 g a 0 0 6
+6 gC a 0 0 7
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6131
@@ -129,9 +129,9 @@ some temperate fruit~
 Some temperate fruit is piled on the ground.~
 This fruit looks like it comes from a temperate region.
 ~
-6 g a 0 0 7
+6 gC a 0 0 8
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6132
@@ -144,9 +144,9 @@ some tropical fruit~
 Some tropical fruit is piled on the ground.~
 This fruit looks like it comes from a tropical region.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6133
@@ -159,9 +159,9 @@ some desert fruit~
 Some desert fruit is piled on the ground.~
 This fruit looks like it comes from a desert region.
 ~
-6 g a 0 0 10
+6 gC a 0 0 11
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6134
@@ -174,9 +174,9 @@ a small vegetable~
 A small vegetable is lying here.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 0 5
+6 gC a 0 0 6
 1 0 0
-7 48
+7 72
 O+ 1 6140
 R
 4 5619 0
@@ -187,9 +187,9 @@ a small magic vegetable~
 A small magic vegetable is lying here.~
 This unidentifiable little vegetable is glowing!
 ~
-6 g a 0 0 6
+6 gC a 0 0 7
 1 0 0
-7 48
+7 72
 O+ 1 6141
 R
 4 5619 0
@@ -200,9 +200,9 @@ a small temperate vegetable~
 A small temperate vegetable is lying here.~
 This vegetable looks like it was grown somewhere temperate.
 ~
-6 g a 0 0 7
+6 gC a 0 0 8
 1 0 0
-7 48
+7 72
 O+ 1 6142
 R
 4 5619 0
@@ -213,9 +213,9 @@ a small tropical vegetable~
 A small tropical vegetable is lying here.~
 This vegetable looks like it was grown somewhere tropical.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 1 0 0
-7 48
+7 72
 O+ 1 6143
 R
 4 5619 0
@@ -226,9 +226,9 @@ a small desert vegetable~
 A small desert vegetable is lying here.~
 This vegetable looks like it was grown somewhere arid.
 ~
-6 g a 0 0 9
+6 gC a 0 0 10
 1 0 0
-7 48
+7 72
 O+ 1 6144
 R
 4 5619 0
@@ -240,9 +240,9 @@ A bunch of vegetables are lying here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 g a 0 0 6
+6 gC a 0 0 7
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6150
@@ -255,9 +255,9 @@ a bunch of magic vegetables~
 A bunch of magic vegetables are lying here.~
 These plants are glowing! You could make a fair amount of food from this.
 ~
-6 g a 0 0 7
+6 gC a 0 0 8
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6151
@@ -270,9 +270,9 @@ a bunch of temperate vegetables~
 A bunch of temperate vegetables are lying here.~
 These vegetables look like they were grown somewhere temperate.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6152
@@ -285,9 +285,9 @@ a bunch of tropical vegetables~
 A bunch of tropical vegetables are lying here.~
 These vegetables look like they were grown somewhere tropical.
 ~
-6 g a 0 0 9
+6 gC a 0 0 10
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6153
@@ -300,9 +300,9 @@ a bunch of desert vegetables~
 A bunch of desert vegetables are lying here.~
 These vegetables look like they were grown somewhere warm.
 ~
-6 g a 0 0 10
+6 gC a 0 0 11
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6154
@@ -315,9 +315,9 @@ a handful of grain~
 A handful of grain is scattered here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 0 a 0 0 4
+3 C a 0 0 5
 0 0 0
-0 1152
+0 1344
 O+ 1 6160
 R
 4 5116 0
@@ -328,9 +328,9 @@ a bunch of grain~
 A bunch of grain is lying here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 g a 0 0 7
+3 gC a 0 0 8
 0 0 0
-0 1152
+0 1344
 C
 1 1
 O+ 1 6170
@@ -356,9 +356,9 @@ some seeds~
 Some seeds are scattered here.~
 These seeds seem okay to eat.
 ~
-6 0 a 0 0 6
+6 C a 0 0 7
 1 0 0
-0 8064
+0 8760
 O+ 1 6181
 R
 4 5210 0
@@ -369,9 +369,9 @@ a handful of nuts~
 A handful of nuts is scattered here.~
 It's hard to identify the nuts, but they look edible.
 ~
-6 0 a 0 0 5
+6 C a 0 0 6
 4 0 0
-0 1152
+0 3240
 O+ 1 6182
 R
 4 5619 0
@@ -382,9 +382,9 @@ a bunch of nuts~
 A bunch of nuts are lying on the ground.~
 These mixed nuts are hard to identify, but easy to eat.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 10 0 0
-0 1152
+0 3240
 C
 1 1
 O+ 1 6192

@@ -383,9 +383,9 @@ A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
 it on partially-cleared jungle.
 ~
-6 bgl a 0 0 5
+6 bglC a 0 0 7
 12 10225 0
-7 168
+7 120
 O+ 1 6133
 R
 4 5114 0
@@ -396,9 +396,9 @@ an agave heart~
 An agave heart is lying here.~
 You can eat this heart of the agave plant, or replant it.
 ~
-6 bl a 0 0 3
+6 blC a 0 0 4
 12 10226 0
-7 168
+7 72
 R
 4 5215 0
 S
@@ -409,9 +409,9 @@ Some cactus pads are stacked here.~
    These cactus pads are edible, since they've been despined. They can also be
 used to plant more.
 ~
-6 bl a 0 0 3
+6 blC a 0 0 4
 6 10227 0
-7 168
+7 72
 R
 4 5215 0
 S
@@ -421,9 +421,9 @@ a cactus fruit~
 A cactus fruit is lying here.~
 This little red fruit came from a cactus, and it looks sweet.
 ~
-6 0 a 0 0 3
+6 C a 0 0 5
 1 0 0
-7 48
+7 336
 R
 4 5619 0
 S
@@ -445,9 +445,9 @@ some desert dandelions~
 Some desert dandelions have been left here.~
 These plants, though not delicious, are still edible.
 ~
-6 0 a 0 0 3
+6 C a 0 0 4
 1 0 0
-7 48
+7 72
 R
 4 5619 0
 S

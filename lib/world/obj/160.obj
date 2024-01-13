@@ -361,9 +361,9 @@ A sack of blood red oranges is sitting here.~
    This sack of blood oranges can be planted or eaten. But who knows what the
 vampires might have done to them?
 ~
-6 bg a 0 0 9
+6 bg a 0 0 10
 24 16024 0
-7 168
+7 336
 A
 20 20 0
 C
@@ -379,9 +379,9 @@ a blood orange~
 A blood orange is lying here.~
 It's a bright red orange.
 ~
-6 g a 0 0 9
+6 g a 0 0 10
 6 0 0
-7 48
+7 336
 A
 20 5 0
 C

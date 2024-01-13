@@ -581,9 +581,9 @@ A massive ancient tree is lying on the ground.~
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 0 0 0 0 17
+3 0 0 0 0 19
 0 0 0
-0 1152
+0 34560
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -604,6 +604,9 @@ I 17 136 5.00 2 p  # SAW: large shoot
 I 17 121 50.00 6 s  # SAW: sticks and leaves
 I 17 121 40.00 10 s  # SAW: sticks and leaves
 I 17 121 10.00 12 s  # SAW: sticks and leaves
+I 26 136 100.00 4  # DECAYS-TO: large shoot
+I 26 121 100.00 8  # DECAYS-TO: sticks and leaves
+I 26 120 100.00 2  # DECAYS-TO: large tree
 O+ 1 6012
 R
 4 5118 0
@@ -678,9 +681,9 @@ a bundle of wheat~
 A bundle of wheat has been left on the ground.~
 Wheat can be milled into flour, or planted.
 ~
-3 bgl a 0 0 4
+3 bglC a 0 0 7
 0 1 0
-7 168
+7 1344
 C
 1 1
 O+ 1 6170
@@ -693,9 +696,9 @@ a bushel of hops~
 A bushel of hops is sitting on the ground.~
 Hops can be made into ale at the tavern.
 ~
-3 bl a 0 0 2
+3 blC a 0 0 5
 0 3 0
-7 168
+7 1344
 C
 1 1
 M
@@ -728,9 +731,9 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 bgl a 0 0 4
+3 bglC a 0 0 7
 0 5 0
-7 168
+7 1344
 C
 1 1
 M

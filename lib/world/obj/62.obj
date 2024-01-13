@@ -4,7 +4,7 @@ some raw meat~
 Someone has left some raw meat here.~
 The meat doesn't look very fresh. Perhaps you should cook it.
 ~
-3 0 a 0 6
+3 C a 0 0 7
 0 0 0
 7 24
 C
@@ -19,7 +19,7 @@ some raw fish~
 Someone has left some raw fish here.~
 This fish can be cooked or eaten.
 ~
-6 0 a 0 5
+6 C a 0 0 6
 24 0 0
 7 168
 C
@@ -35,7 +35,7 @@ Someone has left some cooked meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 7
+6 C a 0 0 8
 24 0 0
 7 96
 C
@@ -53,7 +53,7 @@ Someone has left some cooked poultry here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 7
+6 C a 0 0 8
 24 0 0
 7 96
 C
@@ -71,7 +71,7 @@ Someone has left some cooked pork here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 8
+6 C a 0 0 9
 24 0 0
 7 96
 C
@@ -89,7 +89,7 @@ Someone has left some cooked fish here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 9
+6 C a 0 0 10
 24 0 0
 7 96
 C
@@ -107,7 +107,7 @@ Someone has left some cooked red meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 11
+6 C a 0 0 12
 24 0 0
 7 96
 C
@@ -124,9 +124,9 @@ a cooked meal~
 A cooked meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 10
+6 0 a 0 0 11
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6240
@@ -139,9 +139,9 @@ a cooked vegetarian meal~
 A cooked vegetarian meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 8
+6 0 a 0 0 9
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6241
@@ -154,9 +154,9 @@ a meal of cooked meat~
 A meal of cooked meat has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 9
+6 0 a 0 0 10
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6242

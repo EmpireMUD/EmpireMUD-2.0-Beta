@@ -32,9 +32,9 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bgl a 0 0 9
+6 bglC a 0 0 10
 12 11100 0
-7 168
+7 2160
 C
 1 1
 I 15 11103 100.00 4 x  # SEPARATE: carrot
@@ -48,9 +48,9 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 0 9
+6 gC a 0 0 10
 1 0 0
-7 48
+7 2160
 C
 1 1
 I 14 11102 100.00 4 x  # COMBINE: bunch of carrots
@@ -64,9 +64,9 @@ a bunch of blackberries~
 There are a bunch of blackberries scattered across the ground.~
 You can eat blackberries, or plant them.
 ~
-6 bgl a 0 0 7
+6 bglC a 0 0 8
 12 11101 0
-7 168
+7 336
 C
 1 1
 I 15 11105 100.00 4 x  # SEPARATE: few blackberries
@@ -80,9 +80,9 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 1 0 0
-7 48
+7 336
 C
 1 1
 I 14 11104 100.00 4 x  # COMBINE: bunch of blackberries
@@ -96,15 +96,15 @@ some juicy pears~
 There are some juicy pears scattered across the ground.~
 You can eat pears, or plant them.
 ~
-6 bgl a 0 0 7
+6 bglC a 0 0 9
 12 11102 0
-7 168
+7 336
 C
 1 1
 I 15 11107 100.00 4 x  # SEPARATE: ripe pear
 O+ 1 6132
 R
-4 5114 0
+4 5215 0
 S
 #11107
 pear ripe~
@@ -112,15 +112,15 @@ a ripe pear~
 Someone has dropped a ripe pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 g a 0 0 9
+6 gC a 0 0 11
 2 0 0
-7 48
+7 336
 C
 1 1
 I 14 11106 100.00 4 x  # COMBINE: juicy pears
 O+ 1 6122
 R
-4 5619 0
+4 5215 0
 S
 #11108
 hood scarlet-feathered feathered scarlet~
@@ -574,7 +574,7 @@ a catfish fillet~
 Tehre is a fillet of catfish nearby.~
 You can eat the meat raw... or cook it.
 ~
-6 0 a 0 0 3
+6 C a 0 0 4
 6 0 0
 7 24
 C

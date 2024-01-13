@@ -27,9 +27,9 @@ some firefruit seeds~
 Some firefruit seeds are scattered on the ground.~
 These seeds have a faint glow.
 ~
-3 b a 0 0 6
+3 bC a 0 0 7
 0 10300 0
-7 468
+7 8760
 O+ 1 6180
 R
 4 5210 0
@@ -41,9 +41,9 @@ A firefruit is flickering and sputtering on the ground.~
    The firefruit flickers shades of red, orange and yellow. It's warm to the
 touch, but juicy and delicious. It's probably bright enough to see by.
 ~
-6 bcel a 0 0 8
+6 bcelC a 0 0 10
 24 10300 0
-7 48
+7 336
 A
 30 2 0
 M
@@ -320,9 +320,9 @@ a scaly dragonfruit~
 A scaly dragonfruit is lying here.~
 This exotic red fruit has green, scaly leaves coming out of its leathery skin.
 ~
-6 0 a 0 0 6
+6 C a 0 0 8
 2 0 0
-7 48
+7 336
 I 14 10339 100.00 4 x  # COMBINE: basket of dragonfruit
 R
 4 5619 0
@@ -335,9 +335,9 @@ A basket of dragonfruit is sitting here.~
 on a cactus, and as they require little water, they should be easy to farm in
 the desert. You could probably preserve the dragonfruit by making it into jam.
 ~
-6 b a 0 0 5
+6 bC a 0 0 7
 24 10338 0
-7 168
+7 336
 I 15 10338 100.00 4 x  # SEPARATE: scaly dragonfruit
 R
 4 5114 0
@@ -348,9 +348,9 @@ dragonfruit jam~
 A jar of dragonfruit jam is lying here.~
 The jam is bright red, and doesn't really smell like anything.
 ~
-6 0 a 0 0 3
+6 C a 0 0 4
 48 0 0
-7 336
+7 8760
 I 26 801 100.00 1  # DECAYS-TO: glass jar
 I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R

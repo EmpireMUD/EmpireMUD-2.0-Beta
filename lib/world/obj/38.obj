@@ -5,9 +5,9 @@ A loaf of village bread has been left behind.~
    This simple loaf of bread isn't terribly good, but it will keep the
 villagers fed.
 ~
-6 0 a 0 4
+6 0 a 0 0 5
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -20,7 +20,7 @@ Some gruel has been left behind.~
    This serving of what could, at best, be described as "rudimentary porridge"
 has already gone cold.
 ~
-6 0 a 0 6
+6 0 a 0 0 7
 48 0 0
 7 336
 C
@@ -35,9 +35,9 @@ Some village rice has been left behind.~
    The rice has been cleaned and cooked, but it's rather bland. Still, you
 could sustain an enormous workforce on enough of this.
 ~
-6 0 a 0 6
+6 0 a 0 0 7
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -50,9 +50,9 @@ Some pickled village vegetables are lying here.~
    The vegetables have been pickled to make them edible and give them a little
 flavor. Not very much flavor, mind you, but a little.
 ~
-6 0 a 0 9
+6 C a 0 0 10
 48 0 0
-7 1440
+7 8760
 C
 1 1
 R
@@ -66,9 +66,9 @@ Some village oak cakes are lying here.~
 would have been nice, or perhaps some dried fruit, but there mustn't have been
 any available.
 ~
-6 0 a 0 5
+6 0 a 0 0 6
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -81,9 +81,9 @@ A grilled steak has been left here.~
    The steak is pretty simple. It's a grilled cut of unidentifiable meat,
 cooked without salt or seasonings, over a hot fire.
 ~
-6 0 a 0 6
+6 C a 0 0 7
 24 0 0
-7 336
+7 96
 C
 1 1
 O+ 1 6220
@@ -97,9 +97,9 @@ A piece of grilled chicken is lying here.~
    This cut of grilled poultry would be generous to call itself chicken.
 Still, grilling should make it safe to eat.
 ~
-6 0 a 0 6
+6 C a 0 0 7
 24 0 0
-7 336
+7 96
 C
 1 1
 O+ 1 6221
@@ -112,9 +112,9 @@ a fillet of grilled fish~
 A fillet of grilled fish is sitting here.~
 This fish isn't well-seasoned, but at least it's well-cooked.
 ~
-6 0 a 0 7
+6 C a 0 0 8
 24 0 0
-7 336
+7 96
 C
 1 1
 O+ 1 6223
@@ -127,9 +127,9 @@ a grilled porkchop~
 A grilled porkchop is lying here.~
 This fine cut of pork has been cooked until all hope of flavor is gone.
 ~
-6 0 a 0 7
+6 C a 0 0 8
 24 0 0
-7 336
+7 96
 C
 1 1
 O+ 1 6222
@@ -142,9 +142,9 @@ some village fruit preserves~
 Some village fruit preserves have been left here.~
 The fruit has been cooked and preserved for use outside the growing season.
 ~
-6 0 a 0 10
+6 C a 0 0 11
 48 0 0
-7 1440
+7 8760
 C
 1 1
 R

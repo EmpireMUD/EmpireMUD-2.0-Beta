@@ -19,9 +19,9 @@ a striped barbfish~
 The remains of a striped barbfish is rotting here.~
 You can eat the fish.
 ~
-6 kl a 0 0 5
+6 lC a 0 0 7
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -36,9 +36,9 @@ a giant linefish~
 The remains of a giant linefish is rotting here.~
 You can eat the fish.
 ~
-6 k a 0 0 5
+6 C a 0 0 7
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -53,9 +53,9 @@ a magenta arrowfish~
 The remains of a magenta arrowfish is rotting here.~
 You can eat the fish.
 ~
-6 k a 0 0 5
+6 C a 0 0 7
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -200,9 +200,9 @@ a spotted eel~
 A spotted eel is dried up and rotting.~
 You can eat the fish.
 ~
-6 k a 0 0 7
+6 C a 0 0 9
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -217,9 +217,9 @@ a speckled trout~
 A speckled trout lies dead on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 8
+6 C a 0 0 10
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -236,9 +236,9 @@ a bright red leaping fish~
 A bright red leaping fish is rotting on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 9
+6 C a 0 0 11
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -253,9 +253,9 @@ a fat catfish~
 A fat catfish is lying on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 11
+6 C a 0 0 13
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -270,9 +270,9 @@ a yellow perch~
 A yellow perch lies dead on the ground.~
 You can eat the fish.
 ~
-6 k a 0 0 11
+6 C a 0 0 13
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203
@@ -287,9 +287,9 @@ a small gator~
 A small gator lies dead on the ground.~
 You could eat the gator.
 ~
-6 k a 0 0 11
+6 C a 0 0 15
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6200
@@ -509,6 +509,24 @@ A bolt of llama wool cloth is lying here.~
 sew clothing.
 ~
 3 0 a 0 0 4
+0 0 0
+11 0
+C
+1 1
+O+ 1 6801
+R
+4 5137 0
+R
+4 5134 0
+S
+#1363
+cloth wool yak soft~
+a soft bolt of yak wool cloth~
+A bolt of yak wool cloth has been left here.~
+   The warm, soft cloth is made from dark yak's wool. Thought not as fine as
+some wool, it is highly prized for its insulation and appearance.
+~
+3 0 a 0 0 5
 0 0 0
 11 0
 C

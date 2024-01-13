@@ -441,9 +441,9 @@ a sack of flaxseed~
 A sack of flaxseed is sitting on the ground.~
 The small seeds aren't very good to eat, but can be pressed into linseed oil.
 ~
-6 b a 0 0 5
+6 bC a 0 0 6
 2 18321 0
-0 96
+0 8760
 O+ 1 6181
 R
 4 5210 0
@@ -455,9 +455,9 @@ A jar of linseed oil is sitting here.~
    The jar of linseed oil, which is made from flax, has been sealed for
 storage. It could be used for cooking or for vehicle maintenance.
 ~
-3 0 a 0 0 8
+3 C a 0 0 9
 0 0 0
-6 168
+6 12960
 O+ 1 6321
 R
 4 5134 0

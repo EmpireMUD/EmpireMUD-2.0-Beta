@@ -97,9 +97,9 @@ a pack of dry rations~
 A pack of dry rations is sitting open.~
 This food looks like it could last a while.
 ~
-6 eo a 0 0 2
+6 eoC a 0 0 3
 500 0 0
-0 700
+0 8760
 R
 4 5619 0
 S
@@ -442,9 +442,9 @@ Bright red saguaro fruits are strewn around on the ground.~
    These red fruits are spiny, and have already started to split open. A ripe
 fruit aroma wafts up from the basket, so they won't keep long before rotting.
 ~
-6 bg a 0 0 9
+6 bgC a 0 0 11
 12 10146 0
-7 168
+7 336
 O+ 1 6134
 R
 4 5114 0
@@ -455,9 +455,9 @@ a spiny red fruit~
 A spiny red fruit is lying on the ground.~
 This strange, spiny fruit has a sweet, earthy flavor.
 ~
-6 g a 0 0 8
+6 gC a 0 0 10
 1 0 0
-7 48
+7 336
 O+ 1 6124
 R
 4 5619 0
@@ -573,7 +573,7 @@ A basket of alligator pears is sitting here.~
 dark, bumpy, rigid skin. The inside of the fruit is bright green, with a giant
 seed. They aren't sweet, but have a creamy texture.
 ~
-6 bg a 0 0 9
+6 bgC a 0 0 10
 12 10153 0
 7 168
 I 15 10154 100.00 4 x  # SEPARATE: ripe alligator pear
@@ -588,9 +588,9 @@ An alligator pear is lying on the ground.~
    The alligator pear has a bumpy, black skin. But the inside is bright green
 and creamy.
 ~
-6 g a 0 0 8
+6 gC a 0 0 9
 2 0 0
-7 48
+7 168
 I 14 10153 100.00 4 x  # COMBINE: basket of alligator pears
 O+ 1 6144
 R
@@ -602,9 +602,9 @@ a basket of limes~
 Someone has dropped a basket of limes on the ground.~
 The limes are small, but bright green. You can eat limes, or plant them.
 ~
-6 bg a 0 0 9
+6 bg a 0 0 11
 12 10155 0
-7 168
+7 336
 I 15 10156 100.00 4 e  # SEPARATE: single ripe lime
 M
 4
@@ -622,9 +622,9 @@ a single ripe lime~
 A single ripe lime has been forgotten.~
 This is just a single ripe lime that might provide a little substance.
 ~
-6 g a 0 0 8
+6 g a 0 0 10
 1 0 0
-7 48
+7 336
 I 14 10155 100.00 4 e  # COMBINE: basket of limes
 M
 4
@@ -643,9 +643,9 @@ A maroon firemelon is rolling around on the ground.~
    This firemelon has a deep maroon hue, striped by brighter red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 begm a 0 0 13
+6 begmC a 0 0 14
 12 10157 0
-7 336
+7 168
 A
 21 1 0
 C
@@ -664,9 +664,9 @@ A crimson firemelon is rolling around on the ground.~
    This firemelon has a bright crimson hue, striped by darker red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 begm a 0 0 14
+6 begmC a 0 0 15
 12 10157 0
-7 336
+7 168
 A
 22 1 0
 C
@@ -751,9 +751,9 @@ A sack of mesquite flour is sitting here.~
    Mesquite flour is slightly sweet. It is made from the ground up bean pods of
 the mesquite tree, which grows in the driest deserts.
 ~
-3 0 a 0 0 5
+3 C a 0 0 6
 0 0 0
-7 168
+7 8760
 O+ 1 6300
 R
 4 5109 0
