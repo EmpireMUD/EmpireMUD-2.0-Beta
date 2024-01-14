@@ -1822,7 +1822,7 @@ void init_config_flags(char *key, bitvector_t flags) {
 	
 	HASH_FIND_STR(config_table, key, cnf);
 	if (!cnf) {
-		log("SYSERR: init_config_custom: %s: no key found", key);
+		log("SYSERR: init_config_flags: %s: no key found", key);
 		return;
 	}
 	
