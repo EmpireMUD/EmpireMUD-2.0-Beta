@@ -762,6 +762,7 @@ Homestead Husbandry (Community goal)
 
 Buying this goal lets you build:
   |CC|  chickencoops
+  &t|&G..&t|  pasture
   |ST|  pigsty
 
 See also: PROGRESS
@@ -1630,6 +1631,9 @@ your buildings. If you want to use this chore, but turn off specific items, use
 
 Common things produced by this:
  Apiary: honeycomb, beeswax
+ Chicken coops: eggs, poultry
+ Pasture: mutton, wool
+ Pigsty: pork
  Quarry: flint, rocks, stone blocks
 
 Skilled labor also produces:
