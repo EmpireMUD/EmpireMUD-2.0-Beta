@@ -1245,7 +1245,7 @@ void annual_update_map_tile(struct map_data *tile) {
 			else {
 				dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
 			}
-			dmg = MAX(1.0, dmg);
+			dmg = ceil(MAX(1.0, dmg));
 		
 			// apply damage
 			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
