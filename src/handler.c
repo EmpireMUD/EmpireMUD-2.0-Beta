@@ -11092,8 +11092,8 @@ void add_storage_timer(struct storage_timer **list, int timer, int amount) {
 	struct storage_timer *iter, *st;
 	bool done = FALSE;
 	
-	if (amount < 1 || timer < 1) {
-		return;	// no work
+	if (amount < 1 || timer < 1 || !config_get_bool("decay_in_storage")) {
+		return;	// no work; does not bother if decay is off
 	}
 	
 	if (list) {
@@ -11137,6 +11137,10 @@ void check_storage_timers(any_vnum only_vnum) {
 	empire_data *emp, *next_emp;
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store, *next_store;
+	
+	if (!config_get_bool("decay_in_storage")) {
+		return;
+	}
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {

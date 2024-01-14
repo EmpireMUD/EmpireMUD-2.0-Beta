@@ -2136,6 +2136,8 @@ INTERACTION_FUNC(decay_in_storage_interact) {
 /**
 * To be called every game hour in order to check stored items for expiration
 * timers.
+*
+* Can be configured off with the empire config "decay_in_storage".
 */
 void check_empire_storage_timers(void) {
 	bool counted;
@@ -2146,6 +2148,10 @@ void check_empire_storage_timers(void) {
 	struct empire_unique_storage *eus, *next_eus;
 	struct shipping_data *shipd, *next_shipd;
 	struct storage_timer *st, *next_st;
+	
+	if (!config_get_bool("decay_in_storage")) {
+		return;
+	}
 	
 	// all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2278,6 +2284,8 @@ void check_empire_storage_timers(void) {
 * only operates on in-game characters: just like inventory, home items do not
 * tick down while offline.
 *
+* Can be configured off with the empire config "decay_in_storage".
+*
 * @param char_data *ch The player.
 */
 void check_home_storage_timers(char_data *ch) {
@@ -2286,7 +2294,7 @@ void check_home_storage_timers(char_data *ch) {
 	struct empire_unique_storage *eus, *next_eus;
 	struct storage_timer *st, *next_st;
 	
-	if (!ch || IS_NPC(ch)) {
+	if (!ch || IS_NPC(ch) || !config_get_bool("decay_in_storage")) {
 		return;	// no work
 	}
 	

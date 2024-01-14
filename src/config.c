@@ -1030,6 +1030,21 @@ CONFIG_HANDLER(config_edit_autostore_time) {
 }
 
 
+// ensures everything has a timer if needed
+CONFIG_HANDLER(config_edit_decay_in_storage) {
+	void check_storage_timers(any_vnum only_vnum);
+	
+	bool old = config_get_int("decay_in_storage");
+	
+	// pass thru first...
+	config_edit_bool(ch, config, argument);
+	
+	if (config_get_bool("decay_in_storage") && config_get_bool("decay_in_storage") != old) {
+		check_storage_timers(NOTHING);
+	}
+}
+
+
 CONFIG_HANDLER(config_edit_who_list_sort) {
 	int input, iter, old;
 	
@@ -1939,6 +1954,7 @@ void init_config_system(void) {
 
 	// empire
 	init_config(CONFIG_EMPIRE, "decay_in_storage", CONFTYPE_BOOL, "stored items still count down their decay timers");
+		init_config_custom("decay_in_storage", config_show_bool, config_edit_decay_in_storage, NULL);
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
