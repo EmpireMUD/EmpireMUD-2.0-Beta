@@ -263,6 +263,17 @@ This invisible mob moves around randomly then spawns a goat object.
 T 16645
 T 16643
 S
+#16650
+#n gooseherd~
+the gooseherd~
+#n is trying to herd the geese.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1
+D
+The young gooseherd is cautiously tending the flock.
+~
+S
 #16651
 goose plump~
 a plump goose~
@@ -284,6 +295,7 @@ $n honks loudly.~
 M
 0
 $n honks loudly at you.~
+T 9047
 S
 #16652
 reindeer deer flying red-nosed nosed rednosed~

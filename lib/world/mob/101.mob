@@ -454,9 +454,7 @@ A desert bighorn sheep won't take its eyes off of you.
 D
 This scrawny sheep has horns that are bigger than its head!
 ~
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
 I 1 1351 100.00 1  # SKIN: large skin
 M
 0

@@ -96,10 +96,10 @@ D
    The sheep nibbles at the ground, then springs its head upwards and frolicks
 in a circle around you.
 ~
-I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
-I 2 1358 100.00 1  # SHEAR: bag of sheep's wool
-I 2 1358 50.00 1  # SHEAR: bag of sheep's wool
-I 2 1358 5.00 1  # SHEAR: bag of sheep's wool
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
+I 2 1358 5.00 3 s  # SHEAR: bag of sheep's wool
+I 2 1358 50.00 2 s  # SHEAR: bag of sheep's wool
+I 2 1358 45.00 1 s  # SHEAR: bag of sheep's wool
 M
 0
 $n eats some grass.~
@@ -221,6 +221,7 @@ M
 0
 $n searches around on the ground, looking for bugs.~
 T 9121
+T 9047
 S
 #9011
 rooster~
@@ -314,7 +315,7 @@ A wild sheep chews slowly as it looks at you.
 D
 This wild sheep has short, course hair, totally unlike its domestic cousin.
 ~
-I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
 I 1 1351 100.00 1  # SKIN: large skin
 I 24 9046 100.00 1  # TAME: tame sheep
 M
@@ -952,7 +953,7 @@ D
 brethren. Perhaps if you keep it in the stable long enough, it will evolve into
 the sort of fluffy domestic sheep that you can shear for wool.
 ~
-I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
 I 1 1351 100.00 1  # SKIN: large skin
 M
 0
@@ -961,6 +962,119 @@ M
 0
 $n chews $s cud.~
 T 9046
+S
+#9047
+chicken~
+a chicken~
+A chicken is scratching at the ground around the coop.
+~
+1 5 djo 0 1
+2 0 0 10 -1
+D
+The chicken seems disinterested in you.
+~
+I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
+M
+0
+$n clucks.~
+M
+0
+$n squawks.~
+M
+0
+$n scratches at the ground.~
+M
+0
+$n preens $mself.~
+M
+6
+A chicken is running in circles.~
+M
+6
+A chicken is preening itself.~
+M
+6
+A chicken is pecking at the ground.~
+M
+6
+A chicken is scratching at the ground around the coop.~
+T 9047
+S
+#9048
+pig~
+a pig~
+A pig is rolling in mud.
+~
+5 15 bdjo 0 3
+0 0 0 9 -1
+D
+This fat pink beast looks happy rolling in the mud.
+~
+I 0 3201 100.00 2  # BUTCHER: slab of pork
+M
+0
+$n rolls in the mud.~
+M
+0
+$n eats some slop from the trough.~
+M
+0
+$n splashes around in the mud.~
+M
+0
+$n snorts.~
+M
+0
+$n grunts.~
+M
+6
+A pig is scrounging through the trough.~
+M
+6
+A pig is scratching its hind quarters on the fence.~
+M
+6
+A pig is rolling in mud.~
+S
+#9049
+sheep grazing~
+a grazing sheep~
+There is a sheep grazing contently.
+~
+5 15 bdjoy 0 3
+0 0 0 9 -1
+D
+This cloud-shaped sheep pays no attention to you as it grazes.
+~
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
+I 2 1358 5.00 3 s  # SHEAR: bag of sheep's wool
+I 2 1358 50.00 2 s  # SHEAR: bag of sheep's wool
+I 2 1358 45.00 1 s  # SHEAR: bag of sheep's wool
+M
+0
+$n makes a murmuring noise as $e eats.~
+M
+0
+$n eats and eats.~
+M
+0
+$n brushes past you.~
+M
+6
+There is a sheep grazing contently.~
+M
+6
+There is a sheep ignoring your every move.~
+M
+6
+There is a sheep sniffing at the ground.~
+M
+6
+A sheep grazes right past you.~
+M
+6
+A sheep chews a mouthful of grass.~
 S
 #9055
 jackalope horned~

@@ -394,9 +394,7 @@ D
    You're not sure what to make of this thing, but presumably it pairs well
 with potatoes.
 ~
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3203 100.00 3  # BUTCHER: side of raw mutton
 I 2 1358 100.00 1  # SHEAR: bag of sheep's wool
 I 2 1358 50.00 1  # SHEAR: bag of sheep's wool
 I 2 1358 5.00 1  # SHEAR: bag of sheep's wool

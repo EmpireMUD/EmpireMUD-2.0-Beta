@@ -405,4 +405,87 @@ R
 1010 1 5 0
 Z1 2
 S
+#5216
+Chicken Coops~
+The Chicken Coops~
+&0|CC|~
+8 0 bdp 0
+0 0 0 286
+C
+inventory, retrieve, store~
+E
+coops building around~
+   The wooden coops are arranged all over the area and bedded with straw for
+the chickens. There's a bit of a smell, but it's worth it for the eggs.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 3202 6.00 360 p  # PRODUCTION: egg
+I 31 3200 6.00 180 p  # PRODUCTION: cut of poultry
+I+ 7 11  # Depletion: secondary
+M
+9047 90.00 b
+M
+9010 20.00 b
+M
+9011 10.00 b
+R
+1002 1 5 0
+R
+6400 1 1 0
+S
+#5217
+Pigsty~
+Around the Pigsty~
+&0|ST|~
+8 0 bdp 0
+0 0 0 287
+E
+pigsty sty building around sties~
+   Worn paths crisscross the outer enclosure from both the pigs and the
+swineherd, dividing the otherwise pristine muck of the wallow. The smell is
+foul, but the pigs don't seem to mind.
+~
+E
+troughs~
+Troughs are filled with slop and equally-brown water for the pigs.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 3201 6.00 360 p  # PRODUCTION: slab of pork
+M
+9048 90.00 0
+M
+9154 20.00 0
+R
+1002 1 5 0
+R
+6402 1 1 0
+S
+#5218
+Pasture~
+A Grassy Pasture~
+&t|&?@.@.&t|~
+8 0 bdp 0
+0 0 0 288
+E
+pasture building around~
+   The grassy pasture is enclosed by a wooden fence, though it doesn't seem to
+keep the sheep in.
+~
+E
+grass~
+The grass looks amazing! Those sheep do a great job at mowing.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 3203 6.00 360 p  # PRODUCTION: side of raw mutton
+I 31 1358 4.00 80 p  # PRODUCTION: bag of sheep's wool
+I+ 7 11  # Depletion: secondary
+M
+9049 100.00 0
+M
+9004 20.00 0
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
 $

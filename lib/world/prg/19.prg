@@ -117,4 +117,17 @@ K 2 5185
 P 1901
 P 1040
 S
+#1908
+Homestead Husbandry~
+   In order to satiate your empire's appetite for meat and eggs, it can now
+build chicken coops, pastures, and pigsties. Your workforce will produce eggs,
+poultry, mutton, wool, and pork from these outdoor buildings.
+~
+2 1 15 0 b
+K 2 5216
+K 2 5217
+K 2 5218
+P 1002
+P 2011
+S
 $

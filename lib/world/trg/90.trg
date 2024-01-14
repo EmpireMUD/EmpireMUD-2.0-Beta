@@ -631,6 +631,21 @@ if %sheep.vnum% == 9004
   %purge% %self%
 end
 ~
+#9047
+Chicken: Lay egg~
+0 b 1
+~
+if %self.cooldown(9047)%
+  halt
+end
+nop %self.set_cooldown(9047,3600)%
+%echo% ~%self% lays an egg.
+%load% obj 3202 room 1
+set obj %self.room.contents%
+if %obj% && %obj.vnum% == 3202
+  nop %obj.flag(UNCOLLECTED-LOOT)%
+end
+~
 #9061
 Hypnotoad fight~
 0 k 75
