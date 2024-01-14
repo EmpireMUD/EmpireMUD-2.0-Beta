@@ -7168,8 +7168,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 			}
 		}
 		
-		// TODO this seems like a huge error: why is it adding to is-carrying when equipping a container
-		// or is it because contents still need to count against it?
+		// adds to carrying weight because it's total objects we can carry
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) += obj_carry_size(obj);
 			update_MSDP_inventory(ch, UPDATE_SOON);
