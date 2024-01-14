@@ -1142,8 +1142,8 @@ void set_crop_type(room_data *room, crop_data *cp) {
 * @param double damage_amount How much to set its damage to (not bounded).
 */
 void set_room_damage(room_data *room, double damage_amount) {
-	// cheap rounding to %.2f
-	damage_amount = ((int)(damage_amount * 100)) / 100.0;
+	// rounding to 0.01
+	damage_amount = round(damage_amount * 100.0) / 100.0;
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->damage != damage_amount) {
 		COMPLEX_DATA(room)->damage = damage_amount;
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
@@ -1245,7 +1245,10 @@ void annual_update_map_tile(struct map_data *tile) {
 			else {
 				dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
 			}
-			dmg = ceil(MAX(1.0, dmg));
+			
+			// ensure at least 1.0 and round to nearest 0.1
+			dmg = MAX(1.0, dmg);
+			dmg = round(dmg * 10.0) / 10.0;
 		
 			// apply damage
 			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
