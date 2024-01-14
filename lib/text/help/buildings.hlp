@@ -279,6 +279,17 @@ you can re-spawn at a cemetery if your empire owns one on the same continent
 
 See also: STARTING LOCATION, TOMB COMMAND
 #
+"CHICKEN COOPS" CHICKENCOOPS COOP COOPS
+
+|CC|  Chicken Coops  (Homestead Husbandry goal)
+
+Stores:  eggs
+
+Building chicken coops in your empire will provide it with a steady supply of
+eggs and poultry. Workforce will produce these items with the production chore.
+
+See also: WORKFORCE PRODUCTION
+#
 CLAYPIT "CLAY PIT"
 
 &y|__|&0  Clay Pit  (Build ability)
@@ -827,6 +838,15 @@ The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
 
 See also: MAIL
+#
+PIGSTY PIGSTIES STY STIES "PIG STY" "PIG STIES"
+
+|ST|  Pigsty  (Homestead Husbandry goal)
+
+The pigsty gives your empire's swineherd a place to keep pigs and allows your
+workforce to produce a steady supply of pork with the production chore.
+
+See also: WORKFORCE PRODUCTION
 #
 PUEBLO
 
