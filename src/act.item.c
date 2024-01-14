@@ -143,7 +143,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	obj_data *new_obj;
 	
 	// flags to keep on separate
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_STORE | OBJ_CREATED;
+	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_CREATED;
 	
 	// how many they need
 	add_to_resource_list(&res, RES_OBJECT, GET_OBJ_VNUM(inter_item), interaction->quantity, 0);
@@ -237,7 +237,7 @@ bool douse_light(obj_data *obj) {
 		apply_obj_light(obj, FALSE);
 		
 		// should not be storable after this
-		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);
 		
 		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_DESTROY_WHEN_DOUSED) || (GET_LIGHT_HOURS_REMAINING(obj) == 0 && LIGHT_FLAGGED(obj, LIGHT_FLAG_JUNK_WHEN_EXPIRED))) {
 			extract_obj(obj);
@@ -703,7 +703,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		msg_to_char(ch, "&0");
 	}
 
-	if (!simple && GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE) && OBJ_CAN_STORE(obj)) {
+	if (!simple && GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_BASIC_STORAGE) && OBJ_CAN_STORE(obj)) {
 		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
 				add_string_hash(&str_hash, GET_BLD_NAME(bld), 1);
@@ -776,7 +776,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		else if (library) {
 			msg_to_char(ch, "Storage location: Library\r\n");
 		}
-		else if (OBJ_FLAGGED(obj, OBJ_NO_STORE) && (!proto || !OBJ_FLAGGED(proto, OBJ_NO_STORE))) {
+		else if (OBJ_FLAGGED(obj, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE) && (!proto || !OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE))) {
 			msg_to_char(ch, "Storage location: none (modified object)\r\n");
 		}
 	}
@@ -1615,7 +1615,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 	int iter;
 	
 	// flags to keep on separate
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_STORE | OBJ_CREATED;
+	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_CREATED;
 	
 	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
@@ -1731,7 +1731,7 @@ bool use_hour_of_light(obj_data *obj, bool messages) {
 			set_obj_val(obj, VAL_LIGHT_HOURS_REMAINING, GET_LIGHT_HOURS_REMAINING(obj) - 1);
 			
 			// and ensure it's set no-store
-			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);
 		}
 		
 		// turn it off if necessary
@@ -1841,7 +1841,7 @@ bool used_lighter(char_data *ch, obj_data *obj) {
 	// only lighters (not lights) get used up here
 	if (IS_LIGHTER(obj) && GET_LIGHTER_USES(obj) != UNLIMITED) {
 		set_obj_val(obj, VAL_LIGHTER_USES, GET_LIGHTER_USES(obj) - 1);	// use 1 charge
-		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);	// no longer storable
+		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);	// no longer storable
 		
 		if (GET_LIGHTER_USES(obj) <= 0) {
 			if (ch) {
@@ -5967,7 +5967,7 @@ ACMD(do_eat) {
 	if (IS_FOOD(food)) {
 		set_obj_val(food, VAL_FOOD_HOURS_OF_FULLNESS, GET_FOOD_HOURS_OF_FULLNESS(food) - eat_hours);
 		extract = (GET_FOOD_HOURS_OF_FULLNESS(food) <= 0);
-		SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_STORE);	// no longer storable
+		SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_BASIC_STORAGE);	// no longer storable
 	}
 	
 	// 5. messaging
@@ -6939,7 +6939,7 @@ ACMD(do_light) {
 			schedule_obj_timer_update(obj, FALSE);
 			
 			// set no-store only if we kept the same object
-			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);
 			request_obj_save_in_world(obj);
 		}
 		else {
@@ -7857,7 +7857,7 @@ ACMD(do_seed) {
 	}
 	else {		
 		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
-			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_STORE);
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_BASIC_STORAGE);
 			request_obj_save_in_world(obj);
 		}
 		else {

@@ -1193,7 +1193,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// ensure storable
-			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_STORE) || !GET_OBJ_STORAGE(proto)) {
+			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE) || !GET_OBJ_STORAGE(proto)) {
 				continue;
 			}
 			

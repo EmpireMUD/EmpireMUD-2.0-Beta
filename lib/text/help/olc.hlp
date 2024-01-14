@@ -6999,10 +6999,11 @@ Available flags:
  &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  &cGENERIC-DROP&0 - never receives the HARD-DROP/GROUP-DROP flags
- &c!STORE&0 - can't be stored (or home/warehouse stored), can be toggled by scripts
+ &cNO-BASIC-STORAGE&0 - can't be stored in basic storage; can be toggled by scripts
  &cSEEDED&0 - has already been seeded with the 'seed' command
  &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
  &cLONG-TIMER-IN-STORAGE&0 - Decays slower while stored.
+ &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d

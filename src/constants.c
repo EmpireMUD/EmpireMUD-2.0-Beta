@@ -3090,10 +3090,11 @@ const char *extra_bits[] = {
 	"HARD-DROP",
 	"GROUP-DROP",
 	"GENERIC-DROP",
-	"!STORE",	// 25
+	"NO-BASIC-STORAGE",	// 25
 	"SEEDED",
 	"IMPORTANT",
 	"LONG-TIMER-IN-STORAGE",
+	"NO-WAREHOUSE",
 	"\n"
 };
 
@@ -3125,10 +3126,11 @@ const char *extra_bits_inv_flags[] = {
 	"",	// hard-drop
 	"",	// group-drop
 	"",	// generic-drop
-	"",	// 25, no-store
+	"",	// 25, no-basic-storage
 	"",	// seeded
 	"",	// important
 	"lasts longer when stored",
+	"",	// no-warehouse
 	"\n"
 };
 
@@ -3160,10 +3162,11 @@ const double obj_flag_scaling_bonus[] = {
 	1.2,	// OBJ_HARD_DROP
 	1.3333,	// OBJ_GROUP_DROP
 	1.0,	// OBJ_GENERIC_DROP
-	1.0,	// 25, OBJ_NO_STORE
+	1.0,	// 25, OBJ_NO_BASIC_STORAGE
 	1.0,	// OBJ_SEEDED
 	1.0,	// OBJ_IMPORTANT
 	1.0,	// OBJ_LONG_TIMER_IN_STORAGE
+	1.0,	// OBJ_NO_WAREHOUSE
 };
 
 

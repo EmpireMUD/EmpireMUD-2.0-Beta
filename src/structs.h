@@ -1867,13 +1867,14 @@ typedef enum {
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
-#define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
+#define OBJ_NO_BASIC_STORAGE  BIT(25)	// z. cannot be stored in basic storage anymore
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
 #define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
 #define OBJ_LONG_TIMER_IN_STORAGE  BIT(28)	// C. decays more slowly when stored
+#define OBJ_NO_WAREHOUSE  BIT(29)	// D. cannot be stored in the home/warehouse anymore
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
