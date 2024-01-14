@@ -1386,6 +1386,7 @@ ADMIN_UTIL(util_rescan) {
 		reread_empire_tech(emp);
 		refresh_empire_goals(emp, NOTHING);
 		refresh_empire_dropped_items(emp);
+		check_ruined_cities(emp);
 		send_config_msg(ch, "ok_string");
 	}
 }

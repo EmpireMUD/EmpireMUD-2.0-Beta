@@ -826,7 +826,7 @@ void real_update_player(char_data *ch) {
 * @param struct empire_city_data *city The city to check.
 * @return TRUE if it destroys the city, FALSE otherwise.
 */
-static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
+bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;
@@ -881,23 +881,24 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 * Looks for cities that contain no buildings and destroys them. This prevents
 * old, expired empires from taking up city space near start locations, which
 * is common. -paul 5/22/2014
+*
+* @param empire_data *only_emp Optional: do one instead of all (or NULL for all).
 */
-void check_ruined_cities(void) {
+void check_ruined_cities(empire_data *only_emp) {
 	struct empire_city_data *city, *next_city;
 	empire_data *emp, *next_emp;
 	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!EMPIRE_IMM_ONLY(emp)) {
-			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
-				next_city = city->next;
+		if ((!only_emp || emp == only_emp) && !EMPIRE_IMM_ONLY(emp)) {
+			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
 				any |= check_one_city_for_ruin(emp, city);
 			}
 		}
 	}
 	
 	if (any) {
-		read_empire_territory(NULL, FALSE);
+		read_empire_territory(emp, FALSE);
 	}
 }
 

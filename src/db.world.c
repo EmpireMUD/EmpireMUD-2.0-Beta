@@ -1443,7 +1443,7 @@ void annual_world_update(void) {
 	}
 	
 	// crumble cities that lost their buildings
-	check_ruined_cities();
+	check_ruined_cities(NULL);
 	
 	// rename islands
 	update_island_names();

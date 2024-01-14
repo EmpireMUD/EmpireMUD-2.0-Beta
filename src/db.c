@@ -477,7 +477,7 @@ void boot_db(void) {
 	check_progress_refresh();
 	
 	log("Checking for ruined cities...");
-	check_ruined_cities();
+	check_ruined_cities(NULL);
 	
 	log("Abandoning lost vehicles...");
 	abandon_lost_vehicles();

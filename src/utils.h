@@ -2395,7 +2395,7 @@ void check_deficits(char_data *ch);
 void check_empire_storage_timers();
 void check_home_storage_timers(char_data *ch);
 void check_pointless_fight(char_data *mob);
-void check_ruined_cities();
+void check_ruined_cities(empire_data *only_emp);
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);

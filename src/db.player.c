@@ -6131,6 +6131,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
+	free_member_data(emp);
+	
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 		if (only_empire && index->loyalty != only_empire) {
 			continue;
