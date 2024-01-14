@@ -1252,9 +1252,9 @@ $n hurls a dart at $N, but it explodes into flower petals.
 M36 b 0 +
 animal whip~
 ~
-animal whip~
 whip~
-whips", "whip~
+whips~
+whips~
 0 0 2.8 3.0 3.2
 You whip $N's head right off of $S body!
 $n whips your head right off of your body!
