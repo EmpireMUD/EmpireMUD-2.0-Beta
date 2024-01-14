@@ -1831,7 +1831,12 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// lastly, if timers changed:
 	if (GET_OBJ_TIMER(proto) != old_timer) {
-		check_storage_timers(vnum);
+		ensure_storage_timers(vnum);
+		
+		// update objs in home storage
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			ensure_home_storage_timers(chiter, vnum);
+		}
 	}
 }
 

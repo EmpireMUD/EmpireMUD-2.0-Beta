@@ -11127,55 +11127,6 @@ void add_storage_timer(struct storage_timer **list, int timer, int amount) {
 
 
 /**
-* Ensures all empires have the correct storage timers for their storage.
-*
-* @param obj_vnum only_vnum Optional: Only audit one type of thing (may be NOTHING to do all objects).
-*/
-void check_storage_timers(any_vnum only_vnum) {
-	int timed;
-	empire_data *emp, *next_emp;
-	struct empire_island *isle, *next_isle;
-	struct empire_storage_data *store, *next_store;
-	
-	if (!config_get_bool("decay_in_storage")) {
-		return;
-	}
-	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-			HASH_ITER(hh, isle->store, store, next_store) {
-				if (only_vnum != NOTHING && store->vnum != only_vnum) {
-					continue;
-				}
-				
-				timed = count_storage_timers(store->timers);
-			
-				// check too many/too few timers
-				if (GET_OBJ_TIMER(store->proto) > 0 && timed < store->amount) {
-					// timers missing?
-					add_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto), store->amount - timed);
-					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-				}
-				else if (GET_OBJ_TIMER(store->proto) -= 0 && timed > 0) {
-					// has timers but shouldn't ???
-					free_storage_timers(&store->timers);
-					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-				}
-			
-				// ensure sort
-				DL_SORT(store->timers, sort_storage_timers);
-				
-				// and check caps (after sorting)
-				if (GET_OBJ_TIMER(store->proto) > 0) {
-					ensure_max_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto));
-				}
-			}
-		}
-	}
-}
-
-
-/**
 * Adds up the items in all the timers.
 *
 * @param struct storage_timer *list List of storage timers.
@@ -11190,6 +11141,130 @@ int count_storage_timers(struct storage_timer *list) {
 	}
 	
 	return total;
+}
+
+
+/**
+* Ensures all empires have the correct storage timers for their storage.
+*
+* @param char_data *ch The person whose home storage timers need checking.
+* @param obj_vnum only_vnum Optional: Only audit one type of thing (may be NOTHING to do all objects).
+*/
+void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum) {
+	int timed;
+	obj_data *proto;
+	struct empire_unique_storage *eus;
+	
+	if (!ch || IS_NPC(ch) || !config_get_bool("decay_in_storage")) {
+		return;
+	}
+	
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if (!eus->obj || (only_vnum != NOTHING && GET_OBJ_VNUM(eus->obj) != only_vnum) || !(proto = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
+			continue;
+		}
+		
+		timed = count_storage_timers(eus->timers);
+	
+		// check too many/too few timers
+		if (GET_OBJ_TIMER(proto) > 0 && timed < eus->amount) {
+			// timers missing?
+			add_storage_timer(&eus->timers, GET_OBJ_TIMER(proto), eus->amount - timed);
+		}
+		else if (GET_OBJ_TIMER(proto) <= 0 && timed > 0) {
+			// has timers but shouldn't ???
+			free_storage_timers(&eus->timers);
+		}
+		
+		// ensure sort
+		DL_SORT(eus->timers, sort_storage_timers);
+		
+		// and check caps (after sorting)
+		if (GET_OBJ_TIMER(proto) > 0) {
+			ensure_max_storage_timer(&eus->timers, GET_OBJ_TIMER(proto));
+		}
+	}
+}
+
+
+/**
+* Ensures all empires have the correct storage timers for their storage.
+*
+* @param obj_vnum only_vnum Optional: Only audit one type of thing (may be NOTHING to do all objects).
+*/
+void ensure_storage_timers(any_vnum only_vnum) {
+	int timed;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	struct empire_unique_storage *eus;
+	
+	if (!config_get_bool("decay_in_storage")) {
+		return;
+	}
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// basic storage
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (only_vnum != NOTHING && store->vnum != only_vnum) {
+					continue;
+				}
+				
+				timed = count_storage_timers(store->timers);
+			
+				// check too many/too few timers
+				if (GET_OBJ_TIMER(store->proto) > 0 && timed < store->amount) {
+					// timers missing?
+					add_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto), store->amount - timed);
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				}
+				else if (GET_OBJ_TIMER(store->proto) <= 0 && timed > 0) {
+					// has timers but shouldn't ???
+					free_storage_timers(&store->timers);
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				}
+			
+				// ensure sort
+				DL_SORT(store->timers, sort_storage_timers);
+				
+				// and check caps (after sorting)
+				if (GET_OBJ_TIMER(store->proto) > 0) {
+					ensure_max_storage_timer(&store->timers, GET_OBJ_TIMER(store->proto));
+				}
+			}
+		}
+		
+		// unique storage
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if (!eus->obj || (only_vnum != NOTHING && GET_OBJ_VNUM(eus->obj) != only_vnum) || !(proto = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
+				continue;
+			}
+		
+			timed = count_storage_timers(eus->timers);
+	
+			// check too many/too few timers
+			if (GET_OBJ_TIMER(proto) > 0 && timed < eus->amount) {
+				// timers missing?
+				add_storage_timer(&eus->timers, GET_OBJ_TIMER(proto), eus->amount - timed);
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			}
+			else if (GET_OBJ_TIMER(proto) <= 0 && timed > 0) {
+				// has timers but shouldn't ???
+				free_storage_timers(&eus->timers);
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			}
+		
+			// ensure sort
+			DL_SORT(eus->timers, sort_storage_timers);
+		
+			// and check caps (after sorting)
+			if (GET_OBJ_TIMER(proto) > 0) {
+				ensure_max_storage_timer(&eus->timers, GET_OBJ_TIMER(proto));
+			}
+		}
+	}
 }
 
 

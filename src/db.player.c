@@ -4540,6 +4540,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	refresh_passive_buffs(ch);
 	convert_and_schedule_player_affects(ch);
 	schedule_all_obj_timers(ch);
+	ensure_home_storage_timers(ch, NOTHING);
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	
 	// break last reply if invis

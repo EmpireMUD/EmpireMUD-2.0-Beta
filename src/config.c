@@ -48,6 +48,8 @@
 */
 
 // external funcs
+void ensure_storage_timers(any_vnum only_vnum);
+void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
 // locals
@@ -1032,15 +1034,19 @@ CONFIG_HANDLER(config_edit_autostore_time) {
 
 // ensures everything has a timer if needed
 CONFIG_HANDLER(config_edit_decay_in_storage) {
-	void check_storage_timers(any_vnum only_vnum);
-	
 	bool old = config_get_int("decay_in_storage");
+	char_data *chiter;
 	
 	// pass thru first...
 	config_edit_bool(ch, config, argument);
 	
 	if (config_get_bool("decay_in_storage") && config_get_bool("decay_in_storage") != old) {
-		check_storage_timers(NOTHING);
+		ensure_storage_timers(NOTHING);
+		
+		// update objs in home storage
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			ensure_home_storage_timers(chiter, NOTHING);
+		}
 	}
 }
 
