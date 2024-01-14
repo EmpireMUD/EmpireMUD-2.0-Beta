@@ -2896,8 +2896,10 @@ typedef enum {
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
 #define DPLTN_HUNT  9
-#define DPLTN_PRODUCTION  10
-#define NUM_DEPLETION_TYPES  11	// total
+#define DPLTN_PRODUCTION  10	// for workforce
+#define DPLTN_SECONDARY  11		// for workforce
+#define DPLTN_TERTIARY  12		// for workforce
+#define NUM_DEPLETION_TYPES  13	// total
 
 
 // EVO_x: world evolutions

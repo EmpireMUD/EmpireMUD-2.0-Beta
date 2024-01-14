@@ -3944,6 +3944,8 @@ const char *depletion_types[] = {
 	"chop",
 	"hunt",
 	"production",	// 10
+	"secondary",
+	"tertiary",
 	"\n"
 };
 
@@ -3961,6 +3963,8 @@ const char *depletion_strings[] = {
 	"chopped $$ trees",
 	"hunted $$ animals",	// unlikely to be able to show this one
 	"",	// 10, production
+	"",	// secondary production
+	"",	// tertiary production
 	"\n"
 };
 

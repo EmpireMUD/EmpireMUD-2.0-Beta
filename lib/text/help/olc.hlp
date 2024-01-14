@@ -7867,7 +7867,9 @@ Available depletion types:
  trapping
  chop
  hunt
- production
+ production (for workforce)
+ secondary (for workforce buildings that produce more than 1 thing separately)
+ tertiary (for workforce buildings that produce more than 2 things separately)
 
 Note: This only applies to the PRODUCTION and SKILLED-LABOR interactions, and
 only on buildings and vehicles.
