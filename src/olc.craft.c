@@ -370,7 +370,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
 		FULLSEARCH_INT("quantity", only_quantity, 0, INT_MAX)
-		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
+		FULLSEARCH_INT("quantityover", quantity_over, 0, INT_MAX)
 		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
