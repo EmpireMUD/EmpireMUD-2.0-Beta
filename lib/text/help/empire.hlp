@@ -1070,6 +1070,17 @@ High-level immortals can also target other empires with this command.
 
 See also: WHO
 #
+"SALT OF THE EARTH"
+
+Salt of the Earth (Industry goal)
+
+Buying this goal lets you build:
+  &0|&M88&0|  salterns
+  &y|&W__&y|&0  saltmine
+  &g.&0||&g.&0  saltsilo
+
+See also: PROGRESS
+#
 SEAFARERS
 
 Seafarers (Industry goal)
@@ -1635,10 +1646,11 @@ Common things produced by this:
  Pasture: mutton, wool
  Pigsty: pork
  Quarry: flint, rocks, stone blocks
+ Salterns: sea salt
 
 Skilled labor also produces:
  Herb Gardens: various herbs
- Trapper's Post: skins
+ Trapper's Post: skins, meat
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #

@@ -945,6 +945,43 @@ There is also a designated room by the same name: a root cellar for homes.
 
 See also: DESIGNATE, STORAGE
 #
+SALTERNS "SALT POOLS"
+
+&0|&M88&0|  Salterns  (Salt of the Earth goal)
+
+Stored here:  sea salt crystals
+
+Dig pools for evaporating seawater at the edge of seas. Your workforce will
+produce sea salt from these salterns, or you can dig it out yourself.
+
+Salterns count as in-city territory when built in the outskirts (4x radius).
+
+See also: DIG, EXTENDED RADIUS, SALT, WORKFORCE PRODUCTION
+#
+SALTSILO "SALT SILO"
+
+&g.&0||&g.&0  Salt Silo  (Salt of the Earth goal)
+
+Stored here:  salt
+
+This silo stores all your empire's salt where it will be safe and dry in all
+weather.
+
+See also: SALT, STORAGE
+#
+SALTMINE "SALT MINE"
+
+&y|&W__&y|&0  Salt Mine  (Salt of the Earth goal)
+
+Stored here:  rock salt
+
+Dig for salt at the base of mountains with the salt mine. Workforce will also
+produce salt in the salt mine.
+
+Salt mines count as in-city territory when built in the outskirts (4x radius).
+
+See also: DIG, EXTENDED RADIUS, SALT, WORKFORCE PRODUCTION
+#
 SANDPIT "SAND PIT"
 
 &Y|__|&0  Sand Pit  (Build ability)

@@ -255,6 +255,15 @@ component.
 
 See also: FRUIT COMPONENT, VEGETABLE COMPONENT
 #
+EGG EGGS
+
+Egg (component)
+
+Used for:  cooking
+Stored at:  Chicken Coops, Larder
+
+Eggs are a quick, easy food source.
+#
 FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
 
 Fibers (component)
@@ -664,7 +673,7 @@ Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
-MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK
+MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RAW MUTTON" "RED MEAT" POULTRY PORK MUTTON
 
 Raw meat (component)
 
@@ -672,7 +681,7 @@ Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
 animal corpses or fishing. Common types of raw meat are:
-  fillet of raw meat (raw red meat)
+  fillet of raw meat, side of mutton (raw red meat)
   cut of poultry (raw poultry)
   slab of pork (raw pork)
   striped barbfish, giant linefish, magenta arrowfish (raw fish)
@@ -787,11 +796,24 @@ Common types of rocks are:
 
 See also: BUILD, COMPONENT, DIG, CHIP, LAY, FLINT
 #
+SALT SALTS "ROCK SALT" "SEA SALT"
+
+Salt (component)
+
+Used for:  cooking
+Stored at:  Salt Silo
+
+Salt is found by the sea or at the base of mountains. This critical seasoning
+is used to preserve or flavor food.
+
+See also: DIG, SALT OF THE EARTH
+#
 SEEDS "SEED COMPONENT" "SEEDS COMPONENT" "EDIBLE SEEDS"
 
 Seeds (component)
 
 Used for:  planting, cooking, snacking
+Stored at:  Seed Silo
 
 Seeds are separated into two broad categories: edible seeds and inedible seeds.
 Some seeds can be planted (but you can often plant a crop using the fruit or
