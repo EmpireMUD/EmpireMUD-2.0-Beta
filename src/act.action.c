@@ -3679,6 +3679,8 @@ void process_gen_interact_room(char_data *ch) {
 				}
 			}
 			else {
+				// TODO should this have a message like "You find nothing" ? Player currently just sees the start message again.
+				
 				// not depleted, just came up empty: auto-repeat
 				start_gen_interact_room(ch, dir, to_room, data);
 			}
