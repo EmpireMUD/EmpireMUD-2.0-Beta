@@ -295,8 +295,8 @@ air is dry and the sun beats down on the sandy ground, making it almost too hot
 to touch. Despite the heat, it's a peaceful and quiet place.
 ~
 I 5 100 4.00 250 x  # DIG: rock
-I 5 102 4.00 250 x  # DIG: flint stone
-I 5 110 4.00 50 x  # DIG: sea salt crystals
+I 5 102 2.00 250 x  # DIG: flint stone
+I 5 110 2.00 250 x  # DIG: sea salt crystals
 I 5 107 92.00 250 x  # DIG: bag of sand
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 I 31 100 4.00 250 X  # PRODUCTION: rock
@@ -503,7 +503,7 @@ salterns salt pools building around~
 water. These salterns, worked all die by tireless salt farmers, form beds of
 salt crystals that can be dug up, milled into salt, and sold.
 ~
-I 5 110 5.00 125 p  # DIG: sea salt crystals
+I 5 110 60.00 125 p  # DIG: sea salt crystals
 I 31 110 5.00 125 p  # PRODUCTION: sea salt crystals
 I+ 7 0  # Depletion: dig
 R
@@ -543,7 +543,7 @@ pit mine salt building around down~
    The salt mine is little more than a giant pit dug near the mountain's base.
 Beneath the ground, there is a layer that's as salty as the edge of a sea.
 ~
-I 5 109 5.00 30 p  # DIG: chunk of rock salt
+I 5 109 60.00 30 p  # DIG: chunk of rock salt
 I 31 109 5.00 30 p  # PRODUCTION: chunk of rock salt
 I+ 7 0  # Depletion: dig
 R
