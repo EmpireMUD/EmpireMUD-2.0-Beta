@@ -3647,6 +3647,7 @@ void process_gen_interact_room(char_data *ch) {
 		}
 		
 		if (run_room_interactions(ch, to_room, data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room) || (IS_SET(data->flags, GI_LOCAL_CROPS) && try_gen_interact_local_crops(ch, to_room, data))) {
+			// interactions succeeded
 			end_action(ch);
 			
 			if (data->ptech != NO_TECH) {
@@ -3659,18 +3660,28 @@ void process_gen_interact_room(char_data *ch) {
 				start_gen_interact_room(ch, dir, to_room, data);
 			}
 		}
-		else if (data->msg.empty && *(data->msg.empty)) {
-			end_action(ch);
-			msg_to_char(ch, "%s\r\n", data->msg.empty);
-		}
 		else {
+			// interactions failed... determine if we are empty yet
 			end_action(ch);
-			msg_to_char(ch, "You find nothing.\r\n");
-		}
+			
+			if (interact_data[data->interact].depletion == NOTHING || get_depletion(to_room, interact_data[data->interact].depletion) >= get_depletion_max(to_room, interact_data[data->interact].depletion)) {
+				// depleted for sure
+				if (data->msg.empty && *(data->msg.empty)) {
+					msg_to_char(ch, "%s\r\n", data->msg.empty);
+				}
+				else {
+					msg_to_char(ch, "You find nothing.\r\n");
+				}
 		
-		// check if we failed to repeat but should repeat anyway:
-		if (IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED) && IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
-			start_gen_interact_room(ch, dir, to_room, data);
+				// check if we failed to repeat but should repeat anyway:
+				if (IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED) && IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
+					start_gen_interact_room(ch, dir, to_room, data);
+				}
+			}
+			else {
+				// not depleted, just came up empty: auto-repeat
+				start_gen_interact_room(ch, dir, to_room, data);
+			}
 		}
 	}
 	
