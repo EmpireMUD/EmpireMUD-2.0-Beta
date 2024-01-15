@@ -225,10 +225,10 @@ You can cook:
   fried rice (dexterity)                 prunes (age)
   salt pork                              potato slices
   chicken and vegetables (health)        orange chicken and pears
-  ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
+  ham and cheese sandwiches (move-regen) strawberry jam (mana-regen)
   fruit bowl                             candied mango
   sausage link (to-hit)                  blueberry jam (mana)
-  road biscuit (block)                   coffee
+  road biscuits (block)                  coffee
   candied apple                          mushroom plate (resist-magical)
   gruel                                  rice
   pickled vegetables                     fruit preserves
@@ -240,9 +240,9 @@ You can bake:
   cherry pie (charisma)                  strawberry pie (charisma)
   blueberry pie (charisma)               plum pie (charisma)
   banana pie (charisma)                  banana bread (moves)
-  pumpkin pie (charisma)                 blackberry tart
+  pumpkin pie (charisma)                 blackberry tarts
   casserole (inventory)                  roast meat
-  oat cake (bonus-healing)
+  oat cakes (bonus-healing)
 
 Raw meat, fish, poultry, and pork can be cooked by themselves but will not
 provide a food buff. There are also more recipes to find in the world.
@@ -477,8 +477,8 @@ superior items and allows you to forge and smelt faster.
 
 With the basic Forge skill, you can create:
   nails (x4)
-  imperium spike (x3)
-  nocturnium spike (x3)
+  imperium spikes (x3)
+  nocturnium spikes (x3)
   hammer -- for forging
   knife -- for skinning, butchering, and crafting
   woodsman axe -- for chopping
