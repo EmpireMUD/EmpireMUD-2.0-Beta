@@ -2307,6 +2307,9 @@ ACMD(do_gen_craft) {
 		if (GET_CRAFT_NAME(type)[strlen(GET_CRAFT_NAME(type))-1] == 's') {
 			msg_to_char(ch, "You start %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
 		}
+		else if (GET_CRAFT_QUANTITY(type) > 1) {
+			msg_to_char(ch, "You start %s some %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
+		}
 		else {
 			msg_to_char(ch, "You start %s %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 		}
