@@ -281,7 +281,7 @@ See also: STARTING LOCATION, TOMB COMMAND
 #
 "CHICKEN COOPS" CHICKENCOOPS COOP COOPS
 
-|CC|  Chicken Coops  (Homestead Husbandry goal)
+|CC|  Chicken Coops  (Livestock Livelihood goal)
 
 Stores:  eggs
 
@@ -832,7 +832,7 @@ Parks are a pleasant place to spend the day.
 #
 PASTURE
 
-&t|&G..&t|  Pasture  (Homestead Husbandry goal)
+&t|&G..&t|  Pasture  (Livestock Livelihood goal)
 
 Enclose the open grassland to provide a pasture for your shepherds to tend
 their flocks. Workforce will produce a steady supply of wool and mutton from
@@ -851,7 +851,7 @@ See also: MAIL
 #
 PIGSTY PIGSTIES STY STIES "PIG STY" "PIG STIES"
 
-|ST|  Pigsty  (Homestead Husbandry goal)
+|ST|  Pigsty  (Livestock Livelihood goal)
 
 The pigsty gives your empire's swineherd a place to keep pigs and allows your
 workforce to produce a steady supply of pork with the production chore.

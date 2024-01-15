@@ -118,7 +118,7 @@ P 1901
 P 1040
 S
 #1908
-Homestead Husbandry~
+Livestock Livelihood~
    In order to satiate your empire's appetite for meat and eggs, it can now
 build chicken coops, pastures, and pigsties. Your workforce will produce eggs,
 poultry, mutton, wool, and pork from these outdoor buildings.

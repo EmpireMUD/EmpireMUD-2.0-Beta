@@ -756,17 +756,6 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
-"HOMESTEAD HUSBANRY"
-
-Homestead Husbandry (Community goal)
-
-Buying this goal lets you build:
-  |CC|  chickencoops
-  &t|&G..&t|  pasture
-  |ST|  pigsty
-
-See also: PROGRESS
-#
 ISLANDS
 
 Usage:  islands
@@ -782,6 +771,17 @@ all empires on the island share the same custom name for it.
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CHART, CUSTOMIZE ISLAND, SURVEY
+#
+"LIVESTOCK LIVELIHOOD"
+
+Livestock Livelihood (Community goal)
+
+Buying this goal lets you build:
+  |CC|  chickencoops
+  &t|&G..&t|  pasture
+  |ST|  pigsty
+
+See also: PROGRESS
 #
 LUXURIES "LUXURIES GOAL"
 
