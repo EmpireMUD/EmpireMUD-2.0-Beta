@@ -2180,8 +2180,9 @@ E
 8 0 100.00 13
 E
 10 57 5.00 0
-I 5 107 75.00 125 x  # DIG: bag of sand
 I 5 101 25.00 125 x  # DIG: lump of clay
+I 5 110 15.00 50 x  # DIG: sea salt crystals
+I 5 107 75.00 125 x  # DIG: bag of sand
 I 6 3051 50.00 25 x  # FORAGE: sea urchin
 I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2223,8 +2224,9 @@ E
 E
 26 268435456 4.00 70
 I 5 103 8.00 125 x  # DIG: yellow lightning stone
-I 5 107 71.00 125 x  # DIG: bag of sand
 I 5 101 21.00 125 x  # DIG: lump of clay
+I 5 110 15.00 50 x  # DIG: sea salt crystals
+I 5 107 71.00 125 x  # DIG: bag of sand
 I 6 3051 50.00 25 x  # FORAGE: sea urchin
 I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2355,6 +2357,7 @@ E
 10 57 5.00 1
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 15.00 50 x  # DIG: sea salt crystals
 I 5 101 100.00 125 x  # DIG: lump of clay
 I 6 3051 40.00 25 x  # FORAGE: sea urchin
 I 6 3052 40.00 25 x  # FORAGE: clam
@@ -2448,6 +2451,7 @@ E
 10 53 5.00 0
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 15.00 50 x  # DIG: sea salt crystals
 I 5 101 100.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 25 x  # FORAGE: sea urchin
 I 6 3052 50.00 25 x  # FORAGE: clam
@@ -2514,6 +2518,7 @@ E
 8 0 100.00 13
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
+I 5 109 15.00 50 x  # DIG: chunk of rock salt
 I 5 101 100.00 125 x  # DIG: lump of clay
 I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
@@ -2579,6 +2584,7 @@ E
 23 0 100.00 50
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 15.00 50 x  # DIG: sea salt crystals
 I 5 101 100.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 25 x  # FORAGE: sea urchin
 I 6 3052 50.00 25 x  # FORAGE: clam
@@ -2639,6 +2645,7 @@ E
 10 57 5.00 37
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 15.00 50 x  # DIG: sea salt crystals
 I 5 101 100.00 125 x  # DIG: lump of clay
 I 6 3051 50.00 25 x  # FORAGE: sea urchin
 I 6 3052 50.00 25 x  # FORAGE: clam
