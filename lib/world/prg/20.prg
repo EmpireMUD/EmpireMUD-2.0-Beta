@@ -253,6 +253,25 @@ W
 W
 34 1205 0 250 a
 S
+#2020
+Salt Bay~
+   Produce enough salt to season your burgeoning empire and show the world
+you've cornered the salt market. Dig salterns by the sea, mine the base of the
+mountains, build a silo to store it all in, and mill 1000 portions of salt. A
+pinch of progress will go a long way.
+~
+2 2 0 25 0
+K 7 15
+P 2915
+W
+7 5219 0 1 a
+W
+7 5221 0 1 a
+W
+7 5220 0 1 a
+W
+34 111 0 1000 a
+S
 #2030
 Early Harvest~
    Your empire needs to grow its own food. Harvest a crop and store its produce

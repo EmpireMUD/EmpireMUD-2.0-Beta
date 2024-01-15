@@ -153,4 +153,17 @@ K 7 15
 P 2904
 P 2906
 S
+#2915
+Salt of the Earth~
+   Whether for perserving meat or flavoring exotic dishes, your citizens need
+ever more salt as the empire grows. Whether by salt mines at the base of
+mountains or salterns on the coast, you'll take the reins of the salt trade and
+harness this valuable commodity for the glory of the empire!
+~
+3 2 15 0 b
+K 2 5219
+K 2 5220
+K 2 5221
+P 2011
+S
 $

@@ -4,7 +4,7 @@ some magic lumber~
 Some magic lumber is stacked here.~
 This lumber is imbued with magic.
 ~
-3 e a 0 10
+3 e a 0 0 10
 0 0 0
 0 0
 C
@@ -32,7 +32,7 @@ some fine lumber~
 Some fine lumber is stacked here.~
 This is high-quality lumber, perfect for building or crafting fine things.
 ~
-3 e a 0 13
+3 e a 0 0 13
 0 0 0
 0 0
 C
@@ -62,7 +62,7 @@ A small tree has fallen here.~
 thick enough to make a dugout canoe. You could probably still get some lumber
 out of it.
 ~
-3 e a 0 11
+3 e a 0 0 11
 0 0 0
 0 0
 C
@@ -80,7 +80,7 @@ A rare tree is lying here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 e a 0 10
+3 e a 0 0 10
 0 0 0
 0 0
 C
@@ -104,7 +104,7 @@ a pillar~
 A pillar is lying here.~
 Pillars are used for all kinds of construction projects.
 ~
-3 e a 0 9
+3 e a 0 0 9
 0 0 0
 0 0
 C
@@ -125,7 +125,7 @@ a fine pillar~
 A fine pillar is lying here.~
 Pillars are used for all kinds of construction projects.
 ~
-3 e a 0 10
+3 e a 0 0 10
 0 0 0
 0 0
 C
@@ -147,7 +147,7 @@ A large pillar is lying here.~
    Pillars are used for all kinds of construction projects. Pillars of this
 size are also used as masts for ships.
 ~
-3 e a 0 12
+3 e a 0 0 12
 0 0 0
 0 0
 C
@@ -168,7 +168,7 @@ a sapling~
 A sapling is lying here.~
 This sapling is long and straight, perfect for many crafts or buildings.
 ~
-3 0 a 0 6
+3 0 a 0 0 6
 0 0 0
 0 0
 C
@@ -184,7 +184,7 @@ A fine sapling is lying here.~
    This sapling is long and straight, perfect for many crafts or buildings. It
 is of high quality.
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 0 0
 C
@@ -193,13 +193,27 @@ O+ 1 6026
 R
 4 5118 0
 S
+#6065
+salt block~
+a block of salt~
+A block of salt is lying on the ground.~
+   This hunk of salt looks as if it was hewn directly from the ground. More
+rock than seasoning, it still tastes of the sea.
+~
+3 0 a 0 0 16
+0 0 0
+1 0
+C
+1 1
+O+ 1 6065
+S
 #6075
 block blocks~
 a block~
 A block is sitting here.~
 This block could be used for building.
 ~
-3 e a 0 9
+3 e a 0 0 9
 0 0 0
 1 0
 C
@@ -220,7 +234,7 @@ a large block~
 A large block is sitting here.~
 This block could be used for building.
 ~
-3 e a 0 8
+3 e a 0 0 8
 0 0 0
 1 0
 C

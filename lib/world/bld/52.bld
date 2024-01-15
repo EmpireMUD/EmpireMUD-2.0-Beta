@@ -296,13 +296,16 @@ to touch. Despite the heat, it's a peaceful and quiet place.
 ~
 I 5 100 4.00 250 x  # DIG: rock
 I 5 102 4.00 250 x  # DIG: flint stone
+I 5 110 4.00 50 x  # DIG: sea salt crystals
 I 5 107 92.00 250 x  # DIG: bag of sand
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 I 31 100 4.00 250 X  # PRODUCTION: rock
 I+ 7 0  # Depletion: dig
 I 31 102 4.00 250 X  # PRODUCTION: flint stone
 I+ 7 0  # Depletion: dig
-I 31 107 92.00 250 X  # PRODUCTION: bag of sand
+I 31 110 4.00 50 X  # PRODUCTION: sea salt crystals
+I+ 7 0  # Depletion: dig
+I 31 107 88.00 250 X  # PRODUCTION: bag of sand
 I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
@@ -487,5 +490,63 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+S
+#5219
+Salterns~
+Some Salterns by the Sea~
+&0|&M88&0|~
+8 0 bdmn 0
+0 0 0 -1
+E
+salterns salt pools building around~
+   Along the edge of the sea, shallow pools have been dug to evaporate salt
+water. These salterns, worked all die by tireless salt farmers, form beds of
+salt crystals that can be dug up, milled into salt, and sold.
+~
+I 5 110 5.00 125 p  # DIG: sea salt crystals
+I 31 110 5.00 125 p  # PRODUCTION: sea salt crystals
+I+ 7 0  # Depletion: dig
+R
+1001 1 5 0
+R
+1000 1 5 0
+S
+#5220
+Salt Silo~
+At the Salt Silo~
+&?@.&0||&?@.~
+8 0 bdp 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+E
+salt silo building around silos~
+   The silo is covered in a well-made thatched roof to keep the precious salt
+inside dry.
+~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+1002 1 5 0
+R
+1010 1 5 0
+S
+#5221
+Salt Mine~
+A Salt Mine~
+&y|&W__&y|~
+64 0 dmn 0
+0 0 0 -1
+C
+dig~
+E
+pit mine salt building around down~
+   The salt mine is little more than a giant pit dug near the mountain's base.
+Beneath the ground, there is a layer that's as salty as the edge of a sea.
+~
+I 5 109 5.00 30 p  # DIG: chunk of rock salt
+I 31 109 5.00 30 p  # PRODUCTION: chunk of rock salt
+I+ 7 0  # Depletion: dig
+R
+1000 1 5 0
 S
 $

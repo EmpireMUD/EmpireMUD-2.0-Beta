@@ -104,6 +104,20 @@ R 6050
 T0
 obsidians~
 S
+#6060
+bit of salt~
+6 0
+0 111 0 0
+T0
+bits of salt~
+S
+#6065
+block of salt~
+6 0
+0 6065 0 0
+T0
+blocks of salt~
+S
 #6075
 block~
 6 a

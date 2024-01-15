@@ -5,6 +5,20 @@ glass ingot~
 R
 107 2 0 0
 S
+#109
+rock salt~
+111 8
+5 288 0 4 -1 0 0
+R
+109 1 0 0
+S
+#110
+sea salt~
+111 2
+5 288 0 4 -1 0 0
+R
+110 1 0 0
+S
 #127
 bound wooden column~
 127 1
