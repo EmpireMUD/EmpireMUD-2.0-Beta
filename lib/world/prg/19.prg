@@ -123,10 +123,11 @@ Livestock Livelihood~
 build chicken coops, pastures, and pigsties. Your workforce will produce eggs,
 poultry, mutton, wool, and pork from these outdoor buildings.
 ~
-2 1 15 0 b
+3 1 15 0 b
 K 2 5216
 K 2 5217
 K 2 5218
+K 2 5111
 P 1002
 P 2011
 S

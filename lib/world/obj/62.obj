@@ -118,6 +118,38 @@ R
 R
 4 5119 0
 S
+#6225
+egg cooked~
+a cooked egg~
+A cooked egg is lying on the ground.~
+The egg has been cooked perhaps in hot water or in the coals by the fire.
+~
+6 C a 0 0 9
+6 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+S
+#6226
+mutton cooked~
+some cooked mutton~
+Some cooked mutton is lying here.~
+This rich meat has been cooked over the fire.
+~
+6 C a 0 0 13
+24 0 0
+7 96
+C
+1 1
+O+ 1 6226
+R
+4 5619 0
+R
+4 5119 0
+S
 #6240
 meal cooked~
 a cooked meal~

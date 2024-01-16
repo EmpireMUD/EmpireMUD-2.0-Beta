@@ -178,11 +178,11 @@ S
 #1032
 Great Eggs and Ham~
    Feeding an empire this size takes a lot of work and as society develops, it
-craves more and more variety in its diet. Build pastures, pigsties, and chicken
-coops, attract citizens to work them, and produce enough mutton, pork, poultry,
-and eggs to feed a growing nation!
+craves more and more variety in its diet. Build pastures, pigsties, chicken
+coops, and stables, attract citizens to work them, and produce enough mutton,
+pork, poultry, and eggs to feed a growing nation!
 ~
-2 1 0 25 0
+3 1 0 25 0
 K 7 5
 P 1908
 W
@@ -191,6 +191,8 @@ W
 7 5217 0 1 a
 W
 7 5216 0 1 a
+W
+7 5111 0 1 a
 W
 34 3203 0 250 a
 W

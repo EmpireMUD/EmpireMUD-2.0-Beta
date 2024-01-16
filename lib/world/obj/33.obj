@@ -256,8 +256,8 @@ A slab of steaming salt pork has been left here, discarded.~
    A long, thick slab of salted pork. Lines of fat run through it giving
 contrast to the dense meat.
 ~
-6 C a 0 0 2
-24 0 0
+6 C a 0 0 3
+48 0 0
 7 8760
 E
 fat~
@@ -533,7 +533,7 @@ A hot plate of roast and vegetables has been left here.~
    A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
 to perfection, the sliced carrots and squash let off a surprising aroma.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -549,8 +549,6 @@ $n scoops up some vegetables with $s roast and eats them.~
 O+ 1 6242
 R
 4 5619 0
-R
-4 5132 0
 S
 #3327
 plate fish poached vegetables~
@@ -608,14 +606,14 @@ A fillet of roast meat is sitting on the ground here.~
    You're not sure what this is from, but it probably tastes fine. Or at least
 better than it would have raw.
 ~
-6 C a 0 0 6
+6 C a 0 0 9
 18 0 0
-7 96
+7 336
 O+ 1 6220
 R
 4 5619 0
 R
-4 5132 0
+4 5119 0
 S
 #3330
 pie banana~
@@ -1265,7 +1263,7 @@ Some dried shark meat has been left here.~
    The dried shark meat is the perfect traveling food. Best of all, it's
 pre-salted!
 ~
-6 mC a 0 0 6
+6 mC a 0 0 7
 72 0 0
 7 8760
 A
@@ -1275,6 +1273,8 @@ C
 O+ 1 6220
 R
 4 5619 0
+R
+4 5119 0
 S
 #3366
 kernels toasted~
@@ -1408,6 +1408,71 @@ C
 M
 4
 You eat the roast fruit off the stick.~
+R
+4 5619 0
+S
+#3375
+egg baked~
+a baked egg~
+A baked egg is rolling around.~
+The egg is slightly scorched from cooking by the fire.
+~
+6 C a 0 0 7
+6 0 0
+7 336
+O+ 1 6225
+R
+4 5619 0
+S
+#3376
+omelet veggie~
+a veggie omelet~
+A veggie omelet has been left to rot.~
+Bright bits of vegetable adorn the fluffy egg omelet. It looks delicious!
+~
+6 m a 0 0 8
+24 0 0
+7 336
+A
+9 1 0
+C
+1 1
+O+ 1 6225
+R
+4 5619 0
+S
+#3377
+mutton roast~
+some roast mutton~
+Some roast mutton is lying on the ground.~
+The roasted aroma of the mutton stirs your senses and makes your mouth water.
+~
+6 m a 0 0 8
+24 0 0
+7 336
+C
+1 1
+O+ 1 6226
+R
+4 5619 0
+R
+4 5119 0
+S
+#3378
+rolls mutton~
+some mutton rolls~
+Some mutton rolls are lying here.~
+   The mutton has been shredded and tucked into fresh rolls. You can hardly
+wait to taste it!
+~
+6 m a 0 0 10
+24 0 0
+7 336
+A
+21 1 0
+C
+1 1
+O+ 1 6242
 R
 4 5619 0
 S
