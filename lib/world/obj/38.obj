@@ -81,14 +81,16 @@ A grilled steak has been left here.~
    The steak is pretty simple. It's a grilled cut of unidentifiable meat,
 cooked without salt or seasonings, over a hot fire.
 ~
-6 C a 0 0 7
+6 C a 0 0 9
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6220
 R
 4 5619 0
+R
+4 5119 0
 S
 #3810
 chicken grilled piece~
@@ -97,14 +99,16 @@ A piece of grilled chicken is lying here.~
    This cut of grilled poultry would be generous to call itself chicken.
 Still, grilling should make it safe to eat.
 ~
-6 C a 0 0 7
+6 C a 0 0 9
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6221
 R
 4 5619 0
+R
+4 5119 0
 S
 #3812
 fish fillet filet grilled~
@@ -112,14 +116,16 @@ a fillet of grilled fish~
 A fillet of grilled fish is sitting here.~
 This fish isn't well-seasoned, but at least it's well-cooked.
 ~
-6 C a 0 0 8
+6 C a 0 0 10
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6223
 R
 4 5619 0
+R
+4 5119 0
 S
 #3814
 porkchop chop grilled~
@@ -127,14 +133,16 @@ a grilled porkchop~
 A grilled porkchop is lying here.~
 This fine cut of pork has been cooked until all hope of flavor is gone.
 ~
-6 C a 0 0 8
+6 C a 0 0 10
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6222
 R
 4 5619 0
+R
+4 5119 0
 S
 #3816
 fruit preserves village~
@@ -147,6 +155,82 @@ The fruit has been cooked and preserved for use outside the growing season.
 7 8760
 C
 1 1
+R
+4 5619 0
+S
+#3818
+eggs pickled village~
+some pickled village eggs~
+Some pickled eggs were left here.~
+   The eggs have gone slightly green, but they're as good today as the day they
+were pickled.
+~
+6 0 a 0 0 14
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6225
+R
+4 5619 0
+S
+#3820
+beef corned village~
+some village corned beef~
+Some corned beef has been left behind.~
+The pale pink meat has a peppery aroma and a salty flavor.
+~
+6 0 a 0 0 14
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6225
+R
+4 5619 0
+S
+#3822
+poultry salt-cured cured village~
+some salt-cured village poultry~
+Some salt-cured village poultry has been left here.~
+The poultry is pale in color but salty and delicious!
+~
+6 0 a 0 0 16
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6221
+R
+4 5619 0
+S
+#3824
+fish salt-cured cured village~
+some salt-cured village fish~
+Some salt-cured village fish has been left here.~
+The fish has a briny, ocean smell.
+~
+6 0 a 0 0 17
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6223
+R
+4 5619 0
+S
+#3826
+mutton salted village~
+some salted village mutton~
+Some salted village mutton has been left behind.~
+The meat has gone a little pale, but it tastes amazing.
+~
+6 0 a 0 0 18
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6226
 R
 4 5619 0
 S

@@ -100,7 +100,7 @@ a dragon roast~
 Some roast dragon meat has been left here.~
 This giant piece of roast meat has the pre-charred aroma of dragon.
 ~
-6 0 a 0 0 8
+6 0 a 0 0 9
 72 0 0
 7 336
 M
@@ -114,8 +114,6 @@ R
 4 5619 0
 R
 4 5119 0
-R
-4 5132 0
 S
 #10909
 feast roast dragon~

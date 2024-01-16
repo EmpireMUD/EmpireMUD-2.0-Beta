@@ -44,6 +44,15 @@ raw egg~
 T0
 raw eggs~
 S
+#6206
+raw mutton~
+6 a
+0 3203 0 0
+R 6200
+R 6204
+T0
+raw mutton~
+S
 #6220
 cooked meat~
 6 a
@@ -82,6 +91,22 @@ cooked red meat~
 R 6220
 T0
 cooked red meat~
+S
+#6225
+cooked egg~
+6 a
+0 6225 0 0
+T0
+cooked eggs~
+S
+#6226
+cooked mutton~
+6 a
+0 6226 0 0
+R 6220
+R 6224
+T0
+cooked mutton~
 S
 #6240
 cooked meal~
