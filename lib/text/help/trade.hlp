@@ -217,31 +217,28 @@ However, to bake anything, you'll need a kitchen, bakery, or another type of
 full-sized oven. Many basic cooked foods also give you small food buffs
 (see WELL-FED).
 
-You can cook:
-  bean soup                              fried meat pie (strength)              
-  fish plate (wits)                      catfish plate (intelligence)
-  tortilla                               jerky (bonus-physical)                 
-  burrito (resist-physical)              spicy jerky (bonus-magical)
-  fried rice (dexterity)                 prunes (age)
-  salt pork                              potato slices
-  chicken and vegetables (health)        orange chicken and pears
-  ham and cheese sandwiches (move-regen) strawberry jam (mana-regen)
-  fruit bowl                             candied mango
-  sausage link (to-hit)                  blueberry jam (mana)
-  road biscuits (block)                  coffee
-  candied apple                          mushroom plate (resist-magical)
-  gruel                                  rice
-  pickled vegetables                     fruit preserves
+You can see a full list of recipes from the Cook ability by typing 'ability
+cook'; this also works on other abilities. You can also check what any
+ingredient can be used for by typing 'recipes <item>'.
 
-You can bake:
-  bread (move-regen)                     
-  apple pie (charisma)                   nutty squash flatbread (dodge)
-  peach pie (charisma)                   roast plate (resist-physical)
-  cherry pie (charisma)                  strawberry pie (charisma)
-  blueberry pie (charisma)               plum pie (charisma)
-  banana pie (charisma)                  banana bread (moves)
-  pumpkin pie (charisma)                 blackberry tarts
-  casserole (inventory)                  roast meat
+Some of the things you can cook are:
+  veggie omelet (wits)                     fried meat pie (strength)              
+  fish plate (wits)                        catfish plate (intelligence)
+  burrito (resist-physical)                spicy jerky (bonus-magical)
+  fried rice (dexterity)                   prunes (age)
+  chicken and vegetables (health)          mushroom plate (resist-magical)
+  ham and cheese sandwiches (move-regen)   strawberry jam (mana-regen)
+  sausage link (to-hit)                    blueberry jam (mana)
+  road biscuits (block)                    jerky (bonus-physical)
+
+Some of the things you can bake are:
+  bread (move-regen)                       mutton rolls (bonus-physical)
+  apple pie (charisma)                     nutty squash flatbread (dodge)
+  peach pie (charisma)                     roast plate (resist-physical)
+  cherry pie (charisma)                    strawberry pie (charisma)
+  blueberry pie (charisma)                 plum pie (charisma)
+  banana pie (charisma)                    banana bread (moves)
+  pumpkin pie (charisma)                   casserole (inventory)
   oat cakes (bonus-healing)
 
 Raw meat, fish, poultry, and pork can be cooked by themselves but will not
