@@ -52,6 +52,14 @@ R 6120
 T0
 small desert fruits~
 S
+#6125
+small cooked fruit~
+6 a
+0 6125 0 0
+R 6120
+T0
+small cooked fruit~
+S
 #6130
 large fruit~
 6 a
@@ -91,6 +99,14 @@ large desert fruit~
 R 6130
 T0
 large desert fruits~
+S
+#6135
+large cooked fruit~
+6 a
+0 6135 0 0
+R 6130
+T0
+large cooked fruits~
 S
 #6140
 small vegetable~
@@ -208,11 +224,34 @@ handful of nuts~
 T0
 handfuls of nuts~
 S
+#6183
+spice~
+6 a
+0 6183 0 0
+T0
+spices~
+S
+#6184
+herb~
+6 a
+0 6184 0 0
+T0
+herbs~
+S
 #6192
 bunch of nuts~
 6 a
 0 6192 0 0
 T0
 bunches of nuts~
+S
+#6193
+herb or spice~
+6 a
+0 -1 0 0
+R 6183
+R 6184
+T0
+herbs or spices~
 S
 $

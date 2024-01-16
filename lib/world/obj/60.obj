@@ -166,13 +166,14 @@ S
 sapling saplings~
 a sapling~
 A sapling is lying here.~
-This sapling is long and straight, perfect for many crafts or buildings.
+This sapling is long and straight, perfect for scraping into a pole.
 ~
-3 0 a 0 0 6
+3 0 a 0 0 7
 0 0 0
 0 0
 C
 1 1
+I 16 6035 100.00 1  # SCRAPE: pole
 O+ 1 6025
 R
 4 5118 0
@@ -181,15 +182,47 @@ S
 sapling saplings fine~
 a fine sapling~
 A fine sapling is lying here.~
-   This sapling is long and straight, perfect for many crafts or buildings. It
-is of high quality.
+   This high-quality sapling is perfect for scraping into a pole for building
+or crafting.
+~
+3 0 a 0 0 8
+0 0 0
+0 0
+C
+1 1
+I 16 6036 100.00 1  # SCRAPE: fine pole
+O+ 1 6026
+R
+4 5118 0
+S
+#6035
+pole poles~
+a pole~
+A pole is stuck into the ground.~
+This wooden pole is long and straight, perfect for crafting or building.
 ~
 3 0 a 0 0 7
 0 0 0
 0 0
 C
 1 1
-O+ 1 6026
+O+ 1 6035
+R
+4 5118 0
+S
+#6036
+pole fine~
+a fine pole~
+A fine pole stands here.~
+   This finely crafted wooden pole is perfectly straight, and just right for
+crafting or building.
+~
+3 0 a 0 0 8
+0 0 0
+0 0
+C
+1 1
+O+ 1 6036
 R
 4 5118 0
 S

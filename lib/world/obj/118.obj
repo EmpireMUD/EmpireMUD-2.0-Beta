@@ -218,12 +218,13 @@ top, it is completely unbranched and flawlessly straight.
 life that was given returns to the pixy, and the thing's un-nature is revealed
 in its death.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 5
 0 0 0
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
 O+ 1 6025
 R
 4 5118 0

@@ -61,7 +61,7 @@ you'll need some basic resources first. Produce small stockpiles each of any
 type of rock, lumber, block, pillar, stick, and metal ingots. Completing this
 goal will allow your empire to build new artisan buildings.
 ~
-12 2 0 5 0
+13 2 0 5 0
 K 2 5130
 K 2 5132
 K 2 5134
@@ -83,7 +83,7 @@ W
 W
 35 6015 0 50 a
 W
-35 6025 0 50 a
+35 6035 0 50 a
 W
 35 6000 0 50 a
 S
@@ -144,7 +144,7 @@ the basic component types: lumber, rock, block, pillar, sapling, and metal.
 You can mix and match different types of each component, such as tin and
 copper. Completing this goal earns you another city point.
 ~
-12 2 0 15 0
+13 2 0 15 0
 K 1 1
 P 2011
 W
@@ -156,7 +156,7 @@ W
 W
 35 6050 0 150 a
 W
-35 6025 0 150 a
+35 6035 0 150 a
 W
 35 6000 0 150 a
 S

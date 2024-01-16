@@ -81,6 +81,29 @@ R 6025
 T0
 fine saplings~
 S
+#6035
+pole~
+6 a
+0 6035 0 0
+T0
+poles~
+S
+#6036
+fine pole~
+6 0
+0 6036 0 0
+T0
+fine poles~
+S
+#6037
+sapling or pole~
+6 a
+0 6035 0 0
+R 6035
+R 6025
+T0
+saplings or poles~
+S
 #6050
 rock~
 6 a
