@@ -129,7 +129,7 @@ own help files. Here are some of the common types of components:
  &clumber&0 and &cpillars&0 - building materials
  &crocks&0 - common stones dug up from the ground, for building
  &cnails&0 - building materials
- &csaplings&0 - used in handles and primitive buildings
+ &csaplings&0 - scraped into poles for crafting and building
  &cclay&0 - moldable clay for crafting
  &cfibers&0, &cfeathers&0, and &csticks&0 - used for crafting and building
  &cfruits&0, &cvegetables&0, &cgrains&0, and &cseeds&0 - for cooking and baking
@@ -210,9 +210,9 @@ See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS,
 
 Distilled herbs (component)
 
-Distilled herbs are herbs that have been processed to make them more potent, so
-that you can make more powerful potions. You must have the 'Healing Elixirs'
-ability to 'brew' these from herbs.
+Distilled herbs are magic herbs that have been processed to make them more
+potent, so that you can make more powerful potions. You must have the 'Healing
+Elixirs' ability to 'brew' these from herbs.
 
 The distilled herbs are:
  distilled whitegrass
@@ -372,7 +372,7 @@ a specific one of these, but a few accept any of them.
 Common magic gems include:
   yellow lightning stone - buried in the desert
   red bloodstone - dug up in the mountains
-  iridescent blue iris - found near herbs
+  iridescent blue iris - found near magic herbs
   glowing green seashell - found while fishing
   prismatic crystal (powerful magic gem)
 
@@ -429,25 +429,25 @@ Handle (component)
 Used for:  forge, craft
 Stored in:  Utility Shed, Storage room
 
-Create a handle (from a sapling, or a bone handle from bone) using the craft
-command.
+Create a handle (from a sapling/pole, or a bone handle from bone) using the
+craft command.
 
 Handles are used in forging and crafting to provide a grasping surface to a
-tool or weapon. The most basic handles are made from saplings.
+tool or weapon. The most basic handles are made from saplings or poles.
 
 The more advanced elegant handle can be made from magic wood.
 
 See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
-HERB HERBS "HERB COMPONENT"
+HERB HERBS "MAGIC HERB" "MAGIC HERBS" "MAGIC HERB COMPONENT"
 
-Herb (component)
+Magic Herb (component)
 
 Used for:  potions, poisons, crafting
 
-The herb component type covers all the herbs which can be found using the Find
-Herbs ability. Most recipes call for a specific herb, though. The basic herbs
-are:
+The magic herb component type covers all the herbs which can be found using the
+Find Herbs ability. Most recipes call for a specific herb, though. The basic
+magic herbs are:
  whitegrass - beaches and shores
  fiveleaf - forests and plains
  redthorn - mountains
@@ -473,9 +473,9 @@ Iridescent Blue Iris (resource)
 
 Stored in:  Tower of Sorcery
 
-The iridescent blue iris is a rare herb found anywhere you could find herbs,
-and even if you don't have the Find Herbs ability. It is used in some spells
-and crafts.
+The iridescent blue iris is a rare herb found anywhere you could find magic 
+herbs, and even if you don't have the Find Herbs ability. It is used in some
+spells and crafts.
 
 See also: GEM, PICK, FIND HERBS
 #
@@ -742,9 +742,9 @@ Pillar (component)
 Used for:  building
 
 The most commonly used pillars are simple wooden logs, made by scraping trees.
-You can also craft bound wooden columns from saplings and rope if you have
-Basic Crafts. This may be useful if you're unable to get logs (for example,
-rough wood cannot be scraped).
+You can also craft bound wooden columns from saplings or poles and cord or rope
+if you have Basic Crafts. This may be useful if you're unable to get logs (for
+example, rough wood cannot be scraped).
 
 Common types of pillars are:
   heavy log (basic)
@@ -753,6 +753,17 @@ Common types of pillars are:
   enormous mast (large pillar)
 
 See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
+#
+POLE POLES "POLE COMPONENT"
+
+Pole (component)
+
+Used for:  crafting, building
+
+Poles are straight lengths of wood made from saplings by scraping. They can
+also be made from metal. These are used in many types of buildings and crafts.
+
+See also: COMPONENT, FORGE, SAPLING, SCRAPE
 #
 RETRIEVE
 
@@ -927,11 +938,10 @@ SAPLING SAPLINGS "SAPLING COMPONENT"
 
 Sapling (component)
 
-Used for:  building, crafting
+Used for:  crafting, making poles
 
 Saplings are young, straight trees with very few branches. This makes them
-perfect for making handles, shafts, and arrows. They are also used to make
-many simple buildings.
+perfect for scraping poles.
 
 The best ways to get saplings are:
  chopping a copse
@@ -944,7 +954,7 @@ Common types of saplings are:
   reaching sapling (basic)
   large shoot (basic)
 
-See also: COMPONENT, GATHER, SCRAPE, SAW, COPSE
+See also: COMPONENT, GATHER, POLE, SCRAPE, SAW, COPSE
 #
 STORE STORAGE
 

@@ -45,8 +45,8 @@ Find Herbs (Survival ability)
 
 Usage:  pick
 
-With the ability to find herbs, your "pick" command will find new things instead
-of flowers.
+With the ability to find herbs, your "pick" command will find new things
+instead of flowers.
 
 Find Herbs gains experience when you pick herbs.
 
@@ -58,7 +58,7 @@ Herbs you can find:
  daggerbite - deserts
  bileberries - floodplains, riverbanks
 
-See also: HERBS, DISTILLED HERBS, PICK
+See also: MAGIC HERBS, DISTILLED HERBS, PICK
 #
 "FIND SHELTER" SHELTERS
 

@@ -213,8 +213,8 @@ W
 S
 #2018
 Collecting Herbs~
-   A good stockpile of herbs is necessary for the health and development of an
-empire. Produce 50 of each basic herb to complete this goal.
+   A good stockpile of mgaic herbs is necessary for the health and development
+of an empire. Produce 50 of each magic herb to complete this goal.
 ~
 4 1 0 25 0
 K 7 5
@@ -234,8 +234,8 @@ W
 S
 #2019
 Herbal Empire~
-   Ensure your empire never runs out of herbs by building up a stockpile of 250
-of each herb.
+   Ensure your empire never runs out of magic herbs by building up a stockpile
+of 250 of each herb.
 ~
 6 1 0 50 0
 K 7 5
