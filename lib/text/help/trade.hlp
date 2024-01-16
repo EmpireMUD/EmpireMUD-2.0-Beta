@@ -230,6 +230,7 @@ Some of the things you can cook are:
   ham and cheese sandwiches (move-regen)   strawberry jam (mana-regen)
   sausage link (to-hit)                    blueberry jam (mana)
   road biscuits (block)                    jerky (bonus-physical)
+  honeyed fruit (charisma)
 
 Some of the things you can bake are:
   bread (move-regen)                       mutton rolls (bonus-physical)
@@ -415,7 +416,7 @@ You can bake the following family recipes:
   grandma's berry cobbler (wits)
   grandma's hearty meatloaf (strength)
   grandma's biscuits and gravy (move-regen)
-  mom's pie (max-mana)
+  mom's fruit pie (max-mana)
   mom's chicken and dumplings (intelligence)
   grandpa's shepherd's pie (dexterity)
 
