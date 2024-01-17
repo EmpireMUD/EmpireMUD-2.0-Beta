@@ -763,10 +763,10 @@ S
 pole wooden~
 a wooden pole~
 A wooden pole is lying on the ground.~
-   This sapling is young, straight, and taller than you are. It could be used
-to build a simple hut, or carved into a handle, or fashioned into an arrow.
+   The pole is long and straight. It could be used to build a simple hut,
+fashioned into an arrow, or used for all manner of other buildings and crafts.
 ~
-1 l an 0 0 5
+1 l an 0 0 6
 0 2 5
 0 0
 C
@@ -831,6 +831,22 @@ $n stocks the store room with $p.~
 O+ 1 6170
 R
 4 5116 0
+S
+#146
+pole fine wooden~
+a fine wooden pole~
+A fine wooden pole is leaning here.~
+The wood is immaculate and looks rather expensive on this tall, straight pole.
+~
+1 l an 0 0 6
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+O+ 1 6036
+R
+4 5118 0
 S
 #160
 iron-ore ore iron piece~
