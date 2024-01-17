@@ -234,4 +234,128 @@ O+ 1 6226
 R
 4 5619 0
 S
+#3830
+meat smoked~
+some smoked meat~
+Some smoked meat has been left behind.~
+   The dark color and pungent aroma tell you this meat has been smoked over a
+low fire for a long time.
+~
+6 C a 0 0 10
+24 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+R
+4 5119 0
+S
+#3832
+poultry smoked~
+some smoked poultry~
+Some smoked poultry is lying here.~
+The savory, mouthwatering armoa of the poultry has rich, woody undertones.
+~
+6 C a 0 0 11
+24 0 0
+7 336
+C
+1 1
+O+ 1 6221
+R
+4 5619 0
+R
+4 5119 0
+S
+#3834
+ham smoked~
+some smoked ham~
+Some smoked ham is sitting on the ground.~
+The smoky, succulent smell of the ham has made you feel quite hungry.
+~
+6 C a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6222
+R
+4 5619 0
+R
+4 5119 0
+S
+#3836
+fish smoked~
+some smoked fish~
+Some smoked fish is hanging here.~
+The robust smokiness of the fish is evident from some distance.
+~
+6 C a 0 0 11
+24 0 0
+7 336
+C
+1 1
+O+ 1 6223
+R
+4 5619 0
+R
+4 5119 0
+S
+#3838
+mutton smoked~
+some smoked mutton~
+Some smoked mutton has been left here.~
+The tender mutton releases a hearty, smoky aroma at the slightest touch.
+~
+6 C a 0 0 11
+24 0 0
+7 336
+C
+1 1
+O+ 1 6226
+R
+4 5619 0
+R
+4 5119 0
+S
+#3840
+fruit dried~
+some dried fruit~
+Some dried fruit is sprinkled on the ground.~
+   Drying is a great way to preserve fruit. It may be leathery, but it's still
+delicious.
+~
+6 gC a 0 0 12
+48 13 0
+0 8760
+C
+1 1
+O+ 1 6135
+R
+4 5619 0
+S
+#3842
+fruit honeyed jar~
+a jar of honeyed fruit~
+A jar of honeyed fruit is lying on the ground.~
+   The jar contains fruit in honey, an ancient and tasty way to preserve food
+through the long seasons.
+~
+6 gC a 0 0 14
+48 13 0
+8 8760
+A
+4 1 0
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
+O+ 1 6135
+R
+4 5619 0
+R
+4 5114 0
+S
 $

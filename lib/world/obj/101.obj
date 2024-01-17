@@ -857,11 +857,11 @@ cactus in life. Unlike most plants, dead cacti appear to have skeletons because
 their succulent, fleshy green skin is thick and often has a different shape
 than the underlying structure.
 ~
-3 e a 0 0 2
+3 e a 0 0 3
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
-O+ 1 6025
+O+ 1 6035
 R
 4 5118 0
 S

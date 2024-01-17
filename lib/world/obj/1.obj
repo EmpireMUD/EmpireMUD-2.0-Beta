@@ -536,15 +536,17 @@ S
 sapling saplings green~
 a green sapling~
 A green sapling has fallen here.~
-   This sapling is young, straight, and taller than you are. It could be used
-to build a simple hut, or carved into a handle, or fashioned into an arrow.
+   This sapling is young, straight, and taller than you are. You could scrape
+it to make a pole for building a hut, making a handle, or fashioning an arrow.
 ~
-1 l an 0 0 3
+1 l an 0 0 4
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 121 25.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
@@ -587,15 +589,17 @@ sapling saplings thorny~
 a thorny sapling~
 A thorny sapling has fallen here.~
    This small sapling is covered in thorns or spines -- the difference hardly
-matters when they're buried in your flesh. Still, it could be used for building
-or carved into a handle.
+matters when they're buried in your flesh. Still, you could scrape it to make a
+good pole for crafting and building.
 ~
-1 i an 0 0 4
+1 i an 0 0 5
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 132 25.00 1  # SCRAPE: thorny branches
 O+ 1 6025
 R
 4 5118 0
@@ -605,15 +609,16 @@ sapling saplings reaching~
 a reaching sapling~
 A reaching sapling has fallen here.~
    This sapling is thin, but very strong. In its short life, it grew tall,
-perhaps reaching for the high canopy of the jungle. It could be used for
-building, or carved into a handle.
+perhaps reaching for the high canopy of the jungle. It could be scraped to make
+a pole for building or crafting.
 ~
-1 0 an 0 0 3
+1 0 an 0 0 4
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
 O+ 1 6025
 R
 4 5118 0
@@ -623,14 +628,16 @@ shoot shoots large~
 a large shoot~
 A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
-would be just as useful as a young sapling for building or crafting.
+would be a perfect pole for building or crafting, if you scraped it.
 ~
-1 0 an 0 0 4
+1 0 an 0 0 5
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 121 25.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
@@ -751,6 +758,23 @@ C
 O+ 1 6170
 R
 4 5116 0
+S
+#142
+pole wooden~
+a wooden pole~
+A wooden pole is lying on the ground.~
+   This sapling is young, straight, and taller than you are. It could be used
+to build a simple hut, or carved into a handle, or fashioned into an arrow.
+~
+1 l an 0 0 5
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+O+ 1 6035
+R
+4 5118 0
 S
 #143
 hops bushel~
@@ -1203,13 +1227,15 @@ A spear head is jabbed into the ground.~
 You can wield this spearhead alone, like a knife, or attach it to a shaft to
 make a full spear.
 ~
-1 il ano f 0 4
+1 il ano f 0 5
 0 1 4
 1 0
 C
 1 1
 R
 4 5121 0
+R
+4 5610 0
 S
 #187
 stones grinding set~

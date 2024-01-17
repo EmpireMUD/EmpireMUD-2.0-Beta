@@ -234,4 +234,99 @@ R
 R
 6060 1 1 0
 S
+#3830
+village smoked meat~
+3830 2
+10 293 0 3 -1 0 G
+R
+6204 2 1 0
+S
+#3831
+smoked meat~
+3830 2
+3 293 h 9 -1 0 0
+R
+6204 2 1 0
+S
+#3832
+village smoked poultry~
+3832 2
+10 293 0 3 -1 0 G
+R
+6201 2 1 0
+S
+#3833
+smoked poultry~
+3832 2
+3 293 h 9 -1 0 0
+R
+6201 2 1 0
+S
+#3834
+village smoked ham~
+3834 2
+10 293 0 3 -1 0 G
+R
+6202 2 1 0
+S
+#3835
+smoked ham~
+3834 2
+3 293 h 9 -1 0 0
+R
+6202 2 1 0
+S
+#3836
+village smoked fish~
+3836 2
+10 293 0 3 -1 0 G
+R
+6203 2 1 0
+S
+#3837
+smoked meat~
+3836 2
+3 293 h 9 -1 0 0
+R
+6203 2 1 0
+S
+#3838
+village smoked mutton~
+3838 2
+10 293 0 3 -1 0 G
+R
+6206 2 1 0
+S
+#3839
+smoked mutton~
+3838 2
+3 293 h 9 -1 0 0
+R
+6206 2 1 0
+S
+#3840
+village dried fruit~
+3840 2
+10 293 0 3 -1 0 G
+R
+6130 2 1 0
+S
+#3841
+dried fruit~
+3840 2
+14 293 0 9 -1 f 0
+R
+6130 2 1 0
+S
+#3842
+honeyed fruit~
+3842 1
+3 293 h 9 -1 f 0
+R
+6130 1 1 0
+R
+6340 1 1 0
+R
+801 1 0 0
+S
 $

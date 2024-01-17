@@ -92,6 +92,19 @@ O+ 1 6124
 R
 4 5619 0
 S
+#6125
+fruit cooked small~
+a small cooked fruit~
+A small cooked fruit is lying here.~
+It's been cooked until you can't really tell what it started out as.
+~
+6 gC a 0 0 10
+6 0 0
+7 336
+O+ 1 6125
+R
+4 5619 0
+S
 #6130
 fruit fresh~
 some fresh fruit~
@@ -167,6 +180,21 @@ C
 O+ 1 6134
 R
 4 5114 0
+S
+#6135
+fruit cooked~
+some cooked fruit~
+Some cooked fruit is lying on the ground.~
+The fruit is well-cooked.
+~
+6 gC a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6135
+R
+4 5619 0
 S
 #6140
 vegetable small~
@@ -376,6 +404,28 @@ O+ 1 6182
 R
 4 5619 0
 S
+#6183
+spice~
+some spice~
+Some spice is sprinkled here.~
+This fragrant spice is hard to identify.
+~
+3 0 a 0 0 1
+0 0 0
+0 0
+O+ 1 6183
+S
+#6184
+herb~
+an herb~
+An herb is lying here.~
+This unidentifiable herb smells tasty.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+O+ 1 6184
+S
 #6192
 nuts bunch~
 a bunch of nuts~
@@ -390,5 +440,16 @@ C
 O+ 1 6192
 R
 4 5210 0
+S
+#6193
+ingredient~
+an ingerdient~
+An ingredient was left behind.~
+This fragrant ingredient could pep up a recipe.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+O+ 1 6193
 S
 $
