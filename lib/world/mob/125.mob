@@ -166,7 +166,7 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhyKL cGK 5
+0 0 bdhyKL cGK 5
 0 0 0 14 -1
 D
 The colossus's enormous arm is bigger than a tree!
@@ -181,7 +181,7 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhyKL cGK 5
+0 0 bdhyKL cGK 5
 0 0 0 5 -1
 D
    The arm is so big that it's hard to avoid being knocked off the colossus as
