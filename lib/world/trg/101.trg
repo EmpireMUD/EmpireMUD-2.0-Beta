@@ -1417,7 +1417,7 @@ while %cycles_left% >= 0
       %echoaround% %actor% ~%actor% completes ^%actor% ritual!
       %send% %actor% You complete your ritual!
       * Echo the eclipse globally
-      %regionecho% %actor.room% -9999 A dark shadow covers the land as the sun is momentarily eclipsed.
+      %regionecho% %actor.room% -300 A dark shadow covers the land as the sun is momentarily eclipsed.
       %quest% %actor% trigger 10157
       %send% %actor% @%self% splinters and breaks!
       %echoaround% %actor% @%self% splinters and breaks!
