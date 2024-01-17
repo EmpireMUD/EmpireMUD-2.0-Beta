@@ -1016,11 +1016,38 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		msg_to_char(ch, "Plants %s (%s%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? lbuf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 	
-	if (!simple && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
-		msg_to_char(ch, "It can be combined.\r\n");
-	}
-	if (!simple && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
-		msg_to_char(ch, "It can be separated.\r\n");
+	// interactions
+	if (!simple) {
+		*lbuf = '\0';
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s combined", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s separated", *lbuf ? "," : "");
+		}
+		if (CAN_LIGHT_OBJ(obj)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s lit", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s scraped", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s sawed", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s tanned", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_CHIP)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s chipped", *lbuf ? "," : "");
+		}
+		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED) && !OBJ_FLAGGED(obj, OBJ_SEEDED)) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s seeded", *lbuf ? "," : "");
+		}
+		
+		// show it
+		if (*lbuf) {
+			msg_to_char(ch, "It can be:%s\r\n", lbuf);
+		}
 	}
 	
 	*lbuf = '\0';
