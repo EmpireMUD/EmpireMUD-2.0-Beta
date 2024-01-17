@@ -415,7 +415,9 @@ Tool:  knife
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
 This command succeeds about 60% of the time unskilled, and 100% of the time
-with the Huntsman ability. Not all corpses can be butchered.
+with the Huntsman ability -- at least, when there's something to be butchered
+from the corpse. Not all corpses can be butchered, and some corpses only have
+rare results even with Huntsman.
 
 See also: HUNTSMAN, SKIN COMMAND
 #
@@ -2584,6 +2586,28 @@ Privileged immortals may check the status of other empires' shipments by
 typing: ship "empire name" status
 
 See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
+#
+"SKIN COMMAND" SKINNING
+
+Usage:  skin <corpse>
+Tool:  knife
+
+You can skin a fresh corpse to get usable material, which can later be turned
+into good equipment. This command succeeds about 60% of the time unskilled, or
+100% of the time with the Huntsman ability -- at least, when there's something
+to skin from the corpse. Some corpses cannot be skinned, especially severely
+damaged and putrid ones. Some other corpses may only have rare skinning results
+even with Huntsman.
+
+Possible results from skinning and example animals:
+  small skin: rabbit, squirrel
+  large skin: deer, buffalo
+  shark skin: shark
+  snakeskin: any snake
+  fox fur: fox
+  big cat pelt: tiger, jaguar, leopard
+
+See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
 #
 SLEEP
 

@@ -1068,26 +1068,6 @@ Forge:
 
 See also: CRAFT, FORGE
 #
-"SKIN COMMAND" SKINNING
-
-Usage:  skin <corpse>
-Tool:  knife
-
-You can skin a fresh corpse to get usable material, which can later be turned
-into good equipment. Some corpses cannot be skinned, especially severely
-damaged and putrid ones. This command succeeds about 60% of the time unskilled,
-or 100% of the time with the Huntsman ability.
-
-Possible results from skinning and example animals:
-  small skin: rabbit, squirrel
-  large skin: deer, buffalo
-  shark skin: shark
-  snakeskin: any snake
-  fox fur: fox
-  big cat pelt: tiger, jaguar, leopard
-
-See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
-#
 "SMUGGLER CRAFTS"
 
 Smuggler Crafts
