@@ -3450,7 +3450,7 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		// checking data for the interact itself
 		prettier_sprintbit(data->tool, tool_flags, buf);
 		if (count_bits(data->tool) > 1) {
-			msg_to_char(ch, "You need tools to %s: %s\r\n", buf, data->command);
+			msg_to_char(ch, "You need tools to %s: %s\r\n", data->command, buf);
 		}
 		else {
 			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
@@ -3460,10 +3460,10 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		// similar to previous tool check
 		prettier_sprintbit(missing_tools, tool_flags, buf);
 		if (count_bits(missing_tools) > 1) {
-			msg_to_char(ch, "You need tools to %s: %s\r\n", buf, data->command);
+			msg_to_char(ch, "You need tools to %s %s: %s\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"), buf);
 		}
 		else {
-			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
+			msg_to_char(ch, "You need %s %s to %s %s.\r\n", AN(buf), buf, data->command, (room == IN_ROOM(ch) ? "here" : "there"));
 		}
 	}
 	else if (!can_gen_interact_room(ch, room, data)) {
