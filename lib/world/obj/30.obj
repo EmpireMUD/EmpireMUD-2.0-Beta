@@ -4,7 +4,7 @@ a handful of lichen~
 There is some lichen growing on a rock.~
 The lichen, though not very palatable, looks like you could eat it.
 ~
-6 0 a 0 0 2
+6 g a 0 0 3
 6 0 0
 0 48
 R
@@ -49,7 +49,7 @@ a handful of grain~
 There is some grain scattered about.~
 You can eat the grain, but it's not really anything you could plant.
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 6 0 0
 7 8064
 O+ 1 6160
@@ -190,7 +190,7 @@ a fillet of raw meat~
 There is a fillet of raw meat sitting on the ground.~
 You can eat the meat raw... or cook it.
 ~
-6 lC a 0 0 6
+6 glC a 0 0 7
 6 0 0
 7 24
 C
@@ -205,7 +205,7 @@ a handful of nuts~
 There are some nuts scattered on the ground.~
 You can eat the nuts.
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 6 0 0
 7 3240
 O+ 1 6182
@@ -219,7 +219,7 @@ There is a pile of dry beans here.~
    The beans would taste delicious if you ate them. However, there don't seem
 to be enough to plant any.
 ~
-6 C a 0 0 6
+6 gC a 0 0 7
 1 0 0
 7 8760
 R
@@ -463,7 +463,7 @@ a bunch of coconuts~
 There is a lovely bunch of coconuts, in a row.~
 You can eat coconuts, or plant them.
 ~
-6 blC a 0 0 10
+6 bglC a 0 0 11
 12 3002 0
 7 720
 C
@@ -747,7 +747,7 @@ some tasty weeds~
 Some tasty weeds have been left here.~
 They look like they'd be a bit chewy, but surprisingly tasty.
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 6 0 0
 0 72
 O+ 1 6100
@@ -761,7 +761,7 @@ A head of lettuce is sitting here.~
    Lettuce is bland on its own, but you can still eat it that way. It can also
 be made into a salad with the 'cook' command.
 ~
-6 lC a 0 0 10
+6 glC a 0 0 11
 2 3017 0
 7 72
 C
@@ -777,7 +777,7 @@ Some lettuce seeds are scattered on the ground.~
    It looks like about a handful of tiny seeds. They can be used to plant
 lettuce, or you can press them into oil.
 ~
-6 blC a 0 0 10
+6 bglC a 0 0 11
 1 3017 0
 7 8760
 C
@@ -792,7 +792,7 @@ a sea urchin~
 A sea urchin has been dropped here.~
 You can eat the sea urchin.
 ~
-6 0 a 0 0 5
+6 g a 0 0 6
 6 0 0
 7 24
 R
@@ -804,7 +804,7 @@ a clam~
 A clam has been dropped here.~
 You could eat the clam.
 ~
-6 0 a 0 0 5
+6 g a 0 0 6
 6 0 0
 7 24
 R
@@ -909,7 +909,7 @@ A handful of grain is scattered on the ground.~
    This grain is hard to identify but it looks like you could snack on it. Or
 plant it.
 ~
-6 bC a 0 0 8
+6 bgC a 0 0 9
 1 1 0
 0 1344
 O+ 1 6160
@@ -936,7 +936,7 @@ Some seeds are scattered on the ground.~
    You can't tell what kind of seeds these are, but it looks like you could
 snack on them. Or plant them.
 ~
-6 bC a 0 0 8
+6 bgC a 0 0 9
 1 3 0
 0 8760
 O+ 1 6181
@@ -961,7 +961,7 @@ Some seeds are scattered on the ground.~
    You can't tell what kind of seeds these are, but it looks like you could
 snack on them. Or plant them.
 ~
-6 bC a 0 0 9
+6 bgC a 0 0 10
 1 5 0
 0 8760
 O+ 1 6181
@@ -1016,7 +1016,7 @@ A handful of grain is scattered on the ground.~
    This grain is hard to identify but it looks like you could snack on it. Or
 plant it.
 ~
-6 bC a 0 0 9
+6 bgC a 0 0 10
 1 3015 0
 0 1344
 O+ 1 6160
@@ -1062,7 +1062,7 @@ filling, or you could cook with the honey from it as a sweetener. You'll get
 back the wax from the honeycomb if you use it for this, or you can 'craft
 beeswax' to discard the honey and just keep the wax.
 ~
-6 l a 0 0 7
+6 gl a 0 0 8
 1 0 0
 0 0
 C
@@ -1127,7 +1127,7 @@ A handful of grain is scattered on the ground.~
    This grain is hard to identify but it looks like you could snack on it. Or
 plant it.
 ~
-6 bC a 0 0 9
+6 bgC a 0 0 10
 1 3072 0
 0 1344
 O+ 1 6160

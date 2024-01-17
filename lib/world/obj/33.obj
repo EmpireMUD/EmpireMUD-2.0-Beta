@@ -4,7 +4,7 @@ a fried meat pie~
 A fried meat pie beckons you from the ground.~
 The pie looks delicious.
 ~
-6 m a 0 0 9
+6 gm a 0 0 10
 24 0 0
 7 336
 A
@@ -21,7 +21,7 @@ an apple pie~
 A warm apple pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -39,7 +39,7 @@ a peach pie~
 A glistening peach pie is sitting here.~
 The pie looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -57,7 +57,7 @@ a cherry pie~
 A rich cherry pie is cooling here.~
 The pie looks delicious!
 ~
-6 m a 0 0 7
+6 gm a 0 0 8
 24 0 0
 7 336
 A
@@ -75,7 +75,7 @@ a candied apple~
 A candied apple is stuck on the ground.~
 The candied apple looks delicious!
 ~
-6 C a 0 0 3
+6 gC a 0 0 4
 24 0 0
 7 336
 R
@@ -87,7 +87,7 @@ a steaming casserole~
 A casserole is steaming on the ground.~
 The casserole looks delicious.
 ~
-6 m a 0 0 7
+6 gm a 0 0 8
 24 0 0
 7 336
 A
@@ -106,7 +106,7 @@ a pouch of jerky~
 Someone has left a pouch of jerky here.~
 The jerky looks delicious.
 ~
-6 mC a 0 0 4
+6 gmC a 0 0 5
 24 0 0
 7 8760
 A
@@ -140,7 +140,7 @@ a tortilla~
 A tortilla is lying on the ground.~
 The tortilla would make a good snack.
 ~
-6 0 a 0 0 2
+6 g a 0 0 3
 6 0 0
 7 336
 R
@@ -152,7 +152,7 @@ a burrito~
 A burrito is lying on the ground.~
 The burrito looks muy delicioso.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -169,7 +169,7 @@ a wood ear mushroom~
 A wood ear mushroom is growing here.~
 The mushroom looks good enough to eat, somehow.
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 6 0 0
 7 72
 O+ 1 6101
@@ -216,7 +216,7 @@ a loaf of bread~
 A loaf of bread has been dropped on the ground.~
 Bread is a good portable food.
 ~
-6 lm a 0 0 6
+6 glm a 0 0 7
 24 0 0
 7 336
 A
@@ -237,7 +237,7 @@ A bowl of fried rice is steaming away.~
    This bowl of fried rice was made with very little spices. It is however very
 hot and filling.
 ~
-6 0 a 0 0 6
+6 g a 0 0 7
 48 0 0
 7 336
 A
@@ -259,7 +259,7 @@ A slab of steaming salt pork has been left here, discarded.~
    A long, thick slab of salted pork. Lines of fat run through it giving
 contrast to the dense meat.
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 48 0 0
 7 8760
 E
@@ -284,7 +284,7 @@ There is a full meal of chicken and vegetables just laying here.~
 with a sprig of parsley. The smell wafting up from this plate is delicious and
 the chicken is nice and crispy.
 ~
-6 m a 0 0 8
+6 gm a 0 0 9
 24 0 0
 7 336
 A
@@ -316,7 +316,7 @@ dress it properly, but it is still delicious looking. A good thick slab of
 honey cooked ham with some cheese slipped in between two crusty pieces of
 bread.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -340,7 +340,7 @@ A bowl of fruit is sitting here, like a still life.~
    Comprising of cherries, apples, pears, and other various fruits, this fruit
 bowl will serve for any occasion.
 ~
-6 0 a 0 0 4
+6 g a 0 0 5
 120 0 0
 7 336
 M
@@ -375,7 +375,7 @@ A plate of chicken and pears is sitting here.~
 flowering appearance. Regardless of the finesse involved in creating this
 wonderful dish, it is sure to be gone in a matter of moments.
 ~
-6 0 a 0 0 5
+6 g a 0 0 6
 72 0 0
 7 336
 M
@@ -401,7 +401,7 @@ A couple of hefty sausages are linked together.~
    A pair of sausages, well made and looking savory. Are they spicy? Who knows
 until the first bite.
 ~
-6 m a 0 0 4
+6 gm a 0 0 5
 24 0 0
 7 336
 A
@@ -426,7 +426,7 @@ most importantly strips of meat. All these things have been fixed in the dough
 at the time of cooking. This biscuit will keep for quite a while I'm sure, as
 it has been dried out and well stored.
 ~
-6 m a 0 0 3
+6 gm a 0 0 4
 24 0 0
 7 336
 A
@@ -449,7 +449,7 @@ A fried mushroom plate topped with chicken and rice is sitting here.~
    A deep fried mushroom with little fried chicken bits and rice. It will
 probably clog your arteries but if Furl could see it, he'd just die with envy.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -472,7 +472,7 @@ a pumpkin pie~
 A rich pumpkin pie is cooling here.~
 The pie looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -491,7 +491,7 @@ A flaky blackberry tart has been left here.~
    This small tart is stuffed full with blackberries. Flaky, honey baked crust
 surround a thick blackberry filling. It should be quite delicious.
 ~
-6 0 a 0 0 3
+6 g a 0 0 4
 24 0 0
 7 336
 M
@@ -512,7 +512,7 @@ A piece of flatbread has been left here.~
    Threaded through this inocuous piece of flatbread are nuts, squash and a
 distinct glaze from honey.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -538,7 +538,7 @@ A hot plate of roast and vegetables has been left here.~
    A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
 to perfection, the sliced carrots and squash let off a surprising aroma.
 ~
-6 m a 0 0 7
+6 gm a 0 0 8
 24 0 0
 7 336
 A
@@ -563,7 +563,7 @@ A plate of fish and vegetables has been left here.~
 delicately poached with a hint of lemon and the vegetables have been arranged
 quite artisticly.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -587,7 +587,7 @@ A plate with fried catfish and hushpuppies has been left here.~
    Deep fried catfish with a hint of lemon takes up the majority of this plate.
 Alongside the fish are golden brown hushpuppies.
 ~
-6 m a 0 0 5
+6 gm a 0 0 6
 24 0 0
 7 336
 A
@@ -611,7 +611,7 @@ A fillet of roast meat is sitting on the ground here.~
    You're not sure what this is from, but it probably tastes fine. Or at least
 better than it would have raw.
 ~
-6 C a 0 0 9
+6 gC a 0 0 10
 18 0 0
 7 336
 O+ 1 6220
@@ -626,7 +626,7 @@ a banana pie~
 A warm banana pie is sitting out to cool.~
 It looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -644,7 +644,7 @@ a loaf of banana bread~
 A loaf of banana bread has been dropped on the ground.~
 Banana bread is a good portable food.
 ~
-6 m a 0 0 9
+6 gm a 0 0 10
 24 0 0
 7 336
 A
@@ -677,7 +677,7 @@ a pouch of spicy jerky~
 Someone has left a pouch of spicy jerky here.~
 This is a pouch of jerky with a picture of a pepper printed on the front.
 ~
-6 mC a 0 0 8
+6 gmC a 0 0 9
 24 0 0
 7 8760
 A
@@ -695,7 +695,7 @@ A pouch of dried potato slices is on the ground.~
    This bag of potato slices looks like it would keep you full for much of a
 long adventure.
 ~
-6 C a 0 0 9
+6 gC a 0 0 10
 48 0 0
 7 4320
 R
@@ -707,7 +707,7 @@ a pouch of prunes~
 A pouch of prunes has been left here.~
 This pouch of dried prunes is a must-have for the avid traveler.
 ~
-6 mC a 0 0 8
+6 gmC a 0 0 9
 24 0 0
 7 4320
 A
@@ -723,7 +723,7 @@ a plum pie~
 A plum pie has been left here.~
 This plum pie looks delicious.
 ~
-6 0 a 0 0 5
+6 g a 0 0 6
 48 0 0
 7 336
 R
@@ -737,7 +737,7 @@ a strawberry pie~
 A warm strawberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -755,7 +755,7 @@ a jar of strawberry jam~
 A jar of strawberry jam has been dropped here.~
 This glass jar has been filled with delicious strawberry jam.
 ~
-6 mC a 0 0 10
+6 gmC a 0 0 11
 24 0 0
 7 8760
 A
@@ -775,7 +775,7 @@ a candied mango~
 A candied mango is stuck on the ground.~
 The candied mango looks delicious!
 ~
-6 C a 0 0 4
+6 gC a 0 0 5
 24 0 0
 7 4320
 R
@@ -787,7 +787,7 @@ a blueberry pie~
 A warm blueberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 24 0 0
 7 336
 A
@@ -805,7 +805,7 @@ a jar of blueberry jam~
 A jar of blueberry jam has been dropped on the ground.~
 A glass jar filled with delicious blueberry jam.
 ~
-6 mC a 0 0 8
+6 gmC a 0 0 9
 24 0 0
 7 8760
 A
@@ -862,7 +862,7 @@ a flat oat cake~
 A flat oat cake is on the ground.~
 This flat oat cake looks like it would keep you well nourished.
 ~
-6 m a 0 0 7
+6 gm a 0 0 8
 24 0 0
 7 336
 A
@@ -880,7 +880,7 @@ a hearty meatloaf~
 A hearty meatloaf is sitting on the ground.~
 This hearty meatloaf will make you strong.
 ~
-6 mp a 0 0 6
+6 gmp a 0 0 7
 48 0 0
 7 336
 A
@@ -898,7 +898,7 @@ a shepherd's pie~
 A shepherd's pie is sitting on the ground.~
 This old family recipe will boost your dexterity.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -917,7 +917,7 @@ A plate of fish and chips is sitting here.~
    These fish and chips remind you of your time at the seaside, and those salty
 memories will boost your charisma.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -935,7 +935,7 @@ chicken and dumplings~
 A plate of chicken and dumplings is sitting here.~
 This old cottage recipe will boost your intelligence.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -953,7 +953,7 @@ a rich berry cobbler~
 A rich berry cobbler is lying on the ground.~
 This old-fashioned dessert is exactly what you need to boost your wits.
 ~
-6 mp a 0 0 6
+6 gmp a 0 0 7
 48 0 0
 7 336
 A
@@ -971,7 +971,7 @@ A black sausage is sitting here on the ground.~
    This sausage isn't made from the best parts of the animal, but it will boost
 your ability to hit things.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -989,7 +989,7 @@ jellied eels~
 A plate of jellied eels is sitting here.~
 This old-fashioned dish will make you slippery and boost your dodge.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -1007,7 +1007,7 @@ a pot roast~
 A pot roast is sitting here.~
 The savory pot roast will boost your health.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -1025,7 +1025,7 @@ a bowl of chili~
 A bowl of chili is sitting here.~
 This spicy chili will warm your bones and boost your stamina.
 ~
-6 mp a 0 0 7
+6 gmp a 0 0 8
 48 0 0
 7 336
 A
@@ -1043,7 +1043,7 @@ mom's fruit pie~
 Mom's fruit pie is sitting here.~
 This old-fashioned pie is sure to boost your mana.
 ~
-6 mp a 0 0 5
+6 gmp a 0 0 6
 48 0 0
 7 336
 A
@@ -1060,7 +1060,7 @@ biscuits and gravy~
 Some biscuits and gravy are sitting here.~
 This homestyle favorite will boost your move regeneration.
 ~
-6 mp a 0 0 6
+6 gmp a 0 0 7
 48 0 0
 7 336
 A
@@ -1078,7 +1078,7 @@ stewed vegetables~
 Some stewed vegetables are sitting here.~
 These stewed vegetables will fill you up and boost your mana regeneration.
 ~
-6 mp a 0 0 6
+6 gmp a 0 0 7
 48 0 0
 7 336
 A
@@ -1097,7 +1097,7 @@ Someone has set up a roast turkey feast!~
    There is a banquet of turkey and trimmings. It's enough to feed the whole
 party! This feast will boost melee fighters.
 ~
-6 m 0 0 0 5
+6 gm 0 0 0 6
 96 0 0
 7 336
 A
@@ -1118,7 +1118,7 @@ Someone has set up a mixed vegetable board!~
    The board is covered with all manner of roast vegetables, in every color.
 It's enough to feed the whole party! This feast will boost healers.
 ~
-6 m 0 0 0 5
+6 gm 0 0 0 6
 96 0 0
 7 336
 A
@@ -1139,7 +1139,7 @@ Someone has set up a seafood feast!~
    This overflowing feast of seafood is enough to feed the whole party! This
 feast will boost casters.
 ~
-6 m 0 0 0 6
+6 gm 0 0 0 7
 96 0 0
 7 336
 A
@@ -1160,7 +1160,7 @@ Someone has set up a roast meat platter!~
    This feast of roast meats is enough to feed the whole party! It will boost
 tanks in particular.
 ~
-6 m 0 0 0 6
+6 gm 0 0 0 7
 96 0 0
 7 336
 A
@@ -1183,7 +1183,7 @@ Someone has set up an extravagant dessert platter!~
    This buffet of desserts would make the baker blush. It looks like it's just
 the thing to boost your party members!
 ~
-6 m 0 0 0 5
+6 gm 0 0 0 6
 96 0 0
 7 336
 A
@@ -1228,7 +1228,7 @@ Someone has left a fresh salad on the ground.~
    The salad is made from fresh, crisp lettuce and chopped vegetables. It has
 been dressed with oil and lightly seasoned.
 ~
-6 m a 0 0 7
+6 gm a 0 0 8
 24 0 0
 7 336
 A
@@ -1270,7 +1270,7 @@ Some dried shark meat has been left here.~
    The dried shark meat is the perfect traveling food. Best of all, it's
 pre-salted!
 ~
-6 mC a 0 0 7
+6 gmC a 0 0 8
 72 0 0
 7 8760
 A
@@ -1289,7 +1289,7 @@ some toasted kernels~
 Some toasted kernels are scattered here.~
 The kernels have been toasted and are now slightly edible.
 ~
-6 C a 0 0 9
+6 gC a 0 0 10
 2 0 0
 0 8760
 R
@@ -1301,7 +1301,7 @@ some toasted rice~
 Some toasted rice is scattered here.~
 Now that the rice is toasted and puffed, you can eat it.
 ~
-6 C a 0 0 10
+6 gC a 0 0 11
 2 0 0
 0 8760
 R
@@ -1313,7 +1313,7 @@ a bowl of baked potatoes~
 A bowl of baked potatoes is lying here.~
 These potatoes look good enough to eat!
 ~
-6 0 a 0 0 4
+6 g a 0 0 5
 24 0 0
 0 336
 R
@@ -1325,7 +1325,7 @@ a baked potato~
 A baked potato has been left here.~
 It looks good enough to eat!
 ~
-6 0 a 0 0 3
+6 g a 0 0 4
 2 0 0
 0 336
 R
@@ -1337,7 +1337,7 @@ a small sack of sugar~
 A small sack of sugar has been left here.~
 You can use sugar for cooking.
 ~
-6 C a 0 0 6
+6 gC a 0 0 7
 1 0 0
 0 8760
 C
@@ -1354,7 +1354,7 @@ a loaf of garlic bread~
 A loaf of garlic bread has been dropped on the ground.~
 Garlic bread is a good portable food.
 ~
-6 m a 0 0 6
+6 gm a 0 0 7
 48 0 0
 7 336
 A
@@ -1372,7 +1372,7 @@ a candied lemon~
 A candied lemon is on the ground.~
 The candied lemon looks delicious!
 ~
-6 mC a 0 0 7
+6 gmC a 0 0 8
 6 0 0
 7 4320
 A
@@ -1389,7 +1389,7 @@ A glass jar full of pickles is here.~
 This jar has been filled with cucumbers that float in a salty pickling
 solution.
 ~
-6 C a 0 0 7
+6 gC a 0 0 8
 24 0 0
 7 8760
 A
@@ -1407,7 +1407,7 @@ roast fruit on a stick~
 Some roast fruit on a stick is lying here.~
 It's a little bit stick, a little bit sweet, and a whole lot of delicious.
 ~
-6 0 a 0 0 7
+6 g a 0 0 8
 8 0 0
 7 336
 C
@@ -1425,7 +1425,7 @@ a baked egg~
 A baked egg is rolling around.~
 The egg is slightly scorched from cooking by the fire.
 ~
-6 C a 0 0 7
+6 gC a 0 0 8
 6 0 0
 7 336
 O+ 1 6225
@@ -1438,7 +1438,7 @@ a veggie omelet~
 A veggie omelet has been left to rot.~
 Bright bits of vegetable adorn the fluffy egg omelet. It looks delicious!
 ~
-6 m a 0 0 9
+6 gm a 0 0 10
 24 0 0
 7 336
 A
@@ -1455,7 +1455,7 @@ some roast mutton~
 Some roast mutton is lying on the ground.~
 The roasted aroma of the mutton stirs your senses and makes your mouth water.
 ~
-6 m a 0 0 8
+6 gm a 0 0 9
 24 0 0
 7 336
 C
@@ -1473,7 +1473,7 @@ Some mutton rolls are lying here.~
    The mutton has been shredded and tucked into fresh rolls. You can hardly
 wait to taste it!
 ~
-6 m a 0 0 10
+6 gm a 0 0 11
 24 0 0
 7 336
 A
