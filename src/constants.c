@@ -3546,6 +3546,7 @@ const char *olc_type_bits[] = {
 
 // auditors: keywords that can be safely ignored if missing
 const char *ignore_missing_keywords[] = {
+	"and",
 	"for",
 	"in",
 	"one",
