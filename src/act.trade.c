@@ -1086,6 +1086,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
 	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making %s." } },
+	{ "process", "processing", NOBITS, { "You process the %s...", "$n processes the %s...", "$n is processing %s." } },
 };
 
 

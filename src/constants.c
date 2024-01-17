@@ -2311,6 +2311,7 @@ const char *craft_types[] = {
 	"PRESS",
 	"BAKE",
 	"MAKE",	// 15
+	"PROCESS",
 	"\n"
 };
 

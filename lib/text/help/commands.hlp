@@ -1941,6 +1941,16 @@ abilities with the 'skill' command.
 
 See also: SKILLS
 #
+PROCESS PROCESSING
+
+Usage:  process [number] <thing>
+        process info <thing>
+        process list <keywords>
+
+"Process" is a crafting command used mainly for herbs and spices.
+
+See also: PROCESS INFO, RECIPES, CRAFTING ABILITIES
+#
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
 Usage:  progress [category]
