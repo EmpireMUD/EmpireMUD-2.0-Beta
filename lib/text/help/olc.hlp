@@ -3697,6 +3697,7 @@ Available functions:
  OVEN - allows baking
  MAGIC-WORKSHOP - no code functions, but can be used for workforce
  TRAPPER - no code functions, but can be used for workforce
+ APOTHECARY - To be used for crafts like herbs and spices.
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
@@ -4262,6 +4263,7 @@ Available types are:
  MANUFACTURE
  BAKE - requires a bakery or oven
  MAKE
+ PROCESS
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 

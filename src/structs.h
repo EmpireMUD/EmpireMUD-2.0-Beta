@@ -826,6 +826,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
 #define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
+#define FNC_APOTHECARY  BIT(39)	// for use in crafts
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)

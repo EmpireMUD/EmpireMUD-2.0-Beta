@@ -4146,6 +4146,7 @@ const char *function_flags[] = {
 	"IN-CITY-ONLY",
 	"OVEN",
 	"MAGIC-WORKSHOP",
+	"APOTHECARY",
 	"\n"
 };
 
@@ -4191,6 +4192,7 @@ const char *function_flags_long[] = {
 	"",	// in-city-only?
 	"somewhere with an oven",
 	"in a magic workshop",
+	"at an apothecary",
 	"\n"
 };
 
