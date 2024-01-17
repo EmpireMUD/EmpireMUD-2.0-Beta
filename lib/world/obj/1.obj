@@ -546,7 +546,7 @@ C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
-I 16 121 25.00 1  # SCRAPE: sticks and leaves
+I 16 121 50.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
@@ -599,7 +599,7 @@ C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
-I 16 132 25.00 1  # SCRAPE: thorny branches
+I 16 132 50.00 1  # SCRAPE: thorny branches
 O+ 1 6025
 R
 4 5118 0
@@ -637,7 +637,7 @@ C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
 I 16 142 100.00 1  # SCRAPE: wooden pole
-I 16 121 25.00 1  # SCRAPE: sticks and leaves
+I 16 121 50.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
