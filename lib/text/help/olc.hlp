@@ -4101,7 +4101,9 @@ Available flags:
  &cTAKE-REQUIRED-OBJ&0 - takes the 'required object' when you start the craft, and
     may refund it when dismantled (unless the object is 1-USE)
  &cDISMANTLE-WITHOUT-ABILITY&0 - buildings and vehicles can be dismantled without
-    the origina ability.
+    the original ability
+ &cTOOL-OR-FUNCTION&0 - with this flag, requires the tool OR the function, not
+    both of them
 
 Additional flags are available via the REQUIRESFUNCTION option.
 

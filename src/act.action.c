@@ -1194,8 +1194,10 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
-	char buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
+	char *str, *ptr;
 	craft_data *type = NULL;
+	obj_data *tool = NULL;
 	
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
@@ -1206,19 +1208,32 @@ void process_build_action(char_data *ch) {
 	// check for build recipe
 	type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL);
 	
-	// ensure tools are still present
-	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+	// ensure tools and functions are still present
+	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf);
 		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf1);
+			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf);
 		}
 		else {
-			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
+			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf), buf);
 		}
 		cancel_action(ch);
 		return;
 	}
-
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
+		str = buf;
+		if ((ptr = strrchr(str, ','))) {
+			msg_to_char(ch, "You must be %-*.*s or%s to keep %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		else {	// no comma
+			msg_to_char(ch, "You must be %s to keep %s that.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		cancel_gen_craft(ch);
+		return;
+	}
+	
+	// ok:
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 

@@ -1020,6 +1020,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
 #define CRAFT_DISMANTLE_WITHOUT_ABILITY  BIT(20)	// buildings and vehicles can be dismantled without the ability
+#define CRAFT_TOOL_OR_FUNCTION  BIT(21)	// with this flag, only requires the tool OR the function
 
 
 // For find_building_list_entry

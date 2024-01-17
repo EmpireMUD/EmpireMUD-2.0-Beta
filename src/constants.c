@@ -2262,6 +2262,7 @@ const char *craft_flags[] = {
 	"REMOVE-PRODUCTION",
 	"TAKE-REQUIRED-OBJ",
 	"DISMANTLE-WITHOUT-ABILITY",	// 20
+	"TOOL-OR-FUNCTION",
 	"\n"
 };
 
@@ -2289,6 +2290,7 @@ const char *craft_flag_for_info[] = {
 	"",	// remove-production
 	"",	// take-required-obj
 	"", // 20: dismantle-without-ability
+	"",
 	"\n"
 };
 
