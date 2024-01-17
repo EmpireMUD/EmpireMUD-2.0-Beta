@@ -171,6 +171,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
 		problem = TRUE;
 	}
+	if (CRAFT_FLAGGED(craft, CRAFT_TOOL_OR_FUNCTION) && (GET_CRAFT_REQUIRES_TOOL(craft) == NOBITS || GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has TOOL-OR-FUCTION but is missing %s", (GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS ? "tool" : "function"));
+		problem = TRUE;
+	}
 	
 	// anything not a building
 	if (!CRAFT_IS_BUILDING(craft)) {
