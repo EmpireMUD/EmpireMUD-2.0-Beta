@@ -19,7 +19,7 @@ a striped barbfish~
 The remains of a striped barbfish is rotting here.~
 You can eat the fish.
 ~
-6 lC a 0 0 7
+6 glC a 0 0 8
 24 0 0
 7 24
 C
@@ -36,7 +36,7 @@ a giant linefish~
 The remains of a giant linefish is rotting here.~
 You can eat the fish.
 ~
-6 C a 0 0 7
+6 gC a 0 0 8
 24 0 0
 7 24
 C
@@ -53,7 +53,7 @@ a magenta arrowfish~
 The remains of a magenta arrowfish is rotting here.~
 You can eat the fish.
 ~
-6 C a 0 0 7
+6 gC a 0 0 8
 24 0 0
 7 24
 C
@@ -200,7 +200,7 @@ a spotted eel~
 A spotted eel is dried up and rotting.~
 You can eat the fish.
 ~
-6 C a 0 0 9
+6 gC a 0 0 10
 24 0 0
 7 24
 C
@@ -217,7 +217,7 @@ a speckled trout~
 A speckled trout lies dead on the ground.~
 You can eat the fish.
 ~
-6 C a 0 0 10
+6 gC a 0 0 11
 24 0 0
 7 24
 C
@@ -236,7 +236,7 @@ a bright red leaping fish~
 A bright red leaping fish is rotting on the ground.~
 You can eat the fish.
 ~
-6 C a 0 0 11
+6 gC a 0 0 12
 24 0 0
 7 24
 C
@@ -253,7 +253,7 @@ a fat catfish~
 A fat catfish is lying on the ground.~
 You can eat the fish.
 ~
-6 C a 0 0 13
+6 gC a 0 0 14
 24 0 0
 7 24
 C
@@ -270,7 +270,7 @@ a yellow perch~
 A yellow perch lies dead on the ground.~
 You can eat the fish.
 ~
-6 C a 0 0 13
+6 gC a 0 0 14
 24 0 0
 7 24
 C
@@ -287,7 +287,7 @@ a small gator~
 A small gator lies dead on the ground.~
 You could eat the gator.
 ~
-6 C a 0 0 15
+6 gC a 0 0 16
 24 0 0
 7 24
 C
