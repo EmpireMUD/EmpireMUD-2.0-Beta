@@ -8272,6 +8272,9 @@ the help file on OLC DEPLETION.
 
 The interaction's "percentage" is the chance per hour to produce the item.
 
+Basic production chores only eat food when they produce something, but skilled
+labor will eat if it COULD produce something, even if the random roll fails.
+
 See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"

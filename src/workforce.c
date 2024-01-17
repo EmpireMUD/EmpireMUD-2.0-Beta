@@ -2906,7 +2906,7 @@ INTERACTION_FUNC(one_production_chore) {
 * @param int interact_type INTERACT_PRODUCTION or INTERACT_SKILLED_LABOR
 */
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type) {
-	bool over_limit = FALSE;
+	bool over_limit = FALSE, success = FALSE;
 	char_data *worker;
 	
 	if (has_any_undepleted_interaction_for_chore(emp, CHORE_PRODUCTION, room, veh, interact_type, &over_limit)) {
@@ -2915,11 +2915,23 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 		
 			if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
 				// successful vehicle interact
+				success = TRUE;
 			}
 			else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
 				// successful room interact
+				success = TRUE;
 			}
 			// no else: these interactions may fail due to low percentages
+			
+			// workforce needs:
+			if (interact_type == INTERACT_SKILLED_LABOR || success) {
+				// charging food needs
+				charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
+			}
+			else {
+				// basic production does not charge needs if it doesn't produce
+				charge_workforce(emp, CHORE_PRODUCTION, room, worker, 0, NOTHING, 0);
+			}
 		}
 		else if ((worker = place_chore_worker(emp, CHORE_PRODUCTION, room))) {
 			// fresh worker
