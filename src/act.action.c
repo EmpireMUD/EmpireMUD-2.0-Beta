@@ -1587,6 +1587,9 @@ void process_fillin(char_data *ch) {
 * @param char_data *ch The harvester.
 */
 void process_harvesting(char_data *ch) {
+	bitvector_t missing_tools;
+	char buf[256];
+	
 	if (!ROOM_CROP(IN_ROOM(ch)) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
 		msg_to_char(ch, "There's nothing left to harvest here.\r\n");
 		cancel_action(ch);
@@ -1599,6 +1602,18 @@ void process_harvesting(char_data *ch) {
 	}
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish harvesting.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if ((missing_tools = interaction_list_missing_tools_room(ch, IN_ROOM(ch), INTERACT_HARVEST))) {
+		// custom tools on interactions
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to harvest here: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to harvest here.\r\n", AN(buf), buf);
+		}
 		cancel_action(ch);
 		return;
 	}
@@ -2710,6 +2725,7 @@ ACMD(do_fillin) {
 
 
 ACMD(do_harvest) {
+	bitvector_t missing_tools;
 	int harvest_timer = config_get_int("harvest_timer");
 	
 	if (IS_NPC(ch)) {
@@ -2748,6 +2764,16 @@ ACMD(do_harvest) {
 	}
 	else if (!has_tool(ch, TOOL_HARVESTING)) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
+	}
+	else if ((missing_tools = interaction_list_missing_tools_room(ch, IN_ROOM(ch), INTERACT_HARVEST))) {
+		// custom tools on interactions
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to harvest here: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to harvest here.\r\n", AN(buf), buf);
+		}
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
