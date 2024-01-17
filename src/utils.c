@@ -3406,6 +3406,107 @@ int get_view_height(char_data *ch, room_data *from_room) {
 
 
 /**
+* Determines if a character is missing a tool that's required for all
+* interactions of a given type in a list.
+*
+* @param char_data *ch The player trying to interact.
+* @param struct interaction_item *list The list of interactions to check.
+* @param int type The INTERACT_ type we're checking.
+* @return bitvector_t The missing tool type(s) if any, or NOBITS if the player has all tools (or needs none).
+*/
+bitvector_t interaction_list_missing_tools(char_data *ch, struct interaction_item *list, int type) {
+	bitvector_t found = NOBITS;
+	bool any;
+	struct interaction_item *interact;
+	struct interact_restriction *rest;
+	
+	if (!ch || !list) {
+		return NOBITS;
+	}
+	
+	LL_FOREACH(list, interact) {
+		if (interact->type == type) {
+			any = FALSE;
+			LL_FOREACH(interact->restrictions, rest) {
+				if (rest->type == INTERACT_RESTRICT_TOOL) {
+					if (IS_SET(found, rest->vnum)) {
+						// already checked and failed this type
+						any = TRUE;
+					}
+					else if (!has_tool(ch, rest->vnum)) {
+						found |= rest->vnum;
+						any = TRUE;
+					}
+				}
+			}
+			
+			if (!any) {
+				// made it! found an interact we can do
+				return NOBITS;
+			}
+		}
+	}
+	
+	// if we got here, there may be an error to return
+	return found;
+}
+
+
+/**
+* Checks interaction_list_missing_tools() on all the interaction lists in the
+* room and determines if the player can proceed on any of them, or if they are
+* missing a tool for all of them.
+*
+* @param char_data *ch The player trying to interact.
+* @param room_data *room The room to check for interactions.
+* @param int type The INTERACT_ type we're checking.
+* @return bitvector_t The missing tool type(s) if any, or NOBITS if the player has all tools (or needs none).
+*/
+bitvector_t interaction_list_missing_tools_room(char_data *ch, room_data *room, int type) {
+	bitvector_t bits, found = NOBITS;
+	
+	if (!ch || !room) {
+		return NOBITS;
+	}
+	
+	if (SECT_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_SECT_INTERACTIONS(SECT(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (BLD_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (RMT_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (CROP_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_CROP_INTERACTIONS(ROOM_CROP(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	
+	return found;
+}
+
+
+/**
 * Picks a level based on a min/max and base.
 *
 * @param int level The base level (usually player's level).

@@ -1978,6 +1978,8 @@ room_data *find_load_room(char_data *ch);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
+bitvector_t interaction_list_missing_tools(char_data *ch, struct interaction_item *list, int type);
+bitvector_t interaction_list_missing_tools_room(char_data *ch, room_data *room, int type);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 void relocate_players(room_data *room, room_data *to_room);

@@ -3423,6 +3423,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 * @return bool TRUE if it's ok to proceed, FALSE if it sent an error message.
 */
 bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen_interact_data_t *data) {
+	bitvector_t missing_tools;
 	char buf[1024];
 	
 	if (!room) {
@@ -3446,6 +3447,7 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		msg_to_char(ch, "You can't %s anything at an incomplete building.\r\n", data->command);
 	}
 	else if (data->tool && !has_all_tools(ch, data->tool)) {
+		// checking data for the interact itself
 		prettier_sprintbit(data->tool, tool_flags, buf);
 		if (count_bits(data->tool) > 1) {
 			msg_to_char(ch, "You need tools to %s: %s\r\n", buf, data->command);
@@ -3456,6 +3458,16 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 	}
 	else if (!can_gen_interact_room(ch, room, data)) {
 		// sends own messages
+	}
+	else if ((missing_tools = interaction_list_missing_tools_room(ch, room, data->interact))) {
+		// similar to previous tool check
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to %s: %s\r\n", buf, data->command);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
+		}
 	}
 	else if (data->ptech != NO_TECH && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL, NULL)) {
 		// triggered
