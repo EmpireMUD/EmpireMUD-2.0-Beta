@@ -4105,6 +4105,10 @@ Available flags:
     the original ability
  &cTOOL-OR-FUNCTION&0 - with this flag, requires the tool OR the function, not
     both of them
+ &cUNDAMAGED-DISMANTLE-REFUND&0 - refunds all materials when dismantled while
+    undamaged (instead of 90%)
+ &cFULL-DISMANTLE-REFUND&0 - refunds all materials when dismantled no matter
+    what the health (instead of 20%-90%)
 
 Additional flags are available via the REQUIRESFUNCTION option.
 

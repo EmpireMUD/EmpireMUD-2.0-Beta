@@ -1022,6 +1022,8 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
 #define CRAFT_DISMANTLE_WITHOUT_ABILITY  BIT(20)	// buildings and vehicles can be dismantled without the ability
 #define CRAFT_TOOL_OR_FUNCTION  BIT(21)	// with this flag, only requires the tool OR the function
+#define CRAFT_UNDAMAGED_DISMANTLE_REFUND  BIT(22)	// refunds all materials when dismantled while undamaged (instead of 90%)
+#define CRAFT_FULL_DISMANTLE_REFUND  BIT(23)	// refunds all materials when dismantled no matter what the health (instead of 20%-90%)
 
 
 // For find_building_list_entry

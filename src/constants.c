@@ -2263,6 +2263,8 @@ const char *craft_flags[] = {
 	"TAKE-REQUIRED-OBJ",
 	"DISMANTLE-WITHOUT-ABILITY",	// 20
 	"TOOL-OR-FUNCTION",
+	"UNDAMAGED-DISMANTLE-REFUND",
+	"FULL-DISMANTLE-REFUND",
 	"\n"
 };
 
@@ -2290,7 +2292,9 @@ const char *craft_flag_for_info[] = {
 	"",	// remove-production
 	"",	// take-required-obj
 	"", // 20: dismantle-without-ability
-	"",
+	"",	// tool-or-function
+	"",	// undamaged-dismantle-refund
+	"",	// full-dismantle-refund
 	"\n"
 };
 

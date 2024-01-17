@@ -1478,8 +1478,10 @@ void start_dismantle_building(room_data *loc) {
 		}
 	}
 	
-	// reduce resource: they don't get it all back
-	reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
+	if (!type || (!CRAFT_FLAGGED(type, CRAFT_FULL_DISMANTLE_REFUND) && (!CRAFT_FLAGGED(type, CRAFT_UNDAMAGED_DISMANTLE_REFUND) || BUILDING_DAMAGE(loc)))) {
+		// reduce resource: they don't get it all back
+		reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
+	}
 
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	affect_total_room(loc);
