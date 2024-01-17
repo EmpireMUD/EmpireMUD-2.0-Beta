@@ -754,14 +754,15 @@ Common types of pillars are:
 
 See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
 #
-POLE POLES "POLE COMPONENT"
+POLE POLES "POLE COMPONENT" "WOODEN POLE" "METAL POLE"
 
 Pole (component)
 
 Used for:  crafting, building
 
 Poles are straight lengths of wood made from saplings by scraping. They can
-also be made from metal. These are used in many types of buildings and crafts.
+also be forged from metal. These are used in many types of buildings and
+crafts.
 
 See also: COMPONENT, FORGE, SAPLING, SCRAPE
 #
