@@ -3815,6 +3815,7 @@ Optional interaction restrictions:
  &c-ability <vnum/"name">&0 - Player must have this ability.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
  &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
 
 Examples:
@@ -6125,6 +6126,7 @@ Optional interaction restrictions:
  &c-normal&0 - Mob must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
 
 Example of a rare result from barding (order matters here):
  1. BARDE: 1x an epic warhorse .50% (e)
@@ -7115,6 +7117,7 @@ Optional interaction restrictions:
  &c-normal&0 - Object must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
 
 See also: OLC OBJECTS
 #d
@@ -10032,6 +10035,7 @@ Optional interaction restrictions:
  &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
  &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
 
 Examples:
