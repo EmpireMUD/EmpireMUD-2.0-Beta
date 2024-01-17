@@ -328,7 +328,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		else if (!VEH_IS_COMPLETE(veh) && empire_chore_limit(emp, island, CHORE_BUILDING)) {
 			vehicle_chore_build(emp, veh, CHORE_BUILDING);
 		}
-		else if (empire_chore_limit(emp, island, CHORE_MAINTENANCE)) {
+		else if (VEH_IS_COMPLETE(veh) && empire_chore_limit(emp, island, CHORE_MAINTENANCE)) {
 			vehicle_chore_build(emp, veh, CHORE_MAINTENANCE);
 		}
 		return;	// no further chores while working on the building (dismantle may even have purged it)
