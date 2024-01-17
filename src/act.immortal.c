@@ -5983,6 +5983,7 @@ SHOW(show_lost_books) {
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	size_t size, count;
 	book_data *book, *next_book;
+	player_index_data *index;
 	
 	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
 	
@@ -5992,7 +5993,7 @@ SHOW(show_lost_books) {
 			continue;
 		}
 		
-		snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->name : "???");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
