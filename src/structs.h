@@ -925,6 +925,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
 #define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
 #define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
+#define AFF_NO_DISARM  BIT(46)	// U. player cannot be disarmed
 
 
 // Injury flags -- IS_INJURED

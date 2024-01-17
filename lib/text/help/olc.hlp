@@ -2783,6 +2783,7 @@ The following affect flags are available:
  &cAUTO-RESURRECT&0 - Will resurrect on death.
  &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
    affect. If applied by an ability, will also trigger skill gain and hooks.
+ &c!DISARM&0 - Cannot be disarmed.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
