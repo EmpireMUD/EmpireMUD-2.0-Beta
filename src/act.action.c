@@ -3456,9 +3456,6 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
 		}
 	}
-	else if (!can_gen_interact_room(ch, room, data)) {
-		// sends own messages
-	}
 	else if ((missing_tools = interaction_list_missing_tools_room(ch, room, data->interact))) {
 		// similar to previous tool check
 		prettier_sprintbit(missing_tools, tool_flags, buf);
@@ -3468,6 +3465,9 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		else {
 			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
 		}
+	}
+	else if (!can_gen_interact_room(ch, room, data)) {
+		// sends own messages
 	}
 	else if (data->ptech != NO_TECH && run_ability_triggers_by_player_tech(ch, data->ptech, NULL, NULL, NULL)) {
 		// triggered
