@@ -2177,13 +2177,13 @@ supposed creation by various mages and sorcerers. One, in particular, made the
 mistake of saying 'If I didn't create the calamander, let me be turned into
 one here and now' in the presence of a Stone of Truth.
 ~
-1 0 an 0 0 6
+1 0 an 0 0 7
 0 10 5
 0 0
 C
 50 50
 I 11 11975 100.00 1  # LIGHT: torch
-I 16 6036 100.00 1  # SCRAPE: fine pole
+I 16 146 100.00 1  # SCRAPE: fine wooden pole
 O+ 1 6026
 R
 4 5118 0

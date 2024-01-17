@@ -4,9 +4,11 @@ a little edible plant~
 A little edible plant is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 gC a 0 0 6
+6 gC a 0 0 7
 1 0 0
 7 72
+C
+1 1
 O+ 1 6100
 R
 4 5619 0
@@ -63,9 +65,11 @@ a little fruit~
 A little fruit is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 gC a 0 0 5
+6 gC a 0 0 6
 1 0 0
 7 120
+C
+1 1
 O+ 1 6120
 R
 4 5619 0
@@ -76,9 +80,11 @@ a small magic fruit~
 A small magic fruit is lying here.~
 This little fruit glows with magical power.
 ~
-6 gC a 0 0 7
+6 gC a 0 0 8
 1 0 0
 7 120
+C
+1 1
 O+ 1 6121
 R
 4 5619 0
@@ -89,9 +95,11 @@ a small temperate fruit~
 A small temperate fruit is lying on the ground.~
 This fruit looks like it was grown in a temperate region.
 ~
-6 gC a 0 0 6
+6 gC a 0 0 7
 1 0 0
 7 120
+C
+1 1
 O+ 1 6122
 R
 4 5619 0
@@ -102,9 +110,11 @@ a small tropical fruit~
 A small tropical fruit is lying on the ground.~
 This fruit looks like it was grown in a tropical region.
 ~
-6 gC a 0 0 7
+6 gC a 0 0 8
 1 0 0
 7 120
+C
+1 1
 O+ 1 6123
 R
 4 5619 0
@@ -115,9 +125,11 @@ a small desert fruit~
 A small desert fruit is lying on the ground.~
 This fruit looks like it was grown in a desert region.
 ~
-6 gC a 0 0 8
+6 gC a 0 0 9
 1 0 0
 7 120
+C
+1 1
 O+ 1 6124
 R
 4 5619 0
@@ -128,9 +140,11 @@ a small cooked fruit~
 A small cooked fruit is lying here.~
 It's been cooked until you can't really tell what it started out as.
 ~
-6 gC a 0 0 10
+6 gC a 0 0 11
 6 0 0
 7 336
+C
+1 1
 O+ 1 6125
 R
 4 5619 0
@@ -232,9 +246,11 @@ a small vegetable~
 A small vegetable is lying here.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 gC a 0 0 6
+6 gC a 0 0 7
 1 0 0
 7 72
+C
+1 1
 O+ 1 6140
 R
 4 5619 0
@@ -245,9 +261,11 @@ a small magic vegetable~
 A small magic vegetable is lying here.~
 This unidentifiable little vegetable is glowing!
 ~
-6 gC a 0 0 7
+6 gC a 0 0 8
 1 0 0
 7 72
+C
+1 1
 O+ 1 6141
 R
 4 5619 0
@@ -258,9 +276,11 @@ a small temperate vegetable~
 A small temperate vegetable is lying here.~
 This vegetable looks like it was grown somewhere temperate.
 ~
-6 gC a 0 0 8
+6 gC a 0 0 9
 1 0 0
 7 72
+C
+1 1
 O+ 1 6142
 R
 4 5619 0
@@ -271,9 +291,11 @@ a small tropical vegetable~
 A small tropical vegetable is lying here.~
 This vegetable looks like it was grown somewhere tropical.
 ~
-6 gC a 0 0 9
+6 gC a 0 0 10
 1 0 0
 7 72
+C
+1 1
 O+ 1 6143
 R
 4 5619 0
@@ -284,9 +306,11 @@ a small desert vegetable~
 A small desert vegetable is lying here.~
 This vegetable looks like it was grown somewhere arid.
 ~
-6 gC a 0 0 10
+6 gC a 0 0 11
 1 0 0
 7 72
+C
+1 1
 O+ 1 6144
 R
 4 5619 0
@@ -373,9 +397,11 @@ a handful of grain~
 A handful of grain is scattered here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 C a 0 0 5
+3 C a 0 0 6
 0 0 0
 0 1344
+C
+1 1
 O+ 1 6160
 R
 4 5116 0
@@ -401,9 +427,11 @@ some seeds~
 Some seeds are scattered here.~
 You can't tell where these seeds came from, but they probably aren't edible.
 ~
-3 C a 0 0 6
+3 C a 0 0 7
 0 0 0
 0 8760
+C
+1 1
 O+ 1 6180
 R
 4 5210 0
@@ -414,9 +442,11 @@ some seeds~
 Some seeds are scattered here.~
 These seeds seem okay to eat.
 ~
-6 C a 0 0 7
+6 C a 0 0 8
 1 0 0
 0 8760
+C
+1 1
 O+ 1 6181
 R
 4 5210 0
@@ -427,9 +457,11 @@ a handful of nuts~
 A handful of nuts is scattered here.~
 It's hard to identify the nuts, but they look edible.
 ~
-6 C a 0 0 6
+6 C a 0 0 7
 4 0 0
 0 3240
+C
+1 1
 O+ 1 6182
 R
 4 5619 0
@@ -440,9 +472,11 @@ some spice~
 Some spice is sprinkled here.~
 This fragrant spice is hard to identify.
 ~
-3 0 a 0 0 1
+3 0 a 0 0 2
 0 0 0
 0 0
+C
+1 1
 O+ 1 6183
 S
 #6184
@@ -451,9 +485,11 @@ an herb~
 An herb is lying here.~
 This unidentifiable herb smells tasty.
 ~
-3 0 a 0 0 2
+3 0 a 0 0 3
 0 0 0
 0 0
+C
+1 1
 O+ 1 6184
 S
 #6192
@@ -477,9 +513,11 @@ an ingerdient~
 An ingredient was left behind.~
 This fragrant ingredient could pep up a recipe.
 ~
-3 0 a 0 0 2
+3 0 a 0 0 3
 0 0 0
 0 0
+C
+1 1
 O+ 1 6193
 S
 $
