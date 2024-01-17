@@ -4,13 +4,14 @@ a fried meat pie~
 A fried meat pie beckons you from the ground.~
 The pie looks delicious.
 ~
-6 m a 0 0 8
+6 m a 0 0 9
 24 0 0
 7 336
 A
 1 1 0
 C
 1 1
+O+ 1 6242
 R
 4 5619 0
 S
@@ -105,13 +106,14 @@ a pouch of jerky~
 Someone has left a pouch of jerky here.~
 The jerky looks delicious.
 ~
-6 mC a 0 0 3
+6 mC a 0 0 4
 24 0 0
 7 8760
 A
 21 1 0
 C
 1 1
+O+ 1 6220
 R
 4 5619 0
 S
@@ -167,9 +169,10 @@ a wood ear mushroom~
 A wood ear mushroom is growing here.~
 The mushroom looks good enough to eat, somehow.
 ~
-6 C a 0 0 3
+6 C a 0 0 4
 6 0 0
 7 72
+O+ 1 6101
 R
 4 5619 0
 S
@@ -234,7 +237,7 @@ A bowl of fried rice is steaming away.~
    This bowl of fried rice was made with very little spices. It is however very
 hot and filling.
 ~
-6 0 a 0 0 5
+6 0 a 0 0 6
 48 0 0
 7 336
 A
@@ -245,7 +248,7 @@ $n chows down on $p.~
 M
 4
 You blow on $p and eat a mouthful.~
-O+ 1 6240
+O+ 1 6241
 R
 4 5619 0
 S
@@ -256,7 +259,7 @@ A slab of steaming salt pork has been left here, discarded.~
    A long, thick slab of salted pork. Lines of fat run through it giving
 contrast to the dense meat.
 ~
-6 C a 0 0 3
+6 C a 0 0 4
 48 0 0
 7 8760
 E
@@ -269,6 +272,7 @@ Tearing off a chunk of $p, you chew contentedly.~
 M
 5
 $n tears off a hunk of $p and chews contentedly.~
+O+ 1 6222
 R
 4 5619 0
 S
@@ -508,7 +512,7 @@ A piece of flatbread has been left here.~
    Threaded through this inocuous piece of flatbread are nuts, squash and a
 distinct glaze from honey.
 ~
-6 m a 0 0 4
+6 m a 0 0 5
 24 0 0
 7 336
 A
@@ -521,6 +525,7 @@ You roll up $p and take a good sized bite out of it.~
 M
 5
 $n rolls up $p and bites off a good sized piece.~
+O+ 1 6241
 R
 4 5619 0
 R
@@ -672,13 +677,14 @@ a pouch of spicy jerky~
 Someone has left a pouch of spicy jerky here.~
 This is a pouch of jerky with a picture of a pepper printed on the front.
 ~
-6 mC a 0 0 7
+6 mC a 0 0 8
 24 0 0
 7 8760
 A
 22 1 0
 C
 1 1
+O+ 1 6220
 R
 4 5619 0
 S
@@ -1054,7 +1060,7 @@ biscuits and gravy~
 Some biscuits and gravy are sitting here.~
 This homestyle favorite will boost your move regeneration.
 ~
-6 mp a 0 0 5
+6 mp a 0 0 6
 48 0 0
 7 336
 A
@@ -1064,6 +1070,7 @@ C
 M
 4
 The biscuits and gravy tastes like a warm fireside meal.~
+O+ 1 6240
 S
 #3356
 vegetables stewed~
@@ -1243,12 +1250,12 @@ a jar of coconut oil~
 A jar of coconut oil is sitting on the ground.~
 The coconut oil inside the jar is a rich yellow-orange color.
 ~
-3 C a 0 0 11
+3 C a 0 0 12
 0 0 0
 6 12960
 C
 1 1
-O+ 1 6320
+O+ 1 6322
 R
 4 5192 0
 R
@@ -1400,7 +1407,7 @@ roast fruit on a stick~
 Some roast fruit on a stick is lying here.~
 It's a little bit stick, a little bit sweet, and a whole lot of delicious.
 ~
-6 0 a 0 0 6
+6 0 a 0 0 7
 8 0 0
 7 336
 C
@@ -1408,6 +1415,7 @@ C
 M
 4
 You eat the roast fruit off the stick.~
+O+ 1 6125
 R
 4 5619 0
 S

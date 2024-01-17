@@ -11,6 +11,21 @@ O+ 1 6100
 R
 4 5619 0
 S
+#6101
+mushroom~
+a mushroom~
+There's a mushroom here.~
+It's a small fungus, and it looks edible.
+~
+6 C a 0 0 5
+6 0 0
+7 72
+C
+1 1
+O+ 1 6101
+R
+4 5619 0
+S
 #6110
 plants edible~
 some edible plants~
@@ -26,6 +41,21 @@ C
 O+ 1 6110
 R
 4 5114 0
+S
+#6111
+mushrooms bunch~
+a bunch of mushrooms~
+A bunch of mushrooms are here.~
+These mushrooms look fresh and tasty.
+~
+6 C a 0 0 15
+24 10505 0
+7 72
+C
+1 1
+O+ 1 6111
+R
+4 5215 0
 S
 #6120
 fruit little~

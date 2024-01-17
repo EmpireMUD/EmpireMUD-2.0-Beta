@@ -175,12 +175,12 @@ R
 4 5619 0
 S
 #3820
-beef corned village~
-some village corned beef~
+beef corned~
+some corned beef~
 Some corned beef has been left behind.~
 The pale pink meat has a peppery aroma and a salty flavor.
 ~
-6 0 a 0 0 14
+6 0 a 0 0 15
 48 0 0
 7 8760
 C
@@ -190,12 +190,12 @@ R
 4 5619 0
 S
 #3822
-poultry salt-cured cured village~
-some salt-cured village poultry~
-Some salt-cured village poultry has been left here.~
+poultry salt-cured cured~
+some salt-cured poultry~
+Some salt-cured poultry has been left here.~
 The poultry is pale in color but salty and delicious!
 ~
-6 0 a 0 0 16
+6 0 a 0 0 17
 48 0 0
 7 8760
 C
@@ -205,12 +205,12 @@ R
 4 5619 0
 S
 #3824
-fish salt-cured cured village~
-some salt-cured village fish~
-Some salt-cured village fish has been left here.~
+fish salt-cured cured~
+some salt-cured fish~
+Some salt-cured fish has been left out.~
 The fish has a briny, ocean smell.
 ~
-6 0 a 0 0 17
+6 0 a 0 0 18
 48 0 0
 7 8760
 C
@@ -220,12 +220,12 @@ R
 4 5619 0
 S
 #3826
-mutton salted village~
-some salted village mutton~
-Some salted village mutton has been left behind.~
+mutton salted~
+some salted mutton~
+Some salted mutton has been left behind.~
 The meat has gone a little pale, but it tastes amazing.
 ~
-6 0 a 0 0 18
+6 0 a 0 0 19
 48 0 0
 7 8760
 C

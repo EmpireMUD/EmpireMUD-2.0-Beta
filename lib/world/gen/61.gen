@@ -5,12 +5,26 @@ small edible plant~
 T0
 small edible plants~
 S
+#6101
+small mushroom~
+6 a
+0 6101 0 0
+T0
+small mushrooms~
+S
 #6110
 large edible plant~
 6 a
 0 6110 0 0
 T0
 large edible plants~
+S
+#6111
+large mushroom~
+6 a
+0 6111 0 0
+T0
+large mushrooms~
 S
 #6120
 small fruit~
