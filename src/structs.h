@@ -439,6 +439,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
 #define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
 #define INTERACT_RESTRICT_DEPLETION  7	// determines which depletion is checked/applied, if applicable
+#define INTERACT_RESTRICT_TOOL  8	// tool required for the interaction
 
 
 // for object saving
@@ -3389,7 +3390,7 @@ struct interact_exclusion_data {
 // restricts interactions to certain players
 struct interact_restriction {
 	int type;	// INTERACT_RESTRICT_ type
-	any_vnum vnum;	// based on type
+	signed long long vnum;	// based on type; support most bitvectors too
 	struct interact_restriction *next;
 };
 

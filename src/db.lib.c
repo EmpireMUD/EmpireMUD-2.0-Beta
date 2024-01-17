@@ -4851,6 +4851,7 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	static struct interaction_item *last_interact = NULL;
 	struct interact_restriction *res;
 	int int_in[3];
+	signed long long sll_in;
 	double dbl_in;
 	char char_in, excl = 0;
 	
@@ -4861,14 +4862,14 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 			exit(1);
 		}
 		
-		if (sscanf(line, "I+ %d %d", &int_in[0], &int_in[1]) != 2) {
+		if (sscanf(line, "I+ %d %lld", &int_in[0], &sll_in) != 2) {
 			log("SYSERR: Format error in 'I+' field, %s", error_part);
 			exit(1);
 		}
 		
 		CREATE(res, struct interact_restriction, 1);
 		res->type = int_in[0];
-		res->vnum = int_in[1];
+		res->vnum = sll_in;
 		LL_APPEND(last_interact->restrictions, res);
 		return;
 	}
@@ -4920,7 +4921,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 		
 		// restrictions?
 		LL_FOREACH(interact->restrictions, res) {
-			fprintf(fl, "I+ %d %d  # %s\n", res->type, res->vnum, get_interaction_restriction_display(res, FALSE));
+			fprintf(fl, "I+ %d %lld  # %s\n", res->type, res->vnum, get_interaction_restriction_display(res, FALSE));
 		}
 	}
 }

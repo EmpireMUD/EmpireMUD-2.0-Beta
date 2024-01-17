@@ -5139,6 +5139,12 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 				}
 				break;
 			}
+			case INTERACT_RESTRICT_TOOL: {
+				if (ch && !has_tool(ch, res->vnum)) {
+					return FALSE;
+				}
+				break;
+			}
 			// no default: restriction does not work
 		}
 	}

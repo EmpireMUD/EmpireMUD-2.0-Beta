@@ -5134,6 +5134,7 @@ const char *interact_restriction_types[] = {
 	"group",	// 5
 	"boss",
 	"depletion",
+	"tool",
 	"\n"
 };
 
