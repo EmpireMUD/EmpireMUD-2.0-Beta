@@ -4,7 +4,7 @@ a boar~
 A boar snuffles the ground nearby.
 ~
 10 20 djo 0 3
-0 0 0 27
+0 0 0 27 -1
 D
    Though it resembles the pig in shape, this wild boar is thinner, larger, and
 considerably scruffier. It sniffs along the ground, perhaps looking for fungi
@@ -19,7 +19,7 @@ a forest tapir~
 A forest tapir is rooting around a bush.
 ~
 20 30 djo 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    This fat creature looks like someone took the worst parts of the pig, horse,
 and elephant, mashed them with a pestle, and made a new animal. The tapir just
@@ -34,7 +34,7 @@ a capybara~
 A capybara sits here, staring sideways at you.
 ~
 20 30 djo 0 2
-0 0 0 9
+0 0 0 9 -1
 D
    Though it resembles a guinea pig, the capybara is the largest of all
 rodents. It watches you with narrowed black eyes which peer out from its shaggy
@@ -49,7 +49,7 @@ a harbor seal~
 A harbor seal is rolling around playfully.
 ~
 20 30 bdjo 0 3
-0 0 16 9
+0 0 24 9 -1
 D
 This friendly seal is light brown with dark spots all over its back.
 ~
@@ -68,7 +68,7 @@ a horseshoe crab~
 A horseshoe crab sits at the water's edge.
 ~
 10 15 bdjoz G 1
-0 0 8 3
+0 0 8 3 -1
 D
    This strange little creature looks like a crab with a long tail, until you
 flip it over and discover it's more like a spider with a turtle shell.
@@ -86,7 +86,7 @@ a marine iguana~
 A marine iguana basks on a rock.
 ~
 10 20 bdjo 0 2
-0 0 16 9
+0 0 16 9 -1
 D
    This strange, black iguana seems perfectly at home basking on the sun-lit
 rocks. These creatures dive beneath the waves to scrape plant material from the
@@ -101,7 +101,7 @@ a pink flamingo~
 A pink flamingo is standing on one leg.
 ~
 10 20 djo m 2
-0 0 2 26
+0 0 2 26 -1
 D
 The flamingo is bright pink in color. It stands on a single leg just offshore.
 ~
@@ -120,7 +120,7 @@ a river otter~
 A playful river otter rolls around in the water.
 ~
 15 25 djlo 0 2
-0 0 6 9
+0 0 6 9 -1
 D
    The sleek little brown otter rolls and plays in the water, sometimes diving
 below the surface and returning with a fish.
@@ -143,7 +143,7 @@ a heron~
 A tall heron pokes its beak around for food.
 ~
 10 20 djo m 2
-0 0 2 9
+0 0 2 9 -1
 D
    This lanky brown bird is a heron, a predator of the shoreline. It stalks
 through the water on its spindly legs, occasionally stabbing its long, pointed
@@ -158,7 +158,7 @@ a mud crab~
 A mud crab pokes its head up.
 ~
 10 15 djloz G 1
-0 0 6 3
+0 0 6 3 -1
 D
    This little brown crab has buried itself in the mud, perhaps to wait for
 some unsuspecting meal to walk over it.
@@ -170,7 +170,7 @@ a salty pirate~
 A salty pirate stands atop a half-buried chest.
 ~
 75 100 bdvyzI c 3
-1 0 0 1
+1 0 0 1 -1
 D
    The pirate looks like he's had a rough life. He's missing an eye, a leg, and
 part of his arm -- replaced with a patch, a peg, and a hook, respectively. It
@@ -193,7 +193,7 @@ a little penguin~
 A little penguin waddles along.
 ~
 10 15 djo 0 1
-0 0 16 9
+0 0 16 9 -1
 D
    This black and white penguin looks around for predators and then climbs onto
 the shore. It stands upright, tall for its size, and waddles around with
@@ -213,7 +213,7 @@ a red panda~
 A red panda watches you as it chews a leaf.
 ~
 10 20 djo c 2
-0 0 11 9
+0 0 11 9 -1
 D
    This odd creature, sometimes called the red bear-cat, is indeed mostly red,
 with white markings on its face, a black belly, and a striped red tail.
@@ -240,7 +240,7 @@ a panda bear~
 A panda bear slowly chews a shoot as it watches you.
 ~
 20 40 djkoy c 4
-0 0 0 9
+0 0 0 9 -1
 D
    These huge black and white bears almost appear to be wearing masks. The
 panda is notoriously lazy, and spends most of its time resting and chewing.
@@ -264,7 +264,7 @@ a mourning dove~
 A mourning dove pecks at the ground.
 ~
 1 5 djo 0 1
-0 0 2 26
+0 0 2 26 -1
 D
 This little brown dove seems intent to peck at the ground for food.
 ~
@@ -283,7 +283,7 @@ a mallard duck~
 A mallard duck is looking for food.
 ~
 1 5 djo 0 1
-1 0 2 9
+1 0 2 9 -1
 D
    The mallard has a bright green head and a ring of white around its neck. It
 can often be found near water.
@@ -300,7 +300,7 @@ a teal duck~
 A teal duck is foraging around.
 ~
 1 5 djo 0 1
-1 0 2 9
+1 0 2 9 -1
 D
    The teal has a brown body but when it stretches its wings, it reveals the
 bright feathers that give it its name.
@@ -317,7 +317,7 @@ a honey bear~
 A little honey bear dangles from a tree.
 ~
 10 20 djo c 2
-0 0 1 10
+0 0 1 10 -1
 D
    This honey bear, sometimes called a kinkajou, is the size of a small dog.
 It almost looks like a bear, but it has a long prehensile tail.
@@ -331,7 +331,7 @@ an ovenbird~
 An ovenbird is walking around on the ground.
 ~
 1 5 djo 0 1
-0 0 2 26
+0 0 2 26 -1
 D
    Named for its nests that resemble old wood-fired ovens, the ovenbird is a
 common sight in this part of the world.
@@ -354,7 +354,7 @@ a dire squirrel~
 A dire squirrel circles you menacingly.
 ~
 75 100 djko c 2
-0 0 0 9
+0 0 0 9 -1
 D
    This gray squirrel is far larger than the average rodent you see scurrying
 up and down the trees. As it chitters at you, its mouth begins to foam.
@@ -379,7 +379,7 @@ a brown goshawk~
 A brown goshawk flies overhead.
 ~
 5 15 djo m 2
-0 0 2 10
+0 0 2 10 -1
 D
    The goshawk is a small raptor with brown stripes. It flies above you,
 hunting for a meal.
@@ -396,7 +396,7 @@ a koala~
 A koala is munching on a leaf.
 ~
 10 20 bdjo c 2
-0 0 0 9
+0 0 0 9 -1
 D
    This little grey koala, sometimes called a drop bear, seems content to chew
 on leaves while it hugs trees to stay cool.
@@ -410,7 +410,7 @@ a kangaroo~
 A kangaroo is standing here.
 ~
 20 30 djo 0 4
-0 0 15 11
+0 0 15 11 -1
 D
    This odd creature has the head of a deer, the ears of a rabbit, and the legs
 of a kick-boxer. It hops along, using its tail like a tripod, occasionally
@@ -425,7 +425,7 @@ a wombat~
 A wombat is digging at the ground.
 ~
 10 20 djo 0 3
-0 0 0 9
+0 0 0 9 -1
 D
    This odd mammal sits low to the ground, with its rotund back end high in the
 air, digging furiously.
@@ -439,7 +439,7 @@ a tiger snake~
 A tiger snake is stretched out on the ground.
 ~
 10 20 djo 0 1
-0 0 5 9
+0 0 5 9 -1
 D
    The tiger snake is mostly brown, with banded stripes much like a real tiger.
 It's highly venomous, so keep your distance.
@@ -455,7 +455,7 @@ a monitor lizard~
 A monitor lizard flicks its tongue impatiently.
 ~
 10 20 dj 0 1
-0 0 0 9
+0 0 0 9 -1
 D
    This large lizard is the infamous monitor, whose toxic bite is know to leave
 people in immense pain. It's larger than most lizards you've seen, and you
@@ -469,7 +469,7 @@ a lyrebird~
 A lyrebird is singing on the ground.
 ~
 1 5 djo 0 1
-0 0 2 9
+0 0 2 9 -1
 D
    This little brown bird has long, curved tail feathers that resemble a lyre
 -- as does its sweet voice, which can mimic nearly any sound.
@@ -498,7 +498,7 @@ an emu~
 An emu is pecking at the ground.
 ~
 10 20 djo c 3
-0 0 0 11
+0 0 0 11 -1
 D
    The emu is a soft-feathered, brown bird. But its most impressive trait is
 its size: it stands almost as tall as a man, and as big around as a bear!
@@ -513,7 +513,7 @@ a wallaby~
 A little wallaby is hopping around on the ground.
 ~
 5 15 djo 0 2
-0 0 15 11
+0 0 15 11 -1
 D
    This little creature resembles a large rabbit as it hops around, but with a
 long tail that functions as a tripod.
@@ -527,7 +527,7 @@ a feral dog~
 A feral dog snarls at you.
 ~
 15 25 djoz c 2
-0 0 11 9
+0 0 11 9 -1
 D
    This grungy dog looks like it has lived in the wild all its life, and it's
 fiercely defensive of its pack.
@@ -551,7 +551,7 @@ a huge bunyip~
 A huge bunyip is resting here.
 ~
 80 100 dejo 0 4
-0 0 26 9
+0 0 26 9 -1
 D
    The bunyip is an enormous creature, almost like a bear, but with a massive,
 round, leathery nose pad at the end of its oversized face. You aren't sure
@@ -566,7 +566,7 @@ a honey badger~
 A honey badger is digging at the ground.
 ~
 20 40 djoz c 2
-0 0 0 10
+0 0 0 10 -1
 D
    The honey badger is alternately sniffing at the ground and digging madly
 into it. It must be looking for food.
@@ -595,7 +595,7 @@ a box jellyfish~
 You can see box jellyfish below the surface.
 ~
 50 100 dhjlnoy s 5
-0 0 27 23
+0 0 27 23 -1
 D
    This strange, cube-shaped, transparent jelly is among the most feared
 jellies in the ocean. Their sting is known to be terrifically painful, and can
@@ -609,7 +609,7 @@ a wild yak~
 A hairy yak seems to have been separated from the herd.
 ~
 20 30 djkoy 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The yak is a large, hairy cow that lives high in the mountains. They mainly
 eat grains, but will eat whatever small plant material is available.
@@ -633,7 +633,7 @@ a yak~
 A hairy yak is chewing some grass.
 ~
 20 30 dfjkoy 0 4
-0 0 0 27
+0 0 0 27 -1
 D
    The yak is like a large, hairy cow. The yak seems tame. You could probably
 herd it into a stable and milk or shear it.
@@ -652,7 +652,7 @@ a hedgehog~
 A little hedgehog is sniffing around.
 ~
 1 5 djo c 1
-0 0 0 9
+0 0 0 9 -1
 D
    This spiny little creature is a hedgehog -- like a mix between a shrew and a
 porcupine.
