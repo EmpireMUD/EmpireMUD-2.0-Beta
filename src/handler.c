@@ -11382,7 +11382,7 @@ void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer 
 * @param bool expiring_first If TRUE, removes ones that will expire soonest first. If FALSE, removes the ones with the longest remaining timers instead.
 */
 void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first) {
-	struct storage_timer *st, *next;
+	struct storage_timer *st, *next, *prev = NULL;
 	int this;
 	
 	if (*list) {
@@ -11406,7 +11406,9 @@ void remove_storage_timer_items(struct storage_timer **list, int amount, bool ex
 		}
 		else {
 			// iterate backward
-			for (st = *list ? (*list)->prev : NULL; st; st = (st == *list ? NULL : st->prev)) {
+			for (st = *list ? (*list)->prev : NULL; st; st = prev) {
+				prev = (st == *list ? NULL : st->prev);
+				
 				this = MIN(st->amount, amount);
 				amount -= this;
 				st->amount -= this;
