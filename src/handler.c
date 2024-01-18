@@ -11335,9 +11335,9 @@ bool ensure_max_storage_timer(struct storage_timer **list, int max_timer) {
 * @param struct storage_timer **list A pointer to the list to free.
 */
 void free_storage_timers(struct storage_timer **list) {
-	struct storage_timer *st;
+	struct storage_timer *st, *next;
 	if (list) {
-		while ((st = *list)) {
+		DL_FOREACH_SAFE(*list, st, next) {
 			DL_DELETE(*list, st);
 			free(st);
 		}
@@ -11382,7 +11382,7 @@ void merge_storage_timers(struct storage_timer **merge_to, struct storage_timer 
 * @param bool expiring_first If TRUE, removes ones that will expire soonest first. If FALSE, removes the ones with the longest remaining timers instead.
 */
 void remove_storage_timer_items(struct storage_timer **list, int amount, bool expiring_first) {
-	struct storage_timer *st, *next;
+	struct storage_timer *st, *next, *prev = NULL;
 	int this;
 	
 	if (*list) {
@@ -11406,7 +11406,9 @@ void remove_storage_timer_items(struct storage_timer **list, int amount, bool ex
 		}
 		else {
 			// iterate backward
-			for (st = *list ? (*list)->prev : NULL; st; st = (st == *list ? NULL : st->prev)) {
+			for (st = *list ? (*list)->prev : NULL; st; st = prev) {
+				prev = (st == *list ? NULL : st->prev);
+				
 				this = MIN(st->amount, amount);
 				amount -= this;
 				st->amount -= this;
