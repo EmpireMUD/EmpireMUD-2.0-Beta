@@ -11385,7 +11385,7 @@ void remove_storage_timer_items(struct storage_timer **list, int amount, bool ex
 	struct storage_timer *st, *next, *prev = NULL;
 	int this;
 	
-	if (*list) {
+	if (list) {
 		if (expiring_first) {
 			// iterate foreward
 			DL_FOREACH_SAFE(*list, st, next) {
@@ -11463,7 +11463,7 @@ struct storage_timer *split_storage_timers(struct storage_timer **list, int amou
 				st->timer = iter->timer;
 				st->amount = amount;
 				iter->amount -= amount;
-				DL_PREPEND(new_list, iter);
+				DL_PREPEND(new_list, st);
 				amount = 0;
 			}
 			else {
