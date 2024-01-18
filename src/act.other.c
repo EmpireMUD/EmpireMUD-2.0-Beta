@@ -135,8 +135,8 @@ void do_customize_road(char_data *ch, char *argument) {
 				return;
 			}
 			
-			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			set_room_custom_name(IN_ROOM(ch), arg2);
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
 			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "This road tile is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);

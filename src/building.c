@@ -2419,6 +2419,7 @@ void do_customize_room(char_data *ch, char *argument) {
 
 
 ACMD(do_dedicate) {
+	bool was_custom;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *ded_veh = NULL;
 	room_data *ded_room = NULL;
@@ -2505,12 +2506,14 @@ ACMD(do_dedicate) {
 		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
-
+		
+		was_custom = ROOM_CUSTOM_NAME(ded_room) ? FALSE : TRUE;
+		set_room_custom_name(ded_room, buf);
+		
 		// grant them hide-real-name for this ONLY if it's not already renamed
-		if (!ROOM_CUSTOM_NAME(ded_room)) {
+		if (was_custom) {
 			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
 		}
-		set_room_custom_name(ded_room, buf);
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {
