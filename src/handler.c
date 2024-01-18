@@ -11335,9 +11335,9 @@ bool ensure_max_storage_timer(struct storage_timer **list, int max_timer) {
 * @param struct storage_timer **list A pointer to the list to free.
 */
 void free_storage_timers(struct storage_timer **list) {
-	struct storage_timer *st;
+	struct storage_timer *st, *next;
 	if (list) {
-		while ((st = *list)) {
+		DL_FOREACH_SAFE(*list, st, next) {
 			DL_DELETE(*list, st);
 			free(st);
 		}
