@@ -70,6 +70,7 @@ S
 sapling~
 6 a
 0 6025 0 0
+R 6037
 T0
 saplings~
 S
@@ -85,6 +86,7 @@ S
 pole~
 6 a
 0 6035 0 0
+R 6037
 T0
 poles~
 S
@@ -99,8 +101,6 @@ S
 sapling or pole~
 6 a
 0 6035 0 0
-R 6035
-R 6025
 T0
 saplings or poles~
 S
