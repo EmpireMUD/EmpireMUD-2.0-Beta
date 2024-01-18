@@ -3872,6 +3872,47 @@ void b5_170_home_assignments(void) {
 }
 
 
+// b5.171 replaces bathing with a pair of triggers, which must be attached to all live buildings
+void b5_171_bath_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum BATH_BUILDING = 5162;
+	any_vnum BATH_ROOM = 5614;
+	
+	any_vnum BATH_TRIG_1 = 5162;
+	any_vnum BATH_TRIG_2 = 9808;
+	
+	if (!real_trigger(BATH_TRIG_1) || !real_trigger(BATH_TRIG_2)) {
+		log("- bath update skipped because trigs %d and %d don't exist", BATH_TRIG_1, BATH_TRIG_2);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == BATH_BUILDING || GET_BLD_VNUM(GET_BUILDING(room)) == BATH_ROOM) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = BATH_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+		
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = BATH_TRIG_2;
+			LL_APPEND(room->proto_script, tpl);
+		
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d bath%s", count, PLURAL(count));
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -3976,6 +4017,7 @@ const struct {
 	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
 	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
 	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
+	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
