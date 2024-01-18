@@ -4816,8 +4816,8 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
 	bool home_mode = (mode == SCMD_HOME), num_only;
 	char junk[MAX_INPUT_LENGTH], *tmp;
-	obj_data *obj = NULL;
-	int number, amt = 1;
+	obj_data *obj = NULL, *proto;
+	int min, number, amt = 1;
 	bool all = FALSE, any = FALSE, done = FALSE;
 	trig_data *trig;
 	
@@ -4961,6 +4961,14 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				// grab the timer from storage?
 				if (iter->timers) {
 					GET_OBJ_TIMER(obj) = iter->timers->timer;
+					if ((min = config_get_int("min_timer_after_retrieve")) > 0 && min > GET_OBJ_TIMER(obj)) {
+						if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+							// don't raise it past the prototype (if it has one)
+							min = MIN(min, GET_OBJ_TIMER(proto));
+						}
+						// raise it (but don't lower it if it dropped)
+						GET_OBJ_TIMER(obj) = MAX(min, GET_OBJ_TIMER(obj));
+					}
 				}
 				remove_storage_timer_items(&iter->timers, 1, TRUE);
 				
