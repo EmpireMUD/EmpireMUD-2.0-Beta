@@ -58,14 +58,6 @@ Barde requires the Animal Husbandry ability.
 
 See also: ANIMAL HUSBANDRY, RIDE, STABLE
 #
-BATHE 
-
-Usage:  bathe 
-
-Bathe is used to begin cleaning yourself in either a bath house or a river.
-You must bathe regularly to keep clean. If you bathe in a bath house you will
-get cleaner faster than if you were to bathe in a river.
-#
 CAST SPELL SPELLS
 
 Usage:  cast <spell> [target]
