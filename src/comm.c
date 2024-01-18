@@ -45,6 +45,17 @@
 #include "telnet.h"
 #endif
 
+/* Use dual stack IPv6 on Linux */
+#ifdef __linux___
+#define USE_IPV6
+#endif
+
+#ifdef USE_IPV6
+#define SOCKADDR_IN sockaddr_in6
+#else
+#define SOCKADDR_IN sockaddr_in
+#endif
+
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
 #endif
@@ -176,7 +187,7 @@ struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUT
 *
 * @param char *ip The IP to add.
 */
-void add_slow_ip(char *ip) {
+void add_slow_ip(const char *ip) {
 	if (!ip || !*ip) {
 		return;	// no work
 	}
@@ -2232,8 +2243,8 @@ void init_descriptor(descriptor_data *newd, int desc) {
  */
 socket_t init_socket(ush_int port) {
 	socket_t s;
-	struct sockaddr_in sa;
 	int opt;
+	struct SOCKADDR_IN sa;
 
 	/*
 	 * Should the first argument to socket() be AF_INET or PF_INET?  I don't
@@ -2246,7 +2257,13 @@ socket_t init_socket(ush_int port) {
 	 * number anyway, so the point is (hopefully) moot.
 	 */
 
-	if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+#ifdef USE_IPV6
+	int domain = AF_INET6;
+#else
+	int domain = PF_INET;
+#endif
+
+	if ((s = socket(domain, SOCK_STREAM, 0)) < 0) {
 		perror("SYSERR: Error creating socket");
 		exit(1);
 	}
@@ -2280,9 +2297,22 @@ socket_t init_socket(ush_int port) {
 	/* Clear the structure */
 	memset((char *)&sa, 0, sizeof(sa));
 
+
+#ifdef USE_IPV6
+	/* Bind to both IPv6 and IPv4 on any address */
+	sa.sin6_family = AF_INET6;
+	sa.sin6_port = htons(port);
+	sa.sin6_addr = in6addr_any;
+	opt = 0;
+	if (setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (char *) &opt, sizeof(opt)) < 0) {
+		perror("SYSERR: setsockopt IPV6_V6ONLY");
+		exit(1);
+	}
+#else
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);
 	sa.sin_addr = *(get_bind_addr());
+#endif
 
 	if (bind(s, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
 		perror("SYSERR: bind");
@@ -2299,7 +2329,7 @@ socket_t init_socket(ush_int port) {
 * @param char *ip The IP address to check.
 * @return bool TRUE if we should skip nameserver lookup on this IP.
 */
-bool is_slow_ip(char *ip) {
+bool is_slow_ip(const char *ip) {
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
@@ -2393,13 +2423,63 @@ void manipulate_input_queue(descriptor_data *desc, char *input) {
 }
 
 
+bool getipv6inipv4(struct sockaddr_in6 *in, struct sockaddr_in *out) {
+	/* ::ffff:0:0/96 */
+	static const char translate_prefix[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF};
+	if(memcmp(in->sin6_addr.s6_addr, translate_prefix, sizeof(translate_prefix)) != 0) {
+		return false;
+	} else {
+		out->sin_family = AF_INET;
+		out->sin_port = in->sin6_port;
+		memcpy(&out->sin_addr.s_addr, in->sin6_addr.s6_addr + 12, 4);
+		return true;
+	}
+}
+
+const char* getpeerip(struct sockaddr *sock) {
+	struct sockaddr_in *sock4 = (struct sockaddr_in*)sock;
+	struct sockaddr_in6 *sock6 = (struct sockaddr_in6*)sock;
+	struct sockaddr_in unwrapped;
+	static char peer_ip[INET6_ADDRSTRLEN];
+	if(sock->sa_family == AF_INET) {
+		/* ipv4 */
+		if(!inet_ntop(AF_INET, &sock4->sin_addr, peer_ip, INET_ADDRSTRLEN)) {
+			return "ipv4:???";
+		}
+		return peer_ip;
+	} else if(getipv6inipv4(sock6, &unwrapped)) {
+		/* ipv4 in ipv6 */
+		return getpeerip((struct sockaddr*)&unwrapped);
+	} else {
+		/* ipv6 */
+		if(!inet_ntop(AF_INET6, &sock6->sin6_addr, peer_ip, INET6_ADDRSTRLEN)) {
+			return "ipv6:???";
+		}
+		return peer_ip;
+	}
+}
+
+struct hostent *getsitename(struct sockaddr *sock) {
+	struct sockaddr_in *sock4 = (struct sockaddr_in*)sock;
+	struct sockaddr_in6 *sock6 = (struct sockaddr_in6*)sock;
+	struct sockaddr_in unwrapped;
+	if(sock->sa_family == AF_INET) {
+		/* ipv4 */
+		return gethostbyaddr(&sock4->sin_addr, sizeof(sock4->sin_addr), AF_INET);
+	} else if(getipv6inipv4(sock6, &unwrapped)) {
+		/* ipv4 in ipv6 */
+		return getsitename((struct sockaddr*)&unwrapped);
+	} else {
+		return gethostbyaddr(&sock6->sin6_addr, sizeof(sock6->sin6_addr), AF_INET6);
+	}
+}
 
 int new_descriptor(int s) {
 	socket_t desc;
 	int sockets_connected = 0;
 	socklen_t i;
 	descriptor_data *newd;
-	struct sockaddr_in peer;
+	struct SOCKADDR_IN peer;
 	struct hostent *from;
 	bool slow_ip;
 	time_t when;
@@ -2434,24 +2514,25 @@ int new_descriptor(int s) {
 	memset((char *) newd, 0, sizeof(descriptor_data));
 
 	/* find the sitename */
-	slow_ip = config_get_bool("nameserver_is_slow") || is_slow_ip(inet_ntoa(peer.sin_addr));
+	const char *peer_ip = getpeerip((struct sockaddr*)&peer);
+	slow_ip = config_get_bool("nameserver_is_slow") || is_slow_ip(peer_ip);
 	when = time(0);
-	if (slow_ip || !(from = gethostbyaddr((char *) &peer.sin_addr, sizeof(peer.sin_addr), AF_INET))) {
+	if (slow_ip || !(from = getsitename((struct sockaddr*)&peer))) {
 		/* resolution failed */
 		if (!slow_ip) {
 			char buf[MAX_STRING_LENGTH];
-			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", peer_ip);
 			perror(buf);
 			
 			// did it take longer than 3 seconds to look up?
 			if (when + 3 < time(0)) {
-				log("- added %s to slow IP list", inet_ntoa(peer.sin_addr));
-				add_slow_ip(inet_ntoa(peer.sin_addr));
+				log("- added %s to slow IP list", peer_ip);
+				add_slow_ip(peer_ip);
 			}
 		}
 
 		/* find the numeric site address */
-		newd->host = str_dup((char *)inet_ntoa(peer.sin_addr));
+		newd->host = str_dup(peer_ip);
 	}
 	else {
 		newd->host = str_dup(from->h_name);
