@@ -1496,7 +1496,6 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_BUILDING);
 	stop_room_action(loc, ACT_MINING);
 	stop_room_action(loc, ACT_MINTING);
-	stop_room_action(loc, ACT_BATHING);
 	stop_room_action(loc, ACT_SAWING);
 	stop_room_action(loc, ACT_QUARRYING);
 	stop_room_action(loc, ACT_MAINTENANCE);

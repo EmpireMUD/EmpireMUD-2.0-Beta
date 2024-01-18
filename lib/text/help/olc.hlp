@@ -3660,7 +3660,6 @@ Available functions:
  UPGRADED - building/vehicle is an upgraded version (modifies other functions)
  ALCHEMIST - can brew and mix here
  APIARY - no current use
- BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships

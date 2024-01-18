@@ -59,9 +59,13 @@ BATH BATHS
 
 [&b~~&0]  Baths  (Architect ability)
 
+Command:  bathe
+
 The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
 inction throughout the empire, and are a good way to entertain guests.
+
+Bathing in the baths gives a buff to Charisma and Dexterity.
 
 You can only have this building in a city.
 
