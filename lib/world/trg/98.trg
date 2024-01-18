@@ -124,6 +124,56 @@ else
   return 0
 end
 ~
+#9808
+Detect stop command (room)~
+2 c 0
+stop~
+* Detects that a player has typed 'stop' for the purpose of a script.
+* You must intialize the player's 'stop_command' variable to 0 (use set and remote)
+* If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
+* You can also set 'stop_message_char' for what to show the player.
+* You can also set 'stop_message_room' for what to show the player.
+* 1. CHECK IF WE ARE JUST CLEARING DATA
+if %arg% == cleardata
+  set stop_command 0
+  set needs_stop_command 0
+  remote stop_command %actor.id%
+  remote needs_stop_command %actor.id%
+  rdelete stop_message_char %actor.id%
+  rdelete stop_message_room %actor.id%
+  return 1
+  halt
+end
+* 2. NORMAL USE OF 'stop'
+if %actor.varexists(needs_stop_command)%
+  set needs_stop %actor.needs_stop_command%
+else
+  set needs_stop 0
+end
+* re-set needs_stop_command on the actor (prevents it from silencing repeatedly)
+set needs_stop_command 0
+remote needs_stop_command %actor.id%
+* mark player as stopped
+set stop_command 1
+remote stop_command %actor.id%
+* message if necessary
+if %actor.varexists(stop_message_char)%
+  %send% %actor% %actor.stop_message_char%
+  rdelete stop_message_char %actor.id%
+end
+if %actor.varexists(stop_message_room)%
+  %echoaround% %actor% %actor.stop_message_room%
+  rdelete stop_message_room %actor.id%
+end
+* prevent basic stop if needed
+if %needs_stop% && !%actor.action%
+  * prevents basic 'stop' output
+  return 1
+else
+  * will show normal 'stop' output
+  return 0
+end
+~
 #9850
 Equip imm-only~
 1 j 0
