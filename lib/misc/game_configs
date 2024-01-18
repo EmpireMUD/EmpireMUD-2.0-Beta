@@ -100,6 +100,7 @@ players_per_city_point 2
 *
 * Empire configs
 building_population_timer 48
+decay_in_storage 1
 empire_log_ttl 30
 frontier_timeout 30
 homeless_citizen_speed 10

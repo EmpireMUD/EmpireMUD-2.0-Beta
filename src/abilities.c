@@ -3562,6 +3562,17 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			}
 			case ABIL_LIMIT_DISARMABLE_TARGET: {
 				if (vict) {
+					if (AFF_FLAGGED(vict, AFF_NO_DISARM)) {
+						if (send_msgs) {
+							if (ch == vict) {
+								msg_to_char(ch, "You cannot be disarmed!\r\n");
+							}
+							else {
+								act("$E cannot be disarmed!", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							}
+						}
+						return FALSE;
+					}
 					if (!GET_EQ(vict, WEAR_WIELD) && (!IS_NPC(vict) || !is_attack_flagged_by_vnum(MOB_ATTACK_TYPE(vict), AMDF_DISARMABLE))) {
 						if (send_msgs) {
 							if (ch == vict) {

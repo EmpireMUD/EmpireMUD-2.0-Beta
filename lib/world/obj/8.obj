@@ -4,7 +4,7 @@ a glass flask~
 A flask has been left here.~
 This glass flask can be used to hold water, or to make potions.
 ~
-5 l a 0 7
+5 l a 0 0 7
 10 0 0
 8 0
 C
@@ -21,7 +21,7 @@ A jar has been left here.~
    It's a simple glass jar. You can keep water in the jar. It can also be used
 to make some foods.
 ~
-5 l a 0 8
+5 l a 0 0 9
 10 0 0
 8 0
 C
@@ -30,6 +30,10 @@ R
 4 5135 0
 R
 4 5606 0
+R
+4 5114 0
+R
+4 5130 0
 S
 #802
 glass small pane~
@@ -37,7 +41,7 @@ a small pane of glass~
 A small pane of glass has been left here.~
 Glass panes can be used to make various items.
 ~
-3 l a 0 4
+3 l a 0 0 4
 0 0 0
 8 0
 C
@@ -50,7 +54,7 @@ mirror tarnished small~
 a tarnished mirror~
 A small mirror has fallen here.~
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 C
@@ -69,7 +73,7 @@ A lantern has been set here.~
 'douse lantern' to save wax. You can refill the lantern with 'put candle
 lantern'.
 ~
-29 0 a 0 7
+29 0 a 0 0 7
 48 0 2
 8 0
 C
@@ -88,7 +92,7 @@ A lantern has been set here.~
 'douse lantern' to save wax. You can refill the lantern with 'put candle
 lantern'.
 ~
-29 0 ao 0 4
+29 0 ao 0 0 4
 48 1 2
 8 0
 T 804
@@ -98,7 +102,7 @@ mirror looking glass silver~
 a silver looking glass~
 A silver looking glass has been left here.~
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 3 0
 C
@@ -112,7 +116,7 @@ mirror looking glass gold~
 a gold looking glass~
 A gold looking glass has been left here.~
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 4 0
 C
@@ -127,7 +131,7 @@ a glass vial~
 A vial is lying on the ground.~
 This little glass vial is empty.
 ~
-3 l a 0 9
+3 l a 0 0 9
 0 0 0
 8 0
 C
@@ -143,9 +147,9 @@ some beeswax~
 A pile of beeswax has been left here.~
 Wax can be crafted into a candle.
 ~
-3 0 a 0 6
+3 0 a 0 0 7
 0 0 0
-9 100
+9 0
 C
 1 1
 O+ 1 6891
@@ -161,7 +165,7 @@ A candle is sitting on the ground.~
    Candles have long been a simple way to see at night. Use 'light candle' and
 'douse candle' to use it.
 ~
-29 l ao 0 10
+29 l ao 0 0 10
 8 0 7
 9 0
 C
@@ -178,7 +182,7 @@ a candle~
 A candle is sitting on the ground.~
 A candle lights the way. Use 'light candle' and 'douse candle' to use it.
 ~
-29 0 ao 0 7
+29 0 ao 0 0 7
 8 1 7
 9 0
 O+ 1 851

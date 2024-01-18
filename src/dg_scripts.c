@@ -1317,7 +1317,7 @@ void do_sstat_room(char_data *ch) {
 void do_sstat_object(char_data *ch, obj_data *j) {
 	int id;
 	
-	if (IN_ROOM(j) || j->in_obj || j->in_vehicle || j->carried_by || j->worn_by) {
+	if (OBJ_IS_IN_WORLD(j)) {
 		id = SCRIPT(j) ? obj_script_id(j) : j->script_id;
 	}
 	else {

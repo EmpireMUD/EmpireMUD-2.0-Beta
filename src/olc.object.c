@@ -109,7 +109,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		while (*temp && ispunct(temp[strlen(temp)-1])) {
 			temp[strlen(temp)-1] = '\0';
 		}
-		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj)) && search_block(temp, ignore_missing_keywords, TRUE) == NOTHING) {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}
@@ -125,6 +125,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	}
 	if (OBJ_FLAGGED(obj, OBJ_CREATABLE)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_LONG_TIMER_IN_STORAGE) && GET_OBJ_TIMER(obj) <= 0) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "LONG-TIMER-IN-STORAGE set with no timer");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
@@ -147,6 +151,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && GET_OBJ_STORAGE(obj)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "BoP item has storage locations");
+		problem = TRUE;
+	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;
@@ -155,7 +163,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)) {
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP) && GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
 		problem = TRUE;
 	}
@@ -1707,12 +1715,12 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (SCRIPT(to_update)) {
 		remove_all_triggers(to_update, OBJ_TRIGGER);
 	}
-	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
-		free_proto_scripts(&to_update->proto_script);
+	if (GET_OBJ_SCRIPTS(to_update) && GET_OBJ_SCRIPTS(to_update) != GET_OBJ_SCRIPTS(old_proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(to_update));
 	}
 	
 	// re-attach scripts
-	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
+	GET_OBJ_SCRIPTS(to_update) = copy_trig_protos(GET_OBJ_SCRIPTS(new_proto));
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -1729,12 +1737,16 @@ void save_olc_object(descriptor_data *desc) {
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	char_data *chiter;
+	int old_timer;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
 	if (!(proto = obj_proto(vnum))) {
 		proto = create_obj_table_entry(vnum);
 	}
+	
+	// for updating storage timers later
+	old_timer = GET_OBJ_TIMER(proto);
 	
 	// update the strings, pointers, and stats on live items
 	DL_FOREACH(object_list, obj_iter) {
@@ -1797,8 +1809,8 @@ void save_olc_object(descriptor_data *desc) {
 	GET_OBJ_APPLIES(proto) = NULL;
 	
 	// free old script?
-	if (proto->proto_script) {
-		free_proto_scripts(&proto->proto_script);
+	if (GET_OBJ_SCRIPTS(proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(proto));
 	}
 	
 	// timer must be converted
@@ -1820,6 +1832,16 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_OBJ, vnum);
+	
+	// lastly, if timers changed:
+	if (GET_OBJ_TIMER(proto) != old_timer) {
+		ensure_storage_timers(vnum);
+		
+		// update objs in home storage
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			ensure_home_storage_timers(chiter, vnum);
+		}
+	}
 }
 
 
@@ -1920,7 +1942,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = copy_trig_protos(input->proto_script);
+		GET_OBJ_SCRIPTS(new) = copy_trig_protos(GET_OBJ_SCRIPTS(input));
 		
 		// update version number
 		OBJ_VERSION(new) += 1;
@@ -1936,7 +1958,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		OBJ_VERSION(new) = 1;
 
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
+		GET_OBJ_SCRIPTS(new) = NULL;
 	}
 	
 	// done
@@ -2417,9 +2439,9 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(obj->proto_script));
-	if (obj->proto_script) {
-		get_script_display(obj->proto_script, buf1);
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
+	if (GET_OBJ_SCRIPTS(obj)) {
+		get_script_display(GET_OBJ_SCRIPTS(obj), buf1);
 		strcat(buf, buf1);
 	}
 	
@@ -3308,7 +3330,7 @@ OLC_MODULE(oedit_roomvnum) {
 
 OLC_MODULE(oedit_script) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_script(ch, argument, &(obj->proto_script), OBJ_TRIGGER);
+	olc_process_script(ch, argument, &GET_OBJ_SCRIPTS(obj), OBJ_TRIGGER);
 }
 
 
@@ -3409,6 +3431,15 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
 		}
 		else {
+			// ensure we don't already have it?
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (store->type == mode && store->vnum == num) {
+					msg_to_char(ch, "It already stores there.\r\n");
+					return;
+				}
+			}
+			
+			// ok:
 			CREATE(store, struct obj_storage_type, 1);
 			store->type = mode;
 			store->vnum = num;
@@ -3482,7 +3513,14 @@ OLC_MODULE(oedit_storage) {
 
 OLC_MODULE(oedit_timer) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	
+	if (!str_cmp(argument, "none") || !str_cmp(argument, "unlimited") || !str_cmp(argument, "infinite")) {
+		GET_OBJ_TIMER(obj) = UNLIMITED;
+		msg_to_char(ch, "It now has no decay timer.\r\n");
+	}
+	else {
+		GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	}
 }
 
 

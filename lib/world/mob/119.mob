@@ -188,9 +188,9 @@ I 12 11904 5.00 1 p  # PICKPOCKET: mutton pasty
 I 12 11905 5.00 1 p  # PICKPOCKET: exotic turquoise cheese
 I 12 11869 3.00 1 p  # PICKPOCKET: self-writing pen
 I 12 11867 3.00 1 p  # PICKPOCKET: dynamic reconfabulator
-I 12 11865 4.00 1 p  # PICKPOCKET: ether condenser
-I 12 11864 4.00 1 p  # PICKPOCKET: mana deconfabulator
-I 12 11894 5.00 1 p  # PICKPOCKET: wooden Venus figurine
+I 12 11865 3.00 1 p  # PICKPOCKET: ether condenser
+I 12 11864 3.00 1 p  # PICKPOCKET: mana deconfabulator
+I 12 11894 4.00 1 p  # PICKPOCKET: wooden Venus figurine
 I 12 11868 1.00 1 p  # PICKPOCKET: miniature wellstone prototype
 I 12 11917 1.00 1 p  # PICKPOCKET: page 2413 of the time-traveler's diary
 I 12 11918 2.00 1 p  # PICKPOCKET: page 91 of the time-traveler's diary
@@ -199,16 +199,17 @@ I 12 11920 2.00 1 p  # PICKPOCKET: page 86 of the time-traveler's diary
 I 12 11893 1.00 1 p  # PICKPOCKET: fine leather fox leash
 I 12 11896 2.00 1 p  # PICKPOCKET: leather bladder
 I 12 11877 3.00 1 p  # PICKPOCKET: little gemstone flute
-I 12 11878 4.00 1 p  # PICKPOCKET: gemstone knife
-I 12 11977 5.00 1 p  # PICKPOCKET: steamed mussels
-I 12 1206 5.00 1 p  # PICKPOCKET: iridescent blue iris
-I 12 11879 4.00 1 p  # PICKPOCKET: glowing emerald bud
-I 12 11880 4.00 1 p  # PICKPOCKET: ruby rock candy
+I 12 11878 3.00 1 p  # PICKPOCKET: gemstone knife
+I 12 11977 4.00 1 p  # PICKPOCKET: steamed mussels
+I 12 1206 4.00 1 p  # PICKPOCKET: iridescent blue iris
+I 12 11879 3.00 1 p  # PICKPOCKET: glowing emerald bud
+I 12 11880 3.00 1 p  # PICKPOCKET: ruby rock candy
 I 12 11895 4.00 1 p  # PICKPOCKET: iridescent pearl
 I 12 11897 4.00 1 p  # PICKPOCKET: good rock
 I 12 11866 3.00 1 p  # PICKPOCKET: carved wooden man
 I 12 11872 1.00 1 p  # PICKPOCKET: hand-written note
 I 12 11883 8.00 1 p  # PICKPOCKET: gnarled old wand
+I 12 11974 8.00 1 p  # PICKPOCKET: smudged note
 M
 0
 $n points her gnarled old wand at a mug and heats it with a wild, cackling flame!~
@@ -4266,7 +4267,7 @@ A repairman is working on the damage.
 150 250 bdJL n 3
 1 0 0 15 -1
 D
-   Orlan's jade skin glistens in the sun as he works, shirtless, on repairing
+   Orlin's jade skin glistens in the sun as he works, shirtless, on repairing
 the damaged rooftop walkway. He's wearing only his deep purple pants; his gray
 shirt is draped over a damaged roof beam. He has a set of tools laid out next
 to him including a stone hammer, a bone hammer, a wooden mallet, several stone

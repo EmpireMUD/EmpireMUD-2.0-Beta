@@ -156,7 +156,8 @@ Room types:
  hall - A connecting room
  kitchen - Allows cooking, baking, and other fire-dependent tasks
  laboratory - Identical to the free-standing Alchemist
- larder - A place to store food
+ larder - A place to store many foods
+ root cellar - A place to store vegetables
  sitting room - No special features
  skybridge - Above-ground hallways used in some tree buildings
  store room - Holds certain items
@@ -339,7 +340,7 @@ MILL MILLING
 Mill (Basic Crafts ability)
 
 Building:  (MM)  Mill  (must be by a river; Build ability)
-Stored at the mill:  cornmeal, flour
+Stored at the mill:  cornmeal, flour, salt
 Command:  mill [number] <item>
           mill info <item>
 Tool:  grinding  stone
@@ -348,6 +349,7 @@ You can mill:
   wheat into flour
   corn into cornmeal
   oats into oatmeal
+  rock salt or sea salt
 
 You must do this at a Mill building or have a grinding stone equipped.
 However, it will take longer to do it without the building.

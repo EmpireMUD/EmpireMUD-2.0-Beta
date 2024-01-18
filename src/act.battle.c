@@ -20,11 +20,7 @@
 #include "comm.h"
 #include "interpreter.h"
 #include "handler.h"
-#include "db.h"
 #include "skills.h"
-#include "dg_scripts.h"
-#include "vnums.h"
-#include "constants.h"
 
 /**
 * Contents:

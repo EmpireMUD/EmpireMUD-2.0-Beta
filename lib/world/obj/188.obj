@@ -667,12 +667,12 @@ A tray of candy apples is sitting on the ground.~
 irresistible. Through some strange magic, the apples actually grow this way on
 the tree. Perhaps some clever mage has cross-bred them with caramels.
 ~
-6 bg a 0 0 7
+6 bgC a 0 0 9
 36 18842 0
-7 168
+7 672
 O+ 1 6131
 R
-4 5114 0
+4 5215 0
 S
 #18843
 caramel piece~
@@ -681,10 +681,12 @@ A piece of caramel is stuck to the ground.~
    This little piece of fresh caramel has a stem stuck in it. Perhaps it grew
 on a tree.
 ~
-6 0 a 0 0 6
+6 C a 0 0 8
 2 0 0
-7 48
+7 4320
 O+ 1 6340
+R
+4 5619 0
 S
 #18844
 cornerstone stone mausoleum~
@@ -1319,19 +1321,15 @@ the garden. At the top, the long vertical ridges on the pumpkin converge at a
 short green stem. You can craft a jack-o-lantern or bake a roast pumpkin from
 this.
 ~
-6 bg a 0 0 13
+6 bgC a 0 0 16
 12 18890 0
-7 168
+7 1440
 C
 1 1
 I 25 18891 100.00 2  # SEED: bunch of pumpkin seeds
 O+ 1 6152
 R
-4 5606 0
-R
-4 5610 0
-R
-4 5132 0
+4 5215 0
 S
 #18891
 seeds pumpkin bunch~
@@ -1339,9 +1337,9 @@ a bunch of pumpkin seeds~
 Some pumpkin seeds are scattered here.~
 The oval seeds are pale and tough. Try baking roast pumpkin seeds.
 ~
-3 b a 0 0 10
+3 bC a 0 0 11
 0 18890 0
-7 1152
+7 8760
 C
 1 1
 R
@@ -1355,12 +1353,14 @@ A pumpkin blossom has fallen here.~
 achieve, like a little blossom wearing a flowing dress. You've heard that some
 people eat these flowers.
 ~
-6 g a 0 0 1
+6 gC a 0 0 3
 1 0 0
-0 48
+0 72
 C
 1 1
 O+ 1 6142
+R
+4 5619 0
 S
 #18893
 pumpkin roast~
@@ -1369,9 +1369,9 @@ A roast pumpkin is lying here.~
    The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
 but tastes a lot better than it did fresh.
 ~
-6 gm a 0 0 14
+6 gm a 0 0 15
 24 18890 0
-7 1680
+7 336
 A
 19 1 0
 C
@@ -1388,9 +1388,9 @@ some roasted pumpkin seeds~
 Some roast pumpkin seeds have been dropped here.~
 These seeds have been roasted and they taste great.
 ~
-6 m a 0 0 14
+6 m a 0 0 15
 6 0 0
-0 1680
+0 336
 A
 11 1 0
 C
@@ -1405,9 +1405,9 @@ A jack-o-lantern is sitting here.~
    This big orange pumpkin has been cut to look like a face. Use 'light
 jack-o-lantern' and 'douse jack-o-lantern' to control the light.
 ~
-29 0 ao 0 0 7
+29 C ao 0 0 9
 36 0 6
-7 168
+7 1440
 C
 1 1
 R
@@ -1415,7 +1415,7 @@ R
 R
 4 5610 0
 R
-4 5606 0
+4 5619 0
 S
 #18896
 jack-o-lantern lantern jackolantern~

@@ -1193,7 +1193,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// ensure storable
-			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_STORE) || !GET_OBJ_STORAGE(proto)) {
+			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE) || !GET_OBJ_STORAGE(proto)) {
 				continue;
 			}
 			
@@ -2273,8 +2273,8 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	// customize name
 	snprintf(buf, sizeof(buf), "The Center of %s", city->name);
-	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	set_room_custom_name(city->location, buf);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(city->location);
 	
 	// move einv here if any is lost
@@ -2557,9 +2557,9 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	write_city_data_file();
 	
 	// and rename the center
-	snprintf(buf, sizeof(buf), "The Center of %s", newname);	
-	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	snprintf(buf, sizeof(buf), "The Center of %s", newname);
 	set_room_custom_name(city->location, buf);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(city->location);
 }
 
@@ -3245,7 +3245,7 @@ bool extract_tavern_resources(room_data *room) {
 	// extract resources
 	if (ok) {
 		for (iter = 0; tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost);
+			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost, TRUE);
 		}
 	}
 	
@@ -5251,8 +5251,8 @@ ACMD(do_empire_inventory) {
 	}
 	if (emp) {
 		// sort to get predictable order
-		sort_einv_for_empire(emp);
-		
+		sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
+
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
 		} else {
@@ -5269,7 +5269,7 @@ ACMD(do_enroll) {
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *merged;
 	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
@@ -5419,8 +5419,11 @@ ACMD(do_enroll) {
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
 					if (store->amount > 0) {
-						add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
-					
+						merged = add_to_empire_storage(e, from_isle->island, store->vnum, store->amount, 0);
+						if (merged) {
+							merge_storage_timers(&merged->timers, store->timers, merged->amount);
+						}
+						
 						// counts as imported items
 						add_production_total(e, store->vnum, store->amount);
 						mark_production_trade(e, store->vnum, store->amount, 0);
@@ -5990,31 +5993,33 @@ ACMD(do_findmaintenance) {
 
 
 /**
-* Searches the world for the player's private home.
+* Gets the player's private home, if it's still valid.
+*
+* This function formerly searched the world for the player's private home; this
+* data is on the player as of b5.170.
 *
 * @param char_data *ch The player.
 * @return room_data* The home location, or NULL if none found.
 */
 room_data *find_home(char_data *ch) {
-	room_data *iter, *next_iter;
+	room_data *home;
 	
-	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
-		return NULL;
+	home = (!IS_NPC(ch) && GET_HOME_LOCATION(ch) != NOWHERE) ? real_room(GET_HOME_LOCATION(ch)) : NULL;
+	
+	// audit now for lost home:
+	if (home && ROOM_PRIVATE_OWNER(home) != GET_IDNUM(ch)) {
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		home = NULL;
 	}
 	
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
-			return iter;
-		}
-	}
-	
-	return NULL;
+	return home;
 }
 
 
 ACMD(do_home) {
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
+	char_data *targ;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	
@@ -6088,6 +6093,7 @@ ACMD(do_home) {
 			}
 			
 			set_private_owner(real, GET_IDNUM(ch));
+			GET_HOME_LOCATION(ch) = GET_ROOM_VNUM(real);
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
@@ -6124,12 +6130,18 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
 		}
 		else {
+			if ((targ = is_playing(ROOM_PRIVATE_OWNER(real)))) {
+				GET_HOME_LOCATION(targ) = NOWHERE;
+				queue_delayed_update(targ, CDU_SAVE);
+			}
 			clear_private_owner(ROOM_PRIVATE_OWNER(real));
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
 	else if (!str_cmp(command, "unset")) {
 		clear_private_owner(GET_IDNUM(ch));
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		queue_delayed_update(ch, CDU_SAVE);
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
 	else if (is_abbrev(command, "inventory")) {
@@ -8476,7 +8488,7 @@ ACMD(do_workforce) {
 		}
 		
 		// sort to ensure predictable order
-		sort_einv_for_empire(emp);
+		sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {

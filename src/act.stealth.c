@@ -409,7 +409,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	
 	// applied -- charge a charge (can no longer be stored)
 	set_obj_val(obj, VAL_POISON_CHARGES, GET_POISON_CHARGES(obj) - 1);
-	SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_STORE);
+	SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);
 	request_obj_save_in_world(obj);
 	
 	// attempt immunity/resist

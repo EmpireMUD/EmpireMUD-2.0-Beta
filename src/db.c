@@ -477,7 +477,7 @@ void boot_db(void) {
 	check_progress_refresh();
 	
 	log("Checking for ruined cities...");
-	check_ruined_cities();
+	check_ruined_cities(NULL);
 	
 	log("Abandoning lost vehicles...");
 	abandon_lost_vehicles();
@@ -635,6 +635,7 @@ void boot_world(void) {
 	
 	log("Loading empire storage and logs.");
 	load_empire_storage();
+	ensure_storage_timers(NOTHING);
 	clean_empire_logs();
 	
 	log("Loading daily quest cycles.");
@@ -1219,9 +1220,9 @@ char *fread_string(FILE * fl, char *error) {
 		point = strchr(tmp, '\0');
 		templength = point - tmp;
 		
-		for (point-- ; (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
+		for (point-- ; point >= tmp && (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
 		
-		if (*point == '~') {
+		if (point >= tmp && *point == '~') {
 			*point = '\0';
 			done = 1;
 		}
@@ -1853,6 +1854,7 @@ void init_player_specials(char_data *ch) {
 	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
+	GET_HOME_LOCATION(ch) = NOWHERE;
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;

@@ -235,9 +235,11 @@ a hunk of rat meat~
 There is some spoiled meat on the ground.~
 This meat doesn't look very good, but it's better than starving.
 ~
-6 0 a 0 0 1
+6 C a 0 0 3
 2 0 0
 7 24
+R
+4 5619 0
 S
 #10017
 jerky rat~
@@ -245,9 +247,11 @@ some rat jerky~
 Some jerky is lying on the ground.~
 Rat jerky wouldn't be your first choice for food. Maybe not even top 10.
 ~
-6 0 a 0 0 1
+6 C a 0 0 3
 6 0 0
-7 144
+7 8760
+R
+4 5619 0
 S
 #10018
 wristblade blade wrist-mounted~
@@ -281,9 +285,11 @@ bits of cheese~
 Bits of cheese are scattered on the ground.~
 Somebody has cut up some perfectly good cheese.
 ~
-6 0 a 0 0 1
+6 C a 0 0 3
 3 0 0
-7 48
+7 8760
+R
+4 5619 0
 T 10026
 S
 #10021
@@ -334,9 +340,9 @@ a vial of sewage~
 A grimy vial is lying here.~
 You wouldn't quaff this vial on purpose, if you knew where it came from.
 ~
-25 m a 0 0 5
+25 m a 0 0 6
 -1 0 3030
-8 8064
+8 0
 A
 2 1 0
 C

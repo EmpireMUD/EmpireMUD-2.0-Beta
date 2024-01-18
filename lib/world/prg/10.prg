@@ -5,7 +5,7 @@ A Home To Call My Own~
 ~
 1 1 0 5 0
 W
-24 0 0 1
+24 0 0 1 -
 S
 #1001
 Homestead~
@@ -22,7 +22,7 @@ K 2 5129
 K 7 5
 P 1000
 W
-24 0 0 5
+24 0 0 5 -
 S
 #1002
 Thriving Community~
@@ -34,7 +34,7 @@ homes in order to complete this goal.
 K 0 7
 P 1001
 W
-24 0 0 10
+24 0 0 10 -
 S
 #1003
 Booming Metropolis~
@@ -46,7 +46,7 @@ upgrade its cities to a larger size.
 K 3 1
 P 1002
 W
-24 0 0 50
+24 0 0 50 -
 S
 #1004
 Expanding the Empire~
@@ -58,7 +58,7 @@ sure to claim them all) to complete this goal.
 K 7 5
 P 1003
 W
-24 0 0 100
+24 0 0 100 -
 S
 #1005
 Masonry~
@@ -82,7 +82,7 @@ within 30 map tiles. Then use 'city found <name>' to create your first city.
 ~
 1 1 0 5 0
 W
-32 0 0 1
+32 0 0 1 -
 S
 #1010
 Abundant Water~
@@ -95,7 +95,7 @@ complete this goal.
 ~
 3 1 0 5 0
 W
-7 5106 0 1
+7 5106 0 1 -
 S
 #1011
 Paving the Future~
@@ -107,7 +107,7 @@ goal.
 2 1 0 5 0
 P 1009
 W
-25 9 0 5
+25 9 0 5 -
 S
 #1012
 Road to Prosperity~
@@ -117,7 +117,7 @@ roads to complete this goal. Don't forget to claim them.
 3 1 0 15 0
 P 1011
 W
-25 9 0 50
+25 9 0 50 -
 S
 #1013
 All Roads Lead to Home~
@@ -128,7 +128,7 @@ allies. Lay (and claim) at least 250 roads to complete this goal.
 4 1 0 25 0
 P 1012
 W
-25 9 0 250
+25 9 0 250 -
 S
 #1020
 Making a Friend~
@@ -138,7 +138,7 @@ longer attack each other.
 ~
 5 1 0 15 0
 W
-31 0 16 1
+31 0 16 1 -
 S
 #1021
 Leader of the Community~
@@ -148,7 +148,7 @@ in the region. Better diplomatic relations also lead to a better exchange rate.
 4 1 0 25 0
 P 1020
 W
-31 0 16 10
+31 0 16 10 -
 S
 #1030
 Search For Ore~
@@ -174,6 +174,33 @@ W
 26 0 128 1 a
 W
 35 6790 0 50 a
+S
+#1032
+Great Eggs and Ham~
+   Feeding an empire this size takes a lot of work and as society develops, it
+craves more and more variety in its diet. Build pastures, pigsties, chicken
+coops, and stables, attract citizens to work them, and produce enough mutton,
+pork, poultry, and eggs to feed a growing nation!
+~
+3 1 0 25 0
+K 7 5
+P 1908
+W
+7 5218 0 1 a
+W
+7 5217 0 1 a
+W
+7 5216 0 1 a
+W
+7 5111 0 1 a
+W
+34 3203 0 250 a
+W
+34 3201 0 250 a
+W
+34 3200 0 250 a
+W
+34 3202 0 250 a
 S
 #1040
 Luxuries~
@@ -207,10 +234,10 @@ finishing the first building will complete this goal.
 2 1 0 25 0
 P 1040
 W
-7 5166 0 1
+7 5166 0 1 -
 W
-7 5165 0 1
+7 5165 0 1 -
 W
-7 5203 0 1
+7 5203 0 1 -
 S
 $

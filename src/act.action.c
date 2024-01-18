@@ -1194,8 +1194,10 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
-	char buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
+	char *str, *ptr;
 	craft_data *type = NULL;
+	obj_data *tool = NULL;
 	
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
@@ -1206,19 +1208,32 @@ void process_build_action(char_data *ch) {
 	// check for build recipe
 	type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL);
 	
-	// ensure tools are still present
-	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+	// ensure tools and functions are still present
+	if (type && GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf);
 		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf1);
+			msg_to_char(ch, "You need the following tools to work on this building: %s\r\n", buf);
 		}
 		else {
-			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
+			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf), buf);
 		}
 		cancel_action(ch);
 		return;
 	}
-
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
+		str = buf;
+		if ((ptr = strrchr(str, ','))) {
+			msg_to_char(ch, "You must be %-*.*s or%s to keep %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		else {	// no comma
+			msg_to_char(ch, "You must be %s to keep %s that.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		cancel_gen_craft(ch);
+		return;
+	}
+	
+	// ok:
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 
@@ -1572,6 +1587,9 @@ void process_fillin(char_data *ch) {
 * @param char_data *ch The harvester.
 */
 void process_harvesting(char_data *ch) {
+	bitvector_t missing_tools;
+	char buf[256];
+	
 	if (!ROOM_CROP(IN_ROOM(ch)) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
 		msg_to_char(ch, "There's nothing left to harvest here.\r\n");
 		cancel_action(ch);
@@ -1584,6 +1602,18 @@ void process_harvesting(char_data *ch) {
 	}
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish harvesting.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if ((missing_tools = interaction_list_missing_tools_room(ch, IN_ROOM(ch), INTERACT_HARVEST))) {
+		// custom tools on interactions
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to harvest here: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to harvest here.\r\n", AN(buf), buf);
+		}
 		cancel_action(ch);
 		return;
 	}
@@ -2695,6 +2725,7 @@ ACMD(do_fillin) {
 
 
 ACMD(do_harvest) {
+	bitvector_t missing_tools;
 	int harvest_timer = config_get_int("harvest_timer");
 	
 	if (IS_NPC(ch)) {
@@ -2733,6 +2764,16 @@ ACMD(do_harvest) {
 	}
 	else if (!has_tool(ch, TOOL_HARVESTING)) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
+	}
+	else if ((missing_tools = interaction_list_missing_tools_room(ch, IN_ROOM(ch), INTERACT_HARVEST))) {
+		// custom tools on interactions
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to harvest here: %s\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to harvest here.\r\n", AN(buf), buf);
+		}
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
@@ -3408,6 +3449,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 * @return bool TRUE if it's ok to proceed, FALSE if it sent an error message.
 */
 bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen_interact_data_t *data) {
+	bitvector_t missing_tools;
 	char buf[1024];
 	
 	if (!room) {
@@ -3431,12 +3473,23 @@ bool validate_gen_interact_room(char_data *ch, room_data *room, const struct gen
 		msg_to_char(ch, "You can't %s anything at an incomplete building.\r\n", data->command);
 	}
 	else if (data->tool && !has_all_tools(ch, data->tool)) {
+		// checking data for the interact itself
 		prettier_sprintbit(data->tool, tool_flags, buf);
 		if (count_bits(data->tool) > 1) {
-			msg_to_char(ch, "You need tools to %s: %s\r\n", buf, data->command);
+			msg_to_char(ch, "You need tools to %s: %s\r\n", data->command, buf);
 		}
 		else {
 			msg_to_char(ch, "You need %s %s to %s.\r\n", AN(buf), buf, data->command);
+		}
+	}
+	else if ((missing_tools = interaction_list_missing_tools_room(ch, room, data->interact))) {
+		// similar to previous tool check
+		prettier_sprintbit(missing_tools, tool_flags, buf);
+		if (count_bits(missing_tools) > 1) {
+			msg_to_char(ch, "You need tools to %s %s: %s\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"), buf);
+		}
+		else {
+			msg_to_char(ch, "You need %s %s to %s %s.\r\n", AN(buf), buf, data->command, (room == IN_ROOM(ch) ? "here" : "there"));
 		}
 	}
 	else if (!can_gen_interact_room(ch, room, data)) {
@@ -3647,6 +3700,7 @@ void process_gen_interact_room(char_data *ch) {
 		}
 		
 		if (run_room_interactions(ch, to_room, data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room) || (IS_SET(data->flags, GI_LOCAL_CROPS) && try_gen_interact_local_crops(ch, to_room, data))) {
+			// interactions succeeded
 			end_action(ch);
 			
 			if (data->ptech != NO_TECH) {
@@ -3659,18 +3713,30 @@ void process_gen_interact_room(char_data *ch) {
 				start_gen_interact_room(ch, dir, to_room, data);
 			}
 		}
-		else if (data->msg.empty && *(data->msg.empty)) {
-			end_action(ch);
-			msg_to_char(ch, "%s\r\n", data->msg.empty);
-		}
 		else {
+			// interactions failed... determine if we are empty yet
 			end_action(ch);
-			msg_to_char(ch, "You find nothing.\r\n");
-		}
+			
+			if (interact_data[data->interact].depletion == NOTHING || get_depletion(to_room, interact_data[data->interact].depletion) >= get_depletion_max(to_room, interact_data[data->interact].depletion)) {
+				// depleted for sure
+				if (data->msg.empty && *(data->msg.empty)) {
+					msg_to_char(ch, "%s\r\n", data->msg.empty);
+				}
+				else {
+					msg_to_char(ch, "You find nothing.\r\n");
+				}
 		
-		// check if we failed to repeat but should repeat anyway:
-		if (IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED) && IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
-			start_gen_interact_room(ch, dir, to_room, data);
+				// check if we failed to repeat but should repeat anyway:
+				if (IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED) && IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
+					start_gen_interact_room(ch, dir, to_room, data);
+				}
+			}
+			else {
+				// TODO should this have a message like "You find nothing" ? Player currently just sees the start message again.
+				
+				// not depleted, just came up empty: auto-repeat
+				start_gen_interact_room(ch, dir, to_room, data);
+			}
 		}
 	}
 	

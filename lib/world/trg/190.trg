@@ -613,6 +613,7 @@ nop %instance.level(%level%)%
 * Load mob, apply difficulty setting
 %load% mob 10200
 set mob %room.people%
+nop %mob.link_instance%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 dg_affect #10215 %mob% !ATTACK on 5

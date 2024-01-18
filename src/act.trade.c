@@ -59,6 +59,7 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
 	bitvector_t fncs_minus_upgraded = (GET_CRAFT_REQUIRES_FUNCTION(type) & ~FNC_UPGRADED);
+	obj_data *tool = NULL;
 	
 	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
 	
@@ -121,7 +122,7 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !has_cooking_fire(ch)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_POTTER) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a fire to bake the clay.\r\n");
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE) && !has_cooking_fire(ch)) {
@@ -130,7 +131,19 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
-	else if (fncs_minus_upgraded && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
+	// end flag checks
+	
+	// tool and function checks
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", command, buf1);
+		}
+		else {
+			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, command);
+		}
+	}
+	else if (fncs_minus_upgraded && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
 		// this checks/shows without FNC_UPGRADED, which is handled separately after.
 		prettier_sprintbit(fncs_minus_upgraded, function_flags_long, buf1);
 		str = buf1;
@@ -141,20 +154,8 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 			msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
 		}
 	}
-	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
+	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in an upgraded building to %s that!\r\n", command);
-	}
-	// end flag checks
-	
-	// tool checks
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
-		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", command, buf1);
-		}
-		else {
-			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, command);
-		}
 	}
 	
 	// types that require the building be complete
@@ -878,7 +879,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
 			// don't show applies that can't come from crafting
 			if (apply->apply_type != APPLY_TYPE_HARD_DROP && apply->apply_type != APPLY_TYPE_GROUP_DROP && apply->apply_type != APPLY_TYPE_BOSS_DROP) {
-				sprintf(buf + strlen(buf), ", %s%s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location], (apply->apply_type == APPLY_TYPE_SUPERIOR ? " if superior" : ""));
+				sprintf(buf + strlen(buf), ", %s%s%s", (apply->modifier < 0 ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "penalty to " : "-") : "+"), apply_types[(int) apply->location], (apply->apply_type == APPLY_TYPE_SUPERIOR ? " if superior" : ""));
 			}
 		}
 		if (GET_OBJ_AFF_FLAGS(proto)) {
@@ -1086,6 +1087,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
 	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making %s." } },
+	{ "process", "processing", NOBITS, { "You process the %s...", "$n processes the %s...", "$n is processing %s." } },
 };
 
 
@@ -1454,11 +1456,11 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
 		str = buf;
 		if ((ptr = strrchr(str, ','))) {
@@ -2306,6 +2308,9 @@ ACMD(do_gen_craft) {
 		
 		if (GET_CRAFT_NAME(type)[strlen(GET_CRAFT_NAME(type))-1] == 's') {
 			msg_to_char(ch, "You start %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
+		}
+		else if (GET_CRAFT_QUANTITY(type) > 1) {
+			msg_to_char(ch, "You start %s some %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
 		}
 		else {
 			msg_to_char(ch, "You start %s %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));

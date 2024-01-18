@@ -1386,6 +1386,7 @@ ADMIN_UTIL(util_rescan) {
 		reread_empire_tech(emp);
 		refresh_empire_goals(emp, NOTHING);
 		refresh_empire_dropped_items(emp);
+		check_ruined_cities(emp);
 		send_config_msg(ch, "ok_string");
 	}
 }
@@ -3470,16 +3471,16 @@ SHOW(show_inventory) {
 			count = 0;
 			for (pos = 0; pos < NUM_WEARS; ++pos) {
 				if (GET_EQ(load, pos)) {
-					count += count_objs_by_vnum(vnum, GET_EQ(load, pos));
+					SAFE_ADD(count, count_objs_by_vnum(vnum, GET_EQ(load, pos)), 0, INT_MAX, FALSE);
 				}
 			}
 			if (load->carrying) {
-				count += count_objs_by_vnum(vnum, load->carrying);
+				SAFE_ADD(count, count_objs_by_vnum(vnum, load->carrying), 0, INT_MAX, FALSE);
 			}
 			
 			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
 				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
-					count += eus->amount;
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
 					// does not have contents in home storage
 				}
 			}
@@ -5982,6 +5983,7 @@ SHOW(show_lost_books) {
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	size_t size, count;
 	book_data *book, *next_book;
+	player_index_data *index;
 	
 	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
 	
@@ -5991,7 +5993,7 @@ SHOW(show_lost_books) {
 			continue;
 		}
 		
-		snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->name : "???");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
@@ -7392,7 +7394,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL));
+		snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
 	}
 	else {
 		strcpy(part, "none");
@@ -10149,8 +10151,11 @@ ACMD(do_moveeinv) {
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
 			if (store->amount > 0) {
-				count += store->amount;
-				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
+				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount, 0);
+				if (new_store) {
+					merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
+				}
 			}
 			else {
 				new_store = find_stored_resource(emp, island_to, store->vnum);
@@ -10167,12 +10172,12 @@ ACMD(do_moveeinv) {
 			}
 			
 			HASH_DEL(eisle->store, store);
-			free(store);
+			free_empire_storage_data(store);
 		}
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {
 				unique->island = island_to;
-				count += unique->amount;
+				SAFE_ADD(count, unique->amount, 0, INT_MAX, FALSE);
 				
 				// does not consolidate
 			}

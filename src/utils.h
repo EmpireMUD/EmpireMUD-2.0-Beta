@@ -980,6 +980,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_EXTRA(obj)  ((obj)->obj_flags.extra_flags)
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
 #define GET_OBJ_LONG_DESC(obj)  ((obj)->description)
+#define GET_OBJ_SCRIPTS(obj)  ((obj)->proto_script)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_STORED_EVENTS(obj)  ((obj)->stored_events)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
@@ -1024,8 +1025,9 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
-#define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
-#define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || (!OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_BIND_ON_PICKUP))) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
+#define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_BASIC_STORAGE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
+#define OBJ_IS_IN_WORLD(obj)  (IN_ROOM(obj) || (obj)->in_obj || (obj)->in_vehicle || ((obj)->carried_by && IN_ROOM((obj)->carried_by)) || ((obj)->worn_by && IN_ROOM((obj)->worn_by)))
+#define UNIQUE_OBJ_CAN_STORE(obj, allow_bound)  ((allow_bound || (!OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_BIND_ON_PICKUP))) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_WAREHOUSE | OBJ_JUNK) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && GET_OBJ_CURRENT_SCALE_LEVEL(o1) == GET_OBJ_CURRENT_SCALE_LEVEL(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (!IS_LIGHT(o1) || !IS_LIGHT(o2) || GET_LIGHT_IS_LIT(o1) == GET_LIGHT_IS_LIT(o2) || GET_LIGHT_HOURS_REMAINING(o1) == GET_LIGHT_HOURS_REMAINING(o2) || (GET_LIGHT_HOURS_REMAINING(o1) > 0 && GET_LIGHT_HOURS_REMAINING(o2) > 0)) && (IS_STOLEN(o1) == IS_STOLEN(o2)) && identical_bindings((o1),(o2)))
 
@@ -1280,6 +1282,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_HIGHEST_KNOWN_GREATNESS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_greatness))
 #define GET_HIGHEST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->highest_known_level))
 #define GET_HISTORY(ch, type)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->channel_history[(type)]))
+#define GET_HOME_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_location))
 #define GET_HOME_STORAGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->home_storage))
 #define GET_IDLE_SECONDS(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->idle_seconds))
 #define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))
@@ -1975,6 +1978,8 @@ room_data *find_load_room(char_data *ch);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
+bitvector_t interaction_list_missing_tools(char_data *ch, struct interaction_item *list, int type);
+bitvector_t interaction_list_missing_tools_room(char_data *ch, room_data *room, int type);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 void relocate_players(room_data *room, room_data *to_room);
@@ -2389,8 +2394,10 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void check_daily_cycle_reset(char_data *ch);
 void check_deficits(char_data *ch);
+void check_empire_storage_timers();
+void check_home_storage_timers(char_data *ch);
 void check_pointless_fight(char_data *mob);
-void check_ruined_cities();
+void check_ruined_cities(empire_data *only_emp);
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
@@ -2399,6 +2406,7 @@ void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
 void schedule_obj_timer_update(obj_data *obj, bool override);
+bool tick_obj_timer(obj_data *obj);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
@@ -2705,7 +2713,9 @@ int *get_ordered_chores();
 void log_workforce_where(empire_data *emp, char_data *mob, int chore);
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
-void sort_einv_for_empire(empire_data *emp);
+int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b);
+int sort_einv_by_perishable(struct empire_storage_data *a, struct empire_storage_data *b);
+void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 
 
  //////////////////////////////////////////////////////////////////////////////

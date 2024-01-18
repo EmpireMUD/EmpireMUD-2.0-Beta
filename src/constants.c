@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.169";
+const char *version = "EmpireMUD 2.0 beta 5.170";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.0";
 
 
@@ -1764,6 +1764,7 @@ const char *affected_bits[] = {
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
+	"!DISARM",
 	"\n"
 };
 
@@ -1814,7 +1815,8 @@ const char *affected_bits_consider[] = {
 	"",	// thirstier
 	"",	// immune-temperature
 	"",	// auto-resurrect
-	"",	// counterspell
+	"",	// 45 - counterspell
+	"$E cannot be disarmed",	// !disarm
 	"\n"
 };
 
@@ -1866,6 +1868,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// immune-temperature
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
+	FALSE,	// !disarm
 };
 
 
@@ -2262,6 +2265,9 @@ const char *craft_flags[] = {
 	"REMOVE-PRODUCTION",
 	"TAKE-REQUIRED-OBJ",
 	"DISMANTLE-WITHOUT-ABILITY",	// 20
+	"TOOL-OR-FUNCTION",
+	"UNDAMAGED-DISMANTLE-REFUND",
+	"FULL-DISMANTLE-REFUND",
 	"\n"
 };
 
@@ -2289,6 +2295,9 @@ const char *craft_flag_for_info[] = {
 	"",	// remove-production
 	"",	// take-required-obj
 	"", // 20: dismantle-without-ability
+	"",	// tool-or-function
+	"",	// undamaged-dismantle-refund
+	"",	// full-dismantle-refund
 	"\n"
 };
 
@@ -2311,6 +2320,7 @@ const char *craft_types[] = {
 	"PRESS",
 	"BAKE",
 	"MAKE",	// 15
+	"PROCESS",
 	"\n"
 };
 
@@ -3090,9 +3100,11 @@ const char *extra_bits[] = {
 	"HARD-DROP",
 	"GROUP-DROP",
 	"GENERIC-DROP",
-	"!STORE",	// 25
+	"NO-BASIC-STORAGE",	// 25
 	"SEEDED",
 	"IMPORTANT",
+	"LONG-TIMER-IN-STORAGE",
+	"NO-WAREHOUSE",
 	"\n"
 };
 
@@ -3124,9 +3136,11 @@ const char *extra_bits_inv_flags[] = {
 	"",	// hard-drop
 	"",	// group-drop
 	"",	// generic-drop
-	"",	// 25, no-store
+	"",	// 25, no-basic-storage
 	"",	// seeded
 	"",	// important
+	"lasts longer when stored",
+	"",	// no-warehouse
 	"\n"
 };
 
@@ -3158,9 +3172,11 @@ const double obj_flag_scaling_bonus[] = {
 	1.2,	// OBJ_HARD_DROP
 	1.3333,	// OBJ_GROUP_DROP
 	1.0,	// OBJ_GENERIC_DROP
-	1.0,	// 25, OBJ_NO_STORE
+	1.0,	// 25, OBJ_NO_BASIC_STORAGE
 	1.0,	// OBJ_SEEDED
 	1.0,	// OBJ_IMPORTANT
+	1.0,	// OBJ_LONG_TIMER_IN_STORAGE
+	1.0,	// OBJ_NO_WAREHOUSE
 };
 
 
@@ -3531,6 +3547,17 @@ const char *olc_type_bits[] = {
 	"progression",
 	"event",	// 25
 	"attackmessage",
+	"\n"
+};
+
+
+// auditors: keywords that can be safely ignored if missing
+const char *ignore_missing_keywords[] = {
+	"and",
+	"for",
+	"in",
+	"one",
+	"your",
 	"\n"
 };
 
@@ -3928,6 +3955,8 @@ const char *depletion_types[] = {
 	"chop",
 	"hunt",
 	"production",	// 10
+	"secondary",
+	"tertiary",
 	"\n"
 };
 
@@ -3945,6 +3974,8 @@ const char *depletion_strings[] = {
 	"chopped $$ trees",
 	"hunted $$ animals",	// unlikely to be able to show this one
 	"",	// 10, production
+	"",	// secondary production
+	"",	// tertiary production
 	"\n"
 };
 
@@ -4125,6 +4156,7 @@ const char *function_flags[] = {
 	"IN-CITY-ONLY",
 	"OVEN",
 	"MAGIC-WORKSHOP",
+	"APOTHECARY",
 	"\n"
 };
 
@@ -4170,6 +4202,7 @@ const char *function_flags_long[] = {
 	"",	// in-city-only?
 	"somewhere with an oven",
 	"in a magic workshop",
+	"at an apothecary",
 	"\n"
 };
 
@@ -5109,6 +5142,7 @@ const char *interact_restriction_types[] = {
 	"group",	// 5
 	"boss",
 	"depletion",
+	"tool",
 	"\n"
 };
 

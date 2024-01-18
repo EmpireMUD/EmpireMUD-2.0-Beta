@@ -754,9 +754,9 @@ A bag of dates is stacked here.~
    Sweet dates like these have been grown for thousands of years, as they
 flourish in warm areas. You can eat these dates or plant them.
 ~
-6 bg a 0 0 7
+6 bgC a 0 0 8
 12 12052 0
-7 168
+7 336
 O+ 1 6134
 R
 4 5114 0
@@ -772,9 +772,9 @@ the purse a long time, you could probably still PLANT them.
 Arabia, and beyond. The fronds of the date palm were used in Roman triumphal
 processions. Beyond that, it makes a beautiful ornimental tree.
 ~
-3 b a 0 0 8
+3 bC a 0 0 9
 0 12052 0
-7 168
+7 8760
 R
 4 5210 0
 S

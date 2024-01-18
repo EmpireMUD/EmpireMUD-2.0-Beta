@@ -6,7 +6,7 @@ A mostly covered hole is here. (adventure)~
 it from casual observation. Looking closer you find markings along the edges of
 the hole that are common with goblin construction.
 ~
-8 0 0 0 6
+8 B 0 0 0 7
 -1 0 0
 6 0
 S
@@ -16,7 +16,7 @@ an oversized earthworm~
 An oversized earthworm wriggles here.~
 You can eat the oversized earthworm.
 ~
-6 0 a 0 4
+6 0 a 0 0 4
 6 0 0
 7 48
 S
@@ -27,7 +27,7 @@ A cloak made from unborn lamb wool lays here.~
    As unsettling as it might be to wear unborn lamb wool, no one can claim the
 cloak isn't soft.
 ~
-2 mp ak 0 9
+2 mp ak 0 0 9
 0 0 0
 11 0
 A
@@ -49,7 +49,7 @@ A skull forged from silver sits here.~
 indicate this could be jointed to other things. Perhaps something to keep in
 mind going forward.
 ~
-15 0 a 0 5
+15 0 a 0 0 5
 6 0 0
 3 0
 R
@@ -62,7 +62,7 @@ A rib sharpened into a blade lays here.~
    This was once a rib bone. After being ripped out of a skeleton, the end was
 sharpened into an unusual stabbing weapon.
 ~
-1 imp ano f 14
+1 imp ano f 0 14
 0 5 4
 14 0
 A
@@ -85,7 +85,7 @@ it looks like you can use the various tools in a lumber yard to render it down
 into useable pieces. Perhaps you should try to scrape or saw it and see what
 happens? And of course, you could always light it on fire.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 14 0
 C
@@ -109,13 +109,13 @@ A single long bone rests here.~
 from the crushed skeleton someone left in the lumberyard. Seems it could make a
 reasonable replacement for a stick, if just a bit creepy.
 ~
-1 0 ano 0 6
+1 0 ano 0 0 7
 0 2 5
 14 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
-O+ 1 6025
+O+ 1 6035
 R
 4 5118 0
 S
@@ -126,7 +126,7 @@ A bag full of bone dust sits here.~
 This black bag of ground up bone glows with a light green shimmer. Just imagine
 the sort of affects it could have if you were to use the bone dust.
 ~
-3 p a 0 5
+3 p a 0 0 5
 0 0 0
 14 0
 C
@@ -140,7 +140,7 @@ A stapes earring rests here.~
    This earring is crafted from a collection of stapes bones. The sensitivity
 this causes makes it an excellent protective piece of gear.
 ~
-2 mp am 0 19
+2 mp am 0 0 19
 0 0 0
 14 0
 A
@@ -161,7 +161,7 @@ An ear bone ring is sitting here.~
    A perfectly round ring sits here; crafted from what looks like compacted ear
 bones and flakes of gold.
 ~
-2 mp ab 0 6
+2 mp ab 0 0 6
 0 0 0
 14 0
 A
@@ -186,7 +186,7 @@ A sternum shaped into a shield lays here.~
    A massive sternum has been carefully removed from a hopefully dead person,
 and shaped into a disturbing shield of bone.
 ~
-23 mp ao 0 6
+23 mp ao 0 0 6
 0 0 0
 14 0
 A
@@ -211,7 +211,7 @@ been worked through it. Chipped, burned, darkened, and generally in terrible
 shape, it still may have a use.
 Implant this into mountable creatures to activate the tooth's magic.
 ~
-3 0 a 0 13
+3 0 a 0 0 13
 0 0 0
 14 0
 C
@@ -225,7 +225,7 @@ whip spinal spine~
 a spinal whip~
 A whip made of some poor soul's spine lays here.~
 ~
-1 mp an 0 4
+1 mp an 0 0 4
 0 6 7
 14 0
 A
@@ -247,7 +247,7 @@ A necklace made of human teeth lays here.~
 necromantic power. Each of which seems to hold just a little of the magical
 ability of its donor.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 14 0
 A
@@ -271,7 +271,7 @@ A bow crafted from someone's radius rests here.~
 shortbow. Strung with what looks like human leather, this is clearly not the
 weapon of anyone friendly.
 ~
-20 mp ap 0 6
+20 mp ap 0 0 6
 29 1 0
 14 0
 C
@@ -284,7 +284,7 @@ A waste band lays here.~
    This band, intended to be worn as a belt, is made from all the parts no one
 would want to eat, or could find another good use for.
 ~
-27 mp al 0 2
+27 mp al 0 0 2
 3 0 0
 7 0
 A
@@ -308,7 +308,7 @@ A shadowy opening is visible in the wall. (adventure)~
 smell of blood floats on the stale air, and the sounds of hissing laughter can
 be heard if you listen closely, or have vampiric ears.
 ~
-8 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 1 0
 T 16021
@@ -321,7 +321,7 @@ A disc of solidified blood lays here.~
 They look almost like they'd fit a magical keyhole. Perhaps you could use this
 to meet with the vampire elder behind the invasion?
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 10 0
 T 16020
@@ -334,7 +334,7 @@ The arch back out of here stands before you.~
 It seems that the barier which was present on the other side is only one
 directional.
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 1 0
 S
@@ -346,7 +346,7 @@ A vial made of bone sits here.~
 the inside of the bone. Seems this would be good for a quick pick me up for a
 hungry vampire.
 ~
-5 k a 0 11
+5 k a 0 0 11
 10 10 6
 14 0
 C
@@ -361,9 +361,9 @@ A sack of blood red oranges is sitting here.~
    This sack of blood oranges can be planted or eaten. But who knows what the
 vampires might have done to them?
 ~
-6 bg a 0 9
+6 bg a 0 0 10
 24 16024 0
-7 168
+7 336
 A
 20 20 0
 C
@@ -379,15 +379,17 @@ a blood orange~
 A blood orange is lying here.~
 It's a bright red orange.
 ~
-6 g a 0 8
+6 g a 0 0 10
 6 0 0
-7 48
+7 336
 A
 20 5 0
 C
 1 1
 I 14 16024 100.00 4 x  # COMBINE: sack of blood oranges
 O+ 1 6124
+R
+4 5619 0
 S
 #16026
 amulet half flame~
@@ -399,7 +401,7 @@ same halves to connect, but seem to be able to join with three other amulet
 halves. Symbols for fire, water, earth, and wind are etched along the center
 line.
 ~
-3 k a 0 3
+3 k a 0 0 4
 0 0 0
 10 96
 C
@@ -415,7 +417,7 @@ same halves to connect, but seem to be able to join with three other amulet
 halves. Symbols for fire, water, earth, and wind are etched along the center
 line.
 ~
-3 k a 0 5
+3 k a 0 0 5
 0 0 0
 10 96
 C
@@ -431,7 +433,7 @@ same halves to connect, but seem to be able to join with three other amulet
 halves. Symbols for fire, water, earth, and wind are etched along the center
 line.
 ~
-3 k a 0 5
+3 k a 0 0 5
 0 0 0
 10 96
 C
@@ -447,7 +449,7 @@ same halves to connect, but seem to be able to join with three other amulet
 halves. Symbols for fire, water, earth, and wind are etched along the center
 line.
 ~
-3 k a 0 4
+3 k a 0 0 4
 0 0 0
 10 96
 C
@@ -458,7 +460,7 @@ sarcophagus royal~
 the royal sarcophagus~
 The royal sarcophagus holds center stage in the crypt.~
 ~
-4 0 0 0 3
+4 0 0 0 0 3
 5 1 0
 1 0
 C
@@ -471,16 +473,7 @@ A note has been carelessly dropped here.~
    If you see this, please let the immortals know immediately. Feel free to use
 the bug command to do so. Thank you for your help.
 ~
-3 0 0 0 4
-0 0 0
-0 0
-S
-#16099
-scythe~
-death's scythe~
-A new object is sitting here.~
-~
-0 0 a 0 2
+3 0 0 0 0 4
 0 0 0
 0 0
 S

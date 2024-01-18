@@ -1252,9 +1252,9 @@ $n hurls a dart at $N, but it explodes into flower petals.
 M36 b 0 +
 animal whip~
 ~
-animal whip~
 whip~
-whips", "whip~
+whips~
+whips~
 0 0 2.8 3.0 3.2
 You whip $N's head right off of $S body!
 $n whips your head right off of your body!
@@ -1998,7 +1998,7 @@ Heavy Bash~
 ~
 ... that bash seems to have knocked $S brain loose!
 ... everything goes dark as that bash knocks you out for good!
-... that bash must have knocked $S's brain loose because $E falls to the ground, dead!
+... that bash must have knocked $S brain loose because $E falls to the ground, dead!
 #
 #
 #

@@ -753,7 +753,7 @@ if %spirit.phase2%
   %mod% %self% append-lookdesc-noformat &0      |            Second Floor: Apprentice Level             | |
   %mod% %self% append-lookdesc-noformat &0      |                     Goblin Cages                      | |
   %mod% %self% append-lookdesc-noformat &0      |                      Pixy Races                       | |
-  %mod% %self% append-lookdesc-noformat &0      |                Apprentice Dormatories                 | |
+  %mod% %self% append-lookdesc-noformat &0      |                Apprentice Dormitories                 | |
 else
   %mod% %self% append-lookdesc-noformat &0      |                 Second Floor: Danger!                 | |
   %mod% %self% append-lookdesc-noformat &0      |                  Goblins Everywhere                   | |

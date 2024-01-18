@@ -87,9 +87,9 @@ A huge dragon steak is lying on the ground.~
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
 roast dragon feast and boost the party's damage significantly.
 ~
-3 0 a 0 0 8
+3 C a 0 0 9
 0 0 0
-7 288
+7 48
 O+ 1 6204
 R
 4 5119 0
@@ -100,9 +100,9 @@ a dragon roast~
 Some roast dragon meat has been left here.~
 This giant piece of roast meat has the pre-charred aroma of dragon.
 ~
-6 0 a 0 0 7
+6 0 a 0 0 9
 72 0 0
-7 288
+7 336
 M
 4
 You nearly choke on a huge bite of $p.~
@@ -114,8 +114,6 @@ R
 4 5619 0
 R
 4 5119 0
-R
-4 5132 0
 S
 #10909
 feast roast dragon~
@@ -884,9 +882,9 @@ They're tart, but they should cook up into something delicious.
 You can cook: cranberry jelly
 You can bake: cranbread
 ~
-3 bg a 0 0 9
+3 bgC a 0 0 10
 0 10956 0
-7 168
+7 336
 O+ 1 6133
 R
 4 5114 0
@@ -898,9 +896,9 @@ A jar of cranberry jelly has been left here.~
    This little old jar has been filled with a tart cranberry jelly. It would go
 perfectly with turkey.
 ~
-6 m a 0 0 8
+6 mC a 0 0 10
 24 0 0
-7 336
+7 8760
 A
 7 1 0
 C
@@ -908,9 +906,9 @@ C
 I 26 801 100.00 1  # DECAYS-TO: glass jar
 I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-4 5606 0
-R
 4 5619 0
+R
+4 5114 0
 S
 #10958
 cranbread bread loaf~
@@ -918,7 +916,7 @@ a loaf of cranbread~
 A loaf of cranbread is molding on the ground.~
 It looks like an ordinary loaf of bread, with tart cranberry inclusions.
 ~
-6 m a 0 0 5
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -926,9 +924,9 @@ A
 C
 50 50
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #10959
 skin dragon molted moulted mountainous~

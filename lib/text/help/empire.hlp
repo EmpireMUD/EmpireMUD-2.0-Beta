@@ -731,7 +731,8 @@ You can store up to 300 unique items -- items that can't be stored in other
 buildings -- in your home. Identical items stack with each other and don't
 count toward that 300. When you move to a new home, you can access your stored
 items from your new home after 1 hour. You can check your home inventory and
-identify its items from anywhere.
+identify its items from anywhere. Perishable items will continue to decay in
+home storage, but only while you're in the game (just like your inventory).
 
 Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
@@ -770,6 +771,18 @@ all empires on the island share the same custom name for it.
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CHART, CUSTOMIZE ISLAND, SURVEY
+#
+"LIVESTOCK LIVELIHOOD"
+
+Livestock Livelihood (Community goal)
+
+Buying this goal lets you build:
+  |CC|  chickencoops
+  &t|&G..&t|&0  pasture
+  |ST|  pigsty
+  (SS)  stable
+
+See also: PROGRESS
 #
 LUXURIES "LUXURIES GOAL"
 
@@ -1057,6 +1070,17 @@ If you don't use the "all" option, you won't see members who have timed out.
 High-level immortals can also target other empires with this command.
 
 See also: WHO
+#
+"SALT OF THE EARTH"
+
+Salt of the Earth (Industry goal)
+
+Buying this goal lets you build:
+  &0|&M88&0|  salterns
+  &y|&W__&y|&0  saltmine
+  &g.&0||&g.&0  saltsilo
+
+See also: PROGRESS
 #
 SEAFARERS
 
@@ -1619,11 +1643,15 @@ your buildings. If you want to use this chore, but turn off specific items, use
 
 Common things produced by this:
  Apiary: honeycomb, beeswax
+ Chicken coops: eggs, poultry
+ Pasture: mutton, wool
+ Pigsty: pork
  Quarry: flint, rocks, stone blocks
+ Salterns: sea salt
 
 Skilled labor also produces:
- Herb Gardens: various herbs
- Trapper's Post: skins
+ Herb Gardens: various magic herbs
+ Trapper's Post: skins, meat
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #

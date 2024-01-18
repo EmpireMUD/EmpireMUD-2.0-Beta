@@ -1478,8 +1478,10 @@ void start_dismantle_building(room_data *loc) {
 		}
 	}
 	
-	// reduce resource: they don't get it all back
-	reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
+	if (!type || (!CRAFT_FLAGGED(type, CRAFT_FULL_DISMANTLE_REFUND) && (!CRAFT_FLAGGED(type, CRAFT_UNDAMAGED_DISMANTLE_REFUND) || BUILDING_DAMAGE(loc)))) {
+		// reduce resource: they don't get it all back
+		reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
+	}
 
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	affect_total_room(loc);
@@ -2417,6 +2419,7 @@ void do_customize_room(char_data *ch, char *argument) {
 
 
 ACMD(do_dedicate) {
+	bool was_custom;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *ded_veh = NULL;
 	room_data *ded_room = NULL;
@@ -2503,12 +2506,14 @@ ACMD(do_dedicate) {
 		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
-
+		
+		was_custom = ROOM_CUSTOM_NAME(ded_room) ? FALSE : TRUE;
+		set_room_custom_name(ded_room, buf);
+		
 		// grant them hide-real-name for this ONLY if it's not already renamed
-		if (!ROOM_CUSTOM_NAME(ded_room)) {
+		if (was_custom) {
 			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
 		}
-		set_room_custom_name(ded_room, buf);
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {

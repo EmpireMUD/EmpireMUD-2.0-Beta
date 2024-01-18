@@ -171,6 +171,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
 		problem = TRUE;
 	}
+	if (CRAFT_FLAGGED(craft, CRAFT_TOOL_OR_FUNCTION) && (GET_CRAFT_REQUIRES_TOOL(craft) == NOBITS || GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has TOOL-OR-FUCTION but is missing %s", (GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS ? "tool" : "function"));
+		problem = TRUE;
+	}
 	
 	// anything not a building
 	if (!CRAFT_IS_BUILDING(craft)) {
@@ -370,7 +374,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
 		FULLSEARCH_INT("quantity", only_quantity, 0, INT_MAX)
-		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
+		FULLSEARCH_INT("quantityover", quantity_over, 0, INT_MAX)
 		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)

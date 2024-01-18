@@ -439,6 +439,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
 #define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
 #define INTERACT_RESTRICT_DEPLETION  7	// determines which depletion is checked/applied, if applicable
+#define INTERACT_RESTRICT_TOOL  8	// tool required for the interaction
 
 
 // for object saving
@@ -826,6 +827,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
 #define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
+#define FNC_APOTHECARY  BIT(39)	// for use in crafts
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -923,6 +925,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
 #define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
 #define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
+#define AFF_NO_DISARM  BIT(46)	// U. player cannot be disarmed
 
 
 // Injury flags -- IS_INJURED
@@ -994,6 +997,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_PRESS  13
 #define CRAFT_TYPE_BAKE  14
 #define CRAFT_TYPE_MAKE  15
+#define CRAFT_TYPE_PROCESS  16
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -1018,6 +1022,9 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
 #define CRAFT_DISMANTLE_WITHOUT_ABILITY  BIT(20)	// buildings and vehicles can be dismantled without the ability
+#define CRAFT_TOOL_OR_FUNCTION  BIT(21)	// with this flag, only requires the tool OR the function
+#define CRAFT_UNDAMAGED_DISMANTLE_REFUND  BIT(22)	// refunds all materials when dismantled while undamaged (instead of 90%)
+#define CRAFT_FULL_DISMANTLE_REFUND  BIT(23)	// refunds all materials when dismantled no matter what the health (instead of 20%-90%)
 
 
 // For find_building_list_entry
@@ -1130,6 +1137,12 @@ typedef struct vehicle_data vehicle_data;
 #define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_THIEVERY | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
 #define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
+
+
+// EINV_SORT_x: how sort empire inventory, or how it is currently sorted
+#define EINV_UNSORTED			0	// something has unsorted it (must be 0)
+#define EINV_SORT_AMOUNT		1	// sort by amount
+#define EINV_SORT_PERISHABLE	2	// sort by decay timer
 
 
 // ELOG_x: empire_log_data types
@@ -1861,12 +1874,14 @@ typedef enum {
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
-#define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
+#define OBJ_NO_BASIC_STORAGE  BIT(25)	// z. cannot be stored in basic storage anymore
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
 #define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
+#define OBJ_LONG_TIMER_IN_STORAGE  BIT(28)	// C. decays more slowly when stored
+#define OBJ_NO_WAREHOUSE  BIT(29)	// D. cannot be stored in the home/warehouse anymore
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -2888,8 +2903,10 @@ typedef enum {
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
 #define DPLTN_HUNT  9
-#define DPLTN_PRODUCTION  10
-#define NUM_DEPLETION_TYPES  11	// total
+#define DPLTN_PRODUCTION  10	// for workforce
+#define DPLTN_SECONDARY  11		// for workforce
+#define DPLTN_TERTIARY  12		// for workforce
+#define NUM_DEPLETION_TYPES  13	// total
 
 
 // EVO_x: world evolutions
@@ -3376,7 +3393,7 @@ struct interact_exclusion_data {
 // restricts interactions to certain players
 struct interact_restriction {
 	int type;	// INTERACT_RESTRICT_ type
-	any_vnum vnum;	// based on type
+	signed long long vnum;	// based on type; support most bitvectors too
 	struct interact_restriction *next;
 };
 
@@ -3521,6 +3538,7 @@ struct shipping_data {
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship
+	struct storage_timer *timers;	// for items that decay
 	
 	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
 };
@@ -4799,6 +4817,7 @@ struct player_special_data {
 	room_vnum load_room;	// Which room to place char in
 	room_vnum load_room_check;	// this is the home room of the player's loadroom, used to check that they're still in the right place
 	room_vnum last_room;	// useful when dead
+	room_vnum home_location;	// player's private home, if any -- not called "home_room" to avoid confusion with the room_data version of a "home room"
 	room_vnum tomb_room;	// location of player's chosen tomb
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
@@ -5285,7 +5304,7 @@ struct empire_island {
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
 	struct empire_storage_data *store;	// hash table of storage here
-	bool store_is_sorted;	// TRUE if the storage hasn't changed order
+	bool store_is_sorted;	// EINV_SORT_ id of how it's currently sorted, or EINV_UNSORTED if not
 	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
@@ -5363,6 +5382,7 @@ struct empire_storage_data {
 	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
 	int keep;	// how much workforce should ignore/keep (UNLIMITED/-1 or >0)
+	struct storage_timer *timers;	// doubly-linked list for expiration
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
@@ -5396,7 +5416,8 @@ struct empire_trade_data {
 struct empire_unique_storage {
 	obj_data *obj;	// actual live object
 	int amount;	// stacking
-	sh_int flags;	// up to 15 flags, EUS_x
+	struct storage_timer *timers;	// for expiring items
+	sh_int flags;	// up to 15 flags, EUS_
 	int island;	// split by islands
 	
 	struct empire_unique_storage *prev, *next;
@@ -5467,6 +5488,14 @@ struct offense_data {
 	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
 	
 	struct offense_data *prev, *next;	// doubly-linked list
+};
+
+
+// for item decay timers in storage
+struct storage_timer {
+	int timer;
+	int amount;
+	struct storage_timer *next, *prev;	// stored as a doubly linked list in ascending order by timer
 };
 
 

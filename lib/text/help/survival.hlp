@@ -45,8 +45,8 @@ Find Herbs (Survival ability)
 
 Usage:  pick
 
-With the ability to find herbs, your "pick" command will find new things instead
-of flowers.
+With the ability to find herbs, your "pick" command will find new things
+instead of flowers.
 
 Find Herbs gains experience when you pick herbs.
 
@@ -58,7 +58,7 @@ Herbs you can find:
  daggerbite - deserts
  bileberries - floodplains, riverbanks
 
-See also: HERBS, DISTILLED HERBS, PICK
+See also: MAGIC HERBS, DISTILLED HERBS, PICK
 #
 "FIND SHELTER" SHELTERS
 
@@ -156,7 +156,9 @@ Those with the Huntsman ability deal twice as much damage to animals. This
 ability has a chance to not activate at low levels.
 
 Huntsmen (and huntswomen) also gain access to the hunt command and get a 100%
-chance to skin or butcher corpses.
+chance to skin or butcher corpses -- at least, when there's something to skin
+or butcher from the corpse. Some corpses have no skin or butcher results, and
+some may only have rare results even with Huntsman.
 
 Gains experience when successfully hunt, when you hit an animal, or skin or
 butcher a corpse.

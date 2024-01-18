@@ -21,7 +21,6 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
-#include "vnums.h"
 #include "constants.h"
 
 /**

@@ -4722,7 +4722,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer) {
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list) {
 	static char output[MAX_STRING_LENGTH];
 	struct interact_restriction *res;
-	char line[256];
+	char line[256], part[256];
 	size_t size;
 	
 	*output = '\0';
@@ -4763,8 +4763,13 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				snprintf(line, sizeof(line), "Depletion: %s", depletion_types[res->vnum]);
 				break;
 			}
+			case INTERACT_RESTRICT_TOOL: {
+				prettier_sprintbit(res->vnum, tool_flags, part);
+				snprintf(line, sizeof(line), "Tool: %s", part);
+				break;
+			}
 			default: {
-				snprintf(line, sizeof(line), "Unknown %d:%d", res->type, res->vnum);
+				snprintf(line, sizeof(line), "Unknown %d:%lld", res->type, res->vnum);
 				break;
 			}
 		}
@@ -7655,6 +7660,19 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 			}
 			else {
 				msg_to_char(ch, "Invalid ptech '%s'.\r\n", arg);
+				fail = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-tool")) {
+			ptr = any_one_word(ptr, arg);
+			if ((num = search_block(arg, tool_flags, FALSE)) != NOTHING) {	// valid restriction
+				CREATE(res, struct interact_restriction, 1);
+				res->type = INTERACT_RESTRICT_TOOL;
+				res->vnum = BIT(num);
+				LL_APPEND(*found_restrictions, res);
+			}
+			else {
+				msg_to_char(ch, "Invalid tool '%s'.\r\n", arg);
 				fail = TRUE;
 			}
 		}

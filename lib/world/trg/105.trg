@@ -328,10 +328,14 @@ switch %gem%
     * failure - do nothing
   break
 done
-if %self.carried_by%
+if %self.carried_by% && %gem%
   %send% %self.carried_by% @%self% in your inventory disintegrates, leaving behind %object%!
-else
+elseif %gem%
   %echo% @%self% in the room disintegrates, leaving behind %object%!
+else
+  * nothing to show?
+  return 1
+  halt
 end
 return 0
 %purge% %self%
@@ -1113,6 +1117,7 @@ switch %random.4%
   break
   default
     * failure - do nothing
+    halt
   break
 done
 if %actor%

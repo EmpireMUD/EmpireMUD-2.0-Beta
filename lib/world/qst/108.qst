@@ -165,7 +165,7 @@ Z
 1 10802
 S
 #10805
-collect 20 Saplings~
+Collect 20 Saplings~
    Rosemary wants you to collect some saplings. You can either gather them in
 the forest, or get them by scraping trees. You can also find them by chopping
 down copses.
@@ -700,8 +700,9 @@ Steps:
  3. Type 'skill buy sew'.
  4. Type 'sew info whip' and 'sew info tent' to see what's needed.
  5. Collect the 10 large leather (tan large skins) and 2 saplings.
- 6. Type 'sew whip' and 'sew tent' to make these items, one at a time.
- 7. Return to Horation at the museum.
+ 6. Scrape the saplings to make poles.
+ 7. Type 'sew whip' and 'sew tent' to make these items, one at a time.
+ 8. Return to Horation at the museum.
 ~
 Horation is impressed with your crafting skills.
 ~

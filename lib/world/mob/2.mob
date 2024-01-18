@@ -243,7 +243,7 @@ Master #n is sitting here, watching you.
 100 125 bdqvAI 0 3
 1 0 0 4 -1
 D
-   Judging from his attire, he appears to be a member of the Thieves' Guild.
+   Judging from the attire, this appears to be a member of the Thieves' Guild.
 But you would never make such an accusation out loud -- you like your
 intestines on the inside.
 ~
@@ -1071,5 +1071,79 @@ D
    This citizen has camped out and is methodically searching for minerals.
 (workforce prospecting)
 ~
+S
+#286
+#n tender~
+the chicken tender~
+#n is tending the coops.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1
+D
+This young citizen is cleaning out the chicken coops.
+~
+M
+0
+$n clucks at the hens.~
+M
+0
+$n sweeps up some straw.~
+M
+0
+$n cleans out a coop.~
+M
+0
+$n checks for eggs.~
+S
+#287
+#n swineherd~
+the swineherd~
+#n is tending to the pigsty.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1
+D
+   It's a dirty job, but someone has to do it. The hapless citizen seems
+content enough to muck out the sty all day.
+~
+M
+0
+$n oinks in annoyance.~
+M
+0
+$n mucks out part of the sty.~
+M
+0
+$n covers $s nose with a rag.~
+M
+0
+$n pours a bucket into a trough.~
+M
+0
+$n wipes $s brow, but looks no cleaner.~
+S
+#288
+#n shepherd~
+the shepherd~
+#n is watching the flock.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1
+D
+   This lucky citizen spends all day in the pasture with the sheep. And the
+night, as well.
+~
+M
+0
+$n searches for a sheep.~
+M
+0
+$n traipses up and down the pasture.~
+M
+0
+$n whistles for the sheep.~
+M
+0
+$n tries to push a stubborn sheep.~
 S
 $

@@ -109,11 +109,12 @@ abilities.o: abilities.c conf.h sysdep.h structs.h protocol.h uthash.h \
 act.action.o: act.action.c conf.h sysdep.h structs.h uthash.h utils.h \
   db.h comm.h handler.h interpreter.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.action.c
-act.battle.o: act.battle.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h constants.h
+act.battle.o: act.battle.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h comm.h interpreter.h handler.h skills.h
 	$(CC) -c $(CFLAGS) act.battle.c
-act.comm.o: act.comm.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  interpreter.h handler.h db.h skills.h dg_scripts.h constants.h
+act.comm.o: act.comm.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h comm.h interpreter.h handler.h db.h dg_scripts.h \
+  constants.h
 	$(CC) -c $(CFLAGS) act.comm.c
 act.empire.o: act.empire.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h comm.h handler.h db.h skills.h vnums.h dg_scripts.h olc.h \
@@ -122,12 +123,13 @@ act.empire.o: act.empire.c conf.h sysdep.h structs.h uthash.h utils.h \
 act.fight.o: act.fight.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h constants.h
 	$(CC) -c $(CFLAGS) act.fight.c
-act.god.o: act.god.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  vnums.h interpreter.h handler.h db.h skills.h dg_scripts.h
+act.god.o: act.god.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h comm.h vnums.h interpreter.h handler.h db.h \
+  dg_scripts.h
 	$(CC) -c $(CFLAGS) act.god.c
-act.highsorcery.o: act.highsorcery.c conf.h sysdep.h structs.h uthash.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h \
-  constants.h
+act.highsorcery.o: act.highsorcery.c conf.h sysdep.h structs.h protocol.h \
+  uthash.h utlist.h utils.h comm.h interpreter.h handler.h db.h skills.h \
+  vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) act.highsorcery.c
 act.immortal.o: act.immortal.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h vnums.h interpreter.h handler.h db.h skills.h olc.h dg_scripts.h \
@@ -137,9 +139,9 @@ act.informative.o: act.informative.c conf.h sysdep.h structs.h uthash.h \
   utils.h comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h \
   constants.h boards.h olc.h
 	$(CC) -c $(CFLAGS) act.informative.c
-act.item.o: act.item.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h dg_event.h \
-  constants.h boards.h olc.h
+act.item.o: act.item.c conf.h sysdep.h structs.h protocol.h uthash.h \
+  utlist.h utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h \
+  dg_scripts.h constants.h boards.h olc.h
 	$(CC) -c $(CFLAGS) act.item.c
 act.movement.o: act.movement.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
@@ -160,8 +162,9 @@ act.social.o: act.social.c conf.h sysdep.h structs.h uthash.h utils.h \
 act.stealth.o: act.stealth.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.stealth.c
-act.survival.o: act.survival.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h constants.h
+act.survival.o: act.survival.c conf.h sysdep.h structs.h protocol.h \
+  uthash.h utlist.h utils.h comm.h interpreter.h handler.h db.h skills.h \
+  dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.survival.c
 act.trade.o: act.trade.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h

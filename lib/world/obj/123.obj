@@ -968,12 +968,14 @@ over in the sea.
    Berries like these are exceptionally rare and though they contain seeds,
 there is no known way to grow them.
 ~
-6 g a 0 0 7
+6 gC a 0 0 9
 4 0 0
-7 48
+7 336
 C
 1 1
 O+ 1 6120
+R
+4 5619 0
 S
 #12354
 skein icy serragon blood~
@@ -1153,9 +1155,9 @@ a salmon or trout.
    Called iqaluk or tariungmiutaq in the Inukitut language, arctic char are
 prized by anglers in the frozen north.
 ~
-6 k a 0 0 5
+6 kC a 0 0 6
 24 0 0
-7 168
+7 24
 C
 1 1
 O+ 1 6203

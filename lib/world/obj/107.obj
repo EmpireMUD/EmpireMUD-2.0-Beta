@@ -37,7 +37,7 @@ a honey-cured ham~
 A large ham is lying in the dirt.~
 The ham is mouth-watering.
 ~
-6 m a 0 0 3
+6 m a 0 0 4
 72 0 0
 7 336
 A
@@ -65,7 +65,7 @@ a fruitcake~
 A fruitcake is lying on the ground.~
 This fruitcake looks like it might have been re-gifted.
 ~
-6 m a 0 0 6
+6 m a 0 0 7
 72 0 0
 7 336
 A
@@ -98,7 +98,7 @@ roast goose~
 A roast goose is lying here.~
 This plump roast goose is perfect for Christmas dinner.
 ~
-6 m a 0 0 5
+6 m a 0 0 7
 72 0 0
 7 336
 A
@@ -107,8 +107,6 @@ C
 50 50
 R
 4 5619 0
-R
-4 5132 0
 S
 #10708
 recipe roast goose~
@@ -210,9 +208,9 @@ a plate of christmas cookies~
 A plate of cookies is lying here.~
 A variety of delicious cookies are spread across the plate.
 ~
-6 m a 0 0 7
+6 mC a 0 0 9
 72 0 0
-7 336
+7 69120
 A
 7 1 0
 C
@@ -221,9 +219,9 @@ M
 4
 You're filled with holiday cheer!~
 R
-4 5606 0
-R
 4 5132 0
+R
+4 5619 0
 S
 #10717
 recipe cookie christmas~
@@ -264,15 +262,15 @@ you minor shapeshifting abilities!
 1 0
 S
 #10720
-basket chestnuts sweet~
+basket chestnuts nuts sweet~
 a basket of chestnuts~
 A basket of sweet chestnuts is lying here.~
    The pale yellow insides of these smooth, brown nuts can be roasted and
 eaten, if you can remove them from their prickly green cases.
 ~
-6 b a 0 0 5
+6 bC a 0 0 10
 12 10700 0
-7 336
+7 3240
 I 15 10721 100.00 4  # SEPARATE: handful of chestnuts
 M
 4
@@ -280,21 +278,20 @@ You peel open $p and eat them.~
 M
 5
 $n peels open $p and eats them.~
+O+ 1 6192
 R
-4 5606 0
-R
-4 5610 0
+4 5215 0
 S
 #10721
-chestnuts handful~
+chestnuts nuts handful~
 a handful of chestnuts~
 A handful of chestnuts are lying here.~
    The insides of these smooth brown nuts can be eaten. Or you could roast
 them, if you can find some more.
 ~
-6 0 a 0 0 4
+6 C a 0 0 8
 1 0 0
-7 48
+7 3240
 I 14 10720 100.00 4  # COMBINE: basket of chestnuts
 M
 4
@@ -302,6 +299,9 @@ You peel open $p and eat them.~
 M
 5
 $n peels open $p and eats them.~
+O+ 1 6182
+R
+4 5619 0
 S
 #10722
 chestnuts roast bowl~
@@ -310,17 +310,18 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 m a 0 0 4
+6 mC a 0 0 7
 18 0 0
-7 336
+7 3240
 A
 9 1 0
 C
 50 50
-R
-4 5606 0
+O+ 1 6192
 R
 4 5132 0
+R
+4 5619 0
 S
 #10723
 whistle Christmas tree minipet~
@@ -791,11 +792,13 @@ Some spider meat is globbed on the ground.~
 or you could probably just sell it to the goblins.
 (Type 'sell meat' when you find Miner Meena.)
 ~
-6 0 a 0 0 4
+6 C a 0 0 6
 4 0 0
 7 24
 C
 1 1
+R
+4 5619 0
 T 10751
 S
 #10752
@@ -805,11 +808,13 @@ Some spider meat is lying on the ground.~
    Spider meat actually improves significantly after you cook it. Now it just
 tastes like rancid chicken.
 ~
-6 0 a 0 0 4
+6 C a 0 0 6
 12 0 0
-7 24
+7 96
 C
 1 1
+R
+4 5619 0
 T 10751
 S
 #10753
@@ -846,11 +851,13 @@ crusty goblin bread~
 Some crusty goblin bread is lying on the ground.~
 This bread is a bit tough to eat, but it doesn't taste too bad.
 ~
-6 0 a 0 0 3
+6 0 a 0 0 5
 24 0 0
 7 336
 C
 1 1
+R
+4 5619 0
 S
 #10756
 ring rusty goblin~

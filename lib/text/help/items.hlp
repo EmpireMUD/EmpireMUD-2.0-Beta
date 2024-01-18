@@ -68,7 +68,7 @@ digging in the mountains.
 
 See also: DIG
 #
-BRONZE "BRONZE INGOT"
+BRONZE "BRONZE INGOTS"
 
 Used for:  forge
 Stored in:  Foundry
@@ -129,7 +129,7 @@ own help files. Here are some of the common types of components:
  &clumber&0 and &cpillars&0 - building materials
  &crocks&0 - common stones dug up from the ground, for building
  &cnails&0 - building materials
- &csaplings&0 - used in handles and primitive buildings
+ &csaplings&0 - scraped into poles for crafting and building
  &cclay&0 - moldable clay for crafting
  &cfibers&0, &cfeathers&0, and &csticks&0 - used for crafting and building
  &cfruits&0, &cvegetables&0, &cgrains&0, and &cseeds&0 - for cooking and baking
@@ -210,9 +210,9 @@ See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS,
 
 Distilled herbs (component)
 
-Distilled herbs are herbs that have been processed to make them more potent, so
-that you can make more powerful potions. You must have the 'Healing Elixirs'
-ability to 'brew' these from herbs.
+Distilled herbs are magic herbs that have been processed to make them more
+potent, so that you can make more powerful potions. You must have the 'Healing
+Elixirs' ability to 'brew' these from herbs.
 
 The distilled herbs are:
  distilled whitegrass
@@ -254,6 +254,15 @@ Most types of fruit and vegetables are sub-types of the 'edible plant'
 component.
 
 See also: FRUIT COMPONENT, VEGETABLE COMPONENT
+#
+EGG EGGS
+
+Egg (component)
+
+Used for:  cooking
+Stored at:  Chicken Coops, Larder
+
+Eggs are a quick, easy food source.
 #
 FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
 
@@ -363,7 +372,7 @@ a specific one of these, but a few accept any of them.
 Common magic gems include:
   yellow lightning stone - buried in the desert
   red bloodstone - dug up in the mountains
-  iridescent blue iris - found near herbs
+  iridescent blue iris - found near magic herbs
   glowing green seashell - found while fishing
   prismatic crystal (powerful magic gem)
 
@@ -420,25 +429,25 @@ Handle (component)
 Used for:  forge, craft
 Stored in:  Utility Shed, Storage room
 
-Create a handle (from a sapling, or a bone handle from bone) using the craft
-command.
+Create a handle (from a sapling/pole, or a bone handle from bone) using the
+craft command.
 
 Handles are used in forging and crafting to provide a grasping surface to a
-tool or weapon. The most basic handles are made from saplings.
+tool or weapon. The most basic handles are made from saplings or poles.
 
 The more advanced elegant handle can be made from magic wood.
 
 See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
-HERB HERBS "HERB COMPONENT"
+HERB HERBS "MAGIC HERB" "MAGIC HERBS" "MAGIC HERB COMPONENT"
 
-Herb (component)
+Magic Herb (component)
 
 Used for:  potions, poisons, crafting
 
-The herb component type covers all the herbs which can be found using the Find
-Herbs ability. Most recipes call for a specific herb, though. The basic herbs
-are:
+The magic herb component type covers all the herbs which can be found using the
+Find Herbs ability. Most recipes call for a specific herb, though. The basic
+magic herbs are:
  whitegrass - beaches and shores
  fiveleaf - forests and plains
  redthorn - mountains
@@ -464,9 +473,9 @@ Iridescent Blue Iris (resource)
 
 Stored in:  Tower of Sorcery
 
-The iridescent blue iris is a rare herb found anywhere you could find herbs,
-and even if you don't have the Find Herbs ability. It is used in some spells
-and crafts.
+The iridescent blue iris is a rare herb found anywhere you could find magic 
+herbs, and even if you don't have the Find Herbs ability. It is used in some
+spells and crafts.
 
 See also: GEM, PICK, FIND HERBS
 #
@@ -664,7 +673,7 @@ Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
-MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK
+MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RAW MUTTON" "RED MEAT" POULTRY PORK MUTTON
 
 Raw meat (component)
 
@@ -672,7 +681,7 @@ Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
 animal corpses or fishing. Common types of raw meat are:
-  fillet of raw meat (raw red meat)
+  fillet of raw meat, side of mutton (raw red meat)
   cut of poultry (raw poultry)
   slab of pork (raw pork)
   striped barbfish, giant linefish, magenta arrowfish (raw fish)
@@ -733,9 +742,9 @@ Pillar (component)
 Used for:  building
 
 The most commonly used pillars are simple wooden logs, made by scraping trees.
-You can also craft bound wooden columns from saplings and rope if you have
-Basic Crafts. This may be useful if you're unable to get logs (for example,
-rough wood cannot be scraped).
+You can also craft bound wooden columns from saplings or poles and cord or rope
+if you have Basic Crafts. This may be useful if you're unable to get logs (for
+example, rough wood cannot be scraped).
 
 Common types of pillars are:
   heavy log (basic)
@@ -744,6 +753,18 @@ Common types of pillars are:
   enormous mast (large pillar)
 
 See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
+#
+POLE POLES "POLE COMPONENT" "WOODEN POLE" "METAL POLE"
+
+Pole (component)
+
+Used for:  crafting, building
+
+Poles are straight lengths of wood made from saplings by scraping. They can
+also be forged from metal. These are used in many types of buildings and
+crafts.
+
+See also: COMPONENT, FORGE, SAPLING, SCRAPE
 #
 RETRIEVE
 
@@ -787,11 +808,24 @@ Common types of rocks are:
 
 See also: BUILD, COMPONENT, DIG, CHIP, LAY, FLINT
 #
+SALT SALTS "ROCK SALT" "SEA SALT"
+
+Salt (component)
+
+Used for:  cooking
+Stored at:  Salt Silo
+
+Salt is found by the sea or at the base of mountains. This critical seasoning
+is used to preserve or flavor food.
+
+See also: DIG, SALT OF THE EARTH
+#
 SEEDS "SEED COMPONENT" "SEEDS COMPONENT" "EDIBLE SEEDS"
 
 Seeds (component)
 
 Used for:  planting, cooking, snacking
+Stored at:  Seed Silo
 
 Seeds are separated into two broad categories: edible seeds and inedible seeds.
 Some seeds can be planted (but you can often plant a crop using the fruit or
@@ -905,11 +939,10 @@ SAPLING SAPLINGS "SAPLING COMPONENT"
 
 Sapling (component)
 
-Used for:  building, crafting
+Used for:  crafting, making poles
 
 Saplings are young, straight trees with very few branches. This makes them
-perfect for making handles, shafts, and arrows. They are also used to make
-many simple buildings.
+perfect for scraping poles.
 
 The best ways to get saplings are:
  chopping a copse
@@ -922,7 +955,7 @@ Common types of saplings are:
   reaching sapling (basic)
   large shoot (basic)
 
-See also: COMPONENT, GATHER, SCRAPE, SAW, COPSE
+See also: COMPONENT, GATHER, POLE, SCRAPE, SAW, COPSE
 #
 STORE STORAGE
 
@@ -939,6 +972,8 @@ can be stored from your inventory or from the ground.
 
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them. This does not apply to home storage.
+
+Perishable items such as food will continue to decay while in storage.
 
 Unique, enchanted, superior, leveled, or otherwise-modified items can't be
 stored in regular storage buildings, but you can store them with the
@@ -1118,6 +1153,8 @@ For example, if an item costs you 4 coins to post and you sell it for 10 coins,
 You'll receive 9 coins (95% of the sale price) plus your original 4 back, for
 a total of 13 coins.
 
+You cannot post perishable items on the trading post.
+
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 #
 UNIQUE "UNIQUE ITEM" "UNIQUE OBJECT" (UNIQUE)
@@ -1173,7 +1210,8 @@ Command:  warehouse inventory [item keywords]
 
 While normal resource storage (e.g. the lumber yard) can store many simple
 items, you must use a warehouse (or vault) to store items which are unique,
-scaled, enchanted, superior, or otherwise modified.
+scaled, enchanted, superior, or otherwise modified. Perishable items will
+continue to decay while in storage.
 
 You must have the "warehouse" empire privilege to withdraw items from warehouse
 storage. Items which can be stored in normal resource storage may not be stored

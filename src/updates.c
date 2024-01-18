@@ -366,10 +366,10 @@ void b3_6_einv_fix(void) {
 				if (store->amount > 0 && store->vnum == vnum) {
 					amt = store->amount;
 					total += amt;
-					add_to_empire_storage(emp, isle->island, cloth, 4 * amt);
-					add_to_empire_storage(emp, isle->island, silver, 2 * amt);
+					add_to_empire_storage(emp, isle->island, cloth, 4 * amt, 0);
+					add_to_empire_storage(emp, isle->island, silver, 2 * amt, 0);
 					HASH_DEL(isle->store, store);
-					free(store);
+					free_empire_storage_data(store);
 				}
 			}
 		}
@@ -1061,7 +1061,7 @@ void b5_23_potion_update(void) {
 			if ((obj = eus->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
-					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
+					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount, GET_OBJ_TIMER(proto));
 					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}
@@ -1133,7 +1133,7 @@ void b5_24_poison_update(void) {
 			if ((obj = eus->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
-					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
+					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount, GET_OBJ_TIMER(proto));
 					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}
@@ -3261,7 +3261,7 @@ void b5_152_light_update(obj_data *obj) {
 		}
 		
 		// and is it really in the world? (not on a loaded character)
-		if (IN_ROOM(obj) || obj->in_vehicle || obj->in_obj || (obj->carried_by && IN_ROOM(obj->carried_by)) || (obj->worn_by && IN_ROOM(obj->worn_by))) {
+		if (OBJ_IS_IN_WORLD(obj)) {
 			request_obj_save_in_world(obj);
 			schedule_obj_timer_update(obj, FALSE);
 			
@@ -3773,9 +3773,99 @@ void b5_169_city_centers(void) {
 		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
 				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
-				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 				set_room_custom_name(city->location, buf);
+				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 				affect_total_room(city->location);
+			}
+		}
+	}
+}
+
+
+// b5.170 applies timers to items in storage
+void b5_170_timer_updates(void) {
+	int amount;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	struct shipping_data *shipd, *next_shipd;
+	
+	// Note: there is no need to update warehouse or home storage: these did
+	// not allow items with timers prior to this patch.
+	
+	// all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// each island
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// each storage on the island
+			HASH_ITER(hh, isle->store, store, next_store) {
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				
+				if (store->timers) {
+					// remove and replace existing timers
+					free_storage_timers(&store->timers);
+				}
+				
+				if ((proto = store->proto) && GET_OBJ_TIMER(proto)) {
+					// initialize to several different times
+					amount = store->amount;
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto), amount/2);
+						amount -= (amount / 2);
+					}
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) * 3/4, amount/2);
+						amount -= (amount / 2);
+					}
+					if (amount > 0) {
+						add_storage_timer(&store->timers, GET_OBJ_TIMER(proto) * 2/3, amount);
+					}
+				}
+			}
+		}
+		
+		// shipping
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			if (shipd->timers) {
+				// remove and replace existing timers
+				free_storage_timers(&shipd->timers);
+			}
+			
+			if ((proto = obj_proto(shipd->vnum)) && GET_OBJ_TIMER(proto)) {
+				add_storage_timer(&shipd->timers, GET_OBJ_TIMER(proto), shipd->amount);
+			}
+		}
+	}
+}
+
+
+// b5.170 adds data on the character for their home location; need to update it now
+void b5_170_home_assignments(void) {
+	bool is_file;
+	char_data *ch;
+	room_data *iter, *next_iter;
+	
+	HASH_ITER(hh, world_table, iter, next_iter) {
+		if (ROOM_PRIVATE_OWNER(iter) != NOBODY) {
+			// found private owner
+			if ((ch = find_or_load_player_by_idnum(ROOM_PRIVATE_OWNER(iter), &is_file))) {
+				// save new data
+				GET_HOME_LOCATION(ch) = GET_ROOM_VNUM(iter);
+				
+				if (is_file) {
+					store_loaded_char(ch);
+					is_file = FALSE;
+				}
+				else {
+					queue_delayed_update(ch, CDU_SAVE);
+				}
+			}
+			else {
+				// bad data: no player
+				set_private_owner(iter, NOBODY);
 			}
 		}
 	}
@@ -3884,6 +3974,8 @@ const struct {
 	{ "b5.168", b5_168_updates, b5_188_greatness, "Removing old DIGGING function flag and updating character greatness" },
 	{ "b5.169", b5_169_book_move, NULL, "Renumbering books written by players to resolve vnum conflicts" },
 	{ "b5.169.0.1", b5_169_city_centers, NULL, "Applying names to city centers" },
+	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
+	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

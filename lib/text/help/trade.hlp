@@ -217,32 +217,30 @@ However, to bake anything, you'll need a kitchen, bakery, or another type of
 full-sized oven. Many basic cooked foods also give you small food buffs
 (see WELL-FED).
 
-You can cook:
-  bean soup                              fried meat pie (strength)              
-  fish plate (wits)                      catfish plate (intelligence)
-  tortilla                               jerky (bonus-physical)                 
-  burrito (resist-physical)              spicy jerky (bonus-magical)
-  fried rice (dexterity)                 prunes (age)
-  salt pork                              potato slices
-  chicken and vegetables (health)        orange chicken and pears
-  ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
-  fruit bowl                             candied mango
-  sausage link (to-hit)                  blueberry jam (mana)
-  road biscuit (block)                   coffee
-  candied apple                          mushroom plate (resist-magical)
-  gruel                                  rice
-  pickled vegetables                     fruit preserves
+You can see a full list of recipes from the Cook ability by typing 'ability
+cook'; this also works on other abilities. You can also check what any
+ingredient can be used for by typing 'recipes <item>'.
 
-You can bake:
-  bread (move-regen)                     
-  apple pie (charisma)                   nutty squash flatbread (dodge)
-  peach pie (charisma)                   roast plate (resist-physical)
-  cherry pie (charisma)                  strawberry pie (charisma)
-  blueberry pie (charisma)               plum pie (charisma)
-  banana pie (charisma)                  banana bread (moves)
-  pumpkin pie (charisma)                 blackberry tart
-  casserole (inventory)                  roast meat
-  oat cake (bonus-healing)
+Some of the things you can cook are:
+  veggie omelet (wits)                     fried meat pie (strength)              
+  fish plate (wits)                        catfish plate (intelligence)
+  burrito (resist-physical)                spicy jerky (bonus-magical)
+  fried rice (dexterity)                   prunes (age)
+  chicken and vegetables (health)          mushroom plate (resist-magical)
+  ham and cheese sandwiches (move-regen)   strawberry jam (mana-regen)
+  sausage link (to-hit)                    blueberry jam (mana)
+  road biscuits (block)                    jerky (bonus-physical)
+  honeyed fruit (charisma)
+
+Some of the things you can bake are:
+  bread (move-regen)                       mutton rolls (bonus-physical)
+  apple pie (charisma)                     nutty squash flatbread (dodge)
+  peach pie (charisma)                     roast plate (resist-physical)
+  cherry pie (charisma)                    strawberry pie (charisma)
+  blueberry pie (charisma)                 plum pie (charisma)
+  banana pie (charisma)                    banana bread (moves)
+  pumpkin pie (charisma)                   casserole (inventory)
+  oat cakes (bonus-healing)
 
 Raw meat, fish, poultry, and pork can be cooked by themselves but will not
 provide a food buff. There are also more recipes to find in the world.
@@ -262,7 +260,7 @@ All crafting abilities train when you finish recipes that require them.
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
    PRIMITIVE CRAFTS, WOODWORKING, CRAFTING ABILITIES
 #
-"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO"
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO" "PROCESS INFO"
 
 Usage:  <verb> info <recipe name>
 
@@ -407,14 +405,20 @@ effect for a while after you eat them. These foods are bind-on-pickup, so only
 the person who makes them can eat them.
 
 You can cook the following family recipes:
-  black sausage (to-hit)                   jellied eels (dodge)
-  pot roast (max-health)                   chili (max-moves)
-  fish and chips (charisma)                stewed vegetables (mana-regen)
+  traditional black sausage (to-hit)
+  grandma's jellied eels (dodge)
+  mom's pot roast (max-health)
+  dad's chili (max-moves)
+  dad's fish and chips (charisma)
+  grandpa's stewed vegetables (mana-regen)
   
 You can bake the following family recipes:
-  berry cobbler (wits)                     hearty meatloaf (strength)
-  biscuits and gravy (move-regen)          mom's pie (max-mana)
-  chicken and dumplings (intelligence)     shepherd's pie (dexterity)
+  grandma's berry cobbler (wits)
+  grandma's hearty meatloaf (strength)
+  grandma's biscuits and gravy (move-regen)
+  mom's fruit pie (max-mana)
+  mom's chicken and dumplings (intelligence)
+  grandpa's shepherd's pie (dexterity)
 
 See also: BUFF FOOD, BOP, COOKING FIRE
 #
@@ -471,8 +475,8 @@ superior items and allows you to forge and smelt faster.
 
 With the basic Forge skill, you can create:
   nails (x4)
-  imperium spike (x3)
-  nocturnium spike (x3)
+  imperium spikes (x3)
+  nocturnium spikes (x3)
   hammer -- for forging
   knife -- for skinning, butchering, and crafting
   woodsman axe -- for chopping
@@ -480,6 +484,7 @@ With the basic Forge skill, you can create:
   pick -- for mining
   shovel -- dig faster
   pan -- pan for gold
+  pole -- used in crafts and buildings
   sickle -- used for harvesting
   saw -- for sawing lumber
   mirror
@@ -516,16 +521,18 @@ Usage:  cook [number] <recipe>
 Requirements:  cooking fire, sharp tool
 
 You can create lavish buff foods -- foods that give you an effect for a while
-after you eat them. These recipes are meant to share, so bring ingredients for
-your whole adventuring party! Each recipe provides food for 4 people but cannot
-be moved once prepared.
+after you eat them. You can also prepare feasts -- recipes meant to share --
+so bring ingredients for your whole adventuring party! Feast recipes provide
+food for 4 people but cannot be moved once prepared.
 
-You can make the following gourmet recipes:
+Gourmet feast recipes:
   extravagant dessert platter (general)
   mixed vegetable board (healer)
   roast meat platter (tank)
   roast turkey feast (melee)
   seafood feast (caster)
+
+More gourmet recipes can be found around the world.
 
 See also: BUFF FOOD, COOKING FIRE
 #
@@ -1060,26 +1067,6 @@ Forge:
   heavy shot
 
 See also: CRAFT, FORGE
-#
-"SKIN COMMAND" SKINNING
-
-Usage:  skin <corpse>
-Tool:  knife
-
-You can skin a fresh corpse to get usable material, which can later be turned
-into good equipment. Some corpses cannot be skinned, especially severely
-damaged and putrid ones. This command succeeds about 60% of the time unskilled,
-or 100% of the time with the Huntsman ability.
-
-Possible results from skinning and example animals:
-  small skin: rabbit, squirrel
-  large skin: deer, buffalo
-  shark skin: shark
-  snakeskin: any snake
-  fox fur: fox
-  big cat pelt: tiger, jaguar, leopard
-
-See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
 #
 "SMUGGLER CRAFTS"
 

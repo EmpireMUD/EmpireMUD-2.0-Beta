@@ -184,6 +184,68 @@ O+ 1 6831
 R
 4 5135 0
 S
+#109
+salt rock chunk~
+a chunk of rock salt~
+A chunk of rock salt is lying on the ground.~
+   This chunk of salt looks as if it was hewn directly from the ground. More
+rock than seasoning, it still tastes of the sea. It can be milled into loose
+salt for cooking.
+~
+3 0 a 0 0 18
+0 0 0
+1 0
+C
+1 1
+O+ 1 6065
+R
+4 5220 0
+R
+4 5221 0
+R
+4 5109 0
+S
+#110
+salt sea crystals~
+some sea salt crystals~
+Some sea salt crystals are lying here.~
+   These large salt crystals were formed from evaporating seawater. They can be
+milled down into usable salt.
+~
+3 0 a 0 0 19
+0 0 0
+1 0
+C
+1 1
+O+ 1 6065
+R
+4 5219 0
+R
+4 5220 0
+R
+4 5109 0
+S
+#111
+salt bit~
+a bit of salt~
+A bit of salt has been spilled here.~
+   These white crystals have, at times, ranked among the world's most precious
+commodities. Now, salt is predominantly used in gourmet cooking and in the
+preservation of meat.
+~
+3 l a 0 0 17
+0 0 0
+1 0
+C
+1 1
+O+ 1 6060
+R
+4 5220 0
+R
+4 5109 0
+R
+4 5619 0
+S
 #120
 tree trees large~
 a large tree~
@@ -474,15 +536,17 @@ S
 sapling saplings green~
 a green sapling~
 A green sapling has fallen here.~
-   This sapling is young, straight, and taller than you are. It could be used
-to build a simple hut, or carved into a handle, or fashioned into an arrow.
+   This sapling is young, straight, and taller than you are. You could scrape
+it to make a pole for building a hut, making a handle, or fashioning an arrow.
 ~
-1 l an 0 0 3
+1 l an 0 0 4
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 121 50.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
@@ -525,15 +589,17 @@ sapling saplings thorny~
 a thorny sapling~
 A thorny sapling has fallen here.~
    This small sapling is covered in thorns or spines -- the difference hardly
-matters when they're buried in your flesh. Still, it could be used for building
-or carved into a handle.
+matters when they're buried in your flesh. Still, you could scrape it to make a
+good pole for crafting and building.
 ~
-1 i an 0 0 4
+1 i an 0 0 5
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 132 50.00 1  # SCRAPE: thorny branches
 O+ 1 6025
 R
 4 5118 0
@@ -543,15 +609,16 @@ sapling saplings reaching~
 a reaching sapling~
 A reaching sapling has fallen here.~
    This sapling is thin, but very strong. In its short life, it grew tall,
-perhaps reaching for the high canopy of the jungle. It could be used for
-building, or carved into a handle.
+perhaps reaching for the high canopy of the jungle. It could be scraped to make
+a pole for building or crafting.
 ~
-1 0 an 0 0 3
+1 0 an 0 0 4
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
 O+ 1 6025
 R
 4 5118 0
@@ -561,14 +628,16 @@ shoot shoots large~
 a large shoot~
 A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
-would be just as useful as a young sapling for building or crafting.
+would be a perfect pole for building or crafting, if you scraped it.
 ~
-1 0 an 0 0 4
+1 0 an 0 0 5
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
+I 16 121 50.00 1  # SCRAPE: sticks and leaves
 O+ 1 6025
 R
 4 5118 0
@@ -581,9 +650,9 @@ A massive ancient tree is lying on the ground.~
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 0 0 0 0 17
+3 0 0 0 0 19
 0 0 0
-0 1152
+0 34560
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -604,6 +673,9 @@ I 17 136 5.00 2 p  # SAW: large shoot
 I 17 121 50.00 6 s  # SAW: sticks and leaves
 I 17 121 40.00 10 s  # SAW: sticks and leaves
 I 17 121 10.00 12 s  # SAW: sticks and leaves
+I 26 136 100.00 4  # DECAYS-TO: large shoot
+I 26 121 100.00 8  # DECAYS-TO: sticks and leaves
+I 26 120 100.00 2  # DECAYS-TO: large tree
 O+ 1 6012
 R
 4 5118 0
@@ -678,14 +750,31 @@ a bundle of wheat~
 A bundle of wheat has been left on the ground.~
 Wheat can be milled into flour, or planted.
 ~
-3 bgl a 0 0 4
+3 bglC a 0 0 7
 0 1 0
-7 168
+7 1344
 C
 1 1
 O+ 1 6170
 R
 4 5116 0
+S
+#142
+pole wooden~
+a wooden pole~
+A wooden pole is lying on the ground.~
+   The pole is long and straight. It could be used to build a simple hut,
+fashioned into an arrow, or used for all manner of other buildings and crafts.
+~
+1 l an 0 0 6
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+O+ 1 6035
+R
+4 5118 0
 S
 #143
 hops bushel~
@@ -693,9 +782,9 @@ a bushel of hops~
 A bushel of hops is sitting on the ground.~
 Hops can be made into ale at the tavern.
 ~
-3 bl a 0 0 2
+3 blC a 0 0 5
 0 3 0
-7 168
+7 1344
 C
 1 1
 M
@@ -728,9 +817,9 @@ a sack of barley~
 A sack of barley is sitting here.~
 Barley can be made into ale at the tavern.
 ~
-3 bgl a 0 0 4
+3 bglC a 0 0 7
 0 5 0
-7 168
+7 1344
 C
 1 1
 M
@@ -742,6 +831,22 @@ $n stocks the store room with $p.~
 O+ 1 6170
 R
 4 5116 0
+S
+#146
+pole fine wooden~
+a fine wooden pole~
+A fine wooden pole is leaning here.~
+The wood is immaculate and looks rather expensive on this tall, straight pole.
+~
+1 l an 0 0 6
+0 2 5
+0 0
+C
+1 1
+I 11 184 100.00 1  # LIGHT: torch
+O+ 1 6036
+R
+4 5118 0
 S
 #160
 iron-ore ore iron piece~
@@ -1138,13 +1243,15 @@ A spear head is jabbed into the ground.~
 You can wield this spearhead alone, like a knife, or attach it to a shaft to
 make a full spear.
 ~
-1 il ano f 0 4
+1 il ano f 0 5
 0 1 4
 1 0
 C
 1 1
 R
 4 5121 0
+R
+4 5610 0
 S
 #187
 stones grinding set~

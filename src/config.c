@@ -48,6 +48,8 @@
 */
 
 // external funcs
+void ensure_storage_timers(any_vnum only_vnum);
+void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
 // locals
@@ -1030,6 +1032,25 @@ CONFIG_HANDLER(config_edit_autostore_time) {
 }
 
 
+// ensures everything has a timer if needed
+CONFIG_HANDLER(config_edit_decay_in_storage) {
+	bool old = config_get_int("decay_in_storage");
+	char_data *chiter;
+	
+	// pass thru first...
+	config_edit_bool(ch, config, argument);
+	
+	if (config_get_bool("decay_in_storage") && config_get_bool("decay_in_storage") != old) {
+		ensure_storage_timers(NOTHING);
+		
+		// update objs in home storage
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			ensure_home_storage_timers(chiter, NOTHING);
+		}
+	}
+}
+
+
 CONFIG_HANDLER(config_edit_who_list_sort) {
 	int input, iter, old;
 	
@@ -1822,7 +1843,7 @@ void init_config_flags(char *key, bitvector_t flags) {
 	
 	HASH_FIND_STR(config_table, key, cnf);
 	if (!cnf) {
-		log("SYSERR: init_config_custom: %s: no key found", key);
+		log("SYSERR: init_config_flags: %s: no key found", key);
 		return;
 	}
 	
@@ -1938,6 +1959,8 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
 
 	// empire
+	init_config(CONFIG_EMPIRE, "decay_in_storage", CONFTYPE_BOOL, "stored items still count down their decay timers");
+		init_config_custom("decay_in_storage", config_show_bool, config_edit_decay_in_storage, NULL);
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");

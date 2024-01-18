@@ -1166,6 +1166,7 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 */
 void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	struct resource_data *res, *next_res;
+	craft_data *craft = find_craft_for_vehicle(veh);
 	obj_data *proto;
 	
 	// remove from goals/tech
@@ -1209,8 +1210,11 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 			}
 		}
 	}
-	// reduce resource: they don't get it all back
-	reduce_dismantle_resources(VEH_MAX_HEALTH(veh) - VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), &VEH_NEEDS_RESOURCES(veh));
+	
+	if (!craft || (!CRAFT_FLAGGED(craft, CRAFT_FULL_DISMANTLE_REFUND) && (!CRAFT_FLAGGED(craft, CRAFT_UNDAMAGED_DISMANTLE_REFUND) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)))) {
+		// reduce resource: they don't get it all back
+		reduce_dismantle_resources(VEH_MAX_HEALTH(veh) - VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), &VEH_NEEDS_RESOURCES(veh));
+	}
 	
 	// ensure it has no people/mobs on it
 	if (VEH_LED_BY(veh)) {
@@ -1607,7 +1611,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		while (*temp && ispunct(temp[strlen(temp)-1])) {
 			temp[strlen(temp)-1] = '\0';
 		}
-		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, VEH_KEYWORDS(veh))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, VEH_KEYWORDS(veh)) && search_block(temp, ignore_missing_keywords, TRUE) == NOTHING) {
 			olc_audit_msg(ch, VEH_VNUM(veh), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}

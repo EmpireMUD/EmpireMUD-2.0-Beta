@@ -15,6 +15,7 @@ I 32 1350 3.00 25 s  # SKILLED-LABOR: small skin
 I+ 7 7  # Depletion: trapping
 I 32 1351 3.00 25 s  # SKILLED-LABOR: large skin
 I+ 7 7  # Depletion: trapping
+I 32 3012 3.00 100 s  # SKILLED-LABOR: fillet of raw meat
 L q 0
 M
 9194 5.00 c
@@ -46,6 +47,7 @@ I 32 1355 1.00 25 s  # SKILLED-LABOR: snakeskin
 I+ 7 7  # Depletion: trapping
 I 32 9113 1.00 25 s  # SKILLED-LABOR: spotted fur
 I+ 7 7  # Depletion: trapping
+I 32 3012 3.00 100 s  # SKILLED-LABOR: fillet of raw meat
 L k 0
 M
 9194 5.00 c
@@ -77,6 +79,7 @@ I 32 1355 1.00 25 s  # SKILLED-LABOR: snakeskin
 I+ 7 7  # Depletion: trapping
 I 32 1353 1.00 25 s  # SKILLED-LABOR: big cat pelt
 I+ 7 7  # Depletion: trapping
+I 32 3012 3.00 100 s  # SKILLED-LABOR: fillet of raw meat
 L q 0
 M
 9194 5.00 c

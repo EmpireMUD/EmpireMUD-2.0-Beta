@@ -5,9 +5,9 @@ A loaf of village bread has been left behind.~
    This simple loaf of bread isn't terribly good, but it will keep the
 villagers fed.
 ~
-6 0 a 0 4
+6 g a 0 0 6
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -20,7 +20,7 @@ Some gruel has been left behind.~
    This serving of what could, at best, be described as "rudimentary porridge"
 has already gone cold.
 ~
-6 0 a 0 6
+6 g a 0 0 8
 48 0 0
 7 336
 C
@@ -35,9 +35,9 @@ Some village rice has been left behind.~
    The rice has been cleaned and cooked, but it's rather bland. Still, you
 could sustain an enormous workforce on enough of this.
 ~
-6 0 a 0 6
+6 g a 0 0 8
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -50,9 +50,9 @@ Some pickled village vegetables are lying here.~
    The vegetables have been pickled to make them edible and give them a little
 flavor. Not very much flavor, mind you, but a little.
 ~
-6 0 a 0 9
+6 gC a 0 0 11
 48 0 0
-7 1440
+7 8760
 C
 1 1
 R
@@ -66,9 +66,9 @@ Some village oak cakes are lying here.~
 would have been nice, or perhaps some dried fruit, but there mustn't have been
 any available.
 ~
-6 0 a 0 5
+6 g a 0 0 7
 48 0 0
-7 1440
+7 336
 C
 1 1
 R
@@ -81,7 +81,7 @@ A grilled steak has been left here.~
    The steak is pretty simple. It's a grilled cut of unidentifiable meat,
 cooked without salt or seasonings, over a hot fire.
 ~
-6 0 a 0 6
+6 gC a 0 0 10
 24 0 0
 7 336
 C
@@ -89,6 +89,8 @@ C
 O+ 1 6220
 R
 4 5619 0
+R
+4 5119 0
 S
 #3810
 chicken grilled piece~
@@ -97,7 +99,7 @@ A piece of grilled chicken is lying here.~
    This cut of grilled poultry would be generous to call itself chicken.
 Still, grilling should make it safe to eat.
 ~
-6 0 a 0 6
+6 gC a 0 0 10
 24 0 0
 7 336
 C
@@ -105,6 +107,8 @@ C
 O+ 1 6221
 R
 4 5619 0
+R
+4 5119 0
 S
 #3812
 fish fillet filet grilled~
@@ -112,7 +116,7 @@ a fillet of grilled fish~
 A fillet of grilled fish is sitting here.~
 This fish isn't well-seasoned, but at least it's well-cooked.
 ~
-6 0 a 0 7
+6 gC a 0 0 11
 24 0 0
 7 336
 C
@@ -120,6 +124,8 @@ C
 O+ 1 6223
 R
 4 5619 0
+R
+4 5119 0
 S
 #3814
 porkchop chop grilled~
@@ -127,7 +133,7 @@ a grilled porkchop~
 A grilled porkchop is lying here.~
 This fine cut of pork has been cooked until all hope of flavor is gone.
 ~
-6 0 a 0 7
+6 gC a 0 0 11
 24 0 0
 7 336
 C
@@ -135,6 +141,8 @@ C
 O+ 1 6222
 R
 4 5619 0
+R
+4 5119 0
 S
 #3816
 fruit preserves village~
@@ -142,12 +150,212 @@ some village fruit preserves~
 Some village fruit preserves have been left here.~
 The fruit has been cooked and preserved for use outside the growing season.
 ~
-6 0 a 0 10
+6 gC a 0 0 12
 48 0 0
-7 1440
+7 8760
 C
 1 1
 R
 4 5619 0
+S
+#3818
+eggs pickled village~
+some pickled village eggs~
+Some pickled eggs were left here.~
+   The eggs have gone slightly green, but they're as good today as the day they
+were pickled.
+~
+6 g a 0 0 15
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6225
+R
+4 5619 0
+S
+#3820
+beef corned~
+some corned beef~
+Some corned beef has been left behind.~
+The pale pink meat has a peppery aroma and a salty flavor.
+~
+6 g a 0 0 16
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6225
+R
+4 5619 0
+S
+#3822
+poultry salt-cured cured~
+some salt-cured poultry~
+Some salt-cured poultry has been left here.~
+The poultry is pale in color but salty and delicious!
+~
+6 g a 0 0 18
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6221
+R
+4 5619 0
+S
+#3824
+fish salt-cured cured~
+some salt-cured fish~
+Some salt-cured fish has been left out.~
+The fish has a briny, ocean smell.
+~
+6 g a 0 0 19
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6223
+R
+4 5619 0
+S
+#3826
+mutton salted~
+some salted mutton~
+Some salted mutton has been left behind.~
+The meat has gone a little pale, but it tastes amazing.
+~
+6 g a 0 0 20
+48 0 0
+7 8760
+C
+1 1
+O+ 1 6226
+R
+4 5619 0
+S
+#3830
+meat smoked~
+some smoked meat~
+Some smoked meat has been left behind.~
+   The dark color and pungent aroma tell you this meat has been smoked over a
+low fire for a long time.
+~
+6 gC a 0 0 11
+24 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+R
+4 5119 0
+S
+#3832
+poultry smoked~
+some smoked poultry~
+Some smoked poultry is lying here.~
+The savory, mouthwatering armoa of the poultry has rich, woody undertones.
+~
+6 gC a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6221
+R
+4 5619 0
+R
+4 5119 0
+S
+#3834
+ham smoked~
+some smoked ham~
+Some smoked ham is sitting on the ground.~
+The smoky, succulent smell of the ham has made you feel quite hungry.
+~
+6 gC a 0 0 13
+24 0 0
+7 336
+C
+1 1
+O+ 1 6222
+R
+4 5619 0
+R
+4 5119 0
+S
+#3836
+fish smoked~
+some smoked fish~
+Some smoked fish is hanging here.~
+The robust smokiness of the fish is evident from some distance.
+~
+6 gC a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6223
+R
+4 5619 0
+R
+4 5119 0
+S
+#3838
+mutton smoked~
+some smoked mutton~
+Some smoked mutton has been left here.~
+The tender mutton releases a hearty, smoky aroma at the slightest touch.
+~
+6 gC a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6226
+R
+4 5619 0
+R
+4 5119 0
+S
+#3840
+fruit dried~
+some dried fruit~
+Some dried fruit is sprinkled on the ground.~
+   Drying is a great way to preserve fruit. It may be leathery, but it's still
+delicious.
+~
+6 gC a 0 0 12
+48 13 0
+0 8760
+C
+1 1
+O+ 1 6135
+R
+4 5619 0
+S
+#3842
+fruit honeyed jar~
+a jar of honeyed fruit~
+A jar of honeyed fruit is lying on the ground.~
+   The jar contains fruit in honey, an ancient and tasty way to preserve food
+through the long seasons.
+~
+6 gC a 0 0 14
+48 13 0
+8 8760
+A
+4 1 0
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
+O+ 1 6135
+R
+4 5619 0
+R
+4 5114 0
 S
 $
