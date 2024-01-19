@@ -3593,7 +3593,7 @@ void process_gen_interact_room(char_data *ch) {
 	const struct gen_interact_data_t *data;
 	room_data *in_room = IN_ROOM(ch), *to_room;
 	obj_data *tool = NULL;
-	int count, dir, pos;
+	int amount, count, dir, pos;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
 	to_room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
@@ -3610,7 +3610,8 @@ void process_gen_interact_room(char_data *ch) {
 	
 	// decrement action timer
 	if (IS_SET(data->flags, GI_TOOL_LEVEL_BOOST) && tool) {
-		GET_ACTION_TIMER(ch) -= (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20);
+		amount = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20);
+		GET_ACTION_TIMER(ch) -= MAX(1, amount);
 	}
 	else {	// 1 per tick
 		GET_ACTION_TIMER(ch) -= 1;
