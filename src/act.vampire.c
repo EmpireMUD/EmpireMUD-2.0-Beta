@@ -620,6 +620,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 void update_biting_char(char_data *ch) {
 	char_data *victim;
 	obj_data *corpse;
+	double bonus = 1.0;
 	int amount, hamt;
 
 	if (!(victim = GET_FEEDING_FROM(ch)))
@@ -635,14 +636,22 @@ void update_biting_char(char_data *ch) {
 	}
 	
 	// Transfuse blood -- 10-25 points (pints?) at a time
-	amount = MIN(number(10, 25), GET_BLOOD(victim));
+	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
+		amount = number(20, 60);
+	}
+	else {
+		amount = number(10, 25);
+	}
+	
+	// check limits and set blood
+	amount = MIN(amount, GET_BLOOD(victim));
 	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
-	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
-		amount *= 3;
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_MORE_BLOOD_FROM_HUMANS)) {
+		bonus = number(20, 30) / 10.0;
 	}
-	set_blood(ch, GET_BLOOD(ch) + amount);
+	set_blood(ch, GET_BLOOD(ch) + (amount * bonus));
 	
 	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {

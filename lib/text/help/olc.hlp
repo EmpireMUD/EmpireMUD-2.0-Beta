@@ -1692,7 +1692,7 @@ Available techs are:
  &cHarvest-Command&0 *
  &cPick-Command&0 *
  &cQuarry-Command&0 *
- &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
+ &cDrink-Blood-Faster&0 - Vampires drink more blood at a time.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
@@ -1718,6 +1718,7 @@ Available techs are:
  &cSteal-Command&0 *^ - Allows 'steal'.
  &cUse-Honed-Gear&0 - Allows the player to used items that have been honed.
  &cRedirect-Magical-Damage-to-Mana&0 * - Half of magic damage drains mana not hp.
+ &cMore-Blood-From-Humans&0 - Vampires get a larger benefit drinking blood from humans.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.

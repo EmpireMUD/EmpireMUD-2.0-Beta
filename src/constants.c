@@ -1388,6 +1388,7 @@ const char *player_tech_types[] = {
 	"Steal-Command",
 	"Use-Honed-Gear",
 	"Redirect-Magical-Damage-to-Mana",	// 100
+	"More-Blood-From-Humans",
 	"\n"
 };
 
