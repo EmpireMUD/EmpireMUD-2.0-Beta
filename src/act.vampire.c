@@ -640,7 +640,7 @@ void update_biting_char(char_data *ch) {
 	
 	// can gain more
 	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
-		amount *= 2;
+		amount *= 3;
 	}
 	set_blood(ch, GET_BLOOD(ch) + amount);
 	
