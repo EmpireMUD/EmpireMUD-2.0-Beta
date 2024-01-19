@@ -103,6 +103,7 @@ Included Adventure Zones
 [  282] Goblin Logging Camp [18100-18124] (10-50) 1 mob, 7 objs, 1 room
 [10105] Ruins: Three Bandits [10105-10109] (100-200) 4 mobs, 5 objs, 1 room
 [10250] Portal to the Primeval [10250-10299] (75-175) 18 mobs, 50 objs, 10 rooms
+[10370] An Uninvited Guest [10370-10399] (100-200) 2 mobs, 3 objs, 1 room
 [10400] Hamlet of the Undead [10400-10449] (175-275) 25 mobs, 50 objs, 19 rooms
 [10450] The Sewer: Goblin Outpost [10450-10499] (50-150) 7 mobs, 50 objs, 5 rooms
 [10700] Winter Wonderland [10700-10729] (1-400) 15 mobs, 29 objs, 7 rooms
@@ -110,7 +111,7 @@ Included Adventure Zones
 [10950] Viscous Muck Dragon [10950-10964] (225-325) 2 mobs, 11 objs, 1 room
 [10965] Giant! [10965-10979] (100-175) 5 mobs, 11 objs, 1 room
 [10980] Renegade Spellcaster! [10980-10999] (100-175) 8 mobs, 13 objs, 1 room
-[11800] The Tower Skycleave: Ashes of History [11800-11999] (150-250) 200 mobs, 199 objs, 140 rooms
+[11800] The Tower Skycleave: Ashes of History [11800-11999] (150-250) 200 mobs, 200 objs, 140 rooms
 [12000] Binding Circle: Anat [12000-12029] (225-325) 5 mobs, 22 objs, 1 room
 [12030] Binding Circle: Ba'al Hadad [12030-12059] (225-325) 5 mobs, 25 objs, 2 rooms
 [12300] Fur Dragon [12300-12349] (225-325) 5 mobs, 40 objs, 1 room
