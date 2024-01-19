@@ -4398,6 +4398,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				try_home = TRUE;
 			}
 		}
+		else if (!load_room) {
+			// instance gone?
+			GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
+			load_room = NULL;
+			try_home = TRUE;
+		}
 	}
 	
 	// cancel detected loadroom?
