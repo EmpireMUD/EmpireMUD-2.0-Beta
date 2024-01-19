@@ -418,9 +418,9 @@ R
 4 5619 0
 S
 #10525
-axeroot root~
-an axeroot~
-An axeroot is lying here, uprooted.~
+axeroot root robust~
+a robust axeroot~
+A robust axeroot is lying here, uprooted.~
    The magi-netically engineered axeroot grows in a distinctive blade shape,
 and need only be sharpened to make a suitable chopper. You can also plant it to
 start a new crop.
@@ -428,7 +428,7 @@ start a new crop.
 Craft (Basic Crafts): axeroot chopper
 Craft (Master Craftsman, level 150): spade-axe
 ~
-3 beC a 0 0 9
+3 beC a 0 0 10
 0 10508 0
 2 2160
 R
