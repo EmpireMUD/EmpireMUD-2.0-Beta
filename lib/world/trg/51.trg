@@ -161,6 +161,99 @@ Swamp Platform~
 %terraform% %room% 0
 return 0
 ~
+#5161
+Baths: Clothes / bathing process~
+1 ab 100
+~
+* this runs in a loop
+while %self.val1% > 0
+  * update timer
+  eval timer %self.val1% - 1
+  nop %self.val1(%timer%)%
+  * check vars
+  makeuid actor %self.val0%
+  if !%actor%
+    * gone?
+    %purge% %self%
+    halt
+  elseif %actor.id% != %self.val0% || %actor.room% != %self.room% || %actor.stop_command%
+    * moved or stopped?
+    %purge% %self%
+    halt
+  elseif %actor.fighting% || %actor.position% == Sleeping
+    * bad pos
+    %purge% %self%
+    halt
+  end
+  * next message
+  switch %timer%
+    case 3
+      %send% %actor% You swim through the water...
+      %echoaround% %actor% ~%actor% swims through the water...
+    break
+    case 2
+      %send% %actor% You scrub your hair to get out any dirt and insects...
+      %echoaround% %actor% ~%actor% scrubs ^%actor% hair to get out any dirt and insects...
+    break
+    case 1
+      %send% %actor% You wash yourself off...
+      %echoaround% %actor% ~%actor% washes *%actor%self off carefully...
+    break
+    case 0
+      %send% %actor% You finish bathing and climb out of the water to dry off.
+      %echoaround% %actor% ~%actor% finishes bathing and climbs out of the water to dry off.
+      * done
+      dg_affect #5162 %actor% off
+      dg_affect #5162 %actor% DEXTERITY 1 1800
+      dg_affect #5162 %actor% CHARISMA 1 1800
+      %purge% %self%
+      halt
+    break
+  done
+  wait 8 s
+done
+~
+#5162
+Baths: Bathe command~
+2 c 0
+bathe~
+set valid_positions Standing Sitting Resting
+if %actor.action% || %actor.fighting% || !(%valid_positions% ~= %actor.position%)
+  %send% %actor% You can't do that right now.
+  halt
+elseif !%actor.canuseroom_guest%
+  %send% %actor% You wouldn't want to get caught bathing in here.
+  halt
+end
+* ok bathe:
+%load% obj 5162
+set obj %room.contents%
+* ensure it worked
+if %obj.vnum% != 5162
+  %send% %actor% You don't seem to be able to bathe here.
+  halt
+end
+* update data on obj
+nop %obj.val0(%actor.id%)%
+nop %obj.val1(4)%
+* set up 'stop' command
+set stop_command 0
+set stop_message_char You climb out of the water and get dressed.
+set stop_message_room ~%actor% climbs out of the water and gets dressed.
+set needs_stop_command 1
+remote stop_command %actor.id%
+remote stop_message_char %actor.id%
+remote stop_message_room %actor.id%
+remote needs_stop_command %actor.id%
+* start messages
+if %actor.eq(clothes)%
+  %send% %actor% You undress and climb into the water...
+  %echoaround% %actor% ~%actor% undresses and climbs into the water...
+else
+  %send% %actor% You climb into the water...
+  %echoaround% %actor% ~%actor% climbs into the water...
+end
+~
 #5164
 Sorcery Tower Completion~
 2 o 100

@@ -590,15 +590,46 @@ ACMD(do_friends_online) {
 // called through do_friend
 ACMD(do_friend_accept) {
 	bool file = FALSE, secret = FALSE;
-	int status;
+	char output[MAX_STRING_LENGTH * 2], line[256];
+	int count, status;
+	size_t size, lsize;
 	char_data *plr = NULL;
-	struct friend_data *friend;
+	struct friend_data *friend, *next_friend;
 	
 	if (PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
 		msg_to_char(ch, "You cannot accept or deny friend requests while you have no-friends toggled on.\r\n");
 	}
 	else if (!*argument) {
-		msg_to_char(ch, "Accept the friend request from whom?\r\n");
+		// no-arg: show open requests
+		size = snprintf(output, sizeof(output), "Open friend requests you've received:\r\n");
+		count = 0;
+		
+		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
+			if (friend->status != FRIEND_REQUEST_RECEIVED) {
+				continue;	// wrong status
+			}
+			
+			// otherwise show it
+			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
+			++count;
+		
+			if (size + lsize + 80 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			else {
+				// space reserved for this
+				strcat(output, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, " none\r\n");
+		}
+		
+		page_string(ch->desc, output, TRUE);
+		return;
 	}
 	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
 		msg_to_char(ch, "No such player.\r\n");
@@ -697,14 +728,46 @@ ACMD(do_friend_cancel) {
 // called through do_friend
 ACMD(do_friend_deny) {
 	bool file = FALSE, secret = FALSE;
-	int status;
+	char output[MAX_STRING_LENGTH * 2], line[256];
+	int count, status;
+	size_t size, lsize;
 	char_data *plr = NULL;
+	struct friend_data *friend, *next_friend;
 	
 	if (PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
 		msg_to_char(ch, "You cannot accept or deny friend requests while you have no-friends toggled on.\r\n");
 	}
 	else if (!*argument) {
-		msg_to_char(ch, "Deny your friend request from whom?\r\n");
+		// no-arg: show open requests
+		size = snprintf(output, sizeof(output), "Open friend requests you've received:\r\n");
+		count = 0;
+		
+		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
+			if (friend->status != FRIEND_REQUEST_RECEIVED) {
+				continue;	// wrong status
+			}
+			
+			// otherwise show it
+			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
+			++count;
+		
+			if (size + lsize + 80 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			else {
+				// space reserved for this
+				strcat(output, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, " none\r\n");
+		}
+		
+		page_string(ch->desc, output, TRUE);
+		return;
 	}
 	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
 		msg_to_char(ch, "No such player.\r\n");
@@ -750,7 +813,7 @@ ACMD(do_friend_request) {
 	
 	if (!*argument) {
 		// no-arg: show open requests
-		size = snprintf(output, sizeof(output), "Open friend quests you've sent:\r\n");
+		size = snprintf(output, sizeof(output), "Open friend requests you've sent:\r\n");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -759,7 +822,7 @@ ACMD(do_friend_request) {
 			}
 			
 			// otherwise show it
-			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->name ? friend->name : "Unknown");
+			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
 			++count;
 		
 			if (size + lsize + 80 < sizeof(output)) {

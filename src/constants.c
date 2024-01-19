@@ -4119,7 +4119,7 @@ const bool evo_is_over_time[] = {
 const char *function_flags[] = {
 	"ALCHEMIST",	// 0
 	"UPGRADED",
-	"BATHS",
+	"*",
 	"BEDROOM",
 	"CARPENTER",
 	"*",	// 5
@@ -4165,7 +4165,7 @@ const char *function_flags[] = {
 const char *function_flags_long[] = {
 	"at an alchemist",	// 0
 	"an upgraded building",
-	"at the baths",
+	"",
 	"in a bedroom",
 	"at a carpenter",
 	"",	// 5

@@ -10761,7 +10761,7 @@ void read_vault(empire_data *emp) {
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen) {
 	obj_data *obj, *proto;
 	bool room = FALSE;
-	int available;
+	int available, min;
 
 	proto = store->proto;
 	
@@ -10781,6 +10781,12 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	// grab the timer from storage?
 	if (store->timers) {
 		GET_OBJ_TIMER(obj) = store->timers->timer;
+		if ((min = config_get_int("min_timer_after_retrieve")) > 0 && min > GET_OBJ_TIMER(obj)) {
+			// don't raise it past the prototype
+			min = MIN(min, GET_OBJ_TIMER(proto));
+			// raise it (but don't lower it if it dropped)
+			GET_OBJ_TIMER(obj) = MAX(min, GET_OBJ_TIMER(obj));
+		}
 	}
 	
 	// charge resource after borrowing the timer -- as it likely removes the first timer

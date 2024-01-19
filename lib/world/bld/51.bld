@@ -1521,7 +1521,7 @@ the water. This is a place of cleanliness, so attendants regularly add fresh
 water to the bathing pools.
 ~
 F
-cF
+F
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 236 10.00 ce
@@ -1531,6 +1531,8 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5162
+T 9808
 S
 #5163
 Fountain~

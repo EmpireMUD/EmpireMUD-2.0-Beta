@@ -1034,7 +1034,7 @@ CONFIG_HANDLER(config_edit_autostore_time) {
 
 // ensures everything has a timer if needed
 CONFIG_HANDLER(config_edit_decay_in_storage) {
-	bool old = config_get_int("decay_in_storage");
+	bool old = config_get_bool("decay_in_storage");
 	char_data *chiter;
 	
 	// pass thru first...
@@ -1988,6 +1988,7 @@ void init_config_system(void) {
 		init_config_custom("autostore_time", config_show_int, config_edit_autostore_time, NULL);
 	init_config(CONFIG_ITEMS, "bound_item_junk_time", CONFTYPE_INT, "minutes bound items last on the ground before being junked");
 	init_config(CONFIG_ITEMS, "long_autostore_time", CONFTYPE_INT, "minutes items last with the long-autostore bld flag");
+	init_config(CONFIG_ITEMS, "min_timer_after_retrieve", CONFTYPE_INT, "hour ticks guaranteed after retrieving a resource with a low timer remaining");
 	init_config(CONFIG_ITEMS, "room_item_limit", CONFTYPE_INT, "number of items allowed in buildings with item-limit flag");
 	init_config(CONFIG_ITEMS, "scale_points_at_100", CONFTYPE_DOUBLE, "number of scaling points for a 100-scale item");
 	init_config(CONFIG_ITEMS, "scale_food_fullness", CONFTYPE_DOUBLE, "fullness hours per scaling point");

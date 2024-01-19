@@ -1155,6 +1155,8 @@ create a new secret character without it showing up as a friend to anyone, link
 it to an alt that already has no-friends toggled on. It will inherit this
 setting.
 
+See a list of waiting friend requests with "friends -all" or "friend accept".
+
 If a player is bothering you with friend requests, 'ignore' will silence them.
 
 See also: ALTERNATE, IGNORE, REPLY

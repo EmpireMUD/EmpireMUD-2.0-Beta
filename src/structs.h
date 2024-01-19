@@ -790,7 +790,7 @@ typedef struct vehicle_data vehicle_data;
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
 #define FNC_UPGRADED  BIT(1)	// used on upgraded buildings / advanced crafts
-#define FNC_BATHS  BIT(2)	// can use the bathe command here
+	#define FNC_UNUSED2  BIT(2)	// formerly BATHS; this now uses a script
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
 	#define FNC_UNUSED5  BIT(5)	// formerly DIGGING; no longer needed for workforce
@@ -2023,7 +2023,7 @@ typedef enum {
 #define ACT_PICKING			18
 #define ACT_MORPHING		19
 #define ACT_SCRAPING		20
-#define ACT_BATHING			21
+	#define ACT_BATHING			21	// deprecated as of b5.171
 	#define ACT_CHANTING		22	// deprecated as of b5.166
 #define ACT_PROSPECTING		23
 #define ACT_FILLING_IN		24

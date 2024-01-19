@@ -53,7 +53,6 @@ void process_chipping(char_data *ch);
 void process_driving(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
-void process_bathing(char_data *ch);
 void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
@@ -121,7 +120,7 @@ const struct action_data_struct action_data[] = {
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
-	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
+		{ "bathing", "is bathing in the water.", NOBITS, cancel_action, NULL },	// no longer used: replaced by a script
 		{ "chanting", "is chanting a strange song.", NOBITS, cancel_action, NULL },	// no longer used
 	{ "prospecting", "is prospecting.", ACTF_FAST_PROSPECT, process_prospecting, NULL },	// ACT_PROSPECTING
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_fillin, NULL },	// ACT_FILLING_IN
@@ -160,9 +159,11 @@ const struct action_data_struct action_data[] = {
 // available flags
 #define GI_ALLOW_DIRECTION			BIT(0)	// player can do this in a direction from here
 #define GI_CONTINUE_WHEN_DEPLETED	BIT(1)	// will not stop for depletion
-#define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
+#define GI_SHORT_TIMER_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
 #define GI_LOCAL_CROPS				BIT(3)	// if the interaction fails, tries a random local crop too
 #define GI_ATTEMPT_WITHOUT_INTERACT	BIT(4)	// can try it even if nothing is here
+#define GI_TOOL_LEVEL_BOOST			BIT(5)	// goes faster with a high-level tool
+#define GI_SKILL_CHECK_BOOST		BIT(6)	// goes faster with a skill check
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -250,7 +251,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	{ INTERACT_FISH, ACT_FISHING, "fish", "fishing", "fishing_timer", 40,
 		PTECH_FISH_COMMAND, GI_NO_APPROVAL,
-		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_FASTER_WITH_SKILL_CHECK,
+		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_TOOL_LEVEL_BOOST | GI_SKILL_CHECK_BOOST | GI_SHORT_TIMER_SKILL_CHECK,
 		{ /* start msg */ { "You start watching for fish...", "$n starts looking for fish." },
 		/* pre-finish */ "A fish darts past you...",
 		/* finish msg */ { "You catch $p.", "$n catches $p." },
@@ -1134,56 +1135,6 @@ void perform_saw(char_data *ch) {
 	else if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		// message last, only if they didn't finish
 		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
-	}
-}
-
-
-/**
-* Tick update for bathing action.
-*
-* @param char_data *ch The bather.
-*/
-void process_bathing(char_data *ch) {
-	// can still bathe here?
-	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
-		cancel_action(ch);
-		return;
-	}
-	
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		// finish
-		msg_to_char(ch, "You finish bathing and climb out of the water to dry off.\r\n");
-		act("$n finishes bathing and climbs out of the water to dry off.", FALSE, ch, 0, 0, TO_ROOM);
-		end_action(ch);
-	}
-	else {
-		// decrement
-		GET_ACTION_TIMER(ch) -= 1;
-		
-		// messaging
-		switch (number(0, 2)) {
-			case 0: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You wash yourself off...\r\n");
-				}
-				act("$n washes $mself carefully...", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-			case 1: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You scrub your hair to get out any dirt and insects...\r\n");
-				}
-				act("$n scrubs $s hair to get out any dirt and insects...", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-			case 2: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					msg_to_char(ch, "You swim through the water...\r\n");
-				}
-				act("$n swims through the water...", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-		}
 	}
 }
 
@@ -2415,29 +2366,6 @@ void process_tanning(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION COMMANDS /////////////////////////////////////////////////////////
 
-ACMD(do_bathe) {
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot bathe. It's dirty, but it's true.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_BATHING) {
-		msg_to_char(ch, "You stop bathing and climb out of the water.\r\n");
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're a bit busy right now.\r\n");
-	}
-	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
-		msg_to_char(ch, "You can't bathe here!\r\n");
-	}
-	else {
-		start_action(ch, ACT_BATHING, 4);
-
-		msg_to_char(ch, "You undress and climb into the water!\r\n");
-		act("$n undresses and climbs into the water!", FALSE, ch, 0, 0, TO_ROOM);
-	}
-}
-
-
 ACMD(do_chip) {
 	obj_data *target;
 	int number;
@@ -3619,7 +3547,7 @@ void start_gen_interact_room(char_data *ch, int dir, room_data *room, const stru
 	GET_ACTION_VNUM(ch, 0) = dir;
 	
 	// optional skill check?
-	if (IS_SET(data->flags, GI_FASTER_WITH_SKILL_CHECK) && data->ptech != NO_TECH && player_tech_skill_check_by_ability_difficulty(ch, data->ptech)) {
+	if (IS_SET(data->flags, GI_SHORT_TIMER_SKILL_CHECK) && data->ptech != NO_TECH && player_tech_skill_check_by_ability_difficulty(ch, data->ptech)) {
 		GET_ACTION_TIMER(ch) /= 2;
 	}
 	
@@ -3664,7 +3592,8 @@ bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct g
 void process_gen_interact_room(char_data *ch) {
 	const struct gen_interact_data_t *data;
 	room_data *in_room = IN_ROOM(ch), *to_room;
-	int count, dir, pos;
+	obj_data *tool = NULL;
+	int amount, count, dir, pos;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
 	to_room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
@@ -3674,7 +3603,24 @@ void process_gen_interact_room(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= 1;
+	// detect tool if needed (this is validated elsewhere, so it's optional)
+	if (data->tool) {
+		tool = has_tool(ch, data->tool);
+	}
+	
+	// decrement action timer
+	if (IS_SET(data->flags, GI_TOOL_LEVEL_BOOST) && tool) {
+		amount = (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20);
+		GET_ACTION_TIMER(ch) -= MAX(1, amount);
+	}
+	else {	// 1 per tick
+		GET_ACTION_TIMER(ch) -= 1;
+	}
+	
+	// additional boost?
+	if (IS_SET(data->flags, GI_SKILL_CHECK_BOOST) && data->ptech != NO_TECH && player_tech_skill_check(ch, data->ptech, DIFF_MEDIUM)) {
+		GET_ACTION_TIMER(ch) -= 2;
+	}
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		// still going: tick messages
