@@ -159,10 +159,11 @@ const struct action_data_struct action_data[] = {
 // available flags
 #define GI_ALLOW_DIRECTION			BIT(0)	// player can do this in a direction from here
 #define GI_CONTINUE_WHEN_DEPLETED	BIT(1)	// will not stop for depletion
-#define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
+#define GI_SHORT_TIMER_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
 #define GI_LOCAL_CROPS				BIT(3)	// if the interaction fails, tries a random local crop too
 #define GI_ATTEMPT_WITHOUT_INTERACT	BIT(4)	// can try it even if nothing is here
 #define GI_TOOL_LEVEL_BOOST			BIT(5)	// goes faster with a high-level tool
+#define GI_SKILL_CHECK_BOOST		BIT(6)	// goes faster with a skill check
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -250,7 +251,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	{ INTERACT_FISH, ACT_FISHING, "fish", "fishing", "fishing_timer", 40,
 		PTECH_FISH_COMMAND, GI_NO_APPROVAL,
-		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_TOOL_LEVEL_BOOST | GI_FASTER_WITH_SKILL_CHECK,
+		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_TOOL_LEVEL_BOOST | GI_SKILL_CHECK_BOOST | GI_SHORT_TIMER_SKILL_CHECK,
 		{ /* start msg */ { "You start watching for fish...", "$n starts looking for fish." },
 		/* pre-finish */ "A fish darts past you...",
 		/* finish msg */ { "You catch $p.", "$n catches $p." },
@@ -3546,7 +3547,7 @@ void start_gen_interact_room(char_data *ch, int dir, room_data *room, const stru
 	GET_ACTION_VNUM(ch, 0) = dir;
 	
 	// optional skill check?
-	if (IS_SET(data->flags, GI_FASTER_WITH_SKILL_CHECK) && data->ptech != NO_TECH && player_tech_skill_check_by_ability_difficulty(ch, data->ptech)) {
+	if (IS_SET(data->flags, GI_SHORT_TIMER_SKILL_CHECK) && data->ptech != NO_TECH && player_tech_skill_check_by_ability_difficulty(ch, data->ptech)) {
 		GET_ACTION_TIMER(ch) /= 2;
 	}
 	
@@ -3613,6 +3614,11 @@ void process_gen_interact_room(char_data *ch) {
 	}
 	else {	// 1 per tick
 		GET_ACTION_TIMER(ch) -= 1;
+	}
+	
+	// additional boost?
+	if (IS_SET(data->flags, GI_SKILL_CHECK_BOOST) && data->ptech != NO_TECH && player_tech_skill_check(ch, data->ptech, DIFF_MEDIUM)) {
+		GET_ACTION_TIMER(ch) -= 2;
 	}
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
