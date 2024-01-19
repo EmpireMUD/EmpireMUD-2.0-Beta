@@ -1034,7 +1034,7 @@ CONFIG_HANDLER(config_edit_autostore_time) {
 
 // ensures everything has a timer if needed
 CONFIG_HANDLER(config_edit_decay_in_storage) {
-	bool old = config_get_int("decay_in_storage");
+	bool old = config_get_bool("decay_in_storage");
 	char_data *chiter;
 	
 	// pass thru first...
