@@ -162,6 +162,7 @@ const struct action_data_struct action_data[] = {
 #define GI_FASTER_WITH_SKILL_CHECK	BIT(2)	// runs a skill check and halves the timer
 #define GI_LOCAL_CROPS				BIT(3)	// if the interaction fails, tries a random local crop too
 #define GI_ATTEMPT_WITHOUT_INTERACT	BIT(4)	// can try it even if nothing is here
+#define GI_TOOL_LEVEL_BOOST			BIT(5)	// goes faster with a high-level tool
 
 
 // INTERACT_x: interactions that are processed by do_gen_interact_room
@@ -249,7 +250,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	},
 	{ INTERACT_FISH, ACT_FISHING, "fish", "fishing", "fishing_timer", 40,
 		PTECH_FISH_COMMAND, GI_NO_APPROVAL,
-		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_FASTER_WITH_SKILL_CHECK,
+		TOOL_FISHING, GI_NO_SPEC, GI_ALLOW_DIRECTION | GI_TOOL_LEVEL_BOOST | GI_FASTER_WITH_SKILL_CHECK,
 		{ /* start msg */ { "You start watching for fish...", "$n starts looking for fish." },
 		/* pre-finish */ "A fish darts past you...",
 		/* finish msg */ { "You catch $p.", "$n catches $p." },
@@ -3590,6 +3591,7 @@ bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct g
 void process_gen_interact_room(char_data *ch) {
 	const struct gen_interact_data_t *data;
 	room_data *in_room = IN_ROOM(ch), *to_room;
+	obj_data *tool = NULL;
 	int count, dir, pos;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
@@ -3600,7 +3602,18 @@ void process_gen_interact_room(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= 1;
+	// detect tool if needed (this is validated elsewhere, so it's optional)
+	if (data->tool) {
+		tool = has_tool(ch, data->tool);
+	}
+	
+	// decrement action timer
+	if (IS_SET(data->flags, GI_TOOL_LEVEL_BOOST) && tool) {
+		GET_ACTION_TIMER(ch) -= (GET_OBJ_CURRENT_SCALE_LEVEL(tool) / 20);
+	}
+	else {	// 1 per tick
+		GET_ACTION_TIMER(ch) -= 1;
+	}
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
 		// still going: tick messages
