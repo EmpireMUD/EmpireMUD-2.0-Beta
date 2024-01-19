@@ -11506,9 +11506,6 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
-			refresh_passive_buffs(victim);
-			convert_and_schedule_player_affects(victim);	// ensures the timers are right on affects
-			affect_total(victim);
 			do_stat_character(ch, victim);
 		}
 		
