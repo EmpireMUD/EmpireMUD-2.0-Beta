@@ -910,6 +910,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
 		VEH_LONG_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_LONG_DESC(ruin));
+		CAP(VEH_LONG_DESC(ruin));
 		if (to_free) {
 			free(to_free);
 		}

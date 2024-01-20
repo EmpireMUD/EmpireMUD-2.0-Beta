@@ -432,6 +432,7 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	if (strchr(GET_LONG_DESC(proto ? proto : mob), '#')) {
 		GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		CAP(GET_LONG_DESC(mob));
 		if (free_long) {
 			free(free_long);
 		}

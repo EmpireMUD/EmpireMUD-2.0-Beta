@@ -3571,6 +3571,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
 		set_room_custom_name(inter_room, NULL);
 		temp = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		CAP(temp);
 		set_room_custom_name(inter_room, temp);
 		free(temp);
 	}
@@ -3720,6 +3721,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
 		VEH_LONG_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_LONG_DESC(ruin));
+		CAP(VEH_LONG_DESC(ruin));
 		if (to_free) {
 			free(to_free);
 		}
