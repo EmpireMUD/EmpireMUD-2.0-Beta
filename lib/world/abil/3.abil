@@ -380,4 +380,26 @@ M
 *~
 T s 1
 S
+#318
+Pulsify~
+dor -1 1.00 G 0 0
+A
+20 100
+C
+pulsify 7 bh 2 10 0.00 -1 0 0 5 0
+D 16 54 0
+M
+2
+You touch $N and feel $S pulse racing as black veins spread along $S skin!~
+M
+3
+$n touches you and your heart starts to race as black veins spread along your skin!~
+M
+4
+$n touches $N, causing black veins to spread along $S skin!~
+T b 1
+X+ 1 3116
+X+ 2 75
+X+ 3 75
+S
 $

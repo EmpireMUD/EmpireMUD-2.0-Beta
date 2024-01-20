@@ -662,11 +662,13 @@ a vial of pepper spray~
 A glass vial of pepper spray has been left here.~
 This small glass vial is filled with a bright red fluid that sizzles slightly.
 ~
-26 0 a 0 0 13
+26 0 a 0 0 14
 0 15 -1
 8 0
 C
 125 125
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
 4 5130 0
 T 1273
