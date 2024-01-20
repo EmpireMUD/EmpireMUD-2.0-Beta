@@ -2894,7 +2894,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	}
 	
 	if (IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
-		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_desc(type, amount), PERS(vict, vict, TRUE));
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_amount(type, amount), PERS(vict, vict, TRUE));
 	}
 	
 	// msg to char
