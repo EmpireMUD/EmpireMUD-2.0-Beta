@@ -225,7 +225,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 	int base = base_player_pools[BLOOD];
 	
 	if (IS_NPC(ch)) {
-		base = ch->points.max_pools[BLOOD];
+		base = ch->points.max_pools[BLOOD] + GET_EXTRA_BLOOD(ch);
 	}
 	else {
 		base += GET_EXTRA_BLOOD(ch);
