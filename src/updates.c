@@ -4018,6 +4018,7 @@ const struct {
 	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
 	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
+	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
