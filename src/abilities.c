@@ -3869,6 +3869,20 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				break;
 			}
+			case ABIL_LIMIT_TARGET_IS_HUMAN: {
+				if (vict && IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_HUMAN)) {
+					if (send_msgs) {
+						if (ch == vict) {
+							msg_to_char(ch, "You are not human.\r\n");
+						}
+						else {
+							act("$n is not human.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+						}
+					}
+					return FALSE;
+				}
+				break;
+			}
 		}
 	}
 	

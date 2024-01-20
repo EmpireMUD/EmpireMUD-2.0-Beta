@@ -1318,6 +1318,7 @@ Limitation types:
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget is affected by&0 - Target must have an affect flag.
+ &ctarget is human&0 - Target must be a player or HUMAN-flagged mob.
  &ctarget is vampire&0 - Target must be a vampire.
  &ctarget not affeced by&0 - Target is not affected by a given affect flag.
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.

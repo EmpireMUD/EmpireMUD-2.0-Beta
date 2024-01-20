@@ -533,6 +533,7 @@ const char *ability_limitations[] = {
 	"not leading vehicle",
 	"is affected by",
 	"target is affected by",
+	"target is human",
 	"\n"
 };
 
@@ -593,6 +594,7 @@ const int ability_limitation_misc[] = {
 	ABLIM_NOTHING,	// ABIL_LIMIT_NOT_LEADING_VEHICLE
 	ABLIM_AFF_FLAG,	// ABIL_LIMIT_IS_AFFECTED_BY
 	ABLIM_AFF_FLAG,	// ABIL_LIMIT_TARGET_IS_AFFECTED_BY
+	ABLIM_NOTHING,	// ABIL_LIMIT_TARGET_IS_HUMAN
 };
 
 
