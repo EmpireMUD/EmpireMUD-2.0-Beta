@@ -4961,7 +4961,7 @@ ACMD(do_efind) {
 			page_string(ch->desc, buf, TRUE);
 		}
 		else {
-			msg_to_char(ch, "You don't discover anything like that in your empire.\r\n");
+			msg_to_char(ch, "You don't discover anything like that in %s.\r\n", (emp == GET_LOYALTY(ch) ? "your empire" : EMPIRE_NAME(emp)));
 		}
 	}
 }
