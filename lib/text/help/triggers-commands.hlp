@@ -1062,7 +1062,7 @@ See also: REMOTE, RDELETE, SHOW VARIABLES
 #d
 WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
 
-Usage:  wait <time> [s]
+Usage:  wait <time> [s | t]
         wait until <mudtime>
 
 The wait statement is used to 'pause' the script execution for a period of 
@@ -1070,11 +1070,21 @@ time. When a script is being executed it will attempt to execute all commands
 right away. To get small breaks in, and perhaps give the players time to adjust, 
 use the wait command.
 
-Note: A trigger won't fire again while it's still in a 'wait', so be careful
-using this on Greet triggers.
-Note: Triggers attached to adventures or quests must not use 'wait', because
-those triggers only exist long enough to run, and will cancel themselves when
-they hit a 'wait'.
+Wait times are measured in 'passes', which are very very short; 'wait 1' will
+only pause long enough for players to get a fresh prompt, then will resume. You
+can use 'wait 1 s' to wait for 1 second instead, or 'wait 1 t' to wait for 1
+game hour.
+
+Beware of moving or dead targets when using 'wait'. For example, if %actor%
+dies during a wait, the variable may no longer be valid. This is hard to detect
+in DG Scripts because it ignores missing variables. The best way to check is to
+store %actor.id% to a variable before the 'wait', then compare that variable to
+%actor.id% again after the 'wait'. If it changed, the original actor is gone.
+
+A trigger won't fire again while it's still in a 'wait', so be careful using
+this on Greet triggers. Triggers attached directly to adventures or quests must
+not use 'wait', because those triggers only exist long enough to run, and will
+cancel themselves entirely when they hit a 'wait'.
 
 Examples:
   say GET OUT! NOW!
