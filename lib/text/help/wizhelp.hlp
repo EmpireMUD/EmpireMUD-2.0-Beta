@@ -825,6 +825,7 @@ with the 'empire' grant:
 - city: optional first arg to edit cities for any empire
 - eedit: optional first arg to specify which empire
 - einv: optional first arg to specify which empire
+- efind: optional first arg to specify which empire
 - elog: optional first arg to specify which empire
 - findmaint: optional first arg to specify which empire
 - islands: optional first arg to specify which empire
@@ -832,6 +833,7 @@ with the 'empire' grant:
 - offenses: optional first arg to specify which empire
 - progress: optional first arg to specify which empire
 - roster: optional first arg to specify which empire
+- ship: optional first arg to specify which empire
 - territory: optional first arg to specify which empire
 - warehouse: optional first arg to specify which empire
 
