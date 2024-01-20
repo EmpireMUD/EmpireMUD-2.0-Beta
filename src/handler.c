@@ -9086,6 +9086,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_DIPLOMACY_OVER: {
+				if (!GET_LOYALTY(ch) || count_diplomacy_over(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			case REQ_HAVE_CITY: {
 				if (!GET_LOYALTY(ch) || count_cities(GET_LOYALTY(ch)) < req->needed) {
 					ok = FALSE;
@@ -9363,6 +9369,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
 			}
 			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
+			break;
+		}
+		case REQ_DIPLOMACY_OVER: {
+			sprintbit(req->misc, diplomacy_flags, lbuf, TRUE);
+			if (lbuf[strlen(lbuf)-1] == ' ') {
+				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
+			}
+			snprintf(output, sizeof(output), "Have diplomatic relations of at least: %dx %s", req->needed, lbuf);
 			break;
 		}
 		case REQ_HAVE_CITY: {

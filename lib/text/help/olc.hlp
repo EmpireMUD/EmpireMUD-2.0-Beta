@@ -8870,6 +8870,7 @@ Available tasks:
  &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
  &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
  &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
+ &cDIPLOMACY-OVER&0 - Empire must have N matching (or better) diplomatic relations.
  &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
  &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
  &cEMPIRE-PRODUCED-OBJECT&0 - Empire has produced an amount of an item.

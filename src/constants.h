@@ -275,6 +275,7 @@ extern const char *craft_types[];
 // empire constants
 extern const struct city_metadata_type city_type[];
 extern const char *diplomacy_flags[];
+extern const bitvector_t diplomacy_better_list[];
 extern const struct offense_info_type offense_info[NUM_OFFENSES];
 extern const char *empire_log_types[];
 extern const bool show_empire_log_type[];

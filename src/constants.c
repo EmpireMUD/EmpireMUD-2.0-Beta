@@ -2343,7 +2343,7 @@ const struct city_metadata_type city_type[] = {
 };
 
 
-// DIPL_x: Diplomacy types
+// DIPL_x (1/2): Diplomacy types
 const char *diplomacy_flags[] = {
 	"peace",	// 0
 	"war",
@@ -2354,6 +2354,21 @@ const char *diplomacy_flags[] = {
 	"distrust",
 	"truce",
 	"\n"
+};
+
+
+// DIPL_x (2/2): Types considered better than a given status (for REQ_DIPLOMACY_OVER)
+// These must start with the flag itself (it is considered greater than or equal to itself).
+// These should include anything considered an upgraded version of the flag.
+const bitvector_t diplomacy_better_list[] = {
+	DIPL_PEACE | DIPL_NONAGGR | DIPL_ALLIED,	// 0 - PEACE
+	DIPL_WAR,	// WAR
+	DIPL_THIEVERY | DIPL_WAR,	// THIEVERY
+	DIPL_ALLIED,	// ALLIED
+	DIPL_NONAGGR | DIPL_ALLIED,	// NONAGGR
+	DIPL_TRADE,	// 5 - TRADE
+	DIPL_DISTRUST | DIPL_WAR,	// DISTRUST
+	DIPL_TRUCE | DIPL_PEACE | DIPL_NONAGGR | DIPL_ALLIED,	// TRUCE
 };
 
 
@@ -5218,6 +5233,7 @@ const char *requirement_types[] = {
 	"COMPLETED-QUEST-EVER",
 	"DAYTIME",
 	"NIGHTTIME",	// 45
+	"DIPLOMACY-OVER",
 	"\n",
 };
 
@@ -5270,6 +5286,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// completed-quest-ever
 	REQ_AMT_NONE,	// daytime
 	REQ_AMT_NONE,	// 45, nighttime
+	REQ_AMT_NUMBER,	// diplomacy-over
 };
 
 
@@ -5321,6 +5338,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// completed quest ever
 	FALSE,	// daytime
 	FALSE,	// 45, nighttime
+	FALSE,	// diplomacy-over
 };
 
 

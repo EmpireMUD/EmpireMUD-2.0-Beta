@@ -2505,6 +2505,7 @@ PATHFIND_VALIDATOR(pathfind_road);
 void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
+int count_diplomacy_over(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);

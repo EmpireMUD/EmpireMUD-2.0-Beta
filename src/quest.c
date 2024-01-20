@@ -1207,6 +1207,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
 				break;
 			}
+			case REQ_DIPLOMACY_OVER: {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy_over(GET_LOYALTY(ch), task->misc) : 0;
+				break;
+			}
 			case REQ_HAVE_CITY: {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
@@ -2646,7 +2650,7 @@ void qt_empire_cities(char_data *ch, any_vnum amount) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_DIPLOMACY) {
+			if (task->type == REQ_HAVE_CITY) {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 			}
 		}
@@ -2672,6 +2676,9 @@ void qt_empire_diplomacy(char_data *ch, any_vnum amount) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_DIPLOMACY) {
 				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+			}
+			else if (task->type == REQ_DIPLOMACY_OVER) {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy_over(GET_LOYALTY(ch), task->misc) : 0;
 			}
 		}
 	}
