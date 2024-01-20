@@ -222,13 +222,13 @@ void end_boost(char_data *ch) {
 
 // max blood is set in mobfile for npc, but computed for player
 int GET_MAX_BLOOD(char_data *ch) {
-	int base = base_player_pools[BLOOD];
+	int base;
 	
 	if (IS_NPC(ch)) {
 		base = ch->points.max_pools[BLOOD] + GET_EXTRA_BLOOD(ch);
 	}
 	else {
-		base += GET_EXTRA_BLOOD(ch);
+		base = base_player_pools[BLOOD] + GET_EXTRA_BLOOD(ch);
 
 		if (IS_VAMPIRE(ch)) {
 			if (HAS_BONUS_TRAIT(ch, BONUS_BLOOD)) {
