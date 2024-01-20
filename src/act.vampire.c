@@ -655,13 +655,13 @@ void update_biting_char(char_data *ch) {
 	
 	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {
-		hamt = GET_MAX_HEALTH(ch) / 10;
+		hamt = ceil(GET_MAX_HEALTH(ch) / 10.0 * (amount / 10.0));
 		heal(ch, ch, hamt);
 		
-		hamt = GET_MAX_MANA(ch) / 10;
+		hamt = ceil(GET_MAX_MANA(ch) / 10 * (amount / 10.0));
 		set_mana(ch, GET_MANA(ch) + hamt);
 		
-		hamt = GET_MAX_MOVE(ch) / 10;
+		hamt = ceil(GET_MAX_MOVE(ch) / 10 * (amount / 10.0));
 		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 
