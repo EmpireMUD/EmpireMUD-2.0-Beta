@@ -8547,7 +8547,13 @@ ACMD(do_use) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		// check tool slot?
+		if (GET_EQ(ch, WEAR_TOOL) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_TOOL))) {
+			msg_to_char(ch, "It looks like you're already using it!\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
 	}
 	else {
 		if (IS_POISON(obj)) {
