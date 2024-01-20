@@ -713,6 +713,22 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
+			
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_BLOOD(ch) += mod;
+			
+			// prevent going below 1
+			if (GET_BLOOD(ch) < 1 && (GET_BLOOD(ch) - mod) >= 1) {
+				if (IS_NPC(ch)) {
+					// npcs cannot die this way
+					set_blood(ch, 1);
+				}
+				else {
+					// deficit (players only)
+					GET_BLOOD_DEFICIT(ch) -= GET_BLOOD(ch) - 1;
+					GET_BLOOD(ch) = 1;
+				}
+			}
 			break;
 		}
 		case APPLY_RESIST_PHYSICAL: {

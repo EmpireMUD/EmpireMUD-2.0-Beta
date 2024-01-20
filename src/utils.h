@@ -384,6 +384,7 @@
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
 #define GET_BLOOD_UPKEEP(ch)  (GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP) + (has_skill_flagged(ch, SKILLF_VAMPIRE) <= 15 ? 1 : 0))
 int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
+#define GET_BLOOD_DEFICIT(ch)  GET_DEFICIT((ch), BLOOD)
 #define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
 #define GET_MANA_DEFICIT(ch)  GET_DEFICIT((ch), MANA)

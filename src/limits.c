@@ -211,6 +211,17 @@ void check_deficits(char_data *ch) {
 		set_mana(ch, 0);
 	}
 	
+	// blood
+	if (!IS_NPC(ch) && GET_BLOOD(ch) > 1 && GET_BLOOD_DEFICIT(ch) > 0) {
+		amount = MIN(GET_BLOOD(ch) - 1, GET_BLOOD_DEFICIT(ch));
+		set_blood(ch, GET_BLOOD(ch) - amount);
+		GET_BLOOD_DEFICIT(ch) -= amount;
+	}
+	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
+		// we had to let it go over temporarily; cap it now through set_blood
+		set_blood(ch, GET_MAX_BLOOD(ch));
+	}
+	
 	// do not call affect_total() in here: we are called from there
 }
 
