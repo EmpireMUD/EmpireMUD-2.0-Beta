@@ -671,7 +671,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			GET_MOVE(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
-			if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
+			if (!IS_NPC(ch) && GET_MOVE(ch) < 0 && GET_MAX_MOVE(ch) >= 0) {
 				GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
 				GET_MOVE(ch) = 0;
 			}
@@ -705,7 +705,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			GET_MANA(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
-			if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
+			if (!IS_NPC(ch) && GET_MANA(ch) < 0 && GET_MAX_MANA(ch) >= 0) {
 				GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
 				GET_MANA(ch) = 0;
 			}
@@ -1029,8 +1029,10 @@ void affect_total(char_data *ch) {
 		GET_ATT(ch, iter) = MAX(0, MIN(GET_ATT(ch, iter), att_max(ch)));
 	}
 	
-	// limit this
+	// limit these
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
+	GET_MAX_MOVE(ch) = MAX(0, GET_MAX_MOVE(ch));
+	GET_MAX_MANA(ch) = MAX(0, GET_MAX_MANA(ch));
 	
 	// pay off deficits now and check pool caps (for NPCs, this will also check caps)
 	check_deficits(ch);

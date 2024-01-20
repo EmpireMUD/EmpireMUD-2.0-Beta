@@ -182,6 +182,9 @@ void check_deficits(char_data *ch) {
 		// we had to let it go over temporarily; cap it now through set_move
 		set_move(ch, GET_MAX_MOVE(ch));
 	}
+	else if (GET_MOVE(ch) < 0) {
+		set_move(ch, 0);
+	}
 	
 	// health
 	if (!IS_NPC(ch) && GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
@@ -203,6 +206,9 @@ void check_deficits(char_data *ch) {
 	if (GET_MANA(ch) > GET_MAX_MANA(ch)) {
 		// we had to let it go over temporarily; cap it now through set_mana
 		set_mana(ch, GET_MAX_MANA(ch));
+	}
+	else if (GET_MANA(ch) < 0) {
+		set_mana(ch, 0);
 	}
 	
 	// do not call affect_total() in here: we are called from there
