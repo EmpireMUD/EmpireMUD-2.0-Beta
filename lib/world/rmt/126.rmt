@@ -400,7 +400,7 @@ is flooded, with water as high up as the canopy. As you try to swim up for air,
 roots grasp at your leg and drag you back down. Strangely, the roots don't seem
 to stop you from walking along the forest floor.
 ~
-adi 0 0 12650
+adi 0 F 12650
 D14
 ~
 0 12662
@@ -417,7 +417,7 @@ half-walking, unable to swim to the surface to take a breath. The path is hard
 to see now, but each time you deviate from it, a tree root rises from the
 ground like a tentacle and pulls you back toward the path.
 ~
-adi 0 0 12650
+adi 0 F 12650
 D14
 ~
 0 12663
@@ -436,7 +436,7 @@ underwater in what might be a clearing or a pond. The water around you is
 magical, held up by the strange forces of the Magiterranean. And try as you
 might, you can't get to the surface to breathe.
 ~
-adi 0 0 12650
+adi 0 F 12650
 D14
 ~
 0 12664

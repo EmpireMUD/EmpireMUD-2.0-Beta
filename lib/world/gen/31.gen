@@ -128,4 +128,13 @@ surge~
 T0
 You feel your surge of energy come to an end.~
 S
+#3116
+pulsified~
+4 0
+0 0 0 0
+T0
+The black veins on your skin fade.~
+T4
+Black veins run up and down $s skin.~
+S
 $
