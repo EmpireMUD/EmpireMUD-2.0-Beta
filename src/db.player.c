@@ -6214,6 +6214,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		
 		// delete emptypires
 		if ((!only_empire || emp == only_empire) && should_delete_empire(emp)) {
+			syslog(SYS_EMPIRE, 0, TRUE, "DEL: Empire %s auto-deleted with %d members", EMPIRE_NAME(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp));
 			delete_empire(emp);
 			
 			// don't accidentally keep deleting if we were only doing 1 (it's been freed)
