@@ -86,6 +86,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include <math.h>
 #include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 #include "utlist.h"	// needed by everything

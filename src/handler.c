@@ -11,7 +11,6 @@
 ************************************************************************ */
 
 #include <limits.h>
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"

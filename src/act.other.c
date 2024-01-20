@@ -12,8 +12,6 @@
 
 #define __ACT_OTHER_C__
 
-#include <math.h>
-
 #include "conf.h"
 #include "sysdep.h"
 
