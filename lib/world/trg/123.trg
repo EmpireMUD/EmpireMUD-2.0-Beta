@@ -1310,10 +1310,12 @@ elseif %move% == 3
     eval cycle %cycle% + 1
     if %cycle% < %times% && !%done%
       wait 1
-      %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
-      %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
-      scfight clear dodge
-      scfight setup dodge %targ%
+      if %targ.id% == %targ_id%
+        %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+        %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
+        scfight clear dodge
+        scfight setup dodge %targ%
+      end
     elseif %done% && %targ.id% == %targ_id% && %diff% == 1
       dg_affect #12358 %targ% TO-HIT 25 20
     end
@@ -1543,10 +1545,12 @@ elseif %move% == 2
     eval cycle %cycle% + 1
     if %cycle% < %times% && !%done%
       wait 1
-      %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
-      %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
-      scfight clear dodge
-      scfight setup dodge %targ%
+      if %targ.id% == %targ_id%
+        %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+        %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
+        scfight clear dodge
+        scfight setup dodge %targ%
+      end
     elseif %done% && %targ.id% == %targ_id% && %diff% == 1
       dg_affect #12358 %targ% TO-HIT 25 20
     end
