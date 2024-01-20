@@ -3771,7 +3771,7 @@ void b5_169_city_centers(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
-			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
+			if (city->location) {
 				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
 				set_room_custom_name(city->location, buf);
 				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
