@@ -4848,7 +4848,9 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char buf[MAX_STRING_LENGTH*2];
+	char *argptr;
 	obj_data *obj;
 	empire_data *emp;
 	int total;
@@ -4858,12 +4860,19 @@ ACMD(do_efind) {
 	vehicle_data *veh;
 	size_t size;
 	
-	one_argument(argument, arg);
+	// optional first arg (empire) and empire detection
+	argptr = any_one_word(argument, arg);
+	if (!imm_access || !(emp = get_empire_by_name(arg))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
+	
+	one_argument(argptr, arg);
 	
 	if (IS_NPC(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!(emp = GET_LOYALTY(ch))) {
+	else if (!emp) {
 		msg_to_char(ch, "You aren't in an empire.\r\n");
 	}
 	else if (!*arg) {
