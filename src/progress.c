@@ -93,7 +93,7 @@ int count_diplomacy_over(empire_data *emp, bitvector_t dip_flags) {
 	
 	LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
 		ok = TRUE;
-		for (pos = 0, bits = dip_flags; dip_flags && ok; ++pos, bits >>= 1) {
+		for (pos = 0, bits = dip_flags; bits && ok; ++pos, bits >>= 1) {
 			if (IS_SET(bits, BIT(0)) && !IS_SET(pol->type, diplomacy_better_list[pos])) {
 				ok = FALSE;
 			}
