@@ -4917,7 +4917,13 @@ ACMD(do_efind) {
 		}
 
 		if (total > 0) {
-			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			if (emp == GET_LOYALTY(ch)) {
+				size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			}
+			else {
+				size = snprintf(buf, sizeof(buf), "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));	// leave off \r\n
+			}
+			
 			last_rm = NULL;
 			
 			DL_FOREACH_SAFE(list, eg, next_eg) {
