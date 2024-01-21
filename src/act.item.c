@@ -2985,6 +2985,10 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		return;
 	}
 
+	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+		act("You can't put anything in $p.", FALSE, ch, to_obj, NULL, TO_CHAR);
+		return;
+	}
 	if ((GET_DRINK_CONTAINER_CONTENTS(obj) > 0) && GET_DRINK_CONTAINER_TYPE(obj) != liquid) {
 		send_to_char("There is already another liquid in it. Pour it out first.\r\n", ch);
 		return;
@@ -7362,6 +7366,10 @@ ACMD(do_pour) {
 	}
 	if (to_obj == from_obj) {
 		send_to_char("A most unproductive effort.\r\n", ch);
+		return;
+	}
+	if (OBJ_FLAGGED(to_obj, OBJ_SINGLE_USE)) {
+		act("You can't put anything in $p.", FALSE, ch, to_obj, NULL, TO_CHAR);
 		return;
 	}
 	if ((GET_DRINK_CONTAINER_CONTENTS(to_obj) != 0) && (GET_DRINK_CONTAINER_TYPE(to_obj) != GET_DRINK_CONTAINER_TYPE(from_obj))) {
