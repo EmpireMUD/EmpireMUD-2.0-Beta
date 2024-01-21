@@ -691,7 +691,8 @@ CONFIG_HANDLER(config_edit_bitvector) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.bitvector_val;
-	new = olc_process_flag(ch, argument, config->key, config->key, (const char **)config->custom_data, old);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	new = olc_process_flag(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
 	if (old == new) {
@@ -958,6 +959,7 @@ CONFIG_HANDLER(config_edit_short_string) {
 
 // Custom config handler for editing a 'type' type, resulting in an int, for CONFTYPE_TYPE.
 CONFIG_HANDLER(config_edit_type) {
+	char buf[256];
 	int old, new;
 	
 	// basic sanitation
@@ -979,7 +981,8 @@ CONFIG_HANDLER(config_edit_type) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.int_val;
-	new = olc_process_type(ch, argument, config->key, config->key, (const char **)config->custom_data, old);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	new = olc_process_type(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
 	if (old == new) {
@@ -1071,7 +1074,9 @@ CONFIG_HANDLER(config_show_attack) {
 
 
 // Custom config handler for showing a bitvector, for CONFTYPE_BITVECTOR
-CONFIG_HANDLER(config_show_bitvector) {	
+CONFIG_HANDLER(config_show_bitvector) {
+	char buf[256];
+	
 	// basic sanitation
 	if (!ch || !config) {
 		log("SYSERR: config_show_bitvector called without %s", ch ? "config" : "ch");
@@ -1090,7 +1095,8 @@ CONFIG_HANDLER(config_show_bitvector) {
 	}
 
 	// send it through the olc processor, which will display it all
-	olc_process_flag(ch, "", config->key, config->key, (const char **)config->custom_data, config->data.bitvector_val);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	olc_process_flag(ch, "", config->key, buf, (const char **)config->custom_data, config->data.bitvector_val);
 }
 
 
@@ -1194,7 +1200,9 @@ CONFIG_HANDLER(config_show_short_string) {
 
 
 // config handler for showing a 'type' type, for CONFTYPE_TYPE
-CONFIG_HANDLER(config_show_type) {	
+CONFIG_HANDLER(config_show_type) {
+	char buf[256];
+	
 	// basic sanitation
 	if (!ch || !config) {
 		log("SYSERR: config_show_type called without %s", ch ? "config" : "ch");
@@ -1213,7 +1221,8 @@ CONFIG_HANDLER(config_show_type) {
 	}
 
 	// send it through the olc processor, which will display it all
-	olc_process_type(ch, "", config->key, config->key, (const char **)config->custom_data, config->data.int_val);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	olc_process_type(ch, "", config->key, buf, (const char **)config->custom_data, config->data.int_val);
 }
 
 
