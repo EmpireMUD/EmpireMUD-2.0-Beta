@@ -197,6 +197,7 @@ The correct way to get an object's short description in a send/echo is:
 &c@%obj%&0 - short desc, something
 
 When using field  - The variable returns:
+&cadd_wear(flag)&0, &cremove_wear(flag)&0 - Add or remove a wear flag like TAKE.
 &cattack(field)&0 - Gets info on a weapon's attack type. Valid fields are:
   &yname&0 - attack name             &yfirst-person or 1&0 - 1st person attack message
   &ynoun&0 - noun form of attack     &ythird-person or 3&0 - 3rd person attack message

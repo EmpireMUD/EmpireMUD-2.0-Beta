@@ -4792,7 +4792,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {
-					if (!str_cmp(field, "attack")) {
+					if (!str_cmp(field, "add_wear")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
+							if (pos != NOTHING) {
+								SET_BIT(GET_OBJ_WEAR(o), pos);
+								request_obj_save_in_world(o);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, unknown wear flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "attack")) {
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
 							attack_message_data *amd = real_attack_message(type);
@@ -5010,7 +5023,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
-					
 					break;
 				}
 				case 'h': {	// obj.h*
@@ -5160,7 +5172,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// obj.r*
-					if (!str_cmp(field, "room")) {
+					if (!str_cmp(field, "remove_wear")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
+							if (pos != NOTHING) {
+								REMOVE_BIT(GET_OBJ_WEAR(o), pos);
+								request_obj_save_in_world(o);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, unknown wear flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "room")) {
 						if (obj_room(o))
 							snprintf(str, slen,"%c%d",UID_CHAR, GET_ROOM_VNUM(obj_room(o)) + ROOM_ID_BASE);
 						else
