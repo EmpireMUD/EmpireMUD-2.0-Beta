@@ -4966,6 +4966,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else if (IS_DRINK_CONTAINER(o)) {
 							set_obj_val(o, VAL_DRINK_CONTAINER_CONTENTS, 0);
 							set_obj_val(o, VAL_DRINK_CONTAINER_TYPE, 0);
+
+							if (OBJ_FLAGGED(o, OBJ_SINGLE_USE)) {
+								// single-use: extract it
+								run_interactions(o->carried_by ? o->carried_by : o->worn_by, GET_OBJ_INTERACTIONS(o), INTERACT_CONSUMES_TO, IN_ROOM(o), NULL, o, NULL, consumes_or_decays_interact);
+								empty_obj_before_extract(o);
+								extract_obj(o);
+							}
+							else {
+								// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+								GET_OBJ_TIMER(o) = UNLIMITED;
+							}
 						}
 					}
 					break;
