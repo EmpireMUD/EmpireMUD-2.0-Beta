@@ -1070,7 +1070,6 @@ void renum_world(void) {
 		}
 		
 		// other room setup
-		check_tavern_setup(room);
 		
 		// ensure affects
 		affect_total_room(room);

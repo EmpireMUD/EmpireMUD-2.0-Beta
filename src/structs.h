@@ -759,15 +759,6 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_REL_FORCE_UPGRADE_VEH  5	// automatically upgrades on-reboot
 
 
-// tavern types
-#define BREW_NONE 0
-#define BREW_ALE  1
-#define BREW_LAGER  2
-#define BREW_WHEATBEER  3
-#define BREW_CIDER  4
-#define NUM_BREWS  5	// total
-
-
 // Designate flags -- DES_x -- can only designate if building and room both have a matching flag
 #define DES_CRYPT			BIT(0)
 #define DES_VAULT			BIT(1)
@@ -816,7 +807,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
 #define FNC_TAILOR  BIT(24)	// counts as tailor for crafts like weaving
 #define FNC_TANNERY  BIT(25)	// allows tanning here
-#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TAVERN  BIT(26)	// for workforce crafting
 #define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
 #define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
 #define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
@@ -832,7 +823,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_APOTHECARY  BIT(39)	// for use in crafts
 
 // These function flags don't work on movable vehicles (they require room data)
-#define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
+#define IMMOBILE_FNCS  (FNC_MINE | FNC_TOMB | FNC_LIBRARY)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1340,8 +1331,8 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_DESPAWN  1	// mob despawn
 #define SEV_BURN_DOWN  2	// for buildings
 #define SEV_GROW_CROP  3	// normal crop growth time
-#define SEV_TAVERN  4	// tavern resource use timer
-#define SEV_RESET_TRIGGER  5	// for tavern resets
+	#define SEV_UNUSED4  4	// was tavern; now unused
+#define SEV_RESET_TRIGGER  5	// for scripting reset triggers
 #define SEV_PURSUIT  6	// mob pursuing a target
 #define SEV_MOVEMENT  7	// normal mob movement
 #define SEV_AGGRO  8	// aggro or cityguard mobs
@@ -3008,9 +2999,9 @@ typedef enum {
 #define ROOM_EXTRA_MINE_AMOUNT  1
 #define ROOM_EXTRA_FIRE_REMAINING  2
 #define ROOM_EXTRA_SEED_TIME  3
-#define ROOM_EXTRA_TAVERN_TYPE  4
-#define ROOM_EXTRA_TAVERN_BREWING_TIME  5
-#define ROOM_EXTRA_TAVERN_AVAILABLE_TIME  6
+	#define ROOM_EXTRA_UNUSED4  4	// formerly tavern type
+	#define ROOM_EXTRA_UNUSED5  5	// formerly tavern brewing time
+	#define ROOM_EXTRA_UNUSED6  6	// formerly tavern available time
 	#define ROOM_EXTRA_UNUSED  7	// formerly ruins-icon
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
@@ -5210,14 +5201,6 @@ struct empire_chore_type {
 	mob_vnum mob;
 	bool hidden;	// won't show in the main chores list
 	int requires_tech;	// if any -- or NOTHING
-};
-
-
-// for BREW_x
-struct tavern_data_type {
-	char *name;
-	int liquid;
-	int ingredients[3];
 };
 
 

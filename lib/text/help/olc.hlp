@@ -3683,7 +3683,7 @@ Available functions:
  SUMMON-PLAYER - allows the summon player command
  TAILOR - counts as tailor for crafts like weaving
  TANNERY - allows tanning here
- &rTAVERN*&0 - functions as a tavern (don't set this on the same building as DRINK)
+ TAVERN - for workforce
  &rTOMB*&0 - players can re-spawn here after dying
  TRADING-POST - access to global trade, e.g. a trading post
  VAULT - stores coins, can use the warehouse command for privileged storage

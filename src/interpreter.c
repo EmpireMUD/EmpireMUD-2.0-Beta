@@ -363,7 +363,6 @@ ACMD(do_syslog);
 
 ACMD(do_tame);
 ACMD(do_tan);
-ACMD(do_tavern);
 ACMD(do_tedit);
 ACMD(do_tell);
 ACMD(do_temperature);
@@ -930,7 +929,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "tame", POS_STANDING, do_tame, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "tan", POS_STANDING, do_tan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "taste", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_TASTE ),
-	STANDARD_CMD( "tavern", POS_STANDING, do_tavern, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "tattach", POS_DEAD, do_tattach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 	GRANT_CMD( "tdetach", POS_DEAD, do_tdetach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),

@@ -4339,10 +4339,10 @@ EVENTFUNC(run_reset_triggers) {
 
 
 /**
-* Checks if a building is a tavern and can run. If so, sets up the data for
-* it and schedules the event. If not, it clears that data.
+* Checks if a room has reset triggers. If so, sets up the data for it and
+* schedules the event. If not, it clears that data.
 *
-* @param room_data *room The room to check for tavernness.
+* @param room_data *room The room to check for reset triggers.
 * @param bool random_offest If TRUE, throws in some random in the 1st timer.
 */
 void check_reset_trigger_event(room_data *room, bool random_offset) {

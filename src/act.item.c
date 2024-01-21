@@ -2975,10 +2975,6 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	int amount = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
-
-	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
-		liquid = tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].liquid;
-	}
 	
 	if (amount <= 0) {
 		send_to_char("There is no room for more.\r\n", ch);
@@ -3001,23 +2997,6 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		}
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gently fills $p with water.", TRUE, ch, obj, 0, TO_ROOM);
-	}
-	else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
-		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE) == 0 || !IS_COMPLETE(IN_ROOM(ch))) {
-			msg_to_char(ch, "This tavern has nothing on tap.\r\n");
-			return;
-		}
-		else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-			msg_to_char(ch, "The tavern is brewing up a new batch. Try again later.\r\n");
-			return;
-		}
-		else {
-			sprintf(buf, "You fill $p with %s from the tap.", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		
-			sprintf(buf, "$n fills $p with %s from the tap.", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
-			act(buf, TRUE, ch, obj, 0, TO_ROOM);
-		}
 	}
 	else {
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
@@ -5680,6 +5659,11 @@ ACMD(do_drink) {
 	if (obj) {
 		// bound by contents available
 		amount = MIN(GET_DRINK_CONTAINER_CONTENTS(obj), amount);
+		
+		// can no longer be stored to prevent refilling, if single-use
+		if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+			SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_BASIC_STORAGE);
+		}
 	}
 	
 	// apply effects
@@ -7262,7 +7246,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {	// no 2nd argument: fill from room
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -7407,6 +7391,11 @@ ACMD(do_pour) {
 	set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(from_obj) - amount);
 
 	set_obj_val(to_obj, VAL_DRINK_CONTAINER_CONTENTS, GET_DRINK_CONTAINER_CONTENTS(to_obj) + amount);
+	
+	// from-obj can no longer be stored to prevent refilling, if single-use
+	if (OBJ_FLAGGED(from_obj, OBJ_SINGLE_USE)) {
+		SET_BIT(GET_OBJ_EXTRA(from_obj), OBJ_NO_BASIC_STORAGE);
+	}
 	
 	// copy the timer on the liquid, even if UNLIMITED
 	GET_OBJ_TIMER(to_obj) = GET_OBJ_TIMER(from_obj);

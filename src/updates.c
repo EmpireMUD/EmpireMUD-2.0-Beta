@@ -3913,6 +3913,42 @@ void b5_171_bath_triggers(void) {
 }
 
 
+// b5.172: remove tavern data, remove tavern from learned list on empires without the new goal
+void b5_172_tavern_update(void) {
+	empire_data *emp, *next_emp;
+	room_data *room, *next_room;
+	
+	// new progress goal for tavern
+	const int TAVERN_PROG = 2916;
+	const int TAVERN_CRAFT = 5138;
+	
+	// former data values
+	const int ROOM_EXTRA_TAVERN_TYPE = 4;
+	const int ROOM_EXTRA_TAVERN_BREWING_TIME = 5;
+	const int ROOM_EXTRA_TAVERN_AVAILABLE_TIME = 6;
+	
+	// remove from empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (!empire_has_completed_goal(emp, TAVERN_PROG) && empire_has_learned_craft(emp, TAVERN_CRAFT)) {
+			remove_learned_craft_empire(emp, TAVERN_CRAFT, TRUE);
+		}
+	}
+	
+	// remove old data from rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)) {
+			remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
+		}
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME)) {
+			remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
+		}
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME)) {
+			remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4019,6 +4055,7 @@ const struct {
 	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
 	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
+	{ "b5.172a", b5_172_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

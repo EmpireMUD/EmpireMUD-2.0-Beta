@@ -1870,8 +1870,6 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
-	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
-	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
@@ -2102,6 +2100,10 @@ void init_config_system(void) {
 		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("max_chore_resource_skilled", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "deprecated; was # of 5-minute updates for initial tavern brew");
+		init_config_flags("tavern_brew_time", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "deprecated; was # of 5-minute updates for tavern resource cost");
+		init_config_flags("tavern_timer", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("trench_full_value", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");

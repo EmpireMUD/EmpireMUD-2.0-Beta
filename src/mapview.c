@@ -1704,10 +1704,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "The trench is %d%% complete.\r\n", ABSOLUTE((trench_initial_value - get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) * 100 / trench_initial_value));
 		}
 	}
-	
-	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_TAVERN) && IS_COMPLETE(room)) {
-		msg_to_char(ch, "The tavern has %s on tap.\r\n", tavern_data[get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)].name);
-	}
 
 	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_MINE) && IS_COMPLETE(room)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {

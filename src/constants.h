@@ -467,7 +467,6 @@ extern const char *wait_types[];
 extern const struct action_data_struct action_data[];
 
 // act.empire.c
-extern const struct tavern_data_type tavern_data[];
 
 // act.movement.c
 extern const char *cmd_door[];

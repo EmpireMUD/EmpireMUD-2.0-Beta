@@ -1195,28 +1195,26 @@ Tanning skins at a tannery causes the process to go faster.
 
 See also: STORAGE, TAN
 #
-TAVERN
+TAVERN BARREL ALE LAGER "WHEAT BEER" CIDER
 
-Tavern building (Foundations goal)
+Tavern building (To the Tavern When the Job's Done goal)
 
 Building:  [TT]  Tavern
 Temperature:  milder than outside
-Command:  tavern [type]
 
-You can use this command to change what a Tavern is brewing. It will charge
-your empire the resources for the brew right away, and then will take roughly
-two game days to finish brewing. The empire will be charged the ingredients
-again every few days.
+The tavern is a great gathering place for you and your citizens, and may offer
+the occasional quest, as well. The empire's workforce will craft ale and other
+drinks in wooden barrels from hops, barley, and other ingredients.
 
-There are rumors that members of a secretive guild of thieves meet in taverns.
+Basic brews workforce will make:
+ barrel of ale: wooden barrel, 5x sack of barley, 5x bushel of hops
+ barrel of lager: wooden barrel, 5x bushel of corn, 5x bushel of hops
+ barrel of wheat beer: wooden barrel, 5x bundle of wheat, 5x sack of barley
+ barrel of cider: wooden barrel, 5x bunch of apples, 5x basket of peaches
 
-The available brews are:
-  ale -- barley + hops
-  lager -- corn + hops
-  wheatbeer -- wheat + barley
-  cider -- apples + peaches
+Barrels are crafted at the carpenter. Workforce will make these, too.
 
-Brewing takes 5 of each ingredient at a time.
+See also: CARPENTER, WORKFORCE CRAFTING
 #
 TEMPLE
 

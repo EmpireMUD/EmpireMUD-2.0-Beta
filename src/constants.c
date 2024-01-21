@@ -4427,10 +4427,10 @@ const char *room_extra_types[] = {
 	"mine amount",
 	"fire remaining",
 	"seed time",
-	"tavern type",
-	"tavern brewing time",	// 5
-	"tavern available time",
-	"ruins icon",
+	"tavern type",	// unused
+	"tavern brewing time",	// 5		// unused
+	"tavern available time",	// unused
+	"ruins icon",	// unused
 	"chop progress",
 	"trench progress",
 	"harvest progress",	// 10

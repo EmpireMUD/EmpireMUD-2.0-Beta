@@ -434,13 +434,11 @@ extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
 
-void check_tavern_setup(room_data *room);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
 void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-bool extract_tavern_resources(room_data *room);
 void free_dropped_items(struct empire_dropped_item **list);
 void free_empire(empire_data *emp);
 void free_member_data(empire_data *emp);

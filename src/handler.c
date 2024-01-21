@@ -3641,8 +3641,9 @@ void perform_abandon_room(room_data *room) {
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
 	}
-	else {	// other building types
-		check_tavern_setup(room);
+	else {
+		// other building types
+		
 	}
 	
 	affect_total_room(room);
