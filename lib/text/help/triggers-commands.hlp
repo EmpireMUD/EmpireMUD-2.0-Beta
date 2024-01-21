@@ -557,7 +557,8 @@ Supported fields are:
           append-lookdesc-noformat
  Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
- Rooms: icon, title, description, append-description, append-desc-noformat
+ Rooms: icon, title, description, append-description, append-desc-noformat,
+          magic-growth *
 
 Appending to descriptions triggers string formatting. Using the 'noformat'
 version will prevent this.
@@ -565,6 +566,8 @@ version will prevent this.
 Special fields:
  %mod% %mob% tag %player% - Changes who tagged the mob (and will get the loot)
     to the specified player. Also accepts "none" to clear tags.
+ %mod% %room% magic-growth - Attempts to run a magic-growth evolution silently;
+    this can fail if there isn't one, or if the percent is below 100.
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d
