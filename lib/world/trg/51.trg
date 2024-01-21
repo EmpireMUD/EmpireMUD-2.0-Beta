@@ -206,6 +206,9 @@ while %self.val1% > 0
     case 0
       %send% %actor% You finish bathing and climb out of the water to dry off.
       %echoaround% %actor% ~%actor% finishes bathing and climbs out of the water to dry off.
+      * cancel stop
+      set needs_stop_command 0
+      remote needs_stop_command %actor.id%
       * done
       dg_affect #5162 %actor% off
       dg_affect #5162 %actor% DEXTERITY 1 1800
