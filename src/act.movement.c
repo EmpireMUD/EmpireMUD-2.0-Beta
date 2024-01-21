@@ -2185,7 +2185,7 @@ ACMD(do_circle) {
 	}
 	
 	// cancel some actions on movement
-	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(found_room) && GET_ACTION_ROOM(ch) != NOWHERE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && (GET_ACTION(ch) == ACT_RUNNING || !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE)) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(found_room) && GET_ACTION_ROOM(ch) != NOWHERE) {
 		cancel_action(ch);
 	}
 	
