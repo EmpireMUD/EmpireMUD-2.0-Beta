@@ -2449,6 +2449,7 @@ const char *empire_admin_flags[] = {
 	"!WAR",
 	"!STEAL",
 	"CITY-CLAIMS-ONLY",
+	"!RENAME",
 	"\n"
 };
 

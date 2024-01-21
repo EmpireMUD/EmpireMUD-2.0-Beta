@@ -380,6 +380,7 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!WAR&0 - Empire cannot unilaterally declare war.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
+ &g!RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
 
 Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
