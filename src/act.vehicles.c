@@ -282,7 +282,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		}
 		return FALSE;
 	}
-	if (!validate_vehicle_move(ch, veh, to_room)) {
+	if (!validate_vehicle_move(ch, veh, to_room, FALSE)) {
 		// sends own message
 		return FALSE;
 	}
@@ -1637,12 +1637,15 @@ ACMD(do_drag) {
 	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag anything into the water.\r\n");
 	}
+	/*
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
 		msg_to_char(ch, "You can't drag it on such rough terrain.\r\n");
 	}
+	*/
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
+	/*
 	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
@@ -1652,7 +1655,8 @@ ACMD(do_drag) {
 	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		act("You cannot drag $V there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
-	else if (!validate_vehicle_move(ch, veh, to_room)) {
+	*/
+	else if (!validate_vehicle_move(ch, veh, to_room, TRUE)) {
 		// sends own error (may re-check some of the above, but that's ok)
 	}
 	else {
@@ -1706,7 +1710,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 	else if (!can_enter_portal(ch, portal, FALSE, FALSE)) {
 		// sends own message
 	}
-	else if (!validate_vehicle_move(ch, veh, to_room)) {
+	else if (!validate_vehicle_move(ch, veh, to_room, FALSE)) {
 		// sends own message
 	}
 	else {

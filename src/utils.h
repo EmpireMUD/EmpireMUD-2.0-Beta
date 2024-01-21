@@ -2182,7 +2182,7 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
 int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void skip_run_filler(char **string);
-bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
+bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room, bool dragging);
 
 // act.naturalmagic.c
 bool despawn_companion(char_data *ch, mob_vnum vnum);
