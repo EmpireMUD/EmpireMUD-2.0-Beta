@@ -3232,7 +3232,7 @@ void command_lag(char_data *ch, int wait_type) {
 			if (IS_SLOWED(ch)) {
 				wait = 1 RL_SEC;
 			}
-			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
+			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch)) || (IS_COMPLETE(IN_ROOM(ch)) && (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ATTACH_ROAD)))) {
 				wait = 0;	// no wait on riding/road
 			}
 			else if (IS_OUTDOORS(ch)) {
