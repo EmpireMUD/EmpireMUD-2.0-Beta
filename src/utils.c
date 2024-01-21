@@ -4536,7 +4536,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				case RES_POOL: {
 					// special rule: require that blood or health costs not reduce player below 1
 					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
-					res->amount -= MAX(amt, GET_CURRENT_POOL(ch, res->vnum));
+					res->amount -= MIN(amt, GET_CURRENT_POOL(ch, res->vnum));
 					break;
 				}
 				case RES_ACTION: {
