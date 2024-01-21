@@ -299,7 +299,7 @@ bitvector_t pk_ok = PK_WAR;
 #define CONFTYPE_BOOL  2
 #define CONFTYPE_DOUBLE  3
 #define CONFTYPE_INT  4
-#define CONFTYPE_INT_ARRAY  5
+#define CONFTYPE_INT_ARRAY  5	// TODO: this is not really supported yet
 #define CONFTYPE_SHORT_STRING  6 // max length ~ 128
 #define CONFTYPE_LONG_STRING  7	// paragraph length
 #define CONFTYPE_TYPE  8	// shows a list from a const char array
