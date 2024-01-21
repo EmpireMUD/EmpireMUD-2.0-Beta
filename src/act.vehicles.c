@@ -286,7 +286,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		// sends own message
 		return FALSE;
 	}
-	if (!IS_COMPLETE(to_room) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
+	if (!IS_COMPLETE(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s in there until it's %s.\r\n", drive_data[subcmd].command, IS_DISMANTLING(to_room) ? "fully dismantled" : "complete");
 		}
