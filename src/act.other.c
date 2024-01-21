@@ -173,6 +173,17 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 			
 			// use the water
 			set_obj_val(cont, VAL_DRINK_CONTAINER_CONTENTS, 0);
+			
+			if (OBJ_FLAGGED(cont, OBJ_SINGLE_USE)) {
+				// single-use: extract it
+				run_interactions(ch, GET_OBJ_INTERACTIONS(cont), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, cont, NULL, consumes_or_decays_interact);
+				empty_obj_before_extract(cont);
+				extract_obj(cont);
+			}
+			else {
+				// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+				GET_OBJ_TIMER(cont) = UNLIMITED;
+			}
 		}
 		else {
 			// no container
@@ -208,6 +219,17 @@ void do_douse_room(char_data *ch, room_data *room, obj_data *cont) {
 		
 		act("You throw some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_CHAR);
 		act("$n throws some water from $p onto the flames!", FALSE, ch, cont, NULL, TO_ROOM);
+		
+		if (OBJ_FLAGGED(cont, OBJ_SINGLE_USE)) {
+			// single-use: extract it
+			run_interactions(ch, GET_OBJ_INTERACTIONS(cont), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, cont, NULL, consumes_or_decays_interact);
+			empty_obj_before_extract(cont);
+			extract_obj(cont);
+		}
+		else {
+			// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+			GET_OBJ_TIMER(cont) = UNLIMITED;
+		}
 	}
 	else {
 		// water from room/immortal

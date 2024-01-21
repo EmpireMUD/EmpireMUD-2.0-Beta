@@ -7348,7 +7348,18 @@ ACMD(do_pour) {
 
 			set_obj_val(from_obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
 			set_obj_val(from_obj, VAL_DRINK_CONTAINER_TYPE, 0);
-
+			
+			// check single-use and timer
+			if (OBJ_FLAGGED(from_obj, OBJ_SINGLE_USE)) {
+				// single-use: extract it
+				run_interactions(ch, GET_OBJ_INTERACTIONS(from_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, from_obj, NULL, consumes_or_decays_interact);
+				empty_obj_before_extract(from_obj);
+				extract_obj(from_obj);
+			}
+			else {
+				// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+				GET_OBJ_TIMER(from_obj) = UNLIMITED;
+			}
 			return;
 		}
 		if (!(to_obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
