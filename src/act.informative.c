@@ -1702,7 +1702,7 @@ char *obj_color_by_quality(obj_data *obj, char_data *ch) {
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	static char output[MAX_STRING_LENGTH];
-	char sdesc[MAX_STRING_LENGTH];
+	char sdesc[MAX_STRING_LENGTH], liqname[256];
 	bool color = FALSE;
 	
 	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_WAREHOUSE)) {
@@ -1717,7 +1717,11 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	*sdesc = '\0';
 
 	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && (mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_WAREHOUSE)) {
-		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		strcpy(liqname, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		if (!strstr(GET_OBJ_SHORT_DESC(obj), liqname)) {
+			// only if it's not already in the name
+			sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), liqname);
+		}
 	}
 	else if (IS_AMMO(obj)) {
 		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_AMMO_QUANTITY(obj)));
