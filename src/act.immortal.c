@@ -10920,6 +10920,7 @@ ACMD(do_restore) {
 	
 	// fill pools
 	if (all || health) {
+		GET_DEFICIT(vict, HEALTH) = 0;
 		set_health(vict, GET_MAX_HEALTH(vict));
 		
 		if (GET_POS(vict) < POS_SLEEPING) {
@@ -10930,14 +10931,17 @@ ACMD(do_restore) {
 		sprintf(types + strlen(types), "%s health", *types ? "," : "");
 	}
 	if (all || mana) {
+		GET_DEFICIT(vict, MANA) = 0;
 		set_mana(vict, GET_MAX_MANA(vict));
 		sprintf(types + strlen(types), "%s mana", *types ? "," : "");
 	}
 	if (all || moves) {
+		GET_DEFICIT(vict, MOVE) = 0;
 		set_move(vict, GET_MAX_MOVE(vict));
 		sprintf(types + strlen(types), "%s moves", *types ? "," : "");
 	}
 	if (all || blood) {
+		GET_DEFICIT(vict, BLOOD) = 0;
 		set_blood(vict, GET_MAX_BLOOD(vict));
 		sprintf(types + strlen(types), "%s blood", *types ? "," : "");
 	}
