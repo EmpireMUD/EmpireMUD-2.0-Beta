@@ -1742,24 +1742,36 @@ void check_for_new_map(void) {
 
 /**
 * This function looks for any empire inventory that's in a "no island" location
-* and moves it to the specified island. This includes unique storage.
+* and moves it to the specified island. This includes unique storage. It will
+* also move items from the newbie island(s) as a one-time courtesy.
 *
 * @param empire_data *emp The empire to move.
 * @param int new_island The ID of the island to move to.
 */
-void check_nowhere_einv(empire_data *emp, int new_island) {
+void check_einv_auto_move(empire_data *emp, int new_island) {
 	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_unique_storage *eus;
-	struct empire_island *no_isle;
-	bool any = FALSE;
+	struct empire_island *isle, *next_isle;
+	struct island_info *find_isle, *new_isle;
+	bool any = FALSE, move_newbie = FALSE;
 	
-	if (!emp || new_island == NO_ISLAND) {
+	if (!emp || new_island == NO_ISLAND || !(new_isle = get_island(new_island, FALSE))) {
 		return;	// can't do
 	}
 	
-	// move basic storage
-	if ((no_isle = get_empire_island(emp, NO_ISLAND))) {
-		HASH_ITER(hh, no_isle->store, store, next_store) {
+	// check if we're doing the free newbie move
+	if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_DID_NEWBIE_MOVE) && !IS_SET(new_isle->flags, ISLE_NEWBIE)) {
+		move_newbie = TRUE;
+	}
+	
+	// for each island...
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->island != NO_ISLAND && (!move_newbie || !(find_isle = get_island(isle->island, FALSE)) || !IS_SET(find_isle->flags, ISLE_NEWBIE))) {
+			continue;	// not doing this one
+		}
+		
+		// ok: move basic storage
+		HASH_ITER(hh, isle->store, store, next_store) {
 			if (store->amount > 0) {
 				new_store = add_to_empire_storage(emp, new_island, store->vnum, store->amount, 0);
 				if (new_store) {
@@ -1780,24 +1792,31 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 				}
 			}
 			
-			HASH_DEL(no_isle->store, store);
+			HASH_DEL(isle->store, store);
 			free_empire_storage_data(store);
 			any = TRUE;
 		}
-		no_isle->store = NULL;
+		isle->store = NULL;
 	}
 	
 	// move unique storage
 	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
-		if (eus->island == NO_ISLAND) {
-			eus->island = new_island;	// simple move, for now
-			any = TRUE;
+		if (eus->island != NO_ISLAND && (!move_newbie || !(find_isle = get_island(eus->island, FALSE)) || !IS_SET(find_isle->flags, ISLE_NEWBIE))) {
+			continue;	// wrong island
 		}
+		
+		// ok: move it
+		eus->island = new_island;	// simple move, for now
+		any = TRUE;
 	}
 	
 	if (any) {	// reporting
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-		log_to_empire(emp, ELOG_TERRITORY, "Empire inventory delivered to the new island");
+		log_to_empire(emp, ELOG_TERRITORY, "Empire inventory delivered to %s", get_island_name_for_empire(new_island, emp));
+	}
+	if (move_newbie) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_DID_NEWBIE_MOVE);
 	}
 }
 
@@ -1812,7 +1831,7 @@ void check_nowhere_einv_all(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if ((island = get_main_island(emp)) != NO_ISLAND) {
-			check_nowhere_einv(emp, island);
+			check_einv_auto_move(emp, island);
 		}
 	}
 }

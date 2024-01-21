@@ -105,7 +105,9 @@ Commands:
 - &ccity found <name>&0: This founds a new city on the spot where you're standing.
     It creates a "city center" building, which is open (does not block move-
     ment). It costs 1 city point. You must be 25 tiles away from a starting
-    location and 30 from another empire's city (10 tiles if allied).
+    location and 30 from another empire's city (10 tiles if allied). When you
+    found your empire's first city, anything stored on a newbie island is
+    automatically transferred there as a courtesy.
 - &ccity upgrade <name>&0: This upgrades the given city by 1 level at the cost of
     1 city point.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
@@ -381,6 +383,9 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
  &g!RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
+ &gDID-NEWBIE-MOVE&0 - Empire got its free move from the newbie island when it
+    built a city. Removing this flag then founding a new city will move newbie
+    items again.
 
 Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.

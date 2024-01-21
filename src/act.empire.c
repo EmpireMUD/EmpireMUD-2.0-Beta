@@ -45,7 +45,7 @@
 extern struct empire_chore_type chore_data[NUM_CHORES];
 
 // external funcs
-void check_nowhere_einv(empire_data *emp, int new_island);
+void check_einv_auto_move(empire_data *emp, int new_island);
 bool empire_is_ignoring(empire_data *emp, char_data *victim);
 void warehouse_inventory(char_data *ch, char *argument, int mode);
 void warehouse_identify(char_data *ch, char *argument, int mode);
@@ -2276,7 +2276,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	affect_total_room(city->location);
 	
 	// move einv here if any is lost
-	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
+	check_einv_auto_move(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -5543,7 +5543,7 @@ ACMD(do_enroll) {
 		
 		// ensure no lost einv
 		if ((island = get_main_island(e)) != NO_ISLAND) {
-			check_nowhere_einv(e, island);
+			check_einv_auto_move(e, island);
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities

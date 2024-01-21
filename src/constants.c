@@ -2450,6 +2450,7 @@ const char *empire_admin_flags[] = {
 	"!STEAL",
 	"CITY-CLAIMS-ONLY",
 	"!RENAME",
+	"DID-NEWBIE-MOVE",
 	"\n"
 };
 

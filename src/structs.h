@@ -1071,6 +1071,7 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
 #define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
 #define EADM_NO_RENAME  BIT(3)	// cannot change name/adjective/description
+#define EADM_DID_NEWBIE_MOVE  BIT(4)	// empire got its free move from the newbie island
 
 
 // EATT_x: empire attributes
