@@ -1637,25 +1637,9 @@ ACMD(do_drag) {
 	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag anything into the water.\r\n");
 	}
-	/*
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
-		msg_to_char(ch, "You can't drag it on such rough terrain.\r\n");
-	}
-	*/
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	/*
-	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
-		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	}
-	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, GET_LOYALTY(ch)) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
-		act("There is already too much there to drag $V there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	}
-	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
-		act("You cannot drag $V there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	}
-	*/
 	else if (!validate_vehicle_move(ch, veh, to_room, TRUE)) {
 		// sends own error (may re-check some of the above, but that's ok)
 	}
