@@ -2986,7 +2986,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	}
 
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
-		act("You can't put anything in $p.", FALSE, ch, to_obj, NULL, TO_CHAR);
+		act("You can't put anything in $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		return;
 	}
 	if ((GET_DRINK_CONTAINER_CONTENTS(obj) > 0) && GET_DRINK_CONTAINER_TYPE(obj) != liquid) {
