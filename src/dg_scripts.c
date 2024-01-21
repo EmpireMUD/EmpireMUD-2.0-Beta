@@ -2765,10 +2765,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (c == ch || !CAN_SEE(ch, c) || !valid_dg_target(c, DG_ALLOW_GODS)) {
 								continue;
 							}
-							if (enemy && !is_fight_enemy(ch, c)) {
+							if (enemy && (AFF_FLAGGED(c, AFF_NO_ATTACK) || !is_fight_enemy(ch, c))) {
 								continue;
 							}
-							if (ally && !is_fight_ally(ch, c)) {
+							if (ally && (AFF_FLAGGED(c, AFF_NO_ATTACK) || !is_fight_ally(ch, c))) {
 								continue;
 							}
 
