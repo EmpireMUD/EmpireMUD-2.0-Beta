@@ -1415,7 +1415,7 @@ wait 1
 set actor %self.carried_by%
 if !%actor%
   %purge% %self%
-  %halt%
+  halt
 end
 set try 10
 set done 0

@@ -10,7 +10,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#include <math.h>
 #include <sys/time.h>
 
 #include "conf.h"
@@ -3233,7 +3232,7 @@ void command_lag(char_data *ch, int wait_type) {
 			if (IS_SLOWED(ch)) {
 				wait = 1 RL_SEC;
 			}
-			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
+			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch)) || (IS_COMPLETE(IN_ROOM(ch)) && (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ATTACH_ROAD)))) {
 				wait = 0;	// no wait on riding/road
 			}
 			else if (IS_OUTDOORS(ch)) {
@@ -4457,6 +4456,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 			else if (!HASRES_OBJS && res->type == RES_OBJECT) {
 				continue;
 			}
+			else if (!HASRES_OTHER && (res->type == RES_COINS || res->type == RES_CURRENCY || res->type == RES_POOL)) {
+				continue;	// only do these once: in the othe cycle
+			}
 		
 			// RES_x: check resources by type
 			switch (res->type) {
@@ -4537,7 +4539,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				case RES_POOL: {
 					// special rule: require that blood or health costs not reduce player below 1
 					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
-					res->amount -= MAX(amt, GET_CURRENT_POOL(ch, res->vnum));
+					res->amount -= MIN(amt, GET_CURRENT_POOL(ch, res->vnum));
 					break;
 				}
 				case RES_ACTION: {

@@ -335,6 +335,7 @@
 #define ABIL_LIMIT_NOT_LEADING_VEHICLE		51	// user isn't leading a vehicle
 #define ABIL_LIMIT_IS_AFFECTED_BY			52	// user is affected by an aff flag
 #define ABIL_LIMIT_TARGET_IS_AFFECTED_BY	53	// target is affected by an aff flag
+#define ABIL_LIMIT_TARGET_IS_HUMAN			54	// target must be human (mob or npc)
 
 
 // ABLIM_x: data needed for ability limits:

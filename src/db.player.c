@@ -3463,10 +3463,11 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 				ch = lpd->ch;
 			}
 			else if ((ch = load_player(index->name, TRUE))) {
-				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
-				affect_total(ch);
+				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);;
 				*is_file = TRUE;
 				add_loaded_player(ch);
+				refresh_character_on_load(ch);
+				affect_total(ch);
 			}
 		}
 	}
@@ -3514,9 +3515,10 @@ char_data *find_or_load_player_by_idnum(int idnum, bool *is_file) {
 		}
 		else if ((index = find_player_index_by_idnum(idnum)) && (ch = load_player(index->name, TRUE))) {
 			SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
-			affect_total(ch);
 			*is_file = TRUE;
 			add_loaded_player(ch);
+			refresh_character_on_load(ch);
+			affect_total(ch);
 		}
 	}
 	
@@ -4398,6 +4400,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				try_home = TRUE;
 			}
 		}
+		else if (!load_room) {
+			// instance gone?
+			GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
+			load_room = NULL;
+			try_home = TRUE;
+		}
 	}
 	
 	// cancel detected loadroom?
@@ -4472,13 +4480,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (stop_action) {
 		cancel_action(ch);
 	}
-		
-	// verify skills, abilities, and class and skill/gear levels are up-to-date
-	check_skills_and_abilities(ch);
-	determine_gear_level(ch);
-	add_all_gain_hooks(ch);
-	
-	queue_delayed_update(ch, CDU_SAVE);
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -4501,6 +4502,14 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	global_mute_slash_channel_joins = FALSE;
 	
+	// refresh and apply abilities, bonuses, etc
+	refresh_character_on_load(ch);
+	add_all_gain_hooks(ch);
+	
+	// update the index in case any of this changed
+	index = find_player_index_by_idnum(GET_IDNUM(ch));
+	update_player_index(index, ch);
+	
 	// in some cases, we need to re-read tech when the character logs in
 	if ((emp = GET_LOYALTY(ch))) {
 		if (REREAD_EMPIRE_TECH_ON_LOGIN(ch)) {
@@ -4514,31 +4523,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		}
 	}
 	
-	// remove stale coins
-	cleanup_coins(ch);
-	
-	// verify abils}
-	assign_class_and_extra_abilities(ch, NULL, NOTHING);
-	give_level_zero_abilities(ch);
-	
-	// update the index in case any of this changed
-	index = find_player_index_by_idnum(GET_IDNUM(ch));
-	update_player_index(index, ch);
-	
 	// ensure data is up-to-date
-	apply_all_ability_techs(ch);
-	apply_bonus_pools(ch, TRUE);
-	refresh_all_quests(ch);
+	cleanup_coins(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
 	check_friends(ch);
 	check_languages(ch);
 	check_minipets_and_companions(ch);
-	check_player_events(ch);
 	check_unlocked_archetypes(ch);
-	refresh_passive_buffs(ch);
-	convert_and_schedule_player_affects(ch);
+	refresh_all_quests(ch);
+	check_player_events(ch);
 	schedule_all_obj_timers(ch);
 	ensure_home_storage_timers(ch, NOTHING);
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
@@ -4869,6 +4864,28 @@ void purge_bound_items(int idnum) {
 			extract_obj(obj);
 		}
 	}
+}
+
+
+/**
+* Calls a series of functions when a character has been loaded from file either
+* to player the game or for some other purpose. Consider calling affect_total()
+* after calling this, when you're done loading everything.
+*
+* @param char_data *ch The player.
+*/
+void refresh_character_on_load(char_data *ch) {
+	if (!ch || IS_NPC(ch)) {
+		return;	// not for me
+	}
+	
+	determine_gear_level(ch);
+	check_skills_and_abilities(ch);
+	give_level_zero_abilities(ch);
+	apply_all_ability_techs(ch);
+	apply_bonus_pools(ch, TRUE);
+	refresh_passive_buffs(ch);
+	convert_and_schedule_player_affects(ch);
 }
 
 
@@ -6197,6 +6214,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		
 		// delete emptypires
 		if ((!only_empire || emp == only_empire) && should_delete_empire(emp)) {
+			syslog(SYS_EMPIRE, 0, TRUE, "DEL: Empire %s auto-deleted with %d members", EMPIRE_NAME(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp));
 			delete_empire(emp);
 			
 			// don't accidentally keep deleting if we were only doing 1 (it's been freed)

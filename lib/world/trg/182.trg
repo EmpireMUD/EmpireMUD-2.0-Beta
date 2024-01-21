@@ -431,6 +431,9 @@ end
 Adventuring guild block vault~
 0 s 100
 ~
+if %self.disabled% || %self.position% == Sleeping
+  halt
+end
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%

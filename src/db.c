@@ -116,7 +116,7 @@ int sort_skills_by_data(skill_data *a, skill_data *b);
 int sort_socials_by_data(social_data *a, social_data *b);
 
 // local functions
-void get_one_line(FILE *fl, char *buf);
+void get_one_line(FILE *fl, char *buf, const char *filename);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1096,18 +1096,18 @@ void renum_world(void) {
  * did add the 'goto' and changed some "while()" into "do { } while()".
  *	-gg 6/24/98 (technically 6/25/98, but I care not.)
  */
-int count_alias_records(FILE *fl) {
+int count_alias_records(FILE *fl, const char *filename) {
 	char key[READ_SIZE], next_key[READ_SIZE];
 	char line[READ_SIZE], *scan;
 	int total_keywords = 0;
 
 	/* get the first keyword line */
-	get_one_line(fl, key);
+	get_one_line(fl, key, filename);
 
 	while (*key != '$') {
 		/* skip the text */
 		do {
-			get_one_line(fl, line);
+			get_one_line(fl, line, filename);
 			if (feof(fl))
 				goto ackeof;
 		} while (*line != '#');
@@ -1121,7 +1121,7 @@ int count_alias_records(FILE *fl) {
 		} while (*next_key);
 
 		/* get next keyword line (or $) */
-		get_one_line(fl, key);
+		get_one_line(fl, key, filename);
 
 		if (feof(fl))
 			goto ackeof;
@@ -1260,10 +1260,11 @@ char *fread_string(FILE * fl, char *error) {
 *
 * @param FILE *fl The file to read from.
 * @param char *buf Where to store the string.
+* @param const char *filename Which help file, for error reporting.
 */
-void get_one_line(FILE *fl, char *buf) {
+void get_one_line(FILE *fl, char *buf, const char *filename) {
 	if (fgets(buf, READ_SIZE, fl) == NULL) {
-		log("SYSERR: error reading help file: not terminated with $?");
+		log("SYSERR: error reading help file %s: not terminated with $?", filename);
 		exit(1);
 	}
 
@@ -1357,22 +1358,23 @@ char *next_help_keyword(char *string, char *next_key) {
 * Loads one help file.
 *
 * @param FILE *fl The input file.
+* @param const char *filename Which help file, for error-reporting.
 */
-void load_help(FILE *fl) {
+void load_help(FILE *fl, const char *filename) {
 	char key[READ_SIZE+1], next_key[READ_SIZE+1], entry[32384];
 	char line[READ_SIZE+1], *scan;
 	struct help_index_element el;
 	int iter;
 
 	/* get the first keyword line */
-	get_one_line(fl, key);
+	get_one_line(fl, key, filename);
 	while (*key != '$') {
 		/* read in the corresponding help entry */
 		strcpy(entry, strcat(key, "\r\n"));
-		get_one_line(fl, line);
+		get_one_line(fl, line, filename);
 		while (*line != '#') {
 			strcat(entry, strcat(line, "\r\n"));
-			get_one_line(fl, line);
+			get_one_line(fl, line, filename);
 		}
 
 		el.level = 0;
@@ -1430,7 +1432,7 @@ void load_help(FILE *fl) {
 		}
 
 		/* get next keyword line (or $) */
-		get_one_line(fl, key);
+		get_one_line(fl, key, filename);
 	}
 }
 
@@ -1464,7 +1466,7 @@ void index_boot_help(void) {
 			continue;
 		}
 		else
-			rec_count += count_alias_records(db_file);
+			rec_count += count_alias_records(db_file, buf1);
 
 		fclose(db_file);
 		fscanf(index, "%s\n", buf1);
@@ -1499,7 +1501,7 @@ void index_boot_help(void) {
 		 * If you think about it, we have a race here.  Although, this is the
 		 * "point-the-gun-at-your-own-foot" type of race.
 		 */
-		load_help(db_file);
+		load_help(db_file, buf1);
 
 		fclose(db_file);
 		fscanf(index, "%s\n", buf1);

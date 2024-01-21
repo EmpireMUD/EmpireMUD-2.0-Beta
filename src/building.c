@@ -3128,11 +3128,20 @@ ACMD(do_tunnel) {
 
 			// found a non-rough
 			if (!SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
-				// did we at least have a last room?
-				if (last_room) {
+				if (ROOM_IS_CLOSED(to_room) || (GET_BUILDING(to_room) && !IS_COMPLETE(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_OPEN))) {
+					// building in the way
+					error = TRUE;
+				}
+				else if (WATER_SECT(to_room)) {
+					// can't end on water
+					error = TRUE;
+				}
+				else if (last_room) {
+					// ok: we at least have a last room
 					exit = last_room;
 				}
 				else {
+					// tunnel likely too short
 					error = TRUE;
 				}
 			}

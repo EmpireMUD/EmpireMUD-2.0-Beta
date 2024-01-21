@@ -5999,7 +5999,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_sect = TRUE;
 			break;
 		}
-		case REQ_DIPLOMACY: {
+		case REQ_DIPLOMACY:
+		case REQ_DIPLOMACY_OVER: {
 			need_dip_flags = TRUE;
 			break;
 		}

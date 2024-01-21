@@ -10,8 +10,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#include <math.h>
-
 #include "conf.h"
 #include "sysdep.h"
 
@@ -1355,6 +1353,10 @@ void annual_update_map_tile(struct map_data *tile) {
 */
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
+	
+	if (VEH_OWNER(veh) && EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+		return;	// skip immortal vehicles
+	}
 	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
@@ -3573,6 +3575,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
 		set_room_custom_name(inter_room, NULL);
 		temp = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		CAP(temp);
 		set_room_custom_name(inter_room, temp);
 		free(temp);
 	}
@@ -3722,6 +3725,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
 		VEH_LONG_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_LONG_DESC(ruin));
+		CAP(VEH_LONG_DESC(ruin));
 		if (to_free) {
 			free(to_free);
 		}

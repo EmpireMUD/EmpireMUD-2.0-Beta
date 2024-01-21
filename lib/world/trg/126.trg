@@ -759,6 +759,7 @@ Badger Druid: Earthen Claws~
 if %self.cooldown(12657)%
   halt
 end
+set actor_id %actor.id%
 nop %self.set_cooldown(12657, 30)%
 dg_affect #12670 %self% HARD-STUNNED on 5
 if %self.morph%
@@ -767,7 +768,10 @@ if %self.morph%
   %echo% %current% rapidly morphs into ~%self%!
 end
 wait 1 sec
-if %actor.trigger_counterspell(%self%)%
+if %actor.id% != %actor_id%
+  * gone?
+  halt
+elseif %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they meet your counterspell!
   %echoaround% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they near ~%actor%!
   halt

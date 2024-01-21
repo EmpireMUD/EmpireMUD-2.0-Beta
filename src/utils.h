@@ -384,6 +384,7 @@
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
 #define GET_BLOOD_UPKEEP(ch)  (GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP) + (has_skill_flagged(ch, SKILLF_VAMPIRE) <= 15 ? 1 : 0))
 int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
+#define GET_BLOOD_DEFICIT(ch)  GET_DEFICIT((ch), BLOOD)
 #define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
 #define GET_MANA_DEFICIT(ch)  GET_DEFICIT((ch), MANA)
@@ -1572,7 +1573,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_INCOMPLETE(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_INCOMPLETE))
 #define IS_INSIDE(room)  ROOM_SECT_FLAGGED((room), SECTF_INSIDE)
 #define IS_MAP_BUILDING(room)  ROOM_SECT_FLAGGED((room), SECTF_MAP_BUILDING)
-#define IS_OUTDOOR_TILE(room)  (RMT_FLAGGED((room), RMT_OUTDOOR) || (!IS_ADVENTURE_ROOM(room) && (!IS_ANY_BUILDING(room) || (IS_MAP_BUILDING(room) && ROOM_BLD_FLAGGED((room), BLD_OPEN)))))
+#define IS_OUTDOOR_TILE(room)  (RMT_FLAGGED((room), RMT_OUTDOOR) || (!IS_ADVENTURE_ROOM(room) && (!IS_ANY_BUILDING(room) || (IS_MAP_BUILDING(room) && !IS_COMPLETE(room) && !ROOM_BLD_FLAGGED(room, BLD_CLOSED)) || (IS_MAP_BUILDING(room) && ROOM_BLD_FLAGGED((room), BLD_OPEN)))))
 #define IS_PUBLIC(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC))
 #define IS_ROAD(room)  ROOM_SECT_FLAGGED((room), SECTF_IS_ROAD)
 #define IS_UNCLAIMABLE(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_UNCLAIMABLE))
@@ -2504,6 +2505,7 @@ PATHFIND_VALIDATOR(pathfind_road);
 void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
+int count_diplomacy_over(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 bool delete_progress_perk_from_list(struct progress_perk **list, int type, int value);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);

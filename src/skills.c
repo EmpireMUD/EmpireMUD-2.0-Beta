@@ -4179,11 +4179,7 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 	LL_FOREACH(display, skad) {
 		count += skad->lines;
 		
-		if ((double)count == half) {
-			mid = skad;
-			break;
-		}
-		else if (count > half) {
+		if (count >= (int)round(half)) {
 			mid = skad->next;
 			break;
 		}

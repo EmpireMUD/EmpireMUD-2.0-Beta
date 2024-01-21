@@ -3771,7 +3771,7 @@ void b5_169_city_centers(void) {
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
-			if (city->location && !ROOM_CUSTOM_NAME(city->location)) {
+			if (city->location) {
 				snprintf(buf, sizeof(buf), "The Center of %s", city->name);
 				set_room_custom_name(city->location, buf);
 				SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
@@ -4018,6 +4018,7 @@ const struct {
 	{ "b5.170", b5_170_timer_updates, NULL, "Applying timers to stored items" },
 	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
+	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

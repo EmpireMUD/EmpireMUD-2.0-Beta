@@ -222,13 +222,13 @@ void end_boost(char_data *ch) {
 
 // max blood is set in mobfile for npc, but computed for player
 int GET_MAX_BLOOD(char_data *ch) {
-	int base = base_player_pools[BLOOD];
+	int base;
 	
 	if (IS_NPC(ch)) {
-		base = ch->points.max_pools[BLOOD];
+		base = ch->points.max_pools[BLOOD] + GET_EXTRA_BLOOD(ch);
 	}
 	else {
-		base += GET_EXTRA_BLOOD(ch);
+		base = base_player_pools[BLOOD] + GET_EXTRA_BLOOD(ch);
 
 		if (IS_VAMPIRE(ch)) {
 			if (HAS_BONUS_TRAIT(ch, BONUS_BLOOD)) {
@@ -620,6 +620,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 void update_biting_char(char_data *ch) {
 	char_data *victim;
 	obj_data *corpse;
+	double bonus = 1.0;
 	int amount, hamt;
 
 	if (!(victim = GET_FEEDING_FROM(ch)))
@@ -635,24 +636,32 @@ void update_biting_char(char_data *ch) {
 	}
 	
 	// Transfuse blood -- 10-25 points (pints?) at a time
-	amount = MIN(number(10, 25), GET_BLOOD(victim));
+	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
+		amount = number(20, 60);
+	}
+	else {
+		amount = number(10, 25);
+	}
+	
+	// check limits and set blood
+	amount = MIN(amount, GET_BLOOD(victim));
 	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
-	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
-		amount *= 2;
+	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_MORE_BLOOD_FROM_HUMANS)) {
+		bonus = number(20, 30) / 10.0;
 	}
-	set_blood(ch, GET_BLOOD(ch) + amount);
+	set_blood(ch, GET_BLOOD(ch) + (amount * bonus));
 	
 	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {
-		hamt = GET_MAX_HEALTH(ch) / 10;
+		hamt = ceil(GET_MAX_HEALTH(ch) / 10.0 * (amount / 10.0));
 		heal(ch, ch, hamt);
 		
-		hamt = GET_MAX_MANA(ch) / 10;
+		hamt = ceil(GET_MAX_MANA(ch) / 10 * (amount / 10.0));
 		set_mana(ch, GET_MANA(ch) + hamt);
 		
-		hamt = GET_MAX_MOVE(ch) / 10;
+		hamt = ceil(GET_MAX_MOVE(ch) / 10 * (amount / 10.0));
 		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 

@@ -43,7 +43,8 @@ Ancient Blood (Vampire ability)
 Type: passive
 
 A vampire can tap into the ancient power in her own blood, raising her
-effective blood pool. She can also drink blood much faster.
+effective blood pool. She can also drink blood faster and will get more blood
+from humans.
 
 If you have the Vampire skill at level 100, the amount of blood will continue
 to rise with your level. You will gain experience with this ability when
@@ -393,6 +394,16 @@ Gains experience passively when you're standing in a dark room.
 
 See also: PASSIVES
 #
+PULSIFY
+
+Pulsify 
+Vampire Synergy Ability:  75 Natural Magic
+
+Cost:  10 mana
+
+Pulsify allows you to enhance the blood of a human victim, though it only lasts
+a short while.
+#
 "RED MIST"
 
 Red Mist (Vampire ability)
@@ -421,7 +432,7 @@ This is different from normal regeneration; see also: REGENS
 Sanguine Restoration (Vampire ability)
 
 Blood is life. When drinking blood from a human victim, your health, move, and
-mana will regenerate by 10% per drink.
+mana will regenerate as you drink.
 
 Sanguine Restoration also grants you a larger blood pool.
 

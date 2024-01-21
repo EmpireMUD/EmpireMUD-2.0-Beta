@@ -10,8 +10,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#include <math.h>
-
 #include "conf.h"
 #include "sysdep.h"
 
@@ -2896,7 +2894,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	}
 	
 	if (IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
-		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_desc(type, amount), PERS(vict, vict, TRUE));
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_amount(type, amount), PERS(vict, vict, TRUE));
 	}
 	
 	// msg to char
@@ -5017,7 +5015,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch)), *use_emp = NULL;
 	bool home_mode = (mode == SCMD_HOME);
-	char numarg[MAX_INPUT_LENGTH], *tmp;
+	char arg[MAX_INPUT_LENGTH], numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
 	int total = 1, done = 0, dotmode;
 	bool full = FALSE, capped = FALSE, kept = FALSE;
@@ -5116,17 +5114,20 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 		}
 	}
 	else {
-		if (!*argument) {
+		// not "all"
+		one_argument(argument, arg);
+		
+		if (!*arg) {
 			msg_to_char(ch, "What do you want to store?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
-			msg_to_char(ch, "You don't seem to have any %ss.\r\n", argument);
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 			return;
 		}
 
 		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
-			next_obj = get_obj_in_list_vis(ch, argument, NULL, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;	// mark for later
@@ -8549,7 +8550,13 @@ ACMD(do_use) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		// check tool slot?
+		if (GET_EQ(ch, WEAR_TOOL) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_TOOL))) {
+			msg_to_char(ch, "It looks like you're already using it!\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+		}
 	}
 	else {
 		if (IS_POISON(obj)) {

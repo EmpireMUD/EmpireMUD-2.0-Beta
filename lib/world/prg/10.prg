@@ -136,19 +136,19 @@ Making a Friend~
 another empire using the diplomacy command. Your city guards and towers will no
 longer attack each other.
 ~
-5 1 0 15 0
+6 1 0 15 0
 W
-31 0 16 1 -
+46 0 16 1 -
 S
 #1021
 Leader of the Community~
    Forge non-aggression pacts with a total of 10 empires to help foster peace
 in the region. Better diplomatic relations also lead to a better exchange rate.
 ~
-4 1 0 25 0
+5 1 0 25 0
 P 1020
 W
-31 0 16 10 -
+46 0 16 10 -
 S
 #1030
 Search For Ore~

@@ -404,6 +404,10 @@ You can use "efind all" to find all items on the ground in your empire. The
 Example:
  > efind cart
 
+* Immortals may use this command on any empire. Mortals may only use it on
+their own empire. If the empire name has more than one word, you can use
+quotation marks.
+
 See also: EINVENTORY, NAVIGATION, EIDENTIFY
 #
 ELOG ELOGS "EMPIRE LOGS"
@@ -641,7 +645,7 @@ needed to repair that location or all buildings you own on the island.
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
 
-Immortals can give an empire name as the first argument to see maintenance
+* Immortals can give an empire name as the first argument to see maintenance
 for that empire.
 
 See also: MAINTAIN, WORKFORCE

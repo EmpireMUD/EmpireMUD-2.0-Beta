@@ -38,6 +38,10 @@ if !(druids /= %arg%)
   return 0
   halt
 end
+if !%room.complete%
+  %send% %actor% The building isn't even finished.
+  halt
+end
 if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to chant here.
   halt
@@ -202,6 +206,9 @@ while %self.val1% > 0
     case 0
       %send% %actor% You finish bathing and climb out of the water to dry off.
       %echoaround% %actor% ~%actor% finishes bathing and climbs out of the water to dry off.
+      * cancel stop
+      set needs_stop_command 0
+      remote needs_stop_command %actor.id%
       * done
       dg_affect #5162 %actor% off
       dg_affect #5162 %actor% DEXTERITY 1 1800

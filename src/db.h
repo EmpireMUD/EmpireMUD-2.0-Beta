@@ -730,6 +730,7 @@ char_data *is_at_menu(int id);
 char_data *is_playing(int id);
 bool member_is_timed_out_index(player_index_data *index);
 struct mail_data *parse_mail(FILE *fl, char *first_line);
+void refresh_character_on_load(char_data *ch);
 void remove_lastname(char_data *ch, char *name);
 void remove_player_from_table(player_index_data *plr);
 void save_all_players(bool delay);

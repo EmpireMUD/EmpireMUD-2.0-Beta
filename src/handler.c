@@ -11,7 +11,6 @@
 ************************************************************************ */
 
 #include <limits.h>
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -672,7 +671,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			GET_MOVE(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
-			if (!IS_NPC(ch) && GET_MOVE(ch) < 0) {
+			if (!IS_NPC(ch) && GET_MOVE(ch) < 0 && GET_MAX_MOVE(ch) >= 0) {
 				GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
 				GET_MOVE(ch) = 0;
 			}
@@ -706,7 +705,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			GET_MANA(ch) += mod;
 			
 			// deficits: prevent going negative (players only)
-			if (!IS_NPC(ch) && GET_MANA(ch) < 0) {
+			if (!IS_NPC(ch) && GET_MANA(ch) < 0 && GET_MAX_MANA(ch) >= 0) {
 				GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
 				GET_MANA(ch) = 0;
 			}
@@ -714,6 +713,22 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
+			
+			// these do not use set_current_pool(): it's important to be able to go over the maximum temporarily
+			GET_BLOOD(ch) += mod;
+			
+			// prevent going below 1
+			if (GET_BLOOD(ch) < 1 && (GET_BLOOD(ch) - mod) >= 1) {
+				if (IS_NPC(ch)) {
+					// npcs cannot die this way
+					set_blood(ch, 1);
+				}
+				else {
+					// deficit (players only)
+					GET_BLOOD_DEFICIT(ch) -= GET_BLOOD(ch) - 1;
+					GET_BLOOD(ch) = 1;
+				}
+			}
 			break;
 		}
 		case APPLY_RESIST_PHYSICAL: {
@@ -1030,8 +1045,10 @@ void affect_total(char_data *ch) {
 		GET_ATT(ch, iter) = MAX(0, MIN(GET_ATT(ch, iter), att_max(ch)));
 	}
 	
-	// limit this
+	// limit these
 	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
+	GET_MAX_MOVE(ch) = MAX(0, GET_MAX_MOVE(ch));
+	GET_MAX_MANA(ch) = MAX(0, GET_MAX_MANA(ch));
 	
 	// pay off deficits now and check pool caps (for NPCs, this will also check caps)
 	check_deficits(ch);
@@ -1042,7 +1059,10 @@ void affect_total(char_data *ch) {
 	}
 	
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
-	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
+	if (!IS_NPC(ch)) {
+		// pc-only though; NPCs would have ever-rising blood otherwise
+		GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
+	}
 	
 	// check new highest greatness (in-game only)
 	if (!IS_NPC(ch) && IN_ROOM(ch) && GET_HIGHEST_KNOWN_GREATNESS(ch) < GET_GREATNESS(ch)) {
@@ -9066,6 +9086,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_DIPLOMACY_OVER: {
+				if (!GET_LOYALTY(ch) || count_diplomacy_over(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
 			case REQ_HAVE_CITY: {
 				if (!GET_LOYALTY(ch) || count_cities(GET_LOYALTY(ch)) < req->needed) {
 					ok = FALSE;
@@ -9343,6 +9369,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
 			}
 			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
+			break;
+		}
+		case REQ_DIPLOMACY_OVER: {
+			sprintbit(req->misc, diplomacy_flags, lbuf, TRUE);
+			if (lbuf[strlen(lbuf)-1] == ' ') {
+				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
+			}
+			snprintf(output, sizeof(output), "Have diplomatic relations of at least: %dx %s", req->needed, lbuf);
 			break;
 		}
 		case REQ_HAVE_CITY: {

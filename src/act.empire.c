@@ -10,8 +10,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#include <math.h>
-
 #include "conf.h"
 #include "sysdep.h"
 
@@ -1576,7 +1574,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
 				only_room = IN_ROOM(ch);
 			}
-			else if ((only_room = parse_room_from_coords(argument)) || (only_room = find_target_room(ch, argument))) {
+			else if ((only_room = parse_room_from_coords(argument))) {
 				only_loc = GET_ROOM_VNUM(only_room);
 			}
 			else {
@@ -4850,7 +4848,9 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char buf[MAX_STRING_LENGTH*2];
+	char *argptr;
 	obj_data *obj;
 	empire_data *emp;
 	int total;
@@ -4860,12 +4860,19 @@ ACMD(do_efind) {
 	vehicle_data *veh;
 	size_t size;
 	
-	one_argument(argument, arg);
+	// optional first arg (empire) and empire detection
+	argptr = any_one_word(argument, arg);
+	if (!imm_access || !(emp = get_empire_by_name(arg))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
+	
+	one_argument(argptr, arg);
 	
 	if (IS_NPC(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!(emp = GET_LOYALTY(ch))) {
+	else if (!emp) {
 		msg_to_char(ch, "You aren't in an empire.\r\n");
 	}
 	else if (!*arg) {
@@ -4910,7 +4917,13 @@ ACMD(do_efind) {
 		}
 
 		if (total > 0) {
-			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			if (emp == GET_LOYALTY(ch)) {
+				size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			}
+			else {
+				size = snprintf(buf, sizeof(buf), "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));	// leave off \r\n
+			}
+			
 			last_rm = NULL;
 			
 			DL_FOREACH_SAFE(list, eg, next_eg) {
@@ -4948,7 +4961,7 @@ ACMD(do_efind) {
 			page_string(ch->desc, buf, TRUE);
 		}
 		else {
-			msg_to_char(ch, "You don't discover anything like that in your empire.\r\n");
+			msg_to_char(ch, "You don't discover anything like that in %s.\r\n", (emp == GET_LOYALTY(ch) ? "your empire" : EMPIRE_NAME(emp)));
 		}
 	}
 }

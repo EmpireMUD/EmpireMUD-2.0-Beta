@@ -222,12 +222,18 @@ if !%self.cooldown(12005)% && !%yatpan%
   * Summon Yatpan
   shout Yatpan! Come to me!
   nop %self.set_cooldown(12005, 300)%
+  set actor_id %actor.id%
   wait 2 sec
   %load% mob 12001 ally
   set summon %self.room.people%
   if %summon.vnum% == 12001
     %echo% ~%summon% drops from the sky, holding a bow, which ~%self% takes.
-    %force% %summon% %aggro% %actor%
+    if %actor% && %actor.id% == %actor_id% && %actor.room% == %self.room%
+      %force% %summon% %aggro% %actor%
+    else
+      * gone?
+      %force% %summon% %aggro%
+    end
   end
 else
   * Rain of Arrows

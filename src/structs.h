@@ -86,6 +86,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include <math.h>
 #include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 #include "utlist.h"	// needed by everything
@@ -494,6 +495,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_COMPLETED_QUEST_EVER  43
 #define REQ_DAYTIME  44
 #define REQ_NIGHTTIME  45
+#define REQ_DIPLOMACY_OVER  46
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -2502,7 +2504,7 @@ typedef enum {
 #define PTECH_HARVEST_COMMAND  73	// can 'harvest'
 #define PTECH_PICK_COMMAND  74	// can 'pick'
 #define PTECH_QUARRY_COMMAND  75	// can 'quarry'
-#define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
+#define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink more blood at a time
 #define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 #define PTECH_CUSTOMIZE_VEHICLE  78	// can use 'customize vehicle'
 #define PTECH_PLANT_CROPS  79	// can 'plant'
@@ -2527,6 +2529,7 @@ typedef enum {
 #define PTECH_STEAL_COMMAND  98	// can use 'steal'
 #define PTECH_USE_HONED_GEAR  99	// can use honed gear
 #define PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA  100	// redirect part of magical damage to mana pool instead of health
+#define PTECH_MORE_BLOOD_FROM_HUMANS  101	// vampires get more out of blood from humans
 
 
 // SM_x: status messages

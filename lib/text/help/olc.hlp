@@ -1318,6 +1318,7 @@ Limitation types:
  &ctarget has DoT type&0 - Target must have a certain type of DoT.
  &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
  &ctarget is affected by&0 - Target must have an affect flag.
+ &ctarget is human&0 - Target must be a player or HUMAN-flagged mob.
  &ctarget is vampire&0 - Target must be a vampire.
  &ctarget not affeced by&0 - Target is not affected by a given affect flag.
  &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
@@ -1692,7 +1693,7 @@ Available techs are:
  &cHarvest-Command&0 *
  &cPick-Command&0 *
  &cQuarry-Command&0 *
- &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
+ &cDrink-Blood-Faster&0 - Vampires drink more blood at a time.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
@@ -1718,6 +1719,7 @@ Available techs are:
  &cSteal-Command&0 *^ - Allows 'steal'.
  &cUse-Honed-Gear&0 - Allows the player to used items that have been honed.
  &cRedirect-Magical-Damage-to-Mana&0 * - Half of magic damage drains mana not hp.
+ &cMore-Blood-From-Humans&0 - Vampires get a larger benefit drinking blood from humans.
 
 * Techs marked with an asterisk trigger ability gains on their own without gain hooks.
 ^ Techs marked with a carat support difficulty settings on the ability.
@@ -7246,7 +7248,7 @@ goes any longer than that, you should use /fi to format it with indent inside
 the string editor.
 
 See also: OLC OBJECTS, STRING EDITOR, MEDIT LOOKDESCRIPTION,
-MORPHEDIT LOOKDSECRIPTION
+MORPHEDIT LOOKDESCRIPTION
 #d
 "OEDIT MATERIAL"
 
@@ -8868,6 +8870,7 @@ Available tasks:
  &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
  &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
  &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
+ &cDIPLOMACY-OVER&0 - Empire must have N matching (or better) diplomatic relations.
  &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
  &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
  &cEMPIRE-PRODUCED-OBJECT&0 - Empire has produced an amount of an item.

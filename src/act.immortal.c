@@ -9200,7 +9200,7 @@ ACMD(do_echo) {
 			}
 		}
 		
-		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 
 		// fetch and store channel history for the room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
@@ -9242,7 +9242,7 @@ ACMD(do_echo) {
 		
 			// send to vict
 			if (vict != ch) {
-				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 			}
 		
 			// channel history
@@ -9272,7 +9272,7 @@ ACMD(do_echo) {
 		}
 		
 		// send to room
-		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 
 		// fetch and store channel history for the room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
@@ -11334,9 +11334,9 @@ ACMD(do_slay) {
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			
-			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);
-			act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
-			act("$n brutally slays $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
+			act("$N chops you to pieces!", FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
+			act("$n brutally slays $N!", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
 
 			check_scaling(vict, ch);	// ensure scaling
 			tag_mob(vict, ch);	// ensures loot binding if applicable
@@ -11506,9 +11506,6 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
-			refresh_passive_buffs(victim);
-			convert_and_schedule_player_affects(victim);	// ensures the timers are right on affects
-			affect_total(victim);
 			do_stat_character(ch, victim);
 		}
 		
