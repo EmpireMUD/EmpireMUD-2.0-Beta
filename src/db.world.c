@@ -1354,6 +1354,10 @@ void annual_update_map_tile(struct map_data *tile) {
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
 	
+	if (VEH_OWNER(veh) && EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+		return;	// skip immortal vehicles
+	}
+	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
 	
