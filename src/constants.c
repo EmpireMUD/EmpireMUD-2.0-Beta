@@ -2724,6 +2724,7 @@ const bool generic_types_uses_in_dev[] = {
 const char *generic_flags[] = {
 	"BASIC",	// 0
 	"IN-DEVELOPMENT",
+	"SHOW-ADVENTURE",
 	"\n"
 };
 

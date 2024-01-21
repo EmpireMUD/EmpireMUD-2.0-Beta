@@ -5103,6 +5103,7 @@ The following flags for generics are available:
     component types (fine pillar will substitute for pillar because of BASIC).
  &cIN-DEVELOPMENT&0 - Will not show up for players. This currently only applies
     to MOON generics.
+ &cSHOW-ADVENTURE&0 - Shows what adventure it came from on some types (currency).
 
 See also: OLC GENERICS
 #d
