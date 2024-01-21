@@ -5609,7 +5609,7 @@ SHOW(show_currency) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "%3d %s (%d)\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), cur->vnum);
+				snprintf(line, sizeof(line), "[%5d] %3d %s\r\n", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
