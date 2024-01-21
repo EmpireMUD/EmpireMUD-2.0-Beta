@@ -4796,7 +4796,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
 							if (pos != NOTHING) {
-								SET_BIT(GET_OBJ_WEAR(o), pos);
+								SET_BIT(GET_OBJ_WEAR(o), BIT(pos));
 								request_obj_save_in_world(o);
 							}
 							else {
@@ -5176,7 +5176,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
 							if (pos != NOTHING) {
-								REMOVE_BIT(GET_OBJ_WEAR(o), pos);
+								REMOVE_BIT(GET_OBJ_WEAR(o), BIT(pos));
 								request_obj_save_in_world(o);
 							}
 							else {
