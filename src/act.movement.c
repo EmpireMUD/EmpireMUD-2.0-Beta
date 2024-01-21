@@ -1004,7 +1004,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
-	if (IS_INSIDE(was_in) && HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
+	if (IS_INSIDE(was_in) && IS_INSIDE(to_room) && HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
 		msg_to_char(ch, "You can't go there because the building is incomplete.\r\n");
 		return FALSE;
 	}
