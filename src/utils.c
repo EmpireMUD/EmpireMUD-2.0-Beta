@@ -4456,6 +4456,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 			else if (!HASRES_OBJS && res->type == RES_OBJECT) {
 				continue;
 			}
+			else if (!HASRES_OTHER && (res->type == RES_COINS || res->type == RES_CURRENCY || res->type == RES_POOL)) {
+				continue;	// only do these once: in the othe cycle
+			}
 		
 			// RES_x: check resources by type
 			switch (res->type) {
