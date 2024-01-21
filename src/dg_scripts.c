@@ -5613,7 +5613,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// room.h*
-					if (!str_cmp(field, "has_trigger")) {
+					if (!str_cmp(field, "has_evolution")) {
+						int type;
+						if (subfield && *subfield && (type = search_block(subfield, evo_types, FALSE)) != NOTHING) {
+							snprintf(str, slen, "%d", (SECT(r) && has_evolution_type(SECT(r), type)) ? 1 : 0);
+						}
+						else {
+							snprintf(str, slen, "0");	// no type (or invalid type) provided
+						}
+					}
+					else if (!str_cmp(field, "has_trigger")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							snprintf(str, slen, "%d", has_trigger(SCRIPT(r), atoi(subfield)));
 						}

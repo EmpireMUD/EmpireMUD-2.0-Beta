@@ -180,6 +180,7 @@ When using field - The variable returns:
       %room.north(room)% - room variable for room in direction (may be inside
          or on the map, depending on available exits and location)
       %room.north(map)% - room variable for the map location in the dir
+&chas_evolution(type)&0 - Room has a given evolution available (SECTEDIT EVO).
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &cheight&0 - Get the current height of a map tile or set it with &cheight(num)&0.
    Use &cview_height&0 instead if you want to include things built on it.
