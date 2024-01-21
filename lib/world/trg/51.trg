@@ -38,6 +38,10 @@ if !(druids /= %arg%)
   return 0
   halt
 end
+if !%room.complete%
+  %send% %actor% The building isn't even finished.
+  halt
+end
 if !%actor.canuseroom_guest%
   %send% %actor% You don't have permission to chant here.
   halt
