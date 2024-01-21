@@ -2846,7 +2846,7 @@ ACMD(do_coins) {
 			}
 			
 			if ((gen = real_generic(cur->vnum)) && GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(cur->vnum))) {
-				snprintf(adv_part, sizeof(adv_part), " from %s", GET_ADV_NAME(adv));
+				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {
 				*adv_part = '\0';

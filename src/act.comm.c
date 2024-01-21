@@ -2365,7 +2365,7 @@ ACMD(do_speak) {
 			
 			// show from adventure?
 			if (GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(lang->vnum))) {
-				snprintf(adv_part, sizeof(adv_part), " from %s", GET_ADV_NAME(adv));
+				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {
 				*adv_part = '\0';
