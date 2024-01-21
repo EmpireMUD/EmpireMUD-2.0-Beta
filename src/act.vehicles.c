@@ -1652,6 +1652,9 @@ ACMD(do_drag) {
 	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, GET_LOYALTY(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		act("You cannot drag $V there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
+	else if (!validate_vehicle_move(ch, veh, to_room)) {
+		// sends own error (may re-check some of the above, but that's ok)
+	}
 	else {
 		// seems okay enough -- try movement
 		was_in = IN_ROOM(ch);
