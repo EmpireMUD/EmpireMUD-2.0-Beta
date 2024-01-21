@@ -200,7 +200,7 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 	}
 	
 	*rlbuf = '\0';
-	if (ROOM_CUSTOM_NAME(room)) {
+	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME)) {
 		snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
