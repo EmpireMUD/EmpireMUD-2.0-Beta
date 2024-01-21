@@ -546,6 +546,7 @@ double config_get_double(char *key);
 int config_get_int(char *key);
 int *config_get_int_array(char *key, int *array_size);
 const char *config_get_string(char *key);
+int config_get_type(char *key);
 
 // faction.c
 int compare_reptuation(int rep_a, int rep_b);
