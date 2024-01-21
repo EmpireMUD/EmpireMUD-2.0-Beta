@@ -302,6 +302,7 @@ bitvector_t pk_ok = PK_WAR;
 #define CONFTYPE_INT_ARRAY  5
 #define CONFTYPE_SHORT_STRING  6 // max length ~ 128
 #define CONFTYPE_LONG_STRING  7	// paragraph length
+#define CONFTYPE_TYPE  8	// shows a list from a const char array
 
 
 // CONFIG_x groupings for the config command
@@ -408,7 +409,7 @@ bitvector_t config_get_bitvector(char *key) {
 	
 	if (!key) {
 		log("SYSERR: config_get_bitvector called with no key.");
-		return 1.0;
+		return NOBITS;
 	}
 	
 	// maybe?
@@ -416,11 +417,11 @@ bitvector_t config_get_bitvector(char *key) {
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector called with invalid key '%s'", key);
-		return 1.0;
+		return NOBITS;
 	}
 	if (cnf->type != CONFTYPE_BITVECTOR) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector with non-bitvector key '%s'", key);
-		return 1.0;
+		return NOBITS;
 	}
 	
 	// valid data!
@@ -587,6 +588,37 @@ const char *config_get_string(char *key) {
 	
 	// valid data!
 	return cnf->data.string_val ? cnf->data.string_val : default_string;
+}
+
+
+/**
+* Load a global config as an int, from a 'type' type.
+*
+* @param char *key The one-word string key for the config system.
+* @return int The value associated with that key (default: 0).
+*/
+int config_get_type(char *key) {
+	struct config_type *cnf;
+	
+	if (!key) {
+		log("SYSERR: config_get_type called with no key.");
+		return 0;
+	}
+	
+	// maybe?
+	cnf = get_config_by_key(key, TRUE);
+	
+	if (!cnf) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_type called with invalid key '%s'", key);
+		return 0;
+	}
+	if (cnf->type != CONFTYPE_TYPE) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_type with non-type key '%s'", key);
+		return 0;
+	}
+	
+	// valid data!
+	return cnf->data.int_val;
 }
 
 
@@ -924,88 +956,42 @@ CONFIG_HANDLER(config_edit_short_string) {
 }
 
 
-// Custom config handler for editing a type list, for CONFTYPE_INT_ARRAY.
-CONFIG_HANDLER(config_edit_typelist) {
-	bool alldigit, found, changed = FALSE;
-	char buf[MAX_STRING_LENGTH];
-	const char **type_list;
-	int type, iter;
+// Custom config handler for editing a 'type' type, resulting in an int, for CONFTYPE_TYPE.
+CONFIG_HANDLER(config_edit_type) {
+	int old, new;
 	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_edit_typelist called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_edit_type called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
-	if (config->type != CONFTYPE_INT_ARRAY) {
-		log("SYSERR: config_edit_typelist called on non-int-array key %s", config->key);
+	if (config->type != CONFTYPE_TYPE) {
+		log("SYSERR: config_edit_type called on non-type key %s", config->key);
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
 	if (!config->custom_data) {
-		log("SYSERR: config_edit_typelist called without custom data for key %s", config->key);
+		log("SYSERR: config_edit_type called without custom data for key %s", config->key);
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
-	
-	// setup
-	type_list = (const char **)config->custom_data;
-	*buf = '\0';
-	
-	// did they enter a number?
-	alldigit = is_number(argument);
-	
-	// validate type
-	if (alldigit) {
-		type = atoi(argument) - 1;	// numbers are shown as id+1 to be 1-based not 0-based
 		
-		// ensure type is not past the end of the type_list
-		found = FALSE;
-		for (iter = 0; *type_list[iter] != '\n' && !found; ++iter) {
-			if (iter == type) {
-				found = TRUE;
-			}
-		}
-		
-		if (!found) {
-			type = NOTHING;
-		}
-	}
-	else {
-		type = search_block(argument, type_list, FALSE);
-	}
+	// process (olc processor sends all messages)
+	old = config->data.int_val;
+	new = olc_process_type(ch, argument, config->key, config->key, (const char **)config->custom_data, old);
 	
-	// did we find one?
-	if (type == NOTHING) {
-		msg_to_char(ch, "Unknown option '%s'\r\n", argument);
+	// no change
+	if (old == new) {
 		return;
 	}
 	
-	// is it legit?
-	if (*type_list[type] == '*') {
-		msg_to_char(ch, "You may not choose the '%s' option.\r\n", type_list[type]);
-		return;
-	}
+	// update
+	config->data.int_val = new;
 	
-	// adding or removing?
-	if (find_int_in_array(type, config->data.int_array, config->data_size)) {
-		changed = remove_int_from_int_array(type, &(config->data.int_array), &(config->data_size));
-		if (changed) {
-			syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s removed %s from %s", GET_NAME(ch), type_list[type], config->key);
-		}
-		msg_to_char(ch, "%s: removed %s.\r\n", config->key, type_list[type]);
-	}
-	else {
-		changed = add_int_to_int_array(type, &(config->data.int_array), &(config->data_size));
-		if (changed) {
-			syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s added %s to %s", GET_NAME(ch), type_list[type], config->key);
-		}
-		msg_to_char(ch, "%s: added %s.\r\n", config->key, type_list[type]);
-	}
-	
-	if (changed) {
-		save_config_system();
-	}
+	// build log
+	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s updated %s: set to %s from %s", GET_NAME(ch), config->key, ((const char **)config->custom_data)[new], ((const char **)config->custom_data)[old]);
+	save_config_system();
 }
 
 
@@ -1047,61 +1033,6 @@ CONFIG_HANDLER(config_edit_decay_in_storage) {
 		DL_FOREACH2(player_character_list, chiter, next_plr) {
 			ensure_home_storage_timers(chiter, NOTHING);
 		}
-	}
-}
-
-
-CONFIG_HANDLER(config_edit_who_list_sort) {
-	int input, iter, old;
-	
-	// basic sanitation
-	if (!ch || !config) {
-		log("SYSERR: config_edit_who_list_sort called without %s", ch ? "config" : "ch");
-		msg_to_char(ch, "Error editing type.\r\n");
-		return;
-	}
-	if (config->type != CONFTYPE_INT) {
-		log("SYSERR: config_edit_who_list_sort called on non-int key %s", config->key);
-		msg_to_char(ch, "Error editing type.\r\n");
-		return;
-	}
-	
-	if ((input = search_block(argument, who_list_sort_types, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Invalid option '%s'. Valid sorts are:\r\n", argument);
-		for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
-		}
-		return;
-	}
-	
-	if (config->data.int_val == input) {
-		msg_to_char(ch, "It is already set to that sort.\r\n");
-		return;
-	}
-	
-	old = config->data.int_val;
-	config->data.int_val = input;
-	save_config_system();
-	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s set %s to %s, from %s", GET_NAME(ch), config->key, who_list_sort_types[input], who_list_sort_types[old]);
-	msg_to_char(ch, "%s: set to %s, from %s.\r\n", config->key, who_list_sort_types[input], who_list_sort_types[old]);
-}
-
-
-CONFIG_HANDLER(config_show_who_list_sort) {
-	int iter;
-	
-	// basic sanitation
-	if (!ch || !config) {
-		log("SYSERR: config_show_who_list_sort called without %s", ch ? "config" : "ch");
-		msg_to_char(ch, "Error showing type.\r\n");
-		return;
-	}
-	
-	msg_to_char(ch, "Current sort: %s\r\n", who_list_sort_types[config->data.int_val]);
-	
-	msg_to_char(ch, "Valid sorts are:\r\n");
-	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
-		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
 	}
 }
 
@@ -1262,46 +1193,27 @@ CONFIG_HANDLER(config_show_short_string) {
 }
 
 
-// Custom config handler for showing a type list, for CONFTYPE_INT_ARRAY.
-CONFIG_HANDLER(config_show_typelist) {
-	char buf[MAX_STRING_LENGTH];
-	const char **type_list;
-	int iter;
-	
+// config handler for showing a 'type' type, for CONFTYPE_TYPE
+CONFIG_HANDLER(config_show_type) {	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_show_typelist called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_show_type called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
-	if (config->type != CONFTYPE_INT_ARRAY) {
-		log("SYSERR: config_show_typelist called on non-int-array key %s", config->key);
+	if (config->type != CONFTYPE_TYPE) {
+		log("SYSERR: config_show_type called on non-type key %s", config->key);
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
 	if (!config->custom_data) {
-		log("SYSERR: config_show_typelist called without custom data for key %s", config->key);
+		log("SYSERR: config_show_type called without custom data for key %s", config->key);
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
-	
-	// setup
-	type_list = (const char **)config->custom_data;
-	*buf = '\0';
-	
-	for (iter = 0; *type_list[iter] != '\n'; ++iter) {
-		sprintf(buf + strlen(buf), "%2d. %s%-24.24s&0%s", (iter + 1), find_int_in_array(iter, config->data.int_array, config->data_size) ? "&g" : "", type_list[iter], ((iter % 2) ? "\r\n" : ""));
-	}
-	if ((iter % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
-	
-	if (*buf) {
-		msg_to_char(ch, "List value:\r\n%s", buf);
-	}
-	else {
-		msg_to_char(ch, "No types are configured for key %s.\r\n", config->key);
-	}
+
+	// send it through the olc processor, which will display it all
+	olc_process_type(ch, "", config->key, config->key, (const char **)config->custom_data, config->data.int_val);
 }
 
 
@@ -1463,6 +1375,10 @@ void load_config_system_from_file(void) {
 				}
 				break;
 			}
+			case CONFTYPE_TYPE: {
+				cnf->data.int_val = atoi(arg);
+				break;
+			}
 			default: {
 				log("Unable to load config system: %s: unloadable config type %d", cnf->key, cnf->type);
 				break;
@@ -1562,6 +1478,10 @@ void save_config_system(void) {
 				else {
 					fprintf(fl, "%s 0\n", cnf->key);
 				}
+				break;
+			}
+			case CONFTYPE_TYPE: {
+				fprintf(fl, "%s %d\n", cnf->key, cnf->data.int_val);
 				break;
 			}
 			default: {
@@ -1785,6 +1705,11 @@ void init_config(int set, char *key, int type, char *description) {
 			cnf->edit_func = config_edit_bitvector;
 			break;
 		}
+		case CONFTYPE_TYPE: {
+			cnf->show_func = config_show_type;
+			cnf->edit_func = config_edit_type;
+			break;
+		}
 		case CONFTYPE_INT_ARRAY:
 		default: {
 			// currently requires a custom handler
@@ -1914,7 +1839,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
 	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
 	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
-		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
+		init_config_custom("who_list_sort", config_show_type, config_edit_type, who_list_sort_types);
 	init_config(CONFIG_GAME, "wizlist_header", CONFTYPE_LONG_STRING, "shown at the top of the wizlist");
 
 	// actions
@@ -2299,6 +2224,16 @@ ACMD(do_config) {
 				}
 				case CONFTYPE_LONG_STRING: {
 					lsize = snprintf(line, sizeof(line), "<%s>", cnf->data.string_val ? "set" : "not set");
+					break;
+				}
+				case CONFTYPE_TYPE: {
+					if (cnf->custom_data) {
+						sprinttype(cnf->data.int_val, (const char **)cnf->custom_data, part, sizeof(part), "???");
+						lsize = snprintf(line, sizeof(line), "%s", part);
+					}
+					else {
+						lsize = snprintf(line, sizeof(line), "%d", cnf->data.int_val);
+					}
 					break;
 				}
 				default: {
