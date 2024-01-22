@@ -2238,7 +2238,7 @@ void check_empire_storage_timers(void) {
 					// time to go
 					if (eus->obj) {
 						decay_in_storage_isle = eus->island;
-						if (SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
+						if (SCRIPT_CHECK(eus->obj, OTRIG_TIMER) || IS_DRINK_CONTAINER(eus->obj)) {
 							// has a timer trigger
 							counted = run_timer_triggers_on_decaying_warehouse(emp, eus, st->amount);
 						}
@@ -2333,7 +2333,7 @@ void check_home_storage_timers(char_data *ch) {
 				// time to go
 				if (eus->obj) {
 					decay_in_storage_isle = eus->island;
-					if (home && SCRIPT_CHECK(eus->obj, OTRIG_TIMER)) {
+					if (home && (SCRIPT_CHECK(eus->obj, OTRIG_TIMER) || IS_DRINK_CONTAINER(eus->obj))) {
 						// has a timer trigger
 						counted = run_timer_triggers_on_decaying_home_storage(ch, home, eus, st->amount);
 					}

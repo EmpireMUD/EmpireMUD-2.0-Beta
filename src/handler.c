@@ -11073,10 +11073,6 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	LAST_OWNER_ID(obj) = NOBODY;
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);
-	if (IS_DRINK_CONTAINER(obj)) {
-		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
-	}
 	
 	// SEV_x: events that must be canceled when an item is stored
 	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);
