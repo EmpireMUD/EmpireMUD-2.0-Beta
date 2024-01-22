@@ -745,7 +745,7 @@ void olc_show_craft(char_data *ch) {
 
 	// resources
 	sprintf(buf + strlen(buf), "Resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
-	get_resource_display(GET_CRAFT_RESOURCES(craft), lbuf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
 	strcat(buf, lbuf);
 		
 	page_string(ch->desc, buf, TRUE);

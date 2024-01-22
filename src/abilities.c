@@ -11034,7 +11034,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ABIL_RESOURCE_COST(abil), part);
+		get_resource_display(ch, ABIL_RESOURCE_COST(abil), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
 	}
 	
@@ -11218,7 +11218,7 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "\r\n");
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ABIL_RESOURCE_COST(abil), lbuf);
+		get_resource_display(ch, ABIL_RESOURCE_COST(abil), lbuf);
 		sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
 	}
 	

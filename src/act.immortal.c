@@ -6813,7 +6813,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	}
 	
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
+		get_resource_display(ch, GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
 		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
 	}
 	
@@ -7187,7 +7187,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 
 	// resources
 	msg_to_char(ch, "Resources required:\r\n");
-	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
 	send_to_char(buf, ch);
 }
 
