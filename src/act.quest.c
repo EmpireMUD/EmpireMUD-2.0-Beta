@@ -978,7 +978,7 @@ QCMD(qcmd_info) {
 
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
-	struct quest_temp_list *quest_list = NULL;
+	struct quest_temp_list *quest_list = NULL, *qtl;
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
@@ -989,7 +989,7 @@ QCMD(qcmd_list) {
 		msg_to_char(ch, "%s\r\n", show_daily_quest_line(ch));
 		
 		if ((quest_list = build_available_quest_list(ch))) {
-			msg_to_char(ch, "Try 'quest start' to see a list of available quests here.\r\n");
+			msg_to_char(ch, "Try typing 'start' to see a list of available quests here.\r\n");
 			free_quest_temp_list(quest_list);
 		}
 		return;
@@ -1025,6 +1025,15 @@ QCMD(qcmd_list) {
 	
 	// show dailies status, too
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", show_daily_quest_line(ch));
+	
+	// any quests available here?
+	quest_list = build_available_quest_list(ch);
+	if (quest_list) {
+		count = 0;
+		LL_COUNT(quest_list, qtl, count);
+		size += snprintf(buf + size, sizeof(buf) - size, "There are %d quest%s available here%s.\r\n", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
+	}
+	free_quest_temp_list(quest_list);
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
