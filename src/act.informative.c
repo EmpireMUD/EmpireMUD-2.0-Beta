@@ -3298,7 +3298,7 @@ ACMD(do_inventory) {
 		*heading = '\0';
 		
 		// parse flag if any
-		if (*argument == '-') {
+		while (*argument == '-') {
 			switch (*(argument+1)) {
 				case 'c': {
 					argument += 2;	// skip past -c
@@ -3392,11 +3392,17 @@ ACMD(do_inventory) {
 						
 						// peel off the first arg
 						argument = one_argument(argument, arg);
-						skip_spaces(&argument);
+					}
+					else {
+						// remove arg
+						argument = one_argument(argument, arg);
 					}
 					break;
 				}
 			}
+			
+			// skip spaces and repeat
+			skip_spaces(&argument);
 		}
 		
 		// if we get this far, it's okay
