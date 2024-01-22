@@ -655,7 +655,7 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 			free(buf2);
 		}
 		
-		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s\r\n", buf);
+		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s%s\r\n", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
 	}
 	
 	if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
