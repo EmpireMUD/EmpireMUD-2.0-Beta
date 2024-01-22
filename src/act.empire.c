@@ -6830,8 +6830,15 @@ ACMD(do_pledge) {
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
-		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
-		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		if (old) {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered to pledge %s to this empire", PERS(ch, ch, TRUE), EMPIRE_NAME(old));
+			log_to_empire(old, ELOG_MEMBERS, "%s has offered to pledge the empire to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(e));
+			msg_to_char(ch, "You offer to pledge %s to %s.\r\n", EMPIRE_NAME(old), EMPIRE_NAME(e));
+		}
+		else {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+			msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		}
 		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
