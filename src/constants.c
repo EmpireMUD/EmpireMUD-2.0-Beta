@@ -3656,6 +3656,7 @@ const char *quest_flags[] = {
 	"TUTORIAL",
 	"GROUP-COMPLETION",
 	"EVENT",
+	"IN-CITY-ONLY",	// 10
 	"\n"
 };
 

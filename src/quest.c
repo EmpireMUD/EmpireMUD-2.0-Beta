@@ -1823,6 +1823,9 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(mob)) || !is_in_city_for_empire(IN_ROOM(mob), ROOM_OWNER(IN_ROOM(mob)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -1895,6 +1898,9 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 		}
 		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(ch)) || !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		
 		// success
@@ -1969,6 +1975,9 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 				continue;	// room permissions
 			}
+			if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(room) || !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, NULL))) {
+				continue;	// not in-city
+			}
 			// already on quest?
 			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 				continue;
@@ -2038,6 +2047,9 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// vehicle permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(veh)) || !is_in_city_for_empire(IN_ROOM(veh), ROOM_OWNER(IN_ROOM(veh)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -2091,6 +2103,9 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 		}
 		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(mob)) || !is_in_city_for_empire(IN_ROOM(mob), ROOM_OWNER(IN_ROOM(mob)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
@@ -2150,6 +2165,9 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(ch)) || !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		
 		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
@@ -2207,6 +2225,9 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 				continue;	// room permissions
 			}
+			if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(room) || !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, NULL))) {
+				continue;	// not in-city
+			}
 			// are they on quest?
 			if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
 				continue;
@@ -2260,6 +2281,9 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 		}
 		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// vehicle
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(veh)) || !is_in_city_for_empire(IN_ROOM(veh), ROOM_OWNER(IN_ROOM(veh)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {

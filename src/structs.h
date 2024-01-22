@@ -2642,6 +2642,7 @@ typedef enum {
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 #define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
+#define QST_IN_CITY_ONLY  BIT(10)	// requires that it's in a city
 
 
 // QG_x: quest giver types
