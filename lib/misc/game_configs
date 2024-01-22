@@ -243,6 +243,7 @@ mutual_war_only 0
 offense_min_to_war 0
 offenses_for_free_war 200
 rogue_flag_time 1440
+pk_mode b
 pvp_timer 5
 seconds_per_death 30
 steal_death_penalty 60

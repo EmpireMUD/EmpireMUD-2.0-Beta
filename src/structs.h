@@ -1417,11 +1417,13 @@ typedef struct vehicle_data vehicle_data;
 #define LVL_TO_SEE_ACCOUNTS  LVL_CIMPL
 
 
-// Player killing options (config.c)
-#define PK_NONE  NOBITS
-#define PK_WAR  BIT(0)	// pk when at war
-#define PK_FULL  BIT(1)	// all pk all the time
-#define PK_REVENGE  BIT(2)	// pk when someone has pk'd you
+// PK_x: Player killing options for config_get_bitvector("pk_mode")
+#define PK_OPEN					BIT(0)	// a. all pk all the time
+#define PK_WAR					BIT(1)	// b. pk when at war
+#define PK_TRESPASSERS			BIT(2)	// c. when someone is on your land (or an ally's)
+#define PK_DISTRUST				BIT(3)	// d. when in a state of distrust
+#define PK_EMPIRE_OFFENSES		BIT(4)	// e. empire has any offenses against you
+#define PK_PERSONAL_OFFENSES	BIT(5)	// f. character has any offenses against you
 
 
 // mud-life time

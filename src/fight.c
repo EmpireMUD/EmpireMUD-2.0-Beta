@@ -40,7 +40,6 @@
 
 // external vars
 extern bool catch_up_combat;
-extern bitvector_t pk_ok;
 
 // external funcs
 ACMD(do_flee);
@@ -2527,6 +2526,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
  * aren't spammed.
  */
 bool can_fight(char_data *ch, char_data *victim) {
+	bitvector_t pk_mode;
 	empire_data *ch_emp, *victim_emp;
 	obj_data *obj;
 
@@ -2638,19 +2638,26 @@ bool can_fight(char_data *ch, char_data *victim) {
 	}
 
 	// cascading order of pk modes
+	pk_mode = config_get_bitvector("pk_mode");
 	
-	if (IS_SET(pk_ok, PK_FULL))
+	if (IS_SET(pk_mode, PK_OPEN)) {
+		// formerly PK_FULL
 		return TRUE;
-
-	if (IS_SET(pk_ok, PK_WAR)) {
-		if (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY)) {
-			return TRUE;
-		}
-
-		/* owned territory */
-		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) && !can_use_room(victim, IN_ROOM(victim), GUESTS_ALLOWED)) {
-			return TRUE;
-		}
+	}
+	if (IS_SET(pk_mode, PK_WAR) && (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY))) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_DISTRUST) && (has_relationship(ch_emp, victim_emp, DIPL_DISTRUST) || has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(ch_emp, victim_emp, DIPL_THIEVERY))) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_EMPIRE_OFFENSES) && get_total_offenses_from_empire(ch_emp, victim_emp) > 0) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_PERSONAL_OFFENSES) && get_total_offenses_from_char(ch_emp, victim) > 0) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_TRESPASSERS) && can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) && !can_use_room(victim, IN_ROOM(victim), GUESTS_ALLOWED)) {
+		return TRUE;
 	}
 
 	/* Oops... we shouldn't be fighting */

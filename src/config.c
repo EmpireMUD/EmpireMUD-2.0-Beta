@@ -35,7 +35,6 @@
 *   Message Configs
 *   Operation Options
 *   Player Configs
-*   War Configs
 *   Config System: Data
 *   Config System: Editors
 *   Config System: Custom Editors
@@ -252,19 +251,6 @@ void init_inherent_player_techs(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WAR CONFIGS /////////////////////////////////////////////////////////////
-
-/*
- * Is player-killing allowed?  How restricted is it?
- *  These are bitvectors, except PK_NONE, which must be alone.
- *  PK_NONE    - pk is completely disallowed
- *  PK_WAR     - may pk anyone you're at war with
- *  PK_FULL    - may pk ANYONE
- */	
-bitvector_t pk_ok = PK_WAR;
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: DATA /////////////////////////////////////////////////////
 
 // CONFIG_x: groupings for config command
@@ -337,6 +323,18 @@ const char *lastname_modes[] = {
 	"set-at-creation",
 	"change-any-time",
 	"choose-from-list",
+	"\n"
+};
+
+
+// PK_x: Player killing options for config_get_bitvector("pk_mode")
+const char *pk_modes[] = {
+	"OPEN",		// 0
+	"WAR",
+	"TRESPASSERS",
+	"DISTRUST",
+	"EMPIRE-OFFENSES",
+	"PERSONAL-OFFENSES",	// 5
 	"\n"
 };
 
@@ -2045,6 +2043,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "offense_min_to_war", CONFTYPE_INT, "number of offense points required before war is allowed");
 	init_config(CONFIG_WAR, "offenses_for_free_war", CONFTYPE_INT, "number of offense points at which war cost drops to zero");
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
+	init_config(CONFIG_WAR, "pk_mode", CONFTYPE_BITVECTOR, "what conditions let one player attack another");
+		init_config_custom("pk_mode", config_show_bitvector, config_edit_bitvector, pk_modes);
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
 	init_config(CONFIG_WAR, "steal_death_penalty", CONFTYPE_INT, "minutes a player cannot steal from an empire after being killed by them, 0 for none");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");
