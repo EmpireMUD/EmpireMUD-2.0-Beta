@@ -2007,8 +2007,6 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting/augments at level 100");
 	init_config(CONFIG_SKILLS, "min_exp_to_roll_skillup", CONFTYPE_INT, "minimum skill experience to roll for gains");
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
-	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
-	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
 	init_config(CONFIG_SKILLS, "skill_swap_allowed", CONFTYPE_BOOL, "enables skill swap (immortals always can)");
 	init_config(CONFIG_SKILLS, "skill_swap_min_level", CONFTYPE_INT, "level to use multi-spec");
 	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
@@ -2108,6 +2106,10 @@ void init_config_system(void) {
 		init_config_flags("land_per_tech", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
 		init_config_flags("land_per_wealth", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+		init_config_flags("potion_apply_per_100", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
+		init_config_flags("potion_heal_scale", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 		init_config_flags("generic_facing", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");

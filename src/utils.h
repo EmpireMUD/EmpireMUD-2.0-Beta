@@ -2628,7 +2628,6 @@ bool validate_social_requirements(char_data *ch, social_data *soc);
 
 // statistics.c
 void display_statistics_to_char(char_data *ch);
-void mudstats_empires(char_data *ch, char *argument);
 int stats_get_building_count(bld_data *bdg);
 int stats_get_crop_count(crop_data *cp);
 int stats_get_sector_count(sector_data *sect);

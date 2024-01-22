@@ -1292,6 +1292,7 @@ Usage:  mudstats <option>
 This command displays various statistics about this EmpireMUD.
 
 Options:
+ - configs: Shows how the game is configured.
  - empires: Shows averages for the numbers used to compute empire scores.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"

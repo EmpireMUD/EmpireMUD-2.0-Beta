@@ -40,6 +40,9 @@
 // external protos
 ACMD(do_weather);
 
+void mudstats_configs(char_data *ch, char *argument);
+void mudstats_empires(char_data *ch, char *argument);
+
 // local protos
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
@@ -3729,6 +3732,7 @@ ACMD(do_mudstats) {
 		char *name;
 		void (*func)(char_data *ch, char *argument);
 	} stat_list[] = {
+		{ "configs", mudstats_configs },
 		{ "empires", mudstats_empires },
 		
 		// last

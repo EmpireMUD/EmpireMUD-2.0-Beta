@@ -480,6 +480,7 @@ extern const int base_player_pools[NUM_POOLS];
 extern const char *book_name_list[];
 extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
+extern const char *pk_modes[];
 extern const int primary_attributes[];
 extern struct promo_code_list promo_codes[];
 extern const int round_level_scaling_to_nearest;
