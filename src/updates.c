@@ -3913,8 +3913,8 @@ void b5_171_bath_triggers(void) {
 }
 
 
-// b5.172: remove tavern data, remove tavern from learned list on empires without the new goal
-void b5_172_tavern_update(void) {
+// b5.173: remove tavern data, remove tavern from learned list on empires without the new goal
+void b5_173_tavern_update(void) {
 	empire_data *emp, *next_emp;
 	room_data *room, *next_room;
 	
@@ -4055,7 +4055,7 @@ const struct {
 	{ "b5.170a", b5_170_home_assignments, NULL, "Setting new data for player homes" },
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
 	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
-	{ "b5.172a", b5_172_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
+	{ "b5.172a", b5_173_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
