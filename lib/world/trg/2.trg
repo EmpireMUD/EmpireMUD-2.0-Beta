@@ -46,8 +46,15 @@ detach 230 %self.id%
 Barrel of Fun: Setup command~
 1 c 6
 setup~
+set room %actor.room%
 if %actor.obj_target(%arg.car%)% != %self%
   return 0
+  halt
+elseif %self.fighting%
+  %send% %actor% You're a little busy right now.
+  halt
+elseif %room.sector_flagged(OCEAN)% || %room.sector_flagged(FRESH-WATER)%
+  %send% %actor% You can't set it up here.
   halt
 elseif !%actor.canuseroom_guest%
   %send% %actor% You can't set it up here.
@@ -55,7 +62,7 @@ elseif !%actor.canuseroom_guest%
 end
 * Check items in room?
 set count 0
-set iter %self.room.contents%
+set iter %room.contents%
 while %iter% && %count% < 10
   eval count %count% + 1
   set iter %iter.next_in_list%
@@ -65,7 +72,7 @@ if %count% >= 10
   halt
 end
 * ok: ensure I'm in the room
-%teleport% %self% %actor.room%
+%teleport% %self% %room%
 otimer 168
 nop %self.remove_wear(TAKE)%
 %mod% %self% longdesc &Z%self.shortdesc% has been set up here.
