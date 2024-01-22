@@ -941,6 +941,8 @@ bool check_mob_pursuit(char_data *ch) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (!IS_NPC(vict) && CAN_SEE(ch, vict) && check_pursuit_target(ch, purs, vict) && can_fight(ch, vict)) {
 				found = TRUE;
+				act("$n runs toward you!", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n runs toward $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 				engage_combat(ch, vict, FALSE);
 				
 				// exit early: we're now in combat
@@ -951,7 +953,7 @@ bool check_mob_pursuit(char_data *ch) {
 		// track to next room
 		HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 			// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
-			if ((-1 * track->id) == purs->idnum) {
+			if (track->id == purs->idnum) {
 				found = TRUE;
 				dir = track->dir;
 				track_to_room = track->to_room;
@@ -1011,8 +1013,11 @@ bool check_mob_pursuit(char_data *ch) {
 			next_purs = purs->next;
 			
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && can_fight(ch, vict)) {
+				if (!IS_NPC(vict) && CAN_SEE(ch, vict) && check_pursuit_target(ch, purs, vict) && can_fight(ch, vict)) {
 					found = TRUE;
+					act("$n runs toward you!", FALSE, ch, NULL, vict, TO_VICT);
+					act("$n runs toward $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+					
 					engage_combat(ch, vict, FALSE);
 					
 					// exit now: we are in combat
