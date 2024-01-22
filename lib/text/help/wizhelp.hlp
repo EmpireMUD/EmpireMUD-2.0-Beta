@@ -1153,6 +1153,7 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
+editors    Immort   Shows what each player is editing, if anything.
 factions   Immort   Shows a player's faction levels.
 fmessages  Immort   Shows a player's fight message toggles.
 friends    Immort   Shows another player's friends list.
@@ -1283,6 +1284,14 @@ count towards the 'total' on the einventory command. You can refresh them
 with 'util rescan [empire].
 
 See also: EINVENTORY
+#e
+"SHOW EDITORS"
+
+Usage:  show editors
+
+This command shows you which players are editing anything. This includes OLC
+editing and string editing. You cannot see exactly what immortals above you in
+access level are editing.
 #e
 "SHOW FACTIONS"
 

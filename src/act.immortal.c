@@ -3188,6 +3188,89 @@ SHOW(show_data) {
 }
 
 
+SHOW(show_editors) {
+	bool any;
+	char output[MAX_STRING_LENGTH], line[256], part[256];
+	int count = 0;
+	size_t size, lsize;
+	char_data *targ;
+	descriptor_data *desc;
+	player_index_data *index;
+	
+	size = snprintf(output, sizeof(output), "Players using editors:\r\n");
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+			continue;	// not in-game
+		}
+		if (GET_INVIS_LEV(targ) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// can't see
+		}
+		
+		// start line in case
+		lsize = snprintf(line, sizeof(line), "%s", GET_NAME(targ));
+		any = FALSE;
+		
+		// olc?
+		if (GET_OLC_TYPE(desc)) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - olc");
+			}
+			else {
+				sprintbit(GET_OLC_TYPE(desc), olc_type_bits, part, FALSE);
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - %s %d", part, GET_OLC_VNUM(desc));
+			}
+		}
+		
+		// string editor?
+		if (desc->str) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+			else if (PLR_FLAGGED(targ, PLR_MAILING)) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - mailing %s", (index = find_player_index_by_idnum(desc->mail_to)) ? index->fullname : "someone");
+			}
+			else if (desc->notes_id > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing notes for account %d", desc->notes_id);
+			}
+			else if (desc->island_desc_id != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing description for island %s", get_island(desc->island_desc_id, TRUE) ? get_island(desc->island_desc_id, TRUE)->name : "???");
+			}
+			else if (desc->file_storage) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing file %s", desc->file_storage);
+			}
+			else if (desc->save_empire != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing empire text for %s", real_empire(desc->save_empire) ? EMPIRE_NAME(real_empire(desc->save_empire)) : "an empire");
+			}
+			else {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+		}
+		
+		if (any && size + lsize + 20 < sizeof(output)) {
+			++count;
+			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+		}
+		else {
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 SHOW(show_factions) {
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
 	struct player_faction_data *pfd, *next_pfd;
@@ -11267,6 +11350,7 @@ ACMD(do_show) {
 		{ "libraries", LVL_START_IMM, show_libraries },
 		{ "author", LVL_START_IMM, show_author },
 		{ "lostbooks", LVL_START_IMM, show_lost_books },
+		{ "editors", LVL_START_IMM, show_editors },
 
 		// last
 		{ "\n", 0, NULL }
