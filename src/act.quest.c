@@ -364,6 +364,8 @@ bool fail_daily_quests(char_data *ch, bool event) {
 * @return quest_data* The matching quest, or NULL if none.
 */
 quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
+	bool had_number;
+	int number;
 	struct player_completed_quest *pcq, *next_pcq;
 	quest_data *quest, *abbrev = NULL;
 	
@@ -371,17 +373,25 @@ quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
 		return NULL;	// no quests for mobs
 	}
 	
+	had_number = isdigit(*argument) ? TRUE : FALSE;
+	number = get_number(&argument);
+	
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
 		if (!(quest = quest_proto(pcq->vnum))) {
 			continue;
 		}
 		
-		if (!str_cmp(argument, QUEST_NAME(quest))) {
+		if (!str_cmp(argument, QUEST_NAME(quest)) && --number <= 0) {
 			// exact match
 			return quest;
 		}
-		else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
+		else if ((!abbrev || (had_number && --number <= 0)) && multi_isname(argument, QUEST_NAME(quest))) {
 			abbrev = quest;
+			
+			if (had_number && number <= 0) {
+				// if they requested it by number, just return it now
+				return abbrev;
+			}
 		}
 	}
 	
