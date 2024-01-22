@@ -272,7 +272,7 @@ OLC_MODULE(mapedit_decay) {
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	vehicle_data *veh;
 	
-	one_argument(argment, arg);
+	one_argument(argument, arg);
 	
 	if (*arg) {
 		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
