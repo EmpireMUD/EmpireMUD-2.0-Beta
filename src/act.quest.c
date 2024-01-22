@@ -1290,13 +1290,15 @@ ACMD(do_quest) {
 	arg_ptr = any_one_arg(argument, cmd_arg);
 	skip_spaces(&arg_ptr);
 	if (!*cmd_arg) {
-		msg_to_char(ch, "Available options: ");
-		found = FALSE;
-		for (iter = 0; *quest_cmd[iter].command != '\n'; ++iter) {
-			msg_to_char(ch, "%s%s", (found ? ", " : ""), quest_cmd[iter].command);
-			found = TRUE;
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "Available options: ");
+			found = FALSE;
+			for (iter = 0; *quest_cmd[iter].command != '\n'; ++iter) {
+				msg_to_char(ch, "%s%s", (found ? ", " : ""), quest_cmd[iter].command);
+				found = TRUE;
+			}
+			msg_to_char(ch, "\r\n");
 		}
-		msg_to_char(ch, "\r\n");
 		qcmd_list(ch, "");
 		return;
 	}
