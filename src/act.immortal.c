@@ -10452,7 +10452,7 @@ ACMD(do_peace) {
 			return_to_pursuit_location(iter);
 			
 			LL_FOREACH_SAFE(MOB_PURSUIT(iter), purs, next_purs) {
-				free(purs);
+				free_pursuit(purs);
 			}
 			MOB_PURSUIT(iter) = NULL;
 		}

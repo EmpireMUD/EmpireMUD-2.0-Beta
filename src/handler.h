@@ -581,6 +581,9 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 INTERACTION_FUNC(consumes_or_decays_interact);
 int limit_crowd_control(char_data *victim, int atype);
 
+// mobact.c
+void free_pursuit(struct pursuit_data *purs);
+
 // morph.c
 void perform_morph(char_data *ch, morph_data *morph);
 

@@ -1706,7 +1706,7 @@ void extract_char_final(char_data *ch) {
 		if (MOB_PURSUIT(ch)) {
 			while ((purs = MOB_PURSUIT(ch))) {
 				MOB_PURSUIT(ch) = purs->next;
-				free(purs);
+				free_pursuit(purs);
 			}
 			MOB_PURSUIT(ch) = NULL;
 		}

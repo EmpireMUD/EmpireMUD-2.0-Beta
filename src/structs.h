@@ -4310,6 +4310,10 @@ struct pursuit_data {
 	time_t last_seen;	// time of last spotting
 	room_vnum location;	// prevents tracking forever
 	
+	// possible complications:
+	char *disguise;
+	any_vnum morph;
+	
 	struct pursuit_data *next;
 };
 

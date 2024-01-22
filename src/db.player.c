@@ -882,7 +882,7 @@ void free_char(char_data *ch) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
 		while ((purs = MOB_PURSUIT(ch))) {
 			MOB_PURSUIT(ch) = purs->next;
-			free(purs);
+			free_pursuit(purs);
 		}
 	}
 	

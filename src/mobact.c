@@ -86,7 +86,45 @@ void add_pursuit(char_data *ch, char_data *target) {
 	purs->last_seen = time(0);
 	purs->location = GET_ROOM_VNUM(HOME_ROOM(IN_ROOM(ch)));
 	
+	purs->morph = (GET_MORPH(target) && CHAR_MORPH_FLAGGED(target, MORPHF_ANIMAL)) ? MORPH_VNUM(GET_MORPH(target)) : NOTHING;
+	purs->disguise = (IS_DISGUISED(target) && GET_DISGUISED_NAME(target)) ? strdup(GET_DISGUISED_NAME(target)) : NULL;
+	
 	schedule_pursuit_event(ch);
+}
+
+
+/**
+* Checks if a person is the one a pursuit item refers to. This checks morphs
+* and disguise unless over-leveled.
+*
+* @param char_data *mob The mob doing pursuit.
+* @param struct pursuit_data *purs The pursuit entry.
+* @param char_data *ch The person to check.
+* @return bool TRUE if this is the target; FALSE if not.
+*/
+bool check_pursuit_target(char_data *mob, struct pursuit_data *purs, char_data *ch) {
+	bool morph_ok, disguise_ok;
+	
+	if (!purs || !ch) {
+		return FALSE;	// no person
+	}
+	else if (IS_NPC(ch) || purs->idnum != GET_IDNUM(ch)) {
+		return FALSE;	// wrong person
+	}
+	else if (get_approximate_level(mob) > get_approximate_level(ch) + 25) {
+		return TRUE;	// over-level: ignore morph and disguise
+	}
+	
+	// check morph
+	morph_ok = (purs->morph == NOTHING && (!GET_MORPH(ch) || !CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)));
+	morph_ok |= (purs->morph != NOTHING && GET_MORPH(ch) && purs->morph == MORPH_VNUM(GET_MORPH(ch)));
+	
+	// check disguise
+	disguise_ok = (!purs->disguise && !IS_DISGUISED(ch));
+	disguise_ok |= (purs->disguise && IS_DISGUISED(ch) && GET_DISGUISED_NAME(ch) && !strcmp(purs->disguise, GET_DISGUISED_NAME(ch)));
+	
+	// can we recognize them?
+	return morph_ok && disguise_ok;
 }
 
 
@@ -110,8 +148,21 @@ void end_pursuit(char_data *ch, char_data *target) {
 		
 		if (purs->idnum == GET_IDNUM(target)) {
 			LL_DELETE(MOB_PURSUIT(ch), purs);
-			free(purs);
+			free_pursuit(purs);
 		}
+	}
+}
+
+
+/**
+* @param struct pursuit_data *purs Ths pursuit data to free.
+*/
+void free_pursuit(struct pursuit_data *purs) {
+	if (purs) {
+		if (purs->disguise) {
+			free(purs->disguise);
+		}
+		free(purs);
 	}
 }
 
@@ -144,7 +195,7 @@ bool return_to_pursuit_location(char_data *ch) {
 	
 	// reset pursue data to avoid loops
 	LL_FOREACH_SAFE(MOB_PURSUIT(ch), purs, next_purs) {
-		free(purs);
+		free_pursuit(purs);
 	}
 	MOB_PURSUIT(ch) = NULL;
 	
@@ -879,7 +930,7 @@ bool check_mob_pursuit(char_data *ch) {
 		// check pursuit timeout and distance
 		if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
 			LL_DELETE(MOB_PURSUIT(ch), purs);
-			free(purs);
+			free_pursuit(purs);
 			continue;
 		}
 		
@@ -888,7 +939,7 @@ bool check_mob_pursuit(char_data *ch) {
 
 		// look in this room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
+			if (!IS_NPC(vict) && CAN_SEE(ch, vict) && check_pursuit_target(ch, purs, vict) && can_fight(ch, vict)) {
 				found = TRUE;
 				engage_combat(ch, vict, FALSE);
 				
@@ -913,7 +964,7 @@ bool check_mob_pursuit(char_data *ch) {
 			// first see if they're playing
 			if (!(vict = is_playing(purs->idnum))) {
 				LL_DELETE(MOB_PURSUIT(ch), purs);
-				free(purs);
+				free_pursuit(purs);
 				continue;
 			}
 			
