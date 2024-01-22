@@ -125,9 +125,12 @@ S
 Beekeeping~
    Your empire can now build apiaries, allowing your workforce to keep bees and
 produce honey and wax for your citizens. ('build apiary')
+   If you have taverns and barrels, your workforce will also brew barrels of
+mead from 1x wooden barrel and 5x honeycomb.
 ~
-2 2 30 0 b
+3 2 30 0 b
 K 2 5131
+K 2 236
 P 2019
 S
 #2913

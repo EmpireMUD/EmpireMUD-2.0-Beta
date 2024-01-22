@@ -94,6 +94,25 @@ R
 T 232
 T 233
 S
+#236
+barrel mead~
+a mead barrel~
+A mead barrel is stacked here.~
+   The well-made wooden barrel is suffused with the sweet aroma of mead.
+   You can 'setup mead' to set this up in the room for everyone.
+~
+5 eg a 0 0 9
+96 96 14
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
 #250
 bowl earthenware~
 an earthenware bowl~
