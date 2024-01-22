@@ -224,11 +224,11 @@ void mudstats_configs(char_data *ch, char *argument) {
 	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Player-killing: %s\r\n", config_get_bitvector("pk_mode") ? part : "forbidden");
 	
-	// city
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, %d tiles apart (%d for allies)\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
-	
 	// war
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "War: %d offense%s required%s\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	
+	// city
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, %d tiles apart (%d for allies)\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
 	
 	// storage
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Storage: %s\r\n", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
