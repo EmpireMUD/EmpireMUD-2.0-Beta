@@ -385,7 +385,7 @@ quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
 			// exact match
 			return quest;
 		}
-		else if (multi_isname(argument, QUEST_NAME(quest)) && ((had_number && --number <= 0) || !abbrev)) {
+		else if (multi_isname(argument, QUEST_NAME(quest)) && ((had_number && --number <= 0) || (!had_number && !abbrev))) {
 			abbrev = quest;
 			
 			if (had_number && number <= 0) {
