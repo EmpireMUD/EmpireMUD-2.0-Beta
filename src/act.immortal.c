@@ -3255,7 +3255,7 @@ SHOW(show_editors) {
 			++count;
 			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
 		}
-		else {
+		else if (any) {
 			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
 			break;
 		}
