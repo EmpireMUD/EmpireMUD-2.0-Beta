@@ -50,7 +50,7 @@ set room %actor.room%
 if %actor.obj_target(%arg.car%)% != %self%
   return 0
   halt
-elseif %self.fighting%
+elseif %actor.fighting%
   %send% %actor% You're a little busy right now.
   halt
 elseif %room.sector_flagged(OCEAN)% || %room.sector_flagged(FRESH-WATER)%
