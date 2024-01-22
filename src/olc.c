@@ -5715,7 +5715,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 	if (!*argument) {
 		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
 		for (iter = 0; *flag_names[iter] != '\n' && !one_per_line; ++iter) {
-			if (strlen(flag_names[iter]) + 5 > 30) {
+			if (strlen(flag_names[iter]) + 5 > 34) {
 				// too long
 				one_per_line = TRUE;
 			}
@@ -5728,7 +5728,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line);
 			}
 			else {
-				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2))? "\r\n" : "");
+				sprintf(buf + strlen(buf), "%2d. %s%-34.34s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2))? "\r\n" : "");
 			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {
@@ -6817,7 +6817,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 	if (!*argument) {
 		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
 		for (iter = 0; *type_names[iter] != '\n' && !one_per_line; ++iter) {
-			if (strlen(type_names[iter]) + 10 > 30) {
+			if (strlen(type_names[iter]) + 10 > 34) {
 				// too long
 				one_per_line = TRUE;
 			}
@@ -6830,7 +6830,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (old_value == iter) ? "&g" : "", line);
 			}
 			else {
-				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
+				sprintf(buf + strlen(buf), "%2d. %s%-34.34s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
 			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {
