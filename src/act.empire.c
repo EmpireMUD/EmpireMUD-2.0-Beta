@@ -6080,14 +6080,17 @@ ACMD(do_home) {
 			msg_to_char(ch, "You need to be in an empire to list homes.\r\n");
 		}
 		else {
+			msg_to_char(ch, "Private homes in the empire:\r\n");
+			
 			found = FALSE;
 			HASH_ITER(hh, world_table, iter, next_iter) {
 				if (ROOM_OWNER(iter) == emp && ROOM_PRIVATE_OWNER(iter) != NOBODY) {
 					msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, iter, TRUE), get_room_name(iter, FALSE), ((index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(iter))) ? index->fullname : "<unknown>"));
+					found = TRUE;
 				}
 			}
 			if (!found) {
-				msg_to_char(ch, "No private homes found.\r\n");
+				msg_to_char(ch, " none\r\n");
 			}
 		}
 	}
