@@ -1873,6 +1873,7 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
+	morph_data *morph;
 	trig_data *trig;
 	
 	// shortcut
@@ -1962,6 +1963,11 @@ void reset_one_room(room_data *room) {
 					half_chop(reset->sarg1, field, str);
 					if (is_abbrev(field, "sex")) {
 						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "morph")) {
+						if ((morph = morph_proto(atoi(str)))) {
+							perform_morph(mob, morph);
+						}
 					}
 					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
@@ -4576,6 +4582,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 						strip_crlf(temp);
 						fprintf(fl, "Load: S look\n%s~\n", temp);
 					}
+				}
+				
+				// morph?
+				if (GET_MORPH(mob)) {
+					fprintf(fl, "Load: S morph %d\n", MORPH_VNUM(GET_MORPH(mob)));
 				}
 			
 				if (SCRIPT(mob)) {
