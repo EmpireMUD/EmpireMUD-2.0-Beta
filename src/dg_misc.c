@@ -344,7 +344,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 */
 void do_dg_build(room_data *target, char *argument) {
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
-	bool ruin = FALSE, demolish = FALSE;
 	any_vnum vnum = NOTHING;
 	bld_data *bld = NULL;
 	int dir = NORTH;
@@ -356,11 +355,33 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	// parse arg
-	if (is_abbrev(argument, "ruin")) {
-		ruin = TRUE;
+	if (is_abbrev(argument, "complete")) {
+		if (!IS_DISMANTLING(target) && IS_INCOMPLETE(target)) {
+			complete_building(target);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "ruin")) {
+		room_data *home = HOME_ROOM(target);
+		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
+			ruin_one_building(home);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "decay")) {
+		if (GET_ROOM_VNUM(target) < MAP_SIZE) {
+			annual_update_map_tile(&(world_map[FLAT_X_COORD(target)][FLAT_Y_COORD(target)]));
+			annual_update_depletions(&(SHARED_DATA(target)->depletion));
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
 	}
 	else if (is_abbrev(argument, "demolish")) {
-		demolish = TRUE;
+		disassociate_building(target);
+		request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		return;
 	}
 	else if (isdigit(*argument)) {
 		argument = any_one_arg(argument, vnum_arg);
@@ -387,16 +408,7 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	
-	if (ruin) {
-		room_data *home = HOME_ROOM(target);
-		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
-			ruin_one_building(home);
-		}
-	}
-	else if (demolish) {
-		disassociate_building(target);
-	}
-	else if (bld) {
+	if (bld) {
 		disassociate_building(target);
 	
 		construct_building(target, GET_BLD_VNUM(bld));

@@ -81,11 +81,12 @@ See also: DETACH, TATTACH, TDETACH
 #d
 %BUILD% MBUILD OBUILD VBUILD WBUILD
 
-Usage:  %build% <location> <vnum [dir] | ruin | demolish>
+Usage:  %build% <location> <vnum [dir] | ruin | complete | demolish | decay>
 
 This allows you to place a building on the map, or remove or ruin one. It is
 usually a bad idea to %build% tiles by coordinates. It's almost always
-safest to do this on the map tile the script is running in.
+safest to do this on the map tile the script is running in. This command can
+also complete a building or add a year of decay to it.
 
 Example:
   if (%room.sector% ~= Forest)
