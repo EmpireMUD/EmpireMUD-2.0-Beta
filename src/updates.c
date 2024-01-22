@@ -3919,18 +3919,24 @@ void b5_173_tavern_update(void) {
 	room_data *room, *next_room;
 	
 	// new progress goal for tavern
-	const int TAVERN_PROG = 2916;
-	const int TAVERN_CRAFT = 5138;
+	const any_vnum TAVERN_PROG = 2916;
+	const any_vnum TAVERN_CRAFT = 5138;
+	const any_vnum BEEKEEPING_PROG = 2912;
+	const any_vnum MEAD_CRAFT = 236;
 	
 	// former data values
 	const int ROOM_EXTRA_TAVERN_TYPE = 4;
 	const int ROOM_EXTRA_TAVERN_BREWING_TIME = 5;
 	const int ROOM_EXTRA_TAVERN_AVAILABLE_TIME = 6;
 	
-	// remove from empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// remove Tavern from empires
 		if (!empire_has_completed_goal(emp, TAVERN_PROG) && empire_has_learned_craft(emp, TAVERN_CRAFT)) {
 			remove_learned_craft_empire(emp, TAVERN_CRAFT, TRUE);
+		}
+		// add mead?
+		if (empire_has_completed_goal(emp, BEEKEEPING_PROG)) {
+			add_learned_craft_empire(emp, MEAD_CRAFT);
 		}
 	}
 	
