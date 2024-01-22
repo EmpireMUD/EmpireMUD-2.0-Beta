@@ -915,6 +915,7 @@ void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 void add_trd_owner(room_vnum vnum, empire_vnum owner);
 void annual_update_depletions(struct depletion_data **list);
 void annual_update_map_tile(struct map_data *tile);
+void annual_update_vehicle(vehicle_data *veh);
 void annual_world_update();
 void cancel_world_save_request(room_vnum room, int only_save_type);
 void change_chop_territory(room_data *room);
