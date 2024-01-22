@@ -510,6 +510,11 @@ void boot_db(void) {
 		log(" deleting pre-b5.116 world files...");
 		delete_pre_b5_116_world_files();
 	}
+	if (config_get_int("autoreboot_minutes") > 0) {
+		reboot_control.type = REBOOT_REBOOT;
+		reboot_control.time = config_get_int("autoreboot_minutes");
+		log("Setting autoreboot for %d minute%s", reboot_control.time, PLURAL(reboot_control.time));
+	}
 	// put things here
 	
 	// END
