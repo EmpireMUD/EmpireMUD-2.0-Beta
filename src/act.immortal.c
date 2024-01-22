@@ -7565,10 +7565,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
 				msg_to_char(ch, "unknown\r\n");
