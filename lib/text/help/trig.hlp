@@ -212,9 +212,13 @@ When using field - The variable returns:
    (instead of recognizes) it.
 &ccan_speak(lang,on|off)&0 - Whether the empire can speak a language. Optional
    on/off 2nd arg grants/removes this from the empire but NOT from members.
+&ccharge_coins(amount)&0 - Takes coins from the empire. These are always in the
+   empire's own currency (no exchange rate).
 &ccoins&0 - How many coins the empire has in its vaults.
 &cdescription&0 - The empire's full description.
 &cfame&0 - The empire's total fame value.
+&cgive_coins(amount)&0 - Adds to the empire's coin count. This is always in the
+   empire's own currency (no exchange rate).
 &cgreatness&0 - The empire's total greatness value.
 &chas_progress(vnum)&0 - Checks if the empire has earned/purchased a goal.
 &chas_storage(vnum,location)&0 - Amount of an object (vnum) the empire has

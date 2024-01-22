@@ -6595,6 +6595,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						// and show speakability
 						snprintf(str, slen, "%d", (lang && speaks_language_empire(e, GEN_VNUM(lang)) == LANG_SPEAK) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "charge_coins")) {
+						if (subfield && isdigit(*subfield)) {
+							decrease_empire_coins(e, e, atoi(subfield));
+						}
+						*str = '\0';
+					}
 					else if (!str_cmp(field, "coins")) {
 						snprintf(str, slen, "%d", (int) EMPIRE_COINS(e));
 					}
@@ -6613,7 +6619,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'g': {	// emp.g*
-					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
+					if (!str_cmp(field, "give_coins")) {
+						if (subfield && isdigit(*subfield)) {
+							increase_empire_coins(e, e, atoi(subfield));
+						}
+						*str = '\0';
+					}
+					else if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
 						snprintf(str, slen, "%d", EMPIRE_GREATNESS(e));
 					}
 					break;
