@@ -3522,7 +3522,8 @@ SHOW(show_inventory) {
 	bool all = FALSE, loaded;
 	char_data *load;
 	size_t size, lsize;
-	int count, pos, players;
+	int count, pos, players, empires;
+	empire_data *emp, *next_emp;
 	
 	half_chop(argument, arg1, arg2);
 	all = !str_cmp(arg2, "all") || !str_cmp(arg2, "-all");
@@ -3539,7 +3540,9 @@ SHOW(show_inventory) {
 	else {
 		timer = microtime();
 		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
-		players = 0;
+		players = empires = 0;
+		
+		// players
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			// determine if we should load them
 			if (!all && (time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
@@ -3589,7 +3592,42 @@ SHOW(show_inventory) {
 			}
 		}
 		
-		lsize = snprintf(line, sizeof(line), "(%d player%s, %.2f seconds for search)\r\n", players, PLURAL(players), (microtime() - timer) / 1000000.0);
+		// empires
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
+				continue;	// skip due to timeout
+			}
+			
+			// fresh count: basic storage
+			count = get_total_stored_count(emp, vnum, FALSE);
+			
+			// and unique storage
+			DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
+					// does not have contents in warehouse
+				}
+			}
+			
+			if (count <= 0) {
+				continue;	// nothing to show
+			}
+			
+			// build text
+			lsize = snprintf(line, sizeof(line), "%s: %d\r\n", EMPIRE_NAME(emp), count);
+			++empires;
+			
+			if (size + lsize + 10 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {	// full
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		lsize = snprintf(line, sizeof(line), "(%d player%s, %d empire%s, %.2f seconds for search)\r\n", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
 		if (size + lsize < sizeof(buf)) {
 			strcat(buf, line);
 		}

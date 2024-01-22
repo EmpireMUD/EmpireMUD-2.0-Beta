@@ -1160,7 +1160,7 @@ friends    Immort   Shows another player's friends list.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
-inventory  Immort   Shows how many players have a certain item.
+inventory  Immort   Shows how many players and empires have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
@@ -1347,11 +1347,11 @@ See also: IGNORE, SHOW
 
 Usage:  show inventory <obj vnum> [all]
 
-Searches all players, including offline ones, to see how many of a certain
-object they have in their inventory, equipment, and home storage.
+Searches all players, including offline ones, and all empires, to see how many
+of a certain object they have in their inventory, equipment, and storage.
 
 Without the "all" argument, only checks players that have been online in the
-last two months.
+last two months and empires that are not timed out.
 #e
 "SHOW ISLANDS"
 
