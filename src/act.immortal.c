@@ -12542,8 +12542,13 @@ ACMD(do_vstat) {
 			extract_vehicle(veh);
 		}
 	}
-	else
-		send_to_char("Invalid type.\r\n", ch);
+	else {
+		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
+		send_to_char("Valid types are: adventure, ability, archetype, attack, augment, book,\r\n"
+		"                 building, craft, class, crop, event, faction, global, generic,\r\n"
+		"                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,\r\n"
+		"                 skill, social, trigger, vehicle\r\n", ch);
+	}
 }
 
 
