@@ -217,6 +217,8 @@ When using field - The variable returns:
 &cfame&0 - The empire's total fame value.
 &cgreatness&0 - The empire's total greatness value.
 &chas_progress(vnum)&0 - Checks if the empire has earned/purchased a goal.
+&chas_storage(vnum,location)&0 - Amount of an object (vnum) the empire has
+   stored at the given location (which must be a room variable).
 &chas_tech(name)&0 - True if the empire has that technology (globally).
    This will not work for island-based techs.
 &cid&0 - The scripting ID for the empire.

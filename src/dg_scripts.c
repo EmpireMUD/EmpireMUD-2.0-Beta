@@ -6634,6 +6634,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "has_storage")) {
+						if (subfield && *subfield) {
+							// arg1: obj vnum
+							// arg2: room location (storage is per-island
+							any_vnum vnum;
+							char arg1[256], arg2[256];
+							room_data *where;
+							struct empire_storage_data *store;
+							
+							comma_args(subfield, arg1, arg2);
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || (vnum = atoi(arg1) < 0)) {
+								// bad input
+								snprintf(str, slen, "0");
+							}
+							else if (!(where = get_room(NULL, arg2))) {
+								// bad loccation
+								snprintf(str, slen, "0");
+							}
+							else if (!(store = find_stored_resource(e, GET_ISLAND_ID(where), vnum))) {
+								// none stored
+								snprintf(str, slen, "0");
+							}
+							else {
+								// found
+								snprintf(str, slen, "%d", store->amount);
+							}
+						}
+						else {
+							// no input
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
 							int pos;
