@@ -791,9 +791,6 @@ bool process_import_one(empire_data *emp) {
 	obj_data *orn;
 	double cost, gain;
 	
-	// round to %.001f
-	#define IMPORT_ROUND(amt)  (round((amt) * 1000.0) / 1000.0)
-	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
 		if (is_trading_with(emp, partner)) {
@@ -823,7 +820,7 @@ bool process_import_one(empire_data *emp) {
 			if (!(p_trade = find_trade_entry(plt->emp, TRADE_EXPORT, trade->vnum))) {
 				continue;	// not trading this item
 			}
-			if (IMPORT_ROUND(p_trade->cost * (1.0/plt->rate)) > trade->cost) {
+			if (p_trade->cost * (1.0/plt->rate) > trade->cost) {
 				continue;	// too expensive
 			}
 			if ((their_amt = get_total_stored_count(plt->emp, trade->vnum, FALSE)) <= p_trade->limit) {
@@ -840,7 +837,7 @@ bool process_import_one(empire_data *emp) {
 				pair->emp = plt->emp;
 				pair->amount = their_amt;
 				pair->rate = plt->rate;
-				pair->cost = IMPORT_ROUND(p_trade->cost * (1.0/plt->rate));
+				pair->cost = p_trade->cost * (1.0/plt->rate);
 				DL_APPEND(pair_list, pair);
 			}
 		}
@@ -870,13 +867,13 @@ bool process_import_one(empire_data *emp) {
 			// compute cost for this trade (pair->cost is already rate-exchanged)
 			cost = trade_amt * pair->cost;
 			
-			// round off to 0.1 now (up)
-			cost = ceil(cost * 10.0) / 10.0;
+			// round off to 0.1 now
+			cost = round(cost * 10.0) / 10.0;
 			
 			// can we afford it?
 			if (EMPIRE_COINS(emp) < cost) {
-				trade_amt = EMPIRE_COINS(emp) / pair->cost;	// reduce to how many we can afford
-				cost = ceil(trade_amt * pair->cost * 10.0) / 10.0;
+				trade_amt = floor(EMPIRE_COINS(emp) / pair->cost);	// reduce to how many we can afford
+				cost = round(trade_amt * pair->cost * 10.0) / 10.0;
 				if (trade_amt < 1) {
 					continue;	// can't afford any
 				}
