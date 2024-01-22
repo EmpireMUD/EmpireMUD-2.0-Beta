@@ -10700,6 +10700,7 @@ ACMD(do_random) {
 }
 
 
+// also do_shutdown
 ACMD(do_reboot) {
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
@@ -10722,6 +10723,17 @@ ACMD(do_reboot) {
 		else if ((type = search_block(arg, shutdown_types, TRUE)) != NOTHING) {
 			reboot_control.level = type;
 		}
+		else if (!str_cmp(arg, "cancel")) {
+			if (reboot_control.type != subcmd) {
+				msg_to_char(ch, "There's no %s scheduled.\r\n", reboot_types[subcmd]);
+			}
+			else {
+				reboot_control.type = REBOOT_NONE;
+				reboot_control.time = -1;
+				msg_to_char(ch, "You have canceled the %s.\r\n", reboot_types[subcmd]);
+			}
+			return;
+		}
 		else {
 			msg_to_char(ch, "Unknown reboot option '%s'.\r\n", arg);
 			return;
@@ -10736,18 +10748,21 @@ ACMD(do_reboot) {
 		reboot_control.type = subcmd;
 	}
 	
-	if (subcmd == SCMD_REBOOT) {
+	if (subcmd == REBOOT_REBOOT) {
 		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
 	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_types[reboot_control.type]);
+	}
+	else if (reboot_control.type == REBOOT_NONE || reboot_control.time < 0) {
+		msg_to_char(ch, "There is no %s scheduled.\r\n", reboot_types[subcmd]);
 	}
 	else {
 		var = (no_arg ? reboot_control.time : time);
-		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_types[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
-			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
+			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_types[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
 				if (STATE(desc) != CON_PLAYING || !desc->character) {
 					msg_to_char(ch, " %s at menu\r\n", (desc->character ? GET_NAME(desc->character) : "New connection"));

@@ -327,9 +327,11 @@ int char_script_id(char_data *ch) {
 		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
 		ch->in_lookup_table = TRUE;
 		
-		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
-			reboot_control.time = 16;
-			reboot_control.type = SCMD_REBOOT;
+		if (top_script_uid == INT_MAX && (!REBOOT_IS_SET() || reboot_control.time > config_get_int("reboot_warning_minutes") + 1)) {
+			reboot_control.time = config_get_int("reboot_warning_minutes") + 1;
+			if (reboot_control.type != REBOOT_SHUTDOWN) {
+				reboot_control.type = REBOOT_REBOOT;
+			}
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
 			top_script_uid = OTHER_ID_BASE;
 		}
@@ -354,9 +356,11 @@ int obj_script_id(obj_data *obj) {
 		obj->script_id = top_script_uid++;
 		add_to_lookup_table(obj->script_id, (void *)obj, TYPE_OBJ);
 		
-		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
-			reboot_control.time = 16;
-			reboot_control.type = SCMD_REBOOT;
+		if (top_script_uid == INT_MAX && (!REBOOT_IS_SET() || reboot_control.time > config_get_int("reboot_warning_minutes") + 1)) {
+			reboot_control.time = config_get_int("reboot_warning_minutes") + 1;
+			if (reboot_control.type != REBOOT_SHUTDOWN) {
+				reboot_control.type = REBOOT_REBOOT;
+			}
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for objects has exceeded the limit, scheduling an auto-reboot");
 			top_script_uid = OTHER_ID_BASE;
 		}
@@ -376,9 +380,11 @@ int veh_script_id(vehicle_data *veh) {
 		veh->script_id = top_script_uid++;
 		add_to_lookup_table(veh->script_id, (void *)veh, TYPE_VEH);
 		
-		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
-			reboot_control.time = 16;
-			reboot_control.type = SCMD_REBOOT;
+		if (top_script_uid == INT_MAX && (!REBOOT_IS_SET() || reboot_control.time > config_get_int("reboot_warning_minutes") + 1)) {
+			reboot_control.time = config_get_int("reboot_warning_minutes") + 1;
+			if (reboot_control.type != REBOOT_SHUTDOWN) {
+				reboot_control.type = REBOOT_REBOOT;
+			}
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for vehicles has exceeded the limit, scheduling an auto-reboot");
 			top_script_uid = OTHER_ID_BASE;
 		}

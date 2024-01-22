@@ -148,8 +148,8 @@ bool catch_up_actions = FALSE;	// update_actions()
 char **detected_slow_ips = NULL;
 int num_slow_ips = 0;
 
-/* Reboot data (default to a normal reboot once per week) */
-struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+/* Reboot data (config autoreboot_minutes to set a default auto-reboot) */
+struct reboot_control_data reboot_control = { REBOOT_NONE, -1, SHUTDOWN_NORMAL, FALSE };
 
 
 #ifdef __CXREF__
@@ -625,18 +625,23 @@ void perform_reboot(void) {
 	int gsize = 0;
 	FILE *fl = NULL;
 	
+	if (reboot_control.type == REBOOT_NONE) {
+		// no reboot scheduled
+		return;
+	}
+	
 	*group_data = '\0';
 
-	if (reboot_control.type == SCMD_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
+	if (reboot_control.type == REBOOT_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Reboot file not writeable, aborting reboot");
 		reboot_control.time = -1;
 		return;
 	}
 
-	if (reboot_control.type == SCMD_REBOOT) {
+	if (reboot_control.type == REBOOT_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
 	}
-	else if (reboot_control.type == SCMD_SHUTDOWN) {
+	else if (reboot_control.type == REBOOT_SHUTDOWN) {
 		sprintf(buf, "\r\n[0;0;31m *** Shutting Down ***[0;0;37m\r\nThe mud is shutting down, please reconnect later.\r\n\r\n");
 	}
 
@@ -651,7 +656,7 @@ void perform_reboot(void) {
 			continue;
 		}
 
-		if (reboot_control.type == SCMD_REBOOT && fl) {
+		if (reboot_control.type == REBOOT_REBOOT && fl) {
 			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
@@ -666,7 +671,7 @@ void perform_reboot(void) {
 		
 		// send output
 		write_to_descriptor(desc->descriptor, buf);
-		if (reboot_control.type == SCMD_REBOOT) {
+		if (reboot_control.type == REBOOT_REBOOT) {
 			write_to_descriptor(desc->descriptor, reboot_strings[number(0, num_of_reboot_strings - 1)]);
 		}
 		
@@ -688,7 +693,7 @@ void perform_reboot(void) {
 		binary_map_fl = NULL;
 	}
 
-	if (reboot_control.type == SCMD_REBOOT && fl) {
+	if (reboot_control.type == REBOOT_REBOOT && fl) {
 		fprintf(fl, "-1 ~ ~ ~\n");
 		fprintf(fl, "%s", group_data);
 		fprintf(fl, "$\n");
@@ -696,7 +701,7 @@ void perform_reboot(void) {
 	}
 
 	// If this is a reboot, restart the mud!
-	if (reboot_control.type == SCMD_REBOOT) {
+	if (reboot_control.type == REBOOT_REBOOT) {
 		log("Reboot: performing live reboot");
 		
 		chdir("..");
@@ -772,14 +777,14 @@ void update_reboot(void) {
 	char buf[MAX_STRING_LENGTH];
 	
 	// neverboot
-	if (reboot_control.time < 0) {
+	if (reboot_control.time < 0 || reboot_control.type == REBOOT_NONE) {
 		return;
 	}
 	
 	// otherwise...
 	reboot_control.time -= 1;
 
-	if (reboot_control.time <= 0 || reboot_control.immediate || (check_reboot_confirms() && reboot_control.time <= 15)) {
+	if (reboot_control.time <= 0 || reboot_control.immediate || (check_reboot_confirms() && reboot_control.time <= config_get_int("reboot_warning_minutes"))) {
 		perform_reboot();
 		return;
 	}
@@ -787,14 +792,14 @@ void update_reboot(void) {
 	// wizlock last 5 minutes
 	if (reboot_control.time <= 5) {
 		wizlock_level = 1;	// newbie lock
-		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
+		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_types[reboot_control.type], reboot_types[reboot_control.type], reboot_control.time);
 		wizlock_message = str_dup(buf);
 	}
 	
 	// alert everyone
-	if (reboot_control.time <= 5 || (reboot_control.time <= 15 && (reboot_control.time % 2))) {
-		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
-		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
+	if (reboot_control.time <= config_get_int("reboot_warning_minutes")) {
+		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_types[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_types[reboot_control.type]);
+		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_types[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_types[reboot_control.type]);
 	}
 }
 
@@ -3753,7 +3758,8 @@ RETSIGTYPE checkpointing(int sig) {
 
 RETSIGTYPE hupsig(int sig) {
 	log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM. Shutting down...");
-	reboot_control.type = SCMD_SHUTDOWN;
+	reboot_control.type = REBOOT_SHUTDOWN;
+	reboot_control.immediate = TRUE;
 	perform_reboot();
 	// exit(1);
 }

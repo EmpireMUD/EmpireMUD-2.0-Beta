@@ -874,7 +874,7 @@ finding new places to build an island.
 #d
 REBOOT
 
-Usage:  reboot [now | minutes]
+Usage:  reboot [now | minutes | cancel]
 
 You can use this to either trigger an instant reboot, or count one down. 
 Because this is a reboot and saves everything, no information is ever lost.
@@ -1677,20 +1677,21 @@ If you don't specify an option, you will see their list of active quests.
 #e
 SHUTDOWN
 
-Usage:  shutdown [now | timer] [pause | die | complete]
+Usage:  shutdown [now | timer | cancel] [normal | pause | die | complete]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
 EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
 meaningless. If you are using autorun, the following arguments are available:
 
+normal - Will shut down then reboot.
 pause - Create a file called 'pause' in Empire's root directory; do not
-   try to restart the MUD until 'paused' is removed.
+   try to restart the MUD until 'pause' is removed.
 die - Kill the autorun script; the MUD will not reboot until autorun is
    explicitly run again.
 complete - Like die, but also frees all allocated memory, which helps detect
-   memory leaks. This is slow, and should be done in profiler like valgrind.
+   memory leaks. This is slow, and should be done in a profiler like valgrind.
 
-You can also set a timer, giving the players some warning before the reboot.
+You can also set a timer, giving the players some warning before the shutdown.
 
 If you type this command with no arguments, it will give the current status.
 If you want to shutdown with no timer, use the 'now' option. This command is

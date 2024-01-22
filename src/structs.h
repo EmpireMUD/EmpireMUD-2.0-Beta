@@ -1472,7 +1472,15 @@ typedef struct vehicle_data vehicle_data;
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
 
-// shutdown types
+// REBOOT_x: reboot modes
+#define REBOOT_NONE			0	// no reboot is set
+#define REBOOT_REBOOT		1	// reboot mode
+#define REBOOT_SHUTDOWN		2	// shutdown mode
+
+#define REBOOT_IS_SET()		(reboot_control.type != REBOOT_NONE && (reboot_control.immediate || reboot_control.time >= 0))
+
+
+// SHUTDOWN_x: shutdown types
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
@@ -5809,9 +5817,9 @@ struct player_faction_data {
 
 // For reboots/shutdowns
 struct reboot_control_data {
-	int type;	// SCMD_REBOOT, SCMD_SHUTDOWN
+	int type;	// REBOOT_NONE, REBOOT_REBOOT, REBOOT_SHUTDOWN
 	int time;	// minutes
-	int level;	// REBOOT_NORMAL, PAUSE, DIE
+	int level;	// SHUTDOWN_NORMAL, SHUTDOWN_PAUSE, SHUTDOWN_DIE, SHUTDOWN_COMPLETE
 	int immediate;	// TRUE/FALSE for instant reboot
 };
 

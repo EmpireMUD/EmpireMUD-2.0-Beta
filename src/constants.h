@@ -154,7 +154,8 @@ struct wear_data_type {
 extern const char *level_names[][2];
 extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
-extern const char *reboot_type[];
+extern const char *reboot_types[];
+extern const char *shutdown_types[];
 extern const char *version;
 extern const char *DG_SCRIPT_VERSION;
 
@@ -455,7 +456,6 @@ extern const char *reserved_words[];
 extern const char *weekdays[];
 extern const char *month_name[];
 extern const char *offon_types[];
-extern const char *shutdown_types[];
 extern const char *vehicle_flags[];
 extern const char *identify_vehicle_flags[];
 extern const char *veh_custom_types[];

@@ -107,8 +107,23 @@ const char *reboot_strings[] = {
 };
 
 
-// for the reboot_control -- SCMD_REBOOT, SCMD_SHUTDOWN
-const char *reboot_type[] = { "reboot", "shutdown" };
+// REBOOT_x: reboot modes
+const char *reboot_types[] = {
+	"none",
+	"reboot",
+	"shutdown",
+	"\n"
+};
+
+
+// SHUTDOWN_x
+const char *shutdown_types[] = {
+	"normal",
+	"pause",
+	"die",
+	"complete",
+	"\n"
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5391,16 +5406,6 @@ const char *month_name[] = {
 const char *offon_types[] = {
 	"off",
 	"on",
-	"\n"
-};
-
-
-// SHUTDOWN_x
-const char *shutdown_types[] = {
-	"normal",
-	"pause",
-	"die",
-	"complete",
 	"\n"
 };
 

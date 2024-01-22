@@ -1919,20 +1919,20 @@ ACMD(do_confirm) {
 		return;
 	}
 
-	if (reboot_control.time == -1 || reboot_control.time > 15) {
+	if (reboot_control.time < 0 || reboot_control.time > config_get_int("reboot_warning_minutes") || reboot_control.type == REBOOT_NONE) {
 		msg_to_char(ch, "There is no upcoming reboot to confirm for!\r\n");
 		return;
 	}
 
 	if (REBOOT_CONF(ch)) {
-		msg_to_char(ch, "You've already confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
+		msg_to_char(ch, "You've already confirmed that you're ready for the %s.\r\n", reboot_types[reboot_control.type]);
 	}
 	else {
 		REBOOT_CONF(ch) = TRUE;
-		msg_to_char(ch, "You have confirmed that you're ready for the %s.\r\n", reboot_type[reboot_control.type]);
+		msg_to_char(ch, "You have confirmed that you're ready for the %s.\r\n", reboot_types[reboot_control.type]);
 	}
 
-	if (check_reboot_confirms() && reboot_control.time <= 15) {
+	if (check_reboot_confirms() && reboot_control.time <= config_get_int("reboot_warning_minutes")) {
 		reboot_control.immediate = TRUE;
 	}
 }
