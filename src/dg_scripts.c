@@ -5698,6 +5698,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "is_on_map")) {
+						snprintf(str, slen, "%d", (GET_ROOM_VNUM(r) < MAP_SIZE) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_outdoors")) {
 						snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
 					}

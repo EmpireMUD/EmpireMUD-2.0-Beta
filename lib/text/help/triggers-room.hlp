@@ -188,6 +188,7 @@ When using field - The variable returns:
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
+&cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cis_zenith_day&0 - True if it's the day of the sun's zenith passage here.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
