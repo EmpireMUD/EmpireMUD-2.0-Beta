@@ -1,3 +1,99 @@
+#230
+barrel wooden~
+a wooden barrel~
+A wooden barrel is sitting here.~
+The barrel is well-made, with metal hoops around sturdy, curved planks of wood.
+~
+5 el a 0 0 2
+96 0 0
+0 0
+C
+50 50
+R
+4 5138 0
+R
+4 5134 0
+S
+#232
+barrel ale~
+a barrel of ale~
+A barrel of ale is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the hoppy smell of ale to it.
+   You can 'setup ale' to set this up in the room for everyone.
+~
+5 eg a 0 0 7
+96 96 3
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#233
+barrel lager~
+a barrel of lager~
+A barrel of lager is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. The acrid smell of lager is strong around it.
+   You can 'setup lager' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 1
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#234
+barrel wheat beer~
+a barrel of wheat beer~
+A barrel of wheat beer is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the fragrant citrus-like aroma of wheat beer.
+   You can 'setup beer' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 2
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#235
+barrel cider~
+a barrel of cider~
+A barrel of cider is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the crisp aroma of hard cider.
+   You can 'setup cider' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 4
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
 #250
 bowl earthenware~
 an earthenware bowl~

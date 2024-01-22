@@ -2,8 +2,6 @@
 workforce nailmaking~
 1306 4
 10 -1 0 1 -1 0 h
-B
-0 0 0
 R
 6720 1 1 0
 S
@@ -11,8 +9,6 @@ S
 workforce brickmaking~
 257 1
 10 -1 0 1 -1 0 r
-B
-0 0 0
 R
 6090 2 1 0
 S
@@ -20,8 +16,6 @@ S
 workforce glassmaking~
 108 1
 10 -1 0 1 -1 0 i
-B
-0 0 0
 R
 107 2 0 0
 S
@@ -29,17 +23,75 @@ S
 workforce nexus crystals~
 1115 2
 10 -1 c 1 -1 0 M
-B
-0 0 0
 R
 6600 1 1 0
+S
+#230
+carpenter barrel-making~
+230 1
+10 -1 q 1 -1 0 e
+R
+6000 1 1 0
+R
+6720 1 1 0
+S
+#231
+barrel~
+230 1
+2 58 q 8 -1 c e
+R
+6000 1 1 0
+R
+6720 1 1 0
+S
+#232
+tavern ale-brewing~
+232 1
+10 -1 q 1 -1 0 A
+R
+230 1 0 0
+R
+145 5 0 0
+R
+143 5 0 0
+S
+#233
+tavern lager-brewing~
+233 1
+10 -1 q 1 -1 0 A
+R
+230 1 0 0
+R
+3005 5 0 0
+R
+143 5 0 0
+S
+#234
+tavern wheat beer-brewing~
+234 1
+10 -1 q 1 -1 0 A
+R
+230 1 0 0
+R
+141 5 0 0
+R
+145 5 0 0
+S
+#235
+tavern cider-brewing~
+235 1
+10 -1 q 1 -1 0 A
+R
+230 1 0 0
+R
+3002 5 0 0
+R
+3004 5 0 0
 S
 #250
 bowl~
 250 1
 2 57 a 16 -1 f 0
-B
-0 0 0
 R
 6090 2 1 0
 S
@@ -47,8 +99,6 @@ S
 pot~
 251 1
 2 57 a 16 -1 f 0
-B
-0 0 0
 R
 6090 4 1 0
 S
@@ -56,8 +106,6 @@ S
 vessel~
 254 1
 2 57 a 16 -1 f 0
-B
-0 0 0
 R
 6090 8 1 0
 S
@@ -65,8 +113,6 @@ S
 hestian trinket~
 256 1
 2 202 a 24 -1 f 0
-B
-0 0 0
 R
 6090 1 1 0
 R
@@ -78,8 +124,6 @@ S
 bricks~
 257 1
 2 198 a 8 -1 0 0
-B
-0 0 0
 R
 6090 2 1 0
 S
@@ -87,8 +131,6 @@ S
 peace pipe~
 258 1
 2 202 a 24 -1 f 0
-B
-0 0 0
 R
 6090 1 1 0
 R
@@ -100,8 +142,6 @@ S
 tethyan focus~
 259 1
 2 202 a 32 -1 f 0
-B
-0 0 0
 R
 6090 2 1 0
 R
@@ -113,8 +153,6 @@ S
 areios charm~
 260 1
 2 202 a 32 -1 f 0
-B
-0 0 0
 R
 6090 2 1 0
 R
@@ -126,8 +164,6 @@ S
 gaian effigy~
 261 1
 2 202 a 32 -1 f 0
-B
-0 0 0
 R
 6090 2 1 0
 R
@@ -139,8 +175,6 @@ S
 trinket of conveyance~
 262 1
 2 57 a 18 -1 f 0
-B
-0 0 0
 R
 6090 1 1 0
 S
@@ -148,8 +182,6 @@ S
 letheian icon~
 263 1
 2 203 a 24 -1 f 0
-B
-0 0 0
 R
 6090 1 1 0
 R

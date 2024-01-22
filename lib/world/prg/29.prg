@@ -166,4 +166,30 @@ K 2 5220
 K 2 5221
 P 2011
 S
+#2916
+To the Tavern When the Job's Done~
+   A thriving workforce is the heartbeat of any empire. But when the workday is
+over, there's one thing they want: ale. The time is right to build some taverns
+and create a successful brewing industry. The tavern might even attract some
+interesting characters.
+   Building a tavern requires 10x (lumber), 4x (nails), 12x (bricks),
+20x (stiff plant fibers), 20x bushel of hops, and 20x sack of barley.
+   Crafting barrels requires a carpenter, 1x (lumber), and 1x (common metal
+ingot). Workforce will craft these at the carpenter, as well.
+Workforce will craft the following items at the tavern:
+   barrel of ale: wooden barrel, 5x sack of barley, 5x bushel of hops
+   barrel of lager: wooden barrel, 5x bushel of corn, 5x bushel of hops
+   barrel of wheat beer: wooden barrel, 5x bundle of wheat, 5x sack of barley
+   barrel of cider: wooden barrel, 5x bunch of apples, 5x basket of peaches
+~
+8 2 50 0 b
+K 2 5138
+K 2 231
+K 2 232
+K 2 233
+K 2 234
+K 2 235
+K 2 230
+P 2903
+S
 $
