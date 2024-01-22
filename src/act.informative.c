@@ -3289,11 +3289,11 @@ ACMD(do_inventory) {
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
-		bool kept = FALSE, not_kept = FALSE;
+		bool kept = FALSE, not_kept = FALSE, bound = FALSE, unbound = FALSE;
 		generic_data *cmp = NULL;
 		obj_data *obj;
 		size_t size;
-		int count;
+		int count, to_show = -1;
 		
 		*heading = '\0';
 		
@@ -3362,10 +3362,35 @@ ACMD(do_inventory) {
 					snprintf(heading, sizeof(heading), "Items not marked (keep):");
 					break;
 				}
+				case 'b': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					bound = TRUE;
+					snprintf(heading, sizeof(heading), "Bound items:");
+					break;
+				}
+				case 'u': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					unbound = TRUE;
+					snprintf(heading, sizeof(heading), "Unbound BoE items:");
+					break;
+				}
 				case 'i': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					msg_to_char(ch, "Note: inventory -i is no longer supported. Use 'toggle item-details' instead.\r\n");
+					break;
+				}
+				default: {
+					if (isdigit(*(argument+1))) {
+						// only show this many
+						to_show = atoi(argument+1);
+						
+						// peel off the first arg
+						argument = one_argument(argument, arg);
+						skip_spaces(&argument);
+					}
 					break;
 				}
 			}
@@ -3410,9 +3435,20 @@ ACMD(do_inventory) {
 			if (not_kept && OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				continue;	// not matching no-keep flag
 			}
+			if (bound && !OBJ_BOUND_TO(obj)) {
+				continue;	// isn't bound
+			}
+			if (unbound && (OBJ_BOUND_TO(obj) || !OBJ_FLAGGED(obj, OBJ_BIND_FLAGS))) {
+				continue;	// not an unbound bindable
+			}
 			
 			// looks okay
 			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
+			
+			// show enough?
+			if (to_show > 0 && to_show-- == 0) {
+				break;
+			}
 		}
 		
 		if (ch->desc) {
