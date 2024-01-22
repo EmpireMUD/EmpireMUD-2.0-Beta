@@ -1147,6 +1147,10 @@ VCMD(do_vload) {
 			// and load it
 			object = read_object(number, TRUE);
 		}
+		else {
+			veh_log(veh, "vload: bad object type ??");
+			return;
+		}
 		
 		if (inst) {
 			instance_obj_setup(inst, object);

@@ -1351,6 +1351,10 @@ OCMD(do_oload) {
 			// and load it
 			object = read_object(number, TRUE);
 		}
+		else {
+			obj_log(obj, "oload: bad object type ??");
+			return;
+		}
 		
 		if (inst) {
 			instance_obj_setup(inst, object);

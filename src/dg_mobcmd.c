@@ -823,6 +823,10 @@ ACMD(do_mload) {
 			// and load it
 			object = read_object(number, TRUE);
 		}
+		else {
+			mob_log(ch, "mload: bad object type ??");
+			return;
+		}
 		
 		// object is created by now
 		if (inst) {

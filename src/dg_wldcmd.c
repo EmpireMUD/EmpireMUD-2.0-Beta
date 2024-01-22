@@ -1217,6 +1217,10 @@ WCMD(do_wload) {
 			// and load it
 			object = read_object(number, TRUE);
 		}
+		else {
+			wld_log(room, "wload: bad object type ??");
+			return;
+		}
 		
 		if (inst) {
 			instance_obj_setup(inst, object);
