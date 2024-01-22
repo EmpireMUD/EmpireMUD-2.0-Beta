@@ -5946,9 +5946,11 @@ room_data *find_home(char_data *ch) {
 
 
 ACMD(do_home) {
+	bool found;
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
 	char_data *targ;
+	player_index_data *index;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	
@@ -6073,6 +6075,22 @@ ACMD(do_home) {
 		queue_delayed_update(ch, CDU_SAVE);
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
+	else if (is_abbrev(command, "list")) {
+		if (!emp) {
+			msg_to_char(ch, "You need to be in an empire to list homes.\r\n");
+		}
+		else {
+			found = FALSE;
+			HASH_ITER(hh, world_table, iter, next_iter) {
+				if (ROOM_OWNER(iter) == emp && ROOM_PRIVATE_OWNER(iter) != NOBODY) {
+					msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, iter, TRUE), get_room_name(iter, FALSE), ((index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(iter))) ? index->fullname : "<unknown>"));
+				}
+			}
+			if (!found) {
+				msg_to_char(ch, "No private homes found.\r\n");
+			}
+		}
+	}
 	else if (is_abbrev(command, "inventory")) {
 		warehouse_inventory(ch, argument, SCMD_HOME);
 	}
@@ -6090,7 +6108,7 @@ ACMD(do_home) {
 		warehouse_store(ch, argument, SCMD_HOME);
 	}
 	else {
-		msg_to_char(ch, "Usage: home [set | unset | clear | inventory | retrieve | store]\r\n");
+		msg_to_char(ch, "Usage: home [set | unset | list | clear | inventory | retrieve | store]\r\n");
 	}
 }
 

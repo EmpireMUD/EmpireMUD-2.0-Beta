@@ -725,7 +725,7 @@ See also: PROGRESS
 #
 HOME "HOME STORAGE"
 
-Usage:  home [set/unset/clear]
+Usage:  home [set/unset/list/clear]
         home inventory [item keywords]
         home identify <item keywords>
         home retrieve [number] [item keywords]
@@ -736,6 +736,8 @@ you set it as your home, other members of the empire can't enter (except the
 highest-ranking leaders). You can unset your home from anywhere, or clear the
 owner for the building you're in. Only the empire leaders can clear homes they
 don't own.
+
+Any member may type "home list" to see all homes in the empire.
 
 You can store up to 300 unique items -- items that can't be stored in other
 buildings -- in your home. Identical items stack with each other and don't
