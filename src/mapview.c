@@ -1866,7 +1866,7 @@ void look_in_direction(char_data *ch, int dir) {
 		}
 		if (IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
 			// start the sentence...
-			send_to_char("You see a building", ch);
+			msg_to_char(ch, "You see %s %s", (GET_BUILDING(to_room) ? AN(GET_BLD_NAME(GET_BUILDING(to_room))) : "a"), (GET_BUILDING(to_room) ? GET_BLD_NAME(GET_BUILDING(to_room)) : "building"));
 			
 			if (ROOM_OWNER(to_room)) {
 				msg_to_char(ch, " owned by %s", EMPIRE_NAME(ROOM_OWNER(to_room)));
