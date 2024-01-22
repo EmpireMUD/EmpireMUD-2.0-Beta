@@ -76,6 +76,9 @@ end
 otimer 168
 nop %self.remove_wear(TAKE)%
 %mod% %self% longdesc &Z%self.shortdesc% has been set up here.
+if !%self.is_flagged(NO-BASIC-STORAGE)%
+  nop %self.flag(NO-BASIC-STORAGE)%
+end
 * and message
 %send% %actor% You set up @%self% here.
 %echoaround% %actor% ~%actor% sets up @%self% here.
