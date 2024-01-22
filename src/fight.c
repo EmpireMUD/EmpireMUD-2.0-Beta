@@ -299,7 +299,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 * @return double The basic speed for the character.
 */
 double get_base_speed(char_data *ch, int pos) {
-	obj_data *weapon = GET_EQ(ch, pos);
+	obj_data *weapon = AFF_FLAGGED(ch, AFF_DISARMED) ? NULL : GET_EQ(ch, pos);
 	double base = 3.0;
 	int w_type;
 	attack_message_data *amd;
@@ -332,7 +332,7 @@ double get_base_speed(char_data *ch, int pos) {
 * @return double Get the composite combat speed for that slot.
 */
 double get_combat_speed(char_data *ch, int pos) {
-	obj_data *weapon = GET_EQ(ch, pos);
+	obj_data *weapon = AFF_FLAGGED(ch, AFF_DISARMED) ? NULL : GET_EQ(ch, pos);
 	double base = get_base_speed(ch, pos);
 	
 	// ability mods: player only
