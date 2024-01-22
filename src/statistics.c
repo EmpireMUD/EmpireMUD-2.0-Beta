@@ -214,10 +214,27 @@ void mudstats_configs(char_data *ch, char *argument) {
 	}
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
+	// skills
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
+	
+	// environment
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Environment: %s\r\n", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
+	
+	// pk
+	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Player-killing: %s\r\n", config_get_bitvector("pk_mode") ? part : "forbidden");
+	
+	// city
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, %d tiles apart (%d for allies)\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
+	
+	// war
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "War: %d offense%s required%s\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	
+	// storage
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Storage: %s\r\n", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
 	
 	// workforce
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Workforce: %d cap per member, %d minimum cap per island, %d tile range\r\n", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
-	
 	
 	// newbie island
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
@@ -229,72 +246,54 @@ void mudstats_configs(char_data *ch, char *argument) {
 	}
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
-	
-	// city
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, must be %d tiles apart (%d for allies), %d tiles from starting locations\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"), config_get_int("min_distance_from_city_to_starting_location"));
-	
-	
-	// storage
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Storage: %s\r\n", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
+	// approval
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
+	if (!config_get_bool("auto_approve")) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", needed for:");
+		if (config_get_bool("build_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " building");
+		}
+		if (config_get_bool("chat_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " chatting");
+		}
+		if (config_get_bool("craft_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " crafting");
+		}
+		if (config_get_bool("event_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " events");
+		}
+		if (config_get_bool("gather_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " gathering");
+		}
+		if (config_get_bool("join_empire_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " empires");
+		}
+		if (config_get_bool("quest_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " quests");
+		}
+		if (config_get_bool("skill_gain_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " skills");
+		}
+		if (config_get_bool("tell_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " tells");
+		}
+		if (config_get_bool("terraform_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " terraforming");
+		}
+		if (config_get_bool("title_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " title");
+		}
+		if (config_get_bool("travel_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " travel");
+		}
+		if (config_get_bool("write_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " writing");
+		}
+	}
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// timeouts
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Timeouts: %d days for newbies, up to %d days after %d hours of playtime\r\n", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
-	
-	// skills
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
-	
-	// environment
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Environment: %s\r\n", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
-	
-	// pk
-	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Player-killing: %s\r\n", config_get_bitvector("pk_mode") ? part : "forbidden");
-	
-	// war
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "War: %d offense%s required%s\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
-	
-	// approval
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Approval: %s%s, needed for:", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
-	if (config_get_bool("build_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " building");
-	}
-	if (config_get_bool("chat_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " chatting");
-	}
-	if (config_get_bool("craft_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " crafting");
-	}
-	if (config_get_bool("event_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " events");
-	}
-	if (config_get_bool("gather_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " gathering");
-	}
-	if (config_get_bool("join_empire_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " empires");
-	}
-	if (config_get_bool("quest_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " quests");
-	}
-	if (config_get_bool("skill_gain_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " skills");
-	}
-	if (config_get_bool("tell_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " tells");
-	}
-	if (config_get_bool("terraform_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " terraforming");
-	}
-	if (config_get_bool("title_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " title");
-	}
-	if (config_get_bool("travel_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " travel");
-	}
-	if (config_get_bool("write_approval")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " writing");
-	}
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	if (ch->desc) {
 		page_string(ch->desc, output, TRUE);
