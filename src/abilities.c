@@ -368,7 +368,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	
 	// Cooldown?
-	if (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent)) {
+	if (ABIL_COOLDOWN_SECS(abil) > 0 && (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent))) {
 		has_param_details = TRUE;
 		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %s%s\r\n", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
 	}
