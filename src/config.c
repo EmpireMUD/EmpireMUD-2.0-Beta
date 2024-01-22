@@ -58,11 +58,6 @@ bool find_int_in_array(int to_find, int *array, int size);
 bool remove_int_from_int_array(int to_remove, int **array, int *size);
 
 
-// these are used in various configs below
-#define YES	1
-#define NO	0
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIREMUD CONFIGS ///////////////////////////////////////////////////////
 
