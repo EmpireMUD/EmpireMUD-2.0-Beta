@@ -3315,7 +3315,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "Items of type '%s':", GEN_NAME(cmp));
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s':", (*heading ? ", " : ""), GEN_NAME(cmp));
 					break;
 				}
 				case 'w': {
@@ -3330,7 +3330,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "Items worn on %s:", wear_bits[wear_type]);
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s:", (*heading ? ", " : ""), wear_bits[wear_type]);
 					break;
 				}
 				case 't': {
@@ -3345,35 +3345,35 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "%s items:", item_types[type_type]);
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s%s", (*heading ? ", " : ""), item_types[type_type]);
 					break;
 				}
 				case 'k': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					kept = TRUE;
-					snprintf(heading, sizeof(heading), "Items marked (keep):");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%skept", (*heading ? ", " : ""));
 					break;
 				}
 				case 'n': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					not_kept = TRUE;
-					snprintf(heading, sizeof(heading), "Items not marked (keep):");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%snot kept", (*heading ? ", " : ""));
 					break;
 				}
 				case 'b': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					bound = TRUE;
-					snprintf(heading, sizeof(heading), "Bound items:");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sbound", (*heading ? ", " : ""));
 					break;
 				}
 				case 'u': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					unbound = TRUE;
-					snprintf(heading, sizeof(heading), "Unbound BoE items:");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sunbound BoE", (*heading ? ", " : ""));
 					break;
 				}
 				case 'i': {
@@ -3386,6 +3386,9 @@ ACMD(do_inventory) {
 					if (isdigit(*(argument+1))) {
 						// only show this many
 						to_show = atoi(argument+1);
+						to_show = MAX(1, to_show);
+						
+						snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sfirst %d", (*heading ? ", " : ""), to_show);
 						
 						// peel off the first arg
 						argument = one_argument(argument, arg);
@@ -3398,16 +3401,21 @@ ACMD(do_inventory) {
 		
 		// if we get this far, it's okay
 		skip_spaces(&argument);
-		if (!*heading && *argument) {
-			snprintf(heading, sizeof(heading), "Items matching '%s':", argument);
-		}
-		else if (!*heading && !*argument) {
-			snprintf(heading, sizeof(heading), "Items:");
-		}
-		
-		// build string
-		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
 		count = 0;
+		
+		// start the string
+		if (*argument && *heading) {
+			size = snprintf(buf, sizeof(buf), "%s items matching '%s':\r\n", CAP(heading), argument);
+		}
+		else if (*argument) {
+			size = snprintf(buf, sizeof(buf), "Items matching '%s':\r\n", argument);
+		}
+		else if (*heading) {
+			size = snprintf(buf, sizeof(buf), "%s items:\r\n", CAP(heading));
+		}
+		else {
+			size = snprintf(buf, sizeof(buf), "Items:\r\n");
+		}
 		
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			// break out early
@@ -3445,8 +3453,8 @@ ACMD(do_inventory) {
 			// looks okay
 			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 			
-			// show enough?
-			if (to_show > 0 && to_show-- == 0) {
+			// shown enough?
+			if (to_show > 0 && count >= to_show) {
 				break;
 			}
 		}
