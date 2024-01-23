@@ -873,7 +873,7 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("9")
 	}
 	
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		process_theft_logs();
 		HEARTBEAT_LOG("10")
 	}
