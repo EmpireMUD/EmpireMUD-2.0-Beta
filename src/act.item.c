@@ -3942,8 +3942,7 @@ void process_shipping_one(empire_data *emp) {
 
 
 /**
-* Runs a shipping cycle for all empires. This runs every 6 game hours -- at
-* 1am, 7am, 1pm, and 7pm (global time, not regional time).
+* Runs a shipping cycle for all empires. This runs every 10 minutes.
 */
 void process_shipping(void) {
 	empire_data *emp, *next_emp;

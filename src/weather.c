@@ -408,30 +408,25 @@ void another_hour(void) {
 		}
 	}
 	
-	// hour-based updates
+	// hour-based updates: everything was removed from here to decouple it from the length of game hours
 	switch (main_time_info.hours) {
 		case 0: {	// midnight
 			run_external_evolutions();
 			break;
 		}
-		case 1: {	// 1am shipment
-			process_shipping();
+		case 1: {	// 1am shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 7: {	// 7am shipment
-			process_shipping();
+		case 7: {	// 7am shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 12: {	// noon
-			process_imports();
+		case 12: {	// noon - imports now run on a 30-minute cycle
 			break;
 		}
-		case 13: {	// 1pm shipment
-			process_shipping();
+		case 13: {	// 1pm shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 19: {	// 7pm shipment
-			process_shipping();
+		case 19: {	// 7pm shipment	- now just runs on a 10-minute cycle
 			break;
 		}
 	}

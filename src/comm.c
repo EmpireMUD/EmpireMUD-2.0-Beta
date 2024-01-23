@@ -77,6 +77,8 @@ void display_automessages();
 void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
 void process_import_evolutions();
+void process_imports();
+void process_shipping();
 void process_theft_logs();
 void real_update();
 void reduce_city_overages();
@@ -882,7 +884,10 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("11")
 	}
 	
-	// 12 was moved up (weather_and_time)
+	if (HEARTBEAT(10 * SECS_PER_REAL_MIN)) {
+		process_shipping();
+		HEARTBEAT_LOG("12")
+	}
 	
 	if (HEARTBEAT(WORKFORCE_CYCLE)) {
 		chore_update();
@@ -901,9 +906,7 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		reset_instances();
 		HEARTBEAT_LOG("16")
-	}
-
-	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		
 		update_reboot();
 		HEARTBEAT_LOG("17")
 		
@@ -933,6 +936,9 @@ void heartbeat(unsigned long heart_pulse) {
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
 		reduce_outside_territory();
 		HEARTBEAT_LOG("23")
+		
+		process_imports();
+		HEARTBEAT_LOG("23.5")
 	}
 	
 	if (HEARTBEAT(2 * SECS_PER_REAL_MIN)) {

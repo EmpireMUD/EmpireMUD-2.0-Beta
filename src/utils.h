@@ -1901,7 +1901,6 @@ bool empire_can_claim(empire_data *emp);
 int get_total_score(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
 bool is_trading_with(empire_data *emp, empire_data *partner);
-void process_imports();
 void resort_empires(bool force);
 
 // empire diplomacy utils from utils.c
@@ -2159,7 +2158,6 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
 int obj_carry_size(obj_data *obj);
-void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);
 void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);

@@ -602,8 +602,8 @@ that empire, the more even the exchange of money will be.
 The analyze command will show you which of your trading partners has the item
 available.
 
-An empire can only import 100 items per day total, and imports/exports run once
-per in-game day.
+An empire can only import 100 items at a time, and imports/exports run once per
+30 minutes.
 
 If you want to replace an entry with a new cost tolerance, you can "add" it
 again without removing it. It will replace the old entry.

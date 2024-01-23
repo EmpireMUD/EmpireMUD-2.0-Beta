@@ -2022,7 +2022,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
 
 	// trade
-	init_config(CONFIG_TRADE, "imports_per_day", CONFTYPE_INT, "how many max items an empire will import per day");
+	init_config(CONFIG_TRADE, "imports_per_day", CONFTYPE_INT, "how many max items an empire will import per 30 minute cycle");
 	init_config(CONFIG_TRADE, "trading_post_max_hours", CONFTYPE_INT, "how long a trade can be posted for");
 	init_config(CONFIG_TRADE, "trading_post_days_to_timeout", CONFTYPE_INT, "number of days to log in and collect");
 	init_config(CONFIG_TRADE, "trading_post_fee", CONFTYPE_DOUBLE, "% cut of the sale price");
