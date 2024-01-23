@@ -2321,11 +2321,12 @@ ACMD(do_say) {
 
 
 ACMD(do_speak) {
-	char buf[MAX_STRING_LENGTH], line[256], mods[256];
+	char buf[MAX_STRING_LENGTH], line[256], mods[256], adv_part[256];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
 	size_t size, lsize;
 	int count;
+	adv_data *adv;
 	
 	skip_spaces(&argument);
 	
@@ -2362,12 +2363,20 @@ ACMD(do_speak) {
 				sprintf(mods + strlen(mods), "%s\tgcurrently speaking\t0", (*mods ? ", " : ""));
 			}
 			
-			// build line
-			if (*mods) {
-				lsize = snprintf(line, sizeof(line), " %s (%s)\r\n", GEN_NAME(gen), mods);
+			// show from adventure?
+			if (GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(lang->vnum))) {
+				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), " %s\r\n", GEN_NAME(gen));
+				*adv_part = '\0';
+			}
+			
+			// build line
+			if (*mods) {
+				lsize = snprintf(line, sizeof(line), " %s (%s)%s\r\n", GEN_NAME(gen), mods, adv_part);
+			}
+			else {
+				lsize = snprintf(line, sizeof(line), " %s%s\r\n", GEN_NAME(gen), adv_part);
 			}
 			
 			// append

@@ -105,7 +105,9 @@ Commands:
 - &ccity found <name>&0: This founds a new city on the spot where you're standing.
     It creates a "city center" building, which is open (does not block move-
     ment). It costs 1 city point. You must be 25 tiles away from a starting
-    location and 30 from another empire's city (10 tiles if allied).
+    location and 30 from another empire's city (10 tiles if allied). When you
+    found your empire's first city, anything stored on a newbie island is
+    automatically transferred there as a courtesy.
 - &ccity upgrade <name>&0: This upgrades the given city by 1 level at the cost of
     1 city point.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
@@ -380,6 +382,10 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!WAR&0 - Empire cannot unilaterally declare war.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
+ &g!RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
+ &gDID-NEWBIE-MOVE&0 - Empire got its free move from the newbie island when it
+    built a city. Removing this flag then founding a new city will move newbie
+    items again.
 
 Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
@@ -719,7 +725,7 @@ See also: PROGRESS
 #
 HOME "HOME STORAGE"
 
-Usage:  home [set/unset/clear]
+Usage:  home [set/unset/list/clear]
         home inventory [item keywords]
         home identify <item keywords>
         home retrieve [number] [item keywords]
@@ -730,6 +736,8 @@ you set it as your home, other members of the empire can't enter (except the
 highest-ranking leaders). You can unset your home from anywhere, or clear the
 owner for the building you're in. Only the empire leaders can clear homes they
 don't own.
+
+Any member may type "home list" to see all homes in the empire.
 
 You can store up to 300 unique items -- items that can't be stored in other
 buildings -- in your home. Identical items stack with each other and don't
@@ -1544,6 +1552,7 @@ Common things produced by this:
  Forge: nails
  Potter: bricks
  Glass blower: glass ingots
+ Tavern: barrels of ale
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT
 #

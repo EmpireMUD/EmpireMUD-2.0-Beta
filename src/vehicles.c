@@ -4158,7 +4158,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
-		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), part);
+		get_resource_display(ch, VEH_YEARLY_MAINTENANCE(veh), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "Yearly maintenance:\r\n%s", part);
 	}
 	
@@ -4222,7 +4222,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
-		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
+		get_resource_display(ch, VEH_NEEDS_RESOURCES(veh), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
 	}
 	
@@ -4415,7 +4415,7 @@ void olc_show_vehicle(char_data *ch) {
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
-		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
+		get_resource_display(ch, VEH_YEARLY_MAINTENANCE(veh), lbuf);
 		strcat(buf, lbuf);
 	}
 	

@@ -344,7 +344,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 */
 void do_dg_build(room_data *target, char *argument) {
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
-	bool ruin = FALSE, demolish = FALSE;
 	any_vnum vnum = NOTHING;
 	bld_data *bld = NULL;
 	int dir = NORTH;
@@ -356,11 +355,33 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	// parse arg
-	if (is_abbrev(argument, "ruin")) {
-		ruin = TRUE;
+	if (is_abbrev(argument, "complete")) {
+		if (!IS_DISMANTLING(target) && IS_INCOMPLETE(target)) {
+			complete_building(target);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "ruin")) {
+		room_data *home = HOME_ROOM(target);
+		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
+			ruin_one_building(home);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "decay")) {
+		if (GET_ROOM_VNUM(target) < MAP_SIZE) {
+			annual_update_map_tile(&(world_map[FLAT_X_COORD(target)][FLAT_Y_COORD(target)]));
+			annual_update_depletions(&(SHARED_DATA(target)->depletion));
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
 	}
 	else if (is_abbrev(argument, "demolish")) {
-		demolish = TRUE;
+		disassociate_building(target);
+		request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		return;
 	}
 	else if (isdigit(*argument)) {
 		argument = any_one_arg(argument, vnum_arg);
@@ -387,16 +408,7 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	
-	if (ruin) {
-		room_data *home = HOME_ROOM(target);
-		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
-			ruin_one_building(home);
-		}
-	}
-	else if (demolish) {
-		disassociate_building(target);
-	}
-	else if (bld) {
+	if (bld) {
 		disassociate_building(target);
 	
 		construct_building(target, GET_BLD_VNUM(bld));
@@ -1204,11 +1216,13 @@ void script_modify(char *argument) {
 	room_data *room = NULL;
 	bool clear;
 	int pos;
+	sector_data *preserve;
+	struct evolution_data *evo;
 	
 	half_chop(argument, targ_arg, temp);
 	half_chop(temp, field_arg, value);
 	
-	if (!*targ_arg || !*field_arg || !*value) {
+	if (!*targ_arg || !*field_arg) {
 		script_log("%%mod%% called without %s arguments", (!*targ_arg ? "any" : (!*field_arg ? "field and value" : "value")));
 		return;
 	}
@@ -1223,7 +1237,11 @@ void script_modify(char *argument) {
 	// CHARACTER MODE
 	if ((mob = get_char(targ_arg))) {
 		// player-targetable mods first
-		if (is_abbrev(field_arg, "companion")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "companion")) {
 			if (!IS_NPC(mob)) {
 				if (!str_cmp(value, "none")) {
 					despawn_companion(mob, NOTHING);
@@ -1300,7 +1318,11 @@ void script_modify(char *argument) {
 	}
 	// OBJECT MODE
 	else if ((obj = get_obj(targ_arg))) {
-		if (is_abbrev(field_arg, "keywords")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
 			set_obj_keywords(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
@@ -1340,6 +1362,10 @@ void script_modify(char *argument) {
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
+		else if (!*value && !is_abbrev(field_arg, "magic-growth")) {
+			// these MOSTLY require a value
+			script_log("%%mod%% called without value argument");
+		}
 		else if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
@@ -1377,13 +1403,29 @@ void script_modify(char *argument) {
 				set_room_custom_description(room, temp);
 			}
 		}
+		else if (is_abbrev(field_arg, "magic-growth")) {
+			// attempt a magic growth evolution
+			if ((evo = get_evolution_by_type(SECT(room), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
+				preserve = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
+				change_terrain(room, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
+				remove_depletion(room, DPLTN_PICK);
+				remove_depletion(room, DPLTN_FORAGE);
+			}
+			else {
+				// currently just fails silently if no evolution is present or is rolled on the random chance
+			}
+		}
 		else {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
 		}
 	}
 	// VEHICLE MODE
 	else if ((veh = get_vehicle(targ_arg))) {
-		if (is_abbrev(field_arg, "icon")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}

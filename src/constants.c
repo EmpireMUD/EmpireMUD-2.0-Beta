@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.172";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.0";
+const char *version = "EmpireMUD 2.0 beta 5.173";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.1";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -107,8 +107,23 @@ const char *reboot_strings[] = {
 };
 
 
-// for the reboot_control -- SCMD_REBOOT, SCMD_SHUTDOWN
-const char *reboot_type[] = { "reboot", "shutdown" };
+// REBOOT_x: reboot modes
+const char *reboot_types[] = {
+	"none",
+	"reboot",
+	"shutdown",
+	"\n"
+};
+
+
+// SHUTDOWN_x
+const char *shutdown_types[] = {
+	"normal",
+	"pause",
+	"die",
+	"complete",
+	"\n"
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2449,6 +2464,8 @@ const char *empire_admin_flags[] = {
 	"!WAR",
 	"!STEAL",
 	"CITY-CLAIMS-ONLY",
+	"!RENAME",
+	"DID-NEWBIE-MOVE",
 	"\n"
 };
 
@@ -2724,6 +2741,7 @@ const bool generic_types_uses_in_dev[] = {
 const char *generic_flags[] = {
 	"BASIC",	// 0
 	"IN-DEVELOPMENT",
+	"SHOW-ADVENTURE",
 	"\n"
 };
 
@@ -3638,6 +3656,7 @@ const char *quest_flags[] = {
 	"TUTORIAL",
 	"GROUP-COMPLETION",
 	"EVENT",
+	"IN-CITY-ONLY",	// 10
 	"\n"
 };
 
@@ -4424,10 +4443,10 @@ const char *room_extra_types[] = {
 	"mine amount",
 	"fire remaining",
 	"seed time",
-	"tavern type",
-	"tavern brewing time",	// 5
-	"tavern available time",
-	"ruins icon",
+	"tavern type",	// unused
+	"tavern brewing time",	// 5		// unused
+	"tavern available time",	// unused
+	"ruins icon",	// unused
 	"chop progress",
 	"trench progress",
 	"harvest progress",	// 10
@@ -5388,16 +5407,6 @@ const char *month_name[] = {
 const char *offon_types[] = {
 	"off",
 	"on",
-	"\n"
-};
-
-
-// SHUTDOWN_x
-const char *shutdown_types[] = {
-	"normal",
-	"pause",
-	"die",
-	"complete",
 	"\n"
 };
 

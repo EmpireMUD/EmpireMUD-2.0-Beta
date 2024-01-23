@@ -1109,7 +1109,7 @@ done
 ~
 #12538
 Other adventurer load~
-0 nx 100
+0 n 100
 ~
 if %self.room.template% == 12504
   %morph% %self% 12504

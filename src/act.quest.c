@@ -364,6 +364,8 @@ bool fail_daily_quests(char_data *ch, bool event) {
 * @return quest_data* The matching quest, or NULL if none.
 */
 quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
+	bool had_number;
+	int number;
 	struct player_completed_quest *pcq, *next_pcq;
 	quest_data *quest, *abbrev = NULL;
 	
@@ -371,17 +373,25 @@ quest_data *find_completed_quest_by_name(char_data *ch, char *argument) {
 		return NULL;	// no quests for mobs
 	}
 	
+	had_number = isdigit(*argument) ? TRUE : FALSE;
+	number = get_number(&argument);
+	
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
 		if (!(quest = quest_proto(pcq->vnum))) {
 			continue;
 		}
 		
-		if (!str_cmp(argument, QUEST_NAME(quest))) {
+		if (!str_cmp(argument, QUEST_NAME(quest)) && --number <= 0) {
 			// exact match
 			return quest;
 		}
-		else if (!abbrev && multi_isname(argument, QUEST_NAME(quest))) {
+		else if (multi_isname(argument, QUEST_NAME(quest)) && ((had_number && --number <= 0) || (!had_number && !abbrev))) {
 			abbrev = quest;
+			
+			if (had_number && number <= 0) {
+				// if they requested it by number, just return it now
+				return abbrev;
+			}
 		}
 	}
 	
@@ -645,7 +655,7 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 			free(buf2);
 		}
 		
-		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s\r\n", buf);
+		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s%s\r\n", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
 	}
 	
 	if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
@@ -968,7 +978,7 @@ QCMD(qcmd_info) {
 
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
-	struct quest_temp_list *quest_list = NULL;
+	struct quest_temp_list *quest_list = NULL, *qtl;
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
@@ -979,7 +989,7 @@ QCMD(qcmd_list) {
 		msg_to_char(ch, "%s\r\n", show_daily_quest_line(ch));
 		
 		if ((quest_list = build_available_quest_list(ch))) {
-			msg_to_char(ch, "Try 'quest start' to see a list of available quests here.\r\n");
+			msg_to_char(ch, "Try typing 'start' to see a list of available quests here.\r\n");
 			free_quest_temp_list(quest_list);
 		}
 		return;
@@ -1015,6 +1025,15 @@ QCMD(qcmd_list) {
 	
 	// show dailies status, too
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", show_daily_quest_line(ch));
+	
+	// any quests available here?
+	quest_list = build_available_quest_list(ch);
+	if (quest_list) {
+		count = 0;
+		LL_COUNT(quest_list, qtl, count);
+		size += snprintf(buf + size, sizeof(buf) - size, "There are %d quest%s available here%s.\r\n", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
+	}
+	free_quest_temp_list(quest_list);
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
@@ -1271,13 +1290,15 @@ ACMD(do_quest) {
 	arg_ptr = any_one_arg(argument, cmd_arg);
 	skip_spaces(&arg_ptr);
 	if (!*cmd_arg) {
-		msg_to_char(ch, "Available options: ");
-		found = FALSE;
-		for (iter = 0; *quest_cmd[iter].command != '\n'; ++iter) {
-			msg_to_char(ch, "%s%s", (found ? ", " : ""), quest_cmd[iter].command);
-			found = TRUE;
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "Available options: ");
+			found = FALSE;
+			for (iter = 0; *quest_cmd[iter].command != '\n'; ++iter) {
+				msg_to_char(ch, "%s%s", (found ? ", " : ""), quest_cmd[iter].command);
+				found = TRUE;
+			}
+			msg_to_char(ch, "\r\n");
 		}
-		msg_to_char(ch, "\r\n");
 		qcmd_list(ch, "");
 		return;
 	}

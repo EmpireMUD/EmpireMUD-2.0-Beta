@@ -620,7 +620,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 void update_biting_char(char_data *ch) {
 	char_data *victim;
 	obj_data *corpse;
-	double bonus = 1.0;
+	double bonus = 1.0, percent_lost;
 	int amount, hamt;
 
 	if (!(victim = GET_FEEDING_FROM(ch)))
@@ -645,6 +645,7 @@ void update_biting_char(char_data *ch) {
 	
 	// check limits and set blood
 	amount = MIN(amount, GET_BLOOD(victim));
+	percent_lost = (double)amount / (double)GET_MAX_BLOOD(victim);
 	set_blood(victim, GET_BLOOD(victim) - amount);
 	
 	// can gain more
@@ -655,13 +656,13 @@ void update_biting_char(char_data *ch) {
 	
 	// bite regeneration ptech: 10% heal to h/m/v per drink when biting humans
 	if ((!IS_NPC(victim) || MOB_FLAGGED(victim, MOB_HUMAN)) && has_player_tech(ch, PTECH_BITE_REGENERATION)) {
-		hamt = ceil(GET_MAX_HEALTH(ch) / 10.0 * (amount / 10.0));
+		hamt = ceil(GET_MAX_HEALTH(ch) * percent_lost);
 		heal(ch, ch, hamt);
 		
-		hamt = ceil(GET_MAX_MANA(ch) / 10 * (amount / 10.0));
+		hamt = ceil(GET_MAX_MANA(ch) * percent_lost);
 		set_mana(ch, GET_MANA(ch) + hamt);
 		
-		hamt = ceil(GET_MAX_MOVE(ch) / 10 * (amount / 10.0));
+		hamt = ceil(GET_MAX_MOVE(ch) * percent_lost);
 		set_move(ch, GET_MOVE(ch) + hamt);
 	}
 

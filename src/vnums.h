@@ -42,16 +42,6 @@
 #define BOARD_MORT  1
 #define BOARD_IMM  2
 
-// Natural resources
-#define o_WHEAT  141
-#define o_HOPS  143
-#define o_BARLEY  145
-
-// brewing items
-#define o_APPLES  3002
-#define o_PEACHES  3004
-#define o_CORN  3005
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -177,8 +167,4 @@
 
 // LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)
 #define LIQ_WATER  0
-#define LIQ_LAGER  1
-#define LIQ_WHEATBEER  2
-#define LIQ_ALE  3
-#define LIQ_CIDER  4
 #define LIQ_MILK  5

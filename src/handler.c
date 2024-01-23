@@ -1706,7 +1706,7 @@ void extract_char_final(char_data *ch) {
 		if (MOB_PURSUIT(ch)) {
 			while ((purs = MOB_PURSUIT(ch))) {
 				MOB_PURSUIT(ch) = purs->next;
-				free(purs);
+				free_pursuit(purs);
 			}
 			MOB_PURSUIT(ch) = NULL;
 		}
@@ -3641,8 +3641,9 @@ void perform_abandon_room(room_data *room) {
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
 	}
-	else {	// other building types
-		check_tavern_setup(room);
+	else {
+		// other building types
+		
 	}
 	
 	affect_total_room(room);
@@ -11072,10 +11073,6 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	LAST_OWNER_ID(obj) = NOBODY;
 	obj->last_empire_id = NOTHING;
 	empty_obj_before_extract(obj);
-	if (IS_DRINK_CONTAINER(obj)) {
-		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, 0);
-		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, LIQ_WATER);
-	}
 	
 	// SEV_x: events that must be canceled when an item is stored
 	cancel_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_AUTOSTORE);

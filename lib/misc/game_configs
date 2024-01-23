@@ -216,10 +216,12 @@ summon_npc_limit 5
 tracks_lifespan 60
 *
 * System configs
+autoreboot_minutes 0
 log_losing_descriptor_without_char 0
 max_bad_pws 3
 max_filesize 50000
 nameserver_is_slow 0
+reboot_warning_minutes 15
 siteok_everyone 0
 use_autowiz 1
 *
@@ -240,8 +242,9 @@ hostile_login_delay 30
 mutual_war_only 0
 offense_min_to_war 0
 offenses_for_free_war 200
-rogue_flag_time 1440
+pk_mode b
 pvp_timer 5
+rogue_flag_time 1440
 seconds_per_death 30
 steal_death_penalty 60
 stolen_object_timer 30

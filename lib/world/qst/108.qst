@@ -1398,10 +1398,12 @@ place to complete some tutorials, level some skills, and learn the game.
    When you've done all that and you're ready to leave, craft a canoe (Basic
 Crafts) or find a raft (surely one of those goblins sells one). You'll only
 be able to take what you can carry, but any items you stored on the newbie
-island will be safe there. Abandon your newbie island claims (use the territory
-command to find them) because you'll need to be able to claim in your new
-location (type estats to see your claim limits). Use these tips to find a good
-home:
+island will be safe there until you found a city. Abandon your newbie island
+claims (use the territory command to find them) because you'll need to be able
+to claim in your new location (type estats to see your claim limits).
+   When you found your empire's first city out in the world, any items you
+stored on a newbie island will be transferred there automatically.
+Use these tips to find a good home:
 - Check the game's website for a world map to help you find a location.
 - Use the 'mapscan' command to find out what lies beyond the sea.
 - Choose a continent (not an island) for your city. Continents have better

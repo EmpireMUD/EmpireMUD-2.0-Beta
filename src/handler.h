@@ -546,6 +546,7 @@ double config_get_double(char *key);
 int config_get_int(char *key);
 int *config_get_int_array(char *key, int *array_size);
 const char *config_get_string(char *key);
+int config_get_type(char *key);
 
 // faction.c
 int compare_reptuation(int rep_a, int rep_b);
@@ -579,6 +580,9 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 // limits.c
 INTERACTION_FUNC(consumes_or_decays_interact);
 int limit_crowd_control(char_data *victim, int atype);
+
+// mobact.c
+void free_pursuit(struct pursuit_data *purs);
 
 // morph.c
 void perform_morph(char_data *ch, morph_data *morph);

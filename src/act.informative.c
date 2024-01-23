@@ -40,6 +40,9 @@
 // external protos
 ACMD(do_weather);
 
+void mudstats_configs(char_data *ch, char *argument);
+void mudstats_empires(char_data *ch, char *argument);
+
 // local protos
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
@@ -1702,7 +1705,7 @@ char *obj_color_by_quality(obj_data *obj, char_data *ch) {
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	static char output[MAX_STRING_LENGTH];
-	char sdesc[MAX_STRING_LENGTH];
+	char sdesc[MAX_STRING_LENGTH], liqname[256];
 	bool color = FALSE;
 	
 	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_WAREHOUSE)) {
@@ -1717,7 +1720,11 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	*sdesc = '\0';
 
 	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && (mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_WAREHOUSE)) {
-		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		strcpy(liqname, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		if (!strstr(GET_OBJ_SHORT_DESC(obj), liqname)) {
+			// only if it's not already in the name
+			sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), liqname);
+		}
 	}
 	else if (IS_AMMO(obj)) {
 		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_AMMO_QUANTITY(obj)));
@@ -2265,7 +2272,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	WHO_SORTER(*who_sorters[3]) = { NULL, sort_who_level, sort_who_access_level };
 	
 	// set sorters
-	switch (config_get_int("who_list_sort")) {
+	switch (config_get_type("who_list_sort")) {
 		case WHO_LIST_SORT_LEVEL: {
 			who_sorters[WHO_MORTALS] = sort_who_level;
 			break;
@@ -2816,10 +2823,12 @@ ACMD(do_chart) {
 
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64], adv_part[128];
 	struct player_currency *cur, *next_cur;
 	bool any = FALSE;
 	size_t size = 0;
+	adv_data *adv;
+	generic_data *gen;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs don't carry coins.\r\n");
@@ -2843,6 +2852,13 @@ ACMD(do_coins) {
 				continue; // no keyword match
 			}
 			
+			if ((gen = real_generic(cur->vnum)) && GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(cur->vnum))) {
+				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
+			}
+			else {
+				*adv_part = '\0';
+			}
+			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", cur->vnum);
 			}
@@ -2850,7 +2866,7 @@ ACMD(do_coins) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "%s%3d %s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+			snprintf(line, sizeof(line), "%s%3d %s%s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
 			any = TRUE;
 			
 			if (size + strlen(line) < sizeof(buf)) {
@@ -3273,16 +3289,16 @@ ACMD(do_inventory) {
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
-		bool kept = FALSE, not_kept = FALSE;
+		bool kept = FALSE, not_kept = FALSE, bound = FALSE, unbound = FALSE;
 		generic_data *cmp = NULL;
 		obj_data *obj;
 		size_t size;
-		int count;
+		int count, to_show = -1;
 		
 		*heading = '\0';
 		
 		// parse flag if any
-		if (*argument == '-') {
+		while (*argument == '-') {
 			switch (*(argument+1)) {
 				case 'c': {
 					argument += 2;	// skip past -c
@@ -3299,7 +3315,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "Items of type '%s':", GEN_NAME(cmp));
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s':", (*heading ? ", " : ""), GEN_NAME(cmp));
 					break;
 				}
 				case 'w': {
@@ -3314,7 +3330,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "Items worn on %s:", wear_bits[wear_type]);
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s:", (*heading ? ", " : ""), wear_bits[wear_type]);
 					break;
 				}
 				case 't': {
@@ -3329,21 +3345,35 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "%s items:", item_types[type_type]);
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s%s", (*heading ? ", " : ""), item_types[type_type]);
 					break;
 				}
 				case 'k': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					kept = TRUE;
-					snprintf(heading, sizeof(heading), "Items marked (keep):");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%skept", (*heading ? ", " : ""));
 					break;
 				}
 				case 'n': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					not_kept = TRUE;
-					snprintf(heading, sizeof(heading), "Items not marked (keep):");
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%snot kept", (*heading ? ", " : ""));
+					break;
+				}
+				case 'b': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					bound = TRUE;
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sbound", (*heading ? ", " : ""));
+					break;
+				}
+				case 'u': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					unbound = TRUE;
+					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sunbound BoE", (*heading ? ", " : ""));
 					break;
 				}
 				case 'i': {
@@ -3352,21 +3382,46 @@ ACMD(do_inventory) {
 					msg_to_char(ch, "Note: inventory -i is no longer supported. Use 'toggle item-details' instead.\r\n");
 					break;
 				}
+				default: {
+					if (isdigit(*(argument+1))) {
+						// only show this many
+						to_show = atoi(argument+1);
+						to_show = MAX(1, to_show);
+						
+						snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sfirst %d", (*heading ? ", " : ""), to_show);
+						
+						// peel off the first arg
+						argument = one_argument(argument, arg);
+					}
+					else {
+						// remove arg
+						argument = one_argument(argument, arg);
+					}
+					break;
+				}
 			}
+			
+			// skip spaces and repeat
+			skip_spaces(&argument);
 		}
 		
 		// if we get this far, it's okay
 		skip_spaces(&argument);
-		if (!*heading && *argument) {
-			snprintf(heading, sizeof(heading), "Items matching '%s':", argument);
-		}
-		else if (!*heading && !*argument) {
-			snprintf(heading, sizeof(heading), "Items:");
-		}
-		
-		// build string
-		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
 		count = 0;
+		
+		// start the string
+		if (*argument && *heading) {
+			size = snprintf(buf, sizeof(buf), "%s items matching '%s':\r\n", CAP(heading), argument);
+		}
+		else if (*argument) {
+			size = snprintf(buf, sizeof(buf), "Items matching '%s':\r\n", argument);
+		}
+		else if (*heading) {
+			size = snprintf(buf, sizeof(buf), "%s items:\r\n", CAP(heading));
+		}
+		else {
+			size = snprintf(buf, sizeof(buf), "Items:\r\n");
+		}
 		
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			// break out early
@@ -3394,9 +3449,20 @@ ACMD(do_inventory) {
 			if (not_kept && OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				continue;	// not matching no-keep flag
 			}
+			if (bound && !OBJ_BOUND_TO(obj)) {
+				continue;	// isn't bound
+			}
+			if (unbound && (OBJ_BOUND_TO(obj) || !OBJ_FLAGGED(obj, OBJ_BIND_FLAGS))) {
+				continue;	// not an unbound bindable
+			}
 			
 			// looks okay
 			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
+			
+			// shown enough?
+			if (to_show > 0 && count >= to_show) {
+				break;
+			}
 		}
 		
 		if (ch->desc) {
@@ -3716,6 +3782,7 @@ ACMD(do_mudstats) {
 		char *name;
 		void (*func)(char_data *ch, char *argument);
 	} stat_list[] = {
+		{ "configs", mudstats_configs },
 		{ "empires", mudstats_empires },
 		
 		// last

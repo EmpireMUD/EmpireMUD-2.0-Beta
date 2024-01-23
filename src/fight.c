@@ -40,7 +40,6 @@
 
 // external vars
 extern bool catch_up_combat;
-extern bitvector_t pk_ok;
 
 // external funcs
 ACMD(do_flee);
@@ -299,7 +298,7 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 * @return double The basic speed for the character.
 */
 double get_base_speed(char_data *ch, int pos) {
-	obj_data *weapon = GET_EQ(ch, pos);
+	obj_data *weapon = AFF_FLAGGED(ch, AFF_DISARMED) ? NULL : GET_EQ(ch, pos);
 	double base = 3.0;
 	int w_type;
 	attack_message_data *amd;
@@ -332,7 +331,7 @@ double get_base_speed(char_data *ch, int pos) {
 * @return double Get the composite combat speed for that slot.
 */
 double get_combat_speed(char_data *ch, int pos) {
-	obj_data *weapon = GET_EQ(ch, pos);
+	obj_data *weapon = AFF_FLAGGED(ch, AFF_DISARMED) ? NULL : GET_EQ(ch, pos);
 	double base = get_base_speed(ch, pos);
 	
 	// ability mods: player only
@@ -2527,6 +2526,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
  * aren't spammed.
  */
 bool can_fight(char_data *ch, char_data *victim) {
+	bitvector_t pk_mode;
 	empire_data *ch_emp, *victim_emp;
 	obj_data *obj;
 
@@ -2638,19 +2638,26 @@ bool can_fight(char_data *ch, char_data *victim) {
 	}
 
 	// cascading order of pk modes
+	pk_mode = config_get_bitvector("pk_mode");
 	
-	if (IS_SET(pk_ok, PK_FULL))
+	if (IS_SET(pk_mode, PK_OPEN)) {
+		// formerly PK_FULL
 		return TRUE;
-
-	if (IS_SET(pk_ok, PK_WAR)) {
-		if (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY)) {
-			return TRUE;
-		}
-
-		/* owned territory */
-		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) && !can_use_room(victim, IN_ROOM(victim), GUESTS_ALLOWED)) {
-			return TRUE;
-		}
+	}
+	if (IS_SET(pk_mode, PK_WAR) && (has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(victim_emp, ch_emp, DIPL_THIEVERY))) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_DISTRUST) && (has_relationship(ch_emp, victim_emp, DIPL_DISTRUST) || has_relationship(ch_emp, victim_emp, DIPL_WAR) || has_relationship(ch_emp, victim_emp, DIPL_THIEVERY))) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_EMPIRE_OFFENSES) && get_total_offenses_from_empire(ch_emp, victim_emp) > 0) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_PERSONAL_OFFENSES) && get_total_offenses_from_char(ch_emp, victim) > 0) {
+		return TRUE;
+	}
+	if (IS_SET(pk_mode, PK_TRESPASSERS) && can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) && !can_use_room(victim, IN_ROOM(victim), GUESTS_ALLOWED)) {
+		return TRUE;
 	}
 
 	/* Oops... we shouldn't be fighting */

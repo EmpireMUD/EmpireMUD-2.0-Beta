@@ -912,7 +912,7 @@ The Tavern~
 10 0 pR 0
 0 0 0 220
 C
-fill, tavern~
+inventory, retrieve, store~
 D
    Business is roaring at all hours as serfs and nobles alike pull up stools
 to drink, play cards, laugh, and brawl. The building is wooden, but most of the

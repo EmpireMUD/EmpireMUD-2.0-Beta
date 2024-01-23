@@ -154,7 +154,8 @@ struct wear_data_type {
 extern const char *level_names[][2];
 extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
-extern const char *reboot_type[];
+extern const char *reboot_types[];
+extern const char *shutdown_types[];
 extern const char *version;
 extern const char *DG_SCRIPT_VERSION;
 
@@ -455,7 +456,6 @@ extern const char *reserved_words[];
 extern const char *weekdays[];
 extern const char *month_name[];
 extern const char *offon_types[];
-extern const char *shutdown_types[];
 extern const char *vehicle_flags[];
 extern const char *identify_vehicle_flags[];
 extern const char *veh_custom_types[];
@@ -467,7 +467,6 @@ extern const char *wait_types[];
 extern const struct action_data_struct action_data[];
 
 // act.empire.c
-extern const struct tavern_data_type tavern_data[];
 
 // act.movement.c
 extern const char *cmd_door[];
@@ -481,6 +480,7 @@ extern const int base_player_pools[NUM_POOLS];
 extern const char *book_name_list[];
 extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
+extern const char *pk_modes[];
 extern const int primary_attributes[];
 extern struct promo_code_list promo_codes[];
 extern const int round_level_scaling_to_nearest;

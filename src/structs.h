@@ -759,15 +759,6 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_REL_FORCE_UPGRADE_VEH  5	// automatically upgrades on-reboot
 
 
-// tavern types
-#define BREW_NONE 0
-#define BREW_ALE  1
-#define BREW_LAGER  2
-#define BREW_WHEATBEER  3
-#define BREW_CIDER  4
-#define NUM_BREWS  5	// total
-
-
 // Designate flags -- DES_x -- can only designate if building and room both have a matching flag
 #define DES_CRYPT			BIT(0)
 #define DES_VAULT			BIT(1)
@@ -816,7 +807,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
 #define FNC_TAILOR  BIT(24)	// counts as tailor for crafts like weaving
 #define FNC_TANNERY  BIT(25)	// allows tanning here
-#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TAVERN  BIT(26)	// for workforce crafting
 #define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
 #define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
 #define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
@@ -832,7 +823,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_APOTHECARY  BIT(39)	// for use in crafts
 
 // These function flags don't work on movable vehicles (they require room data)
-#define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
+#define IMMOBILE_FNCS  (FNC_MINE | FNC_TOMB | FNC_LIBRARY)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1070,6 +1061,8 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
 #define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
+#define EADM_NO_RENAME  BIT(3)	// cannot change name/adjective/description
+#define EADM_DID_NEWBIE_MOVE  BIT(4)	// empire got its free move from the newbie island
 
 
 // EATT_x: empire attributes
@@ -1338,8 +1331,8 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_DESPAWN  1	// mob despawn
 #define SEV_BURN_DOWN  2	// for buildings
 #define SEV_GROW_CROP  3	// normal crop growth time
-#define SEV_TAVERN  4	// tavern resource use timer
-#define SEV_RESET_TRIGGER  5	// for tavern resets
+	#define SEV_UNUSED4  4	// was tavern; now unused
+#define SEV_RESET_TRIGGER  5	// for scripting reset triggers
 #define SEV_PURSUIT  6	// mob pursuing a target
 #define SEV_MOVEMENT  7	// normal mob movement
 #define SEV_AGGRO  8	// aggro or cityguard mobs
@@ -1424,11 +1417,13 @@ typedef struct vehicle_data vehicle_data;
 #define LVL_TO_SEE_ACCOUNTS  LVL_CIMPL
 
 
-// Player killing options (config.c)
-#define PK_NONE  NOBITS
-#define PK_WAR  BIT(0)	// pk when at war
-#define PK_FULL  BIT(1)	// all pk all the time
-#define PK_REVENGE  BIT(2)	// pk when someone has pk'd you
+// PK_x: Player killing options for config_get_bitvector("pk_mode")
+#define PK_OPEN					BIT(0)	// a. all pk all the time
+#define PK_WAR					BIT(1)	// b. pk when at war
+#define PK_TRESPASSERS			BIT(2)	// c. when someone is on your land (or an ally's)
+#define PK_DISTRUST				BIT(3)	// d. when in a state of distrust
+#define PK_EMPIRE_OFFENSES		BIT(4)	// e. empire has any offenses against you
+#define PK_PERSONAL_OFFENSES	BIT(5)	// f. character has any offenses against you
 
 
 // mud-life time
@@ -1479,7 +1474,15 @@ typedef struct vehicle_data vehicle_data;
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
 
-// shutdown types
+// REBOOT_x: reboot modes
+#define REBOOT_NONE			0	// no reboot is set
+#define REBOOT_REBOOT		1	// reboot mode
+#define REBOOT_SHUTDOWN		2	// shutdown mode
+
+#define REBOOT_IS_SET()		(reboot_control.type != REBOOT_NONE && (reboot_control.immediate || reboot_control.time >= 0))
+
+
+// SHUTDOWN_x: shutdown types
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
@@ -1504,6 +1507,7 @@ typedef struct vehicle_data vehicle_data;
 // GEN_x: generic flags
 #define GEN_BASIC  BIT(0)	// a. indicates it's basic (varies by type)
 #define GEN_IN_DEVELOPMENT  BIT(1)	// b. disables SOME types -- see generic_types_uses_in_dev[]
+#define GEN_SHOW_ADVENTURE  BIT(2)	// c. for some types, shows what adventure they came from
 
 
 // how many strings a generic stores (can be safely raised with no updates)
@@ -2638,6 +2642,7 @@ typedef enum {
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 #define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
+#define QST_IN_CITY_ONLY  BIT(10)	// requires that it's in a city
 
 
 // QG_x: quest giver types
@@ -3005,9 +3010,9 @@ typedef enum {
 #define ROOM_EXTRA_MINE_AMOUNT  1
 #define ROOM_EXTRA_FIRE_REMAINING  2
 #define ROOM_EXTRA_SEED_TIME  3
-#define ROOM_EXTRA_TAVERN_TYPE  4
-#define ROOM_EXTRA_TAVERN_BREWING_TIME  5
-#define ROOM_EXTRA_TAVERN_AVAILABLE_TIME  6
+	#define ROOM_EXTRA_UNUSED4  4	// formerly tavern type
+	#define ROOM_EXTRA_UNUSED5  5	// formerly tavern brewing time
+	#define ROOM_EXTRA_UNUSED6  6	// formerly tavern available time
 	#define ROOM_EXTRA_UNUSED  7	// formerly ruins-icon
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
@@ -4316,6 +4321,10 @@ struct pursuit_data {
 	time_t last_seen;	// time of last spotting
 	room_vnum location;	// prevents tracking forever
 	
+	// possible complications:
+	char *disguise;
+	any_vnum morph;
+	
 	struct pursuit_data *next;
 };
 
@@ -5210,14 +5219,6 @@ struct empire_chore_type {
 };
 
 
-// for BREW_x
-struct tavern_data_type {
-	char *name;
-	int liquid;
-	int ingredients[3];
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE STRUCTS //////////////////////////////////////////////////////////
 
@@ -5819,9 +5820,9 @@ struct player_faction_data {
 
 // For reboots/shutdowns
 struct reboot_control_data {
-	int type;	// SCMD_REBOOT, SCMD_SHUTDOWN
+	int type;	// REBOOT_NONE, REBOOT_REBOOT, REBOOT_SHUTDOWN
 	int time;	// minutes
-	int level;	// REBOOT_NORMAL, PAUSE, DIE
+	int level;	// SHUTDOWN_NORMAL, SHUTDOWN_PAUSE, SHUTDOWN_DIE, SHUTDOWN_COMPLETE
 	int immediate;	// TRUE/FALSE for instant reboot
 };
 

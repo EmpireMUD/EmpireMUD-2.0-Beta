@@ -1119,15 +1119,17 @@ WCMD(do_wquest) {
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = find_instance_by_room(room, FALSE, FALSE);
-	int number = 0;
+	int number = 0, pos;
+	book_data *book;
+	empire_data *emp;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	room_data *in_room;
 	vehicle_data *veh;
+	struct empire_storage_data *store;
 	char *target;
-	int pos;
 
 	target = two_arguments(argument, arg1, arg2);
 	skip_spaces(&target);
@@ -1172,110 +1174,53 @@ WCMD(do_wload) {
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		load_mtrigger(mob);
 	}
-	else if (is_abbrev(arg1, "object")) {
-		if (!obj_proto(number)) {
-			wld_log(room, "wload: bad object vnum");
-			return;
-		}
-		object = read_object(number, TRUE);
-		
-		if (inst) {
-			instance_obj_setup(inst, object);
-		}
-		
-		/* special handling to make objects able to load on a person/in a container/worn etc. */
-		if (!target || !*target) {
-			obj_to_room(object, room);
-
-			// adventure is level-locked?		
-			if (inst && INST_LEVEL(inst) > 0) {
-				scale_item_to_level(object, INST_LEVEL(inst));
-			}
-		
-			load_otrigger(object);
-			return;
-		}
-
-		target = two_arguments(target, arg1, arg2); /* recycling ... */
-		skip_spaces(&target);
-		
-		// if they're picking a room, move arg2 down a slot to "target" level
-		in_room = NULL;
-		if (!str_cmp(arg1, "room")) {
-			in_room = room;
-			target = arg2;
-		}
-		else if (*arg1 == UID_CHAR) {
-			if ((in_room = get_room(room, arg1))) {
-				target = arg2;
-			}
-		}
-		else {	// not targeting a room
-			in_room = NULL;
-		}
-		
-		// scaling on request
-		if (*target && isdigit(*target)) {
-			scale_item_to_level(object, atoi(target));
-		}
-		else if (inst && INST_LEVEL(inst) > 0) {
-			// scaling by locked adventure
-			scale_item_to_level(object, INST_LEVEL(inst));
-		}
-		
-		if (in_room) {	// load in room
-			obj_to_room(object, in_room); 
-			load_otrigger(object);
-			return;
-		}
-		
-		tch = get_char_in_room(room, arg1);
-		if (tch) {
-			// mark as "gathered" like a resource
-			if (!IS_NPC(tch) && GET_LOYALTY(tch)) {
-				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
-			}
-			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
-				equip_char(tch, object, pos);
-				load_otrigger(object);
-				// get_otrigger(object, tch, FALSE);
-				determine_gear_level(tch);
+	else if (is_abbrev(arg1, "object") || is_abbrev(arg1, "book") || is_abbrev(arg1, "einventory")) {
+		// object, book, or empire resource
+		if (is_abbrev(arg1, "object")) {
+			if (!obj_proto(number)) {
+				wld_log(room, "wload: bad object vnum");
 				return;
 			}
-			obj_to_char(object, tch);
-			if (load_otrigger(object)) {
-				get_otrigger(object, tch, FALSE);
+			object = read_object(number, TRUE);
+		}
+		else if (is_abbrev(arg1, "book")) {
+			if (!str_cmp(arg2, "lost")) {
+				book = random_lost_book();
 			}
-			return;
+			else {
+				book = book_proto(number);
+			}
+			
+			if (!book) {
+				wld_log(room, "wload: bad book vnum%s", !str_cmp(arg2, "lost") ? " - no lost books" : "");
+				return;
+			}
+			
+			object = create_book_obj(book);
 		}
-		cnt = get_obj_in_room(room, arg1);
-		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
-			obj_to_obj(object, cnt);
-			load_otrigger(object);
-			return;
-		}
-		/* neither char nor container found - just dump it in room */
-		obj_to_room(object, room); 
-		load_otrigger(object);
-		return;
-	}
-	else if (is_abbrev(arg1, "book")) {
-		book_data *book;
-		
-		if (!str_cmp(arg2, "lost")) {
-			book = random_lost_book();
+		else if (is_abbrev(arg1, "einventory")) {
+			// %load% einv <vnum> <empire> [target]
+			target = any_one_word(target, emp_arg);
+			if (!*emp_arg || !(emp = get_empire(emp_arg))) {
+				wld_log(room, "wload: bad empire '%s'", emp_arg);
+				return;
+			}
+			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), number)) || store->amount < 1) {
+				wld_log(room, "wload: empire has no stored #%d on island %d", number, GET_ISLAND_ID(room));
+				return;
+			}
+			
+			// ok: charge it
+			charge_stored_resource(emp, GET_ISLAND_ID(room), number, 1, TRUE);
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			// and load it
+			object = read_object(number, TRUE);
 		}
 		else {
-			book = book_proto(number);
-		}
-		
-		if (!book) {
-			wld_log(room, "wload: bad book vnum%s", !str_cmp(arg2, "lost") ? " - no lost books" : "");
+			wld_log(room, "wload: bad object type ??");
 			return;
 		}
-		
-		object = create_book_obj(book);
 		
 		if (inst) {
 			instance_obj_setup(inst, object);

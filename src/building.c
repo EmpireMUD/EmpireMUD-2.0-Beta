@@ -631,9 +631,6 @@ void disassociate_building(room_data *room) {
 	
 	// some extra data safely clears now
 	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
-	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
@@ -643,7 +640,6 @@ void disassociate_building(room_data *room) {
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
-	cancel_stored_event_room(room, SEV_TAVERN);
 	cancel_stored_event_room(room, SEV_RESET_TRIGGER);
 	
 	// disassociate inside rooms

@@ -36,7 +36,6 @@
 *   Inspire Helpers
 *   Islands Helpers
 *   Land Management
-*   Tavern Helpers
 *   Territory Helpers
 *   Empire Commands
 */
@@ -45,7 +44,7 @@
 extern struct empire_chore_type chore_data[NUM_CHORES];
 
 // external funcs
-void check_nowhere_einv(empire_data *emp, int new_island);
+void check_einv_auto_move(empire_data *emp, int new_island);
 bool empire_is_ignoring(empire_data *emp, char_data *victim);
 void warehouse_inventory(char_data *ch, char *argument, int mode);
 void warehouse_identify(char_data *ch, char *argument, int mode);
@@ -2276,7 +2275,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	affect_total_room(city->location);
 	
 	// move einv here if any is lost
-	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
+	check_einv_auto_move(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -3194,89 +3193,6 @@ const struct manage_data_type manage_vehicle_data[] = {
 MANAGE_FUNC(mng_nowork) {
 	if (on && ROOM_OWNER(IN_ROOM(ch))) {
 		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
-	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// TAVERN HELPERS //////////////////////////////////////////////////////////
-
-// for do_tavern, BREW_x
-const struct tavern_data_type tavern_data[] = {
-	{ "nothing", 0, { NOTHING } },
-	{ "ale", LIQ_ALE, { o_BARLEY, o_HOPS, NOTHING } },
-	{ "lager", LIQ_LAGER, { o_CORN, o_HOPS, NOTHING } },
-	{ "wheatbeer", LIQ_WHEATBEER, { o_WHEAT, o_BARLEY, NOTHING } },
-	{ "cider", LIQ_CIDER, { o_APPLES, o_PEACHES, NOTHING } },
-	
-	{ "\n", 0, { NOTHING } }
-};
-
-
-/**
-* @param room_data *room Tavern
-* @return TRUE if it was able to get resources from an empire, FALSE if not
-*/
-bool extract_tavern_resources(room_data *room) {
-	struct empire_storage_data *store;
-	empire_data *emp = ROOM_OWNER(room);
-	int type = get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-	int iter;
-	bool ok;
-	
-	int cost = 5;
-	
-	if (!emp) {
-		return FALSE;
-	}
-	
-	// check if they can afford it
-	ok = TRUE;
-	for (iter = 0; ok && tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-		store = find_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter]);
-		
-		if (!store || store->amount < cost) {
-			ok = FALSE;
-		}
-	}
-	
-	// extract resources
-	if (ok) {
-		for (iter = 0; tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost, TRUE);
-		}
-	}
-	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	return ok;
-}
-
-
-/**
-* Displays all the empire's taverns to char.
-*
-* @param char_data *ch The person to display to.
-*/
-void show_tavern_status(char_data *ch) {
-	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter, *next_ter;
-	bool found = FALSE;
-	
-	if (!emp) {
-		return;
-	}
-	
-	msg_to_char(ch, "Your taverns:\r\n");
-	
-	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TAVERN)) {
-			found = TRUE;
-			msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-		}
-	}
-	
-	if (!found) {
-		msg_to_char(ch, " none\r\n");
 	}
 }
 
@@ -5543,7 +5459,7 @@ ACMD(do_enroll) {
 		
 		// ensure no lost einv
 		if ((island = get_main_island(e)) != NO_ISLAND) {
-			check_nowhere_einv(e, island);
+			check_einv_auto_move(e, island);
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
@@ -6030,9 +5946,11 @@ room_data *find_home(char_data *ch) {
 
 
 ACMD(do_home) {
+	bool found;
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
 	char_data *targ;
+	player_index_data *index;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	
@@ -6157,6 +6075,25 @@ ACMD(do_home) {
 		queue_delayed_update(ch, CDU_SAVE);
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
+	else if (is_abbrev(command, "list")) {
+		if (!emp) {
+			msg_to_char(ch, "You need to be in an empire to list homes.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Private homes in the empire:\r\n");
+			
+			found = FALSE;
+			HASH_ITER(hh, world_table, iter, next_iter) {
+				if (ROOM_OWNER(iter) == emp && ROOM_PRIVATE_OWNER(iter) != NOBODY) {
+					msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, iter, TRUE), get_room_name(iter, FALSE), ((index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(iter))) ? index->fullname : "<unknown>"));
+					found = TRUE;
+				}
+			}
+			if (!found) {
+				msg_to_char(ch, " none\r\n");
+			}
+		}
+	}
 	else if (is_abbrev(command, "inventory")) {
 		warehouse_inventory(ch, argument, SCMD_HOME);
 	}
@@ -6174,7 +6111,7 @@ ACMD(do_home) {
 		warehouse_store(ch, argument, SCMD_HOME);
 	}
 	else {
-		msg_to_char(ch, "Usage: home [set | unset | clear | inventory | retrieve | store]\r\n");
+		msg_to_char(ch, "Usage: home [set | unset | list | clear | inventory | retrieve | store]\r\n");
 	}
 }
 
@@ -6275,75 +6212,6 @@ ACMD(do_islands) {
 	}
 	
 	page_string(ch->desc, output, TRUE);
-}
-
-
-ACMD(do_tavern) {
-	int iter, type = NOTHING, pos, old;
-	
-	one_argument(argument, arg);
-	
-	if (*arg) {
-		for (iter = 0; type == NOTHING && *tavern_data[iter].name != '\n'; ++iter) {
-			if (is_abbrev(arg, tavern_data[iter].name)) {
-				type = iter;
-			}
-		}
-	}
-	
-	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "This tavern only works in a city.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "Complete the building to change what it's brewing.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-	}
-	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
-		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_WORKFORCE, IN_ROOM(ch))) {
-		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
-	}
-	else if (!*arg || type == NOTHING) {
-		if (*arg && type == NOTHING) {
-			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
-		}
-		else {
-			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
-			show_tavern_status(ch);
-		}
-		send_to_char("You can have it make:\r\n", ch);
-		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
-			msg_to_char(ch, " %s", tavern_data[iter].name);
-			for (pos = 0; tavern_data[iter].ingredients[pos] != NOTHING; ++pos) {
-				msg_to_char(ch, "%s%s", pos > 0 ? " + " : ": ", get_obj_name_by_proto(tavern_data[iter].ingredients[pos]));
-			}
-			send_to_char("\r\n", ch);
-		}
-	}
-	else {
-		old = get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE);
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, type);
-		
-		if (extract_tavern_resources(IN_ROOM(ch))) {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
-			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-			msg_to_char(ch, "This tavern will now brew %s.\r\n", tavern_data[type].name);
-			check_tavern_setup(IN_ROOM(ch));
-		}
-		else {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, old);
-			msg_to_char(ch, "Your empire doesn't have the resources to brew that.\r\n");
-		}
-	}
 }
 
 
@@ -6983,8 +6851,15 @@ ACMD(do_pledge) {
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
-		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
-		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		if (old) {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered to pledge %s to this empire", PERS(ch, ch, TRUE), EMPIRE_NAME(old));
+			log_to_empire(old, ELOG_MEMBERS, "%s has offered to pledge the empire to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(e));
+			msg_to_char(ch, "You offer to pledge %s to %s.\r\n", EMPIRE_NAME(old), EMPIRE_NAME(e));
+		}
+		else {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+			msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		}
 		queue_delayed_update(ch, CDU_SAVE);
 	}
 }

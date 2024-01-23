@@ -1292,7 +1292,8 @@ Usage:  mudstats <option>
 This command displays various statistics about this EmpireMUD.
 
 Options:
- - empires: Shows averages for the numbers used to compute empire scores.
+ configs: Shows how the game is configured.
+ empires: Shows averages for the numbers used to compute empire scores.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
@@ -1345,6 +1346,9 @@ may happen on newbie islands:
   (they may still claim a small number of tiles).
 - The map returns to its natural state each week on the newbie island.
 - Hostile mobs like the highwayman won't attack you on a newbie island.
+
+When you found your empire's first city, anything stored on a newbie island is
+automatically transferred there as a courtesy.
 
 See also: INFO, GETTING STARTED
 #

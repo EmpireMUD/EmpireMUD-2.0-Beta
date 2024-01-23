@@ -231,9 +231,9 @@ the deep-sea feast~
 A feast of deep-sea delights has been spread here.~
 The bounty of deep-sea creatures is impressive. This feast will boost casters.
 ~
-6 m 0 0 0 5
+6 m 0 0 0 6
 96 0 0
-7 336
+7 24
 A
 17 1 0
 A
@@ -626,9 +626,9 @@ a seaweed salad~
 A seaweed salad is drying out on the ground.~
 This lightly-dressed salad smells of the ocean.
 ~
-6 m a 0 0 9
+6 m a 0 0 10
 24 0 0
-7 336
+7 0
 A
 18 1 0
 C

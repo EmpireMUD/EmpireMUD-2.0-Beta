@@ -3188,6 +3188,89 @@ SHOW(show_data) {
 }
 
 
+SHOW(show_editors) {
+	bool any;
+	char output[MAX_STRING_LENGTH], line[256], part[256];
+	int count = 0;
+	size_t size, lsize;
+	char_data *targ;
+	descriptor_data *desc;
+	player_index_data *index;
+	
+	size = snprintf(output, sizeof(output), "Players using editors:\r\n");
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+			continue;	// not in-game
+		}
+		if (GET_INVIS_LEV(targ) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// can't see
+		}
+		
+		// start line in case
+		lsize = snprintf(line, sizeof(line), "%s", GET_NAME(targ));
+		any = FALSE;
+		
+		// olc?
+		if (GET_OLC_TYPE(desc)) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - olc");
+			}
+			else {
+				sprintbit(GET_OLC_TYPE(desc), olc_type_bits, part, FALSE);
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - %s %d", part, GET_OLC_VNUM(desc));
+			}
+		}
+		
+		// string editor?
+		if (desc->str) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+			else if (PLR_FLAGGED(targ, PLR_MAILING)) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - mailing %s", (index = find_player_index_by_idnum(desc->mail_to)) ? index->fullname : "someone");
+			}
+			else if (desc->notes_id > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing notes for account %d", desc->notes_id);
+			}
+			else if (desc->island_desc_id != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing description for island %s", get_island(desc->island_desc_id, TRUE) ? get_island(desc->island_desc_id, TRUE)->name : "???");
+			}
+			else if (desc->file_storage) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing file %s", desc->file_storage);
+			}
+			else if (desc->save_empire != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing empire text for %s", real_empire(desc->save_empire) ? EMPIRE_NAME(real_empire(desc->save_empire)) : "an empire");
+			}
+			else {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+		}
+		
+		if (any && size + lsize + 20 < sizeof(output)) {
+			++count;
+			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+		}
+		else if (any) {
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 SHOW(show_factions) {
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
 	struct player_faction_data *pfd, *next_pfd;
@@ -3439,7 +3522,8 @@ SHOW(show_inventory) {
 	bool all = FALSE, loaded;
 	char_data *load;
 	size_t size, lsize;
-	int count, pos, players;
+	int count, pos, players, empires;
+	empire_data *emp, *next_emp;
 	
 	half_chop(argument, arg1, arg2);
 	all = !str_cmp(arg2, "all") || !str_cmp(arg2, "-all");
@@ -3456,7 +3540,9 @@ SHOW(show_inventory) {
 	else {
 		timer = microtime();
 		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
-		players = 0;
+		players = empires = 0;
+		
+		// players
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			// determine if we should load them
 			if (!all && (time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
@@ -3506,7 +3592,42 @@ SHOW(show_inventory) {
 			}
 		}
 		
-		lsize = snprintf(line, sizeof(line), "(%d player%s, %.2f seconds for search)\r\n", players, PLURAL(players), (microtime() - timer) / 1000000.0);
+		// empires
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
+				continue;	// skip due to timeout
+			}
+			
+			// fresh count: basic storage
+			count = get_total_stored_count(emp, vnum, FALSE);
+			
+			// and unique storage
+			DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
+					// does not have contents in warehouse
+				}
+			}
+			
+			if (count <= 0) {
+				continue;	// nothing to show
+			}
+			
+			// build text
+			lsize = snprintf(line, sizeof(line), "%s%s\t0: %d\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
+			++empires;
+			
+			if (size + lsize + 10 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {	// full
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		lsize = snprintf(line, sizeof(line), "(%d player%s, %d empire%s, %.2f seconds for search)\r\n", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
 		if (size + lsize < sizeof(buf)) {
 			strcat(buf, line);
 		}
@@ -5609,7 +5730,7 @@ SHOW(show_currency) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "%3d %s (%d)\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), cur->vnum);
+				snprintf(line, sizeof(line), "[%5d] %3d %s\r\n", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
@@ -6730,7 +6851,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	}
 	
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
+		get_resource_display(ch, GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
 		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
 	}
 	
@@ -7104,7 +7225,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 
 	// resources
 	msg_to_char(ch, "Resources required:\r\n");
-	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
 	send_to_char(buf, ch);
 }
 
@@ -7482,10 +7603,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
 				msg_to_char(ch, "unknown\r\n");
@@ -10331,7 +10452,7 @@ ACMD(do_peace) {
 			return_to_pursuit_location(iter);
 			
 			LL_FOREACH_SAFE(MOB_PURSUIT(iter), purs, next_purs) {
-				free(purs);
+				free_pursuit(purs);
 			}
 			MOB_PURSUIT(iter) = NULL;
 		}
@@ -10579,6 +10700,7 @@ ACMD(do_random) {
 }
 
 
+// also do_shutdown
 ACMD(do_reboot) {
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
@@ -10601,6 +10723,17 @@ ACMD(do_reboot) {
 		else if ((type = search_block(arg, shutdown_types, TRUE)) != NOTHING) {
 			reboot_control.level = type;
 		}
+		else if (!str_cmp(arg, "cancel")) {
+			if (reboot_control.type != subcmd) {
+				msg_to_char(ch, "There's no %s scheduled.\r\n", reboot_types[subcmd]);
+			}
+			else {
+				reboot_control.type = REBOOT_NONE;
+				reboot_control.time = -1;
+				msg_to_char(ch, "You have canceled the %s.\r\n", reboot_types[subcmd]);
+			}
+			return;
+		}
 		else {
 			msg_to_char(ch, "Unknown reboot option '%s'.\r\n", arg);
 			return;
@@ -10615,18 +10748,21 @@ ACMD(do_reboot) {
 		reboot_control.type = subcmd;
 	}
 	
-	if (subcmd == SCMD_REBOOT) {
+	if (subcmd == REBOOT_REBOOT) {
 		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
 	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_types[reboot_control.type]);
+	}
+	else if (reboot_control.type == REBOOT_NONE || reboot_control.time < 0) {
+		msg_to_char(ch, "There is no %s scheduled.\r\n", reboot_types[subcmd]);
 	}
 	else {
 		var = (no_arg ? reboot_control.time : time);
-		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_types[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
-			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
+			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_types[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
 				if (STATE(desc) != CON_PLAYING || !desc->character) {
 					msg_to_char(ch, " %s at menu\r\n", (desc->character ? GET_NAME(desc->character) : "New connection"));
@@ -10920,6 +11056,7 @@ ACMD(do_restore) {
 	
 	// fill pools
 	if (all || health) {
+		GET_DEFICIT(vict, HEALTH) = 0;
 		set_health(vict, GET_MAX_HEALTH(vict));
 		
 		if (GET_POS(vict) < POS_SLEEPING) {
@@ -10930,14 +11067,17 @@ ACMD(do_restore) {
 		sprintf(types + strlen(types), "%s health", *types ? "," : "");
 	}
 	if (all || mana) {
+		GET_DEFICIT(vict, MANA) = 0;
 		set_mana(vict, GET_MAX_MANA(vict));
 		sprintf(types + strlen(types), "%s mana", *types ? "," : "");
 	}
 	if (all || moves) {
+		GET_DEFICIT(vict, MOVE) = 0;
 		set_move(vict, GET_MAX_MOVE(vict));
 		sprintf(types + strlen(types), "%s moves", *types ? "," : "");
 	}
 	if (all || blood) {
+		GET_DEFICIT(vict, BLOOD) = 0;
 		set_blood(vict, GET_MAX_BLOOD(vict));
 		sprintf(types + strlen(types), "%s blood", *types ? "," : "");
 	}
@@ -11263,6 +11403,7 @@ ACMD(do_show) {
 		{ "libraries", LVL_START_IMM, show_libraries },
 		{ "author", LVL_START_IMM, show_author },
 		{ "lostbooks", LVL_START_IMM, show_lost_books },
+		{ "editors", LVL_START_IMM, show_editors },
 
 		// last
 		{ "\n", 0, NULL }
@@ -12187,6 +12328,10 @@ ACMD(do_vnum) {
 	}
 	else {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
+		send_to_char("Valid types are: adventure, ability, archetype, attack, augment, book,\r\n"
+		"                 building, craft, class, crop, event, faction, global, generic,\r\n"
+		"                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,\r\n"
+		"                 skill, social, trigger, vehicle\r\n", ch);
 	}
 }
 
@@ -12450,8 +12595,13 @@ ACMD(do_vstat) {
 			extract_vehicle(veh);
 		}
 	}
-	else
-		send_to_char("Invalid type.\r\n", ch);
+	else {
+		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
+		send_to_char("Valid types are: adventure, ability, archetype, attack, augment, book,\r\n"
+		"                 building, craft, class, crop, event, faction, global, generic,\r\n"
+		"                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,\r\n"
+		"                 skill, social, trigger, vehicle\r\n", ch);
+	}
 }
 
 

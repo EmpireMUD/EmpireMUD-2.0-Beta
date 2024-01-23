@@ -200,7 +200,7 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 	}
 	
 	*rlbuf = '\0';
-	if (ROOM_CUSTOM_NAME(room)) {
+	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME)) {
 		snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
@@ -1704,10 +1704,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "The trench is %d%% complete.\r\n", ABSOLUTE((trench_initial_value - get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) * 100 / trench_initial_value));
 		}
 	}
-	
-	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_TAVERN) && IS_COMPLETE(room)) {
-		msg_to_char(ch, "The tavern has %s on tap.\r\n", tavern_data[get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)].name);
-	}
 
 	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_MINE) && IS_COMPLETE(room)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
@@ -1870,7 +1866,7 @@ void look_in_direction(char_data *ch, int dir) {
 		}
 		if (IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
 			// start the sentence...
-			send_to_char("You see a building", ch);
+			msg_to_char(ch, "You see %s %s", (GET_BUILDING(to_room) ? AN(GET_BLD_NAME(GET_BUILDING(to_room))) : "a"), (GET_BUILDING(to_room) ? GET_BLD_NAME(GET_BUILDING(to_room)) : "building"));
 			
 			if (ROOM_OWNER(to_room)) {
 				msg_to_char(ch, " owned by %s", EMPIRE_NAME(ROOM_OWNER(to_room)));

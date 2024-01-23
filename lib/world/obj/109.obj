@@ -100,9 +100,11 @@ a dragon roast~
 Some roast dragon meat has been left here.~
 This giant piece of roast meat has the pre-charred aroma of dragon.
 ~
-6 0 a 0 0 9
+6 0 a 0 0 11
 72 0 0
-7 336
+7 0
+C
+100 100
 M
 4
 You nearly choke on a huge bite of $p.~
@@ -122,9 +124,9 @@ A roast dragon feast is set out here!~
    This feast of roast dragon meat is enough to feed the whole party. It will
 greatly increase damage in combat.
 ~
-6 m 0 0 0 5
+6 m 0 0 0 6
 96 0 0
-7 336
+7 24
 A
 21 1 0
 A
@@ -916,13 +918,13 @@ a loaf of cranbread~
 A loaf of cranbread is molding on the ground.~
 It looks like an ordinary loaf of bread, with tart cranberry inclusions.
 ~
-6 m a 0 0 7
+6 m a 0 0 8
 24 0 0
-7 336
+7 0
 A
 21 1 0
 C
-50 50
+100 100
 R
 4 5132 0
 R

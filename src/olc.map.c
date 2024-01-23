@@ -270,8 +270,20 @@ OLC_MODULE(mapedit_convert2newbie) {
 
 OLC_MODULE(mapedit_decay) {
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	vehicle_data *veh;
 	
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+	one_argument(argument, arg);
+	
+	if (*arg) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+			msg_to_char(ch, "Ok.\r\n");
+			annual_update_vehicle(veh);
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+		}
+	}
+	else if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 		msg_to_char(ch, "You can only decay map tiles.\r\n");
 	}
 	else {

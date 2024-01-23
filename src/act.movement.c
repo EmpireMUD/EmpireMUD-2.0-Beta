@@ -248,7 +248,7 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 			act("$V can't be led into $v.", FALSE, ch, GET_ROOM_VEHICLE(to_room), GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 			return FALSE;
 		}
-		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
+		if (!validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room, FALSE)) {
 			// sends own message
 			return FALSE;
 		}
@@ -1004,7 +1004,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
-	if (IS_INSIDE(was_in) && HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
+	if (IS_INSIDE(was_in) && IS_INSIDE(to_room) && HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
 		msg_to_char(ch, "You can't go there because the building is incomplete.\r\n");
 		return FALSE;
 	}
@@ -1138,7 +1138,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		return FALSE;
 	}
 	// check if they can lead a vehicle there -- validate_vehicle_move sends own messages
-	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room, FALSE)) {
 		return FALSE;
 	}
 	// this checks if a led MOB can move there
@@ -1279,9 +1279,11 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 * 
 * @param char_data *ch The player trying to move. (OPTIONAL)
 * @param vehicle_data *veh The vehicle trying to move, too.
+* @param room_data *to_room Where it's going.
+* @param bool dragging If TRUE, is being dragged (ignores some checks). FALSE implies moving normally.
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
-bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room) {
+bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room, bool dragging) {
 	char buf[MAX_STRING_LENGTH];
 	bool veh_allows_veh, veh_allows_veh_home, veh_can_go_in;
 	
@@ -1299,7 +1301,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// required number of mounts
-	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
+	if (!dragging && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		if (ch) {
 			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
@@ -1373,7 +1375,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
-	if (!WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && (!WATER_SECT(IN_ROOM(veh)) || !VEH_FLAGGED(veh, VEH_DRAGGABLE)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
+	if (!dragging && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && (!WATER_SECT(IN_ROOM(veh)) || !VEH_FLAGGED(veh, VEH_DRAGGABLE)) && !VEH_FLAGGED(veh, VEH_DRIVING | VEH_FLYING) && (!VEH_FLAGGED(veh, VEH_LEADABLE) || VEH_FLAGGED(veh, VEH_SAILING))) {
 		if (ch) {
 			act("$V can't go onto land.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
@@ -2185,7 +2187,7 @@ ACMD(do_circle) {
 	}
 	
 	// cancel some actions on movement
-	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(found_room) && GET_ACTION_ROOM(ch) != NOWHERE) {
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && (GET_ACTION(ch) == ACT_RUNNING || !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE)) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(found_room) && GET_ACTION_ROOM(ch) != NOWHERE) {
 		cancel_action(ch);
 	}
 	

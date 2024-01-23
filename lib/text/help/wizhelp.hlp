@@ -874,7 +874,7 @@ finding new places to build an island.
 #d
 REBOOT
 
-Usage:  reboot [now | minutes]
+Usage:  reboot [now | minutes | cancel]
 
 You can use this to either trigger an instant reboot, or count one down. 
 Because this is a reboot and saves everything, no information is ever lost.
@@ -1153,13 +1153,14 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
+editors    Immort   Shows what each player is editing, if anything.
 factions   Immort   Shows a player's faction levels.
 fmessages  Immort   Shows a player's fight message toggles.
 friends    Immort   Shows another player's friends list.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
-inventory  Immort   Shows how many players have a certain item.
+inventory  Immort   Shows how many players and empires have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
@@ -1284,6 +1285,14 @@ with 'util rescan [empire].
 
 See also: EINVENTORY
 #e
+"SHOW EDITORS"
+
+Usage:  show editors
+
+This command shows you which players are editing anything. This includes OLC
+editing and string editing. You cannot see exactly what immortals above you in
+access level are editing.
+#e
 "SHOW FACTIONS"
 
 Usage:  show factions <player> [filter]
@@ -1338,11 +1347,11 @@ See also: IGNORE, SHOW
 
 Usage:  show inventory <obj vnum> [all]
 
-Searches all players, including offline ones, to see how many of a certain
-object they have in their inventory, equipment, and home storage.
+Searches all players, including offline ones, and all empires, to see how many
+of a certain object they have in their inventory, equipment, and storage.
 
 Without the "all" argument, only checks players that have been online in the
-last two months.
+last two months and empires that are not timed out.
 #e
 "SHOW ISLANDS"
 
@@ -1668,20 +1677,21 @@ If you don't specify an option, you will see their list of active quests.
 #e
 SHUTDOWN
 
-Usage:  shutdown [now | timer] [pause | die | complete]
+Usage:  shutdown [now | timer | cancel] [normal | pause | die | complete]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
 EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
 meaningless. If you are using autorun, the following arguments are available:
 
+normal - Will shut down then reboot.
 pause - Create a file called 'pause' in Empire's root directory; do not
-   try to restart the MUD until 'paused' is removed.
+   try to restart the MUD until 'pause' is removed.
 die - Kill the autorun script; the MUD will not reboot until autorun is
    explicitly run again.
 complete - Like die, but also frees all allocated memory, which helps detect
-   memory leaks. This is slow, and should be done in profiler like valgrind.
+   memory leaks. This is slow, and should be done in a profiler like valgrind.
 
-You can also set a timer, giving the players some warning before the reboot.
+You can also set a timer, giving the players some warning before the shutdown.
 
 If you type this command with no arguments, it will give the current status.
 If you want to shutdown with no timer, use the 'now' option. This command is

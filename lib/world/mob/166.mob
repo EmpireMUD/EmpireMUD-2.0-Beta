@@ -284,7 +284,7 @@ A goose is waddling around.
 D
 This fat white goose looks ready to eat.
 ~
-I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 10715 100.00 2  # BUTCHER: fine cut of goose
 I 0 9025 100.00 1  # BUTCHER: bird feathers
 M
 0

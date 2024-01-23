@@ -4894,10 +4894,12 @@ void get_requirement_display(struct req_data *list, char *save_buffer) {
 /**
 * Gets the resource list for use in an editor or display.
 *
+* @param char_data *ch Person viewing the list (for columns).
 * @param struct resource_data *list The list to show.
 * @param char *save_buffer A string to write the output to.
 */
-void get_resource_display(struct resource_data *list, char *save_buffer) {
+void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer) {
+	bool vnum, screen_reader = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER));
 	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
@@ -4910,57 +4912,73 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 			case RES_OBJECT: {
 				obj = obj_proto(res->vnum);
 				sprintf(line, "%dx %s", res->amount, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				vnum = TRUE;
 				break;
 			}
 			case RES_COMPONENT: {
 				sprintf(line, "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				vnum = FALSE;
 				break;
 			}
 			case RES_LIQUID: {
 				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				vnum = TRUE;
 				break;
 			}
 			case RES_COINS: {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, money_amount(real_empire(res->vnum), res->amount));
+				strcpy(line, money_amount(real_empire(res->vnum), res->amount));
+				vnum = FALSE;
 				break;
 			}
 			case RES_POOL: {
 				sprintf(line, "%d %s", res->amount, pool_types[res->vnum]);
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				vnum = FALSE;
 				break;
 			}
 			case RES_ACTION: {
 				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				vnum = TRUE;
 				break;
 			}
 			case RES_CURRENCY: {
 				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				vnum = TRUE;
 				break;
 			}
 			case RES_TOOL: {
 				prettier_sprintbit(res->vnum, tool_flags, buf);
 				sprintf(line, "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-26.26s", num, line);
+				vnum = FALSE;
 				break;
 			}
 			default: {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, "???");
+				strcpy(line, "???");
+				vnum = FALSE;
 			}
 		}
 		
-		if (!(num % 2)) {
-			strcat(save_buffer, "\r\n");
+		// append
+		if (screen_reader) {
+			if (vnum) {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %s\r\n", num, res->vnum, line);
+			}
+			else {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %s\r\n", num, line);
+			}
+		}
+		else {	// not screen-reader
+			if (vnum) {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s%s", num, res->vnum, line, !(num % 2) ? "\r\n" : "");
+			}
+			else {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s%s", num, line,  !(num % 2) ? "\r\n" : "");
+			}
 		}
 	}
 	if (!*save_buffer) {
 		strcpy(save_buffer, "  none\r\n");
 	}
-	else if (!(num % 2)) {
+	else if (!screen_reader && !(num % 2)) {
 		strcat(save_buffer, "\r\n");
 	}
 }
@@ -5715,7 +5733,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 	if (!*argument) {
 		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
 		for (iter = 0; *flag_names[iter] != '\n' && !one_per_line; ++iter) {
-			if (strlen(flag_names[iter]) + 5 > 30) {
+			if (strlen(flag_names[iter]) + 5 > 34) {
 				// too long
 				one_per_line = TRUE;
 			}
@@ -5728,7 +5746,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line);
 			}
 			else {
-				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2))? "\r\n" : "");
+				sprintf(buf + strlen(buf), "%2d. %s%-34.34s&0%s", (iter + 1), (IS_SET(existing_bits, BIT(iter)) ? "&g" : ""), line, ((iter % 2))? "\r\n" : "");
 			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {
@@ -6817,7 +6835,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 	if (!*argument) {
 		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
 		for (iter = 0; *type_names[iter] != '\n' && !one_per_line; ++iter) {
-			if (strlen(type_names[iter]) + 10 > 30) {
+			if (strlen(type_names[iter]) + 10 > 34) {
 				// too long
 				one_per_line = TRUE;
 			}
@@ -6830,7 +6848,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 				sprintf(buf + strlen(buf), "%2d. %s%s&0\r\n", (iter + 1), (old_value == iter) ? "&g" : "", line);
 			}
 			else {
-				sprintf(buf + strlen(buf), "%2d. %s%-30.30s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
+				sprintf(buf + strlen(buf), "%2d. %s%-34.34s&0%s", (iter + 1), (old_value == iter) ? "&g" : "", line, ((iter % 2) ? "\r\n" : ""));
 			}
 		}
 		if (!one_per_line && (iter % 2) != 0) {

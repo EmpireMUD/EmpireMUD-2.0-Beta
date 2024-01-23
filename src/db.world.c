@@ -33,7 +33,6 @@
 *   City Lib
 *   Room Resets
 *   Sector Indexing
-*   Taverns
 *   Territory
 *   Trench Filling
 *   Evolutions
@@ -1874,6 +1873,7 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
+	morph_data *morph;
 	trig_data *trig;
 	
 	// shortcut
@@ -1963,6 +1963,11 @@ void reset_one_room(room_data *room) {
 					half_chop(reset->sarg1, field, str);
 					if (is_abbrev(field, "sex")) {
 						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "morph")) {
+						if ((morph = morph_proto(atoi(str)))) {
+							perform_morph(mob, morph);
+						}
 					}
 					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
@@ -2279,92 +2284,6 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
 	request_world_save(map ? map->vnum : GET_ROOM_VNUM(loc), WSAVE_MAP | WSAVE_ROOM);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// TAVERNS /////////////////////////////////////////////////////////////////
-
-EVENTFUNC(tavern_update) {
-	struct room_event_data *data = (struct room_event_data *)event_obj;
-	room_data *room;
-	
-	// grab data but don't free (we usually reschedule this)
-	room = data->room;
-	
-	// still a tavern?
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
-		// remove data and cancel event
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-		delete_stored_event_room(room, SEV_TAVERN);
-		free(data);
-		return 0;
-	}
-	
-	if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
-			// brew's ready!
-			set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-		}
-	}
-	else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
-		// count down to re-brew
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
-		
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
-			// enough to go again?
-			if (extract_tavern_resources(room)) {
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-			}
-			else {
-				// can't afford to keep brewing
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-				
-				// free up data and cancel the event (it'll be rescheduled if they set a brew)
-				delete_stored_event_room(room, SEV_TAVERN);
-				free(data);
-				return 0;
-			}
-		}
-	}
-
-	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
-}
-
-
-/**
-* Checks if a building is a tavern and can run. If so, sets up the data for
-* it and schedules the event. If not, it clears that data.
-*
-* @param room_data *room The room to check for tavernness.
-*/
-void check_tavern_setup(room_data *room) {
-	struct room_event_data *data;
-	struct dg_event *ev;
-	
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
-		// not a tavern or not set up
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-		cancel_stored_event_room(room, SEV_TAVERN);
-		return;
-	}
-	
-	// otherwise, it IS a tavern and we'll just let the event function handle it
-	if (!find_stored_event_room(room, SEV_TAVERN)) {
-		CREATE(data, struct room_event_data, 1);
-		data->room = room;
-		
-		// schedule every 7.5 minutes -- the same frequency this ran under the old system
-		ev = dg_event_create(tavern_update, (void*)data, (7.5 * 60) RL_SEC);
-		add_stored_event_room(room, SEV_TAVERN, ev);
-	}
 }
 
 
@@ -4663,6 +4582,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 						strip_crlf(temp);
 						fprintf(fl, "Load: S look\n%s~\n", temp);
 					}
+				}
+				
+				// morph?
+				if (GET_MORPH(mob)) {
+					fprintf(fl, "Load: S morph %d\n", MORPH_VNUM(GET_MORPH(mob)));
 				}
 			
 				if (SCRIPT(mob)) {

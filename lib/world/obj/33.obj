@@ -1100,9 +1100,9 @@ Someone has set up a roast turkey feast!~
    There is a banquet of turkey and trimmings. It's enough to feed the whole
 party! This feast will boost melee fighters.
 ~
-6 gm 0 0 0 6
+6 gm 0 0 0 7
 96 0 0
-7 336
+7 24
 A
 17 1 0
 A
@@ -1121,9 +1121,9 @@ Someone has set up a mixed vegetable board!~
    The board is covered with all manner of roast vegetables, in every color.
 It's enough to feed the whole party! This feast will boost healers.
 ~
-6 gm 0 0 0 6
+6 gm 0 0 0 7
 96 0 0
-7 336
+7 24
 A
 7 1 0
 A
@@ -1142,9 +1142,9 @@ Someone has set up a seafood feast!~
    This overflowing feast of seafood is enough to feed the whole party! This
 feast will boost casters.
 ~
-6 gm 0 0 0 7
+6 gm 0 0 0 8
 96 0 0
-7 336
+7 24
 A
 17 1 0
 A
@@ -1163,9 +1163,9 @@ Someone has set up a roast meat platter!~
    This feast of roast meats is enough to feed the whole party! It will boost
 tanks in particular.
 ~
-6 gm 0 0 0 7
+6 gm 0 0 0 8
 96 0 0
-7 336
+7 24
 A
 18 1 0
 A
@@ -1186,9 +1186,9 @@ Someone has set up an extravagant dessert platter!~
    This buffet of desserts would make the baker blush. It looks like it's just
 the thing to boost your party members!
 ~
-6 gm 0 0 0 6
+6 gm 0 0 0 7
 96 0 0
-7 336
+7 24
 A
 9 1 0
 A
@@ -1207,7 +1207,8 @@ jar oils lettuce seed~
 a jar of lettuce seed oil~
 There is a jar of lettuce seed oil here.~
    The jar has a sacred seal on top, as the oil inside is primarily used in
-ceremonies. It is made from the pressed seeds of the lettuce plant.
+ceremonies (you can annoint someone with it). It is made from the pressed seeds
+of the lettuce plant.
 ~
 3 lC a 0 0 10
 0 0 0

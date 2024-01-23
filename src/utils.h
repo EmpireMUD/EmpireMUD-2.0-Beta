@@ -2182,7 +2182,7 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
 int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void skip_run_filler(char **string);
-bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
+bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room, bool dragging);
 
 // act.naturalmagic.c
 bool despawn_companion(char_data *ch, mob_vnum vnum);
@@ -2628,7 +2628,6 @@ bool validate_social_requirements(char_data *ch, social_data *soc);
 
 // statistics.c
 void display_statistics_to_char(char_data *ch);
-void mudstats_empires(char_data *ch, char *argument);
 int stats_get_building_count(bld_data *bdg);
 int stats_get_crop_count(crop_data *cp);
 int stats_get_sector_count(sector_data *sect);

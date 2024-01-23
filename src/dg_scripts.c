@@ -2765,10 +2765,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (c == ch || !CAN_SEE(ch, c) || !valid_dg_target(c, DG_ALLOW_GODS)) {
 								continue;
 							}
-							if (enemy && !is_fight_enemy(ch, c)) {
+							if (enemy && (AFF_FLAGGED(c, AFF_NO_ATTACK) || !is_fight_enemy(ch, c))) {
 								continue;
 							}
-							if (ally && !is_fight_ally(ch, c)) {
+							if (ally && (AFF_FLAGGED(c, AFF_NO_ATTACK) || !is_fight_ally(ch, c))) {
 								continue;
 							}
 
@@ -4792,7 +4792,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {
-					if (!str_cmp(field, "attack")) {
+					if (!str_cmp(field, "add_wear")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
+							if (pos != NOTHING) {
+								SET_BIT(GET_OBJ_WEAR(o), BIT(pos));
+								request_obj_save_in_world(o);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, unknown wear flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "attack")) {
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
 							attack_message_data *amd = real_attack_message(type);
@@ -4966,6 +4979,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else if (IS_DRINK_CONTAINER(o)) {
 							set_obj_val(o, VAL_DRINK_CONTAINER_CONTENTS, 0);
 							set_obj_val(o, VAL_DRINK_CONTAINER_TYPE, 0);
+
+							if (OBJ_FLAGGED(o, OBJ_SINGLE_USE)) {
+								// single-use: extract it
+								run_interactions(o->carried_by ? o->carried_by : o->worn_by, GET_OBJ_INTERACTIONS(o), INTERACT_CONSUMES_TO, IN_ROOM(o), NULL, o, NULL, consumes_or_decays_interact);
+								empty_obj_before_extract(o);
+								extract_obj(o);
+							}
+							else {
+								// if it wasn't single-use, reset its timer to UNLIMITED since the timer refers to the contents
+								GET_OBJ_TIMER(o) = UNLIMITED;
+							}
 						}
 					}
 					break;
@@ -4999,7 +5023,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
-					
 					break;
 				}
 				case 'h': {	// obj.h*
@@ -5149,7 +5172,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// obj.r*
-					if (!str_cmp(field, "room")) {
+					if (!str_cmp(field, "remove_wear")) {
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, wear_bits, FALSE);
+							if (pos != NOTHING) {
+								REMOVE_BIT(GET_OBJ_WEAR(o), BIT(pos));
+								request_obj_save_in_world(o);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, unknown wear flag: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						snprintf(str, slen, "0");
+					}
+					else if (!str_cmp(field, "room")) {
 						if (obj_room(o))
 							snprintf(str, slen,"%c%d",UID_CHAR, GET_ROOM_VNUM(obj_room(o)) + ROOM_ID_BASE);
 						else
@@ -5613,7 +5649,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// room.h*
-					if (!str_cmp(field, "has_trigger")) {
+					if (!str_cmp(field, "has_evolution")) {
+						int type;
+						if (subfield && *subfield && (type = search_block(subfield, evo_types, FALSE)) != NOTHING) {
+							snprintf(str, slen, "%d", (SECT(r) && has_evolution_type(SECT(r), type)) ? 1 : 0);
+						}
+						else {
+							snprintf(str, slen, "0");	// no type (or invalid type) provided
+						}
+					}
+					else if (!str_cmp(field, "has_trigger")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							snprintf(str, slen, "%d", has_trigger(SCRIPT(r), atoi(subfield)));
 						}
@@ -5652,6 +5697,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "is_on_map")) {
+						snprintf(str, slen, "%d", (GET_ROOM_VNUM(r) < MAP_SIZE) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_outdoors")) {
 						snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
@@ -6550,6 +6598,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						// and show speakability
 						snprintf(str, slen, "%d", (lang && speaks_language_empire(e, GEN_VNUM(lang)) == LANG_SPEAK) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "charge_coins")) {
+						if (subfield && isdigit(*subfield)) {
+							decrease_empire_coins(e, e, atoi(subfield));
+						}
+						*str = '\0';
+					}
 					else if (!str_cmp(field, "coins")) {
 						snprintf(str, slen, "%d", (int) EMPIRE_COINS(e));
 					}
@@ -6568,7 +6622,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'g': {	// emp.g*
-					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
+					if (!str_cmp(field, "give_coins")) {
+						if (subfield && isdigit(*subfield)) {
+							increase_empire_coins(e, e, atoi(subfield));
+						}
+						*str = '\0';
+					}
+					else if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
 						snprintf(str, slen, "%d", EMPIRE_GREATNESS(e));
 					}
 					break;
@@ -6587,6 +6647,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "has_storage")) {
+						if (subfield && *subfield) {
+							// arg1: obj vnum
+							// arg2: room location (storage is per-island
+							any_vnum vnum;
+							char arg1[256], arg2[256];
+							room_data *where;
+							struct empire_storage_data *store;
+							
+							comma_args(subfield, arg1, arg2);
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || (vnum = atoi(arg1) < 0)) {
+								// bad input
+								snprintf(str, slen, "0");
+							}
+							else if (!(where = get_room(NULL, arg2))) {
+								// bad loccation
+								snprintf(str, slen, "0");
+							}
+							else if (!(store = find_stored_resource(e, GET_ISLAND_ID(where), vnum))) {
+								// none stored
+								snprintf(str, slen, "0");
+							}
+							else {
+								// found
+								snprintf(str, slen, "%d", store->amount);
+							}
+						}
+						else {
+							// no input
+							snprintf(str, slen, "0");
 						}
 					}
 					else if (!str_cmp(field, "has_tech")) {

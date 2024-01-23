@@ -166,7 +166,7 @@ switch %random.4%
     set verify_target %actor.id%
     set cycle 1
     while %cycle% <= %max_cycles%
-      if %verify_target% != %actor.id%
+      if %verify_target% != %actor.id% || %actor.room% != %self.room%
         %echo% |%self% bandages return to their proper place.
         halt
       end

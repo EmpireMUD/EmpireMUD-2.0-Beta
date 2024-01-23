@@ -1362,7 +1362,7 @@ void olc_show_building(char_data *ch) {
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
 	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
+		get_resource_display(ch, GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
 		strcat(buf, lbuf);
 	}
 

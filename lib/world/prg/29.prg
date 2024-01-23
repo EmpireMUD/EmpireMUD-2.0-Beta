@@ -125,9 +125,12 @@ S
 Beekeeping~
    Your empire can now build apiaries, allowing your workforce to keep bees and
 produce honey and wax for your citizens. ('build apiary')
+   If you have taverns and barrels, your workforce will also brew barrels of
+mead from 1x wooden barrel and 5x honeycomb.
 ~
-2 2 30 0 b
+3 2 30 0 b
 K 2 5131
+K 2 236
 P 2019
 S
 #2913
@@ -165,5 +168,31 @@ K 2 5219
 K 2 5220
 K 2 5221
 P 2011
+S
+#2916
+To the Tavern When the Job's Done~
+   A thriving workforce is the heartbeat of any empire. But when the workday is
+over, there's one thing they want: ale. The time is right to build some taverns
+and create a successful brewing industry. The tavern might even attract some
+interesting characters.
+   Building a tavern requires 10x (lumber), 4x (nails), 12x (bricks),
+20x (stiff plant fibers), 20x bushel of hops, and 20x sack of barley.
+   Crafting barrels requires a carpenter, 1x (lumber), and 1x (common metal
+ingot). Workforce will craft these at the carpenter, as well.
+Workforce will craft the following items at the tavern:
+   barrel of ale: wooden barrel, 5x sack of barley, 5x bushel of hops
+   barrel of lager: wooden barrel, 5x bushel of corn, 5x bushel of hops
+   barrel of wheat beer: wooden barrel, 5x bundle of wheat, 5x sack of barley
+   barrel of cider: wooden barrel, 5x bunch of apples, 5x basket of peaches
+~
+8 2 50 0 b
+K 2 5138
+K 2 231
+K 2 232
+K 2 233
+K 2 234
+K 2 235
+K 2 230
+P 2903
 S
 $

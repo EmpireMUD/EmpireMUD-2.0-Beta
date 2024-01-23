@@ -35,7 +35,6 @@
 *   Message Configs
 *   Operation Options
 *   Player Configs
-*   War Configs
 *   Config System: Data
 *   Config System: Editors
 *   Config System: Custom Editors
@@ -53,14 +52,6 @@ void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
 // locals
-bool add_int_to_int_array(int to_add, int **array, int *size);
-bool find_int_in_array(int to_find, int *array, int size);
-bool remove_int_from_int_array(int to_remove, int **array, int *size);
-
-
-// these are used in various configs below
-#define YES	1
-#define NO	0
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -260,19 +251,6 @@ void init_inherent_player_techs(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WAR CONFIGS /////////////////////////////////////////////////////////////
-
-/*
- * Is player-killing allowed?  How restricted is it?
- *  These are bitvectors, except PK_NONE, which must be alone.
- *  PK_NONE    - pk is completely disallowed
- *  PK_WAR     - may pk anyone you're at war with
- *  PK_FULL    - may pk ANYONE
- */	
-bitvector_t pk_ok = PK_WAR;
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: DATA /////////////////////////////////////////////////////
 
 // CONFIG_x: groupings for config command
@@ -299,9 +277,10 @@ bitvector_t pk_ok = PK_WAR;
 #define CONFTYPE_BOOL  2
 #define CONFTYPE_DOUBLE  3
 #define CONFTYPE_INT  4
-#define CONFTYPE_INT_ARRAY  5
+#define CONFTYPE_INT_ARRAY  5	// TODO: this is not really supported yet
 #define CONFTYPE_SHORT_STRING  6 // max length ~ 128
 #define CONFTYPE_LONG_STRING  7	// paragraph length
+#define CONFTYPE_TYPE  8	// shows a list from a const char array
 
 
 // CONFIG_x groupings for the config command
@@ -344,6 +323,18 @@ const char *lastname_modes[] = {
 	"set-at-creation",
 	"change-any-time",
 	"choose-from-list",
+	"\n"
+};
+
+
+// PK_x: Player killing options for config_get_bitvector("pk_mode")
+const char *pk_modes[] = {
+	"OPEN",		// 0
+	"WAR",
+	"TRESPASSERS",
+	"DISTRUST",
+	"EMPIRE-OFFENSES",
+	"PERSONAL-OFFENSES",	// 5
 	"\n"
 };
 
@@ -408,7 +399,7 @@ bitvector_t config_get_bitvector(char *key) {
 	
 	if (!key) {
 		log("SYSERR: config_get_bitvector called with no key.");
-		return 1.0;
+		return NOBITS;
 	}
 	
 	// maybe?
@@ -416,11 +407,11 @@ bitvector_t config_get_bitvector(char *key) {
 	
 	if (!cnf) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector called with invalid key '%s'", key);
-		return 1.0;
+		return NOBITS;
 	}
 	if (cnf->type != CONFTYPE_BITVECTOR) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_bitvector with non-bitvector key '%s'", key);
-		return 1.0;
+		return NOBITS;
 	}
 	
 	// valid data!
@@ -590,6 +581,37 @@ const char *config_get_string(char *key) {
 }
 
 
+/**
+* Load a global config as an int, from a 'type' type.
+*
+* @param char *key The one-word string key for the config system.
+* @return int The value associated with that key (default: 0).
+*/
+int config_get_type(char *key) {
+	struct config_type *cnf;
+	
+	if (!key) {
+		log("SYSERR: config_get_type called with no key.");
+		return 0;
+	}
+	
+	// maybe?
+	cnf = get_config_by_key(key, TRUE);
+	
+	if (!cnf) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_type called with invalid key '%s'", key);
+		return 0;
+	}
+	if (cnf->type != CONFTYPE_TYPE) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_type with non-type key '%s'", key);
+		return 0;
+	}
+	
+	// valid data!
+	return cnf->data.int_val;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: EDITORS //////////////////////////////////////////////////
 
@@ -659,7 +681,8 @@ CONFIG_HANDLER(config_edit_bitvector) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.bitvector_val;
-	new = olc_process_flag(ch, argument, config->key, config->key, (const char **)config->custom_data, old);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	new = olc_process_flag(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
 	if (old == new) {
@@ -924,88 +947,44 @@ CONFIG_HANDLER(config_edit_short_string) {
 }
 
 
-// Custom config handler for editing a type list, for CONFTYPE_INT_ARRAY.
-CONFIG_HANDLER(config_edit_typelist) {
-	bool alldigit, found, changed = FALSE;
-	char buf[MAX_STRING_LENGTH];
-	const char **type_list;
-	int type, iter;
+// Custom config handler for editing a 'type' type, resulting in an int, for CONFTYPE_TYPE.
+CONFIG_HANDLER(config_edit_type) {
+	char buf[256];
+	int old, new;
 	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_edit_typelist called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_edit_type called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
-	if (config->type != CONFTYPE_INT_ARRAY) {
-		log("SYSERR: config_edit_typelist called on non-int-array key %s", config->key);
+	if (config->type != CONFTYPE_TYPE) {
+		log("SYSERR: config_edit_type called on non-type key %s", config->key);
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
 	if (!config->custom_data) {
-		log("SYSERR: config_edit_typelist called without custom data for key %s", config->key);
+		log("SYSERR: config_edit_type called without custom data for key %s", config->key);
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
-	
-	// setup
-	type_list = (const char **)config->custom_data;
-	*buf = '\0';
-	
-	// did they enter a number?
-	alldigit = is_number(argument);
-	
-	// validate type
-	if (alldigit) {
-		type = atoi(argument) - 1;	// numbers are shown as id+1 to be 1-based not 0-based
 		
-		// ensure type is not past the end of the type_list
-		found = FALSE;
-		for (iter = 0; *type_list[iter] != '\n' && !found; ++iter) {
-			if (iter == type) {
-				found = TRUE;
-			}
-		}
-		
-		if (!found) {
-			type = NOTHING;
-		}
-	}
-	else {
-		type = search_block(argument, type_list, FALSE);
-	}
+	// process (olc processor sends all messages)
+	old = config->data.int_val;
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	new = olc_process_type(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
-	// did we find one?
-	if (type == NOTHING) {
-		msg_to_char(ch, "Unknown option '%s'\r\n", argument);
+	// no change
+	if (old == new) {
 		return;
 	}
 	
-	// is it legit?
-	if (*type_list[type] == '*') {
-		msg_to_char(ch, "You may not choose the '%s' option.\r\n", type_list[type]);
-		return;
-	}
+	// update
+	config->data.int_val = new;
 	
-	// adding or removing?
-	if (find_int_in_array(type, config->data.int_array, config->data_size)) {
-		changed = remove_int_from_int_array(type, &(config->data.int_array), &(config->data_size));
-		if (changed) {
-			syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s removed %s from %s", GET_NAME(ch), type_list[type], config->key);
-		}
-		msg_to_char(ch, "%s: removed %s.\r\n", config->key, type_list[type]);
-	}
-	else {
-		changed = add_int_to_int_array(type, &(config->data.int_array), &(config->data_size));
-		if (changed) {
-			syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s added %s to %s", GET_NAME(ch), type_list[type], config->key);
-		}
-		msg_to_char(ch, "%s: added %s.\r\n", config->key, type_list[type]);
-	}
-	
-	if (changed) {
-		save_config_system();
-	}
+	// build log
+	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s updated %s: set to %s from %s", GET_NAME(ch), config->key, ((const char **)config->custom_data)[new], ((const char **)config->custom_data)[old]);
+	save_config_system();
 }
 
 
@@ -1051,61 +1030,6 @@ CONFIG_HANDLER(config_edit_decay_in_storage) {
 }
 
 
-CONFIG_HANDLER(config_edit_who_list_sort) {
-	int input, iter, old;
-	
-	// basic sanitation
-	if (!ch || !config) {
-		log("SYSERR: config_edit_who_list_sort called without %s", ch ? "config" : "ch");
-		msg_to_char(ch, "Error editing type.\r\n");
-		return;
-	}
-	if (config->type != CONFTYPE_INT) {
-		log("SYSERR: config_edit_who_list_sort called on non-int key %s", config->key);
-		msg_to_char(ch, "Error editing type.\r\n");
-		return;
-	}
-	
-	if ((input = search_block(argument, who_list_sort_types, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Invalid option '%s'. Valid sorts are:\r\n", argument);
-		for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
-		}
-		return;
-	}
-	
-	if (config->data.int_val == input) {
-		msg_to_char(ch, "It is already set to that sort.\r\n");
-		return;
-	}
-	
-	old = config->data.int_val;
-	config->data.int_val = input;
-	save_config_system();
-	syslog(SYS_CONFIG, GET_INVIS_LEV(ch), TRUE, "CONFIG: %s set %s to %s, from %s", GET_NAME(ch), config->key, who_list_sort_types[input], who_list_sort_types[old]);
-	msg_to_char(ch, "%s: set to %s, from %s.\r\n", config->key, who_list_sort_types[input], who_list_sort_types[old]);
-}
-
-
-CONFIG_HANDLER(config_show_who_list_sort) {
-	int iter;
-	
-	// basic sanitation
-	if (!ch || !config) {
-		log("SYSERR: config_show_who_list_sort called without %s", ch ? "config" : "ch");
-		msg_to_char(ch, "Error showing type.\r\n");
-		return;
-	}
-	
-	msg_to_char(ch, "Current sort: %s\r\n", who_list_sort_types[config->data.int_val]);
-	
-	msg_to_char(ch, "Valid sorts are:\r\n");
-	for (iter = 0; *who_list_sort_types[iter] != '\n'; ++iter) {
-		msg_to_char(ch, " %s\r\n", who_list_sort_types[iter]);
-	}
-}
-
-
 // resets after setting
 CONFIG_HANDLER(config_edit_mob_spawn_interval) {
 	int old = config_get_int("mob_spawn_interval");
@@ -1140,7 +1064,9 @@ CONFIG_HANDLER(config_show_attack) {
 
 
 // Custom config handler for showing a bitvector, for CONFTYPE_BITVECTOR
-CONFIG_HANDLER(config_show_bitvector) {	
+CONFIG_HANDLER(config_show_bitvector) {
+	char buf[256];
+	
 	// basic sanitation
 	if (!ch || !config) {
 		log("SYSERR: config_show_bitvector called without %s", ch ? "config" : "ch");
@@ -1159,7 +1085,8 @@ CONFIG_HANDLER(config_show_bitvector) {
 	}
 
 	// send it through the olc processor, which will display it all
-	olc_process_flag(ch, "", config->key, config->key, (const char **)config->custom_data, config->data.bitvector_val);
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	olc_process_flag(ch, "", config->key, buf, (const char **)config->custom_data, config->data.bitvector_val);
 }
 
 
@@ -1262,46 +1189,30 @@ CONFIG_HANDLER(config_show_short_string) {
 }
 
 
-// Custom config handler for showing a type list, for CONFTYPE_INT_ARRAY.
-CONFIG_HANDLER(config_show_typelist) {
-	char buf[MAX_STRING_LENGTH];
-	const char **type_list;
-	int iter;
+// config handler for showing a 'type' type, for CONFTYPE_TYPE
+CONFIG_HANDLER(config_show_type) {
+	char buf[256];
 	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_show_typelist called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_show_type called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
-	if (config->type != CONFTYPE_INT_ARRAY) {
-		log("SYSERR: config_show_typelist called on non-int-array key %s", config->key);
+	if (config->type != CONFTYPE_TYPE) {
+		log("SYSERR: config_show_type called on non-type key %s", config->key);
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
 	if (!config->custom_data) {
-		log("SYSERR: config_show_typelist called without custom data for key %s", config->key);
+		log("SYSERR: config_show_type called without custom data for key %s", config->key);
 		msg_to_char(ch, "Error showing type.\r\n");
 		return;
 	}
-	
-	// setup
-	type_list = (const char **)config->custom_data;
-	*buf = '\0';
-	
-	for (iter = 0; *type_list[iter] != '\n'; ++iter) {
-		sprintf(buf + strlen(buf), "%2d. %s%-24.24s&0%s", (iter + 1), find_int_in_array(iter, config->data.int_array, config->data_size) ? "&g" : "", type_list[iter], ((iter % 2) ? "\r\n" : ""));
-	}
-	if ((iter % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
-	
-	if (*buf) {
-		msg_to_char(ch, "List value:\r\n%s", buf);
-	}
-	else {
-		msg_to_char(ch, "No types are configured for key %s.\r\n", config->key);
-	}
+
+	// send it through the olc processor, which will display it all
+	snprintf(buf, sizeof(buf), "config %s", config->key);
+	olc_process_type(ch, "", config->key, buf, (const char **)config->custom_data, config->data.int_val);
 }
 
 
@@ -1463,6 +1374,10 @@ void load_config_system_from_file(void) {
 				}
 				break;
 			}
+			case CONFTYPE_TYPE: {
+				cnf->data.int_val = atoi(arg);
+				break;
+			}
 			default: {
 				log("Unable to load config system: %s: unloadable config type %d", cnf->key, cnf->type);
 				break;
@@ -1562,6 +1477,10 @@ void save_config_system(void) {
 				else {
 					fprintf(fl, "%s 0\n", cnf->key);
 				}
+				break;
+			}
+			case CONFTYPE_TYPE: {
+				fprintf(fl, "%s %d\n", cnf->key, cnf->data.int_val);
 				break;
 			}
 			default: {
@@ -1785,6 +1704,11 @@ void init_config(int set, char *key, int type, char *description) {
 			cnf->edit_func = config_edit_bitvector;
 			break;
 		}
+		case CONFTYPE_TYPE: {
+			cnf->show_func = config_show_type;
+			cnf->edit_func = config_edit_type;
+			break;
+		}
 		case CONFTYPE_INT_ARRAY:
 		default: {
 			// currently requires a custom handler
@@ -1913,8 +1837,8 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
 	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
-	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
-		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
+	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_TYPE, "what order the who-list appears in");
+		init_config_custom("who_list_sort", config_show_type, config_edit_type, who_list_sort_types);
 	init_config(CONFIG_GAME, "wizlist_header", CONFTYPE_LONG_STRING, "shown at the top of the wizlist");
 
 	// actions
@@ -1936,8 +1860,6 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
-	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "# of 5-minute updates for initial tavern brew");
-	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
@@ -2085,16 +2007,16 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "enchant_points_at_100", CONFTYPE_DOUBLE, "number of scale points for enchanting/augments at level 100");
 	init_config(CONFIG_SKILLS, "min_exp_to_roll_skillup", CONFTYPE_INT, "minimum skill experience to roll for gains");
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
-	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
-	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
 	init_config(CONFIG_SKILLS, "skill_swap_allowed", CONFTYPE_BOOL, "enables skill swap (immortals always can)");
 	init_config(CONFIG_SKILLS, "skill_swap_min_level", CONFTYPE_INT, "level to use multi-spec");
 	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
 
 	// system
+	init_config(CONFIG_SYSTEM, "autoreboot_minutes", CONFTYPE_INT, "minutes to schedule an automatic reboot at startup (0 if not using this)");
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");
+	init_config(CONFIG_SYSTEM, "reboot_warning_minutes", CONFTYPE_INT, "minutes before a reboot that players start getting alerts");
 	init_config(CONFIG_SYSTEM, "use_autowiz", CONFTYPE_BOOL, "if on, automatically generates the wizlist");
 	init_config(CONFIG_SYSTEM, "siteok_everyone", CONFTYPE_BOOL, "flags players siteok on creation, essentially inverting ban logic");
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
@@ -2119,6 +2041,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "offense_min_to_war", CONFTYPE_INT, "number of offense points required before war is allowed");
 	init_config(CONFIG_WAR, "offenses_for_free_war", CONFTYPE_INT, "number of offense points at which war cost drops to zero");
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
+	init_config(CONFIG_WAR, "pk_mode", CONFTYPE_BITVECTOR, "what conditions let one player attack another");
+		init_config_custom("pk_mode", config_show_bitvector, config_edit_bitvector, pk_modes);
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
 	init_config(CONFIG_WAR, "steal_death_penalty", CONFTYPE_INT, "minutes a player cannot steal from an empire after being killed by them, 0 for none");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");
@@ -2168,6 +2092,10 @@ void init_config_system(void) {
 		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("max_chore_resource_skilled", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "deprecated; was # of 5-minute updates for initial tavern brew");
+		init_config_flags("tavern_brew_time", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "deprecated; was # of 5-minute updates for tavern resource cost");
+		init_config_flags("tavern_timer", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("trench_full_value", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
@@ -2178,6 +2106,10 @@ void init_config_system(void) {
 		init_config_flags("land_per_tech", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
 		init_config_flags("land_per_wealth", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+		init_config_flags("potion_apply_per_100", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
+		init_config_flags("potion_heal_scale", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 		init_config_flags("generic_facing", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
@@ -2299,6 +2231,16 @@ ACMD(do_config) {
 				}
 				case CONFTYPE_LONG_STRING: {
 					lsize = snprintf(line, sizeof(line), "<%s>", cnf->data.string_val ? "set" : "not set");
+					break;
+				}
+				case CONFTYPE_TYPE: {
+					if (cnf->custom_data) {
+						sprinttype(cnf->data.int_val, (const char **)cnf->custom_data, part, sizeof(part), "???");
+						lsize = snprintf(line, sizeof(line), "%s", part);
+					}
+					else {
+						lsize = snprintf(line, sizeof(line), "%d", cnf->data.int_val);
+					}
 					break;
 				}
 				default: {
