@@ -410,8 +410,7 @@ void another_hour(void) {
 	
 	// hour-based updates: everything was removed from here to decouple it from the length of game hours
 	switch (main_time_info.hours) {
-		case 0: {	// midnight
-			run_external_evolutions();
+		case 0: {	// midnight - evolver now runs on a 30-minute cycle
 			break;
 		}
 		case 1: {	// 1am shipment	- now just runs on a 10-minute cycle

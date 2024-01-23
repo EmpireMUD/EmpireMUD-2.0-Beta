@@ -269,8 +269,8 @@ See also: GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 
-The 'evolve' utility is a separate program the EmpireMUD runs once per game
-day to update the map. This is normally silent, but will result in logs if
+The 'evolve' utility is a separate program the EmpireMUD runs once per 30
+minutes to update the map. This is normally silent, but will result in logs if
 you run it manually ('util evolve') or if the evolver fails to run.
 
 If not all of the evolver's suggested changes could be made, the most likely
@@ -1879,7 +1879,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
+ &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
  &cexportcsv&0 - Output a csv file with some game data.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cpathtest&0 - Test function for the pathfinding code.
