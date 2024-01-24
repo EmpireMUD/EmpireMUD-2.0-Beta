@@ -1709,7 +1709,7 @@ void start_burning(room_data *room) {
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, config_get_int("fire_extinguish_value"));
-	set_burn_down_time(room, time(0) + config_get_int("burn_down_time"), TRUE);
+	set_burn_down_time(room, time(0) + get_burn_down_time_seconds(room), TRUE);
 	
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);

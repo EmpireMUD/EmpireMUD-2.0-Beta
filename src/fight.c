@@ -194,6 +194,33 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 
 
 /**
+* Gets the burn-down time, in seconds, for a building. This is never less than
+* 1 game hour or 1 workforce cycle (whichever is longer).
+*
+* @param room_data *room The room (building location).
+* @return int How long it takes to burn down.
+*/
+int get_burn_down_time_seconds(room_data *room) {
+	int seconds = 0;
+	
+	room = HOME_ROOM(room);
+	
+	if (COMPLEX_DATA(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		// 1 hour per 4 hitpoints on the building
+		seconds = (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) - BUILDING_DAMAGE(room)) * SECS_PER_MUD_HOUR / 4;
+	}
+	
+	// never less than an hour
+	seconds = MAX(seconds, SECS_PER_MUD_HOUR);
+	
+	// or less than a workforce cycle
+	seconds = MAX(seconds, WORKFORCE_CYCLE);
+	
+	return seconds;
+}
+
+
+/**
 * Determines what TYPE_ a character is actually using.
 * 
 * @param char_data *ch The character attacking.

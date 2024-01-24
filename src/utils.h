@@ -2329,6 +2329,7 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 void death_log(char_data *ch, char_data *killer, int type);
 void death_restore(char_data *ch);
 double get_base_dps(obj_data *weapon);
+int get_burn_down_time_seconds(room_data *room);
 int get_block_rating(char_data *ch, bool can_gain_skill);
 double get_combat_speed(char_data *ch, int pos);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
