@@ -861,14 +861,16 @@ void chore_update(void) {
 		
 		// 1. check if it's my time for logs/needs
 		log_and_needs = (EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) + WORKFORCE_LOG_AND_NEEDS_CYCLE <= time(0));
-		EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) = time(0);
-		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		
 		// 2. special sort to ensure they use things that will expire first
 		sort_einv_for_empire(emp, EINV_SORT_PERISHABLE);
 		
 		// 3. update islands needs (once per 30 minutes)
 		if (log_and_needs) {
+			// reset needs time
+			EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) = time(0);
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
 			HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
 				HASH_ITER(hh, eisle->needs, needs, next_needs) {
