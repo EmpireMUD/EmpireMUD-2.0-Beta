@@ -377,6 +377,10 @@ void boot_db(void) {
 	init_config_system();
 	init_inherent_player_techs();
 	
+	// ensure time configurations are valid
+	assert(SECS_PER_MUD_HOUR >= SECS_PER_REAL_UPDATE);
+	assert((SECS_PER_MUD_HOUR % SECS_PER_REAL_UPDATE) == 0);
+	
 	log("Loading game data system.");
 	load_data_table();
 	
