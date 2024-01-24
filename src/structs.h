@@ -1454,7 +1454,8 @@ typedef struct vehicle_data vehicle_data;
 #define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 #define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
-#define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
+#define WORKFORCE_CYCLE  75	// seconds between workforce chore updates
+#define WORKFORCE_LOG_AND_NEEDS_CYCLE  (30 * SECS_PER_REAL_MIN)	// how often it will update workforce logs and needs
 
 
 // System timing
@@ -5579,6 +5580,9 @@ struct empire_data {
 	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	struct channel_history_data *chat_history;
+	
+	// other saved data
+	time_t wf_log_and_needs_time;	// last time we updated wf logs and needs (saved to storage file)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

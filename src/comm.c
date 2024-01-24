@@ -813,6 +813,7 @@ void heartbeat(unsigned long heart_pulse) {
 	static int mins_since_crashsave = 0;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
+	#define HEARTBEAT_OFFSET(x,y)	!(((int)(heart_pulse + ((y) * PASSES_PER_SEC))) % ((int)((x) * PASSES_PER_SEC)))
 	
 	// switch which of these is commented if you want timestamp logging:
 	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
@@ -889,7 +890,8 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("12")
 	}
 	
-	if (HEARTBEAT(WORKFORCE_CYCLE)) {
+	if (HEARTBEAT_OFFSET(WORKFORCE_CYCLE, 1)) {
+		// runs just off of the cycle, to space it out when it's the same as the hour cycle
 		chore_update();
 		HEARTBEAT_LOG("13")
 	}

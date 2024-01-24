@@ -2461,6 +2461,17 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// data: A # <value>
+				if (sscanf(line, "A 0 %ld", &l_in) == 1) {
+					EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) = l_in;
+				}
+				else {
+					log("SYSERR: Storage A data entry for %s was invalid", err_str);
+					exit(1);
+				}
+				
+				break;
+			}
 			case 'L': {	// production limit/logs
 				// uses a subtype
 				switch (*(line+1)) {
@@ -3510,6 +3521,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 	if (!emp) {
 		return;
+	}
+	
+	// A: data
+	if (EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp)) {
+		fprintf(fl, "A 0 %ld\n", EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp));
 	}
 	
 	// L: production limits
