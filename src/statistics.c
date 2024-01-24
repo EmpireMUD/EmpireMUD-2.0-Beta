@@ -215,7 +215,10 @@ void mudstats_configs(char_data *ch, char *argument) {
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// time
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %s%s hours, %s days, %s months, %s years\r\n", colon_time(SECS_PER_MUD_HOUR, FALSE, NULL), (SECS_PER_MUD_HOUR < SECS_PER_REAL_MIN ? " second" : ""), colon_time(SECS_PER_MUD_DAY, FALSE, NULL), colon_time(SECS_PER_MUD_MONTH, FALSE, NULL), colon_time(SECS_PER_MUD_YEAR, FALSE, NULL));
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %s%s hours,", colon_time(SECS_PER_MUD_HOUR, FALSE, NULL), (SECS_PER_MUD_HOUR < SECS_PER_REAL_MIN ? " second" : ""));
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %s days,", colon_time(SECS_PER_MUD_DAY, FALSE, NULL));
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %s months,", colon_time(SECS_PER_MUD_MONTH, FALSE, NULL));
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %s years\r\n", colon_time(SECS_PER_MUD_YEAR, FALSE, NULL));
 	
 	// skills
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
