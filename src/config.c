@@ -1853,7 +1853,8 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "harvest_timer", CONFTYPE_INT, "ticks to harvest a crop, modified by Dexterity");
 	init_config(CONFIG_ACTIONS, "mining_timer", CONFTYPE_INT, "weapon damage to mine 1 ore");
 	init_config(CONFIG_ACTIONS, "panning_timer", CONFTYPE_INT, "ticks to pan one time");
-	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in seconds; planting reduces it by half up to 3 times");
+	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in game hours; planting cuts it in half up to 3 times");
+	init_config(CONFIG_ACTIONS, "planting_workforce_timer", CONFTYPE_INT, "in game hours; how long crops take after workforce harvests them");
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile, normally");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion used by hunt, formerly by others");

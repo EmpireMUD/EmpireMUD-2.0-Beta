@@ -2941,7 +2941,8 @@ ACMD(do_plant) {
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
 		set_crop_type(IN_ROOM(ch), cp);
 		
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + config_get_int("planting_base_timer"));
+		// uses "planting_base_timer" in game hours; this may be cut in half up to 3x
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, time(0) + (config_get_int("planting_base_timer") * SECS_PER_MUD_HOUR));
 		if (GET_MAP_LOC(IN_ROOM(ch))) {
 			schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
 		}
