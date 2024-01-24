@@ -321,6 +321,43 @@ void mudstats_empires(char_data *ch, char *argument) {
 }
 
 
+/**
+* do_mudstats: time until certain events
+*
+* @param char_data *ch Person to show it to.
+* @param char *argument In case some stats have sub-categories.
+*/
+void mudstats_time(char_data *ch, char *argument) {
+	char output[MAX_STRING_LENGTH * 2];
+	long when;
+	
+	// start output
+	snprintf(output, sizeof(output), "Time until:\r\n");
+	
+	// daily reset
+	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily cycle: imminent\r\n");
+	}
+	
+	// maintenance cycle
+	when = (data_get_long(DATA_LAST_NEW_YEAR) + SECS_PER_MUD_YEAR) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Empire maintenance: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Empire maintenance: imminent\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STATS GETTERS ///////////////////////////////////////////////////////////
 

@@ -1294,6 +1294,7 @@ This command displays various statistics about this EmpireMUD.
 Options:
  configs: Shows how the game is configured.
  empires: Shows averages for the numbers used to compute empire scores.
+ time: Shows time left until events such as the next daily cycle.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
