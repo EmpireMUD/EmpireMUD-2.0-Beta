@@ -300,7 +300,7 @@ wait 10
 %echo% Chiv sinks into the shadows...
 set verify_target %actor.id%
 wait 30
-if %verify_target% != %actor.id%
+if %verify_target% != %actor.id% || %actor.room% != %self.room%
   %echo% ~%self% appears from the shadows, seemingly without doing anything?
   halt
 end
