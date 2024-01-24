@@ -668,7 +668,7 @@ void real_update_player(char_data *ch) {
 		if (AFF_FLAGGED(ch, AFF_HUNGRIER)) {
 			gain_condition(ch, FULL, number(1, 2));
 		}
-		else if (!number(0, 1)) {
+		else if (number(0, 2)) {
 			// random chance of hunger
 			gain_condition(ch, FULL, 1);
 		}
@@ -684,7 +684,7 @@ void real_update_player(char_data *ch) {
 		if (AFF_FLAGGED(ch, AFF_THIRSTIER)) {
 			gain_condition(ch, THIRST, number(1, 2));
 		}
-		else if (!number(0, 1)) {
+		else if (number(0, 2)) {
 			gain_condition(ch, THIRST, 1);
 		}
 	}
