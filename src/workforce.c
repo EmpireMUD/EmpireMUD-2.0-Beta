@@ -906,12 +906,12 @@ void chore_update(void) {
 			}
 			
 			read_vault(emp);
-			
-			// no longer need this -- free up the tracker
-			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 		}
 		
-		// 6. report production once per 30 minutes
+		// 6. no longer need this -- free up the tracker, if it had one
+		ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
+		
+		// 7. report production once per 30 minutes
 		if (log_and_needs) {
 			report_workforce_production_log(emp);
 		}
