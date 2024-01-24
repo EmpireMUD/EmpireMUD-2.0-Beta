@@ -2540,8 +2540,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					perform_change_sect(room, NULL, old_sect);
 					check_terrain_height(room);
 			
-					// we are keeping the original sect the same as it was; set the time to one game day
-					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
+					// we are keeping the original sect the same as it was; just update the timer
+					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (config_get_int("planting_workforce_timer") * SECS_PER_MUD_HOUR));
 					if (GET_MAP_LOC(room)) {
 						schedule_crop_growth(GET_MAP_LOC(room));
 					}
