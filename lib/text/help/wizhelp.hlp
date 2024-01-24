@@ -648,15 +648,17 @@ NATURALIZE "NATURAL SECTOR"
 what that is by using 'stat room' on the map. It shows a display like this:
 Sector: [10 - Building], Base: [0 - Plains], Natural: [4 - Overgrown Forest]
 
-Newbie islands will naturalize their unclaimed tiles each year if the world
-config 'naturalize_newbie_islands' is turned on.
+Newbie islands will naturalize their unclaimed tiles each time depletions are
+reset (by default, this is every 7.5 real days) if the world config
+'naturalize_newbie_islands' is turned on. Check 'mudstats time' to see when
+that will be.
 
 The map editor can be used to naturalize a tile, island, or the whole world
 via '.map naturalize'.
 
 You can change a tile's (or island's) natural sector with '.map remember'.
 
-See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER
+See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER, MUDSTATS
 #d
 NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
 
@@ -1898,7 +1900,7 @@ Available utilities:
  &ctemperature&0 - Gives a temperature breakdown of the room. You can also
     give it any sun status or season to simulate those here (e.g. spring dark).
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
- &cyearly&0 - Runs a full annual update on the world.
+ &cyearly&0 - Runs a full maintenance/decay/newbie reset on the world.
 #d
 "UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
 

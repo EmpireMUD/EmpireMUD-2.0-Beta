@@ -4179,7 +4179,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
-	struct resource_data *yearly_maintenance;	// needed each year
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	struct bld_relation *relations;	// links to buildings/vehicles
 	
 	// live data (not saved, not freed)
@@ -6314,7 +6314,7 @@ struct vehicle_attribute_data {
 	bld_vnum interior_room_vnum;	// Any ROOM-flagged bld to use as an interior
 	int max_rooms;	// 1 = can enter; >1 allows designate
 	bitvector_t designate_flags;	// DES_ flags
-	struct resource_data *yearly_maintenance;
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	int veh_move_speed;  // VSPEED_ for driving action speed
 	int size;	// vehicle size
 	struct extra_descr_data *ex_description;	// extra descriptions

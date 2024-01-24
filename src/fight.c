@@ -2861,7 +2861,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			// apply needed maintenance if we did more than 10% damage
 			if (GET_BUILDING(to_room) && !IS_DISMANTLING(to_room) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
 				old_list = GET_BUILDING_RESOURCES(to_room);
-				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
+				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
 				free_resource_list(old_list);
 			}
 		
@@ -2947,7 +2947,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		// apply needed maintenance if we did more than 10% damage
 		if ((damage >= (VEH_MAX_HEALTH(veh) / 10) || !VEH_NEEDS_RESOURCES(veh)) && !VEH_IS_DISMANTLING(veh)) {
 			old_list = VEH_NEEDS_RESOURCES(veh);
-			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_REGULAR_MAINTENANCE(veh) ? VEH_REGULAR_MAINTENANCE(veh) : default_res);
 			free_resource_list(old_list);
 		}
 		

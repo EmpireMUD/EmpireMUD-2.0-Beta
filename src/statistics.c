@@ -337,19 +337,19 @@ void mudstats_time(char_data *ch, char *argument) {
 	// daily reset
 	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
 	if (when > 0) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily cycle: imminent\r\n");
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: imminent\r\n");
 	}
 	
 	// maintenance cycle
-	when = (data_get_long(DATA_LAST_NEW_YEAR) + SECS_PER_MUD_YEAR) - time(0);
+	when = (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR)) - time(0);
 	if (when > 0) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Empire maintenance: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Empire maintenance: imminent\r\n");
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): imminent\r\n");
 	}
 	
 	if (ch->desc) {

@@ -313,7 +313,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	// apply maintenance if not dismantling -- and is either complete OR has had at least 1 item added
 	if (!VEH_IS_DISMANTLING(veh) && (VEH_IS_COMPLETE(veh) || VEH_BUILT_WITH(veh))) {
 		old_list = VEH_NEEDS_RESOURCES(veh);
-		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_REGULAR_MAINTENANCE(veh) ? VEH_REGULAR_MAINTENANCE(veh) : default_res);
 		free_resource_list(old_list);
 	}
 	
@@ -1647,7 +1647,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Designate flags set but vehicle has no interior");
 		problem = TRUE;
 	}
-	if (!VEH_YEARLY_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+	if (!VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Requires no maintenance");
 		problem = TRUE;
 	}
@@ -2932,8 +2932,8 @@ void free_vehicle(vehicle_data *veh) {
 	
 	// attributes
 	if (veh->attributes && (!proto || veh->attributes != proto->attributes)) {
-		if (VEH_YEARLY_MAINTENANCE(veh)) {
-			free_resource_list(VEH_YEARLY_MAINTENANCE(veh));
+		if (VEH_REGULAR_MAINTENANCE(veh)) {
+			free_resource_list(VEH_REGULAR_MAINTENANCE(veh));
 		}
 		if (VEH_EX_DESCS(veh)) {
 			free_extra_descs(&VEH_EX_DESCS(veh));
@@ -3138,8 +3138,8 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
-			case 'R': {	// resources/yearly maintenance
-				parse_resource(fl, &VEH_YEARLY_MAINTENANCE(veh), error);
+			case 'R': {	// resources/regular maintenance
+				parse_resource(fl, &VEH_REGULAR_MAINTENANCE(veh), error);
 				break;
 			}
 			
@@ -3273,7 +3273,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "P\n%d\n", VEH_SPEED_BONUSES(veh));
 	
 	// 'R': resources
-	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
+	write_resources_to_file(fl, 'R', VEH_REGULAR_MAINTENANCE(veh));
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
@@ -3984,8 +3984,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_LOOK_DESC(proto)) {
 		free(VEH_LOOK_DESC(proto));
 	}
-	if (VEH_YEARLY_MAINTENANCE(proto)) {
-		free_resource_list(VEH_YEARLY_MAINTENANCE(proto));
+	if (VEH_REGULAR_MAINTENANCE(proto)) {
+		free_resource_list(VEH_REGULAR_MAINTENANCE(proto));
 	}
 	free_interactions(&VEH_INTERACTIONS(proto));
 	while ((spawn = VEH_SPAWNS(proto))) {
@@ -4047,7 +4047,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_LOOK_DESC(new) = VEH_LOOK_DESC(input) ? str_dup(VEH_LOOK_DESC(input)) : NULL;
 		
 		// copy lists
-		VEH_YEARLY_MAINTENANCE(new) = copy_resource_list(VEH_YEARLY_MAINTENANCE(input));
+		VEH_REGULAR_MAINTENANCE(new) = copy_resource_list(VEH_REGULAR_MAINTENANCE(input));
 		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
 		VEH_INTERACTIONS(new) = copy_interaction_list(VEH_INTERACTIONS(input));
 		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
@@ -4157,9 +4157,9 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", part);
 	}
 	
-	if (VEH_YEARLY_MAINTENANCE(veh)) {
-		get_resource_display(ch, VEH_YEARLY_MAINTENANCE(veh), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Yearly maintenance:\r\n%s", part);
+	if (VEH_REGULAR_MAINTENANCE(veh)) {
+		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Regular maintenance:\r\n%s", part);
 	}
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Scaled to level: [\tc%d (%d-%d)\t0], Owner: [%s%s\t0]\r\n", VEH_SCALE_LEVEL(veh), VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh), VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "", VEH_OWNER(veh) ? EMPIRE_NAME(VEH_OWNER(veh)) : "nobody");
@@ -4413,9 +4413,9 @@ void olc_show_vehicle(char_data *ch) {
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
-	if (VEH_YEARLY_MAINTENANCE(veh)) {
-		get_resource_display(ch, VEH_YEARLY_MAINTENANCE(veh), lbuf);
+	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_REGULAR_MAINTENANCE(veh)));
+	if (VEH_REGULAR_MAINTENANCE(veh)) {
+		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), lbuf);
 		strcat(buf, lbuf);
 	}
 	
@@ -4676,7 +4676,7 @@ OLC_MODULE(vedit_requiresclimate) {
 
 OLC_MODULE(vedit_resource) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
+	olc_process_resources(ch, argument, &VEH_REGULAR_MAINTENANCE(veh));
 }
 
 

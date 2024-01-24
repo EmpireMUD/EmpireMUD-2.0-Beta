@@ -673,12 +673,12 @@ You cannot remove the global name from an island, even if you set its name to
 'none'.
 
 There are three ways an island name can become that island's global name:
-Discovery (the first empire to name an unexplored island sets its global name)
-Sole ownership (if yours is the only empire with a city on the island)
-Consensus (if all empires with cities on the island use the same name for it)
+ Discovery (the first empire to name an unexplored island sets its global name)
+ Sole ownership (if yours is the only empire with a city on the island)
+ Consensus (if all empires with cities on the island use the same name for it)
 
 Only discovery changes an island's global name immediately; all other changes
-only happen at the beginning of a new MUD year.
+only happen later, at the same time maintenance and depletions reset.
 #
 DIAGNOSE
 
@@ -2862,13 +2862,10 @@ Just like the real world, time is different in different parts of the game
 world. Eastern parts of the map are later in the day (or even the next morning)
 than western parts of the map.
 
-Handy time-conversion chart:
- - 1 regeneration tick in-game = 5 seconds
- - 1 hour in-game = 75 seconds
- - 1 day in-game = 30 minutes
- - 1 year in-game = 7.5 days
+Regeneration ticks are every 5 seconds. You can see how long in-game hours,
+days, and years are by typing "mudstats configs".
 
-See also: SURVEY, TEMPERATURE, TIME ZONE, WEATHER, YEARLY RESET
+See also: SURVEY, TEMPERATURE, TIME ZONE, WEATHER, WORLD RESET, MUDSTATS
 #
 TITLE
 

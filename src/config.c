@@ -1830,7 +1830,6 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
 	init_config(CONFIG_GAME, "name_rules", CONFTYPE_LONG_STRING, "shown during creation");
 	init_config(CONFIG_GAME, "name_rules_lastname", CONFTYPE_LONG_STRING, "shown during creation for last names");
-	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
@@ -1867,6 +1866,8 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_per_member", CONFTYPE_INT, "workforce resource cap per member");
+	init_config(CONFIG_ACTIONS, "world_reset_hours", CONFTYPE_INT, "how many real hours between resets for depletions and empire maintenance");
+	init_config(CONFIG_ACTIONS, "world_reset_message", CONFTYPE_SHORT_STRING, "shown to all players before the laggy reset of depletions and empire maintenance");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
@@ -2057,7 +2058,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "default_interior", CONFTYPE_INT, "building room vnum to use for designate");
 		init_config_custom("default_interior", config_show_building, config_edit_building, NULL);
 	init_config(CONFIG_WORLD, "water_crop_distance", CONFTYPE_INT, "distance at which a crop marked requires-water can be planted from one");
-	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature each year");
+	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature when depletions reset");
 	init_config(CONFIG_WORLD, "naturalize_unclaimable", CONFTYPE_BOOL, "if true, naturalize/remember will also work on unclaimable tiles");
 	init_config(CONFIG_WORLD, "nearby_sector_distance", CONFTYPE_INT, "distance for the near-sector evolution");
 	init_config(CONFIG_WORLD, "ignore_island_levels", CONFTYPE_BOOL, "instancer will ignore island levels when spawning adventures");
@@ -2081,6 +2082,7 @@ void init_config_system(void) {
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 
 	// deprecated configs: no longer used/shown
+	deprecated_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING);
 	deprecated_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT);
 	deprecated_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT);
 	deprecated_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT);

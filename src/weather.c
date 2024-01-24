@@ -373,8 +373,6 @@ void weather_and_time(void) {
 * Advances time by an hour and triggers things which happen on specific hours.
 */
 void another_hour(void) {
-	long lny;
-	
 	// update main time
 	++main_time_info.hours;
 	if (main_time_info.hours > 23) {
@@ -394,16 +392,6 @@ void another_hour(void) {
 			if (main_time_info.month > 11) {
 				main_time_info.month = 0;
 				++main_time_info.year;
-				
-				// run annual update
-				annual_world_update();
-			}
-		}
-		else {	// not day 30
-			// check if we've missed a new year recently
-			lny = data_get_long(DATA_LAST_NEW_YEAR);
-			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
-				annual_world_update();
 			}
 		}
 	}

@@ -288,7 +288,7 @@
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
-#define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
+#define GET_BLD_REGULAR_MAINTENANCE(bld)  ((bld)->regular_maintenance)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1784,7 +1784,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
 #define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
-#define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
+#define VEH_REGULAR_MAINTENANCE(veh)  ((veh)->attributes->regular_maintenance)
 #define VEH_SIZE(veh)  ((veh)->attributes->size)
 #define VEH_SPAWNS(veh)  ((veh)->attributes->spawns)
 #define VEH_SPEED_BONUSES(veh)  ((veh)->attributes->veh_move_speed)

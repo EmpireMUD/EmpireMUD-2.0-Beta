@@ -70,6 +70,7 @@ char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
 void check_idle_menu_users();
+void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
@@ -957,6 +958,11 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		update_trading_post();
 		HEARTBEAT_LOG("26")
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		check_maintenance_and_depletion_reset();
+		HEARTBEAT_LOG("26.5")
 	}
 	
 	if (HEARTBEAT(1)) {

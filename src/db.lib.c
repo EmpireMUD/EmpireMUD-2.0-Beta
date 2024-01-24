@@ -658,8 +658,8 @@ void free_building(bld_data *bdg) {
 		free_proto_scripts(&GET_BLD_SCRIPTS(bdg));
 	}
 	
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg) && (!proto || GET_BLD_YEARLY_MAINTENANCE(bdg) != GET_BLD_YEARLY_MAINTENANCE(proto))) {
-		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg) && (!proto || GET_BLD_REGULAR_MAINTENANCE(bdg) != GET_BLD_REGULAR_MAINTENANCE(proto))) {
+		free_resource_list(GET_BLD_REGULAR_MAINTENANCE(bdg));
 	}
 	
 	if (GET_BLD_RELATIONS(bdg) && (!proto || GET_BLD_RELATIONS(bdg) != GET_BLD_RELATIONS(proto))) {
@@ -813,8 +813,8 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
-			case 'R': {	// resources/yearly maintenance
-				parse_resource(fl, &GET_BLD_YEARLY_MAINTENANCE(bld), buf2);
+			case 'R': {	// resources/regular maintenance
+				parse_resource(fl, &GET_BLD_REGULAR_MAINTENANCE(bld), buf2);
 				break;
 			}
 			
@@ -958,7 +958,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// 'R': resources
-	write_resources_to_file(fl, 'R', GET_BLD_YEARLY_MAINTENANCE(bld));
+	write_resources_to_file(fl, 'R', GET_BLD_REGULAR_MAINTENANCE(bld));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));

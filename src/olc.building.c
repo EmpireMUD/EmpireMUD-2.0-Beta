@@ -87,12 +87,12 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM | BLD_IS_RUINS) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM | BLD_IS_RUINS) && !GET_BLD_REGULAR_MAINTENANCE(bld)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Requires no maintenance");
 		problem = TRUE;
 	}
-	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_YEARLY_MAINTENANCE(bld)) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_REGULAR_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has maintenance resources (will have no effect)");
 		problem = TRUE;
 	}
 	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && (count_bld_relations(bld, BLD_REL_UPGRADES_TO_BLD) > 0 || count_bld_relations(bld, BLD_REL_FORCE_UPGRADE_BLD) > 0 || count_bld_relations(bld, BLD_REL_UPGRADES_TO_VEH) > 0 || count_bld_relations(bld, BLD_REL_FORCE_UPGRADE_VEH) > 0)) {
@@ -1128,8 +1128,8 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);
 	}
-	if (GET_BLD_YEARLY_MAINTENANCE(proto)) {
-		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(proto));
+	if (GET_BLD_REGULAR_MAINTENANCE(proto)) {
+		free_resource_list(GET_BLD_REGULAR_MAINTENANCE(proto));
 	}
 	if (GET_BLD_RELATIONS(proto)) {
 		free_bld_relations(GET_BLD_RELATIONS(proto));
@@ -1216,7 +1216,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
 		
 		// maintenance
-		GET_BLD_YEARLY_MAINTENANCE(new) = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(input));
+		GET_BLD_REGULAR_MAINTENANCE(new) = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(input));
 	}
 	else {
 		// brand new: some defaults
@@ -1360,9 +1360,9 @@ void olc_show_building(char_data *ch) {
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
+	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
+		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
 		strcat(buf, lbuf);
 	}
 
@@ -1607,7 +1607,7 @@ OLC_MODULE(bedit_relations) {
 
 OLC_MODULE(bedit_resource) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
+	olc_process_resources(ch, argument, &GET_BLD_REGULAR_MAINTENANCE(bdg));
 }
 
 

@@ -61,7 +61,7 @@ Some adventures need some setup:
 Additional tools:
  - 'show startlocs' - Lists the starting locations.
  - 'config world naturalize_newbie_islands true' - If you want to automatically
-   clean up the newbie islands each year.
+   clean up the newbie islands each time maintenance and depletions are reset.
 
 
 ==================

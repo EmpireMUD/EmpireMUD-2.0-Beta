@@ -543,9 +543,9 @@ void b4_15_building_update(void) {
 		// convert maintenance
 		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
 			// add maintenance
-			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+			if (GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room))) {
 				// basic stuff
-				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				disrepair_res = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)));
 
 				// multiply by years of disrepair
 				LL_FOREACH(disrepair_res, res) {
@@ -812,7 +812,7 @@ void b5_1_global_update(void) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+		LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
 				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
@@ -822,7 +822,7 @@ void b5_1_global_update(void) {
 	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+		LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
 				save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
@@ -2098,7 +2098,7 @@ void b5_88_resource_components_update(void) {
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
-		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+		LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
 					log("- converting resource on building [%d] %s from (%d %s) to [%d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
@@ -2218,7 +2218,7 @@ void b5_88_resource_components_update(void) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+		LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
 					log("- converting resource on vehicle [%d] %s from (%d %s) to [%d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
@@ -3955,6 +3955,25 @@ void b5_173_tavern_update(void) {
 }
 
 
+// b5.174: copy old config to new config
+void b5_174_config_change(void) {
+	struct config_type *get_config_by_key(char *key, bool exact);
+	struct config_type *config;
+	
+	if (strcmp(config_get_string("newyear_message"), "The ground under you shakes violently!")) {
+		// had a custom message -- copy it over
+		if ((config = get_config_by_key("world_reset_message", TRUE))) {
+			log("- copying message");
+			if (config->data.string_val) {
+				free(config->data.string_val);
+			}
+			config->data.string_val = str_dup(config_get_string("newyear_message"));
+			save_config_system();
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4062,6 +4081,7 @@ const struct {
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
 	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
 	{ "b5.172a", b5_173_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
+	{ "b5.174", b5_174_config_change, NULL, "Copying newyear_message to world_reset_message if needed" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
