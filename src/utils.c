@@ -4874,12 +4874,12 @@ char *CAP(char *txt) {
 * Converts a number of seconds (or minutes) from a large number to a 0:00
 * format (or 0:00:00 or even 0:00:00:00).
 *
-* @param int seconds How long the time is.
+* @param long seconds How long the time is.
 * @param bool minutes_instead if TRUE, the 'seconds' field is actually minutes and the time returned will be minutes as well.
 * @param char *unlimited_str If the time can be -1/UNLIMITED, returns this string instead (may be NULL).
 * @return char* The time string formatted with colons, or the "unlimited_str" if seconds was -1/UNLIMITED
 */
-char *colon_time(int seconds, bool minutes_instead, char *unlimited_str) {
+char *colon_time(long seconds, bool minutes_instead, char *unlimited_str) {
 	static char output[256];
 	int minutes, hours, days;
 	
@@ -4907,13 +4907,13 @@ char *colon_time(int seconds, bool minutes_instead, char *unlimited_str) {
 	seconds %= SECS_PER_REAL_MIN;
 	
 	if (days > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, (int)seconds);
 	}
 	else if (hours > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, (int)seconds);
 	}
 	else {
-		snprintf(output, sizeof(output), "%d:%02d", minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d", minutes, (int)seconds);
 	}
 	
 	// if we started with minutes, shave the seconds off

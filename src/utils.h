@@ -2006,7 +2006,7 @@ sector_data *get_sect_by_name(char *name);
 bool any_isname(const char *str, const char *namelist);
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
-char *colon_time(int seconds, bool minutes_instead, char *unlimited_str);
+char *colon_time(long seconds, bool minutes_instead, char *unlimited_str);
 char *delete_doubledollar(char *string);
 char *double_map_ampersands(char *icon);;
 const char *double_percents(const char *string);
