@@ -2966,7 +2966,7 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_PROSPECTING, room, worker, 1, NOTHING, 0);
 			add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
 		
-			if (get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) < config_get_int("prospecting_workforce_hours")) {
+			if ((get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) * WORKFORCE_CYCLE) < (config_get_int("prospecting_workforce_hours") * SECS_PER_REAL_HOUR)) {
 				// still working: only send message if someone else is present (don't bother verifying it's a player)
 				if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
 					switch (number(0, 2)) {
