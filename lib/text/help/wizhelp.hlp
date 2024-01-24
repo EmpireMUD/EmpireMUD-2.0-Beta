@@ -571,6 +571,7 @@ Island flags:
  CONTINENT - Is a whole continent (affects adventure spawns)
  !CHART - Cannot be charted by players
  !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
+ ALWAYS-LIGHT - Outdoor tiles are lit at night
 
 See also: CHART, GRANT
 #d

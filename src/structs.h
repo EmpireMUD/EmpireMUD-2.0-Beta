@@ -2969,6 +2969,7 @@ typedef enum {
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
 #define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
+#define ISLE_ALWAYS_LIGHT  BIT(7)	// h. outdoor tiles are always light
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them

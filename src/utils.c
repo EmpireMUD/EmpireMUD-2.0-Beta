@@ -7085,6 +7085,9 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	}
 	
 	// things that make the room light
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room)) {
+		return TRUE;
+	}
 	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
 		return TRUE;	// not dark: has a light source
 	}

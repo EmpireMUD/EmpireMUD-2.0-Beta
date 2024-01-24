@@ -4253,6 +4253,7 @@ const char *island_bits[] = {
 	"*",	// has-custom-desc (internal use only)
 	"!CHART",	// 5
 	"!TEMPERATURE-PENALTIES",
+	"ALWAYS-LIGHT",
 	"\n"
 };
 
