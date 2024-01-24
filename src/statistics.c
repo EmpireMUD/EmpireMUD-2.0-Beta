@@ -215,10 +215,7 @@ void mudstats_configs(char_data *ch, char *argument) {
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// time
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %.1f minutes per game hour,", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN);
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %.1f hours per day,", SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR);
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %.1f days per month,", SECS_PER_MUD_MONTH / (double) SECS_PER_REAL_DAY);
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), " %.1f days per year\r\n", SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year\r\n", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
 	
 	// skills
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
