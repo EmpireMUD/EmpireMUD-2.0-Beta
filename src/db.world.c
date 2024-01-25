@@ -1123,6 +1123,12 @@ void set_crop_type(room_data *room, crop_data *cp) {
 	ROOM_CROP(room) = cp;
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
+		
+		// check locking
+		if (CROP_FLAGGED(cp, CROPF_LOCK_ICON)) {
+			lock_icon(room, NULL);
+		}
+		
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP);
 	}
 	else {
