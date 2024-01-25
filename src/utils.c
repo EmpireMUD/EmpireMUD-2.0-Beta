@@ -6927,9 +6927,15 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (SHARED_DATA(room) == &ocean_shared_data) {
 		return;	// never on the ocean
 	}
-
+	
+	// hich icon?
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		if (ROOM_CROP(room)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(room)), GET_SEASON(room));
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		}
 	}
 	
 	// did we find one
