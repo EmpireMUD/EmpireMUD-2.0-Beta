@@ -95,7 +95,11 @@ The banshee familiar will use the following abilities in combat:
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the banshee is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS,
+   SUPPORT FAMILIARS
 #
 "BY THE SUN AND STARS" "SUN AND STARS"
 
@@ -133,7 +137,11 @@ The basilisk familiar will use the following abilities in combat:
 - Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
 - Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the basilisk is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS,
+   SUPPORT FAMILIARS
 #
 BREW
 
@@ -215,6 +223,9 @@ Trade synergy:
 Vampire synergy:
   Skeletal Hulk (caster) - Attacks the enemy.
   Banshee (healer) - Debuffs the enemy.
+
+You can choose which ability will be used by support familiars in combat using
+'order companion status'. Not all familiars use abilities.
 
 See also: HELP <NAME> FAMILIAR
 See also: COMPANION, SYNERGIES, FAMILIAR, MIRROR IMAGE, SUPPORT FAMILIARS
@@ -619,7 +630,10 @@ The moon rabbit familiar will use the following abilities in combat:
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
 - Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the moon rabbit is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS, SUPPORT FAMILIARS
 #
 MOONRISE
 
@@ -671,9 +685,12 @@ The owl shadow familiar will use the following abilities in combat:
 - Invigorating Darkness: +(level/5) Move points on party (instant)
 - Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
+Check what ability the owl shadow is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
 When you hide, this familiar will hide too.
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS, SUPPORT FAMILIARS
 #
 "PHOENIX FAMILIAR"
 
@@ -688,7 +705,10 @@ The phoenix familiar will use the following abilities in combat:
 - Healing Fire: smaller heal for the whole party (instant)
 - Burning Passion: +(level/30) bonus physical/magical damage to party (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the phoenix is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS, SUPPORT FAMILIARS
 #
 PURIFY
 
@@ -809,7 +829,10 @@ The salamander familiar will use the following abilities in combat:
 - Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
-See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the salamander is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS, SUPPORT FAMILIARS
 #
 "SAVAGE WEREWOLF FORM"
 
@@ -836,9 +859,13 @@ The scorpion shadow familiar will use the following abilities in combat:
 - Numbing Venom: -(2+level/100) Wits on enemy (30 sec)
 - Agonizing Venom: Poison DoT on enemy (30 sec)
 
+Check what ability the scorpion shadow is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
 When you hide, this familiar will hide too.
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS,
+   SUPPORT FAMILIARS
 #
 "SKELETAL HULK FAMILIAR"
 
@@ -898,7 +925,11 @@ The spirit wolf familiar will use the following abilities in combat:
 - Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
-See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS
+Check what ability the spirit wolf is set to use in combat by typing 'order
+companion status' then 'order companion <ability>' to choose one.
+
+See also: DEBUFF, FAMILIAR, DEBUFF FAMILIARS, COMPANION, DISMISS,
+   SUPPORT FAMILIARS
 #
 "SUMMON ANIMALS"
 
