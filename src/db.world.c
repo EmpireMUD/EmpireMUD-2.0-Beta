@@ -1125,7 +1125,7 @@ void set_crop_type(room_data *room, crop_data *cp) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
 		
 		// check locking
-		if (CROP_FLAGGED(cp, CROPF_LOCK_ICON)) {
+		if (cp && CROP_FLAGGED(cp, CROPF_LOCK_ICON)) {
 			lock_icon(room, NULL);
 		}
 		
