@@ -4496,13 +4496,14 @@ Usage:  .flags [add | remove] <flags>
 Crop flags determine some various properties about crops.
 
 Available flags:
- REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
- ORCHARD - Use 'pick' and 'chop' interactions instead of 'harvest'
- !WILD - Won't spawn in the wild
- NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
- !NEWBIE - Does not spawn on newbie islands
- ANY-LISTED-CLIMATE - Only 1 of the climate flags must match to plant this.
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
+ &cREQUIRES-WATER&0 - Can only be planted within 4 tiles of fresh water
+ &cORCHARD&0 - Use 'pick' and 'chop' interactions instead of 'harvest'
+ &c!WILD&0 - Won't spawn in the wild
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands (can be planted anywhere)
+ &c!NEWBIE&0 - Does not spawn on newbie islands
+ &cANY-LISTED-CLIMATE&0 - Only 1 of the climate flags must match to plant this.
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cLOCK-ICON&0 - a random icon is chosen when the crop grows, and is kept
 
 See also: OLC CROPS
 #d

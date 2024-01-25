@@ -1715,7 +1715,7 @@ void check_for_new_map(void) {
 	// map checks:
 	LL_FOREACH(land_map, map) {
 		// check icon-locking:
-		if (!map->shared->icon && SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON)) {
+		if (!map->shared->icon && (SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON) || (map->crop_type && CROP_FLAGGED(map->crop_type, CROPF_LOCK_ICON)))) {
 			lock_icon(real_room(map->vnum), NULL);
 		}
 		

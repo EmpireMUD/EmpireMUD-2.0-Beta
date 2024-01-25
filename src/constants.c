@@ -3968,6 +3968,7 @@ const char *crop_flags[] = {
 	"!NEWBIE",
 	"ANY-LISTED-CLIMATE",	// 5
 	"NO-GLOBAL-SPAWNS",
+	"LOCK-ICON",
 	"\n"
 };
 

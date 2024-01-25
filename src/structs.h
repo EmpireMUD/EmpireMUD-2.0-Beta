@@ -1041,6 +1041,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 #define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
+#define CROPF_LOCK_ICON  BIT(7)	// similar to sectors; crop has a permanent random icon
 
 
 // CROP_CUSTOM_x: custom messages

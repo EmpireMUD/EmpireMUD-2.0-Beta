@@ -195,7 +195,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	}
 	
 	// do we need to lock the icon?
-	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON)) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON) || (ROOM_CROP(room) && CROP_FLAGGED(ROOM_CROP(room), CROPF_LOCK_ICON))) {
 		lock_icon(room, NULL);
 	}
 	
@@ -2278,7 +2278,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for icon locking
-	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON) || (map && map->crop_type && CROP_FLAGGED(map->crop_type, CROPF_LOCK_ICON)) || (loc && ROOM_CROP(loc) && CROP_FLAGGED(ROOM_CROP(loc), CROPF_LOCK_ICON))) {
 		if (map) {
 			lock_icon_map(map, NULL);
 		}
