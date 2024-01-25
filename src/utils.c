@@ -6930,7 +6930,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	
 	// hich icon?
 	if (!(icon = use_icon)) {
-		if (ROOM_CROP(room)) {
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) {
 			icon = get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(room)), GET_SEASON(room));
 		}
 		else {
@@ -6977,7 +6977,12 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	}
 
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		if (SECT_FLAGGED(loc->sector_type, SECTF_CROP) && loc->crop_type && CROP_FLAGGED(loc->crop_type, CROPF_LOCK_ICON)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(loc->crop_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
 	}
 	
 	// did we find one
