@@ -3175,7 +3175,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// 25, no-basic-storage
 	"",	// seeded
 	"",	// important
-	"lasts longer when stored",
+	"",	// long-timer-in-storage
 	"",	// no-warehouse
 	"\n"
 };
