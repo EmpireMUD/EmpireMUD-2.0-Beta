@@ -30,11 +30,11 @@ end
 detach 5138 %room.id%
 ~
 #5142
-Chant of Druids (gain natural magic at a henge)~
+Chant of Magic (gain natural magic at a henge)~
 2 c 0
 chant~
-* Chant of Druids gains the player their 1st point of natural magic
-if !(druids /= %arg%)
+* Chant of Magic gains the player their 1st point of natural magic
+if !(magic /= %arg%)
   return 0
   halt
 end
@@ -47,7 +47,7 @@ if !%actor.canuseroom_guest%
   halt
 end
 if !%room.in_city(true)% && %room.bld_flagged(IN-CITY-ONLY)%
-  %send% %actor% You can't perform the chant of druids because the building isn't in a city.
+  %send% %actor% You can't perform the chant of magic because the building isn't in a city.
   halt
 end
 if %actor.fighting% || %actor.disabled%
@@ -76,64 +76,63 @@ while %cycles_left% >= 0
   * messaging
   switch %cycles_left%
     case 13
-      %send% %actor% You start the chant of druids...
-      %echoaround% %actor% ~%actor% starts the chant of druids...
+      %send% %actor% You start the Chant of Magic in the shadow of the henge...
+      %echoaround% %actor% ~%actor% starts the Chant of Magic beneath the henge...
     break
     case 12
-      %send% %actor% You dance around the henge...
-      %echoaround% %actor% ~%actor% dances around the henge...
+      %send% %actor% You chant, 'Feel the mana stir within, a whisper of the earth's embrace,' as you walk in and out of the henge...
+      %echoaround% %actor% ~%actor% chants, 'Feel the mana stir within, a whisper of the earth's embrace,' as &%actor% walks in and out of the henge...
     break
     case 11
-      %send% %actor% You recite the chant of druids as best you can...
-      %echoaround% %actor% ~%actor% recites the chant of druids...
+      %send% %actor% You chant, 'Raise your hands to the sky, beckoning the energies untold.'
+      %echoaround% %actor% ~%actor% chants, 'Raise your hands to the sky, beckoning the energies untold.'
     break
     case 10
-      %send% %actor% You chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You chant, 'Step lightly, dance with the winds, as nature's rhythm unfolds.'
+      %echoaround% %actor% ~%actor% chants, 'Step lightly, dance with the winds, as nature's rhythm unfolds.'
     break
     case 9
-      %send% %actor% Your voice falters as you try to remember all the words to the chant...
-      %echoaround% %actor% ~%actor% recites the chant of druids to the best of ^%actor% ability...
+      %send% %actor% Your voice falters as you chant, 'In every leaf, in every breeze, the mana's secret stories reside.'
+      %echoaround% %actor% ~%actor%'s voice falters as &%actor% chants, 'In every leaf, in every breeze, the mana's secret stories reside.'
     break
     case 8
-      %send% %actor% You hum and chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% hums and chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You dance across the henge, chanting, 'Embrace the essence, become one with the ebb and flow.'
+      %echoaround% %actor% ~%actor% dances across the henge, chanting, 'Embrace the essence, become one with the ebb and flow.'
     break
     case 7
-      %send% %actor% You begin the second verse of the chant of druids...
-      %echoaround% %actor% ~%actor% begins the second verse of the chant of druids...
+      %send% %actor% You look up, saying, 'Chant softly, words that echo in the language of the land.'
+      %echoaround% %actor% ~%actor% looks up, saying, 'Chant softly, words that echo in the language of the land.'
     break
     case 6
-      %send% %actor% You make percussion noises with your mouth between lines of the chant...
-      %echoaround% %actor% ~%actor% makes percussion noises with ^%actor% mouth...
+      %send% %actor% You chants, 'Sense the currents, weave the threads, as mana responds to your command.'
+      %echoaround% %actor% ~%actor% chants, 'Sense the currents, weave the threads, as mana responds to your command.'
     break
     case 5
-      %send% %actor% You reach the chorus and recite the chant of druids loudly...
-      %echoaround% %actor% ~%actor% recites the chant of druids as loud as &%actor% can...
+      %echo% The henge seems to hum, resonating with |%actor% footsteps.
     break
     case 4
-      %send% %actor% You chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You chant, 'In this dance of mana, the path to magic unfolds.'
+      %echoaround% %actor% ~%actor% chants, 'In this dance of mana, the path to magic unfolds.'
     break
     case 3
-      %send% %actor% You chant the final verse of the chant of druids...
-      %echoaround% %actor% ~%actor% chants the final verse of the chant of druids...
+      %send% %actor% You fall into the grass beneath the henge as colors swirl around you...
+      %echoaround% %actor% ~%actor% falls into the grass beneath the henge...
     break
     case 2
-      %send% %actor% You spin in place, waving your arms as you near the end of the chant of druids...
-      %echoaround% %actor% ~%actor% spins in place, waving ^%actor% arms up and down as &%actor% chants...
+      %send% %actor% The sun rises and sets and rises and sets above you as the stars act out a strange play...
+      %echoaround% %actor% ~%actor% stares up at the sky...
     break
     case 1
-      %send% %actor% You collapse in the center of the henge, exhausted from the chant.
-      %echoaround% %actor% ~%actor% collapses in the center of the henge.
+      %send% %actor% The fragrant aroma of the world's colors fades from your eyes, but not your mind, as you slowly climb to your feet.
+      %echoaround% %actor% ~%actor% slowly climbs to ^%actor% feet.
     break
     case 0
       * chant complete
       if %actor.skill(Natural Magic)% < 1
-        %send% %actor% &&gAs you finish the chant, you begin to see the weave of mana through nature...&&0
+        %send% %actor% &&gAs you finish the chant, you finally to see the weave of mana through nature...&&0
         nop %actor.gain_skill(Natural Magic,1)%
         if %actor.skill(Natural Magic)% < 1
-          %send% %actor% But you fail to grasp the concepts of the chant of druids (you cannot gain Natural Magic skill).
+          %send% %actor% But you fail to grasp the concepts of the Chant of Magic (you cannot gain Natural Magic skill).
         end
       else
         %send% %actor% You finish the chant.
@@ -148,14 +147,14 @@ while %cycles_left% >= 0
 done
 ~
 #5143
-Chant of Druids 2nd person (denial)~
+Chant of Magics 2nd person (denial)~
 2 c 0
 chant~
-if !(druids /= %arg%)
+if !(magic /= %arg%)
   return 0
   halt
 end
-%send% %actor% Only one person can perform the chant of druids at a time.
+%send% %actor% Only one person can perform the Chant of Magic at a time.
 ~
 #5156
 Swamp Platform~

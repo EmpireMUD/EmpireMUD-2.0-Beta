@@ -2460,7 +2460,7 @@ void b5_94_terrain_heights(void) {
 }
 
 
-// b5.99 replaces chant of druids with a pair of triggers, which must be
+// b5.99 replaces chant of magic/druids with a pair of triggers, which must be
 // attached to all live buildings
 void b5_99_henge_triggers(void) {
 	const any_vnum main_trig = 5142, second_trig = 5143;

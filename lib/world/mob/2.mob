@@ -548,14 +548,15 @@ The patron appears to be having trouble staying on his chair.
 ~
 S
 #243
-druid~
-a druid~
-A druid is chanting here.
+manaweaver~
+a manaweaver~
+A hooded manaweaver is chanting here.
 ~
 20 50 dqvxI c 3
 1 0 0 16 -1
 D
-The druid is wearing a long, brown cloak with the hood over his head.
+   The old mage is wearing a long, brown cloak with the hood over his head.
+There's a faint, green glow around him.
 ~
 I 4 1107 10.00 1  # LOOT: wooden staff
 S
