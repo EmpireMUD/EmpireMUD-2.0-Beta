@@ -6490,7 +6490,7 @@ SHOW(show_spawns) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -6503,7 +6503,7 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
 				CAP(buf1);	// crop names are lowercase
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
@@ -6517,7 +6517,7 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -6530,7 +6530,7 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}

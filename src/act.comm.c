@@ -607,7 +607,7 @@ void load_global_history(void) {
 // uses subcmd as a position in the pub_comm array
 ACMD(do_pub_comm) {
 	char msgbuf[MAX_STRING_LENGTH], langbuf[MAX_STRING_LENGTH];
-	char level_string[10], invis_string[10];
+	char level_string[256], invis_string[256];
 	descriptor_data *desc;
 	generic_data *lang = NULL;
 	bool emote = FALSE, res;
@@ -884,7 +884,7 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		sprintf(lbuf, "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
+		snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (!d->character || STATE(d) != CON_PLAYING) {
@@ -1094,7 +1094,7 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 * Loads the slash channels from their files and does some maintenance on them.
 */
 void load_slash_channels(void) {
-	char name[256], filename[256], line[256], error[256], str[256];
+	char name[256], filename[512], line[256], error[512], str[256];
 	struct channel_history_data *hist, *next_hist;
 	struct slash_channel *chan;
 	char color;
@@ -1125,7 +1125,7 @@ void load_slash_channels(void) {
 		}
 		
 		// now try to load from file
-		sprintf(filename, "%s%s", LIB_CHANNELS, name);
+		snprintf(filename, sizeof(filename), "%s%s", LIB_CHANNELS, name);
 		if ((fl = fopen(filename, "r"))) {
 			// file open..
 			snprintf(error, sizeof(error), "slash-channel %s", name);
@@ -1203,7 +1203,7 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		sprintf(lbuf, "[\t%c/%s\tn]: %s\tn\r\n", chan->color, chan->name, output);
+		snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn]: %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (!d->character || STATE(d) != CON_PLAYING) {
@@ -1902,7 +1902,7 @@ ACMD(do_history) {
 	}
 	else if (subcmd == SCMD_HISTORY && *arg == '/') {
 		// forward to /history
-		char buf[MAX_INPUT_LENGTH];
+		char buf[MAX_STRING_LENGTH];
 		snprintf(buf, sizeof(buf), "history %s", arg);
 		do_slash_channel(ch, buf, 0, 0);
 		return;
@@ -2092,7 +2092,7 @@ ACMD(do_page) {
 	else if (!*arg)
 		msg_to_char(ch, "Whom do you wish to page?\r\n");
 	else {
-		sprintf(buf, "\007*$n* %s", buf2);
+		snprintf(buf, sizeof(buf), "\007*$n* %s", buf2);
 		if (!str_cmp(arg, "all")) {
 			if (GET_ACCESS_LEVEL(ch) >= LVL_IMPL) {
 				for (d = descriptor_list; d; d = d->next) {
