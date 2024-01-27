@@ -2435,6 +2435,7 @@ ACMD(do_learned) {
 			
 			// ok:
 			++count;
+			l_size = 0;
 			
 			// check start of line
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
