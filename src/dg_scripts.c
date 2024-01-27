@@ -6659,7 +6659,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							struct empire_storage_data *store;
 							
 							comma_args(subfield, arg1, arg2);
-							if (!*arg1 || !*arg2 || !isdigit(*arg1) || (vnum = atoi(arg1) < 0)) {
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || (vnum = atoi(arg1)) < 0) {
 								// bad input
 								snprintf(str, slen, "0");
 							}
