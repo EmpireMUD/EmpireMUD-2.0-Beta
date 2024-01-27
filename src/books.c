@@ -563,13 +563,7 @@ void load_book_library_file(void) {
 	char line[MAX_STRING_LENGTH];
 	int room, book;
 	FILE *fl;
-	struct library_info *library, *next_library;
-	
-	// clear any existing library data
-	HASH_ITER(hh, library_table, library, next_library) {
-		HASH_DEL(library_table, library);
-		free_library_info(library);
-	}
+	struct library_info *library;
 	
 	// open library file? not fatal if missing -- just no existing libraries
 	if (!(fl = fopen(LIBRARY_FILE, "r"))) {
