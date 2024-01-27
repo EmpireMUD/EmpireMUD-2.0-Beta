@@ -96,6 +96,7 @@ void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
 void write_binary_world_index_updates();
+void write_book_library_file();
 void write_mapout_updates();
 void write_running_events_file();
 
@@ -993,7 +994,13 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("32")
 	}
 	
-	// this goes roughly last -- update MSDP users
+	// check library updates
+	if (book_library_file_needs_save) {
+		write_book_library_file();
+		HEARTBEAT_LOG("33")
+	}
+	
+	// this goes roughly last -- update MSDP users etc
 	if (HEARTBEAT(1)) {
 		msdp_update();
 		HEARTBEAT_LOG("34")

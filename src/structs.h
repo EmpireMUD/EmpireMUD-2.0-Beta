@@ -4134,16 +4134,24 @@ struct book_data {
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
-	struct library_data *in_libraries;	// hash of places this book is kept
 	
 	UT_hash_handle hh;	// book_table
 };
 
 
-// linked list of locations the book occurs
-struct library_data {
-	room_vnum location;
-	UT_hash_handle hh;	// in_libraries hash
+// single book in a library
+struct library_book {
+	any_vnum vnum;		// book vnum
+	UT_hash_handle hh;	// hashed by vnum in the library
+};
+
+
+// tracks where books are stored
+struct library_info {
+	room_vnum room;	// location (hash key)
+	struct library_book *books;	// hash of books (by vnum)
+	
+	UT_hash_handle hh;
 };
 
 

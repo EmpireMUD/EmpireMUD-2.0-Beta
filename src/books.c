@@ -27,9 +27,16 @@
 *   Data
 *   Author Tracking
 *   Core Functions
-*   Library
+*   Library Functions
+*   Library Commands
 *   Reading
 */
+
+
+// local prototypes
+void add_book_to_library(any_vnum vnum, struct library_info *library);
+struct library_book *find_book_in_library(any_vnum vnum, struct library_info *library);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
@@ -37,6 +44,9 @@
 book_data *book_table = NULL;	// hash table
 struct author_data *author_table = NULL;	// hash table of authors
 book_vnum top_book_vnum = 0;	// need a persistent top vnum because re-using a book vnum causes funny issues with obj copies of the book
+
+struct library_info *library_table = NULL;	// global hash (by room vnum) of libraries
+bool book_library_file_needs_save = FALSE;		// hint to save the library file
 
 // from bookedit.c
 extern const char *default_book_title;
@@ -94,22 +104,18 @@ book_data *book_proto(book_vnum vnum) {
 
 /**
 * Dumps all the books stored here into the room as items. (They remain in the
-* library list, too, unless you also call remove_library_from_books() on the
-* room.
+* library list, too, unless you also call delete_library() on the room.
 *
 * @param room_data *room The room to dump books in, from its own library list.
 */
 void dump_library_to_room(room_data *room) {
-	room_vnum loc = GET_ROOM_VNUM(room);
-	book_data *book, *next_book;
 	obj_data *obj;
-	struct library_data *libr;
+	struct library_book *book, *next;
+	struct library_info *library;
 	
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
-		if (libr) {
-			// found a book
-			obj = create_book_obj(book);
+	if ((library = find_library(GET_ROOM_VNUM(room), FALSE))) {
+		HASH_ITER(hh, library->books, book, next) {
+			obj = create_book_obj(book_proto(book->vnum));
 			obj_to_room(obj, room);
 			
 			if (load_otrigger(obj) && ROOM_PEOPLE(room)) {
@@ -123,7 +129,7 @@ void dump_library_to_room(room_data *room) {
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
 	book_data *book;
-	struct library_data *libr;
+	struct library_info *library;
 	struct paragraph_data *para;
 	
 	room_vnum room;
@@ -190,14 +196,11 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				}
 				break;
 			}
-			case 'L': {	// library
+			case 'L': {	// library -- OLD data deprecated in b5.174 (still read in for backwards-compatibility)
 				room = atoi(line+2);
-				if (real_room(room)) {
-					CREATE(libr, struct library_data, 1);
-					libr->location = room;
-					HASH_ADD_INT(BOOK_IN_LIBRARIES(book), location, libr);
+				if (real_room(room) && (library = find_library(room, TRUE))) {
+					add_book_to_library(BOOK_VNUM(book), library);
 				}
-				
 				break;
 			}
 
@@ -221,7 +224,6 @@ void parse_book(FILE *fl, book_vnum vnum) {
 void save_author_books(int idnum) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
-	struct library_data *libr, *next_libr;
 	book_data *book, *next_book;
 	FILE *fl;
 	
@@ -259,9 +261,7 @@ void save_author_books(int idnum) {
 			}
 			
 			// 'L': library
-			HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-				fprintf(fl, "L %d\n", libr->location);
-			}
+			// Deprecated as of b5.174: libraries now have their own file
 			
 			fprintf(fl, "S\n");
 		}
@@ -285,7 +285,7 @@ book_data *random_lost_book(void) {
 	int count = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (BOOK_AUTHOR(book) != 0 && BOOK_IN_LIBRARIES(book)) {
+		if (BOOK_AUTHOR(book) != 0 && find_book_in_any_library(BOOK_VNUM(book))) {
 			continue;	// not lost
 		}
 		if (!BOOK_PARAGRAPHS(book)) {
@@ -302,34 +302,6 @@ book_data *random_lost_book(void) {
 	}
 	
 	return found;	// if any
-}
-
-
-/**
-* When a library is destroyed, removes it from the library list on all books.
-*
-* @param room_vnum location Where the library was.
-*/
-void remove_library_from_books(room_vnum location) {
-	book_data *book, *next_book;
-	struct library_data *libr, *next_libr;
-	struct vnum_hash *vhash = NULL, *vh, *next_vh;
-	
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (libr->location == location) {
-				add_vnum_hash(&vhash, BOOK_AUTHOR(book), 1);
-				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-				free(libr);
-			}
-		}
-	}
-	
-	// and save authors
-	HASH_ITER(hh, vhash, vh, next_vh) {
-		save_author_books(vh->vnum);
-	}
-	free_vnum_hash(&vhash);
 }
 
 
@@ -369,19 +341,20 @@ void save_author_index(void) {
 * @param room_data *room the location of the library
 * @return book_data* either the book in this library, or NULL
 */
-book_data *find_book_in_library(char *argument, room_data *room) {
-	book_data *book, *next_book, *by_name = NULL, *found = NULL;
-	struct library_data *libr, *next_libr;
+book_data *find_book_in_library_by_name(char *argument, room_data *room) {
 	int num = NOTHING;
+	book_data *book, *found = NULL, *by_name = NULL;
+	struct library_book *libbook, *next;
+	struct library_info *library;
 	
 	if (is_number(argument)) {
 		num = atoi(argument);
 	}
 	
 	// find by number or name
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (libr->location == GET_ROOM_VNUM(room)) {
+	if ((library = find_library(GET_ROOM_VNUM(room), FALSE))) {
+		HASH_ITER(hh, library->books, libbook, next) {
+			if ((book = book_proto(libbook->vnum))) {
 				if (num != NOTHING && --num == 0) {
 					// found by number!
 					found = book;
@@ -454,7 +427,272 @@ book_data *find_book_by_author(char *argument, int idnum) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// LIBRARY /////////////////////////////////////////////////////////////////
+//// LIBRARY FUNCTIONS ///////////////////////////////////////////////////////
+
+/**
+* Adds a book to a library, by vnum, if it's not already there.
+*
+* @param any_vnum vnum The book vnum to add.
+* @param struct library_info *library The library to shelve it in.
+*/
+void add_book_to_library(any_vnum vnum, struct library_info *library) {
+	struct library_book *book;
+	
+	if (vnum == NOTHING || !library || find_book_in_library(vnum, library)) {
+		return;	// shortcut
+	}
+	
+	CREATE(book, struct library_book, 1);
+	book->vnum = vnum;
+	HASH_ADD_INT(library->books, vnum, book);
+	book_library_file_needs_save = TRUE;
+}
+
+
+/**
+* Deletes the library entry for a room, if it exists.
+*
+* @param room_data *room The library's location.
+*/
+void delete_library(room_data *room) {
+	struct library_info *library;
+	
+	if (room && (library = find_library(GET_ROOM_VNUM(room), FALSE))) {
+		HASH_DEL(library_table, library);
+		free_library_info(library);
+		book_library_file_needs_save = TRUE;
+	}
+}
+
+
+/**
+* Finds the entry for a book in a given library, by vnum, if it exists.
+*
+* @param any_vnum vnum The book vnum to find.
+* @param struct library_info *library The library to find it in.
+* @return struct library_book* The book's entry in that library, if it exists, or NULL if not.
+*/
+struct library_book *find_book_in_library(any_vnum vnum, struct library_info *library) {
+	struct library_book *book;
+	
+	if (vnum == NOTHING || !library) {
+		return NULL;	// shortcut
+	}
+	
+	HASH_FIND_INT(library->books, &vnum, book);
+	return book;	// if any
+}
+
+
+/**
+* Determines if a book (by vnum) is in any libraries.
+*
+* @param any_vnum vnum Which book vnum.
+* @return bool TRUE if the book is in any libraries; FALSE if not.
+*/
+bool find_book_in_any_library(any_vnum vnum) {
+	struct library_info *library, *next;
+	
+	HASH_ITER(hh, library_table, library, next) {
+		if (find_book_in_library(vnum, library)) {
+			// only takes 1
+			return TRUE;
+		}
+	}
+	
+	// nope
+	return FALSE;
+}
+
+
+/**
+* Finds the library data for a given room location. Can also create it, if
+* desired.
+*
+* @param room_vnum location Which room has the library (should have the LIBRARY function flag).
+* @param bool add_if_missing If TRUE, creates the entry if none exists.
+* @return struct library_info* The library data for that location, if any. Guaranteed if add_if_missing was TRUE.
+*/
+struct library_info *find_library(room_vnum location, bool add_if_missing) {
+	struct library_info *library;
+	
+	HASH_FIND_INT(library_table, &location, library);
+	
+	if (!library && add_if_missing) {
+		CREATE(library, struct library_info, 1);
+		library->room = location;
+		
+		HASH_ADD_INT(library_table, room, library);
+		book_library_file_needs_save = TRUE;
+	}
+	
+	return library;
+}
+
+
+/**
+* Frees a hash of library books.
+*
+* @param struct library_book *hash The hash of books to free.
+*/
+void free_library_books(struct library_book *hash) {
+	struct library_book *iter, *next;
+	HASH_ITER(hh, hash, iter, next) {
+		HASH_DEL(hash, iter);
+		free(iter);
+	}
+}
+
+
+/**
+* Frees a library_info and its data (warning: does not remove from the
+* library_table first).
+*
+* @param struct library_info *library The library info to free.
+*/
+void free_library_info(struct library_info *library) {
+	free_library_books(library->books);
+	free(library);
+}
+
+
+/**
+* Loads the library file (at startup), if it exists.
+*/
+void load_book_library_file(void) {
+	char line[MAX_STRING_LENGTH];
+	int room, book;
+	FILE *fl;
+	struct library_info *library, *next_library;
+	
+	// clear any existing library data
+	HASH_ITER(hh, library_table, library, next_library) {
+		HASH_DEL(library_table, library);
+		free_library_info(library);
+	}
+	
+	// open library file? not fatal if missing -- just no existing libraries
+	if (!(fl = fopen(LIBRARY_FILE, "w"))) {
+		log("No existing libraries found");
+		return;
+	}
+	
+	// load entries
+	for (;;) {
+		if (!get_line(fl, line)) {
+			// premature EOF is unfortunate but not fatal
+			log("Warning: Unexpected end if library file %s", LIBRARY_FILE);
+			fclose(fl);
+			return;
+		}
+		
+		if (*line == '$') {
+			// done
+			break;
+		}
+		else if (isdigit(*line)) {
+			// book entry
+			if (sscanf(line, "%d %d", &room, &book) != 2) {
+				log("Warning: Unable to parse line '%s' in library file %s", line, LIBRARY_FILE);
+				// not fatal
+				continue;
+			}
+			
+			// add the book
+			if (real_room(room) && (library = find_library(room, TRUE))) {
+				add_book_to_library(book, library);
+			}
+		}
+		else {
+			log("Warning: Unexpected line '%s' in library file %s", line, LIBRARY_FILE);
+			// but not fatal
+		}
+	}
+	
+	fclose(fl);
+	
+	// since we just loaded it, consider it correct
+	book_library_file_needs_save = FALSE;
+}
+
+
+/**
+* Removes a book from a library, by vnum, if it's in there.
+*
+* @param any_vnum vnum The book vnum to remove.
+* @param struct library_info *library The library to remove it from.
+* @return bool TRUE if it was removed, FALSE if it wasn't present.
+*/
+bool remove_book_from_library(any_vnum vnum, struct library_info *library) {
+	struct library_book *book;
+	
+	if (!library || !(book = find_book_in_library(vnum, library))) {
+		return FALSE;	// no work
+	}
+	
+	HASH_DEL(library->books, book);
+	free(book);
+	book_library_file_needs_save = TRUE;
+	return TRUE;
+}
+
+
+/**
+* Removes a book from any library it is shelved in.
+*
+* @param any_vnum vnum The book vnum.
+*/
+void remove_book_from_all_libraries(any_vnum vnum) {
+	struct library_info *library, *next;
+	
+	HASH_ITER(hh, library_table, library, next) {
+		remove_book_from_library(vnum, library);
+	}
+}
+
+
+/**
+* Writes a fresh copy of the library file. This is triggered by setting
+* 'book_library_file_needs_save' to be true, or you can call it manually.
+*/
+void write_book_library_file(void) {
+	FILE *fl;
+	struct library_book *book, *next_book;
+	struct library_info *library, *next_library;
+	
+	if (!(fl = fopen(LIBRARY_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to write library file '%s'", LIBRARY_FILE TEMP_SUFFIX);
+		exit(1);
+	}
+	
+	// for each library
+	HASH_ITER(hh, library_table, library, next_library) {
+		if (library->room == NOWHERE) {
+			continue;	// skip unexpected entries
+		}
+		
+		// for each book in it
+		HASH_ITER(hh, library->books, book, next_book) {
+			if (book->vnum == NOTHING) {
+				continue;	// skip invalid entries
+			}
+			
+			// 1 entry: room vnum
+			fprintf(fl, "%d %d\n", library->room, book->vnum);
+		}
+	}
+	
+	// done
+	fprintf(fl, "$\n");
+	fclose(fl);
+	rename(LIBRARY_FILE TEMP_SUFFIX, LIBRARY_FILE);
+	
+	book_library_file_needs_save = FALSE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LIBRARY COMMANDS ////////////////////////////////////////////////////////
 
 // externs
 LIBRARY_SCMD(bookedit_abort);
@@ -473,18 +711,19 @@ LIBRARY_SCMD(bookedit_write);
 
 
 LIBRARY_SCMD(library_browse) {
-	book_data *book, *next_book;
-	struct library_data *libr;
+	book_data *book;
+	struct library_book *libbook, *next;
+	struct library_info *library;
 	int count = 0;
-	room_vnum loc = GET_ROOM_VNUM(IN_ROOM(ch));
 
 	if (ch->desc) {
 		sprintf(buf, "Books shelved here:\r\n");
-	
-		HASH_ITER(hh, book_table, book, next_book) {
-			HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
-			if (libr) {
-				sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+		
+		if ((library = find_library(GET_ROOM_VNUM(IN_ROOM(ch)), FALSE))) {
+			HASH_ITER(hh, library->books, libbook, next) {
+				if ((book = book_proto(libbook->vnum))) {
+					sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+				}
 			}
 		}
 	
@@ -509,7 +748,7 @@ LIBRARY_SCMD(library_checkout) {
 	if (!*argument) {
 		msg_to_char(ch, "Check out which book? (Use 'library browse' to see a list.)\r\n");
 	}
-	else if (!(book = find_book_in_library(argument, IN_ROOM(ch)))) {
+	else if (!(book = find_book_in_library_by_name(argument, IN_ROOM(ch)))) {
 		msg_to_char(ch, "No such book is shelved here.\r\n");
 	}
 	else {
@@ -528,30 +767,14 @@ LIBRARY_SCMD(library_checkout) {
 // actually shelves a book -- 99% of sanity checks done before this
 int perform_shelve(char_data *ch, obj_data *obj) {
 	book_data *book;
-	struct library_data *libr;
-	bool found = FALSE;
-	room_vnum loc = GET_ROOM_VNUM(IN_ROOM(ch));
 	
 	if (!IS_BOOK(obj) || !(book = book_proto(GET_BOOK_ID(obj)))) {
 		act("You can't shelve $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
 	else {
-		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
-		if (libr) {
-			found = TRUE;
-		}
+		add_book_to_library(BOOK_VNUM(book), find_library(GET_ROOM_VNUM(IN_ROOM(ch)), TRUE));
 		
-		if (!found) {
-			// not already in the library
-			CREATE(libr, struct library_data, 1);
-			libr->location = GET_ROOM_VNUM(IN_ROOM(ch));
-			HASH_ADD_INT(BOOK_IN_LIBRARIES(book), location, libr);
-			
-			// save new locations
-			save_author_books(BOOK_AUTHOR(book));
-		}
-	
 		act("You shelve $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n shelves $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
@@ -647,8 +870,7 @@ LIBRARY_SCMD(library_shelve) {
 
 LIBRARY_SCMD(library_burn) {
 	book_data *book;
-	struct library_data *libr;
-	room_vnum loc;
+	struct library_info *library;
 	
 	skip_spaces(&argument);
 	
@@ -658,18 +880,14 @@ LIBRARY_SCMD(library_burn) {
 	else if (!*argument) {
 		msg_to_char(ch, "Burn which book? (Use 'library browse' to see a list.)\r\n");
 	}
-	else if (!(book = find_book_in_library(argument, IN_ROOM(ch)))) {
+	else if (!(book = find_book_in_library_by_name(argument, IN_ROOM(ch)))) {
 		msg_to_char(ch, "No such book is shelved here.\r\n");
 	}
 	else {
-		loc = GET_ROOM_VNUM(IN_ROOM(ch));
-		HASH_FIND_INT(BOOK_IN_LIBRARIES(book), &loc, libr);
-		if (libr) {
-			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-			free(libr);
+		// actual removal
+		if ((library = find_library(GET_ROOM_VNUM(IN_ROOM(ch)), FALSE))) {
+			remove_book_from_library(BOOK_VNUM(book), library);
 		}
-
-		save_author_books(BOOK_AUTHOR(book));
 		
 		msg_to_char(ch, "You take all the copies of %s from the shelves and burn them behind the library!\r\n", BOOK_TITLE(book));
 		sprintf(buf, "$n takes all the copies of %s from the shelves and burn them behind the library!", BOOK_TITLE(book));

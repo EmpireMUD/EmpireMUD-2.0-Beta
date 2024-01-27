@@ -6055,7 +6055,7 @@ SHOW(show_libraries) {
 	size_t size, count;
 	book_data *book;
 	room_data *room;
-	struct library_data *libr, *next_libr;
+	struct library_info *libr, *next_libr;
 	
 	one_word(argument, arg);
 	
@@ -6069,8 +6069,8 @@ SHOW(show_libraries) {
 		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (!(room = real_room(libr->location))) {
+		HASH_ITER(hh, library_table, libr, next_libr) {
+			if (!(room = real_room(libr->room))) {
 				continue;
 			}
 			
@@ -6110,7 +6110,7 @@ SHOW(show_lost_books) {
 	
 	count = 0;
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (BOOK_IN_LIBRARIES(book)) {
+		if (find_book_in_any_library(BOOK_VNUM(book))) {
 			continue;
 		}
 		

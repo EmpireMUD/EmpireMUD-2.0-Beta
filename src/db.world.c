@@ -503,7 +503,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
-		remove_library_from_books(GET_ROOM_VNUM(room));
+		delete_library(room);
 	}
 	
 	// ensure not owned (and update empire stuff if so)

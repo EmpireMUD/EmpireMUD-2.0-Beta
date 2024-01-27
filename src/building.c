@@ -573,7 +573,7 @@ void disassociate_building(room_data *room) {
 	}
 	
 	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
-		remove_library_from_books(GET_ROOM_VNUM(room));
+		delete_library(room);
 	}
 	
 	if (ROOM_OWNER(room)) {

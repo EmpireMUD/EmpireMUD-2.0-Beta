@@ -535,9 +535,7 @@ obj_data *perform_remove(char_data *ch, int pos);
 book_data *book_proto(book_vnum vnum);
 void dump_library_to_room(room_data *room);
 book_data *find_book_by_author(char *argument, int idnum);
-book_data *find_book_in_library(char *argument, room_data *room);
 book_data *random_lost_book(void);
-void remove_library_from_books(room_vnum location);
 
 // config.c
 bitvector_t config_get_bitvector(char *key);

@@ -3598,7 +3598,7 @@ void b5_169_book_move(void) {
 	player_index_data *index, *next_index;
 	struct author_data *author, *next_author;
 	struct empire_unique_storage *eus;
-	struct library_data *libr, *next_libr;
+	struct library_info *library, *next_library;
 	struct trading_post_data *tpd;
 	
 	// list to keep as-is
@@ -3650,10 +3650,6 @@ void b5_169_book_move(void) {
 		copied = setup_olc_book(book);
 		BOOK_VNUM(copied) = new_vnum;
 		add_book_to_table(copied);
-		
-		// swap in-library data; this will be correct soon
-		BOOK_IN_LIBRARIES(copied) = BOOK_IN_LIBRARIES(book);
-		BOOK_IN_LIBRARIES(book) = NULL;
 		
 		// delete old book
 		remove_book_from_table(book);
@@ -3738,14 +3734,12 @@ void b5_169_book_move(void) {
 		}
 	}
 	
-	// and lastly, audit remaining books for invalid library locations
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
-				// invalid location
-				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-				free(libr);
-			}
+	// and lastly, audit libraries for invalid locations
+	HASH_ITER(hh, library_table, library, next_library) {
+		if (!(room = real_room(library->room)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
+			HASH_DEL(library_table, library);
+			free_library_info(library);
+			book_library_file_needs_save = TRUE;
 		}
 	}
 	
@@ -3974,6 +3968,48 @@ void b5_174_config_change(void) {
 }
 
 
+// b5.174: converts stock books to author 0 and saves all book/library files
+void b5_174_library_and_author_update(void) {
+	void write_book_library_file();
+	bool found;
+	int iter;
+	book_data *book, *next_book;
+	struct author_data *author, *next_author;
+
+	// list to keep as-is
+	int core_book_list[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 24, 5511, 11862, -1 };	// terminated by -1
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		// is it a core book?
+		for (iter = 0, found = FALSE; core_book_list[iter] != -1 && !found; ++iter) {
+			if (BOOK_VNUM(book) == core_book_list[iter]) {
+				found = TRUE;
+			}
+		}
+		if (!found) {
+			// skip books NOT on the core list
+			continue;
+		}
+		
+		// OK:
+		// ensure author is 0 (no author for core books)
+		BOOK_AUTHOR(book) = 0;
+	}
+	
+	// ensure author is in table, and save the index
+	add_book_author(0);
+	save_author_index();
+	
+	// save all books now
+	HASH_ITER(hh, author_table, author, next_author) {
+		save_author_books(author->idnum);
+	}
+	
+	// ensure library file is saved
+	write_book_library_file();
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4082,6 +4118,7 @@ const struct {
 	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
 	{ "b5.172a", b5_173_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
 	{ "b5.174", b5_174_config_change, NULL, "Copying newyear_message to world_reset_message if needed" },
+	{ "b5.174a", b5_174_library_and_author_update, NULL, "Renumbering stock book authors and saving updated library and book files" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

@@ -251,7 +251,6 @@
 #define BOOK_AUTHOR(book)		((book)->author)
 #define BOOK_BYLINE(book)		((book)->byline)
 #define BOOK_FLAGS(book)		((book)->flags)
-#define BOOK_IN_LIBRARIES(book)	((book)->in_libraries)
 #define BOOK_ITEM_DESC(book)	((book)->item_description)
 #define BOOK_ITEM_NAME(book)	((book)->item_name)
 #define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
