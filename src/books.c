@@ -655,6 +655,10 @@ void write_book_library_file(void) {
 	struct library_book *book, *next_book;
 	struct library_info *library, *next_library;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(LIBRARY_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write library file '%s'", LIBRARY_FILE TEMP_SUFFIX);
 		exit(1);
