@@ -1200,7 +1200,7 @@ A Grand Library~
 24 10 R 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    You take a step and are immersed in a musty swirl of dust. Stacks of books
 taller than your house are piled in oak bookshelves set against marble walls
@@ -1217,6 +1217,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5149
 S
 #5150
 High Temple~

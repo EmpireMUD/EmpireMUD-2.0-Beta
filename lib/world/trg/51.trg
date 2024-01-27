@@ -156,6 +156,22 @@ if !(magic /= %arg%)
 end
 %send% %actor% Only one person can perform the Chant of Magic at a time.
 ~
+#5149
+Library commands~
+2 c 0
+browse checkout shelve~
+* just passes through commands to the library command
+return 1
+if browse /= %cmd%
+  %force% %actor% library browse %arg%
+elseif checkout /= %cmd%
+  %force% %actor% library checkout %arg%
+elseif shelve /= %cmd%
+  %force% %actor% library shelve %arg%
+else
+  return 0
+end
+~
 #5156
 Swamp Platform~
 2 o 100
