@@ -1,3 +1,4 @@
+books/libraries
 channels/*
 !channels/index
 equipment.csv
