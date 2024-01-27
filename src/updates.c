@@ -4010,6 +4010,43 @@ void b5_174_library_and_author_update(void) {
 }
 
 
+// b5.174: new triggers on libraries
+void b5_174_library_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum LIBRARY_BUILDING = 5149;
+	any_vnum DRAGON_LIBRARY_BUILDING = 10926;
+	any_vnum LIBRARY_ROOM = 18895;
+	
+	any_vnum LIBRARY_TRIG_1 = 5149;
+	
+	if (!real_trigger(LIBRARY_TRIG_1)) {
+		log("- library update skipped because trig %d doesn't exist", LIBRARY_TRIG_1);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == LIBRARY_BUILDING || GET_BLD_VNUM(GET_BUILDING(room)) == DRAGON_LIBRARY_BUILDING || GET_BLD_VNUM(GET_BUILDING(room)) == LIBRARY_ROOM) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = LIBRARY_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+		
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d libraries", count);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4119,6 +4156,7 @@ const struct {
 	{ "b5.172a", b5_173_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
 	{ "b5.174", b5_174_config_change, NULL, "Copying newyear_message to world_reset_message if needed" },
 	{ "b5.174a", b5_174_library_and_author_update, NULL, "Renumbering stock book authors and saving updated library and book files" },
+	{ "b5.174b", b5_174_library_triggers, NULL, "Updating libraries with new triggers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
