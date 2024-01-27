@@ -104,7 +104,7 @@ A Torchlit Stone Circle~
 is well-worn, but completely dry. No rain seems to fall inside the circle, but
 it's coming down so hard everywhere else that you can barely see anything past
 the stones. The root path leads back to the rift from here, and there's also a
-small trail leading into the druid's tent.
+small trail leading into the Archweaver's tent.
 ~
 acgi k 0 10140
 D14
@@ -120,7 +120,7 @@ flat on the inside, and inscribed with pictographs you can't understand.
 ~
 E
 trail tent~
-   A small trail leads into a large leather tent, but the high druid is
+   A small trail leads into a large leather tent, but the Archweaver is
 watching you and won't let you go that way.
 ~
 M 0 10144 100.00 1
@@ -131,12 +131,12 @@ T 10157
 Z1 10
 S
 #10143
-The Head Druid's Tent~
-   You have managed to sneak into the druid's tent which, inexplicably, is
+The Archweaver's Tent~
+   You have managed to sneak into the elder mage's tent which, inexplicably, is
 larger on the inside. The outside of the tent looked like it was made from
 animal hides, but the inside is fine ironwood. Wooden shelves hold piles and
 piles of scrolled parchment. There's a writing desk and a wooden trunk, and a
-bed made from piled skins. But the rest of the druid's possessions are piled
+bed made from piled skins. But the rest of the weaver's possessions are piled
 haphazardly like a half-mad hoarder.
 Commands: &csearch&0
 ~

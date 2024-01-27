@@ -3,8 +3,8 @@ pod glowkra glowing vegetable~
 a glowkra pod~
 Someone has dropped a glowing vegetable.~
    It has a faint sky-blue glow, although not enough to light the way. This
-appears to be a magi-netically modified crop from the deranged druids of the
-Magiterranean.
+appears to be a magi-netically modified crop from the deranged manaweavers of
+the Magiterranean.
 ~
 6 C a 0 0 10
 1 0 0
@@ -26,7 +26,8 @@ A handful of glowkra pods are scattered on the ground.~
    The glowkra are a bright sky-blue fruit that seems to have a faint glow.
 You've heard they glow brighter when pickled. You also have a good recipe for
 seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
-This strange crop is surely the work of the mad druids of the Magiterranean.
+This strange crop is surely the work of the mad manaweavers of the
+Magiterranean.
 ~
 6 bC a 0 0 8
 12 10500 0
@@ -132,9 +133,9 @@ S
 spadebrush bundle~
 a bundle of spadebrush~
 A bundle of spadebrush is lying here.~
-   Spadebrush is a plant that has been magi-netically engineered by the druids
-of the Magiterranean to make handy spades for digging. If you get an axeroot,
-you can craft a combination tool - a spade-axe.
+   Spadebrush is a plant that has been magi-netically engineered by the mana-
+weavers of the Magiterranean to make handy spades for digging. If you get an
+axeroot, you can craft a combination tool - a spade-axe.
 
 Craft (requires Basic Crafts): spadebrush shovel
 ~
@@ -287,7 +288,7 @@ S
 basket mushrooms magic~
 a basket of magic mushrooms~
 A basket of magic mushrooms is sitting here.~
-   These mushrooms don't look terribly appetizing, but those druids sure were
+   These mushrooms don't look terribly appetizing, but those mages sure were
 growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
@@ -339,7 +340,7 @@ basket pudding figs~
 a basket of pudding figs~
 A basket of pudding figs is sitting on the ground.~
    These pudding figs seem to be the latest magi-netically modified fruit crop
-from the druids of the Magiterranean.
+from the manaweavers of the Magiterranean.
 
 Cook: figgy pudding
  2x basket of pudding figs
@@ -354,8 +355,8 @@ S
 pudding figgy~
 a figgy pudding~
 A figgy pudding has been left on the ground.~
-   This figgy pudding has the mystical smell of druidic herbs. Somehow, it's
-still warm and each bite reminds you of home.
+   This figgy pudding has the mystical smell of Magiterranean herbs. Somehow,
+it's still warm and each bite reminds you of home.
 ~
 6 0 a 0 0 3
 48 0 0
@@ -409,7 +410,7 @@ leaves dark gray grey axeroot~
 some axeroot leaves~
 Some dark gray leaves are lying here.~
    These dark gray leaves come from the axeroot plant, one of the many strange
-magi-netically modified plants collected by druids.
+magi-netically modified plants collected by manaweavers.
 ~
 6 C a 0 0 3
 6 0 0
@@ -439,8 +440,8 @@ chopper axeroot~
 an axeroot chopper~
 An axeroot chopper sticks up from the ground.~
    This trusty axe is made from a sharpened axeroot, one of the bizarre plants
-created by the druids of the Magiterranean in their magi-netically modified
-foods program.
+created by the manaweavers of the Magiterranean in their magi-netically
+modified foods program.
 ~
 1 0 an a 0 5
 0 5 2
@@ -458,7 +459,7 @@ a spade-axe~
 A spade-axe is sticking out of the ground.~
    This strange multi-tool is made from an axeroot and a spadebrush, and looks
 to be good for both chopping and digging. It's no wonder the Magiterranean
-druids have been magi-netically engineering new plants. This is useful!
+manaweavers have been magi-netically engineering new plants. This is useful!
 ~
 1 emo ano ao 0 9
 0 1 2
@@ -471,7 +472,7 @@ chowberries crunchy~
 some crunchy chowberries~
 Some chowberries are scattered on the ground.~
    This handful of berries is surprisingly crunchy. Surely this was thought up
-by some half-fiveleafed Magiterranean druid working late in the magi-netic
+by some half-fiveleafed Magiterranean manaweaver working late in the magi-netic
 engineering lab.
 ~
 6 C a 0 0 4
@@ -490,9 +491,9 @@ S
 pod puppy~
 a puppy pod~
 A puppy pod is sitting on the ground.~
-   The latest innovation from the Magiterranean druids, this magi-netically
-engineered puppy pod can be used to grow a furry friend. Grow your own best
-friend!
+   The latest innovation from the Magiterranean manaweavers, this
+magi-netically engineered puppy pod can be used to grow a furry friend. Grow
+your own best friend!
 Type 'use pod' to summon a temporary puppy pet.
 ~
 3 be a 0 0 3
@@ -521,7 +522,7 @@ fruit pickthorn red~
 a red pickthorn fruit~
 A pickthorn fruit is lying here.~
    This strange red fruit comes from the pickthorn plant, which was
-magi-netically engineered by a group of druids to grow natural tools.
+magi-netically engineered by a group of manaweavers to grow natural tools.
 ~
 6 b a 0 0 4
 6 10510 0
@@ -533,7 +534,7 @@ S
 stalk pickthorn~
 a pickthorn stalk~
 A pickthorn stalk seems planted here.~
-   The pickthorn is a plant magi-netically engineered by Magiterranean druids
+   The pickthorn is a plant magi-netically engineered by Magiterranean mages
 to grow useful tools on unused farmland.
 
 Craft (Basic Crafts): thorn pick
@@ -551,7 +552,7 @@ a thorn pick~
 A thorn pick is stuck into the ground.~
    This plant-based pick was made from a pickthorn plant, magi-netically
 modified from a woody desert plant into a temperate tool. What will those
-Magiterranean druids come up with next?
+Magiterranean manaweavers come up with next?
 ~
 1 0 an h 0 6
 0 3 8

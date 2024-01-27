@@ -316,12 +316,12 @@ end
 return 0
 ~
 #12651
-Grove 2.0: Druid death~
+Grove 2.0: Manaweaver death~
 0 f 100
 ~
 if %actor.on_quest(12650)%
   %quest% %actor% drop 12650
-  %send% %actor% You fail the quest Tranquility of the Grove for killing a druid.
+  %send% %actor% You fail the quest Tranquility of the Grove for killing a manaweaver.
   set fox %instance.mob(12676)%
   if %fox%
     %at% %fox.room% %load% mob 12677
@@ -672,7 +672,7 @@ nop %self.set_cooldown(12657, 30)%
 %dot% #12658 %actor% 100 30 physical
 ~
 #12659
-Faun Druid 2.0: Rejuvenate~
+Faun Shifter 2.0: Rejuvenate~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -684,7 +684,7 @@ eval amount (%level%/10) + 1
 dg_affect #12659 %self% HEAL-OVER-TIME %amount% 30
 ~
 #12660
-Grove Druid 2.0: Firebolt~
+Grove Manaweaver 2.0: Firebolt~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -714,7 +714,7 @@ mmove
 mmove
 ~
 #12662
-Squirrel Druid: Morph/Nibble~
+Squirrel Shifter: Morph/Nibble~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -735,7 +735,7 @@ else
 end
 ~
 #12663
-Badger Druid: Morph~
+Badger Shifter: Morph~
 0 k 50
 ~
 if %self.cooldown(12657)%
@@ -753,7 +753,7 @@ wait 1 sec
 %damage% %actor% 100 physical
 ~
 #12664
-Badger Druid: Earthen Claws~
+Badger Shifter: Earthen Claws~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -784,7 +784,7 @@ else
 end
 ~
 #12665
-Archdruid: Grand Fireball~
+Archweaver: Grand Fireball~
 0 k 50
 ~
 if %self.affect(12666)%
@@ -824,7 +824,7 @@ end
 %aoe% 75 fire
 ~
 #12666
-Archdruid: Ignite Weapon~
+Archweaver: Ignite Weapon~
 0 k 100
 ~
 if %self.affect(12666)%
@@ -841,7 +841,7 @@ wait 1 sec
 dg_affect #12666 %self% SLOW on 15
 ~
 #12667
-Crow Druid: Morph~
+Crow Shifter: Morph~
 0 k 50
 ~
 if %self.cooldown(12657)%
@@ -864,7 +864,7 @@ if %actor.id% == %id%
 end
 ~
 #12668
-Crow Druid: Squall~
+Crow Shifter: Squall~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -888,7 +888,7 @@ while %person%
 done
 ~
 #12669
-Turtle Druid: Morph~
+Turtle Shifter: Morph~
 0 k 50
 ~
 if %self.aff_flagged(IMMUNE-DAMAGE)% && %random.4% == 4
@@ -912,7 +912,7 @@ dg_affect #12669 %self% IMMUNE-DAMAGE on -1
 nop %self.add_mob_flag(NO-ATTACK)%
 ~
 #12670
-Turtle Druid: Riptide~
+Turtle Shifter: Riptide~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -947,7 +947,7 @@ done
 %echo% |%self% riptide dissipates.
 ~
 #12671
-Stomp turtle druid~
+Stomp turtle shifter~
 0 c 0
 stomp~
 if !%self.affect(12669)%
@@ -1077,11 +1077,11 @@ while %cycles_left% >= 0
       set done 1
       set vnum 12654
       while %vnum% <= 12657
-        set druid %instance.mob(%vnum%)%
-        if !%druid%
+        set mage %instance.mob(%vnum%)%
+        if !%mage%
           set done 0
         else
-          if !%druid.affect(12673)%
+          if !%mage.affect(12673)%
             set done 0
           end
         end
@@ -1097,7 +1097,7 @@ while %cycles_left% >= 0
             nop %person.give_currency(12650, 1)%
           end
           if %person.quest_finished(12650)%
-            %send% %person% You have tranquilized all four of the druid leaders.
+            %send% %person% You have tranquilized all four of the manaweaver leaders.
           end
         end
         set person %person.next_in_room%
@@ -1281,7 +1281,7 @@ else
 end
 ~
 #12679
-Druid spawner~
+Manaweaver spawner~
 1 n 100
 ~
 if %random.2% == 2
@@ -1307,12 +1307,12 @@ if !%arg%
 end
 if badger /= %arg%
   set target badger
-elseif druid /= %arg% || grove /= %arg%
-  set target druid
+elseif manaweaver /= %arg% || weaver /= %arg% || grove /= %arg% || shifter /= %arg%
+  set target manaweaver
 elseif wildling /= %arg% || ambusher /= %arg%
   set target wildling
-elseif archdruid /= %arg%
-  set target archdruid
+elseif archweaver /= %arg%
+  set target archweaver
 elseif crow /= %arg%
   set target crow
 elseif turtle /= %arg%
@@ -1348,7 +1348,7 @@ Grove 2.0 Quest Finish completes adventure~
 %adventurecomplete%
 ~
 #12683
-Grove Druid 2.0 Underwater: Water Blast~
+Grove Manaweaver 2.0 Underwater: Water Blast~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -1416,11 +1416,11 @@ if %success% && !%failure%
   set done 1
   set vnum 12654
   while %vnum% <= 12657
-    set druid %instance.mob(%vnum%)%
-    if !%druid%
+    set mage %instance.mob(%vnum%)%
+    if !%mage%
       set done 0
     else
-      if !%druid.affect(12673)%
+      if !%mage.affect(12673)%
         set done 0
       end
     end
@@ -1436,7 +1436,7 @@ if %success% && !%failure%
         nop %person.give_currency(12650, 1)%
       end
       if %person.quest_finished(12650)%
-        %send% %person% You have tranquilized all four of the druid leaders.
+        %send% %person% You have tranquilized all four of the manaweaver leaders.
       end
     end
     set person %person.next_in_room%

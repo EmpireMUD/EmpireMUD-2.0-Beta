@@ -446,7 +446,7 @@ if %new_mob%
 end
 ~
 #10225
-Druid greeting~
+Gardener greeting~
 0 g 100
 ~
 wait 5
@@ -461,7 +461,7 @@ wait 5
 %load% obj 10237 %actor% inv
 ~
 #10226
-Druid Offer~
+Gardener Offer~
 0 c 0
 offer~
 if (%actor.has_resources(3002,4)% && %actor.has_resources(3004,4)% && %actor.has_resources(3008,4)% && %actor.has_resources(3010,4)%)
@@ -981,8 +981,8 @@ elseif feathered /= %arg%
 elseif small /= %arg%
   set keyword small
   set target %instance.mob(10257)%
-elseif druid /= %arg%
-  set keyword druid
+elseif mage /= %arg%
+  set keyword mage
   set target %instance.mob(10258)%
 end
 * see if that keyword was already tracked here

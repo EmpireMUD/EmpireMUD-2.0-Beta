@@ -84,11 +84,11 @@ Z
 S
 #10144
 Monsoon: Spell Search~
-   This strange rift appears to lead to the Magiterranean, the plane of druids.
-Surely this is the source of the cacti that have been attacking people in the
-countryside. You draw a quick sketch of the rift and take some notes. Find a
-Tower of Sorcery, climb to the top, and type 'study monsoon' to look for a
-spell to seal the rift.
+   This strange rift appears to lead to the Magiterranean, the plane of natural
+magic. Surely this is the source of the cacti that have been attacking people
+in the countryside. You draw a quick sketch of the rift and take some notes.
+Find a Tower of Sorcery, climb to the top, and type 'study monsoon' to look for
+a spell to seal the rift.
 ~
 You found the spell to seal the rift!
 ~
@@ -170,14 +170,14 @@ Z
 S
 #10147
 Monsoon: Quench the Desert~
-   The druids have opened this monsoon rift to bring life-giving rain to the
+   The weavers have opened this monsoon rift to bring life-giving rain to the
 desert, but the chaotic Magiterranean stormclouds are impossible to control
 from this side. Travel back through the rift into your native plane, and use
 the monsoon chant to bring water to the thirsty desert.
    Use the command 'chant monsoon' to summon a storm cloud on 6 different
-desert map tiles, then return to the head druid inside the rift.
+desert map tiles, then return to the archweaver inside the rift.
 ~
-   You have brought the monsoon rains to part of the desert, and the head druid
+   You have brought the monsoon rains to part of the desert, and the archweaver
 thanks you for your service to nature. Thanks to your help, the thirsty desert
 plants have the water to survive another year. You can already see the rift
 beginning to close -- better hurry back out.
@@ -217,21 +217,21 @@ Z
 1 10144
 S
 #10150
-Monsoon: Dirt on the Druids~
-   The monsoon rift is causing a problem, and the Magiterranean druids are
-behind it. The head druid is protected by powerful magic, but a clever thief
-might be able to find the right leverage to convince the druids to move the
+Monsoon: Dirt on the Weavers~
+   The monsoon rift is causing a problem, and the Magiterranean weavers are
+behind it. The archweaver is protected by powerful magic, but a clever thief
+might be able to find the right leverage to convince the weavers to move the
 rift.
-   Head down the path and toward the stone circle, and infiltrate the head
-druid's tent. Once inside, use 'search' to find some incriminating evidence
-that could be used to blackmail the druids into closing this rift. Once you've
-found it, return to the thief.
+   Head down the path and toward the stone circle, and infiltrate the
+archweaver's tent. Once inside, use 'search' to find some incriminating
+evidence that could be used to blackmail the weavers into closing this rift.
+Once you've found it, return to the thief.
 ~
-   You give the druid's dirty laundry to the thief, who quickly determines that
-these robes actually belong to a city sorcerer. This is exactly the evidence
-needed to blackmail the druids. The thief bundles a note with a scrap of the
-laundry, ties them to a pigeon, and sends it off.
-   Within moments, the rift starts to close. Clearly the head druid got the
+   You give the weaver's dirty laundry to the thief, who quickly determines
+that these robes actually belong to a city sorcerer. This is exactly the
+evidence needed to blackmail the nature mages. The thief bundles a note with a
+scrap of the laundry, ties them to a pigeon, and sends it off.
+   Within moments, the rift starts to close. Clearly the archweaver got the
 message. You had better head out of the rift, before it collapses completely.
 ~
 11 cd 75 100 1440
@@ -265,7 +265,7 @@ W
 13 10143 0 1 a
 W+
 11 0 0 1 a
-Search the head druid's tent~
+Search the archweaver's tent~
 W
 2 10178 0 1 a
 Z
@@ -322,10 +322,10 @@ S
 #10156
 Monsoon: Enemy of the Sun~
    The pale man talks at length about the invasive plants conjured by the
-druids to attack the countryside. He describes the plants as soldiers of the
-sun, the natural enemy of vampires. A powerful vampire such as yourself could
-channel ancient blood magicks inside the Magiterranean rift, in order to cut
-off the source of the plants' power.
+nature mages to attack the countryside. He describes the plants as soldiers of
+the sun, the natural enemy of vampires. A powerful vampire such as yourself
+could channel ancient blood magicks inside the Magiterranean rift, in order to
+cut off the source of the plants' power.
    First, take this bat totem to an oasis and 'infuse totem' during the night,
 while the sun is down. Further instructions will be provided after you have
 completed the infusion. Infusing the totem will require some of your blood.

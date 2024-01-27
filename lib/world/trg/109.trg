@@ -1127,7 +1127,7 @@ set ritual_active 0
 remote ritual_active %self.id%
 ~
 #10989
-Rogue Druid: Morph Attack~
+Rogue Manaweaver: Morph Attack~
 0 k 33
 ~
 if %self.cooldown(10981)%
@@ -1155,7 +1155,7 @@ end
 %aoe% 25 physical
 ~
 #10990
-Rogue Druid: Dust Devil~
+Rogue Manaweaver: Dust Devil~
 0 k 50
 ~
 if %self.cooldown(10981)%
@@ -1204,7 +1204,7 @@ else
 end
 ~
 #10991
-Rogue Druid: Dust Cloud~
+Rogue Manaweaver: Dust Cloud~
 0 k 100
 ~
 if %self.cooldown(10981)%

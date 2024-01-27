@@ -17,76 +17,76 @@ I 4 10002 5.00 1  # LOOT: stag antlers
 T 10002
 S
 #10001
-druid grove hooded figure~
-a druid of the Grove~
+weaver mage grove hooded figure~
+a weaver of the Grove~
 A hooded figure is standing amongst the trees.
 ~
 0 0 abdvxzI c 3
 1 0 0 18 -1
 D
-   The druid is covered head-to-toe by a long brown robe, exposing only its
+   The mage is covered head-to-toe by a long brown robe, exposing only its
 face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 10.00 1  # LOOT: ring of the badger
-I 4 10004 25.00 1  # LOOT: staff of the grove druid
+I 4 10004 25.00 1  # LOOT: staff of the grove weaver
 T 10001
 T 10003
 S
 #10002
-faun druid hooded antlered tall~
+faun mage hooded antlered tall~
 a hooded faun~
-A tall, antlered druid stands beneath the canopy of trees.
+A tall, antlered mage stands beneath the canopy of trees.
 ~
 0 0 abdvxzI c 3
 2 0 0 16 -1
 D
-   The druid's hood has been pulled back to reveal strange, branching antlers
-that protrude from the druid's forehead. Whatever this druid is, she's not
+   The mage's hood has been pulled back to reveal strange, branching antlers
+that protrude from the mage's forehead. Whatever this mage is, she's not
 entirely human.
 ~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 100.00 1  # LOOT: stag antlers
 I 4 10003 10.00 1  # LOOT: ring of the badger
-I 4 10004 25.00 1  # LOOT: staff of the grove druid
+I 4 10004 25.00 1  # LOOT: staff of the grove weaver
 T 10001
 T 10003
 S
 #10003
-druid badger creature huge man~
-the badger druid~
+shifter mage badger creature huge man~
+the badger shifter~
 A huge creature - half man, half badger - looms over you!
 ~
 0 0 abdvzI cq 3
 1 0 0 10 -1
 D
-   The druid's brown robe is in tatters, barely clinging to the shoulders of
+   The mage's brown robe is in tatters, barely clinging to the shoulders of
 this half-man, half-badger creature.
 ~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 100.00 1  # LOOT: ring of the badger
-I 4 10004 25.00 1  # LOOT: staff of the grove druid
+I 4 10004 25.00 1  # LOOT: staff of the grove weaver
 T 10001
 T 10003
 S
 #10004
-druid archdruid #n~
-Archdruid #n~
-Archdruid #n seems to glow with the energy of the Grove!
+weaver archweaver #n~
+Archweaver #n~
+Archweaver #n seems to glow with the energy of the Grove!
 ~
 0 0 abdvxyI c 3
 2 3 0 20 -1
 D
-   The archdruid's brown robe is woven with strands of glimmering gold and
+   The archweaver's brown robe is woven with strands of glimmering gold and
 silver, which seem to pulse as she channels mana from the earth.
 ~
 I 4 10001 25.00 1  # LOOT: wild fire
 I 4 10002 5.00 1  # LOOT: stag antlers
 I 4 10003 5.00 1  # LOOT: ring of the badger
-I 4 10004 25.00 1  # LOOT: staff of the grove druid
+I 4 10004 25.00 1  # LOOT: staff of the grove weaver
 I 4 10005 75.00 1  # LOOT: belt of the Grove
 T 10000
 T 10001
