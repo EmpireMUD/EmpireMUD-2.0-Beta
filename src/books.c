@@ -572,7 +572,7 @@ void load_book_library_file(void) {
 	}
 	
 	// open library file? not fatal if missing -- just no existing libraries
-	if (!(fl = fopen(LIBRARY_FILE, "w"))) {
+	if (!(fl = fopen(LIBRARY_FILE, "r"))) {
 		log("No existing libraries found");
 		return;
 	}
@@ -606,6 +606,7 @@ void load_book_library_file(void) {
 		else {
 			log("Warning: Unexpected line '%s' in library file %s", line, LIBRARY_FILE);
 			// but not fatal
+			break;
 		}
 	}
 	
