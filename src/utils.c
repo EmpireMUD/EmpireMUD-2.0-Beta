@@ -4874,12 +4874,12 @@ char *CAP(char *txt) {
 * Converts a number of seconds (or minutes) from a large number to a 0:00
 * format (or 0:00:00 or even 0:00:00:00).
 *
-* @param int seconds How long the time is.
+* @param long seconds How long the time is.
 * @param bool minutes_instead if TRUE, the 'seconds' field is actually minutes and the time returned will be minutes as well.
 * @param char *unlimited_str If the time can be -1/UNLIMITED, returns this string instead (may be NULL).
 * @return char* The time string formatted with colons, or the "unlimited_str" if seconds was -1/UNLIMITED
 */
-char *colon_time(int seconds, bool minutes_instead, char *unlimited_str) {
+char *colon_time(long seconds, bool minutes_instead, char *unlimited_str) {
 	static char output[256];
 	int minutes, hours, days;
 	
@@ -4907,13 +4907,13 @@ char *colon_time(int seconds, bool minutes_instead, char *unlimited_str) {
 	seconds %= SECS_PER_REAL_MIN;
 	
 	if (days > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, (int)seconds);
 	}
 	else if (hours > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, (int)seconds);
 	}
 	else {
-		snprintf(output, sizeof(output), "%d:%02d", minutes, seconds);
+		snprintf(output, sizeof(output), "%d:%02d", minutes, (int)seconds);
 	}
 	
 	// if we started with minutes, shave the seconds off
@@ -6927,9 +6927,15 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (SHARED_DATA(room) == &ocean_shared_data) {
 		return;	// never on the ocean
 	}
-
+	
+	// hich icon?
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(room)), GET_SEASON(room));
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		}
 	}
 	
 	// did we find one
@@ -6971,7 +6977,12 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	}
 
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		if (SECT_FLAGGED(loc->sector_type, SECTF_CROP) && loc->crop_type && CROP_FLAGGED(loc->crop_type, CROPF_LOCK_ICON)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(loc->crop_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
 	}
 	
 	// did we find one
@@ -7085,6 +7096,9 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	}
 	
 	// things that make the room light
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room)) {
+		return TRUE;
+	}
 	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
 		return TRUE;	// not dark: has a light source
 	}

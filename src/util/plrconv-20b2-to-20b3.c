@@ -819,7 +819,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (!feof(ptOldHndl)) {
-		fread(&stOld, sizeof(struct b2_char_file_u), 1, ptOldHndl);
+		if (fread(&stOld, sizeof(struct b2_char_file_u), 1, ptOldHndl) < 1) {
+			printf("Failure reading file: %s\n", argv[1]);
+			exit(1);
+		}
 		
 		convert_char_file_u(&stNew, &stOld);
 

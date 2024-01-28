@@ -146,7 +146,6 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 void free_book(book_data *book) {
 	book_data *proto = book_proto(BOOK_VNUM(book));
 	struct paragraph_data *para;
-	struct library_data *libr, *next_libr;
 	
 	if (BOOK_TITLE(book) && (!proto || BOOK_TITLE(book) != BOOK_TITLE(proto))) {
 		free(BOOK_TITLE(book));
@@ -159,13 +158,6 @@ void free_book(book_data *book) {
 	}
 	if (BOOK_ITEM_DESC(book) && (!proto || BOOK_ITEM_DESC(book) != BOOK_ITEM_DESC(proto))) {
 		free(BOOK_ITEM_DESC(book));
-	}
-	
-	if (BOOK_IN_LIBRARIES(book) && (!proto || BOOK_IN_LIBRARIES(book) != BOOK_IN_LIBRARIES(proto))) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-			free(libr);
-		}
 	}
 	
 	if (BOOK_PARAGRAPHS(book) && (!proto || BOOK_PARAGRAPHS(book) != BOOK_PARAGRAPHS(proto))) {
@@ -222,6 +214,9 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 	}
 	
 	snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
+	
+	// pull it from the world
+	remove_book_from_all_libraries(vnum);
 		
 	// pull it from the hash FIRST
 	remove_book_from_table(book);
@@ -287,7 +282,6 @@ void save_olc_book(descriptor_data *desc) {
 	book_data *proto, *book = GET_OLC_BOOK(desc);
 	book_vnum vnum = GET_OLC_VNUM(desc);
 	struct paragraph_data *para;
-	struct library_data *libr;
 	UT_hash_handle hh;
 	int author_change = -1;
 	
@@ -342,18 +336,11 @@ void save_olc_book(descriptor_data *desc) {
 		add_book_author(BOOK_AUTHOR(book));
 	}
 	
-	// save library data and move over
-	libr = BOOK_IN_LIBRARIES(proto);
-	BOOK_IN_LIBRARIES(proto) = NULL;
-	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	*proto = *book;	// copy data
 	BOOK_VNUM(proto) = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore hash handle
-	
-	// restore libraries
-	BOOK_IN_LIBRARIES(proto) = libr;
 	
 	// and save to file
 	save_author_books(BOOK_AUTHOR(book));
@@ -386,9 +373,6 @@ book_data *setup_olc_book(book_data *input) {
 		BOOK_BYLINE(new) = BOOK_BYLINE(input) ? str_dup(BOOK_BYLINE(input)) : NULL;
 		BOOK_ITEM_NAME(new) = BOOK_ITEM_NAME(input) ? str_dup(BOOK_ITEM_NAME(input)) : NULL;
 		BOOK_ITEM_DESC(new) = BOOK_ITEM_DESC(input) ? str_dup(BOOK_ITEM_DESC(input)) : NULL;
-		
-		// don't need this
-		BOOK_IN_LIBRARIES(new) = NULL;
 		
 		BOOK_PARAGRAPHS(new) = NULL;
 		LL_FOREACH(BOOK_PARAGRAPHS(input), para) {

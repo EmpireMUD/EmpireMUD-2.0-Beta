@@ -707,8 +707,8 @@ telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
 Most depleted resources recover over time. In each tile, most of the depleted
-resources will return each year. However, mountains will ONLY replenish ore if
-you dismantle the mines on them completely before the end of the year.
+resources will return each reset cycle. However, mountains will ONLY replenish
+ore if you dismantle the mines on them completely before reset.
 
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves grow out of desert tiles at random. If you leave stumps behind
@@ -718,6 +718,7 @@ the copses will grow into full forests or groves.
 Some vehicles and buildings have their own depletions, separate from the
 location they are in.
 
+See also: WORLD RESET
 Immortals see also: OLC DEPLETION
 #
 DEXTERITY DEX
@@ -861,8 +862,8 @@ Newbie island crops:
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 Make sure you claim all your map tiles that have crops as unclaimed crops may
-vanish at the end of the year. Crops can be burnt to remove them, even when
-they're still growing.
+vanish on their own. Crops can be burnt to remove them, even when they're still
+growing.
 
 See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
    IRRIGATION
@@ -1294,6 +1295,7 @@ This command displays various statistics about this EmpireMUD.
 Options:
  configs: Shows how the game is configured.
  empires: Shows averages for the numbers used to compute empire scores.
+ time: Shows time left until events such as the next daily cycle.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
@@ -1702,7 +1704,7 @@ Strength is used for:
  - Increasing melee DPS (damage per second) from physical weapons.
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).
 
-See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
+See also: ATTRIBUTES, MELEE DPS
 #
 STUMPS COPSE COPPICE COPPICING
 
@@ -1757,9 +1759,9 @@ See also: BINDING
 This game has different time zones that depend on how far east or west you
 travel on the map. By default, the world has 24 time zones and wraps from east
 to west. The latest time zone is always the one that's furthest east, and is
-the time zone used for global events like the yearly reset.
+the time zone used for global events.
 
-See also: TIME, YEARLY RESET
+See also: TIME
 #
 TIP TIPS "TIP OF THE DAY" HINT
 
@@ -1954,23 +1956,27 @@ tier above that.
 
 Many different types of items and recipes appear as world drops.
 #
-"YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS"
+"WORLD RESET" "YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS" "DEPLETION RESET" "MINE RESET" "MAINTENANCE RESET" "RESET CYCLE" "MAINTENANCE CYCLE" "DEPLETION CYCLE"
 
-When the game world reaches a new year, there is an earthquake with the message
-'The ground under you shakes violently!' This causes a little damage to
-buildings and vehicles; they now require maintenance.
+The game periodically resets its mines and other depletions and dilapidates
+buildings and vehicles, which need maintenance. You can view the time left
+until the next reset by typing "mudstats time".
 
-This yearly reset also refreshes any mountain tile that no longer has a mine or
-other building on it, giving them a new type and fresh amount of ore. Other
-types of depletion, such as areas that have been dug until there's nothing left
-to dig up, refresh by 50% during the yearly reset -- even if there's still a
-building on them.
+This is accompanied by a message that 'The ground under you shakes violently!'
 
-The new year and earthquake happen at the end of December 30 and start of
-January 1 on the 'time' command in the latest time zone in the game. This means
-they may happen before the end of December 30 for many players.
+This reset only refreshes mountain tiles that no longer have a mine or other
+building on them, giving them a new type and fresh amount of ore.
 
-See also: MAINTAIN, TIME, TIME ZONE
+All other types of depletion, such as areas that have been dug until there's
+nothing left to dig up, refresh most of their resources during this reset, even
+if there's still a building on them.
+
+This reset was, in days past, linked to the game's calendar year and happened
+on December 30 or January 1, depending on your location in the world. Now, it
+happens on its own cycle (usually every 7.5 real days). However, it is still
+sometimes called the "yearly reset".
+
+See also: MAINTAIN, MUDSTATS, TIME, TIME ZONE
 #
 ZENITH "ZENITH PASSAGE" "SUN ZENITH"
 

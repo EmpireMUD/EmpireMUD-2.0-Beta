@@ -519,7 +519,7 @@ ADMIN_UTIL(util_bldconvert) {
 	// stuff to copy
 	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
 	int fame = 0, military = 0, max_dam = 0, extra_rooms = 0;
-	struct resource_data *yearly_maintenance = NULL;
+	struct resource_data *regular_maintenance = NULL;
 	struct interaction_item *interactions = NULL;
 	struct extra_descr_data *ex_descs = NULL;
 	struct bld_relation *relations = NULL;
@@ -630,8 +630,8 @@ ADMIN_UTIL(util_bldconvert) {
 		GET_BLD_DESIGNATE_FLAGS(to_bld) = NOBITS;
 		room_affs = GET_BLD_BASE_AFFECTS(to_bld);
 		GET_BLD_BASE_AFFECTS(to_bld) = NOBITS;
-		yearly_maintenance = GET_BLD_YEARLY_MAINTENANCE(to_bld);
-		GET_BLD_YEARLY_MAINTENANCE(to_bld) = NULL;
+		regular_maintenance = GET_BLD_REGULAR_MAINTENANCE(to_bld);
+		GET_BLD_REGULAR_MAINTENANCE(to_bld) = NULL;
 		
 		// flags that change
 		REMOVE_BIT(GET_BLD_FLAGS(to_bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES);
@@ -686,7 +686,7 @@ ADMIN_UTIL(util_bldconvert) {
 		spawns = copy_spawn_list(GET_BLD_SPAWNS(from_bld));
 		relations = copy_bld_relations(GET_BLD_RELATIONS(from_bld));
 		interactions = copy_interaction_list(GET_BLD_INTERACTIONS(from_bld));
-		yearly_maintenance = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(from_bld));
+		regular_maintenance = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(from_bld));
 		
 		// validate ruins
 		LL_FOREACH_SAFE(interactions, inter, next_inter) {
@@ -793,7 +793,7 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_RELATIONS(to_veh) = relations;
 		VEH_ROOM_AFFECTS(to_veh) = room_affs | ROOM_AFF_NO_WORKFORCE_EVOS;
 		VEH_SPAWNS(to_veh) = spawns;
-		VEH_YEARLY_MAINTENANCE(to_veh) = yearly_maintenance;
+		VEH_REGULAR_MAINTENANCE(to_veh) = regular_maintenance;
 		
 		if (room_affs) {
 			sprintbit(room_affs, room_aff_bits, buf, TRUE);
@@ -5178,7 +5178,7 @@ SHOW(show_uses) {
 				break;
 			}
 			
-			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
 				}
@@ -5301,7 +5301,7 @@ SHOW(show_uses) {
 				break;
 			}
 			
-			LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
 				}
@@ -6055,7 +6055,7 @@ SHOW(show_libraries) {
 	size_t size, count;
 	book_data *book;
 	room_data *room;
-	struct library_data *libr, *next_libr;
+	struct library_info *libr, *next_libr;
 	
 	one_word(argument, arg);
 	
@@ -6069,8 +6069,8 @@ SHOW(show_libraries) {
 		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (!(room = real_room(libr->location))) {
+		HASH_ITER(hh, library_table, libr, next_libr) {
+			if (!(room = real_room(libr->room))) {
 				continue;
 			}
 			
@@ -6110,7 +6110,7 @@ SHOW(show_lost_books) {
 	
 	count = 0;
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (BOOK_IN_LIBRARIES(book)) {
+		if (find_book_in_any_library(BOOK_VNUM(book))) {
 			continue;
 		}
 		
@@ -6490,7 +6490,7 @@ SHOW(show_spawns) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -6503,7 +6503,7 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
 				CAP(buf1);	// crop names are lowercase
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
@@ -6517,7 +6517,7 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -6530,7 +6530,7 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -6850,9 +6850,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		send_to_char(buf, ch);
 	}
 	
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
-		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
+		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), buf);
+		msg_to_char(ch, "Regular maintenance:\r\n%s", buf);
 	}
 	
 	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);

@@ -843,6 +843,7 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 * This runs once per mud hour to update all empire chores.
 */
 void chore_update(void) {
+	bool log_and_needs = FALSE;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_island *eisle, *next_eisle;
 	struct empire_needs *needs, *next_needs;
@@ -858,12 +859,19 @@ void chore_update(void) {
 			continue;
 		}
 		
+		// 1. check if it's my time for logs/needs
+		log_and_needs = (EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) + WORKFORCE_LOG_AND_NEEDS_CYCLE <= time(0));
+		
+		// 2. special sort to ensure they use things that will expire first
 		sort_einv_for_empire(emp, EINV_SORT_PERISHABLE);
 		
-		// update islands
-		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
-			// run needs and logs (8pm only)
-			if (main_time_info.hours == 20) {
+		// 3. update islands needs (once per 30 minutes)
+		if (log_and_needs) {
+			// reset needs time
+			EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) = time(0);
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
 				HASH_ITER(hh, eisle->needs, needs, next_needs) {
 					if (needs->needed > 0 && !EMPIRE_IMM_ONLY(emp)) {
@@ -876,15 +884,15 @@ void chore_update(void) {
 			}
 		}
 		
-		// run chores
+		// 4. free old log entries
+		free_workforce_where_log(&EMPIRE_WORKFORCE_WHERE_LOG(emp));
+		while ((wf_log = EMPIRE_WORKFORCE_LOG(emp))) {
+			EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
+			free(wf_log);
+		}
+		
+		// 5. run chores
 		if (EMPIRE_HAS_TECH(emp, TECH_WORKFORCE)) {
-			// free old log entries
-			free_workforce_where_log(&EMPIRE_WORKFORCE_WHERE_LOG(emp));
-			while ((wf_log = EMPIRE_WORKFORCE_LOG(emp))) {
-				EMPIRE_WORKFORCE_LOG(emp) = wf_log->next;
-				free(wf_log);
-			}
-			
 			// this uses a global next to avoid an issue where territory is freed mid-execution
 			global_next_territory_entry = NULL;
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
@@ -900,13 +908,13 @@ void chore_update(void) {
 			}
 			
 			read_vault(emp);
-			
-			// no longer need this -- free up the tracker
-			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 		}
 		
-		// report production now, only at 8pm, like needs
-		if (main_time_info.hours == 20) {
+		// 6. no longer need this -- free up the tracker, if it had one
+		ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
+		
+		// 7. report production once per 30 minutes
+		if (log_and_needs) {
 			report_workforce_production_log(emp);
 		}
 	}
@@ -2490,8 +2498,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					perform_change_sect(room, NULL, old_sect);
 					check_terrain_height(room);
 			
-					// we are keeping the original sect the same as it was; set the time to one game day
-					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
+					// we are keeping the original sect the same as it was; just update the timer
+					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (config_get_int("planting_workforce_timer") * SECS_PER_MUD_HOUR));
 					if (GET_MAP_LOC(room)) {
 						schedule_crop_growth(GET_MAP_LOC(room));
 					}
@@ -2532,8 +2540,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					perform_change_sect(room, NULL, old_sect);
 					check_terrain_height(room);
 			
-					// we are keeping the original sect the same as it was; set the time to one game day
-					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
+					// we are keeping the original sect the same as it was; just update the timer
+					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (config_get_int("planting_workforce_timer") * SECS_PER_MUD_HOUR));
 					if (GET_MAP_LOC(room)) {
 						schedule_crop_growth(GET_MAP_LOC(room));
 					}
@@ -2649,8 +2657,9 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 			act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		
 			// compute how many in order to put it out before it burns down (giving the mob an hour to spawn)
-			total_ticks = (int)(config_get_int("burn_down_time") / SECS_PER_MUD_HOUR) - 2;
+			total_ticks = (int)(get_burn_down_time_seconds(room) / SECS_PER_MUD_HOUR) - 2;
 			per_hour = ceil(config_get_int("fire_extinguish_value") / total_ticks) + 1;
+			per_hour = MAX(1, per_hour);	// for safety
 		
 			add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -per_hour);
 
@@ -2957,7 +2966,7 @@ void do_chore_prospecting(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_PROSPECTING, room, worker, 1, NOTHING, 0);
 			add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
 		
-			if (get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) < config_get_int("prospecting_workforce_hours")) {
+			if ((get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) * WORKFORCE_CYCLE) < (config_get_int("prospecting_workforce_hours") * SECS_PER_REAL_HOUR)) {
 				// still working: only send message if someone else is present (don't bother verifying it's a player)
 				if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
 					switch (number(0, 2)) {

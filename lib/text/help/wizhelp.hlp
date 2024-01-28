@@ -269,8 +269,8 @@ See also: GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 
-The 'evolve' utility is a separate program the EmpireMUD runs once per game
-day to update the map. This is normally silent, but will result in logs if
+The 'evolve' utility is a separate program the EmpireMUD runs once per 30
+minutes to update the map. This is normally silent, but will result in logs if
 you run it manually ('util evolve') or if the evolver fails to run.
 
 If not all of the evolver's suggested changes could be made, the most likely
@@ -571,6 +571,7 @@ Island flags:
  CONTINENT - Is a whole continent (affects adventure spawns)
  !CHART - Cannot be charted by players
  !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
+ ALWAYS-LIGHT - Outdoor tiles are lit at night
 
 See also: CHART, GRANT
 #d
@@ -647,15 +648,17 @@ NATURALIZE "NATURAL SECTOR"
 what that is by using 'stat room' on the map. It shows a display like this:
 Sector: [10 - Building], Base: [0 - Plains], Natural: [4 - Overgrown Forest]
 
-Newbie islands will naturalize their unclaimed tiles each year if the world
-config 'naturalize_newbie_islands' is turned on.
+Newbie islands will naturalize their unclaimed tiles each time depletions are
+reset (by default, this is every 7.5 real days) if the world config
+'naturalize_newbie_islands' is turned on. Check 'mudstats time' to see when
+that will be.
 
 The map editor can be used to naturalize a tile, island, or the whole world
 via '.map naturalize'.
 
 You can change a tile's (or island's) natural sector with '.map remember'.
 
-See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER
+See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER, MUDSTATS
 #d
 NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
 
@@ -1879,7 +1882,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
+ &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
  &cexportcsv&0 - Output a csv file with some game data.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cpathtest&0 - Test function for the pathfinding code.
@@ -1897,7 +1900,7 @@ Available utilities:
  &ctemperature&0 - Gives a temperature breakdown of the room. You can also
     give it any sun status or season to simulate those here (e.g. spring dark).
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
- &cyearly&0 - Runs a full annual update on the world.
+ &cyearly&0 - Runs a full maintenance/decay/newbie reset on the world.
 #d
 "UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
 

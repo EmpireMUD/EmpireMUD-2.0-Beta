@@ -220,8 +220,8 @@ Mines will only display as 'deep' if, thanks to this bonus, they have more ore
 than the normal maximum.
 
 Once you have started a mine on (or prospected) a given mountain tile, it will
-remain a deep mine unless the mountain is reset at the end of the year. For
-more information on mountain resets, see HELP MINE.
+remain a deep mine until the mountain is reset. For more information on
+mountain resets, see HELP MINE.
 
 See also: MINE, PROSPECT, RARE METALS
 #
@@ -319,7 +319,7 @@ dismantled when they are empty. However, workers will only dismantle it if the
 building chore is turned on as well. You can prevent dismantling of individual
 mines using the nodismantle command.
 
-Mines must be dismantled each year in order for the ore to refresh.
+Mines must be dismantled when empty in order for the ore to refresh.
 
 See also: NODISMANTLE, WORKFORCE
 #
@@ -602,8 +602,8 @@ that empire, the more even the exchange of money will be.
 The analyze command will show you which of your trading partners has the item
 available.
 
-An empire can only import 100 items per day total, and imports/exports run once
-per in-game day.
+An empire can only import 100 items at a time, and imports/exports run once per
+30 minutes.
 
 If you want to replace an entry with a new cost tolerance, you can "add" it
 again without removing it. It will replace the old entry.
@@ -1028,8 +1028,7 @@ The following mines can only be found if you have Rare Metals:
 - moonstone mine (1.5% chance)
 
 Once you have started a mine (or prospected) a given mountain tile, it will
-keep its current metal type unless the mountain is reset at the end of the
-year. For more information on mountain resets, see HELP MINE.
+keep its current metal type until the mountain is reset (see HELP MINE).
 
 See also: MINE, DEEP MINES, PROSPECT, METALS
 #

@@ -477,12 +477,12 @@ Vehicles (VEDIT):
 - The DRAGABLE flag always allows a vehicle to be dragged on land, never any
   other terrain.
 - A vehicle is effectively a chair if it has SIT but no movement flags.
-- Vehicles take 10% health damage each year ONLY if they require yearly
+- Vehicles take 10% health damage each weekly reset ONLY if they're set to need
   maintenance (or are incomplete). A vehicle with only 1 hitpoint won't last
   long.
 - When a vehicle takes at least 10% of its max hitpoints in damage, it will
-  also add 1 year's maintenance to its repair needs. If it has no yearly
-  maintenance set, it will add a "pouch of nails" instead.
+  also add 1 cycle's maintenance to its repair needs. If it has no maintenance
+  set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
 - You should generally avoid putting object storage on moving vehicles.
@@ -3734,7 +3734,7 @@ Intelligence + 1 damage. You can determine how many hitpoints to give a
 building based on this.
 
 If a building takes more than 10% of its hitpoints in damage from an attack,
-it will also need its yearly maintenance resources to be fixed.
+it will also need its regular maintenance resources to be fixed.
 
 Common hitpoint levels:
  house: 8-24
@@ -3743,7 +3743,7 @@ Common hitpoint levels:
  mountain building: 128
  adventure: 1000 (to discourage sieging)
 
-See also: BEDIT YEARLY MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
+See also: BEDIT RESOURCE MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -3867,30 +3867,30 @@ Available relationship types:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
+"BEDIT RESOURCES" "BEDIT REGULAR MAINTENANCE" "BEDIT YEARLY MAINTENANCE"
 
 Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
-This command adds materials to the building's "yearly maintenance" list. These
-are resources needed to maintain the building each year. If you don't set any,
-then the building does not require maintenance.
+This command adds materials to the building's regular maintenance list. These
+are resources needed to maintain the building each time depletions and
+maintenance are reset. If you don't set any, then the building does not require
+maintenance.
 
 This uses the ".resource" command to be consistent with other editors, but
 these are not the resources needed to build the vehicle in the first place --
 only to repair it.
 
 If a building takes damage from any source, and that damage is more than 10% of
-its hitpoints, it will also add the yearly-maintenance resources to the repair
-cost.
+its hitpoints, it will also add the maintenance resources to the repair cost.
 
-Buildings with only 1 hitpoint will never get their yearly maintenance cost, as
-even 1 year of decay will destroy them.
+Buildings with only 1 hitpoint will never get their maintenance cost, as even 1
+cycle of decay will destroy them.
 
-Note: Interior rooms do not normally require any yearly maintenance and don't
-take damage.
+Note: Interior rooms do not normally require any maintenance and don't take
+damage.
 
 See HELP OLC RESOURCES for more information.
 
@@ -4496,13 +4496,14 @@ Usage:  .flags [add | remove] <flags>
 Crop flags determine some various properties about crops.
 
 Available flags:
- REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
- ORCHARD - Use 'pick' and 'chop' interactions instead of 'harvest'
- !WILD - Won't spawn in the wild
- NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
- !NEWBIE - Does not spawn on newbie islands
- ANY-LISTED-CLIMATE - Only 1 of the climate flags must match to plant this.
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
+ &cREQUIRES-WATER&0 - Can only be planted within 4 tiles of fresh water
+ &cORCHARD&0 - Use 'pick' and 'chop' interactions instead of 'harvest'
+ &c!WILD&0 - Won't spawn in the wild
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands (can be planted anywhere)
+ &c!NEWBIE&0 - Does not spawn on newbie islands
+ &cANY-LISTED-CLIMATE&0 - Only 1 of the climate flags must match to plant this.
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cLOCK-ICON&0 - a random icon is chosen when the crop grows, and is kept
 
 See also: OLC CROPS
 #d
@@ -5658,7 +5659,7 @@ You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&
 The following commands are available:
  complete - Finishes the building you're standing in.
  convert2newbie - Converts an island's terrains to/from newbie terrains.
- decay - Performs 1 year of decay (building, trench) on the tile or vehicle.
+ decay - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
  deleteroom - Deletes the room you're standing in (interior rooms only).
@@ -5725,8 +5726,8 @@ See also: MAP OLC, ISLAND COMMAND
 
 Usage:  .map decay
 
-Performs 1 year of decay (building, trench, mine data) on the tile, as if the
-new year had just rolled over.
+Performs 1 cycle of decay (building, trench, mine data) on the tile, as if the
+depletion/maintenance cycle had just rolled over.
 
 See also: MAP OLC
 #d
@@ -5881,7 +5882,8 @@ Usage:  .map remember [island]
 
 This command will store the current sector of the map tile you're in (or the
 entire island you're on) as the "natural" sector. This can be used to change
-how a newbie island will be restored at the end of the year, for example.
+how a newbie island will be restored at the end of the depletion/maintenance
+cycle, for example.
 
 Building and adventure tiles are ignored during this command.
 
@@ -8271,7 +8273,7 @@ chore.
 
 The interaction's "quantity" is the depletion limit; workforce will produce the
 item 1 at a time. Depletions are slightly random; set this number 25% higher
-than the amount you want the player to get per year.
+than the amount you want the player to get per depletion cycle.
 
 All production on a single tile or building will share the same depletion
 counter unless you use the "-depletion <type>" option on each interaction. See
@@ -10559,8 +10561,8 @@ Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
 deal Intelligence + 1 damage. You can determine how many hitpoints to give a
 building based on this.
 
-Any damage over 10% of a vehicle's health will also add "1 year" of required
-maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
+Any damage over 10% of a vehicle's health will also add "1 cycle" of required
+maintenance to the vehicle (or nails, if the vehicle requires no regular work).
 The repair command can be used to restore hitpoints.
 
 Common hitpoint levels:
@@ -10571,7 +10573,7 @@ Common hitpoint levels:
  medium ship: 96
  large ship: 128
 
-See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
+See also: VEDIT RESOURCE MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
 "VEDIT ICON"
 
@@ -10698,27 +10700,27 @@ appropriate for vehicles.
 
 See also: OLC VEHICLES
 #d
-"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
+"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE" "VEDIT REGULAR MAINTENANCE"
 
 Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
-This command adds materials to the vehicle's "yearly maintenance" list. These
-are resources needed to maintain the vehicle each year. If you don't set any,
-then the vehicle does not require maintenance.
+This command adds materials to the vehicle's "regular maintenance" list. These
+are resources needed to maintain the vehicle after each depletion/maintenance
+cycle. If you don't set any, then the vehicle does not require maintenance.
 
 This uses the ".resource" command to be consistent with other editors, but
 these are not the resources needed to build the vehicle in the first place --
 only to repair it.
 
 If a vehicle takes damage from any source, and that damage is more than 10% of
-its hitpoints, it will also add the yearly-maintenance resources to the repair
+its hitpoints, it will also add the regular maintenance resources to the repair
 cost.
 
-Vehicles with only 1 hitpoint will never get their yearly maintenance cost, as
-even 1 year of decay will destroy them.
+Vehicles with only 1 hitpoint will never get their regular maintenance cost, as
+even 1 cycle of decay will destroy them.
 
 See HELP OLC RESOURCES for more information.
 

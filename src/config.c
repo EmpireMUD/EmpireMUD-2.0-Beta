@@ -52,6 +52,7 @@ void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
 // locals
+#define deprecated_config(set, name, type)	{ init_config((set), (name), (type), "deprecated: do not set"); init_config_flags((name), CONF_FLAG_DEPRECATED); }
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1829,7 +1830,6 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
 	init_config(CONFIG_GAME, "name_rules", CONFTYPE_LONG_STRING, "shown during creation");
 	init_config(CONFIG_GAME, "name_rules_lastname", CONFTYPE_LONG_STRING, "shown during creation for last names");
-	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
@@ -1852,19 +1852,22 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "harvest_timer", CONFTYPE_INT, "ticks to harvest a crop, modified by Dexterity");
 	init_config(CONFIG_ACTIONS, "mining_timer", CONFTYPE_INT, "weapon damage to mine 1 ore");
 	init_config(CONFIG_ACTIONS, "panning_timer", CONFTYPE_INT, "ticks to pan one time");
-	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in seconds; planting reduces it by half up to 3 times");
+	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in game hours; planting cuts it in half up to 3 times");
+	init_config(CONFIG_ACTIONS, "planting_workforce_timer", CONFTYPE_INT, "in game hours; how long crops take after workforce harvests them");
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile, normally");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion used by hunt, formerly by others");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
-	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "game hours for workforce to prospect 1 tile");
+	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "real hours for workforce to prospect 1 tile (shorter than world reset)");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_per_member", CONFTYPE_INT, "workforce resource cap per member");
+	init_config(CONFIG_ACTIONS, "world_reset_hours", CONFTYPE_INT, "how many real hours between resets for depletions and empire maintenance");
+	init_config(CONFIG_ACTIONS, "world_reset_message", CONFTYPE_SHORT_STRING, "shown to all players before the laggy reset of depletions and empire maintenance");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
@@ -2022,13 +2025,12 @@ void init_config_system(void) {
 	init_config(CONFIG_SYSTEM, "log_losing_descriptor_without_char", CONFTYPE_BOOL, "somewhat spammy disconnect logs");
 
 	// trade
-	init_config(CONFIG_TRADE, "imports_per_day", CONFTYPE_INT, "how many max items an empire will import per day");
+	init_config(CONFIG_TRADE, "imports_per_day", CONFTYPE_INT, "how many max items an empire will import per 30 minute cycle");
 	init_config(CONFIG_TRADE, "trading_post_max_hours", CONFTYPE_INT, "how long a trade can be posted for");
 	init_config(CONFIG_TRADE, "trading_post_days_to_timeout", CONFTYPE_INT, "number of days to log in and collect");
 	init_config(CONFIG_TRADE, "trading_post_fee", CONFTYPE_DOUBLE, "% cut of the sale price");
 	
 	// war
-	init_config(CONFIG_WAR, "burn_down_time", CONFTYPE_INT, "seconds it takes to burn down a building");
 	init_config(CONFIG_WAR, "fire_extinguish_value", CONFTYPE_INT, "douse this value and the fire goes out");
 	init_config(CONFIG_WAR, "pvp_timer", CONFTYPE_INT, "minutes from when you shut off pvp flag, until it's off");
 	init_config(CONFIG_WAR, "stolen_object_timer", CONFTYPE_INT, "minutes an object is considered stolen");
@@ -2056,7 +2058,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "default_interior", CONFTYPE_INT, "building room vnum to use for designate");
 		init_config_custom("default_interior", config_show_building, config_edit_building, NULL);
 	init_config(CONFIG_WORLD, "water_crop_distance", CONFTYPE_INT, "distance at which a crop marked requires-water can be planted from one");
-	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature each year");
+	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature when depletions reset");
 	init_config(CONFIG_WORLD, "naturalize_unclaimable", CONFTYPE_BOOL, "if true, naturalize/remember will also work on unclaimable tiles");
 	init_config(CONFIG_WORLD, "nearby_sector_distance", CONFTYPE_INT, "distance for the near-sector evolution");
 	init_config(CONFIG_WORLD, "ignore_island_levels", CONFTYPE_BOOL, "instancer will ignore island levels when spawning adventures");
@@ -2078,46 +2080,29 @@ void init_config_system(void) {
 		init_config_custom("default_adventure_sect", config_show_sector, config_edit_sector, NULL);
 	init_config(CONFIG_WORLD, "default_land_sect", CONFTYPE_INT, "vnum of sector for basic land");
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
-	
+
 	// deprecated configs: no longer used/shown
-	init_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
-		init_config_flags("chop_depletion", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
-		init_config_flags("garden_depletion", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
-		init_config_flags("gather_depletion", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "deprecated: set depletions on interactions directly");
-		init_config_flags("pick_depletion", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("max_chore_resource_skilled", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT, "deprecated; was # of 5-minute updates for initial tavern brew");
-		init_config_flags("tavern_brew_time", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "deprecated; was # of 5-minute updates for tavern resource cost");
-		init_config_flags("tavern_timer", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("trench_full_value", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("bonus_city_point_techs", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("bonus_city_point_wealth", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("land_per_tech", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
-		init_config_flags("land_per_wealth", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
-		init_config_flags("potion_apply_per_100", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
-		init_config_flags("potion_heal_scale", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
-		init_config_flags("generic_facing", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
-		init_config_flags("arctic_percent", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
-		init_config_flags("tropics_percent", CONF_FLAG_DEPRECATED);
-	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
-		init_config_flags("ocean_pool_size", CONF_FLAG_DEPRECATED);
+	deprecated_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING);
+	deprecated_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "tavern_brew_time", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT);
+	deprecated_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT);
+	deprecated_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT);
+	deprecated_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT);
+	deprecated_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT);
+	deprecated_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE);
+	deprecated_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE);
+	deprecated_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE);
+	deprecated_config(CONFIG_WAR, "burn_down_time", CONFTYPE_INT);
+	deprecated_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR);
+	deprecated_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE);
+	deprecated_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE);
+	deprecated_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT);
 
 	// last
 	load_config_system_from_file();

@@ -3175,7 +3175,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// 25, no-basic-storage
 	"",	// seeded
 	"",	// important
-	"lasts longer when stored",
+	"",	// long-timer-in-storage
 	"",	// no-warehouse
 	"\n"
 };
@@ -3968,6 +3968,7 @@ const char *crop_flags[] = {
 	"!NEWBIE",
 	"ANY-LISTED-CLIMATE",	// 5
 	"NO-GLOBAL-SPAWNS",
+	"LOCK-ICON",
 	"\n"
 };
 
@@ -4253,6 +4254,7 @@ const char *island_bits[] = {
 	"*",	// has-custom-desc (internal use only)
 	"!CHART",	// 5
 	"!TEMPERATURE-PENALTIES",
+	"ALWAYS-LIGHT",
 	"\n"
 };
 

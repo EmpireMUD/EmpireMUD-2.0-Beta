@@ -84,6 +84,7 @@ void link_and_check_vehicles();
 void load_automessages();
 void load_banned();
 void load_binary_map_file();
+void load_book_library_file();
 void load_daily_quest_file();
 void load_empire_storage();
 void load_global_history();
@@ -377,6 +378,10 @@ void boot_db(void) {
 	init_config_system();
 	init_inherent_player_techs();
 	
+	// ensure time configurations are valid
+	assert(SECS_PER_MUD_HOUR >= SECS_PER_REAL_UPDATE);
+	assert((SECS_PER_MUD_HOUR % SECS_PER_REAL_UPDATE) == 0);
+	
 	log("Loading game data system.");
 	load_data_table();
 	
@@ -408,6 +413,9 @@ void boot_db(void) {
 
 	log("Loading fight messages.");
 	load_fight_messages();
+	
+	log("Loading book libraries.");
+	load_book_library_file();
 	
 	log("Loading trading post.");
 	load_trading_post();
@@ -611,7 +619,7 @@ void boot_world(void) {
 	log("Loading quests.");
 	index_boot(DB_BOOT_QST);
 	
-	log("Loading books into libraries.");
+	log("Loading books.");
 	index_boot(DB_BOOT_BOOKS);
 	
 	log("Loading adventures.");

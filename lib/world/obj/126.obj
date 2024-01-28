@@ -301,7 +301,7 @@ S
 corpse drowned interloper~
 the corpse of a drowned interloper~
 A drowned corpse floats in front of you, held in place by a long root.~
-It looks like this interloper messed with the wrong druids.
+It looks like this interloper messed with the wrong mages.
 ~
 3 0 0 0 0 1
 0 0 0
@@ -460,11 +460,11 @@ C
 0 75
 S
 #12667
-robes grove druids~
-robes of the Grove druids~
-The robes of the Grove druids are lying here.~
-   These layered brown robes are the sort worn by the druids of the Grove of
-the Magiterranean.
+robes grove weavers~
+robes of the Grove weavers~
+The robes of the Grove weavers are lying here.~
+   These layered brown robes are the sort worn by the manaweavers of the Grove
+of the Magiterranean.
 ~
 2 p ad 0 0 4
 0 0 0
@@ -473,7 +473,7 @@ C
 75 75
 M
 12
-The druid $n stands before you in heavy brown robes.~
+The manaweaver $n stands before you in heavy brown robes.~
 S
 #12668
 trap wildling tiny~
@@ -556,9 +556,9 @@ Your breath is here, and it is breathtaking.~
 T 12675
 S
 #12677
-oil jar snake druid~
-oil of the snake druid~
-A jar of oil of the snake druid is lying here.~
+oil jar snake shifter~
+oil of the snake shifter~
+A jar of oil of the snake shifter is lying here.~
    This tiny jar of oil is just enough to polish one item. When used on any of
 the rings, belts, or gloves from the Grove of the Magiterranean, this oil
 permanently enhances the item.
@@ -583,9 +583,9 @@ Use 'seek grove' to find the nearest Magiterranean: The Grove adventure.
 T 12678
 S
 #12679
-spawner druid~
-a druid~
-A druid spawner is here.~
+spawner manaweaver~
+a manaweaver~
+A manaweaver spawner is here.~
 ~
 3 0 0 0 0 3
 0 0 0
@@ -609,7 +609,7 @@ C
 1 1
 M
 4
-You munch away at the grove mix, wistfully remembering how you saved the druids of the Grove.~
+You munch away at the grove mix, wistfully remembering how you saved the mages of the Grove.~
 S
 #12682
 mix grove pocketful~
@@ -628,7 +628,7 @@ C
 1 1
 M
 4
-You weep as you eat the grove mix, remembering all those druids you killed.~
+You weep as you eat the grove mix, remembering all those manaweavers you killed.~
 S
 #12684
 seedling golden~

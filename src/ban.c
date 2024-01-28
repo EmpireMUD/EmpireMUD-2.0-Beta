@@ -158,9 +158,10 @@ ACMD(do_ban) {
 
 	CREATE(ban_node, struct ban_list_element, 1);
 	strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
-	for (nextchar = ban_node->site; *nextchar; nextchar++)
-		*nextchar = LOWER(*nextchar);
 	ban_node->site[BANNED_SITE_LENGTH] = '\0';
+	for (nextchar = ban_node->site; *nextchar; nextchar++) {
+		*nextchar = LOWER(*nextchar);
+	}
 	strncpy(ban_node->name, GET_NAME(ch), MAX_NAME_LENGTH);
 	ban_node->name[MAX_NAME_LENGTH] = '\0';
 	ban_node->date = time(0);

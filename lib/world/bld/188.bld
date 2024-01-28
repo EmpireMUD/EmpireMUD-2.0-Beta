@@ -219,7 +219,7 @@ The Library~
 1 0 a 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    The east wing of the mansion is a rather impressive library, filled to the
 ceiling with books. However, each time you pick up a book, you find it written
@@ -244,6 +244,7 @@ F
 l
 M
 18895 100.00 0
+T 5149
 S
 #18896
 Gallery~

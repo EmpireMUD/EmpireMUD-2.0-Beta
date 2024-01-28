@@ -291,14 +291,14 @@ T 10149
 T 10143
 S
 #10144
-druid head #n~
-Head Druid #n~
-Head Druid #n stands at the center of the circle, protected by powerful magic.
+archweaver weaver #n~
+Archweaver #n~
+Archweaver #n stands at the center of the circle, protected by powerful magic.
 ~
 0 0 bdL n 3
 0 2 0 15 -1
 D
-   Robed in brown and with an air of superiority, the druid seems to think they
+   Robed in brown and with an air of superiority, the mage seems to think they
 are the master of the monsoon. It certainly seems to have bent to their will.
 ~
 T 18258

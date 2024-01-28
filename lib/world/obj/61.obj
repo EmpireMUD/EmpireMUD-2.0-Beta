@@ -472,12 +472,14 @@ some spice~
 Some spice is sprinkled here.~
 This fragrant spice is hard to identify.
 ~
-3 0 a 0 0 2
+3 0 a 0 0 3
 0 0 0
 0 0
 C
 1 1
 O+ 1 6183
+R
+4 12102 0
 S
 #6184
 herb~

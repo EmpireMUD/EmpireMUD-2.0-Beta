@@ -373,8 +373,6 @@ void weather_and_time(void) {
 * Advances time by an hour and triggers things which happen on specific hours.
 */
 void another_hour(void) {
-	long lny;
-	
 	// update main time
 	++main_time_info.hours;
 	if (main_time_info.hours > 23) {
@@ -394,44 +392,28 @@ void another_hour(void) {
 			if (main_time_info.month > 11) {
 				main_time_info.month = 0;
 				++main_time_info.year;
-				
-				// run annual update
-				annual_world_update();
-			}
-		}
-		else {	// not day 30
-			// check if we've missed a new year recently
-			lny = data_get_long(DATA_LAST_NEW_YEAR);
-			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
-				annual_world_update();
 			}
 		}
 	}
 	
-	// hour-based updates
+	// hour-based updates: everything was removed from here to decouple it from the length of game hours
 	switch (main_time_info.hours) {
-		case 0: {	// midnight
-			run_external_evolutions();
+		case 0: {	// midnight - evolver now runs on a 30-minute cycle
 			break;
 		}
-		case 1: {	// 1am shipment
-			process_shipping();
+		case 1: {	// 1am shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 7: {	// 7am shipment
-			process_shipping();
+		case 7: {	// 7am shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 12: {	// noon
-			process_imports();
+		case 12: {	// noon - imports now run on a 30-minute cycle
 			break;
 		}
-		case 13: {	// 1pm shipment
-			process_shipping();
+		case 13: {	// 1pm shipment	- now just runs on a 10-minute cycle
 			break;
 		}
-		case 19: {	// 7pm shipment
-			process_shipping();
+		case 19: {	// 7pm shipment	- now just runs on a 10-minute cycle
 			break;
 		}
 	}

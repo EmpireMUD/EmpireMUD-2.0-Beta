@@ -468,8 +468,8 @@ token fruit wooden~
 a wooden fruit token~
 A wooden fruit token has been dropped here.~
    It's a wooden token with a picture of some fruits. The back is carved with
-the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.
+the symbol of the Magiterranean, the hidden world of natural magic. When you
+have all three tokens, type 'combine tokens'.
 ~
 3 kp a 0 0 1
 0 0 0
@@ -480,8 +480,8 @@ token grain copper~
 a copper grain token~
 A copper grain token is lying here.~
    It's a copper token with wheat stamped on one side. The back is carved with
-the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.
+the symbol of the Magiterranean, the hidden world of natural magic. When you
+have all three tokens, type 'combine tokens'.
 ~
 3 kp a 0 0 1
 0 0 0
@@ -492,8 +492,8 @@ token silver tradegoods~
 a silver tradegoods token~
 A silver tradegoods token is lying here.~
    It's a silver token with a merchant ship etched into one side. The back is
-carved with the symbol of the Magiterranean, the hidden world of druids. When
-you have all three tokens, type 'combine tokens'.
+carved with the symbol of the Magiterranean, the hidden world of natural magic.
+When you have all three tokens, type 'combine tokens'.
 ~
 3 kp a 0 0 1
 0 0 0
@@ -514,8 +514,8 @@ Hidden Garden adventure area.
 T 10236
 S
 #10237
-list first druid's~
-the druid's first list~
+list first gardener's~
+the gardener's first list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -524,15 +524,15 @@ It appears to be a list, scribbled quickly in green ink:
   4x bag of cherries
   4x sack of oranges
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
 3 k a 0 0 1
 0 0 0
 0 0
 S
 #10238
-list second druid's~
-the druid's second list~
+list second gardener's~
+the gardener's second list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -541,15 +541,15 @@ It appears to be a list, scribbled quickly in green ink:
   4x sack of rice
   4x sack of barley
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
 3 k a 0 0 1
 0 0 0
 0 0
 S
 #10239
-list druid's third~
-the druid's third list~
+list gardener's third~
+the gardener's third list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -558,7 +558,7 @@ It appears to be a list, scribbled quickly in green ink:
   4x basket of squash
   4x basket of olives
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
 3 k a 0 0 2
 0 0 0

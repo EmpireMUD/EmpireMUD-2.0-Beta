@@ -84,6 +84,7 @@ void show_map_stats(void) {
 void load_map(const char *filename) {
 	struct map_file_header header;
 	FILE *fl;
+	size_t read;
 	
 	// in case it's called twice
 	if (loaded_map) {
@@ -95,7 +96,11 @@ void load_map(const char *filename) {
 		exit(1);
 	}
 	
-	fread(&header, sizeof(struct map_file_header), 1, fl);
+	read = fread(&header, sizeof(struct map_file_header), 1, fl);
+	if (read < 1) {
+		fprintf(stdout, "Failure reading map header.\n");
+		exit(1);
+	}
 	fprintf(stdout, "Reading map file '%s': version %d, size %dx%d\n", filename, header.version, header.width, header.height);
 	map_width = header.width;
 	map_height = header.height;
@@ -106,7 +111,12 @@ void load_map(const char *filename) {
 	}
 	
 	CREATE(loaded_map, map_file_data, header.width * header.height);
-	fread(loaded_map, sizeof(map_file_data), header.width * header.height, fl);
+	read = fread(loaded_map, sizeof(map_file_data), header.width * header.height, fl);
+	
+	if (read < header.width * header.height) {
+		fprintf(stdout, "Failure reading map: %zu bytes read; expecting %d.\n", read, header.width * header.height);
+		exit(1);
+	}
 	
 	fclose(fl);
 }

@@ -912,7 +912,7 @@ The Tavern~
 10 0 pR 0
 0 0 0 220
 C
-inventory, retrieve, store~
+buy, list, inventory, retrieve, store, price~
 D
    Business is roaring at all hours as serfs and nobles alike pull up stools
 to drink, play cards, laugh, and brawl. The building is wooden, but most of the
@@ -950,6 +950,7 @@ R
 R
 6790 1 1 0
 T 5138
+T 5141
 Z1 2
 S
 #5139
@@ -1023,7 +1024,7 @@ A Stone Henge~
 128 4 d 0
 0 0 0 -1
 C
-chant druids~
+chant magic~
 E
 henge stone building around monument~
    As you approach the ancient henge, you can feel the weight of history and
@@ -1200,7 +1201,7 @@ A Grand Library~
 24 10 R 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    You take a step and are immersed in a musty swirl of dust. Stacks of books
 taller than your house are piled in oak bookshelves set against marble walls
@@ -1217,6 +1218,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5149
 S
 #5150
 High Temple~

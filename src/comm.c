@@ -70,6 +70,7 @@ char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
 void check_idle_menu_users();
+void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
@@ -77,6 +78,8 @@ void display_automessages();
 void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
 void process_import_evolutions();
+void process_imports();
+void process_shipping();
 void process_theft_logs();
 void real_update();
 void reduce_city_overages();
@@ -93,6 +96,7 @@ void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
 void write_binary_world_index_updates();
+void write_book_library_file();
 void write_mapout_updates();
 void write_running_events_file();
 
@@ -811,6 +815,7 @@ void heartbeat(unsigned long heart_pulse) {
 	static int mins_since_crashsave = 0;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
+	#define HEARTBEAT_OFFSET(x,y)	!(((int)(heart_pulse + ((y) * PASSES_PER_SEC))) % ((int)((x) * PASSES_PER_SEC)))
 	
 	// switch which of these is commented if you want timestamp logging:
 	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
@@ -873,7 +878,7 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("9")
 	}
 	
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		process_theft_logs();
 		HEARTBEAT_LOG("10")
 	}
@@ -882,9 +887,13 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("11")
 	}
 	
-	// 12 was moved up (weather_and_time)
+	if (HEARTBEAT(10 * SECS_PER_REAL_MIN)) {
+		process_shipping();
+		HEARTBEAT_LOG("12")
+	}
 	
-	if (HEARTBEAT(WORKFORCE_CYCLE)) {
+	if (HEARTBEAT_OFFSET(WORKFORCE_CYCLE, 1)) {
+		// runs just off of the cycle, to space it out when it's the same as the hour cycle
 		chore_update();
 		HEARTBEAT_LOG("13")
 	}
@@ -901,9 +910,7 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		reset_instances();
 		HEARTBEAT_LOG("16")
-	}
-
-	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		
 		update_reboot();
 		HEARTBEAT_LOG("17")
 		
@@ -931,8 +938,14 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
+		run_external_evolutions();
+		HEARTBEAT_LOG("22.5")
+		
 		reduce_outside_territory();
 		HEARTBEAT_LOG("23")
+		
+		process_imports();
+		HEARTBEAT_LOG("23.5")
 	}
 	
 	if (HEARTBEAT(2 * SECS_PER_REAL_MIN)) {
@@ -946,6 +959,11 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		update_trading_post();
 		HEARTBEAT_LOG("26")
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		check_maintenance_and_depletion_reset();
+		HEARTBEAT_LOG("26.5")
 	}
 	
 	if (HEARTBEAT(1)) {
@@ -976,7 +994,13 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("32")
 	}
 	
-	// this goes roughly last -- update MSDP users
+	// check library updates
+	if (book_library_file_needs_save) {
+		write_book_library_file();
+		HEARTBEAT_LOG("33")
+	}
+	
+	// this goes roughly last -- update MSDP users etc
 	if (HEARTBEAT(1)) {
 		msdp_update();
 		HEARTBEAT_LOG("34")

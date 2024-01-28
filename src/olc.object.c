@@ -683,7 +683,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
-		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
+		found |= remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related object", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
@@ -872,7 +872,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
+		found = remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(veh), RES_OBJECT, vnum);
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_OBJ, vnum);
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related object", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -936,7 +936,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
-			found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
+			found |= remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
@@ -1077,7 +1077,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
+			found = remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
 			found |= delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_OBJ, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used on the vehicle you're editing was deleted.\r\n");
@@ -1429,7 +1429,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
-		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+		for (res = GET_BLD_REGULAR_MAINTENANCE(bld); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1652,7 +1652,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+		for (res = VEH_REGULAR_MAINTENANCE(veh); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;

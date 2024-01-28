@@ -35,7 +35,8 @@ A newbie island usually needs these things:
       NEWBIE  - enables newbie adventures and protections
       !AGGRO  - prevents aggro mobs from attacking players
       !CUSTOMIZE  - prevents players from renaming the island
-      !TEMPERATURE-PENALTIES - if you plan to have penalties turned on
+      !TEMPERATURE-PENALTIES  - if you plan to have penalties turned on
+      ALWAYS-LIGHT  - much easier to learn the game without darkness
  4. Goto the newbie island and convert terrains: .map convert2newbie confirm
 
 Some adventures need some setup:
@@ -60,7 +61,7 @@ Some adventures need some setup:
 Additional tools:
  - 'show startlocs' - Lists the starting locations.
  - 'config world naturalize_newbie_islands true' - If you want to automatically
-   clean up the newbie islands each year.
+   clean up the newbie islands each time maintenance and depletions are reset.
 
 
 ==================

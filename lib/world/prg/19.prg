@@ -1,8 +1,10 @@
 #1900
-Henge Construction~
-   Like the druids of old, your empire has learned to construct henges from
-megalithic stones. These henges can be used to learn the secrets of the druids
-and the path of Natural Magic.
+Mysteries in the Shadow of Henge~
+   No one knows why the ancients built the first henges, but they have become
+an enduring symbol of the mysteries that lie beneath the surface of the world.
+Now, your empire has learned to construct these monumental henges from
+megalithic stone. In the shadow of these henges, you can learn the secrets of
+Natural Magic and follow the path of the manaweavers.
    The henge requires 120x (large blocks).
 ~
 4 1 50 0 b

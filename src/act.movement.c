@@ -2819,7 +2819,7 @@ ACMD(do_run) {
 	long long time_check = -1;
 	room_data *path_to_room;
 	char *found_path = NULL;
-	int dir, dist = -1;
+	int dir = NO_DIR, dist = -1;
 	bool dir_only;
 
 	skip_run_filler(&argument);

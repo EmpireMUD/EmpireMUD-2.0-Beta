@@ -678,7 +678,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
-		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+		for (res = GET_BLD_REGULAR_MAINTENANCE(bld); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
@@ -841,7 +841,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+		for (res = VEH_REGULAR_MAINTENANCE(veh); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
@@ -1491,7 +1491,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), res_type, vnum)) {
+		if (remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(bld), res_type, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted maintenance generic", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -1647,7 +1647,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
+		if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(veh), res_type, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted maintenance generic", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -1683,7 +1683,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), res_type, vnum)) {
+			if (remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(GET_OLC_BUILDING(desc)), res_type, vnum)) {
 				msg_to_char(desc->character, "One of the resources used in the building you're editing was deleted.\r\n");
 			}
 		}
@@ -1809,7 +1809,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
+			if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
 				msg_to_char(desc->character, "One of the resources used for maintenance for the vehicle you're editing was deleted.\r\n");
 			}
 		}

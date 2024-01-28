@@ -859,7 +859,9 @@ void read_from_file(void *buffer, int size, long filepos) {
 	}
 
 	fseek(mail_file, filepos, SEEK_SET);
-	fread(buffer, size, 1, mail_file);
+	if (fread(buffer, size, 1, mail_file) < 1) {
+		printf("SYSERR: Unable to read mail file '%s'.\r\n", MAIL_FILE);
+	}
 	fclose(mail_file);
 	return;
 }
@@ -1544,13 +1546,21 @@ int main(int argc, char *argv[]) {
 	
 	// first determine top account
 	while (!feof(ptOldHndl)) {
-		fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl);
-		top_account_id = MAX(top_account_id, stOld.player_specials_saved.account_id);
+		if (fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl) > 0) {
+			top_account_id = MAX(top_account_id, stOld.player_specials_saved.account_id);
+		}
+		else {
+			printf("Failure reading file: lib/etc/players\n");
+			exit(1);
+		}
 	}
 	rewind(ptOldHndl);
 	
 	while (!feof(ptOldHndl)) {
-		fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl);
+		if (fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl) > 0) {
+			printf("Failure reading file: lib/etc/players\n");
+			exit(1);
+		}
 		convert_char(&stOld);
 		
 		// log progress to screen

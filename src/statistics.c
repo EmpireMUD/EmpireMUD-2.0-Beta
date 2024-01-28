@@ -214,6 +214,9 @@ void mudstats_configs(char_data *ch, char *argument) {
 	}
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
+	// time
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year\r\n", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
+	
 	// skills
 	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
 	
@@ -314,6 +317,43 @@ void mudstats_empires(char_data *ch, char *argument) {
 	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
 		msg_to_char(ch, " %s: %d\r\n", score_type[iter], (int) empire_score_average[iter]);
+	}
+}
+
+
+/**
+* do_mudstats: time until certain events
+*
+* @param char_data *ch Person to show it to.
+* @param char *argument In case some stats have sub-categories.
+*/
+void mudstats_time(char_data *ch, char *argument) {
+	char output[MAX_STRING_LENGTH * 2];
+	long when;
+	
+	// start output
+	snprintf(output, sizeof(output), "Time until:\r\n");
+	
+	// daily reset
+	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: imminent\r\n");
+	}
+	
+	// maintenance cycle
+	when = (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR)) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): imminent\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 }
 

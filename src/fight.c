@@ -194,6 +194,33 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 
 
 /**
+* Gets the burn-down time, in seconds, for a building. This is never less than
+* 1 game hour or 1 workforce cycle (whichever is longer).
+*
+* @param room_data *room The room (building location).
+* @return int How long it takes to burn down.
+*/
+int get_burn_down_time_seconds(room_data *room) {
+	int seconds = 0;
+	
+	room = HOME_ROOM(room);
+	
+	if (COMPLEX_DATA(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		// 1 hour per 4 hitpoints on the building
+		seconds = (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) - BUILDING_DAMAGE(room)) * SECS_PER_MUD_HOUR / 4;
+	}
+	
+	// never less than an hour
+	seconds = MAX(seconds, SECS_PER_MUD_HOUR);
+	
+	// or less than a workforce cycle
+	seconds = MAX(seconds, WORKFORCE_CYCLE);
+	
+	return seconds;
+}
+
+
+/**
 * Determines what TYPE_ a character is actually using.
 * 
 * @param char_data *ch The character attacking.
@@ -1781,7 +1808,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL, NULL) != 0) {
 		// slow effect (1 mud hour)
-		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, SECS_PER_MUD_HOUR, AFF_SLOW, ch);
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, SECS_PER_REAL_MIN, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
 		
 		// distraction effect (5 sec)
@@ -2834,7 +2861,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			// apply needed maintenance if we did more than 10% damage
 			if (GET_BUILDING(to_room) && !IS_DISMANTLING(to_room) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
 				old_list = GET_BUILDING_RESOURCES(to_room);
-				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
+				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
 				free_resource_list(old_list);
 			}
 		
@@ -2920,7 +2947,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		// apply needed maintenance if we did more than 10% damage
 		if ((damage >= (VEH_MAX_HEALTH(veh) / 10) || !VEH_NEEDS_RESOURCES(veh)) && !VEH_IS_DISMANTLING(veh)) {
 			old_list = VEH_NEEDS_RESOURCES(veh);
-			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_REGULAR_MAINTENANCE(veh) ? VEH_REGULAR_MAINTENANCE(veh) : default_res);
 			free_resource_list(old_list);
 		}
 		

@@ -29,12 +29,142 @@ if !%room.down(room)%
 end
 detach 5138 %room.id%
 ~
+#5139
+Bartender: List drinks from empire inventory~
+0 c 0
+list~
+set empire %self.empire%
+set room %self.room%
+set cost %room.var(tavern_cost,50)%
+return 1
+*
+* basic checks
+if identify /= %arg%
+  %send% %actor% You can't use list-identify here.
+  halt
+elseif !%empire%
+  %send% %actor% There's nothing available here.
+  halt
+end
+*
+* otherwise show what's available
+%send% %actor% Available to buy by the barrel for %cost% %empire.adjective% coins:
+set any 0
+if %empire.has_storage(232,%room%)%
+  %send% %actor% &&0  ale
+  set any 1
+end
+if %empire.has_storage(233,%room%)%
+  %send% %actor% &&0  lager
+  set any 1
+end
+if %empire.has_storage(234,%room%)%
+  %send% %actor% &&0  wheat beer
+  set any 1
+end
+if %empire.has_storage(235,%room%)%
+  %send% %actor% &&0  cider
+  set any 1
+end
+if %empire.has_storage(236,%room%)%
+  %send% %actor% &&0  mead
+  set any 1
+end
+if !%any%
+  %send% %actor% &&0  nothing
+end
+~
+#5140
+Bartender: Buy drink from empire inventory~
+0 c 0
+buy~
+set empire %self.empire%
+set room %self.room%
+set cost %room.var(tavern_cost,50)%
+return 1
+*
+* basic checks
+if !%empire%
+  %send% %actor% There's nothing available here.
+  halt
+elseif !%arg%
+  return 0
+  halt
+elseif ale /= %arg%
+  set vnum 232
+elseif lager /= %arg%
+  set vnum 233
+elseif wheat beer /= %arg% || beer /= %arg%
+  set vnum 234
+elseif cider /= %arg%
+  set vnum 235
+elseif mead /= %arg%
+  set vnum 236
+else
+  %send% %actor% They don't seem to have that on tap.
+  halt
+end
+*
+* found drink... now advanced checks
+if %empire.has_storage(%vnum%,%room%)% < 1
+  %send% %actor% They don't seem to have any.
+  halt
+elseif !%actor.can_afford(%cost%)%
+  %send% %actor% You can't afford the cost.
+  halt
+end
+*
+* charge and load
+set money %actor.charge_coins(%cost%)%
+nop %empire.give_coins(%cost%)%
+%load% einv %vnum% %empire% %actor% inv
+set obj %actor.inventory%
+if %obj.vnum% == %vnum%
+  %send% %actor% You buy @%obj% for %money%.
+  %echoaround% %actor% ~%actor% buys @%obj%.
+end
+~
+#5141
+Tavern: Charge a differnet price~
+2 c 0
+price~
+set empire %self.empire%
+set cost %room.var(tavern_cost,50)%
+eval val %arg% + 0
+return 1
+if !%arg%
+  if %cost% != 1
+    set coins coins
+  else
+    set coins coin
+  end
+  %send% %actor% The tavern charges %cost% %empire.adjective% %coins%.
+elseif %actor.is_npc%
+  %send% %actor% You can't do that.
+elseif !%empire%
+  %send% %actor% The tavern must be claimed for you to set the price.
+elseif %empire% != %actor.empire%
+  %send% %actor% You don't own the tavern; you can't set the price.
+elseif %arg% != 0 && %val% < 1
+  %send% %actor% You can't set the price to that.
+else
+  set tavern_cost %val%
+  remote tavern_cost %room.id%
+  if %val% != 1
+    set coins coins
+  else
+    set coins coin
+  end
+  %send% %actor% You set the price to %val% %empire.adjective% %coins%.
+  %echoaround% %actor% ~%actor% sets the price to %val% %empire.adjective% %coins%.
+end
+~
 #5142
-Chant of Druids (gain natural magic at a henge)~
+Chant of Magic (gain natural magic at a henge)~
 2 c 0
 chant~
-* Chant of Druids gains the player their 1st point of natural magic
-if !(druids /= %arg%)
+* Chant of Magic gains the player their 1st point of natural magic
+if !(magic /= %arg%)
   return 0
   halt
 end
@@ -47,7 +177,7 @@ if !%actor.canuseroom_guest%
   halt
 end
 if !%room.in_city(true)% && %room.bld_flagged(IN-CITY-ONLY)%
-  %send% %actor% You can't perform the chant of druids because the building isn't in a city.
+  %send% %actor% You can't perform the chant of magic because the building isn't in a city.
   halt
 end
 if %actor.fighting% || %actor.disabled%
@@ -76,64 +206,63 @@ while %cycles_left% >= 0
   * messaging
   switch %cycles_left%
     case 13
-      %send% %actor% You start the chant of druids...
-      %echoaround% %actor% ~%actor% starts the chant of druids...
+      %send% %actor% You start the Chant of Magic in the shadow of the henge...
+      %echoaround% %actor% ~%actor% starts the Chant of Magic beneath the henge...
     break
     case 12
-      %send% %actor% You dance around the henge...
-      %echoaround% %actor% ~%actor% dances around the henge...
+      %send% %actor% You chant, 'Feel the mana stir within, a whisper of the earth's embrace,' as you walk in and out of the henge...
+      %echoaround% %actor% ~%actor% chants, 'Feel the mana stir within, a whisper of the earth's embrace,' as &%actor% walks in and out of the henge...
     break
     case 11
-      %send% %actor% You recite the chant of druids as best you can...
-      %echoaround% %actor% ~%actor% recites the chant of druids...
+      %send% %actor% You chant, 'Raise your hands to the sky, beckoning the energies untold.'
+      %echoaround% %actor% ~%actor% chants, 'Raise your hands to the sky, beckoning the energies untold.'
     break
     case 10
-      %send% %actor% You chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You chant, 'Step lightly, dance with the winds, as nature's rhythm unfolds.'
+      %echoaround% %actor% ~%actor% chants, 'Step lightly, dance with the winds, as nature's rhythm unfolds.'
     break
     case 9
-      %send% %actor% Your voice falters as you try to remember all the words to the chant...
-      %echoaround% %actor% ~%actor% recites the chant of druids to the best of ^%actor% ability...
+      %send% %actor% Your voice falters as you chant, 'In every leaf, in every breeze, the mana's secret stories reside.'
+      %echoaround% %actor% ~%actor%'s voice falters as &%actor% chants, 'In every leaf, in every breeze, the mana's secret stories reside.'
     break
     case 8
-      %send% %actor% You hum and chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% hums and chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You dance across the henge, chanting, 'Embrace the essence, become one with the ebb and flow.'
+      %echoaround% %actor% ~%actor% dances across the henge, chanting, 'Embrace the essence, become one with the ebb and flow.'
     break
     case 7
-      %send% %actor% You begin the second verse of the chant of druids...
-      %echoaround% %actor% ~%actor% begins the second verse of the chant of druids...
+      %send% %actor% You look up, saying, 'Chant softly, words that echo in the language of the land.'
+      %echoaround% %actor% ~%actor% looks up, saying, 'Chant softly, words that echo in the language of the land.'
     break
     case 6
-      %send% %actor% You make percussion noises with your mouth between lines of the chant...
-      %echoaround% %actor% ~%actor% makes percussion noises with ^%actor% mouth...
+      %send% %actor% You chants, 'Sense the currents, weave the threads, as mana responds to your command.'
+      %echoaround% %actor% ~%actor% chants, 'Sense the currents, weave the threads, as mana responds to your command.'
     break
     case 5
-      %send% %actor% You reach the chorus and recite the chant of druids loudly...
-      %echoaround% %actor% ~%actor% recites the chant of druids as loud as &%actor% can...
+      %echo% The henge seems to hum, resonating with |%actor% footsteps.
     break
     case 4
-      %send% %actor% You chant as you dance in and out of the henge's ring...
-      %echoaround% %actor% ~%actor% chants as &%actor% dances in and out of the henge's ring...
+      %send% %actor% You chant, 'In this dance of mana, the path to magic unfolds.'
+      %echoaround% %actor% ~%actor% chants, 'In this dance of mana, the path to magic unfolds.'
     break
     case 3
-      %send% %actor% You chant the final verse of the chant of druids...
-      %echoaround% %actor% ~%actor% chants the final verse of the chant of druids...
+      %send% %actor% You fall into the grass beneath the henge as colors swirl around you...
+      %echoaround% %actor% ~%actor% falls into the grass beneath the henge...
     break
     case 2
-      %send% %actor% You spin in place, waving your arms as you near the end of the chant of druids...
-      %echoaround% %actor% ~%actor% spins in place, waving ^%actor% arms up and down as &%actor% chants...
+      %send% %actor% The sun rises and sets and rises and sets above you as the stars act out a strange play...
+      %echoaround% %actor% ~%actor% stares up at the sky...
     break
     case 1
-      %send% %actor% You collapse in the center of the henge, exhausted from the chant.
-      %echoaround% %actor% ~%actor% collapses in the center of the henge.
+      %send% %actor% The fragrant aroma of the world's colors fades from your eyes, but not your mind, as you slowly climb to your feet.
+      %echoaround% %actor% ~%actor% slowly climbs to ^%actor% feet.
     break
     case 0
       * chant complete
       if %actor.skill(Natural Magic)% < 1
-        %send% %actor% &&gAs you finish the chant, you begin to see the weave of mana through nature...&&0
+        %send% %actor% &&gAs you finish the chant, you finally to see the weave of mana through nature...&&0
         nop %actor.gain_skill(Natural Magic,1)%
         if %actor.skill(Natural Magic)% < 1
-          %send% %actor% But you fail to grasp the concepts of the chant of druids (you cannot gain Natural Magic skill).
+          %send% %actor% But you fail to grasp the concepts of the Chant of Magic (you cannot gain Natural Magic skill).
         end
       else
         %send% %actor% You finish the chant.
@@ -148,14 +277,30 @@ while %cycles_left% >= 0
 done
 ~
 #5143
-Chant of Druids 2nd person (denial)~
+Chant of Magics 2nd person (denial)~
 2 c 0
 chant~
-if !(druids /= %arg%)
+if !(magic /= %arg%)
   return 0
   halt
 end
-%send% %actor% Only one person can perform the chant of druids at a time.
+%send% %actor% Only one person can perform the Chant of Magic at a time.
+~
+#5149
+Library commands~
+2 c 0
+browse checkout shelve~
+* just passes through commands to the library command
+return 1
+if browse /= %cmd%
+  %force% %actor% library browse %arg%
+elseif checkout /= %cmd%
+  %force% %actor% library checkout %arg%
+elseif shelve /= %cmd%
+  %force% %actor% library shelve %arg%
+else
+  return 0
+end
 ~
 #5156
 Swamp Platform~
