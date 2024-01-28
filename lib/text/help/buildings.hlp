@@ -1201,10 +1201,15 @@ Tavern building (To the Tavern When the Job's Done goal)
 
 Building:  [TT]  Tavern
 Temperature:  milder than outside
+Stored here:  barrels of alcohol
 
 The tavern is a great gathering place for you and your citizens, and may offer
 the occasional quest, as well. The empire's workforce will craft ale and other
 drinks in wooden barrels from hops, barley, and other ingredients.
+
+The tavern will sell barrels of ale, lager, wheat, cider, or mead, if any are
+available in storage. You can set the price with the 'price' command in the
+tavern.
 
 Basic brews workforce will make:
  barrel of ale: wooden barrel, 5x sack of barley, 5x bushel of hops
