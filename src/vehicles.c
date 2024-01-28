@@ -44,6 +44,8 @@ const char *default_vehicle_keywords = "vehicle unnamed";
 const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
+#define UNAPPLIED_ISLAND  -2	// distinct from NO_ISLAND to prevent re-applying a vehicle to NO_ISLAND
+
 // local protos
 void clear_vehicle(vehicle_data *veh);
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
@@ -2561,14 +2563,16 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 * @param vehicle_data *veh The vehicle.
 */
 void unapply_vehicle_to_island(vehicle_data *veh) {
-	if (veh && VEH_APPLIED_TO_ISLAND(veh) != NO_ISLAND) {
-		// un-apply tech
-		apply_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
-		
-		// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
-		
-		// and clear the data
-		VEH_APPLIED_TO_ISLAND(veh) = NO_ISLAND;
+	if (veh) {
+		if (VEH_APPLIED_TO_ISLAND(veh) != UNAPPLIED_ISLAND) {
+			// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
+			
+			// un-apply tech -- do it before removing from the island
+			apply_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
+			
+			// and clear the data
+			VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
+		}
 	}
 }
 
@@ -3045,7 +3049,7 @@ void clear_vehicle(vehicle_data *veh) {
 	VEH_CONSTRUCTION_ID(veh) = NOTHING;
 	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
-	VEH_APPLIED_TO_ISLAND(veh) = NO_ISLAND;
+	VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
 }
 
 
