@@ -1731,6 +1731,8 @@ static inline int GET_SEASON(room_data *room) {
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_APPLIED_TO_ISLAND(veh)  ((veh)->applied_to_island)
+#define VEH_APPLIED_TO_ROOM(veh)  ((veh)->applied_to_room)
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
@@ -2635,6 +2637,8 @@ void update_world_count();
 
 // vehicles.c
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+void apply_vehicle_to_island(vehicle_data *veh, int island_id);
+void apply_vehicle_to_room(vehicle_data *veh, room_data *room);
 bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
@@ -2666,6 +2670,8 @@ void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room, empire_data *for_empire);
 int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire);
 int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp);
+void unapply_vehicle_to_island(vehicle_data *veh);
+void unapply_vehicle_to_room(vehicle_data *veh);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);

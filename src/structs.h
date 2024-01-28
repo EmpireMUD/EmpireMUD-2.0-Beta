@@ -6303,6 +6303,10 @@ struct vehicle_data {
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	
+	// this helps with updating vehicles when they change rooms/islands
+	room_data *applied_to_room;	// room its traits were applied to, if any
+	int applied_to_island;	// island its traits were applied to (by id), if any
+	
 	// lists
 	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
 	struct vehicle_data *prev_in_room, *next_in_room;	// ROOM_VEHICLES(room) doubly-linked list
